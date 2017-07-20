@@ -10,7 +10,7 @@ DApps development, deployment and execution on iExec offchain computing platform
 
 ## XtremWeb-HEP
 
-[XtremWeb-HEP (_XWHEP_)](https://github.com/lodygens/xtremweb-hep) is an open source middleware proposed by [CNRS](http://www.cnrs.fr) and [INRIA](https://www.inria.fr).
+[XtremWeb-HEP (_XWHEP_)](https://github.com/lodygens/xtremweb-hep) is an open source middleware jointly developped by [CNRS](http://www.cnrs.fr) and [INRIA](https://www.inria.fr).
 It permits to build a cloud over a set of volunteer computing resources, based on peer to peer services and protocols.
 
 iExec uses XWHEP to deploy a decentralized computing paltform. iExec packages the XWHEP client to ease Dapps developper work.
