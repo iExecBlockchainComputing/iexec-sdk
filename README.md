@@ -48,7 +48,7 @@ Apple PackageMaker must be installed.
 ```
  /Applications/PackageMaker.app/Contents/MacOS/PackageMaker \
        -d installers/xwhep/10.5.2/installers/macosx/xwhep.client/installer/xwhep-client.pmdoc \
-       -o installers/xwhep/10.5.2/installers/macosx/xwhep.client/installer/xwhep-client-$VERSION.mpkg
+       -o installers/xwhep/10.5.2/installers/macosx/xwhep.client/installer/xwhep-client-10.5.2.mpkg
 
 ```
 
