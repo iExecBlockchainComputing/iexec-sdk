@@ -26,6 +26,7 @@ Install XWHEP client
 ====================
 
 The client comes in three different packages: Redhat, Debian and Apple Package.
+We provide no Windows package.
 
 RedHat
 ------
