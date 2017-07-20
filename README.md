@@ -17,7 +17,7 @@ iExec uses XWHEP to deploy a decentralized computing paltform. iExec packages th
 
 ## iExec oracle:
 
-iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bridging-the-real-world-to-the-blockchain-ca97c2fc3e6c) to securely link blockchain iand computing worlds:
+iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bridging-the-real-world-to-the-blockchain-ca97c2fc3e6c) to securely link blockchain and computing worlds:
    * the blockchain smart contract ensure security and payment;
    * the bridge to link blockchain and XtremWeb-HEP.
 
