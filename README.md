@@ -12,9 +12,9 @@ XtremWeb-HEP
 ============
 
 [XtremWeb-HEP (_XWHEP_)](https://github.com/lodygens/xtremweb-hep) is an open source middleware conjointly developped by [CNRS](http://www.cnrs.fr) and [INRIA](https://www.inria.fr).
-It permits to build a cloud over a set of volunteer computing resources, based on peer to peer services and protocols.
+It permits to build a cloud over a set of volunteer computing resources, based on peer to peer services and protocols. XWHEP is the middleware iExec uses to deploy a decentralized cloud.
 
-iExec uses XWHEP to deploy a decentralized computing paltform. iExec packages the XWHEP client to ease Dapps developper work.
+iExec packages the XWHEP client to ease Dapps developper work.
 
 
 ## Install XWHEP client
