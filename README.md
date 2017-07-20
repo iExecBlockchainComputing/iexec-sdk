@@ -6,7 +6,7 @@ This packages all needed tools to develop, deploy and execute Dapps.
 Dapp management
 ===============
 
-DApps development, deployment and execution on iExec offchain computing platform requires two packages: the client of the offchain computing middleware and the iExec blockchain oracle.
+DApps development, deployment and execution on iExec offchain computing platform requires two packages: the [client](#XtremWeb-HEP) of the offchain computing middleware and the [iExec blockchain oracle](#iExec Oracle).
 
 ## XtremWeb-HEP
 
