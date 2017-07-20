@@ -1,0 +1,247 @@
+#!/bin/sh
+
+# Copyrights     : CNRS
+# Author         : Oleg Lodygensky
+# Acknowledgment : XtremWeb-HEP is based on XtremWeb 1.8.0 by inria : http://www.xtremweb.net/
+# Web            : http://www.xtremweb-hep.org
+# 
+#      This file is part of XtremWeb-HEP.
+#
+#    XtremWeb-HEP is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    XtremWeb-HEP is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with XtremWeb-HEP.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+
+
+#
+#
+# File    : xtremweb.jra2
+# Date    : Novembre 26th, 2008
+# Purpose : This starts/stops xtremweb jra2 daemon
+# Params  : [start | stop | restart]
+#
+
+# chkconfig: 345 99 99
+# description: XWHEP DesktopGrid brigde element
+
+
+#
+# This is the PERL script to launch
+#
+PERLSCRIPTNAME="xtremweb.jra2.pl"
+
+#
+# If 1, this uses SU to launch the service under a given identity
+#  (XWUSER in xtremwebconf.sh)
+#
+SUDO=1
+
+
+######################################################
+# This starts xtremweb bridge part as daemon
+# return : 0 on success
+#          3 if already running
+######################################################
+start () {
+    if [ ! -f $PIFILE ] ; then
+        echo "$PROG is already running"
+        return
+    fi
+
+    if [ -f $LOGFILE ]; then
+        mv -f $LOGFILE $LOGBAKFILE
+    fi
+    touch $LOGFILE
+    chown $XWUSER $LOGFILE
+
+
+    echo "`date` [`uname -n` $PROG] INFO : starting $PROG" >> $LOGFILE
+
+    #
+    # Try to determine SU usage...
+    #
+    SU=""
+    MINUS=""
+    if [ $SUDO -eq 1 ]; then
+	su -l $XWUSER -c exit > /dev/null  2>& 1
+	if ( [ $? -eq 0 ] ); then
+            SU="su - -l $XWUSER"
+	else
+            su $XWUSER -c exit - > /dev/null  2>&1
+            if ( [ $? -eq 0 ] ); then
+		SU="su - $XWUSER"
+		MINUS=" -"
+            else
+		echo "Can't determine SU usage :("
+		echo "`date` [`uname -n` $PROG] ERROR : can't find SU usage" >> $LOGFILE
+		return $ERRUSER
+            fi
+	fi
+    fi
+
+
+    #
+    # Try to determine default shell for user $XWUSER
+    #
+    
+    USHELL="unknown"
+    [ -x /bin/ksh  ] && USHELL="/bin/ksh"
+    [ -x /bin/zsh  ] && USHELL="/bin/zsh"
+    [ -x /bin/csh  ] && USHELL="/bin/csh"
+    [ -x /bin/tcsh ] && USHELL="/bin/tcsh"
+    [ -x /bin/sh   ] && USHELL="/bin/sh"
+    [ -x /bin/bash ] && USHELL="/bin/bash"
+
+
+    [ $SUDO -eq 1 ] && SU="$SU -s $USHELL -c"
+    
+    case $USHELL in
+        "/bin/sh"|"/bin/bash"|"/bin/ksh"|"/bin/zsh" )
+	    if [ $SUDO -eq 1 ]; then
+		echo "$SU $ROOTDIR/bin/$PERLSCRIPTNAME $* >> $LOGFILE 2>&1 & $MINUS" >> $LOGFILE
+		$SU "$ROOTDIR/bin/$PERLSCRIPTNAME *$ >> $LOGFILE 2>&1 & $MINUS"
+	    else
+		echo "$ROOTDIR/bin/$PERLSCRIPTNAME *$ >> $LOGFILE 2>&1 &" >> $LOGFILE
+		`$ROOTDIR/bin/$PERLSCRIPTNAME $* >> $LOGFILE 2>&1 &`
+	    fi
+            ;;
+        "/bin/csh"|"/bin/tcsh" )
+	    if [ $SUDO -eq 1 ]; then
+		echo "$SU $ROOTDIR/bin/$PERLSCRIPTNAME $* >>& $LOGFILE & $MINUS"  >> $LOGFILE
+		$SU "$ROOTDIR/bin/$PERLSCRIPTNAME $* >>& $LOGFILE & $MINUS"
+	    else
+		echo "$ROOTDIR/bin/$PERLSCRIPTNAME $* >>& $LOGFILE &"  >> $LOGFILE
+		`$ROOTDIR/bin/$PERLSCRIPTNAME $* >>& $LOGFILE &`
+	    fi
+            ;;
+        "unknown" )
+            echo "Can't find any shell :("
+	    echo "`date` [`uname -n` $PROG] ERROR : can't find any shell" >> $LOGFILE
+            return $ERRUSER
+            ;;
+    esac
+    
+    PID=`ps auxwww | grep $PERLSCRIPTNAME | grep $XWUSER | grep -v grep | sed "s/[[:space:]][[:space:]]*/ /g" | cut -d " " -f 2`
+
+    if [ "X$PID" = "X" ] ; then
+        echo "$PROG : launch error"
+	echo "`date` [`uname -n` $PROG] ERROR : launch error" >> $LOGFILE
+        return $ERRSTATE
+    fi
+
+    [ "X$LOGGERLEVEL" = "Xdebug" ] && echo "$PID  => $PIDFILE"
+    echo $PID > $PIDFILE
+    echo "`date` [`uname -n` $PROG] INFO : $PROG started" >> $LOGFILE
+    echo "$PROG started"
+}
+
+
+######################################################
+# This stops xtremweb part
+# return : 0 on success
+#          3 if not running
+######################################################
+stop(){
+
+    kill -9 `cat $PIDFILE` > /dev/null 2>&1
+    rm -f $PIDFILE
+    echo "$PROG stopped"
+}
+
+######################################################
+# This restarts xtremweb part
+######################################################
+restart(){
+    stop
+    start $*
+}
+
+
+
+######################################################
+# This retreives the status
+# return : always 0 
+######################################################
+status(){
+
+    if [ ! -f $PIFILE ] ; then
+        echo "$PROG is running"
+    else
+        echo "$PROG is not running"
+    fi
+}
+
+
+######################################################
+# Main
+######################################################
+
+
+#
+# resolve symlinks
+#
+PRG=$0
+
+while [ -h "$PRG" ]; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '^.*-> \(.*\)$' 2>/dev/null`
+    if expr "$link" : '^/' 2> /dev/null >/dev/null; then
+        PRG="$link"
+    else
+        PRG="`dirname $PRG`/$link"
+    fi
+done
+
+progdir=`dirname $PRG`
+progname=`basename $0`
+
+#
+# loading default values
+#
+PROG=$progname
+#ROOTDIR="$progdir/.."
+#[ "$ROOTDIR" = "./.." ] && ROOTDIR=`pwd`/..
+
+currentDir=`pwd`
+cd $progdir
+ROOTDIR=`pwd`/..
+cd $currentDir
+
+. $ROOTDIR/bin/xtremwebconf.sh > /dev/null  2>&1
+
+#
+# Parse command line parameters
+#
+case "$ACTION" in
+    start)
+        start $*
+        ;;
+    status)
+        status
+        exit 0
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart $*
+        ;;
+    *)
+        echo "Usage : $0 {start | stop | restart | status}"
+esac
+
+
+#
+# End of file
+#

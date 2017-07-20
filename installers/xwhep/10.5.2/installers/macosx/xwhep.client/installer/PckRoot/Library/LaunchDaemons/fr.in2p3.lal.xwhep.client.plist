@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+ <key>Label</key>
+  <string>fr.in2p3.lal.xwhep.client</string>
+ <key>EnvironmentVariables</key>
+  <dict>
+   <key>JAVA_HOME</key>
+   <string>/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home</string>
+  </dict>
+ <key>ProgramArguments</key>
+  <array>
+   <string>/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/java</string>
+   <string>-Djavax.net.ssl.trustStore=/Applications/xwhep.client/keystore/xwhepclient.keys</string>
+   <string>-Dxtremweb.cache=/tmp </string>
+   <string>-Dxtremweb.cp=/Applications/xwhep.client/lib</string>
+   <string>-cp</string>
+   <string>/Applications/xwhep.client/lib/xtremweb.jar:/Applications/xwhep.client/lib/bcprov-jdk16-140.jar:/Applications/xwhep.client/lib/ibis-util-2.1.jar:/Applications/xwhep.client/lib/slf4j-api-1.7.2.jar:/Applications/xwhep.client/lib/slf4j-log4j12-1.7.2.jar:/Applications/xwhep.client/lib/smartsockets-1.4.jar</string>
+   <string>xtremweb.client.Client</string>
+   <string>--xwshell</string>
+   <string>--xwconfig</string>
+   <string>/Applications/xwhep.client/conf/xtremweb.client.conf</string>
+  </array>
+ <key>RunAtLoad</key>
+  <true/>
+ <key>Nice</key>
+  <integer>10</integer>
+ <key>UserName</key>
+  <string>%SYSLOGIN%</string>
+ <key>StandardOutPath</key>
+  <string>/tmp/xwhep.client.log</string>
+ <key>StandardErrorPath</key>
+  <string>/tmp/xwhep.client.log</string>
+</dict>
+</plist>

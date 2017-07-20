@@ -1,0 +1,158 @@
+GETTING STARTED
+
+
+Table Of Content :
+
+  -1- Introduction
+  -2- Requirements
+  -3- Installing from sources
+  -4- Installing from binary distribution
+  -5- Installing the client from binary distribution
+
+
+============================================================
+
+-1- Introduction
+    ===========
+
+XWHEP platform is made of three components :
+  - the server : a centralized component which aims to manage the platform
+  - the worker : a distributed component which aims to aggregate CPUs
+  - the client : a distributed component which aims use the platform (submit jobs, retreive results)
+
+Deploying an XWHEP platform consists on 
+  -1- installing a server 
+  -2- deploying workers on volunteer PCs
+  -3- deploying clients so that end users can submit jobs, retreive their results etc.
+
+
+
+============================================================
+
+-2-  Requirements : 
+     ============
+
+   Java 1.7 or above (http://java.cun.com)
+
+   Mysql             (http://www.mysql.com)
+     Under Debian : apt-get install mysql-server
+
+   uuidgen           This can be found in package libuuid1 (Debian) 
+
+
+
+
+============================================================
+
+-3- Installing from sources :
+    ======================
+
+Installing from sources generates the binary distribution
+
+Compiling and instalfing the binary distribution :
+   Edit build/build.conf file and fill all field marked "*** MUST BE FILLED ***""
+   in the directory build, execute the following commands :
+      - make
+
+   To rebuild all:
+      - make clean
+      - make
+
+Uninstallation:
+   note that the build/build.conf must be correctly filled
+      - make clean
+      - make uninstall
+
+
+
+============================================================
+
+-4- Installing from binary distribution :
+    ===================================
+
+The binary distribution is available from our web site.
+You may also have prepared it from source distribution in previous chapter.
+
+
+To prepare an XWHEP deployment, please use the script
+  - bin/xwconfigure
+
+Directory tree
+==============
+
+   -bin................................XWHEP scripts                                
+   -bin/xwconfigure....................Linux script to prepare a deployement
+   -bin/xtremweb.client.app............Mac OS X client GUI
+   -bin/xtremweb.client.bat............Win32    client GUI
+   -bin/xwgui..........................Linux    client GUI
+   -bin/xwXXX..........................Linux client scripts
+   -bin/xtremweb.client................Linux client script
+   -bin/xtremweb.server................Linux server script
+   -bin/xtremweb.worker................Linux worker script
+
+   -conf...............................XWHEP configuration files
+
+   -doc................................XWHEP documentation files
+
+   -installers.........................Installers
+
+   -+-XWHEP-client-$VERSION.zip........XWHEP client package (platform independant)
+
+   -+-linux............................Linux installers
+   --+-rpm.............................RPM packages
+   ---+-xtremweb.worker................XWHEP worker package
+   ---+-xtremweb.server................XWHEP server package
+   ---+-xtremweb.bridge................XWHEP bridge package
+   --+-dpkg............................Debian packages
+   ---+-xtremweb.worker................XWHEP worker package
+   ---+-xtremweb.server................XWHEP server package
+   ---+-xtremweb.bridge................XWHEP bridge package
+
+   -+-macosx...........................Mac OS X installers
+   --+-xtremweb.worker.................XWHEP worker package
+   ---+-installer......................XWHEP worker installation package
+   ---+-uninstaller....................XWHEP worker uninstallation package
+   --+-xtremweb.server.................XWHEP server package
+   ---+-installer......................XWHEP server installation package
+   ---+-uninstaller....................XWHEP server uninstallation package
+
+   -+-win32............................Win32 installers
+   --+-xtremweb.worker.................XWHEP worker package
+   -------innoSetup....................XWHEP worker installation package
+
+   -+-xtremweb.client..................XWHEP client package (platform independant)
+
+
+   -keystore...........................XWHEP certificates
+
+   -lib................................XWHEP libraries
+
+
+
+Preparing the deployment
+========================
+To prepare an XWHEP deployment, please use the script
+  - bin/xwconfigure
+
+As xwconfigure succesfully ends, server, worker and client packages are ready.
+
+
+
+============================================================
+
+-5- Installing the client from binary distribution
+    ==============================================
+
+To install the client from XWHEP-client-$VERSION.zip :
+ -1- unzip the file where you want
+ -2- copy conf/xtremweb.client.conf.template to conf/xtremweb.client.conf
+ -3- edit conf/xtremweb.client.conf
+ -3.1- set login variable
+ -3.2- set password variable
+ -3.3- set SSLKeyStore variable
+
+
+============================================================
+=                             EOF                          =
+============================================================
+

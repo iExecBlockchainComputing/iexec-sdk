@@ -1,0 +1,421 @@
+#!/bin/sh
+#=============================================================================
+#
+#  Copyright (C) 2011-2012 O. LODYGENSKY, E. URBAH
+#                          at LAL, Univ Paris-Sud, IN2P3/CNRS, Orsay, France
+#  License GPL v3
+#
+#  Shell script using VirtualBox to create a VDI disk image
+#  (for example for contextualization of virtual machines).
+#
+#  Under Linux, it currently requires to be sudoer.
+#
+#  Parameters
+#          --src SOURCE :  optionnal paremeter. If present:
+#                After lexical compaction, SOURCE can NOT be / or contain ..
+#                SOURCE is copied to the disk image.
+#                If SOURCE is a folder, this script does NOT copy the folder
+#                itself, but its content.
+#
+#          --size XX :    not used if SOURCE provided.
+#                 XX is in mega bytes (Default: 10240)
+#
+#  Output :       $SOURCE.vdi
+#
+#=============================================================================
+
+LOGFILE="createvdi.log"
+touch $LOGFILE
+
+#=============================================================================
+#  Function  usage()
+#=============================================================================
+usage()
+{
+  if [ "$*" ]; then
+    echo "$*"  > /dev/stderr
+  fi
+  
+  cat << "END_OF_HELP"  > /dev/stderr
+
+Usage : $0 --help | --src SOURCE | --size XX --name NNNN
+  
+  --help :           This help
+  
+  --src SOURCE : optionnal paremeter. If present:
+                 After lexical compaction, SOURCE can NOT be / or contain ..
+                 SOURCE is copied to the disk image.
+                 If SOURCE is a folder, this script does NOT copy the folder
+                 itself, but its content.
+
+  --size XX  :   not used if SOURCE provided.
+                 XX is in mega bytes (Default: 10240)
+
+  --name NNN :   is --size is used, this provides output file name
+                 (default: output.vdi)
+
+END_OF_HELP
+
+  exit 1
+}
+
+
+#=============================================================================
+#  Function  fatal()
+#=============================================================================
+fatal()
+{
+  RC=$?
+  if [ $RC -eq 0 ]; then RC=1; fi
+  
+  echo "$(date "$DATE_FORMAT")  $0  FATAL:  ${*:-Ctrl+C}"  > /dev/stderr
+  exit $RC
+}
+
+
+#=============================================================================
+#  Function  clean()
+#=============================================================================
+clean()
+{
+  RC=$?
+  if [ $RC -eq 0 ]; then RC=1; fi
+  
+  echo "$(date "$DATE_FORMAT")  $0  FATAL:  $1"      >> $LOGFILE 2>&1
+  echo "$(date "$DATE_FORMAT")  $0  Trying to clean" >> $LOGFILE 2>&1
+
+  THISOS=`uname -s`
+
+  case $THISOS in
+  
+    Darwin )
+      ( set -x;  hdiutil  detach  "$MOUNT_POINT" ) >> $LOGFILE 2>&1
+      ;;
+    
+    Linux )
+      echo +  umount            "$LINUX_DEVICE" >> $LOGFILE 2>&1
+      umount            "$LINUX_DEVICE" >> $LOGFILE 2>&1
+      echo +  /sbin/losetup  -d "$LINUX_DEVICE" >> $LOGFILE 2>&1
+      /sbin/losetup  -d "$LINUX_DEVICE" >> $LOGFILE 2>&1
+      ;;
+    
+  esac
+  
+  exit $RC
+}
+
+
+#=============================================================================
+#  MAIN
+#=============================================================================
+trap fatal SIGINT SIGTERM
+
+
+#-----------------------------------------------------------------------------
+#  Depending on the OS, set :
+#  -  The date format
+#  -  VB_MGT as the VirtualBox management command
+#-----------------------------------------------------------------------------
+
+THISOS=`uname -s`
+
+case $THISOS in
+  
+  Darwin )
+    DATE_FORMAT='+%Y-%m-%d %H:%M:%S%z'
+    VB_MGT=/Applications/VirtualBox.app/Contents/MacOS/VBoxManage
+    ;;
+  
+  Linux )
+    DATE_FORMAT='--rfc-3339=seconds'
+    VB_MGT=/usr/bin/vboxmanage
+    ;;
+  
+  * )
+    fatal  "OS not supported ($THISOS)" 
+    ;;
+  
+esac
+
+
+
+
+DEFAULTDISKSIZE=10240
+DISKSIZE=$DEFAULTDISKSIZE
+
+DISK_NAME="output"
+
+[ $# -lt 1 ] && usage
+
+while [ $# -gt 0 ]; do
+    case $1 in
+    "-h" | "--help" | "--xwhelp" )
+		usage
+        ;;
+    "--src" )
+		shift
+		SOURCE=$1
+		[ ! -r "$SOURCE" ]  &&  fatal "Source NOT found : $SOURCE"
+		;;
+    "--size" )
+		shift
+		DISKSIZE=$1
+ 	   ;;
+    "--name" )
+		shift
+		DISK_NAME=$1
+ 	   ;;
+    * )
+    	usage
+    	;;
+    esac
+
+    shift
+    
+done
+
+echo  "$SOURCE"  |  grep  -E '\.(qcow|qcow2|vdi|vmdk|vhd|iso)$'  > /dev/null 2>&1
+if [ $? -eq 0 ] ; then
+	echo  "$0 : $SOURCE is already a Virtual Disk" >> $LOGFILE 2>&1
+	echo $SOURCE
+	exit 0
+fi
+
+#-----------------------------------------------------------------------------
+#  There must be 1 parameter :  A file or folder name.  In this parameter :
+#  -  Replace all '//' by '/', all '/./' by '/', remove leading './'.
+#  -  If empty or leading '../' or embedded '/../' :  Prefix by $PWD,
+#        replace all '/xyz/../' by '/', then forbid any remaining '/../'.
+#  -  Remove any trailing '/'.
+#-----------------------------------------------------------------------------
+
+if [ -n "$SOURCE" ] ; then
+	SOURCE=$(echo "$SOURCE/"  |  perl  -wpe  's=//+=/=g;  s=(^|/)(\./)+=$1=g' )
+
+	if [ '(' -z "${SOURCE##../*}" ')' -o  \
+    	 '(' -z "${SOURCE##[^/]*/../*}" ')' ]; then
+		SOURCE="$PWD/$SOURCE"
+	fi
+  
+	while expr "$SOURCE" : ".*/\.*[^./][^/]*/\.\./" > /dev/null
+	do
+	  SOURCE=$(echo "$SOURCE"  |  perl  -wpe  's=/\.*[^./][^/]*/\.\./=/=g')
+	done
+
+	if [ -z "${SOURCE##*/../*}" ]; then
+		usage "SOURCE='$SOURCE' NOT allowed"
+	fi
+
+	SOURCE=$(echo "$SOURCE"  |  perl  -wpe  's=(.)/+$=$1=')
+
+fi
+
+
+#-----------------------------------------------------------------------------
+#  Elementary checks
+#-----------------------------------------------------------------------------
+
+[ ! -x "$VB_MGT" ]  &&  fatal "Can NOT find VirtualBox application : $VB_MGT"
+
+VBVERSION=$($VB_MGT -v  |  cut -d '.' -f 1-2)
+
+#-----------------------------------------------------------------------------
+#  Choose folder for temp files in R/W filesystem having greatest free space.
+#  Verify that it is NOT $SOURCE or a subfolder of it.
+#-----------------------------------------------------------------------------
+if [ -n "$SOURCE" ] ; then
+	echo "$(date "$DATE_FORMAT")  $0  INFO:  Begin for '$SOURCE'"  >> $LOGFILE 2>&1
+else
+	echo "$(date "$DATE_FORMAT")  $0  INFO:  Begin for $DISKSIZE Mb"  >> $LOGFILE 2>&1
+fi
+
+TMP_FOLDER=/var/tmp
+if [ '(' -d /scratch ')' -a '(' -w /scratch ')' ]; then
+  if [ $(expr $(stat -f -c '%S' /scratch) '*' $(stat -f -c '%a' /scratch) )  \
+       -gt  \
+       $(expr $(stat -f -c '%S' /var/tmp) '*' $(stat -f -c '%a' /var/tmp) ) ]
+  then
+    TMP_FOLDER=/scratch
+  fi
+fi
+
+if [ -n "$SOURCE" ] ; then
+	{ [ "$SOURCE" = "/" ] || expr "$TMP_FOLDER/" : "$SOURCE/" > /dev/null; }  && \
+		fatal "Can NOT recursively copy '$SOURCE' to '$TMP_FOLDER'"
+fi
+
+#-----------------------------------------------------------------------------
+#  Calculate disk and file names
+#-----------------------------------------------------------------------------
+
+VOLNAME="V$DISKSIZE"
+if [ -n "$SOURCE" ] ; then
+	DISK_NAME=$(basename "$SOURCE"  |  tr ' .' '-_')
+	#VOLNAME=$(basename "$SOURCE"  |  tr 'a-z .' 'A-Z-_')
+fi
+
+VDI_NAME="$DISK_NAME.vdi"
+TMP_DISK="$TMP_FOLDER/$DISK_NAME.dmg"        # Linux: Format is NOT really DMG
+
+
+#-----------------------------------------------------------------------------
+#  Purge temporary files
+#-----------------------------------------------------------------------------
+[ -f "$VDI_NAME" ]  &&  fatal "'$VDI_NAME' already exists."  \
+                              "Cowardly refuse to overwrite it."
+
+rm -f "$TMP_DISK" >> $LOGFILE 2>&1  ||  \
+  fatal "Can NOT delete '$TMP_DISK' (maybe the disk is already mounted)"
+
+#-----------------------------------------------------------------------------
+#  Create the disk containing the source.
+#  Its size will be  1.1 * (size of the source) + 10 Mb.
+#-----------------------------------------------------------------------------
+
+DISK_SIZE_MB=$DISKSIZE
+
+if [ -n "$SOURCE" ] ; then
+	DISK_SIZE_MB=$(du -s -m "$SOURCE" | cut -f 1)
+	DISK_SIZE_MB=$(expr $DISK_SIZE_MB + 0${DISK_SIZE_MB%?} + 10)
+fi
+
+echo "$(date "$DATE_FORMAT")  $0  INFO:  Creating '$VDI_NAME'"  \
+     " with $DISK_SIZE_MB Mb" >> $LOGFILE 2>&1
+
+THISOS=`uname -s`
+
+case $THISOS in
+  
+  #---------------------------------------------------------------------------
+  #  Mac OS X :  Use the 'hdiutil' command
+  #---------------------------------------------------------------------------
+  Darwin )
+    
+    #-------------------------------------------------------------------------
+    #  Create an empty disk in FAT32
+    #-------------------------------------------------------------------------
+    ( set -x;  rm -f $TMP_DISK  && hdiutil  create  -size "${DISK_SIZE_MB}m"  -fs MS-DOS  \
+                        -volname "$VOLNAME"  "$TMP_DISK"  ) >> $LOGFILE 2>&1 ||  \
+      fatal "Can NOT create new disk '$TMP_DISK' in FAT32"
+    
+    #-------------------------------------------------------------------------
+    #  Attach the disk R/W
+    #-------------------------------------------------------------------------
+    DISK_LOG="$TMP_DISK.log"
+    rm -f "$DISK_LOG" >> $LOGFILE 2>&1
+    ( set -x;  hdiutil  attach  -readwrite "$TMP_DISK"  |  \
+               tee "$DISK_LOG" ) >> $LOGFILE 2>&1   ||  \
+      fatal "Can NOT attach '$TMP_DISK'"
+    
+    #-------------------------------------------------------------------------
+    #  Copy the source to the disk
+    #-------------------------------------------------------------------------
+    MOUNT_POINT="/Volumes/$VOLNAME"
+	if [ -n "$SOURCE" ] ; then
+    	if [ -f "$SOURCE" ]; then
+	    	( set -x;  cp  -v -f -p     "$SOURCE"    "$MOUNT_POINT/" ) >> $LOGFILE 2>&1
+    	else
+      		( set -x;  cp  -v -f -p -r  "$SOURCE"/*  "$MOUNT_POINT/" ) >> $LOGFILE 2>&1
+	    fi
+    fi
+    
+    #-------------------------------------------------------------------------
+    #  Detach the disk
+    #-------------------------------------------------------------------------
+    ( set -x;  hdiutil  detach  "$MOUNT_POINT" ) >> $LOGFILE 2>&1  ||  \
+      clean "Can NOT detach '$MOUNT_POINT'"
+    
+    ;;
+  
+  #---------------------------------------------------------------------------
+  #  Linux :  Use the 'dd', 'losetup', 'mkfs' and 'mount' commands.
+  #           This requires to be sudoer.
+  #---------------------------------------------------------------------------
+  Linux )
+    
+    #-------------------------------------------------------------------------
+    #  Create an unformatted disk
+    #-------------------------------------------------------------------------
+    MEGA_BYTE=$(expr 1024 '*' 1024)
+    ( set -x;  dd  if=/dev/zero  of="$TMP_DISK"  bs="$MEGA_BYTE"  \
+                   count="$DISK_SIZE_MB" ) >> $LOGFILE 2>&1   ||  \
+      fatal "Can NOT create a disk of '$DISK_SIZE_MB' blocs of"  \
+            "'$MEGA_BYTE' bytes at '$TMP_DISK'"
+    
+    #-------------------------------------------------------------------------
+    #  Find a free loop device
+    #-------------------------------------------------------------------------
+    /sbin/losetup -f >> /dev/null 2>&1   ||  \
+      fatal "Can NOT losetup -f"
+
+    LINUX_DEVICE="$(/sbin/losetup  -f)"
+    echo +  /sbin/losetup  "$LINUX_DEVICE"  "$TMP_DISK" >> $LOGFILE 2>&1
+    /sbin/losetup  "$LINUX_DEVICE"  "$TMP_DISK" >> $LOGFILE 2>&1   ||  \
+      fatal "Can NOT losetup '$LINUX_DEVICE'"
+    
+
+    #-------------------------------------------------------------------------
+    #  Format the disk in 'ext3'
+    #-------------------------------------------------------------------------
+    echo +  /sbin/mkfs  -t ext3  -L "$VOLNAME"  "$LINUX_DEVICE" >> $LOGFILE 2>&1
+    /sbin/mkfs  -t ext3  -L "$VOLNAME"  "$LINUX_DEVICE" >> $LOGFILE 2>&1 ||  \
+      clean "Can NOT format '$LINUX_DEVICE' in 'ext3' successfully"
+
+    #-------------------------------------------------------------------------
+    #  Mount the disk
+    #-------------------------------------------------------------------------
+    MOUNT_POINT="/mnt/$DISK_NAME"
+    mkdir  -p  "$MOUNT_POINT" >> $LOGFILE 2>&1 ||  \
+      clean "Can NOT execute 'mkdir' on '$MOUNT_POINT' successfully"
+    
+    echo +  mount  -t auto  "$LINUX_DEVICE"  "$MOUNT_POINT" >> $LOGFILE 2>&1
+    mount  -t auto  "$LINUX_DEVICE"  "$MOUNT_POINT" >> $LOGFILE 2>&1 ||  \
+      clean "Can NOT mount '$LINUX_DEVICE' on '$MOUNT_POINT' successfully"
+    
+    #-------------------------------------------------------------------------
+    #  Copy the source to the disk
+    #-------------------------------------------------------------------------
+	if [ -n "$SOURCE" ] ; then
+	    if [ -f "$SOURCE" ]; then
+    		echo +  cp  -v -f -p     "$SOURCE"    "$MOUNT_POINT/" >> $LOGFILE 2>&1
+      		cp  -v -f -p     "$SOURCE"    "$MOUNT_POINT/" >> $LOGFILE 2>&1
+	    else
+    		echo +  cp  -v -f -p -r  "$SOURCE"/*  "$MOUNT_POINT/" >> $LOGFILE 2>&1
+      		cp  -v -f -p -r  "$SOURCE"/*  "$MOUNT_POINT/" >> $LOGFILE 2>&1
+    	fi  ||  \
+      clean "Can NOT copy '$SOURCE' on '$MOUNT_POINT' successfully"
+    fi
+    #-------------------------------------------------------------------------
+    #  Unmount the disk
+    #-------------------------------------------------------------------------
+    echo +  umount  "$MOUNT_POINT" >> $LOGFILE 2>&1
+    umount  "$MOUNT_POINT" >> $LOGFILE 2>&1 ||  \
+      clean "Can NOT umount '$MOUNT_POINT' successfully"
+    
+    #-------------------------------------------------------------------------
+    #  Release the loop device
+    #-------------------------------------------------------------------------
+    echo +  /sbin/losetup  -d "$LINUX_DEVICE" >> $LOGFILE 2>&1
+    /sbin/losetup  -d "$LINUX_DEVICE" >> $LOGFILE 2>&1  ||  \
+      clean "Can NOT release loop device '$LINUX_DEVICE' successfully"
+    
+    ;;
+    
+esac
+
+#-----------------------------------------------------------------------------
+#  Use VirtualBox to convert the disk from raw to VDI
+#-----------------------------------------------------------------------------
+( set -x;  "$VB_MGT"  convertfromraw  "$TMP_DISK"  "$VDI_NAME" ) >> $LOGFILE 2>&1  ||  \
+  fatal "Can't create VDI : $TMP_DISK"
+
+rm  -f  "$TMP_DISK"
+
+echo "$(date "$DATE_FORMAT")  $0  INFO:  Successfully created '$VDI_NAME'"  >> $LOGFILE 2>&1
+
+if [ -n "$SUDO_USER" ] ; then
+	chown $SUDO_USER $VDI_NAME
+else
+	chmod 644 $VDI_NAME
+fi
+echo $VDI_NAME

@@ -1,0 +1,129 @@
+#!/bin/bash
+
+#
+# Copyrights     : CNRS
+# Author         : Oleg Lodygensky
+# Acknowledgment : XtremWeb-HEP is based on XtremWeb 1.8.0 by inria : http://www.xtremweb.net/
+# Web            : http://www.xtremweb-hep.org
+#
+#      This file is part of XtremWeb-HEP.
+#
+#    XtremWeb-HEP is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    XtremWeb-HEP is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with XtremWeb-HEP.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+
+
+#  ******************************************************************
+#  File    : xwcontext_epilogue
+#  Date    : August 31st, 2012
+#  Author  : Oleg Lodygensky
+# 
+#  OS      : Linux
+#  Arch    : noarch
+# 
+#  Purpose : contextualization - final steps after boot
+#            contextualization disk is mounted on /mnt/xwcontext
+#            this is HEPiX compliant contextualisation epilog
+#            this is based on http://grid.desy.de/vm/hepix/vwg/doc/html/start/contextualisation-principles-cern-status.shtml 
+#
+#  See     : ubuntu_createlivecd.sh; sl5_createlivecd.sh; sl6_createlivecd.sh; sl6_createlivecd.ks; xwcontext_prologue
+#
+#
+# Changelog:
+#              $Log: xwcontext_epilogue,v $
+#
+
+# chkconfig: 2345 99 2
+# description: XWHEP contextualization epilog
+
+
+LOGFILE=/var/log/xwcontext_epilogue.log
+MNTCONTEXT=/mnt/xwcontext
+MNTAPP=/mnt/app
+MNTINPUT=/mnt/input
+MNTRESULTS=/mnt/results
+EPILOG=$MNTCONTEXT/epilog.sh
+
+#  ******************************************************************
+# start()
+#  ******************************************************************
+start() {
+
+    touch $LOGFILE
+
+    cd $MNTCONTEXT >> $LOGFILE 2>&1
+    RETVAL=$?
+
+    if [ 0 -eq $RETVAL ] ; then
+        if [ -e $EPILOG ]; then
+            echo "Launching $EPILOG" >> $LOGFILE 2>&1
+            chmod +x $EPILOG >> $LOGFILE 2>&1
+            /bin/su -l vmuser bash -c $EPILOG >> $LOGFILE 2>&1
+            RETVAL=$?
+        else
+            echo "[`date`] XWHEP Volunteer Cloud [WARN]: no contextualization epilog found" >> $LOGFILE 2>&1
+        fi
+     fi
+
+    echo $"XWHEP contextualization epilog:                            [  OK  ]"
+
+    return $RETVAL
+}
+
+
+#  ******************************************************************
+# stop()
+#  ******************************************************************
+stop() {
+#    echo -n $"[`date`] XWHEP Volunteer Cloud [INFO]: unmouting context disk: "
+#    umount $MNTAPP     >> $LOGFILE 2>&1
+#    umount $MNTINPUT   >> $LOGFILE 2>&1
+#    umount $MNTCONTEXT >> $LOGFILE 2>&1
+#    umount $MNTRESULTS >> $LOGFILE 2>&1
+#    RETVAL=$?
+#    if [ 0 -eq $RETVAL ]; then
+#      echo "[  OK  ]"
+#    else
+#      echo "[ FAILED ]"
+#    fi
+#     echo
+#     return $RETVAL
+    echo "[`date`] XWHEP Volunteer Cloud [INFO]: xwcontext_prologue stop does nothing" >> $LOGFILE 2>&1
+    echo -n $"XWHEP contextualization epilog:                            [  OK  ]"
+    return 0
+}
+
+
+#  ******************************************************************
+# main
+#  ******************************************************************
+case "$1" in
+	start)
+#   [ $running -eq 0 ] && exit 0
+		start
+		RETVAL=$?
+		;;
+	stop)
+# 		[ $running -eq 0 ] || exit 0
+		stop
+		RETVAL=$?
+		;;
+	*)
+		echo $"Usage: $0 {start|stop}"
+		RETVAL=2
+esac
+
+exit $RETVAL
+

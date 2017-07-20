@@ -1,0 +1,103 @@
+#!/bin/bash
+#
+# File : xwhep.client/installer/Ressources/postflight
+#
+# Copyrights     : CNRS
+# Author         : Oleg Lodygensky
+# Acknowledgment : XtremWeb-HEP is based on XtremWeb 1.8.0 by inria : http://www.xtremweb.net/
+# Web            : http://www.xtremweb-hep.org
+# 
+#      This file is part of XtremWeb-HEP.
+#
+#    XtremWeb-HEP is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    XtremWeb-HEP is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with XtremWeb-HEP.  If not, see <http://www.gnu.org/licenses/>.
+
+ERROK=0
+ERRUSAGE=1
+ERRFILE=2
+ERRCONNECTION=3
+ERRSTATE=4
+ERRUSER=5
+
+SYSLOGIN=xwhep
+PKG="xwhep.client"
+PROG="xtremweb.client"
+# this is the name defined in /Library/LaunchDaemons/xwhep.client.plist
+LAUNCHNAME="fr.in2p3.lal.xwhep.client"
+
+LOGFILE="/var/log/$PKG.log"
+touch $LOGFILE
+
+echo "*****************************" >> $LOGFILE 2>&1
+echo "* [`date`] [$PROG] INFO : installing $PROG"  >> $LOGFILE 2>&1
+
+OSMAJOR="10"
+OSMINOR="6"
+
+OSVERSION=`sw_vers -productVersion`
+if [ $? -eq 0 ] ; then
+    OSMAJOR=`sw_vers -productVersion | cut -d '.' -f 1`
+    OSMINOR=`sw_vers -productVersion | cut -d '.' -f 2`
+else
+    echo "* [`date`] [$PROG] ERROR : can't determine OS version (sw_vers not found)" >> $LOGFILE 2>&1
+    echo "*****************************" >> $LOGFILE 2>&1
+    return $ERRUSAGE
+fi
+
+if [ $OSMAJOR -lt 10 ] ; then
+    echo "* [`date`] [$PROG] ERROR : Mac OS $OSMAJOR not supported" >> $LOGFILE 2>&1
+    echo "*****************************" >> $LOGFILE 2>&1
+    return $ERRUSAGE
+fi
+
+if [ ! -d /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/ ] ; then
+    echo "* [`date`] [$PROG] ERROR : Can't find Java 1.6" >> $LOGFILE 2>&1
+    echo "*****************************" >> $LOGFILE 2>&1
+    return $ERRUSAGE
+fi
+
+echo "Installing $PKG" >> $LOGFILE 2>&1
+
+
+if [ $OSMINOR -lt 4 ] ; then
+    echo "* [`date`] [$PROG] ERROR : Mac OS 10.$OSMINOR not supported" >> $LOGFILE 2>&1
+    echo "*****************************" >> $LOGFILE 2>&1
+fi
+
+if [ "X$SYSLOGIN" != "X" ] ; then 
+    dscl . list /users/$SYSLOGIN
+    if [ $? -ne 0 ]; then
+	echo "list user $SYSLOGIN return code : $?" >> $LOGFILE 2>&1
+	return $ERRUSER
+    fi
+
+    #
+    # Since Mac OS 10.4 launchdis used
+    #
+    TMPDATE=`date +%Y%m%d%H%M%S`
+    TMPNAME=xw_$TMPDATE
+    cat /Library/LaunchDaemons/$LAUNCHNAME.plist | sed "s/%SYSLOGIN%/$SYSLOGIN/" > /tmp/$TMPNAME
+    mv /tmp/$TMPNAME /Library/LaunchDaemons/$LAUNCHNAME.plist
+    rm -f /tmp/$TMPNAME
+    chown root:wheel /Library/LaunchDaemons/$LAUNCHNAME.plist >> $LOGFILE 2>&1
+fi
+
+
+echo "* [`date`] [$PROG] INFO : $PROG installed " >> $LOGFILE 2>&1
+echo "*****************************" >> $LOGFILE 2>&1
+
+
+
+#
+# EOF
+#
