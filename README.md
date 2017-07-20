@@ -30,7 +30,7 @@ The client comes in three different packages: Redhat, Debian and Apple Package.
 RedHat
 ------
 ```
- rpmbuild  --buildroot $CURRENTWORKINGDIR/BUILD/xwhep-server-$VERSION -bb $CURRENTWORKINGDIR/xwhep-server.spec
+ rpmbuild  --buildroot installers/xwhep/10.5.2/installers/linux/rpm/xwhep.client/BUILD/xwhep-client-10.5.2 -bb installers/xwhep/10.5.2/installers/linux/rpm/xwhep.client/xwhep-server.spec
 ```
 
 Debian
