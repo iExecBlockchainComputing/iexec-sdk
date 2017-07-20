@@ -22,3 +22,19 @@ iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bri
    * the bridge links blockchain and iExec XWHEP platform.
 
 
+Install XWHEP client
+====================
+
+The client comes in three different packages: Redhat, Debian and Apple Package.
+
+RedHat
+------
+```
+ rpmbuild  --buildroot $CURRENTWORKINGDIR/BUILD/xwhep-server-$VERSION -bb $CURRENTWORKINGDIR/xwhep-server.spec
+```
+
+Debian
+------
+```
+ pkg-deb --build installers/xwhep/10.5.2/installers/linux/dpkg/xwhep.client xwhep-client-10.5.2.deb
+```
