@@ -32,7 +32,7 @@ RedHat
 ------
 ```
  rpmbuild  --buildroot installers/xwhep/10.5.2/installers/linux/rpm/xwhep.client/BUILD/xwhep-client-10.5.2 \
-           -bb installers/xwhep/10.5.2/installers/linux/rpm/xwhep.client/xwhep-server.spec
+           -bb         installers/xwhep/10.5.2/installers/linux/rpm/xwhep.client/xwhep-server.spec
 ```
 
 Debian
