@@ -12,5 +12,6 @@ DApps development, deployment and execution on iExec offchain computing platform
    * the technology to bridge blockchain and XtremWeb-HEP
 - iExec uses and packages: 
    * the [XtremWeb-HEP (_XWHEP_)](https://github.com/lodygens/xtremweb-hep) client to interact with our decentralized computing platform.
+
 	XWHEP is an open source middleware by CNRS.
 
