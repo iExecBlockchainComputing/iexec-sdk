@@ -46,7 +46,7 @@ Apple PackageMaker must be installed.
 iExec oracle
 ============
 
-iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bridging-the-real-world-to-the-blockchain-ca97c2fc3e6c) to securely link blockchain and computing worlds:
+iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bridging-the-real-world-to-the-blockchain-ca97c2fc3e6c) to securely link blockchain and computing networks:
    * the blockchain smart contract ensures security and payment;
    * the bridge links blockchain and iExec XWHEP platform.
 
