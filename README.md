@@ -50,3 +50,8 @@ iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bri
    * the blockchain smart contract ensures security and payment;
    * the bridge links blockchain and iExec XWHEP platform.
 
+## Installation
+
+```
+  git clone https://github.com/iExecBlockchainComputing/ApiSolidity.git
+```
