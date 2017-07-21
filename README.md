@@ -17,7 +17,7 @@ It permits to build a cloud over a set of volunteer computing resources, based o
 
 ## Install XWHEP client
 
-iExec packages the XWHEP client to ease Dapps developper work.
+The XWHEP client permits to ease Dapps developments.
 
 The client comes in three different packages: Redhat, Debian and Apple Package.
 We provide no Windows package.
