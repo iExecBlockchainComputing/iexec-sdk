@@ -48,7 +48,7 @@ iExec oracle
 
 iExec proposes a [blockchain oracle](https://blog.ledger.co/hardware-oracles-bridging-the-real-world-to-the-blockchain-ca97c2fc3e6c) to securely link blockchain and computing networks:
    * the blockchain smart contract ensures security and payment;
-   * the bridge links blockchain and iExec XWHEP platform.
+   * the bridge links blockchain and offchain computing using XWHEP [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API.
 
 ## Installation
 
