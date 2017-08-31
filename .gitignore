@@ -18,13 +18,10 @@ coverage
 node_modules
 
 # Compiled JS directory
-/dist
+# /dist
 
 # Optional npm cache directory
 .npm
 
 # Optional REPL history
 .node_repl_history
-
-# ignore this test file
-myTest.js
