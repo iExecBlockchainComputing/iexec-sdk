@@ -1,4 +1,0 @@
-<pkgref spec="1.12" uuid="4B657C3F-6A24-48A3-9DB3-CBE1CA62E2C8"><config><identifier>XWHEP Client</identifier><version>10.5.2</version><description>This the XWHEP desktop grid computing element
-
-http://dghep.lal.in2p3.fr
-</description><post-install type="none"/><requireAuthorization/><installFrom relative="true" mod="true">PckRoot</installFrom><installTo relative="true"></installTo><flags><followSymbolicLinks/><discardResourceForks/></flags><packageStore type="internal"></packageStore><mod>extraFiles</mod><mod>installTo</mod><mod>scripts.postflight.path</mod><mod>scripts.postinstall.path</mod><mod>identifier</mod><mod>parent</mod><mod>includeRoot</mod><mod>scripts.postinstall.isRelativeType</mod><mod>installFrom.isRelativeType</mod><mod>version</mod></config><scripts><postflight relative="true" mod="true">Resources/postflight</postflight><scripts-dir relative="true">Resources</scripts-dir></scripts><extra-files/></pkgref>
