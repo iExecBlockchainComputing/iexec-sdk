@@ -2,8 +2,8 @@
 
 const commander = require('commander');
 
-const packageJson = require('../package.json');
+const packageJSON = require('../package.json');
 
-new commander.Command(packageJson.name)
-  .version(packageJson.version)
+new commander.Command(packageJSON.name)
+  .version(packageJSON.version)
   .parse(process.argv);
