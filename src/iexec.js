@@ -10,7 +10,6 @@ debug('add DEBUG=* to show logs');
 cli
   .description(packageJSON.description)
   .version(packageJSON.version)
-  .description(packageJSON.description)
 ;
 
 cli
