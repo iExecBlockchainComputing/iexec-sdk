@@ -26,7 +26,8 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "commander": "^2.11.0",
-    "debug": "^3.0.1"
+    "debug": "^3.0.1",
+    "truffle": "^3.4.9"
   },
   "devDependencies": {
     "eslint": "^4.5.0",
