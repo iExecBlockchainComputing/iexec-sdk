@@ -1,9 +1,24 @@
 #!/usr/bin/env node
 
-const commander = require('commander');
-
+const Debug = require('debug');
+const cli = require('commander');
 const packageJSON = require('../package.json');
+const truffle = require('./truffle-cli');
 
-new commander.Command(packageJSON.name)
+const debug = Debug('iexec');
+debug('add DEBUG=* to show logs');
+
+debug('truffle', truffle);
+
+cli
+  .description(packageJSON.description)
   .version(packageJSON.version)
-  .parse(process.argv);
+;
+
+cli
+  .command('compile')
+  .description('call truffle int')
+  .action(() => truffle('compile'))
+;
+
+cli.parse(process.argv);
