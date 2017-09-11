@@ -14,8 +14,6 @@ const ORACLE_REPO = 'iexec-oracle';
 
 cli.parse(process.argv);
 
-debug('cli', cli.args);
-
 async function init() {
   const branchName = cli.args.length ? cli.args[0] : 'hello-world';
 
