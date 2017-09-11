@@ -8,12 +8,12 @@ const debug = Debug('iexec');
 debug('add DEBUG=* to show logs');
 
 cli
+  .description(packageJSON.description)
   .version(packageJSON.version)
 ;
 
 cli
   .command('init', 'init sample iexec dapp')
-  .description('run setup commands for all envs')
 ;
 
 cli.parse(process.argv);
