@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 
-const commander = require('commander');
+const cli = require('commander');
 
 const packageJSON = require('../package.json');
 
-new commander.Command(packageJSON.name)
+cli
   .version(packageJSON.version)
-  .parse(process.argv);
+;
+
+cli
+  .command('init', 'init sample iexec dapp')
+  .description('run setup commands for all envs')
+;
+
+cli.parse(process.argv);
