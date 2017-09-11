@@ -8,11 +8,13 @@ const truffle = require('./truffle-cli');
 const debug = Debug('iexec');
 debug('add DEBUG=* to show logs');
 
-debug('truffle', truffle);
-
 cli
   .description(packageJSON.description)
   .version(packageJSON.version)
+;
+
+cli
+  .command('init', 'init sample iexec dapp')
 ;
 
 cli

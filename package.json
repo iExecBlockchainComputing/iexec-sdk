@@ -2,7 +2,7 @@
   "name": "iexec",
   "version": "1.0.2",
   "description": "iExec cli",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "rm -rf ./dist && ./node_modules/babel-cli/bin/babel.js src --out-dir dist --copy-files",
@@ -27,7 +27,9 @@
     "babel-register": "^6.26.0",
     "commander": "^2.11.0",
     "debug": "^3.0.1",
-    "truffle": "^3.4.9"
+    "truffle": "^3.4.9",
+    "fs-extra": "^4.0.1",
+    "recursive-copy": "^2.0.6"
   },
   "devDependencies": {
     "eslint": "^4.5.0",
