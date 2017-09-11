@@ -16,6 +16,7 @@ cli.parse(process.argv);
 
 async function init() {
   const branchName = cli.args.length ? cli.args[0] : 'hello-world';
+  debug('pulling %o...', branchName);
 
   await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} .`);
   await fs.remove('./.git');
