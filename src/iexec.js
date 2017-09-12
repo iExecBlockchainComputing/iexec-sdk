@@ -12,8 +12,12 @@ cli
   .version(packageJSON.version)
 ;
 
-cli
-  .command('init', 'init sample iexec dapp')
-;
+cli.command('init', 'init sample iexec dapp');
+
+cli.command('truffle [args...]', 'execute truffle with any number of truffle arguments');
+
+cli.command('compile [args...]', 'call truffle compile');
+
+cli.command('migrate [args...]', 'call truffle migrate');
 
 cli.parse(process.argv);
