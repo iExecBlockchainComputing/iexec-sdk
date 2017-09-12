@@ -1,11 +1,11 @@
 const Debug = require('debug');
-const util = require('util');
+const Promise = require('bluebird');
 const { exec } = require('child_process');
 const cli = require('commander');
 const fs = require('fs-extra');
 const copy = require('recursive-copy');
 
-const execAsync = util.promisify(exec);
+const execAsync = Promise.promisify(exec);
 const debug = Debug('iexec:iexec-init');
 
 const IEXEC_GITHUB = 'git@github.com:iExecBlockchainComputing/';
