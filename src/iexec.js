@@ -3,7 +3,6 @@
 const Debug = require('debug');
 const cli = require('commander');
 const packageJSON = require('../package.json');
-const truffle = require('./truffle-cli');
 
 const debug = Debug('iexec');
 debug('add DEBUG=* to show logs');
@@ -18,22 +17,16 @@ cli
 ;
 
 cli
-  .command('truffle [args...]')
+  .command('truffle [args...]', 'execute truffle with any number of truffle arguments')
   .alias('t')
-  .description('execute truffle with any number of truffle arguments')
-  .action(args => truffle(...args))
 ;
 
 cli
-  .command('compile')
-  .description('call truffle compile')
-  .action(() => truffle('compile'))
+  .command('compile [args...]', 'call truffle compile')
 ;
 
 cli
-  .command('migrate')
-  .description('call truffle migrate')
-  .action(() => truffle('migrate'))
+  .command('migrate [args...]', 'call truffle migrate')
 ;
 
 cli.parse(process.argv);
