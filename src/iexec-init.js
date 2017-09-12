@@ -6,7 +6,7 @@ const fs = require('fs-extra');
 const copy = require('recursive-copy');
 
 const execAsync = util.promisify(exec);
-const debug = Debug('iexec-init');
+const debug = Debug('iexec:iexec-init');
 
 const IEXEC_GITHUB = 'git@github.com:iExecBlockchainComputing/';
 const SAMPLES_REPO = 'iexec-dapp-samples.git';
