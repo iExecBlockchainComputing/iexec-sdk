@@ -18,9 +18,22 @@ cli
 ;
 
 cli
+  .command('truffle [args...]')
+  .alias('t')
+  .description('execute truffle with any number of truffle arguments')
+  .action(args => truffle(...args))
+;
+
+cli
   .command('compile')
-  .description('call truffle int')
+  .description('call truffle compile')
   .action(() => truffle('compile'))
+;
+
+cli
+  .command('migrate')
+  .description('call truffle migrate')
+  .action(() => truffle('migrate'))
 ;
 
 cli.parse(process.argv);
