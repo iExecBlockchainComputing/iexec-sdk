@@ -1,16 +1,30 @@
 const Debug = require('debug');
 const path = require('path');
-const util = require('util');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
-const execAsync = util.promisify(exec);
 const debug = Debug('iexec:truffle-cli');
+debug('');
 
 const rootPath = path.resolve(__dirname, '..');
 const trufflePath = path.join(rootPath, 'node_modules', 'truffle', 'build', 'cli.bundled.js');
 
+const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
+  const proc = args ? spawn(bin, args) : spawn(bin);
 
-module.exports = async function cli(args) {
-  debug('args', args);
-  await execAsync(`${trufflePath} ${args}`);
-};
+  proc.stdout.on('data', data => console.log(`${data}`));
+  proc.stderr.on('data', data => console.log(`${data}`));
+
+  proc.on('close', (code) => {
+    if (code !== 0) reject();
+    resolve();
+  });
+
+  proc.on('exit', (code) => {
+    if (code !== 0) reject();
+    resolve();
+  });
+
+  proc.on('error', () => reject());
+});
+
+module.exports = (...args) => spawnAsync(trufflePath, args);
