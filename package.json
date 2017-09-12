@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "rm -rf ./dist && ./node_modules/babel-cli/bin/babel.js src --out-dir dist --copy-files",
-    "postinstall": "rm -rf ./dist && ./node_modules/babel-cli/bin/babel.js src --out-dir dist --copy-files"
+    "postinstall": "node node_modules/babel-cli/bin/babel.js src --out-dir dist --copy-files"
   },
   "bin": {
     "iexec": "./dist/iexec.js"
