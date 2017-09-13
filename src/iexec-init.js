@@ -8,9 +8,9 @@ const copy = require('recursive-copy');
 const execAsync = Promise.promisify(exec);
 const debug = Debug('iexec:iexec-init');
 
-const IEXEC_GITHUB = 'git@github.com:iExecBlockchainComputing/';
+const IEXEC_GITHUB = 'https://github.com/iExecBlockchainComputing/';
 const SAMPLES_REPO = 'iexec-dapp-samples.git';
-const ORACLE_REPO = 'iexec-oracle';
+const ORACLE_REPO = 'iexec-oracle.git';
 
 cli.parse(process.argv);
 
