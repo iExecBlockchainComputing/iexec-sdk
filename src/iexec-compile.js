@@ -8,4 +8,4 @@ const debug = Debug('iexec:iexec-compile');
 const args = process.argv.slice(2);
 debug('args', args);
 
-truffle('compile', ...args);
+truffle.compile(args);

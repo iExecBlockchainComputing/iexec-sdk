@@ -29,4 +29,14 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   proc.on('error', () => reject());
 });
 
-module.exports = (...args) => spawnAsync(trufflePath, args);
+const run = args => spawnAsync(trufflePath, args);
+
+const compile = async (args = []) => {
+  console.log('Compiling contracts...');
+  await run(['compile', ...args]);
+};
+
+module.exports = {
+  run,
+  compile,
+};

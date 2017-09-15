@@ -14,6 +14,8 @@ cli
 
 cli.command('init', 'init sample iexec dapp');
 
+cli.command('wallet [args...]', 'manage local ethereum wallet');
+
 cli.command('truffle [args...]', 'execute truffle with any number of truffle arguments');
 
 cli.command('compile [args...]', 'call truffle compile');
