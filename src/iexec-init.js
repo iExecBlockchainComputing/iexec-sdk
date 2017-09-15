@@ -15,16 +15,20 @@ const ORACLE_REPO = 'iexec-oracle.git';
 cli.parse(process.argv);
 
 async function init() {
-  const branchName = cli.args.length ? cli.args[0] : 'hello-world';
-  console.log(`pulling ${branchName}...`);
-  debug('pulling %o...', branchName);
+  try {
+    const branchName = cli.args.length ? cli.args[0] : 'hello-world';
+    console.log(`pulling ${branchName}...`);
+    debug('pulling %o...', branchName);
 
-  await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} .`);
-  await fs.remove('./.git');
+    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} .`);
+    await fs.remove('./.git');
 
-  await execAsync(`git clone --depth=1 ${IEXEC_GITHUB}${ORACLE_REPO} temp`);
+    await execAsync(`git clone --depth=1 ${IEXEC_GITHUB}${ORACLE_REPO} temp`);
 
-  await copy('./temp/contracts', './contracts');
-  await fs.remove('./temp');
+    await copy('./temp/contracts', './contracts');
+    await fs.remove('./temp');
+  } catch (error) {
+    console.log(`"iexec init" failed with ${error}`);
+  }
 }
 init();

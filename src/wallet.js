@@ -2,6 +2,7 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
+const fetch = require('node-fetch');
 const { genKeyPair } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { privateToPublic } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
@@ -74,9 +75,41 @@ const load = async () => {
         return create();
       }
 
-      return console.log('Aborting. You need a wallet to continue');
+      throw new Error('Aborting. You need a wallet to continue');
     }
     debug('load() error', error);
+    throw error;
+  }
+};
+
+const faucets = [
+  {
+    name: 'facet.ropsten.be',
+    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()),
+  },
+  {
+    name: 'ropsten.faucet.b9lab.com',
+    getETH: address => fetch('https://ropsten.faucet.b9lab.com/tap',
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({ toWhom: '0x'.concat(address) }),
+      }).then(res => res.json()),
+  },
+];
+
+const getETH = async () => {
+  try {
+    const userWallet = await load();
+    const responses = await Promise.all(faucets.map(faucet => faucet.getETH(userWallet.address)));
+    const responsesMessage = faucets.reduce((accu, curr, index) =>
+      accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
+    console.log(responsesMessage);
+  } catch (error) {
+    debug('getETH() error', error);
     throw error;
   }
 };
@@ -84,4 +117,5 @@ const load = async () => {
 module.exports = {
   create,
   load,
+  getETH,
 };
