@@ -35,10 +35,10 @@ const migrate = async () => {
 
     const contract = new web3.eth.Contract(abi);
 
-    const unsignedTx = contract.deploy({
-      data: unlinked_binary,
-      arguments: [iexecConfig.oracleAddress],
-    }).encodeABI();
+    const toDeploy = { data: unlinked_binary };
+    if (iexecConfig.constructorArgs) toDeploy.arguments = iexecConfig.constructorArgs;
+
+    const unsignedTx = contract.deploy(toDeploy).encodeABI();
 
     if (cli.wallet === 'local') {
       const userWallet = await wallet.load();
