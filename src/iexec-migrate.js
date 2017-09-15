@@ -65,10 +65,10 @@ const migrate = async () => {
       chainId,
     }, userWallet.privateKey);
 
-    // const txReceipt = await web3.eth.sendSignedTransaction('0x'.concat(rawTx))
-    //   .once('transactionHash', hash => debug('hash', hash))
-    //   .on('error', error => debug('error', error));
-    // debug('txReceipt', txReceipt);
+    const txReceipt = await web3.eth.sendSignedTransaction('0x'.concat(rawTx))
+      .once('transactionHash', hash => debug('hash', hash))
+      .on('error', error => debug('error', error));
+    debug('txReceipt', txReceipt);
   } else if (cli.wallet === 'remote') {
     debug('remote');
   }
