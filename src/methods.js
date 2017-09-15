@@ -21,6 +21,7 @@ const send = async (walletType, network, methodName, args) => {
     const contractAddress = networks[network.network_id].address;
     const contract = new web3.eth.Contract(abi, contractAddress);
 
+    debug('contract', contract);
     const unsignedTx = contract.methods[methodName](...args).encodeABI();
 
     if (walletType === 'local') {
@@ -47,7 +48,10 @@ const send = async (walletType, network, methodName, args) => {
         gasLimit: web3.utils.toHex(gasLimit),
         data: unsignedTx,
         chainId,
+        value: '0x00',
       }, userWallet.privateKey);
+
+      debug('raw trans', '0x'.concat(rawTx));
 
       const txReceipt = await web3.eth.sendSignedTransaction('0x'.concat(rawTx))
         .once('transactionHash', hash => console.log('txHash :', hash))

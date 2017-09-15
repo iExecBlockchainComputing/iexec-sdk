@@ -15,7 +15,6 @@ cli
   .parse(process.argv);
 
 const network = truffleConfig.networks[cli.network];
-const args = cli.args.slice(1);
 
-debug('args', args);
-methods.send(cli.wallet, network, 'submit', args).catch(error => console.log(`"iexec submit" failed with ${error}`));
+debug('cli.args', cli.args);
+methods.send(cli.wallet, network, 'iexecSubmit', cli.args).catch(error => console.log(`"iexec submit" failed with ${error}`));
