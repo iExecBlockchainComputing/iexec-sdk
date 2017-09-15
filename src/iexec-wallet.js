@@ -11,7 +11,7 @@ debug('');
 cli
   .command('create')
   .description('create a local wallet')
-  .action(() => wallet.create())
+  .action(() => wallet.create().catch(error => console.log(`"iexec wallet create" failed with ${error}`)))
 ;
 
 cli.parse(process.argv);
