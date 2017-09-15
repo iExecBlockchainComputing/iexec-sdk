@@ -20,12 +20,12 @@ async function init() {
     console.log(`pulling ${branchName}...`);
     debug('pulling %o...', branchName);
 
-    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} .`);
-    await fs.remove('./.git');
+    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${branchName}`);
+    await fs.remove(`./${branchName}/.git`);
 
     await execAsync(`git clone --depth=1 ${IEXEC_GITHUB}${ORACLE_REPO} temp`);
 
-    await copy('./temp/contracts', './contracts');
+    await copy('./temp/contracts', `./${branchName}/contracts`);
     await fs.remove('./temp');
   } catch (error) {
     console.log(`"iexec init" failed with ${error}`);
