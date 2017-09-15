@@ -14,4 +14,10 @@ cli
   .action(() => wallet.create().catch(error => console.log(`"iexec wallet create" failed with ${error}`)))
 ;
 
+cli
+  .command('getETH')
+  .description('apply for ETH from pre-registered faucets')
+  .action(() => wallet.getETH().catch(error => console.log(`"iexec wallet getETH" failed with ${error}`)))
+;
+
 cli.parse(process.argv);
