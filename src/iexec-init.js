@@ -16,7 +16,7 @@ cli.parse(process.argv);
 
 async function init() {
   try {
-    const branchName = cli.args.length ? cli.args[0] : 'hello-world';
+    const branchName = cli.args.length ? cli.args[0] : 'factorial';
     console.log(`pulling ${branchName}...`);
     debug('pulling %o...', branchName);
 
