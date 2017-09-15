@@ -16,6 +16,7 @@ const iexecConfig = require(path.join(process.cwd(), 'iexec.js'));
 
 const debug = Debug('iexec:iexec-migrate');
 const readFileAsync = Promise.promisify(fs.readFile);
+const writeFileAsync = Promise.promisify(fs.writeFile);
 
 cli
   .option('--network [name]', 'migrate to network name', 'ropsten')
@@ -30,8 +31,10 @@ const migrate = async () => {
     await truffle.compile();
 
     console.log(`Deploying ${iexecConfig.name} contract...`);
-    const compiledFile = await readFileAsync(`build/contracts/${iexecConfig.name}.json`);
-    const { abi, unlinked_binary } = JSON.parse(compiledFile);
+    const compiledFileJSONPath = `build/contracts/${iexecConfig.name}.json`;
+    const compiledFileJSON = await readFileAsync(compiledFileJSONPath);
+    const compiledFile = JSON.parse(compiledFileJSON);
+    const { abi, unlinked_binary } = compiledFile;
 
     const contract = new web3.eth.Contract(abi);
 
@@ -67,9 +70,14 @@ const migrate = async () => {
       }, userWallet.privateKey);
 
       const txReceipt = await web3.eth.sendSignedTransaction('0x'.concat(rawTx))
-        .once('transactionHash', hash => debug('hash', hash))
+        .once('transactionHash', hash => console.log('txHash', hash, '\n'))
         .on('error', error => debug('error', error));
-      debug('txReceipt', txReceipt);
+      console.log('txReceipt', txReceipt, '\n');
+      console.log(`View on etherscan: https://${cli.network}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+
+      compiledFile.networks[chainId] = { address: txReceipt.contractAddress };
+      await writeFileAsync(compiledFileJSONPath, JSON.stringify(compiledFile, null, 4));
+      console.log(`saved new contract address to ${compiledFileJSONPath}\n`);
     } else if (cli.wallet === 'remote') {
       debug('remote');
     }
