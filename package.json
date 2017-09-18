@@ -28,7 +28,6 @@
     "bluebird": "^3.5.0",
     "commander": "^2.11.0",
     "debug": "^3.0.1",
-    "eth-lightwallet": "^2.5.6",
     "ethereumjs-tx": "^1.3.3",
     "fs-extra": "^4.0.1",
     "inquirer": "^3.2.3",
@@ -36,7 +35,6 @@
     "ora": "^1.3.0",
     "recursive-copy": "^2.0.6",
     "truffle": "^3.4.9",
-    "truffle-contract": "^3.0.0",
     "web3": "^0.20.2"
   },
   "devDependencies": {
