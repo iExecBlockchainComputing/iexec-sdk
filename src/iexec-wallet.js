@@ -9,6 +9,11 @@ const debug = Debug('iexec:iexec-wallet');
 debug('');
 
 cli
+  .option('--network [name]', 'network name', 'ropsten')
+  .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
+;
+
+cli
   .command('create')
   .description('create a local wallet')
   .action(() => wallet.create().catch(error => console.log(`"iexec wallet create" failed with ${error}`)))
@@ -17,7 +22,15 @@ cli
 cli
   .command('getETH')
   .description('apply for ETH from pre-registered faucets')
-  .action(() => wallet.getETH().catch(error => console.log(`"iexec wallet getETH" failed with ${error}`)))
+  .action(() => wallet.getETH(cli.network).catch(error => console.log(`"iexec wallet getETH" failed with ${error}`)))
+;
+
+cli
+  .command('show')
+  .description('show local wallet balances')
+  .action(() => wallet.show().catch(error => console.log(`"iexec wallet show" failed with ${error}`)))
 ;
 
 cli.parse(process.argv);
+
+if (cli.args.length <= 1) cli.help();
