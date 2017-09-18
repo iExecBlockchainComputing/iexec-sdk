@@ -3,11 +3,14 @@
 const Debug = require('debug');
 const fs = require('fs');
 const Web3 = require('web3');
+const NewWeb3 = require('./web3');
 const Promise = require('bluebird');
 const cli = require('commander');
 const path = require('path');
 const ora = require('ora');
 const tx = require('@warren-bank/ethereumjs-tx-sign');
+const EthereumTx = require('ethereumjs-tx');
+// const contract = require('truffle-contract');
 const truffle = require('./truffle-cli');
 const wallet = require('./wallet');
 const utils = require('./utils');
@@ -30,6 +33,7 @@ const migrate = async () => {
   try {
     const network = truffleConfig.networks[cli.network];
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
+    const newWeb3 = new NewWeb3(new NewWeb3.providers.HttpProvider(network.host));
     Promise.promisifyAll(web3.eth);
 
     await truffle.compile();
@@ -42,11 +46,18 @@ const migrate = async () => {
     const { abi, unlinked_binary } = compiledFile;
 
     const Contract = web3.eth.contract(abi);
+    const newContract = new newWeb3.eth.Contract(abi);
 
     const constructorArgs = iexecConfig.constructorArgs || [];
 
-    const unsignedTx = Contract.new.getData(constructorArgs, { data: unlinked_binary });
+    const toDeploy = { data: unlinked_binary };
+    if (iexecConfig.constructorArgs) toDeploy.arguments = iexecConfig.constructorArgs;
 
+    const newUnsignedTx = newContract.deploy(toDeploy).encodeABI();
+    debug('newUnsignedTx', newUnsignedTx);
+
+    const unsignedTx = Contract.new.getData(constructorArgs, { data: unlinked_binary });
+    debug('unsignedTx', unsignedTx);
     if (cli.wallet === 'local') {
       const userWallet = await wallet.load();
       const [networkGasPrice, nonce] = await Promise.all([
@@ -64,6 +75,45 @@ const migrate = async () => {
       const chainId = web3.version.network;
       debug('chainId', chainId);
 
+      // var MyContract = contract({
+      //   abi,
+      //   unlinked_binary,
+      //   // address: ..., // optional
+      //   // many more
+      // })
+      // MyContract.setProvider(provider);
+
+      // const privateKey = Buffer.from(userWallet.privateKey, 'hex');
+      //
+      // const tx2 = new EthereumTx({
+      //   nonce: web3.toHex(nonce),
+      //   gasPrice: web3.toHex(gasPrice),
+      //   gasLimit: web3.toHex(gasLimit),
+      //   // to: '0x0000000000000000000000000000000000000000',
+      //   // value: '0x00',
+      //   data: unsignedTx,
+      //   chainId,
+      // });
+      // debug('tx2', tx2);
+      // tx2.sign(privateKey);
+      // const serialized = tx2.serialize().toString('hex');
+      // debug('serialized', serialized);
+
+      const newRawTx = tx.sign({
+        nonce: newWeb3.utils.toHex(nonce),
+        gasPrice: newWeb3.utils.toHex(gasPrice),
+        gasLimit: newWeb3.utils.toHex(gasLimit),
+        data: unsignedTx,
+        chainId,
+      }, userWallet.privateKey);
+      debug('newRawTx.rawTx', newRawTx.rawTx);
+
+      const newTxReceipt = await newWeb3.eth.sendSignedTransaction('0x'.concat(newRawTx.rawTx))
+        .once('transactionHash', hash => console.log('txHash', hash, '\n'))
+        .on('error', error => debug('error', error));
+      console.log('newTxReceipt', newTxReceipt, '\n');
+      console.log(`View on etherscan: https://${cli.network}.etherscan.io/tx/${newTxReceipt.transactionHash}\n`);
+
       const { rawTx } = tx.sign({
         nonce: web3.toHex(nonce),
         gasPrice: web3.toHex(gasPrice),
@@ -71,7 +121,10 @@ const migrate = async () => {
         data: unsignedTx,
         chainId,
       }, userWallet.privateKey);
+      debug('rawTx', rawTx);
 
+      // const txHash2 = await web3.eth.sendRawTransactionAsync('0x'.concat(serialized));
+      // debug('txHash2', txHash2);
       const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
       spinner.succeed(`new contract txHash: ${txHash} \n`);
 
