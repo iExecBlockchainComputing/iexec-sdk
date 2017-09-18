@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "iExec cli",
   "main": "src/index.js",
   "scripts": {
@@ -28,12 +28,14 @@
     "bluebird": "^3.5.0",
     "commander": "^2.11.0",
     "debug": "^3.0.1",
+    "ethereumjs-tx": "^1.3.3",
     "fs-extra": "^4.0.1",
     "inquirer": "^3.2.3",
     "node-fetch": "^1.7.3",
+    "ora": "^1.3.0",
     "recursive-copy": "^2.0.6",
     "truffle": "^3.4.9",
-    "web3": "^1.0.0-beta.18"
+    "web3": "^0.20.2"
   },
   "devDependencies": {
     "eslint": "^4.5.0",

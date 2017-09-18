@@ -20,6 +20,8 @@ cli.command('truffle [args...]', 'execute truffle with any number of truffle arg
 
 cli.command('compile [args...]', 'call truffle compile');
 
-cli.command('migrate [args...]', 'call truffle migrate');
+cli.command('migrate [args...]', 'compile and deploy the contract');
+
+cli.command('submit [args...]', 'send submit transaction');
 
 cli.parse(process.argv);
