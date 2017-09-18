@@ -7,7 +7,6 @@ const Promise = require('bluebird');
 const cli = require('commander');
 const path = require('path');
 const ora = require('ora');
-const tx = require('@warren-bank/ethereumjs-tx-sign');
 const truffle = require('./truffle-cli');
 const wallet = require('./wallet');
 const utils = require('./utils');
@@ -49,31 +48,13 @@ const migrate = async () => {
     debug('unsignedTx', unsignedTx);
     if (cli.wallet === 'local') {
       const userWallet = await wallet.load();
-      const [networkGasPrice, nonce] = await Promise.all([
-        web3.eth.getGasPriceAsync(),
-        web3.eth.getTransactionCount('0x'.concat(userWallet.address)),
-      ]);
-      debug('networkGasPrice', networkGasPrice);
-      debug('nonce', nonce);
 
-      const gasPriceMultiplier = network.gasPriceMultiplier || 3;
-      const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
-      debug('gasPrice', gasPrice);
-      const gasLimit = network.gas || 4400000;
-      debug('gasLimit', gasLimit);
-      const chainId = parseInt(web3.version.network, 10);
-      debug('chainId', chainId);
-
-      const { rawTx } = tx.sign({
-        nonce: web3.toHex(nonce),
-        gasPrice: web3.toHex(gasPrice),
-        gasLimit: web3.toHex(gasLimit),
-        data: unsignedTx,
-        chainId,
-      }, userWallet.privateKey);
-
-      debug('1');
-      const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
+      const txHash = await utils.signAndSendTx({
+        web3,
+        userWallet,
+        unsignedTx,
+        network,
+      });
       spinner.succeed(`new contract txHash: ${txHash} \n`);
 
       spinner.start('waiting for txReceipt');
@@ -82,6 +63,7 @@ const migrate = async () => {
       console.log(JSON.stringify(txReceipt, null, 4));
       console.log(`View on etherscan: https://${cli.network}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
 
+      const chainId = parseInt(web3.version.network, 10);
       compiledFile.networks[chainId] = { address: txReceipt.contractAddress };
       await writeFileAsync(compiledFileJSONPath, JSON.stringify(compiledFile, null, 4));
       console.log(`saved new contract address to ${compiledFileJSONPath}\n`);
