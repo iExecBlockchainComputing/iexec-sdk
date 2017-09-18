@@ -17,7 +17,7 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
   const spinner = ora();
   try {
     const fnString = methodName.concat('(', args.join(), ')');
-    spinner.start(`calling ${fnString})`);
+    spinner.start(`calling ${fnString}`);
     const network = truffleConfig.networks[networkName];
 
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
@@ -54,6 +54,7 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
         gasLimit: web3.toHex(gasLimit),
         data: unsignedTx,
         chainId,
+        to: contractAddress,
       }, userWallet.privateKey);
 
       const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
