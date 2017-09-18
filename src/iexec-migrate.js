@@ -36,7 +36,7 @@ const migrate = async () => {
 
     spinner.start(`Deploying ${iexecConfig.name} contract...`);
 
-    const compiledFileJSONPath = `build/contracts/${iexecConfig.name}.json`;
+    const compiledFileJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
     const compiledFileJSON = await readFileAsync(compiledFileJSONPath);
     const compiledFile = JSON.parse(compiledFileJSON);
     const { abi, unlinked_binary } = compiledFile;
