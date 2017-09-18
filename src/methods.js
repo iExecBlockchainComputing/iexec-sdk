@@ -5,7 +5,6 @@ const Promise = require('bluebird');
 const path = require('path');
 const ora = require('ora');
 const tx = require('@warren-bank/ethereumjs-tx-sign');
-const lightwallet = require('eth-lightwallet');
 const wallet = require('./wallet');
 const utils = require('./utils');
 // eslint-disable-next-line
@@ -28,6 +27,9 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
     const { abi, networks } = JSON.parse(compiledFile);
 
     const contractAddress = networks[network.network_id].address;
+    const contract = web3.eth.contract(abi).at(contractAddress);
+
+    const unsignedTx = contract[methodName].getData(...args);
 
     if (walletType === 'local') {
       const userWallet = await wallet.load();
@@ -43,17 +45,15 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
       debug('gasPrice', gasPrice);
       const gasLimit = network.gas || 4400000;
       debug('gasLimit', gasLimit);
-      const chainId = web3.version.network;
+      const chainId = parseInt(web3.version.network, 10);
       debug('chainId', chainId);
 
-      const rawTx2 = lightwallet.txutils.functionTx(abi, methodName, args, { to: contractAddress });
-      debug('rawTx2', rawTx2);
-
       const { rawTx } = tx.sign({
-        data: '0x'.concat(rawTx2),
         nonce: web3.toHex(nonce),
         gasPrice: web3.toHex(gasPrice),
         gasLimit: web3.toHex(gasLimit),
+        data: unsignedTx,
+        chainId,
       }, userWallet.privateKey);
 
       const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
