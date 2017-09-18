@@ -24,4 +24,6 @@ cli.command('migrate [args...]', 'compile and deploy the contract');
 
 cli.command('submit [args...]', 'send submit transaction');
 
+cli.command('results', 'fetch all jobs results');
+
 cli.parse(process.argv);
