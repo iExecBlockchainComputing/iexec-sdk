@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const Debug = require('debug');
 const Promise = require('bluebird');
 const { exec } = require('child_process');
