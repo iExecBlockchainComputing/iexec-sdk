@@ -6,8 +6,6 @@ const wallet = require('./wallet');
 
 const debug = Debug('iexec:iexec-wallet');
 
-debug('');
-
 cli
   .option('--network [name]', 'network name', 'ropsten')
   .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
@@ -33,4 +31,5 @@ cli
 
 cli.parse(process.argv);
 
-if (cli.args.length <= 1) cli.help();
+debug('cli.args', cli.args);
+if (cli.args.length === 0) cli.help();
