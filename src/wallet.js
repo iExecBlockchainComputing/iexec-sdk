@@ -1,11 +1,16 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
+const Web3 = require('web3');
+const ora = require('ora');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const fetch = require('node-fetch');
 const { genKeyPair } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { privateToPublic } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
+const path = require('path');
+// eslint-disable-next-line
+const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
 
 const debug = Debug('iexec:wallet');
 const openAsync = Promise.promisify(fs.open);
@@ -84,10 +89,12 @@ const load = async () => {
 
 const faucets = [
   {
-    name: 'facet.ropsten.be',
+    networkName: 'ropsten',
+    name: 'faucet.ropsten.be',
     getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()),
   },
   {
+    networkName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
     getETH: address => fetch('https://ropsten.faucet.b9lab.com/tap',
       {
@@ -99,17 +106,62 @@ const faucets = [
         body: JSON.stringify({ toWhom: '0x'.concat(address) }),
       }).then(res => res.json()),
   },
+  {
+    networkName: 'rinkeby',
+    name: 'faucet.rinkeby.io',
+    getETH: () => ({ message: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH' }),
+  },
+  {
+    networkName: 'kovan',
+    name: 'gitter.im/kovan-testnet/faucet',
+    getETH: () => ({ message: 'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH' }),
+  },
 ];
 
-const getETH = async () => {
+const getETH = async (networkName) => {
+  const spinner = ora('Requesting faucets for ETH...').start();
   try {
     const userWallet = await load();
-    const responses = await Promise.all(faucets.map(faucet => faucet.getETH(userWallet.address)));
-    const responsesMessage = faucets.reduce((accu, curr, index) =>
+    debug('networkName', networkName);
+    const filteredFaucets = faucets.filter(e => e.networkName === networkName);
+    const responses = await Promise.all(
+      filteredFaucets.map(faucet => faucet.getETH(userWallet.address)));
+    const responsesMessage = filteredFaucets.reduce((accu, curr, index) =>
       accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
+    spinner.succeed('Faucets responses:\n');
     console.log(responsesMessage);
   } catch (error) {
-    debug('getETH() error', error);
+    spinner.fail(`getETH() failed with ${error}`);
+    throw error;
+  }
+};
+
+const show = async () => {
+  const spinner = ora();
+  try {
+    const userWallet = await load();
+
+    console.log('Wallet:\n');
+    console.log(JSON.stringify(userWallet, null, 4), '\n');
+    spinner.start('Checking ETH balances...');
+
+    const networkNames = Object.keys(truffleConfig.networks);
+    const providers = networkNames.map(
+      name => new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host)));
+    debug('providers', providers);
+    providers.map(e => Promise.promisifyAll(e.eth));
+    const balances = await Promise.all(
+      providers.map(web3 => web3.eth.getBalanceAsync(userWallet.address).then(balance => web3.fromWei(balance, 'ether')).catch(() => 0)));
+    spinner.succeed('ETH balances:\n');
+    const balancesString = balances.reduce(
+      (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
+      '',
+    );
+
+    console.log(balancesString, '\n');
+    console.log('Run "iexec wallet getETH" to top up your account');
+  } catch (error) {
+    spinner.fail(`show() failed with ${error}`);
     throw error;
   }
 };
@@ -118,4 +170,5 @@ module.exports = {
   create,
   load,
   getETH,
+  show,
 };
