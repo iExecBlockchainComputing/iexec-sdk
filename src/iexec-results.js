@@ -46,6 +46,8 @@ const fetchResults = async () => {
     const oracle = web3.eth.contract(abi).at(network.iexecOracleAddress);
     Promise.promisifyAll(oracle);
 
+    debug('user address', '0x'.concat(userWallet.address.toString('hex')));
+    debug('providerAddress', providerAddress);
     const submitCounts = await oracle.getUserProviderUsageCountAsync(
       '0x'.concat(userWallet.address.toString('hex')),
       providerAddress,
@@ -59,7 +61,7 @@ const fetchResults = async () => {
       ));
     }
     const results = await Promise.all(resultsPromise);
-    spinner.succeed(`${submitCounts} result${submitCounts > 1 ? 's' : ''}:`);
+    spinner.succeed(`${submitCounts} result${submitCounts === 1 ? 's' : ''}:`);
     console.log(JSON.stringify(results, null, 4));
   } catch (error) {
     spinner.fail(`"iexec results" failed with ${error}`);
