@@ -4,7 +4,6 @@ const Web3 = require('web3');
 const Promise = require('bluebird');
 const path = require('path');
 const ora = require('ora');
-const tx = require('@warren-bank/ethereumjs-tx-sign');
 const wallet = require('./wallet');
 const utils = require('./utils');
 // eslint-disable-next-line
@@ -33,31 +32,14 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
 
     if (walletType === 'local') {
       const userWallet = await wallet.load();
-      const [networkGasPrice, nonce] = await Promise.all([
-        web3.eth.getGasPriceAsync(),
-        web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
-      ]);
-      debug('networkGasPrice', networkGasPrice);
-      debug('nonce', nonce);
 
-      const gasPriceMultiplier = network.gasPriceMultiplier || 3;
-      const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
-      debug('gasPrice', gasPrice);
-      const gasLimit = network.gas || 4400000;
-      debug('gasLimit', gasLimit);
-      const chainId = parseInt(web3.version.network, 10);
-      debug('chainId', chainId);
-
-      const { rawTx } = tx.sign({
-        nonce: web3.toHex(nonce),
-        gasPrice: web3.toHex(gasPrice),
-        gasLimit: web3.toHex(gasLimit),
-        data: unsignedTx,
-        chainId,
-        to: contractAddress,
-      }, userWallet.privateKey);
-
-      const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
+      const txHash = await utils.signAndSendTx({
+        web3,
+        userWallet,
+        unsignedTx,
+        network,
+        contractAddress,
+      });
       spinner.succeed(`${fnString} txHash: ${txHash} \n`);
 
       spinner.start('waiting for txReceipt');

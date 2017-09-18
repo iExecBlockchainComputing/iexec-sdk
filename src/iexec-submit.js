@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const Debug = require('debug');
 const cli = require('commander');
 const path = require('path');
