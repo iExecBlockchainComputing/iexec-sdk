@@ -14,7 +14,5 @@ cli
   .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
   .parse(process.argv);
 
-const network = truffleConfig.networks[cli.network];
-
 debug('cli.args', cli.args);
-methods.send(cli.wallet, network, 'iexecSubmit', cli.args).catch(error => console.log(`"iexec submit" failed with ${error}`));
+methods.send(cli.wallet, cli.network, truffleConfig, 'iexecSubmit', cli.args).catch(error => console.log(`"iexec submit" failed with ${error}`));
