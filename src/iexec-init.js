@@ -21,13 +21,14 @@ async function init() {
     const branchName = cli.args.length ? cli.args[0] : 'init';
     console.log(`pulling ${branchName}...`);
     debug('pulling %o...', branchName);
+    const dirName = 'iexec-'.concat(branchName);
 
-    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} iexec-${branchName}`);
-    await fs.remove(`./${branchName}/.git`);
+    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${dirName}`);
+    await fs.remove(`./${dirName}/.git`);
 
     await execAsync(`git clone --depth=1 ${IEXEC_GITHUB}${ORACLE_REPO} temp`);
 
-    await copy('./temp/contracts', `./${branchName}/contracts`);
+    await copy('./temp/contracts', `./${dirName}/contracts`);
     await fs.remove('./temp');
   } catch (error) {
     console.log(`"iexec init" failed with ${error}`);
