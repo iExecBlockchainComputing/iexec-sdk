@@ -18,11 +18,11 @@ cli.parse(process.argv);
 
 async function init() {
   try {
-    const branchName = cli.args.length ? cli.args[0] : 'factorial';
+    const branchName = cli.args.length ? cli.args[0] : 'init';
     console.log(`pulling ${branchName}...`);
     debug('pulling %o...', branchName);
 
-    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${branchName}`);
+    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} iexec-${branchName}`);
     await fs.remove(`./${branchName}/.git`);
 
     await execAsync(`git clone --depth=1 ${IEXEC_GITHUB}${ORACLE_REPO} temp`);
