@@ -7,6 +7,8 @@ const FETCH_INTERVAL = 1000;
 const TIMEOUT = 60 * 1000;
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const DEFAULT_GAS_PRICE_MULTIPLIER = 1;
+const DEFAULT_GAS_LIMIT_MULTIPLIER = 4;
 
 const waitFor = async (fn, hash) => {
   let counter = 0;
@@ -44,10 +46,10 @@ const signAndSendTx = async ({
     debug('nonce', nonce);
     debug('estimatedGas', estimatedGas);
 
-    const gasPriceMultiplier = network.gasPriceMultiplier || 1;
+    const gasPriceMultiplier = network.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
     const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
     debug('gasPrice', gasPrice);
-    const gasLimitMultiplier = network.gasLimitMultiplier || 2;
+    const gasLimitMultiplier = network.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
     const gasLimit = (network.gas || estimatedGas * gasLimitMultiplier);
     debug('gasLimit', gasLimit);
     const chainId = parseInt(web3.version.network, 10);
