@@ -27,6 +27,7 @@ Init
 Init your iexec project with one of the [sample iexec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
 ```bash
 iexec init factorial
+cd iexec-factorial
 ```
 
 It will download the sample iexec project to start with.
