@@ -53,7 +53,7 @@ const fetchResults = async () => {
       providerAddress,
     );
     const resultsPromise = [];
-    for (let x = 0; x < submitCounts; x += 1) {
+    for (let x = 1; x <= submitCounts; x += 1) {
       resultsPromise.push(oracle.getWorkAsync(
         '0x'.concat(userWallet.address.toString('hex')),
         providerAddress,
