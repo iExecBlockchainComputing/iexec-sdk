@@ -7,89 +7,73 @@ Using these tools, you will be able to deploy any legacy applications in the iex
 and execute them through calls to Ethereum smart contracts.
 
 
-Installing the iexec SDK
-========================
+Install
+========
 
-First clone the iexec-sdk Githup repo.
+Requirement: [Node.js](https://nodejs.org/en/)
 
-Make sure you have the following components installed :
- - Ethereum client
-
-
-
-Then move in the directory and enter the following command:
-
-```
-npm install iexec
+```bash
+npm -g install iexec
+iexec --version
+iexec --help
 ```
 
-You're done ! Now, you can create your first hello world application.
+You're done ! Now, you can create your first iexec application.
 
 
-I create,
+Init
 =========
 
-
+Init your iexec project with one of the [sample iexec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
+```bash
+iexec init factorial
 ```
-iexec init
-```
 
-It will scaffolding the helloWorld project to start with.
+It will download the sample iexec project to start with.
 
-Your iexec Dapps is composed of two parts:
-- an offchain app, which can be any kind of legacy application. The offchain app will be executed by the iexec decentralised cloud.
-- a smart contract that interfaces your iexec Dapp from Ethereum to the offchain app.
+Your iexec Dapps is composed at the minimum of two parts:
+1. an offchain app, which can be any kind of legacy application. The offchain app will be executed by the iexec decentralised cloud.
+2. a smart contract that interfaces your iexec Dapp from Ethereum to the offchain app.
 
 Ethereum ->  Smart Contract -> offchain
 
- I deploy,
-==========
-
-For his offchain computing app, the developer must first deploy his binary into iexec. To do so,  connect  with your ethereum address, obtain a token, then launch :
-
+Wallet
+=================
+All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees. First get a Wallet, and some ETH:
+```bash
+iexec wallet create
+iexec wallet getETH
 ```
-iexec sendapp appName
-```
-
-For his smart contract, the developer will use truffle behind the seen with the followings commands :
-
-```
-iexec compile
-iexec migrate
-iexec test
+You can check how many ETH you have on your wallet:
+```bash
+iexec wallet show
 ```
 
-
+I deploy
 ============
+```bash
+iexec migrate
+iexec migrate --network ropsten # you need ETH on the ropsten testnet to do that
+```
+This will use informations from the iexec and truffle config file to deploy the contract on ethereum:
+This is the iexec configuration file:
+```js
+// iexec.js
+module.exports = {
+    name: 'Factorial',  // the name of the contract to be deployed
+    constructorArgs: ['0xe6b658facf9621eff76a0d649c61dba4c8de85fb'],  // the constructor arguments for contract deployment logic
+};
+```
 
 I exec
 ============
-
-To debug the offchain computing part of your dapp, you can try to submit a work through your smart contract by the following command :
+Let's submit our first calculation:
+```bash
+iexec submit factorial 10
 ```
-iexec register(work) appName (find a better word ? )
+check the results:
 ```
-It will return an uid of your work.
-
-Configure your work, by adding parameter
-```
-iexec setParam appName uid  paramName paramValue
-```
-Put your work available for a iexec worker to execute it
-```
-iexec setPending appName uid (find a better word ? )
+iexec results
 ```
 
-Get your work status :
-```
-iexec getStatus appName uid
-```
-
-When finish, you can download your work results with  :
-
-```
-iexec getResults appName uid
-```
-
-You just test that your smart contract can you use offchain computing.
-Now sky's the limit for you and your smart contract !
+Your smart contract is "offchain computing ready!".Sky is the limit for you and your smart contract!
