@@ -1,5 +1,4 @@
-iexec SDK
-=========
+# iexec SDK [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec)
 
 Iexec allows Ethereum developpers to create applications that can be executed off-chain.
 This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iexec.
@@ -7,8 +6,7 @@ Using these tools, you will be able to deploy any legacy applications in the iex
 and execute them through calls to Ethereum smart contracts.
 
 
-Install
-========
+## Install
 
 Requirement: [Node.js](https://nodejs.org/en/)
 
@@ -21,8 +19,7 @@ iexec --help
 You're done ! Now, you can create your first iexec application.
 
 
-Init
-=========
+## Init
 
 Init your iexec project with one of the [sample iexec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
 ```bash
@@ -35,10 +32,9 @@ Your iexec Dapps is composed at the minimum of two parts:
 1. an offchain app, which can be any kind of legacy application. The offchain app will be executed by the iexec decentralised cloud.
 2. a smart contract that interfaces your iexec Dapp from Ethereum to the offchain app.
 
-Ethereum ->  Smart Contract -> offchain
 
-Wallet
-=================
+## Wallet
+
 All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees. First get a Wallet, and some ETH:
 ```bash
 iexec wallet create
@@ -49,8 +45,8 @@ You can check how many ETH you have on your wallet:
 iexec wallet show
 ```
 
-I deploy
-============
+## I deploy
+
 ```bash
 iexec migrate
 iexec migrate --network ropsten # you need ETH on the ropsten testnet to do that
@@ -65,8 +61,8 @@ module.exports = {
 };
 ```
 
-I exec
-============
+## I exec
+
 Let's submit our first calculation:
 ```bash
 iexec submit factorial 10
