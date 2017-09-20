@@ -1,11 +1,12 @@
 # iexec SDK [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec)
 
 
-Iexec allows Ethereum developpers to create applications that can be executed off-chain.
+iExec allows Ethereum developers to create applications that can be executed off-chain.
 This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iexec.
 Using these tools, you will be able to deploy any legacy applications in the iexec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
+A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda. 
 
 ## Install
 
@@ -73,4 +74,4 @@ check the results:
 iexec results
 ```
 
-Your smart contract is "offchain computing ready!".Sky is the limit for you and your smart contract!
+Your smart contract is "offchain computing ready!". Sky is the limit for you and your smart contract!
