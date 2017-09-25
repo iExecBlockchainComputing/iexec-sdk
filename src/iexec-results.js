@@ -48,10 +48,11 @@ const fetchResults = async () => {
 
     debug('user address', '0x'.concat(userWallet.address.toString('hex')));
     debug('providerAddress', providerAddress);
-    const submitCounts = await oracle.getUserProviderUsageCountAsync(
+    const submitCountsBN = await oracle.getUserProviderUsageCountAsync(
       '0x'.concat(userWallet.address.toString('hex')),
       providerAddress,
     );
+    const submitCounts = submitCountsBN.toNumber();
     const resultsPromise = [];
     for (let x = 1; x <= submitCounts; x += 1) {
       resultsPromise.push(oracle.getWorkAsync(
@@ -61,7 +62,7 @@ const fetchResults = async () => {
       ));
     }
     const results = await Promise.all(resultsPromise);
-    spinner.succeed(`${submitCounts} result${submitCounts === 1 ? 's' : ''}:`);
+    spinner.succeed(`${submitCounts} result${submitCounts !== 1 ? 's' : ''}:`);
     console.log(JSON.stringify(results, null, 4));
   } catch (error) {
     spinner.fail(`"iexec results" failed with ${error}`);
