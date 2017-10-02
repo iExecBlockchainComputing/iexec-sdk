@@ -13,7 +13,7 @@ const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
 // eslint-disable-next-line
 const iexecConfig = require(path.join(process.cwd(), 'iexec.js'));
 
-const debug = Debug('iexec:iexec-submit');
+const debug = Debug('iexec:iexec-result');
 const readFileAsync = Promise.promisify(fs.readFile);
 
 cli
@@ -48,24 +48,25 @@ const fetchResults = async () => {
 
     debug('user address', '0x'.concat(userWallet.address.toString('hex')));
     debug('providerAddress', providerAddress);
-    const submitCountsBN = await oracle.getUserProviderUsageCountAsync(
-      '0x'.concat(userWallet.address.toString('hex')),
-      providerAddress,
-    );
-    const submitCounts = submitCountsBN.toNumber();
-    const resultsPromise = [];
-    for (let x = 1; x <= submitCounts; x += 1) {
-      resultsPromise.push(oracle.getWorkAsync(
-        '0x'.concat(userWallet.address.toString('hex')),
-        providerAddress,
-        x,
-      ));
+
+    const [txReceipt, result] = await Promise.all([
+      web3.eth.getTransactionReceiptAsync(cli.args[0]),
+      oracle.getWorkAsync(cli.args[0]),
+    ]);
+    debug('txReceipt', txReceipt);
+    if (txReceipt === null) throw Error('Transaction hash does not exist');
+
+    debug('result', result);
+
+    if (!result[4] && !result[5]) {
+      spinner.info('PENDING...');
+      return;
     }
-    const results = await Promise.all(resultsPromise);
-    spinner.succeed(`${submitCounts} result${submitCounts !== 1 ? 's' : ''}:`);
-    console.log(JSON.stringify(results, null, 4));
+
+    spinner.succeed('Result:');
+    console.log(JSON.stringify(result, null, 4));
   } catch (error) {
-    spinner.fail(`"iexec results" failed with ${error}`);
+    spinner.fail(`"iexec result" failed with ${error}`);
   }
 };
 fetchResults();
