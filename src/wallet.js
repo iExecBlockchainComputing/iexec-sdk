@@ -96,7 +96,8 @@ const faucets = [
   {
     networkName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
-    getETH: address => fetch('https://ropsten.faucet.b9lab.com/tap',
+    getETH: address => fetch(
+      'https://ropsten.faucet.b9lab.com/tap',
       {
         headers: {
           Accept: 'application/json',
@@ -104,7 +105,8 @@ const faucets = [
         },
         method: 'POST',
         body: JSON.stringify({ toWhom: '0x'.concat(address) }),
-      }).then(res => res.json()),
+      },
+    ).then(res => res.json()),
   },
   {
     networkName: 'rinkeby',
@@ -124,8 +126,8 @@ const getETH = async (networkName) => {
     const userWallet = await load();
     debug('networkName', networkName);
     const filteredFaucets = faucets.filter(e => e.networkName === networkName);
-    const responses = await Promise.all(
-      filteredFaucets.map(faucet => faucet.getETH(userWallet.address)));
+    const responses = await Promise.all(filteredFaucets.map(faucet =>
+      faucet.getETH(userWallet.address)));
     const responsesMessage = filteredFaucets.reduce((accu, curr, index) =>
       accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
     spinner.succeed('Faucets responses:\n');
@@ -146,12 +148,12 @@ const show = async () => {
     spinner.start('Checking ETH balances...');
 
     const networkNames = Object.keys(truffleConfig.networks);
-    const providers = networkNames.map(
-      name => new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host)));
+    const providers = networkNames.map(name =>
+      new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host)));
     debug('providers', providers);
     providers.map(e => Promise.promisifyAll(e.eth));
-    const balances = await Promise.all(
-      providers.map(web3 => web3.eth.getBalanceAsync(userWallet.address).then(balance => web3.fromWei(balance, 'ether')).catch(() => 0)));
+    const balances = await Promise.all(providers.map(web3 =>
+      web3.eth.getBalanceAsync(userWallet.address).then(balance => web3.fromWei(balance, 'ether')).catch(() => 0)));
     spinner.succeed('ETH balances:\n');
     const balancesString = balances.reduce(
       (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
