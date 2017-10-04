@@ -6,7 +6,7 @@ This packages bring all the tools to develop, deploy and execute Dapps on Ethere
 Using these tools, you will be able to deploy any legacy applications in the iexec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
-A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda. 
+A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda.
 
 ## Install
 
@@ -26,6 +26,7 @@ You're done ! Now, you can create your first iexec application.
 Init your iexec project with one of the [sample iexec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
 ```bash
 iexec init factorial
+cd iexec-factorial  // move into new project directory
 ```
 
 It will download the sample iexec project to start with.
