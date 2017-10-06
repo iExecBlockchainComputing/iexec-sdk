@@ -39,7 +39,7 @@ const signAndSendTx = async ({
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
       web3.eth.getGasPriceAsync(),
       web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
-      web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress }),
+      web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress, from: '0x'.concat(userWallet.address) }),
     ]);
     debug('contractAddress', contractAddress);
     debug('networkGasPrice', networkGasPrice);
