@@ -87,7 +87,7 @@ const load = async () => {
   }
 };
 
-const faucets = [
+const ethFaucets = [
   {
     networkName: 'ropsten',
     name: 'faucet.ropsten.be',
@@ -121,11 +121,10 @@ const faucets = [
 ];
 
 const getETH = async (networkName) => {
-  const spinner = ora('Requesting faucets for ETH...').start();
+  const spinner = ora(`Requesting ${networkName} faucets for ETH...`).start();
   try {
     const userWallet = await load();
-    debug('networkName', networkName);
-    const filteredFaucets = faucets.filter(e => e.networkName === networkName);
+    const filteredFaucets = ethFaucets.filter(e => e.networkName === networkName);
     const responses = await Promise.all(filteredFaucets.map(faucet =>
       faucet.getETH(userWallet.address)));
     const responsesMessage = filteredFaucets.reduce((accu, curr, index) =>
@@ -134,6 +133,29 @@ const getETH = async (networkName) => {
     console.log(responsesMessage);
   } catch (error) {
     spinner.fail(`getETH() failed with ${error}`);
+    throw error;
+  }
+};
+
+const rlcFaucets = [
+  {
+    name: 'faucet.iex.ec',
+    getRLC: (chainName, address) => fetch(`https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`).then(res => res.json()),
+  },
+];
+
+const getRLC = async (networkName) => {
+  const spinner = ora(`Requesting ${networkName} faucet for RLC...`).start();
+  try {
+    const userWallet = await load();
+    const responses = await Promise.all(rlcFaucets.map(faucet =>
+      faucet.getRLC(networkName, userWallet.address)));
+    const responsesMessage = rlcFaucets.reduce((accu, curr, index) =>
+      accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
+    spinner.succeed('Faucets responses:\n');
+    console.log(responsesMessage);
+  } catch (error) {
+    spinner.fail(`getRLC() failed with ${error}`);
     throw error;
   }
 };
@@ -150,7 +172,6 @@ const show = async () => {
     const networkNames = Object.keys(truffleConfig.networks);
     const providers = networkNames.map(name =>
       new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host)));
-    debug('providers', providers);
     providers.map(e => Promise.promisifyAll(e.eth));
     const balances = await Promise.all(providers.map(web3 =>
       web3.eth.getBalanceAsync(userWallet.address).then(balance => web3.fromWei(balance, 'ether')).catch(() => 0)));
@@ -172,5 +193,6 @@ module.exports = {
   create,
   load,
   getETH,
+  getRLC,
   show,
 };

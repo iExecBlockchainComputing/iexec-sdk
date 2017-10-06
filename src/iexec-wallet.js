@@ -21,11 +21,15 @@ cli
   .action(() => wallet.getETH(cli.network).catch(error => console.log(`"iexec wallet getETH" failed with ${error}`)));
 
 cli
+  .command('getRLC')
+  .description('apply for RLC from iexec faucet')
+  .action(() => wallet.getRLC(cli.network).catch(error => console.log(`"iexec wallet getRLC" failed with ${error}`)));
+
+cli
   .command('show')
   .description('show local wallet balances')
   .action(() => wallet.show().catch(error => console.log(`"iexec wallet show" failed with ${error}`)));
 
 cli.parse(process.argv);
 
-debug('cli.args', cli.args);
 if (cli.args.length === 0) cli.help();
