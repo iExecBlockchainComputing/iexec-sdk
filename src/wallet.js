@@ -11,6 +11,7 @@ const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypair
 const path = require('path');
 // eslint-disable-next-line
 const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
+const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 
 const debug = Debug('iexec:wallet');
 const openAsync = Promise.promisify(fs.open);
@@ -165,24 +166,52 @@ const show = async () => {
   try {
     const userWallet = await load();
 
+    const chains = {};
+
     console.log('Wallet:\n');
     console.log(JSON.stringify(userWallet, null, 4), '\n');
     spinner.start('Checking ETH balances...');
 
     const networkNames = Object.keys(truffleConfig.networks);
-    const providers = networkNames.map(name =>
-      new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host)));
-    providers.map(e => Promise.promisifyAll(e.eth));
-    const balances = await Promise.all(providers.map(web3 =>
-      web3.eth.getBalanceAsync(userWallet.address).then(balance => web3.fromWei(balance, 'ether')).catch(() => 0)));
+    networkNames.forEach((name) => {
+      chains[name] = {};
+      chains[name].name = name;
+      chains[name].web3 =
+        new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));
+      Promise.promisifyAll(chains[name].web3.eth);
+      chains[name].id = truffleConfig.networks[name].network_id;
+      chains[chains[name].id] = chains[name];
+    });
+
+    const ethBalances = await Promise.all(networkNames.map(name =>
+      chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => Web3.fromWei(balance, 'ether')).catch(() => 0)));
     spinner.succeed('ETH balances:\n');
-    const balancesString = balances.reduce(
+    const ethBalancesString = ethBalances.reduce(
       (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
       '',
     );
 
-    console.log(balancesString, '\n');
-    console.log('Run "iexec wallet getETH" to top up your account');
+    console.log(ethBalancesString, '\n');
+    console.log('Run "iexec wallet getETH" to top up your ETH account\n');
+
+    spinner.start('Checking RLC balances...');
+    const chainIDs = Object.keys(rlcJSON.networks);
+
+    const rlcBalances = await Promise.all(chainIDs.map((id) => {
+      const rlcAddress = rlcJSON.networks[id].address;
+      const rlcContract = chains[id].web3.eth.contract(rlcJSON.abi).at(rlcAddress);
+      Promise.promisifyAll(rlcContract);
+      return rlcContract.balanceOfAsync('0x'.concat(userWallet.address));
+    }));
+
+    spinner.succeed('RLC balances:\n');
+    const rlcBalancesString = chainIDs.reduce(
+      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} RLC\n`),
+      '',
+    );
+
+    console.log(rlcBalancesString, '\n');
+    console.log('Run "iexec wallet getRLC" to top up your RLC account\n');
   } catch (error) {
     spinner.fail(`show() failed with ${error}`);
     throw error;
