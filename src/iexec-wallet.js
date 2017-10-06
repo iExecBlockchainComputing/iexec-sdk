@@ -32,4 +32,5 @@ cli
 
 cli.parse(process.argv);
 
+debug('cli.args.length', cli.args.length);
 if (cli.args.length === 0) cli.help();
