@@ -184,7 +184,7 @@ const show = async () => {
     });
 
     const ethBalances = await Promise.all(networkNames.map(name =>
-      chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => Web3.fromWei(balance, 'ether')).catch(() => 0)));
+      chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => chains[name].web3.fromWei(balance, 'ether')).catch(() => 0)));
     spinner.succeed('ETH balances:\n');
     const ethBalancesString = ethBalances.reduce(
       (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
