@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const { exec } = require('child_process');
 const cli = require('commander');
 const fs = require('fs-extra');
+const ora = require('ora');
 
 const execAsync = Promise.promisify(exec);
 const debug = Debug('iexec:iexec-init');
@@ -15,9 +16,10 @@ const SAMPLES_REPO = 'iexec-dapp-samples.git';
 cli.parse(process.argv);
 
 async function init() {
+  const spinner = ora();
   try {
     const branchName = cli.args.length ? cli.args[0] : 'init';
-    console.log(`pulling ${branchName}...`);
+    spinner.start(`pulling ${branchName}...`);
     debug('pulling %o...', branchName);
     const dirName = 'iexec-'.concat(branchName);
 
@@ -27,7 +29,7 @@ async function init() {
     process.chdir(dirName);
     await execAsync('npm i');
   } catch (error) {
-    console.log(`"iexec init" failed with ${error}`);
+    spinner.fail(`"iexec init" failed with ${error}`);
   }
 }
 init();
