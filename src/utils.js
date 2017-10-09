@@ -1,6 +1,10 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
 const tx = require('@warren-bank/ethereumjs-tx-sign');
+const path = require('path');
+// eslint-disable-next-line
+const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
+const Web3 = require('web3');
 
 const debug = Debug('iexec:utils');
 const FETCH_INTERVAL = 1000;
@@ -8,7 +12,7 @@ const TIMEOUT = 60 * 1000;
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_GAS_PRICE_MULTIPLIER = 1;
-const DEFAULT_GAS_LIMIT_MULTIPLIER = 4;
+const DEFAULT_GAS_LIMIT_MULTIPLIER = 1;
 
 const waitFor = async (fn, hash) => {
   let counter = 0;
@@ -50,6 +54,7 @@ const signAndSendTx = async ({
     const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
     debug('gasPrice', gasPrice);
     const gasLimitMultiplier = network.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
+    debug('network.gas', network.gas);
     const gasLimit = (network.gas || estimatedGas * gasLimitMultiplier);
     debug('gasLimit', gasLimit);
     const chainId = parseInt(web3.version.network, 10);
@@ -73,7 +78,28 @@ const signAndSendTx = async ({
   }
 };
 
+const getChains = () => {
+  try {
+    const chains = {};
+    const networkNames = Object.keys(truffleConfig.networks);
+    networkNames.forEach((name) => {
+      chains[name] = { ...truffleConfig.networks[name] };
+      chains[name].name = name;
+      chains[name].web3 =
+        new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));
+      Promise.promisifyAll(chains[name].web3.eth);
+      chains[name].id = truffleConfig.networks[name].network_id;
+      chains[chains[name].id] = chains[name];
+    });
+    return chains;
+  } catch (error) {
+    debug('chains()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   waitFor,
   signAndSendTx,
+  getChains,
 };
