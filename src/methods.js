@@ -16,7 +16,6 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
   const spinner = ora();
   try {
     const fnString = methodName.concat('(', args.join(), ')');
-    spinner.start(`calling ${fnString}`);
     const network = truffleConfig.networks[networkName];
 
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
@@ -33,6 +32,7 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
     if (walletType === 'local') {
       const userWallet = await wallet.load();
 
+      spinner.start(`calling ${fnString}`);
       const txHash = await utils.signAndSendTx({
         web3,
         userWallet,
