@@ -1,22 +1,85 @@
 const Debug = require('debug');
+const fs = require('fs-extra');
 const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
 const wallet = require('./wallet');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
 const Promise = require('bluebird');
+const ethUtil = require('ethereumjs-util');
+const sigUtil = require('eth-sig-util');
+const inquirer = require('inquirer');
+const http = require('./api');
 
 const debug = Debug('iexec:account');
+const openAsync = Promise.promisify(fs.open);
+const writeAsync = Promise.promisify(fs.write);
+const readFileAsync = Promise.promisify(fs.readFile);
+const writeFileAsync = Promise.promisify(fs.writeFile);
+
+const LOGIN_CONFIRMATION = 'You are not logged in yet, log in?';
+const ACCOUNT_FILE_NAME = 'account.json';
+
+const save = async (account) => {
+  const jsonAccount = JSON.stringify(account, null, 4);
+  try {
+    const fd = await openAsync(ACCOUNT_FILE_NAME, 'wx');
+    await writeAsync(fd, jsonAccount, 0, 'utf8');
+    return fs.close(fd);
+  } catch (error) {
+    if (error.code === 'EEXIST') {
+      return writeFileAsync(ACCOUNT_FILE_NAME, jsonAccount);
+    }
+    debug('save() error', error);
+    throw error;
+  }
+};
 
 const login = async () => {
   const spinner = ora();
   try {
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
-    spinner.start('logging in iExec...');
+    spinner.start('logging into iExec...');
+    const { secret } = await http.get('secret');
+    debug('secret', secret);
+
+    const msgHashBuffer = ethUtil.hashPersonalMessage(ethUtil.toBuffer(secret));
+    const msgHash = ethUtil.bufferToHex(msgHashBuffer);
+    debug('msgHash', msgHash);
+    const sig = ethUtil.ecsign(msgHashBuffer, ethUtil.toBuffer('0x'.concat(userWallet.privateKey)));
+    const signature = ethUtil.bufferToHex(sigUtil.concatSig(sig.v, sig.r, sig.s));
+
+    const { jwtoken } = await http.get('auth', { msgHash, signature });
+    debug('jwtoken', jwtoken);
+    await save({ jwtoken });
     spinner.succeed('You are logged into iExec\n');
   } catch (error) {
     spinner.fail(`login() failed with ${error}`);
+    throw error;
+  }
+};
+
+const load = async () => {
+  try {
+    const accountJSON = await readFileAsync(ACCOUNT_FILE_NAME, 'utf8');
+    debug('accountJSON', accountJSON);
+    const account = JSON.parse(accountJSON);
+    return account;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      const answers = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'login',
+        message: LOGIN_CONFIRMATION,
+      }]);
+      if (answers.login) {
+        return login().then(() => load());
+      }
+
+      throw new Error('Aborting. You need to login to continue');
+    }
+    debug('load() error', error);
     throw error;
   }
 };
@@ -91,4 +154,5 @@ module.exports = {
   login,
   setCredit,
   show,
+  load,
 };
