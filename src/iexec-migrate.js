@@ -42,7 +42,7 @@ const migrate = async () => {
 
     const constructorArgs = iexecConfig.constructorArgs || [];
 
-    const unsignedTx = Contract.new.getData(constructorArgs, { data: unlinked_binary });
+    const unsignedTx = Contract.new.getData(...constructorArgs, { data: unlinked_binary });
     debug('unsignedTx', unsignedTx);
     if (cli.wallet === 'local') {
       const userWallet = await wallet.load();
