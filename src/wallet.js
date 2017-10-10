@@ -122,9 +122,11 @@ const ethFaucets = [
 ];
 
 const getETH = async (networkName) => {
-  const spinner = ora(`Requesting ${networkName} faucets for ETH...`).start();
+  const spinner = ora();
   try {
     const userWallet = await load();
+
+    spinner.start(`Requesting ${networkName} faucets for ETH...`);
     const filteredFaucets = ethFaucets.filter(e => e.networkName === networkName);
     const responses = await Promise.all(filteredFaucets.map(faucet =>
       faucet.getETH(userWallet.address)));
@@ -146,9 +148,11 @@ const rlcFaucets = [
 ];
 
 const getRLC = async (networkName) => {
-  const spinner = ora(`Requesting ${networkName} faucet for RLC...`).start();
+  const spinner = ora();
   try {
     const userWallet = await load();
+
+    spinner.start(`Requesting ${networkName} faucet for RLC...`);
     const responses = await Promise.all(rlcFaucets.map(faucet =>
       faucet.getRLC(networkName, userWallet.address)));
     const responsesMessage = rlcFaucets.reduce((accu, curr, index) =>

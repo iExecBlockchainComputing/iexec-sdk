@@ -33,8 +33,6 @@ const migrate = async () => {
 
     await truffle.compile();
 
-    spinner.start(`Deploying ${iexecConfig.name} contract...`);
-
     const compiledFileJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
     const compiledFileJSON = await readFileAsync(compiledFileJSONPath);
     const compiledFile = JSON.parse(compiledFileJSON);
@@ -44,11 +42,12 @@ const migrate = async () => {
 
     const constructorArgs = iexecConfig.constructorArgs || [];
 
-    const unsignedTx = Contract.new.getData(constructorArgs, { data: unlinked_binary });
+    const unsignedTx = Contract.new.getData(...constructorArgs, { data: unlinked_binary });
     debug('unsignedTx', unsignedTx);
     if (cli.wallet === 'local') {
       const userWallet = await wallet.load();
 
+      spinner.start(`Deploying ${iexecConfig.name} contract...`);
       const txHash = await utils.signAndSendTx({
         web3,
         userWallet,
