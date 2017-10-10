@@ -83,7 +83,7 @@ const getChains = () => {
     const chains = {};
     const networkNames = Object.keys(truffleConfig.networks);
     networkNames.forEach((name) => {
-      chains[name] = { ...truffleConfig.networks[name] };
+      chains[name] = Object.assign({}, truffleConfig.networks[name]);
       chains[name].name = name;
       chains[name].web3 =
         new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));

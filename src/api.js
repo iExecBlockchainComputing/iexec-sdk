@@ -22,14 +22,16 @@ const httpRequest = verb => async (endpoint, body = {}) => {
   debug('queryString', queryString);
   const url = API_BASE_URL.concat(endpoint, queryString);
   debug('url', url);
-  const response = await fetch(url, {
-    method: verb,
-    headers: {
-      Accept: 'application/json',
-      'content-type': 'application/json',
-    },
-    ...makeBody(verb, body),
-  });
+  const response = await fetch(
+    url,
+    Object.assign({
+      method: verb,
+      headers: {
+        Accept: 'application/json',
+        'content-type': 'application/json',
+      },
+    }, makeBody(verb, body)),
+  );
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     const json = await response.json();
