@@ -12,7 +12,7 @@ const iexecConfig = require(path.join(process.cwd(), 'iexec.js'));
 const debug = Debug('iexec:iexec-submit');
 
 cli
-  .option('--network [name]', 'network name', 'ropsten')
+  .option('--chain, --network [name]', 'network name', 'ropsten')
   .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
   .parse(process.argv);
 

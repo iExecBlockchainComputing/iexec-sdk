@@ -20,7 +20,7 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
 
 cli
-  .option('--network [name]', 'migrate to network name', 'ropsten')
+  .option('--chain, --network [name]', 'migrate to network name', 'ropsten')
   .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
   .parse(process.argv);
 
