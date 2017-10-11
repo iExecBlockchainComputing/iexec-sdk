@@ -19,8 +19,8 @@ async function init() {
   const spinner = ora();
   try {
     const branchName = cli.args.length ? cli.args[0] : 'init';
+    debug(`pulling ${branchName}...`);
     spinner.start(`pulling ${branchName}...`);
-    debug('pulling %o...', branchName);
     const dirName = 'iexec-'.concat(branchName);
 
     await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${dirName}`);
@@ -28,6 +28,7 @@ async function init() {
 
     process.chdir(dirName);
     await execAsync('npm i');
+    spinner.succeed(`"${dirName}" folder created, your new iexec project is inside`);
   } catch (error) {
     spinner.fail(`"iexec init" failed with ${error}`);
   }
