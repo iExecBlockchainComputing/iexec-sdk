@@ -38,6 +38,7 @@ const signAndSendTx = async ({
   unsignedTx,
   network,
   contractAddress = ZERO_ADDRESS,
+  value = 0,
 }) => {
   try {
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
@@ -46,9 +47,10 @@ const signAndSendTx = async ({
       web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress, from: '0x'.concat(userWallet.address) }),
     ]);
     debug('contractAddress', contractAddress);
-    debug('networkGasPrice', networkGasPrice);
+    debug('networkGasPrice', networkGasPrice.toNumber());
     debug('nonce', nonce);
     debug('estimatedGas', estimatedGas);
+    debug('value', web3.toHex(value));
 
     const gasPriceMultiplier = network.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
     const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
@@ -64,6 +66,7 @@ const signAndSendTx = async ({
       nonce: web3.toHex(nonce),
       gasPrice: web3.toHex(gasPrice),
       gasLimit: web3.toHex(gasLimit),
+      value: web3.toHex(value),
       data: unsignedTx,
       chainId,
     };
@@ -93,7 +96,7 @@ const getChains = () => {
     });
     return chains;
   } catch (error) {
-    debug('chains()', error);
+    debug('getChains()', error);
     throw error;
   }
 };
