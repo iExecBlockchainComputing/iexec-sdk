@@ -7,7 +7,7 @@ const wallet = require('./wallet');
 const debug = Debug('iexec:iexec-wallet');
 
 cli
-  .option('--network [name]', 'network name', 'ropsten')
+  .option('--chain, --network [name]', 'network name', 'ropsten')
   .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local');
 
 cli

@@ -7,7 +7,7 @@ const account = require('./account');
 const debug = Debug('iexec:iexec-account');
 
 cli
-  .option('--network [name]', 'network name', 'ropsten');
+  .option('--chain, --network [name]', 'network name', 'ropsten');
 
 cli
   .command('login')
@@ -17,7 +17,7 @@ cli
 cli
   .command('setCredit')
   .description('set the RLC credit on iexec account')
-  .action(() => account.credit(cli.network, cli.args).catch(error => console.log(`"iexec account credit" failed with ${error}`)));
+  .action(() => account.setCredit(cli.network, cli.args).catch(error => console.log(`"iexec account credit" failed with ${error}`)));
 
 cli
   .command('show')

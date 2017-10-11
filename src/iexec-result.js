@@ -17,7 +17,7 @@ const debug = Debug('iexec:iexec-result');
 const readFileAsync = Promise.promisify(fs.readFile);
 
 cli
-  .option('--network [name]', 'network name', 'ropsten')
+  .option('--chain, --network [name]', 'network name', 'ropsten')
   .parse(process.argv);
 
 debug('cli.args', cli.args);
