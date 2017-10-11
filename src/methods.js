@@ -24,6 +24,7 @@ const send = async (walletType, networkName, truffleConfig, methodName, args) =>
     const compiledFile = await readFileAsync(`build/contracts/${iexecConfig.name}.json`);
     const { abi, networks } = JSON.parse(compiledFile);
 
+    if (!(network.network_id in networks)) throw Error(`No existing deployed contract on ${networkName}`);
     const contractAddress = networks[network.network_id].address;
     const contract = web3.eth.contract(abi).at(contractAddress);
 
