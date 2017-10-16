@@ -7,6 +7,7 @@ const cli = require('commander');
 const ora = require('ora');
 const Web3 = require('web3');
 const path = require('path');
+const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
 const wallet = require('./wallet');
 // eslint-disable-next-line
 const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
@@ -32,18 +33,14 @@ const fetchResults = async () => {
 
     spinner.start('Fetching submitted jobs results');
 
-    const oracleFileJSONPath = path.join('.', 'build', 'contracts', 'IexecOracle.json');
     const providerFileJSONPath = path.join('.', 'build', 'contracts', `${iexecConfig.name}.json`);
-    const [oracleFileJSON, providerFileJSON] = await Promise.all([
-      readFileAsync(oracleFileJSONPath),
-      readFileAsync(providerFileJSONPath),
-    ]);
-    const { abi } = JSON.parse(oracleFileJSON);
-    const { networks } = JSON.parse(providerFileJSON);
+    const providerFileJSON = await readFileAsync(providerFileJSONPath);
+    const providerJSON = JSON.parse(providerFileJSON);
 
-    const providerAddress = networks[network.network_id].address;
+    const providerAddress = providerJSON.networks[network.network_id].address;
+    const oracleAddress = oracleJSON.networks[network.network_id].address;
 
-    const oracle = web3.eth.contract(abi).at(network.iexecOracleAddress);
+    const oracle = web3.eth.contract(oracleJSON.abi).at(oracleAddress);
     Promise.promisifyAll(oracle);
 
     debug('user address', '0x'.concat(userWallet.address.toString('hex')));
