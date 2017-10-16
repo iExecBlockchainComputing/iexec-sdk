@@ -40,7 +40,7 @@ const migrate = async () => {
 
     const Contract = web3.eth.contract(abi);
 
-    const constructorArgs = iexecConfig.constructorArgs || [];
+    const constructorArgs = network.constructorArgs || [];
 
     const unsignedTx = Contract.new.getData(...constructorArgs, { data: unlinked_binary });
     debug('unsignedTx', unsignedTx);
