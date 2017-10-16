@@ -84,7 +84,7 @@ const load = async () => {
   }
 };
 
-const setCredit = async (networkName, cliArgs) => {
+const allow = async (networkName, cliArgs) => {
   const spinner = ora();
   try {
     const userWallet = await wallet.load();
@@ -113,7 +113,7 @@ const setCredit = async (networkName, cliArgs) => {
     console.log(JSON.stringify(txReceipt, null, 4));
     console.log(`\nView on etherscan: https://${networkName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
   } catch (error) {
-    spinner.fail(`setCredit() failed with ${error}`);
+    spinner.fail(`allow() failed with ${error}`);
     throw error;
   }
 };
@@ -152,7 +152,7 @@ const show = async () => {
 
 module.exports = {
   login,
-  setCredit,
+  allow,
   show,
   load,
 };
