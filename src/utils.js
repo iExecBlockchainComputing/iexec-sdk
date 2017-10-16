@@ -12,7 +12,7 @@ const TIMEOUT = 60 * 1000;
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_GAS_PRICE_MULTIPLIER = 1;
-const DEFAULT_GAS_LIMIT_MULTIPLIER = 1;
+let DEFAULT_GAS_LIMIT_MULTIPLIER = 1;
 
 const waitFor = async (fn, hash) => {
   let counter = 0;
@@ -41,6 +41,9 @@ const signAndSendTx = async ({
   value = 0,
 }) => {
   try {
+    const isMigrating = contractAddress === ZERO_ADDRESS;
+    if (isMigrating) DEFAULT_GAS_LIMIT_MULTIPLIER = 4;
+
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
       web3.eth.getGasPriceAsync(),
       web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
