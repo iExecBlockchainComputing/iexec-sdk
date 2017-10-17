@@ -22,7 +22,7 @@ cli
 
 cli
   .command('getRLC')
-  .description('apply for RLC from iexec faucet')
+  .description('apply for nRLC from iexec faucet')
   .action(() => wallet.getRLC(cli.network).catch(error => console.log(`"iexec wallet getRLC" failed with ${error}`)));
 
 cli

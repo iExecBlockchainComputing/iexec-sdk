@@ -97,7 +97,7 @@ const allow = async (networkName, cliArgs) => {
     const creditAmount = parseInt(cliArgs[0], 10);
 
     const unsignedTx = rlcContract.approve.getData(oracleAddress, creditAmount);
-    spinner.start('credit RLC on iExec account');
+    spinner.start('credit nRLC on iExec account');
     const txHash = await signAndSendTx({
       web3: chain.web3,
       userWallet,
@@ -138,11 +138,11 @@ const show = async () => {
     spinner.succeed('iExec account details:\n');
 
     const rlcAllowancesString = chainIDs.reduce(
-      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcAllowances[index]} RLC\n`),
+      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcAllowances[index]} nRLC\n`),
       '',
     );
 
-    console.log('RLC credits:');
+    console.log('nRLC allowances:');
     console.log(rlcAllowancesString, '\n');
   } catch (error) {
     spinner.fail(`show() failed with ${error}`);

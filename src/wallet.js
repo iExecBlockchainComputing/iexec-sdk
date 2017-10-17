@@ -152,7 +152,7 @@ const getRLC = async (networkName) => {
   try {
     const userWallet = await load();
 
-    spinner.start(`Requesting ${networkName} faucet for RLC...`);
+    spinner.start(`Requesting ${networkName} faucet for nRLC...`);
     const responses = await Promise.all(rlcFaucets.map(faucet =>
       faucet.getRLC(networkName, userWallet.address)));
     const responsesMessage = rlcFaucets.reduce((accu, curr, index) =>
@@ -198,7 +198,7 @@ const show = async () => {
     console.log(ethBalancesString, '\n');
     console.log('Run "iexec wallet getETH" to top up your ETH account\n');
 
-    spinner.start('Checking RLC balances...');
+    spinner.start('Checking nRLC balances...');
     const chainIDs = Object.keys(rlcJSON.networks);
 
     const rlcBalances = await Promise.all(chainIDs.map((id) => {
@@ -208,14 +208,14 @@ const show = async () => {
       return rlcContract.balanceOfAsync('0x'.concat(userWallet.address));
     }));
 
-    spinner.succeed('RLC balances:\n');
+    spinner.succeed('nRLC balances:\n');
     const rlcBalancesString = chainIDs.reduce(
-      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} RLC\n`),
+      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} nRLC\n`),
       '',
     );
 
     console.log(rlcBalancesString, '\n');
-    console.log('Run "iexec wallet getRLC" to top up your RLC account\n');
+    console.log('Run "iexec wallet getRLC" to top up your nRLC account\n');
   } catch (error) {
     spinner.fail(`show() failed with ${error}`);
     throw error;

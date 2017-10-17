@@ -66,7 +66,7 @@ const submit = async (networkName, methodName, args) => {
     debug('dappPrice', dappPrice.toNumber());
     debug('allowance', allowance.toNumber());
 
-    if (dappPrice > allowance) throw Error(`the dapp price (${dappPrice} RLC) is higher than your iexec credit (${allowance} RLC).`);
+    if (dappPrice > allowance) throw Error(`the dapp price (${dappPrice} nRLC) is higher than your iexec credit (${allowance} nRLC).`);
 
     const txHash = await utils.signAndSendTx({
       web3,

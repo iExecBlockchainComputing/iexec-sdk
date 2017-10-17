@@ -16,7 +16,7 @@ cli
 
 cli
   .command('allow')
-  .description('set the RLC credit on iexec account')
+  .description('set the nRLC allowance on iexec account')
   .action(() => account.allow(cli.network, cli.args).catch(error => console.log(`"iexec account credit" failed with ${error}`)));
 
 cli
