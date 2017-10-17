@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "iexec sdk",
   "main": "src/index.js",
   "scripts": {
