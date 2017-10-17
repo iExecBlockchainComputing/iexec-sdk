@@ -6,9 +6,10 @@ const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.js
 const wallet = require('./wallet');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
 const Promise = require('bluebird');
-const ethUtil = require('ethereumjs-util');
 const sigUtil = require('eth-sig-util');
 const inquirer = require('inquirer');
+const sha3 = require('js-sha3');
+const secp256k1 = require('secp256k1');
 const http = require('./api');
 
 const debug = Debug('iexec:account');
@@ -44,11 +45,29 @@ const login = async () => {
     const { secret } = await http.get('secret');
     debug('secret', secret);
 
-    const msgHashBuffer = ethUtil.hashPersonalMessage(ethUtil.toBuffer(secret));
-    const msgHash = ethUtil.bufferToHex(msgHashBuffer);
+    const secretBuffer = Buffer.from(secret);
+    const prefixBuffer = Buffer.from('\u0019Ethereum Signed Message:\n'.concat(secret.length.toString()));
+    const msgBuffer = Buffer.concat([prefixBuffer, secretBuffer]);
+    const msgHash = '0x'.concat(sha3.keccak256(msgBuffer));
     debug('msgHash', msgHash);
-    const sig = ethUtil.ecsign(msgHashBuffer, ethUtil.toBuffer('0x'.concat(userWallet.privateKey)));
-    const signature = ethUtil.bufferToHex(sigUtil.concatSig(sig.v, sig.r, sig.s));
+    const msgHashBuffer = Buffer.from(sha3.keccak256(msgBuffer), 'hex');
+    debug('msgHashBuffer', msgHashBuffer);
+
+    // const sig = ethUtil.ecsign(msgHashBuffer, Buffer.from('0x'.concat(userWallet.privateKey)));
+    const privateKeyBuffer = Buffer.from(userWallet.privateKey, 'hex');
+    debug('privateKeyBuffer', privateKeyBuffer);
+
+    const sigBuffer = secp256k1.sign(msgHashBuffer, Buffer.from(userWallet.privateKey, 'hex'));
+    const sig = {
+      r: sigBuffer.signature.slice(0, 32),
+      s: sigBuffer.signature.slice(32, 64),
+      v: sigBuffer.recovery + 27,
+    };
+    debug('sig', sig);
+    const signatureBuffer = sigUtil.concatSig(sig.v, sig.r, sig.s);
+    const signature = signatureBuffer.toString();
+
+    debug('signature', signature);
 
     const { jwtoken } = await http.get('auth', { msgHash, signature });
     debug('jwtoken', jwtoken);
