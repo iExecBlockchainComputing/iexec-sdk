@@ -43,7 +43,7 @@ const signAndSendTx = async ({
 }) => {
   try {
     const isMigrating = contractAddress === ZERO_ADDRESS;
-    DEFAULT_GAS_LIMIT_MULTIPLIER = isMigrating ? 4 : 2;
+    DEFAULT_GAS_LIMIT_MULTIPLIER = isMigrating ? 5 : 3;
 
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
       web3.eth.getGasPriceAsync(),
@@ -61,7 +61,7 @@ const signAndSendTx = async ({
     debug('gasPrice', gasPrice);
     const gasLimitMultiplier = network.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
     debug('network.gas', network.gas);
-    const gasLimit = (network.gas || estimatedGas * gasLimitMultiplier);
+    const gasLimit = Math.min(network.gas || estimatedGas * gasLimitMultiplier, BLOCK_GAS_LIMIT);
     debug('gasLimit', gasLimit);
     const chainId = parseInt(web3.version.network, 10);
     debug('chainId', chainId);
