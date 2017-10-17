@@ -13,6 +13,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_GAS_PRICE_MULTIPLIER = 1;
 let DEFAULT_GAS_LIMIT_MULTIPLIER = 1;
+const BLOCK_GAS_LIMIT = 6999999;
 
 const waitFor = async (fn, hash) => {
   let counter = 0;
