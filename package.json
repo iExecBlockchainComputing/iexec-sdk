@@ -28,7 +28,6 @@
     "bluebird": "^3.5.1",
     "commander": "^2.11.0",
     "debug": "^3.1.0",
-    "eth-sig-util": "^1.4.0",
     "fs-extra": "^4.0.2",
     "iexec-oracle-contract": "github:iExecBlockchainComputing/iexec-oracle-contract#v1.0.4",
     "inquirer": "^3.3.0",

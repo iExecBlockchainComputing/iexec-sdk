@@ -6,7 +6,6 @@ const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.js
 const wallet = require('./wallet');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
 const Promise = require('bluebird');
-const sigUtil = require('eth-sig-util');
 const inquirer = require('inquirer');
 const sha3 = require('js-sha3');
 const secp256k1 = require('secp256k1');
@@ -58,15 +57,8 @@ const login = async () => {
     debug('privateKeyBuffer', privateKeyBuffer);
 
     const sigBuffer = secp256k1.sign(msgHashBuffer, Buffer.from(userWallet.privateKey, 'hex'));
-    const sig = {
-      r: sigBuffer.signature.slice(0, 32),
-      s: sigBuffer.signature.slice(32, 64),
-      v: sigBuffer.recovery + 27,
-    };
-    debug('sig', sig);
-    const signatureBuffer = sigUtil.concatSig(sig.v, sig.r, sig.s);
-    const signature = signatureBuffer.toString();
 
+    const signature = '0x'.concat(sigBuffer.signature.toString('hex'), (sigBuffer.recovery + 27).toString(16));
     debug('signature', signature);
 
     const { jwtoken } = await http.get('auth', { msgHash, signature });
