@@ -42,7 +42,7 @@ const signAndSendTx = async ({
 }) => {
   try {
     const isMigrating = contractAddress === ZERO_ADDRESS;
-    if (isMigrating) DEFAULT_GAS_LIMIT_MULTIPLIER = 4;
+    DEFAULT_GAS_LIMIT_MULTIPLIER = isMigrating ? 4 : 2;
 
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
       web3.eth.getGasPriceAsync(),
