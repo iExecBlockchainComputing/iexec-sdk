@@ -8,10 +8,8 @@ const fetch = require('node-fetch');
 const { genKeyPair } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { privateToPublic } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
-const path = require('path');
-// eslint-disable-next-line
-const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
+const utils = require('./utils');
 
 const debug = Debug('iexec:wallet');
 const openAsync = Promise.promisify(fs.open);
@@ -176,14 +174,14 @@ const show = async () => {
     console.log(JSON.stringify(userWallet, null, 4), '\n');
     spinner.start('Checking ETH balances...');
 
-    const networkNames = Object.keys(truffleConfig.networks);
+    const networkNames = Object.keys(utils.truffleConfig.networks);
     networkNames.forEach((name) => {
       chains[name] = {};
       chains[name].name = name;
       chains[name].web3 =
-        new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));
+        new Web3(new Web3.providers.HttpProvider(utils.truffleConfig.networks[name].host));
       Promise.promisifyAll(chains[name].web3.eth);
-      chains[name].id = truffleConfig.networks[name].network_id;
+      chains[name].id = utils.truffleConfig.networks[name].network_id;
       chains[chains[name].id] = chains[name];
     });
 

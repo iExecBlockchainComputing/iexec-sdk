@@ -3,7 +3,6 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const debug = Debug('iexec:truffle-cli');
-debug('');
 
 const rootPath = path.resolve(__dirname, '..');
 const trufflePath = path.join(rootPath, 'node_modules', 'truffle', 'build', 'cli.bundled.js');

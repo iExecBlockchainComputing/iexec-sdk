@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 const Debug = require('debug');
-const fs = require('fs');
 const cli = require('commander');
-const path = require('path');
 const ora = require('ora');
 const Web3 = require('web3');
 const Promise = require('bluebird');
@@ -11,13 +9,8 @@ const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.js
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const wallet = require('./wallet');
 const utils = require('./utils');
-// eslint-disable-next-line
-const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
-// eslint-disable-next-line
-const iexecConfig = require(path.join(process.cwd(), 'iexec.js'));
 
 const debug = Debug('iexec:iexec-submit');
-const readFileAsync = Promise.promisify(fs.readFile);
 
 cli
   .option('--chain, --network [name]', 'network name', 'ropsten')
@@ -31,13 +24,12 @@ const submit = async (networkName, methodName, args) => {
     const userWallet = await wallet.load();
 
     const fnString = methodName.concat('(', args.join(), ')');
-    const network = truffleConfig.networks[networkName];
+    const network = utils.truffleConfig.networks[networkName];
 
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
     Promise.promisifyAll(web3.eth);
 
-    const compiledFile = await readFileAsync(`build/contracts/${iexecConfig.name}.json`);
-    const { abi, networks } = JSON.parse(compiledFile);
+    const { abi, networks } = await utils.loadContractDesc();
 
     if (!(network.network_id in networks)) throw Error(`No existing deployed contract on ${networkName}`);
     const dappAddress = networks[network.network_id].address;

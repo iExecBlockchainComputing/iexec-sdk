@@ -1,12 +1,18 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
+const fs = require('fs-extra');
 const tx = require('@warren-bank/ethereumjs-tx-sign');
 const path = require('path');
+const Web3 = require('web3');
 // eslint-disable-next-line
 const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
-const Web3 = require('web3');
+// eslint-disable-next-line
+const iexecConfig = require(path.join(process.cwd(), 'iexec.js'));
 
 const debug = Debug('iexec:utils');
+const readFileAsync = Promise.promisify(fs.readFile);
+const writeFileAsync = Promise.promisify(fs.writeFile);
+
 const FETCH_INTERVAL = 1000;
 const TIMEOUT = 60 * 1000;
 const sleep = ms => new Promise(res => setTimeout(res, ms));
@@ -105,8 +111,35 @@ const getChains = () => {
   }
 };
 
+const loadContractDesc = async () => {
+  try {
+    const contractDescJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
+    const contractDescJSON = await readFileAsync(contractDescJSONPath);
+    const contractDesc = JSON.parse(contractDescJSON);
+    return contractDesc;
+  } catch (error) {
+    debug('loadContractDesc()', error);
+    throw error;
+  }
+};
+
+const saveContractDesc = async (contractDesc) => {
+  try {
+    const contractDescJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
+    await writeFileAsync(contractDescJSONPath, JSON.stringify(contractDesc, null, 4));
+    return contractDescJSONPath;
+  } catch (error) {
+    debug('saveContractDesc()', error);
+    throw error;
+  }
+};
+
 module.exports = {
+  iexecConfig,
+  truffleConfig,
   waitFor,
   signAndSendTx,
   getChains,
+  loadContractDesc,
+  saveContractDesc,
 };

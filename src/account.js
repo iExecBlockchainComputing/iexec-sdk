@@ -52,7 +52,6 @@ const login = async () => {
     const msgHashBuffer = Buffer.from(sha3.keccak256(msgBuffer), 'hex');
     debug('msgHashBuffer', msgHashBuffer);
 
-    // const sig = ethUtil.ecsign(msgHashBuffer, Buffer.from('0x'.concat(userWallet.privateKey)));
     const privateKeyBuffer = Buffer.from(userWallet.privateKey, 'hex');
     debug('privateKeyBuffer', privateKeyBuffer);
 
