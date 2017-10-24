@@ -23,7 +23,7 @@
   "dependencies": {
     "@warren-bank/ethereumjs-tx-sign": "^2.0.0",
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "bluebird": "^3.5.1",
     "commander": "^2.11.0",
@@ -37,12 +37,13 @@
     "rlc-faucet-contract": "github:iExecBlockchainComputing/rlc-faucet-contract#v1.0.1",
     "secp256k1": "^3.3.0",
     "truffle": "^3.4.11",
-    "web3": "^0.20.2"
+    "web3": "^0.20.2",
+    "xwhep-js-client": "github:iExecBlockchainComputing/xwhep-js-client#v1.0.5"
   },
   "devDependencies": {
     "eslint": "^4.9.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.7.0"
+    "eslint-plugin-import": "^2.8.0"
   },
   "babel": {
     "presets": [
