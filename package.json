@@ -29,7 +29,7 @@
     "commander": "^2.11.0",
     "debug": "^3.1.0",
     "fs-extra": "^4.0.2",
-    "iexec-oracle-contract": "github:iExecBlockchainComputing/iexec-oracle-contract#v1.0.4",
+    "iexec-oracle-contract": "github:iExecBlockchainComputing/iexec-oracle-contract#v1.0.9",
     "inquirer": "^3.3.0",
     "js-sha3": "^0.6.1",
     "node-fetch": "^1.7.3",
