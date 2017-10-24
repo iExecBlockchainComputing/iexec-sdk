@@ -23,6 +23,8 @@ cli.command('compile [args...]', 'call truffle compile');
 
 cli.command('migrate [args...]', 'compile and deploy the contract');
 
+cli.command('apps [args...]', 'manage offchain apps');
+
 cli.command('submit [args...]', 'send submit transaction');
 
 cli.command('result', 'fetch all jobs results');
