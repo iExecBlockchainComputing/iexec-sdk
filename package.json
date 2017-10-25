@@ -38,7 +38,7 @@
     "secp256k1": "^3.3.0",
     "truffle": "^3.4.11",
     "web3": "^0.20.2",
-    "xwhep-js-client": "github:iExecBlockchainComputing/xwhep-js-client#v1.0.5"
+    "xwhep-js-client": "github:iExecBlockchainComputing/xwhep-js-client#v1.0.6"
   },
   "devDependencies": {
     "eslint": "^4.9.0",
