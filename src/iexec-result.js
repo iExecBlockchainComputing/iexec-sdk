@@ -46,13 +46,14 @@ const fetchResults = async () => {
     if (txReceipt === null) throw Error('Transaction hash does not exist');
 
     debug('result', result);
-    if (!result[4] && !result[5]) {
+    if (!result[2] && !result[3]) {
       spinner.info('PENDING...');
       return;
     }
 
     spinner.succeed('Result:');
-    console.log(JSON.stringify(result, null, 4));
+    console.log('   stdout:  ', JSON.stringify(result[2]));
+    console.log('   stderr:  ', JSON.stringify(result[3]));
   } catch (error) {
     spinner.fail(`"iexec result" failed with ${error}`);
   }
