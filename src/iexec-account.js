@@ -15,9 +15,9 @@ cli
   .action(() => account.login().catch(error => console.log(`"iexec account login" failed with ${error}`)));
 
 cli
-  .command('allow')
+  .command('allow <amount>')
   .description('set the nRLC allowance on iexec account')
-  .action(() => account.allow(cli.network, cli.args).catch(error => console.log(`"iexec account credit" failed with ${error}`)));
+  .action(amount => account.allow(cli.network, amount).catch(error => console.log(`"iexec account credit" failed with ${error}`)));
 
 cli
   .command('show')

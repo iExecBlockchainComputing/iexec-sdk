@@ -94,7 +94,7 @@ const load = async () => {
   }
 };
 
-const allow = async (networkName, cliArgs) => {
+const allow = async (networkName, amount) => {
   const spinner = ora();
   try {
     const userWallet = await wallet.load();
@@ -104,7 +104,7 @@ const allow = async (networkName, cliArgs) => {
     const rlcAddress = rlcJSON.networks[chain.id].address;
     const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
 
-    const creditAmount = parseInt(cliArgs[0], 10);
+    const creditAmount = parseInt(amount, 10);
 
     const unsignedTx = rlcContract.approve.getData(oracleAddress, creditAmount);
     spinner.start('credit nRLC on iExec account');
