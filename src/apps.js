@@ -8,12 +8,13 @@ const utils = require('./utils');
 const debug = Debug('iexec:apps');
 const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
-const send = async (chainName) => {
+const send = async (chainName, cliAppName) => {
   const spinner = ora();
   try {
+    debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;
-    const { appName } = utils.iexecConfig;
-
+    const appName = cliAppName || utils.iexecConfig.appName;
+    debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
     const appPath = path.join(process.cwd(), 'apps', appName);

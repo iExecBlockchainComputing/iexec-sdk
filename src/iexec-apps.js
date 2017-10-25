@@ -10,9 +10,9 @@ cli
   .option('--chain, --network [name]', 'network name', 'ropsten');
 
 cli
-  .command('send')
-  .description('send app to offchain server')
-  .action(() => apps.send(cli.network).catch(error => console.log(`"iexec apps send" failed with ${error}`)));
+  .command('send [appName]')
+  .description('send app to iexec server, app binary must be located inside /apps')
+  .action(appName => apps.send(cli.network, appName).catch(error => console.log(`"iexec apps send" failed with ${error}`)));
 
 cli.parse(process.argv);
 
