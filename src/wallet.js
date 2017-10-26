@@ -124,7 +124,7 @@ const getETH = async (networkName) => {
   try {
     const userWallet = await load();
 
-    spinner.start(`Requesting ${networkName} faucets for ETH...`);
+    spinner.start(`Requesting ETH from ${networkName} faucets...`);
     const filteredFaucets = ethFaucets.filter(e => e.networkName === networkName);
     const responses = await Promise.all(filteredFaucets.map(faucet =>
       faucet.getETH(userWallet.address)));
