@@ -10,7 +10,7 @@ cli
   .option('--chain, --network <name>', 'network name', 'ropsten');
 
 cli
-  .command('send [appName]')
+  .command('deploy [appName]')
   .description('send app to iexec server, app binary must be located inside /apps')
   .action(appName => apps.send(cli.network, appName).catch(() => {}));
 

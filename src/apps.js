@@ -8,7 +8,7 @@ const utils = require('./utils');
 const debug = Debug('iexec:apps');
 const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
-const send = async (chainName, cliAppName) => {
+const deploy = async (chainName, cliAppName) => {
   const spinner = ora({ color: 'yellow' });
   try {
     debug('cliAppName', cliAppName);
@@ -43,11 +43,11 @@ const send = async (chainName, cliAppName) => {
 
     spinner.succeed(`App deployed on iExec offchain platform. Only accessible on ${chainName} from dapp: ${contractAddress}\n`);
   } catch (error) {
-    spinner.fail(`send() failed with ${error}`);
+    spinner.fail(`deploy() failed with ${error}`);
     throw error;
   }
 };
 
 module.exports = {
-  send,
+  deploy,
 };
