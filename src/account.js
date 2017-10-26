@@ -94,12 +94,12 @@ const load = async () => {
   }
 };
 
-const allow = async (networkName, amount) => {
+const allow = async (chainName, amount) => {
   const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await wallet.load();
     const chains = getChains();
-    const chain = chains[networkName];
+    const chain = chains[chainName];
     const oracleAddress = oracleJSON.networks[chain.id].address;
     const rlcAddress = rlcJSON.networks[chain.id].address;
     const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
@@ -120,7 +120,7 @@ const allow = async (networkName, amount) => {
     spinner.start('waiting for transaction to be mined');
     const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: https://${networkName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
     spinner.succeed('Credited 10 nRLC on your iExec account, run "iexec account show" to check \n');
   } catch (error) {
     spinner.fail(`allow() failed with ${error}`);
