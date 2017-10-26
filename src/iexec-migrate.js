@@ -13,7 +13,6 @@ const debug = Debug('iexec:iexec-migrate');
 
 cli
   .option('--chain, --network [name]', 'migrate to network name', 'ropsten')
-  .option('--wallet <type>', 'choose type of wallet', /^(local|remote)$/i, 'local')
   .parse(process.argv);
 
 const migrate = async () => {
@@ -34,31 +33,28 @@ const migrate = async () => {
 
     const unsignedTx = Contract.new.getData(...constructorArgs, { data: unlinked_binary });
     debug('unsignedTx', unsignedTx);
-    if (cli.wallet === 'local') {
-      const userWallet = await wallet.load();
 
-      spinner.start(`Deploying ${utils.iexecConfig.name} contract...`);
-      const txHash = await utils.signAndSendTx({
-        web3,
-        userWallet,
-        unsignedTx,
-        network,
-      });
-      spinner.succeed(`new contract txHash: ${txHash} \n`);
+    const userWallet = await wallet.load();
 
-      spinner.start('waiting for txReceipt');
-      const txReceipt = await utils.waitFor(web3.eth.getTransactionReceiptAsync, txHash);
-      spinner.succeed('new contract txReceipt:');
-      console.log(JSON.stringify(txReceipt, null, 4));
-      console.log(`View on etherscan: https://${cli.network}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.start(`Deploying ${utils.iexecConfig.name} contract...`);
+    const txHash = await utils.signAndSendTx({
+      web3,
+      userWallet,
+      unsignedTx,
+      network,
+    });
+    spinner.succeed(`new contract txHash: ${txHash} \n`);
 
-      const chainId = parseInt(web3.version.network, 10);
-      contractDesc.networks[chainId] = { address: txReceipt.contractAddress };
-      const path = await utils.saveContractDesc(contractDesc);
-      console.log(`saved new contract address to ${path}\n`);
-    } else if (cli.wallet === 'remote') {
-      debug('remote');
-    }
+    spinner.start('waiting for txReceipt');
+    const txReceipt = await utils.waitFor(web3.eth.getTransactionReceiptAsync, txHash);
+    spinner.succeed('new contract txReceipt:');
+    console.log(JSON.stringify(txReceipt, null, 4));
+    console.log(`View on etherscan: https://${cli.network}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+
+    const chainId = parseInt(web3.version.network, 10);
+    contractDesc.networks[chainId] = { address: txReceipt.contractAddress };
+    const path = await utils.saveContractDesc(contractDesc);
+    console.log(`saved new contract address to ${path}\n`);
   } catch (error) {
     spinner.fail(`"iexec migrate" failed with ${error}`);
   }
