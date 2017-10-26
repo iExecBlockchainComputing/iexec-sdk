@@ -16,7 +16,7 @@ const SAMPLES_REPO = 'iexec-dapp-samples.git';
 cli.parse(process.argv);
 
 async function init() {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const branchName = cli.args.length ? cli.args[0] : 'init';
     debug(`pulling ${branchName}...`);

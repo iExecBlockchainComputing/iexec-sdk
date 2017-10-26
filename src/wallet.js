@@ -120,7 +120,7 @@ const ethFaucets = [
 ];
 
 const getETH = async (networkName) => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await load();
 
@@ -146,7 +146,7 @@ const rlcFaucets = [
 ];
 
 const getRLC = async (networkName) => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await load();
 
@@ -164,7 +164,7 @@ const getRLC = async (networkName) => {
 };
 
 const show = async () => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await load();
 

@@ -13,20 +13,22 @@ cli
 
 cli.command('init', 'init sample iexec dapp');
 
-cli.command('wallet [args...]', 'manage local ethereum wallet');
+cli.command('wallet', 'manage local ethereum wallet');
 
-cli.command('account [args...]', 'manage iexec account');
+cli.command('account', 'manage iExec account');
 
 cli.command('truffle [args...]', 'execute truffle with any number of truffle arguments');
 
-cli.command('compile [args...]', 'call truffle compile');
+cli.command('compile', 'call truffle compile');
 
-cli.command('migrate [args...]', 'compile and deploy the contract');
+cli.command('migrate', 'compile and deploy the contract');
 
-cli.command('apps [args...]', 'manage offchain apps');
+cli.command('apps', 'manage offchain apps');
 
-cli.command('submit [args...]', 'send submit transaction');
+cli.command('deploy', 'combo of iexec migrate + iexec apps send');
 
-cli.command('result', 'fetch all jobs results');
+cli.command('submit [param]', 'submit a job to iExec');
+
+cli.command('result <txHash>', 'fetch the result of a job');
 
 cli.parse(process.argv);

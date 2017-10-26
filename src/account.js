@@ -36,7 +36,7 @@ const save = async (account) => {
 };
 
 const login = async () => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
@@ -95,7 +95,7 @@ const load = async () => {
 };
 
 const allow = async (networkName, amount) => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     const userWallet = await wallet.load();
     const chains = getChains();

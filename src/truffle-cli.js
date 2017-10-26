@@ -1,5 +1,6 @@
 const Debug = require('debug');
 const path = require('path');
+const ora = require('ora');
 const { spawn } = require('child_process');
 
 const debug = Debug('iexec:truffle-cli');
@@ -31,8 +32,15 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
 const run = args => spawnAsync(trufflePath, args);
 
 const compile = async (args = []) => {
-  console.log('Compiling contracts...');
-  await run(['compile', ...args]);
+  const spinner = ora({ color: 'yellow' });
+  try {
+    spinner.start('Compiling contracts...');
+    await run(['compile', ...args]);
+    spinner.stop();
+  } catch (error) {
+    spinner.fail(`"iexec compile" failed with ${error}`);
+    throw error;
+  }
 };
 
 module.exports = {

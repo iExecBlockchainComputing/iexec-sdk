@@ -9,11 +9,11 @@ const debug = Debug('iexec:apps');
 const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
 const send = async (chainName, cliAppName) => {
-  const spinner = ora();
+  const spinner = ora({ color: 'yellow' });
   try {
     debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;
-    const appName = cliAppName || utils.iexecConfig.appName;
+    const appName = cliAppName || utils.iexecConfig.name;
     debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
@@ -41,7 +41,7 @@ const send = async (chainName, cliAppName) => {
     );
     debug('res', res);
 
-    spinner.succeed(`App successfully sent for ${chainName} dapp: ${contractAddress}\n`);
+    spinner.succeed(`App successfully deployed for ${chainName} dapp: ${contractAddress}\n`);
   } catch (error) {
     spinner.fail(`send() failed with ${error}`);
     throw error;

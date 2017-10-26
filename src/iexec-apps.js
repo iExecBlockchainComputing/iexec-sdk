@@ -7,12 +7,12 @@ const apps = require('./apps');
 const debug = Debug('iexec:iexec-apps');
 
 cli
-  .option('--chain, --network [name]', 'network name', 'ropsten');
+  .option('--chain, --network <name>', 'network name', 'ropsten');
 
 cli
   .command('send [appName]')
   .description('send app to iexec server, app binary must be located inside /apps')
-  .action(appName => apps.send(cli.network, appName).catch(error => console.log(`"iexec apps send" failed with ${error}`)));
+  .action(appName => apps.send(cli.network, appName).catch(() => {}));
 
 cli.parse(process.argv);
 
