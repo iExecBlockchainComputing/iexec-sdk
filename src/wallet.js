@@ -170,7 +170,7 @@ const show = async () => {
 
     const chains = {};
 
-    console.log('Wallet:\n');
+    spinner.info('Wallet:\n');
     console.log(JSON.stringify(userWallet, null, 4), '\n');
     spinner.start('Checking ETH balances...');
 
@@ -187,7 +187,7 @@ const show = async () => {
 
     const ethBalances = await Promise.all(networkNames.map(name =>
       chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => chains[name].web3.fromWei(balance, 'ether')).catch(() => 0)));
-    spinner.succeed('ETH balances:\n');
+    spinner.info('ETH balances:\n');
     const ethBalancesString = ethBalances.reduce(
       (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
       '',
@@ -206,7 +206,7 @@ const show = async () => {
       return rlcContract.balanceOfAsync('0x'.concat(userWallet.address));
     }));
 
-    spinner.succeed('nRLC balances:\n');
+    spinner.info('nRLC balances:\n');
     const rlcBalancesString = chainIDs.reduce(
       (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} nRLC\n`),
       '',

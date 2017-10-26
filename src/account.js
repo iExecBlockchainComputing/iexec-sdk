@@ -115,13 +115,13 @@ const allow = async (networkName, amount) => {
       network: chain,
       contractAddress: rlcAddress,
     });
-    spinner.succeed(`txHash: ${txHash} \n`);
+    spinner.info(`txHash: ${txHash} \n`);
 
-    spinner.start('waiting for txReceipt');
+    spinner.start('waiting for transaction to be mined');
     const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
-    spinner.succeed('txReceipt:');
-    console.log(JSON.stringify(txReceipt, null, 4));
-    console.log(`\nView on etherscan: https://${networkName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
+    spinner.info(`View on etherscan: https://${networkName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.succeed('Credited 10 nRLC on your iExec account, run "iexec account show" to check \n');
   } catch (error) {
     spinner.fail(`allow() failed with ${error}`);
     throw error;
