@@ -16,7 +16,7 @@ const fetchResults = async (txHash, chainName) => {
     Promise.promisifyAll(web3.eth);
     const userWallet = await wallet.load();
 
-    spinner.start('Fetching submitted jobs results');
+    spinner.start('Fetching submitted job result');
 
     const contractDesc = await utils.loadContractDesc();
 
