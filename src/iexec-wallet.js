@@ -12,22 +12,22 @@ cli
 cli
   .command('create')
   .description('create a local wallet')
-  .action(() => wallet.create().catch(error => console.log(`"iexec wallet create" failed with ${error}`)));
+  .action(() => wallet.create().catch(() => {}));
 
 cli
   .command('getETH')
   .description('apply for ETH from pre-registered faucets')
-  .action(() => wallet.getETH(cli.network).catch(error => console.log(`"iexec wallet getETH" failed with ${error}`)));
+  .action(() => wallet.getETH(cli.network).catch(() => {}));
 
 cli
   .command('getRLC')
   .description('apply for nRLC from iexec faucet')
-  .action(() => wallet.getRLC(cli.network).catch(error => console.log(`"iexec wallet getRLC" failed with ${error}`)));
+  .action(() => wallet.getRLC(cli.network).catch(() => {}));
 
 cli
   .command('show')
   .description('show local wallet balances')
-  .action(() => wallet.show().catch(error => console.log(`"iexec wallet show" failed with ${error}`)));
+  .action(() => wallet.show().catch(() => {}));
 
 cli.parse(process.argv);
 
