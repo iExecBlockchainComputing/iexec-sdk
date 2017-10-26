@@ -8,7 +8,7 @@ const utils = require('./utils');
 
 const debug = Debug('iexec:result');
 
-const fetchResults = async (chainName, txHash) => {
+const fetchResults = async (txHash, chainName) => {
   const spinner = ora({ color: 'yellow' });
   try {
     const network = utils.truffleConfig.networks[chainName];
