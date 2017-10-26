@@ -3,13 +3,13 @@ const fs = require('fs-extra');
 const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
-const wallet = require('./wallet');
-const { getChains, signAndSendTx, waitFor } = require('./utils');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const sha3 = require('js-sha3');
 const secp256k1 = require('secp256k1');
 const http = require('./api');
+const { getChains, signAndSendTx, waitFor } = require('./utils');
+const wallet = require('./wallet');
 
 const debug = Debug('iexec:account');
 const openAsync = Promise.promisify(fs.open);
