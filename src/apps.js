@@ -41,7 +41,7 @@ const send = async (chainName, cliAppName) => {
     );
     debug('res', res);
 
-    spinner.succeed(`App successfully deployed for ${chainName} dapp: ${contractAddress}\n`);
+    spinner.succeed(`App deployed on iExec offchain platform. Only accessible on ${chainName} from dapp: ${contractAddress}\n`);
   } catch (error) {
     spinner.fail(`send() failed with ${error}`);
     throw error;
