@@ -57,6 +57,7 @@ const submit = async (networkName, methodName, param) => {
       network,
       contractAddress: dappAddress,
       value: callbackPrice,
+      chainID: network.network_id,
     });
     spinner.info(`${fnString} txHash: ${txHash} \n`);
 

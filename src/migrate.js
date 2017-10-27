@@ -35,6 +35,7 @@ const migrate = async (chainName) => {
       userWallet,
       unsignedTx,
       network,
+      chainID: network.network_id,
     });
     spinner.info(`txHash: ${txHash} \n`);
 

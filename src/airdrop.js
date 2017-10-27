@@ -83,7 +83,7 @@ const airdrop = async (chainName, csvPath) => {
           network: chain,
           contractAddress: rlcAddress,
           nonceOffset,
-          chainID: parseInt(chain.id, 10),
+          chainID: chain.id,
         });
         debug('txHash', txHash);
 

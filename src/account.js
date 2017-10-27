@@ -114,6 +114,7 @@ const allow = async (chainName, amount) => {
       unsignedTx,
       network: chain,
       contractAddress: rlcAddress,
+      chainID: chain.id,
     });
     spinner.info(`txHash: ${txHash} \n`);
 

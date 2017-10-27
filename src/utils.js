@@ -46,6 +46,8 @@ const signAndSendTx = async ({
   network,
   contractAddress = ZERO_ADDRESS,
   value = 0,
+  nonceOffset = 0,
+  chainID,
 }) => {
   try {
     const isMigrating = contractAddress === ZERO_ADDRESS;
@@ -56,9 +58,11 @@ const signAndSendTx = async ({
       web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
       web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress, from: '0x'.concat(userWallet.address) }),
     ]);
+
     debug('contractAddress', contractAddress);
     debug('networkGasPrice', networkGasPrice.toNumber());
     debug('nonce', nonce);
+    debug('nonceOffset', nonceOffset);
     debug('estimatedGas', estimatedGas);
     debug('value', web3.toHex(value));
 
@@ -69,17 +73,17 @@ const signAndSendTx = async ({
     debug('network.gas', network.gas);
     const gasLimit = Math.min(network.gas || estimatedGas * gasLimitMultiplier, BLOCK_GAS_LIMIT);
     debug('gasLimit', gasLimit);
-    const chainId = parseInt(web3.version.network, 10);
-    debug('chainId', chainId);
+    debug('chainId', chainID);
 
     const txObject = {
-      nonce: web3.toHex(nonce),
+      nonce: web3.toHex(nonce + nonceOffset),
       gasPrice: web3.toHex(gasPrice),
       gasLimit: web3.toHex(gasLimit),
       value: web3.toHex(value),
       data: unsignedTx,
-      chainId,
+      chainId: parseInt(chainID, 10),
     };
+    debug('txObject', txObject);
     if (contractAddress !== ZERO_ADDRESS) txObject.to = contractAddress;
     const { rawTx } = tx.sign(txObject, userWallet.privateKey);
 
