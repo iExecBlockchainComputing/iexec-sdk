@@ -62,4 +62,4 @@ const oraOptions = {
     ],
   },
 };
-export default oraOptions;
+module.exports = oraOptions;
