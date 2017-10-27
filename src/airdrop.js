@@ -5,10 +5,9 @@ const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const Promise = require('bluebird');
 const moment = require('moment');
-const {
-  getChains, signAndSendTx, waitFor, oraOptions,
-} = require('./utils');
+const { getChains, signAndSendTx, waitFor } = require('./utils');
 const wallet = require('./wallet');
+const oraOptions = require('./oraOptions');
 
 const readFileAsync = Promise.promisify(fs.readFile);
 

@@ -8,10 +8,9 @@ const inquirer = require('inquirer');
 const sha3 = require('js-sha3');
 const secp256k1 = require('secp256k1');
 const http = require('./api');
-const {
-  getChains, signAndSendTx, waitFor, oraOptions,
-} = require('./utils');
+const { getChains, signAndSendTx, waitFor } = require('./utils');
 const wallet = require('./wallet');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:account');
 const openAsync = Promise.promisify(fs.open);

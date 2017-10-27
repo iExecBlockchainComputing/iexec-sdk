@@ -5,11 +5,12 @@ const ora = require('ora');
 const truffle = require('./truffle-cli');
 const wallet = require('./wallet');
 const utils = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:migrate');
 
 const migrate = async (chainName) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const network = utils.truffleConfig.networks[chainName];
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));

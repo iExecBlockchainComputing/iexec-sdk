@@ -10,6 +10,7 @@ const { privateToPublic } = require('@warren-bank/ethereumjs-tx-sign/lib/keypair
 const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const utils = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:wallet');
 const openAsync = Promise.promisify(fs.open);
@@ -120,7 +121,7 @@ const ethFaucets = [
 ];
 
 const getETH = async (networkName) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await load();
 
@@ -146,7 +147,7 @@ const rlcFaucets = [
 ];
 
 const getRLC = async (networkName) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await load();
 
@@ -164,7 +165,7 @@ const getRLC = async (networkName) => {
 };
 
 const show = async () => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await load();
 

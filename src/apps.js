@@ -4,12 +4,13 @@ const ora = require('ora');
 const createXWHEPClient = require('xwhep-js-client');
 const account = require('./account');
 const utils = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:apps');
 const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
 const deploy = async (chainName, cliAppName) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;

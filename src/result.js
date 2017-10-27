@@ -5,11 +5,12 @@ const Web3 = require('web3');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
 const wallet = require('./wallet');
 const utils = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:result');
 
 const fetchResults = async (txHash, chainName) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const network = utils.truffleConfig.networks[chainName];
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));

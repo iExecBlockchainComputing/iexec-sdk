@@ -6,11 +6,12 @@ const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.js
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const wallet = require('./wallet');
 const utils = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:submit');
 
 const submit = async (networkName, methodName, param) => {
-  const spinner = ora(utils.oraOptions);
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await wallet.load();
 

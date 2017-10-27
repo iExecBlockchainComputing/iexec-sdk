@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const cli = require('commander');
 const fs = require('fs-extra');
 const ora = require('ora');
-const { oraOptions } = require('./utils');
+const oraOptions = require('./oraOptions');
 
 const execAsync = Promise.promisify(exec);
 const debug = Debug('iexec:iexec-init');
