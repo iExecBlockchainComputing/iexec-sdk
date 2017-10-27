@@ -9,7 +9,7 @@ const debug = Debug('iexec:apps');
 const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
 const deploy = async (chainName, cliAppName) => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(utils.oraOptions);
   try {
     debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;

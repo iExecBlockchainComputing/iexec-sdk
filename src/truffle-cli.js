@@ -32,7 +32,7 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
 const run = args => spawnAsync(trufflePath, args);
 
 const compile = async (args = []) => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(oraOptions);
   try {
     spinner.start('Compiling contracts...');
     await run(['compile', ...args]);

@@ -9,7 +9,7 @@ const utils = require('./utils');
 const debug = Debug('iexec:result');
 
 const fetchResults = async (txHash, chainName) => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(oraOptions);
   try {
     const network = utils.truffleConfig.networks[chainName];
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));

@@ -8,7 +8,9 @@ const inquirer = require('inquirer');
 const sha3 = require('js-sha3');
 const secp256k1 = require('secp256k1');
 const http = require('./api');
-const { getChains, signAndSendTx, waitFor } = require('./utils');
+const {
+  getChains, signAndSendTx, waitFor, oraOptions,
+} = require('./utils');
 const wallet = require('./wallet');
 
 const debug = Debug('iexec:account');
@@ -36,7 +38,7 @@ const save = async (account) => {
 };
 
 const login = async () => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
@@ -95,7 +97,7 @@ const load = async () => {
 };
 
 const allow = async (chainName, amount) => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(oraOptions);
   try {
     const userWallet = await wallet.load();
     const chains = getChains();

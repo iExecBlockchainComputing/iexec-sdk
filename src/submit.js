@@ -10,7 +10,7 @@ const utils = require('./utils');
 const debug = Debug('iexec:submit');
 
 const submit = async (networkName, methodName, param) => {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(utils.oraOptions);
   try {
     const userWallet = await wallet.load();
 

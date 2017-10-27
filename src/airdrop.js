@@ -5,12 +5,14 @@ const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const Promise = require('bluebird');
 const moment = require('moment');
-const { getChains, signAndSendTx, waitFor } = require('./utils');
+const {
+  getChains, signAndSendTx, waitFor, oraOptions,
+} = require('./utils');
 const wallet = require('./wallet');
 
 const readFileAsync = Promise.promisify(fs.readFile);
 
-const MAX_CONCURRENT_TX = 30;
+let MAX_CONCURRENT_TX = 0;
 let transferring = 0;
 let transferred = 0;
 let errored = 0;
@@ -24,9 +26,11 @@ let blockNumber = 0;
 
 const debug = Debug('iexec:airdrop');
 
-const airdrop = async (chainName, csvPath) => {
-  const spinner = ora({ color: 'yellow' });
+const airdrop = async (chainName, csvPath, batch) => {
+  const spinner = ora(oraOptions);
   try {
+    MAX_CONCURRENT_TX = batch;
+
     const startTime = new Date();
     const userWallet = await wallet.load();
     const chains = getChains();

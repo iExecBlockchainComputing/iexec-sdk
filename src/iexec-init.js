@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 const cli = require('commander');
 const fs = require('fs-extra');
 const ora = require('ora');
+const { oraOptions } = require('./utils');
 
 const execAsync = Promise.promisify(exec);
 const debug = Debug('iexec:iexec-init');
@@ -16,7 +17,7 @@ const SAMPLES_REPO = 'iexec-dapp-samples.git';
 cli.parse(process.argv);
 
 async function init() {
-  const spinner = ora({ color: 'yellow' });
+  const spinner = ora(oraOptions);
   try {
     const branchName = cli.args.length ? cli.args[0] : 'init';
     debug(`pulling ${branchName}...`);
