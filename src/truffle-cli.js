@@ -2,6 +2,7 @@ const Debug = require('debug');
 const path = require('path');
 const ora = require('ora');
 const { spawn } = require('child_process');
+const { oraOptions } = require('./utils');
 
 const debug = Debug('iexec:truffle-cli');
 
