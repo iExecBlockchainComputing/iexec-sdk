@@ -32,8 +32,8 @@ cd iexec-factorial  // move into new project directory
 It will download the sample iexec project to start with.
 
 Your iexec Dapps is composed of two parts:
-1. An offchain app (Under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
-2. A smart contract (Under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
+1. An offchain app (under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
+2. A smart contract (under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
 
 
 ## Wallet
