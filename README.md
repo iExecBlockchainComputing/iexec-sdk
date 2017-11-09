@@ -2,7 +2,7 @@
 
 
 iExec allows Ethereum developers to create applications that can be executed off-chain.
-This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iexec.
+This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
 Using these tools, you will be able to deploy any legacy applications in the iexec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
@@ -31,48 +31,39 @@ cd iexec-factorial  // move into new project directory
 
 It will download the sample iexec project to start with.
 
-Your iexec Dapps is composed at the minimum of two parts:
-1. an offchain app, which can be any kind of legacy application. The offchain app will be executed by the iexec decentralised cloud.
-2. a smart contract that interfaces your iexec Dapp from Ethereum to the offchain app.
+Your iexec Dapps is composed of two parts:
+1. An offchain app (Under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
+2. A smart contract (Under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
 
 
 ## Wallet
 
-All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees. First get a Wallet, and some ETH:
+All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees and some RLC to pay for computation fees:
 ```bash
 iexec wallet create
 iexec wallet getETH
+iexec wallet getRLC
 ```
-You can check how many ETH you have on your wallet:
+You can check how many ETH/RLC you have in your wallet:
 ```bash
 iexec wallet show
 ```
 
 ## I deploy
-
+Using a single command line, you can deploy your smart contract (```/contracts/Factorial.sol```) on Ethereum AND deploy your legacy application (```/apps/Factorial```) on the iExec network:
 ```bash
-iexec migrate
-iexec migrate --network ropsten # you need ETH on the ropsten testnet to do that
-```
-This will use informations from the iexec and truffle config file to deploy the contract on ethereum:
-This is the iexec configuration file:
-```js
-// iexec.js
-module.exports = {
-    name: 'Factorial',  // the name of the contract to be deployed
-    constructorArgs: ['0xe6b658facf9621eff76a0d649c61dba4c8de85fb'],  // the constructor arguments for contract deployment logic
-};
+iexec deploy
 ```
 
 ## I exec
 
 Let's submit our first calculation:
 ```bash
-iexec submit factorial 10
+iexec submit 10
 ```
-check the results:
+Each submission gives you back a transaction hash, that you need to use as a parameter to get the result of the submit:
 ```
-iexec results
+iexec result txHash
 ```
 
-Your smart contract is "offchain computing ready!". Sky is the limit for you and your smart contract!
+Congrats, your smart contract is "offchain computing ready!". Sky is the limit for you and your smart contract!
