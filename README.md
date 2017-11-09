@@ -6,7 +6,9 @@ This packages bring all the tools to develop, deploy and execute Dapps on Ethere
 Using these tools, you will be able to deploy any legacy applications in the iexec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
-A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda.
+* A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda.
+* An iExec explorer is available at https://explorer.iex.ec
+* A RLC faucet is available at https://faucet.iex.ec
 
 ## Install
 
@@ -56,7 +58,10 @@ iexec deploy
 ```
 
 ## I exec
-
+Depending on the price of the application you want to use, you will need to credit your iExec account with some RLC before submitting a calculation:
+```
+iexec allow 5
+```
 Let's submit our first calculation:
 ```bash
 iexec submit 10
