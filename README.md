@@ -60,7 +60,7 @@ iexec deploy
 ## I exec
 Depending on the price of the application you want to use, you will need to credit your iExec account with some RLC before submitting a calculation:
 ```
-iexec allow 5
+iexec account allow 5
 ```
 Let's submit our first calculation:
 ```bash
