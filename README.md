@@ -12,15 +12,15 @@ and execute them through calls to Ethereum smart contracts.
 
 ## Install
 
-Requirement: [Node.js](https://nodejs.org/en/)
-
+Requirements:
+[Node.js](https://nodejs.org/en/) (version >= 6) and [Git](https://git-scm.com/).
 ```bash
 npm -g install iexec
 iexec --version
 iexec --help
 ```
 
-You're done ! Now, you can create your first iexec application.
+You're done ! Now, let's create your first iexec application.
 
 
 ## Init
