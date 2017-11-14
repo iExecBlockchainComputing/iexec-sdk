@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const { exec } = require('child_process');
 const cli = require('commander');
 const fs = require('fs-extra');
+const path = require('path');
 const ora = require('ora');
 const oraOptions = require('./oraOptions');
 
@@ -25,7 +26,7 @@ async function init() {
     const dirName = 'iexec-'.concat(branchName);
 
     await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${dirName}`);
-    await fs.remove(`./${dirName}/.git`);
+    await fs.remove(path.join(process.cwd(), dirName, '.git'));
 
     process.chdir(dirName);
     await execAsync('npm i');
