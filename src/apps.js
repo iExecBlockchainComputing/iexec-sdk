@@ -17,6 +17,7 @@ const deploy = async (chainName, cliAppName) => {
     const appName = cliAppName || utils.iexecConfig.name;
     const os = utils.iexecConfig.os || 'linux';
     const cpu = utils.iexecConfig.cpu || 'amd64';
+    const type = utils.iexecConfig.type || 'binary';
     debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
@@ -41,6 +42,7 @@ const deploy = async (chainName, cliAppName) => {
       os,
       cpu,
       'file://'.concat(appPath),
+      type,
     );
     debug('res', res);
 
