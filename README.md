@@ -3,7 +3,7 @@
 
 iExec allows Ethereum developers to create applications that can be executed off-chain.
 This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
-Using these tools, you will be able to deploy any legacy applications in the iexec infrastructure
+Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
 * A [step-by-step tutorial](https://goo.gl/REsz1j) is available on Katacoda.
@@ -20,20 +20,20 @@ iexec --version
 iexec --help
 ```
 
-You're done ! Now, let's create your first iexec application.
+You're done ! Now, let's create your first iExec application.
 
 
 ## Init
 
-Init your iexec project with one of the [sample iexec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
+Init your iExec project with one of the [sample iExec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
 ```bash
 iexec init factorial
 cd iexec-factorial  // move into new project directory
 ```
 
-It will download the sample iexec project to start with.
+It will download the sample iExec project to start with.
 
-Your iexec Dapps is composed of two parts:
+Your iExec Dapps is composed of two parts:
 1. An offchain app (under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
 2. A smart contract (under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
 
