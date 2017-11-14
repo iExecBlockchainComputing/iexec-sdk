@@ -12,7 +12,7 @@ const trufflePath = path.join(rootPath, 'node_modules', 'truffle', 'build', 'cli
 const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
-  const proc = args ? spawn(bin, args) : spawn(bin);
+  const proc = args ? spawn('node', [bin, ...args]) : spawn('node', [bin]);
 
   proc.stdout.on('data', data => console.log(`${data}`));
   proc.stderr.on('data', data => console.log(`${data}`));
