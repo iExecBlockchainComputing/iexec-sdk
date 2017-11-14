@@ -19,13 +19,13 @@ const migrate = async (chainName) => {
     await truffle.compile();
 
     const contractDesc = await utils.loadContractDesc();
-    const { abi, unlinked_binary } = contractDesc;
+    const { abi, bytecode } = contractDesc;
 
     const Contract = web3.eth.contract(abi);
 
     const constructorArgs = network.constructorArgs || [];
 
-    const unsignedTx = Contract.new.getData(...constructorArgs, { data: unlinked_binary });
+    const unsignedTx = Contract.new.getData(...constructorArgs, { data: bytecode });
     debug('unsignedTx', unsignedTx);
 
     const userWallet = await wallet.load();
