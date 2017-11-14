@@ -15,6 +15,8 @@ const deploy = async (chainName, cliAppName) => {
     debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;
     const appName = cliAppName || utils.iexecConfig.name;
+    const os = utils.iexecConfig.os || 'linux';
+    const cpu = utils.iexecConfig.cpu || 'amd64';
     debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
@@ -36,8 +38,8 @@ const deploy = async (chainName, cliAppName) => {
       '',
       '',
       contractAddress,
-      'linux',
-      'amd64',
+      os,
+      cpu,
       'file://'.concat(appPath),
     );
     debug('res', res);
