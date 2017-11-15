@@ -3,13 +3,15 @@ const Promise = require('bluebird');
 const ora = require('ora');
 const Web3 = require('web3');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
+const createXWHEPClient = require('xwhep-js-client');
 const wallet = require('./wallet');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
+const account = require('./account');
 
 const debug = Debug('iexec:result');
 
-const fetchResults = async (txHash, chainName) => {
+const fetchResults = async (txHash, chainName, save) => {
   const spinner = ora(oraOptions);
   try {
     const network = utils.truffleConfig.networks[chainName];
@@ -43,9 +45,20 @@ const fetchResults = async (txHash, chainName) => {
       return;
     }
 
+    const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
+    const { jwtoken } = await account.load();
+    const cookies = await xwhep.auth(jwtoken);
+    const res = await xwhep.getWorkByExternalID(cookies, txHash);
+    debug('res.xwhep.work[0]', res.xwhep.work[0]);
+    let savePath;
+    if (save) savePath = await xwhep.download(cookies, res.xwhep.work[0].resulturi[0], txHash.concat('.txt'));
+    debug('savePath', savePath);
+
     spinner.succeed('Result:');
     console.log('   stdout:  ', JSON.stringify(result[2]));
     console.log('   stderr:  ', JSON.stringify(result[3]));
+    console.log('   resuri:  ', JSON.stringify(res.xwhep.work[0].resulturi[0]), '\n');
+    if (save) spinner.succeed(`Saved result to file ${savePath}`);
   } catch (error) {
     spinner.fail(`"iexec result" failed with ${error}`);
     throw error;
