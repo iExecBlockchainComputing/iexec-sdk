@@ -48,17 +48,17 @@ const fetchResults = async (txHash, chainName, save) => {
     const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
     const { jwtoken } = await account.load();
     const cookies = await xwhep.auth(jwtoken);
-    const res = await xwhep.getWorkByExternalID(cookies, txHash);
-    debug('res.xwhep.work[0]', res.xwhep.work[0]);
-    let savePath;
-    if (save) savePath = await xwhep.download(cookies, res.xwhep.work[0].resulturi[0], txHash.concat('.txt'));
-    debug('savePath', savePath);
+    const work = await xwhep.getWorkByExternalID(cookies, txHash);
+    debug('work.xwhep.work[0]', work.xwhep.work[0]);
+    let downResult;
+    if (save) downResult = await xwhep.download(cookies, work.xwhep.work[0].resulturi[0], txHash.concat('.txt'));
+    debug('downResult', downResult);
 
     spinner.succeed('Result:');
     console.log('   stdout:  ', JSON.stringify(result[2]));
     console.log('   stderr:  ', JSON.stringify(result[3]));
-    console.log('   resuri:  ', JSON.stringify(res.xwhep.work[0].resulturi[0]), '\n');
-    if (save) spinner.succeed(`Saved result to file ${savePath}`);
+    console.log('   resuri:  ', JSON.stringify(work.xwhep.work[0].resulturi[0]), '\n');
+    if (save) spinner.succeed(`Saved result to file ${downResult.savePath}`);
   } catch (error) {
     spinner.fail(`"iexec result" failed with ${error}`);
     throw error;
