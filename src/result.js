@@ -51,7 +51,7 @@ const fetchResults = async (txHash, chainName, save) => {
     const work = await xwhep.getWorkByExternalID(cookies, txHash);
     debug('work.xwhep.work[0]', work.xwhep.work[0]);
     let downResult;
-    if (save) downResult = await xwhep.download(cookies, work.xwhep.work[0].resulturi[0], txHash.concat('.txt'));
+    if (save) downResult = await xwhep.download(cookies, work.xwhep.work[0].resulturi[0], txHash);
     debug('downResult', downResult);
 
     spinner.succeed('Result:');
