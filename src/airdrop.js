@@ -90,13 +90,11 @@ const airdrop = async (chainName, csvPath, batch) => {
         });
         debug('txHash', txHash);
 
-        const [tx, txReceipt] = await Promise.all([
-          chain.web3.eth.getTransactionAsync(txHash),
-          waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash),
-        ]);
+        const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
         debug('txReceipt:', txReceipt);
+        const tx = await chain.web3.eth.getTransactionAsync(txHash);
         debug('tx:', tx);
-        const etherscanURL = `https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}`;
+        const etherscanURL = `https://${chainName === 'mainnet' ? '' : chainName.concat('.')}etherscan.io/tx/${txReceipt.transactionHash}`;
 
         transferred += 1;
         transferring -= 1;
