@@ -17,6 +17,6 @@ USER $user
 RUN mkdir /home/$user/.npm-global
 
 WORKDIR /home/$user/app
-RUN npm -g i
+RUN npm -g i --no-optional
 
 ENTRYPOINT ["iexec"]
