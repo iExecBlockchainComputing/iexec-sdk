@@ -25,7 +25,7 @@ cli.command('migrate', 'compile and deploy the contract');
 
 cli.command('apps', 'manage offchain apps');
 
-cli.command('deploy', 'combo of iexec migrate + iexec apps send');
+cli.command('deploy', 'combo of iexec migrate + iexec apps deploy');
 
 cli.command('submit [param]', 'submit a job to iExec');
 
