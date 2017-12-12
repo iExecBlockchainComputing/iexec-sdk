@@ -2,7 +2,7 @@
 
 
 iExec allows Ethereum developers to create applications that can be executed off-chain.
-This packages bring all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
+This package brings all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
 Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
 and execute them through calls to Ethereum smart contracts.
 
