@@ -8,3 +8,11 @@ pipeline:
       - ${DRONE_TAG##v}
     when:
       event: tag
+
+  npm:
+    image: plugins/npm
+    secrets: [ npm_password ]
+    username: sulliwane
+    email: sulliwane@gmail.com
+    when:
+      event: tag
