@@ -4,8 +4,6 @@ pipeline:
     commands:
       - npm install
       - npm run build
-    when:
-      event: tag
 
   publish:
     image: plugins/docker
