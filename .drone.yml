@@ -4,6 +4,8 @@ pipeline:
     commands:
       - npm install
       - npm run build
+    when:
+      event: tag
 
   npm:
     image: plugins/npm
