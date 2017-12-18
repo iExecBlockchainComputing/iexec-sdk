@@ -1,7 +1,7 @@
 {
   "name": "iexec",
-  "version": "1.4.5",
-  "description": "iexec sdk",
+  "version": "1.4.6",
+  "description": "iExec sdk",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
