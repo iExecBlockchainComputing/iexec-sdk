@@ -3,8 +3,8 @@ const fetch = require('node-fetch');
 const querystring = require('querystring');
 
 const debug = Debug('iexec:api');
-const API_BASE_URL = 'https://auth.iex.ec/';
-// const API_BASE_URL = 'http://localhost:3200/';
+let apiBaseURL = 'https://auth.iex.ec/';
+// let apiBaseURL = 'http://localhost:3200/';
 
 const makeBody = (verb, body) => {
   if (verb === 'GET') return {};
@@ -20,7 +20,7 @@ const makeQueryString = (verb, body) => {
 const httpRequest = verb => async (endpoint, body = {}) => {
   const queryString = makeQueryString(verb, body);
   debug('queryString', queryString);
-  const url = API_BASE_URL.concat(endpoint, queryString);
+  const url = apiBaseURL.concat(endpoint, queryString);
   debug('url', url);
   const response = await fetch(
     url,
@@ -43,7 +43,10 @@ const httpRequest = verb => async (endpoint, body = {}) => {
   throw new Error('API call error');
 };
 
+const setAuthServer = (server) => { apiBaseURL = server; };
+
 module.exports = {
   get: httpRequest('GET'),
   post: httpRequest('POST'),
+  setAuthServer,
 };

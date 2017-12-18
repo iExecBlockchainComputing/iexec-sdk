@@ -9,7 +9,7 @@ cli
 cli
   .command('login')
   .description('login into your iexec account')
-  .action(() => account.login().catch(() => {}));
+  .action(() => account.login(cli.network).catch(() => {}));
 
 cli
   .command('allow <amount>')

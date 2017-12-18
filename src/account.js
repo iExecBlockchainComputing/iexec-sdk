@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
+const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const sha3 = require('js-sha3');
@@ -36,9 +37,11 @@ const save = async (account) => {
   }
 };
 
-const login = async () => {
+const login = async (chainName) => {
   const spinner = ora(oraOptions);
   try {
+    const chain = getChains()[chainName];
+    if (chain.auth) http.setAuthServer(chain.auth);
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
     spinner.start('logging into iExec...');
@@ -101,13 +104,13 @@ const allow = async (chainName, amount) => {
     const userWallet = await wallet.load();
     const chains = getChains();
     const chain = chains[chainName];
-    const oracleAddress = oracleJSON.networks[chain.id].address;
+    const escrowAddress = escrowJSON.networks[chain.id].address;
     const rlcAddress = rlcJSON.networks[chain.id].address;
     const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
 
     const creditAmount = parseInt(amount, 10);
 
-    const unsignedTx = rlcContract.approve.getData(oracleAddress, creditAmount);
+    const unsignedTx = rlcContract.approve.getData(escrowAddress, creditAmount);
     spinner.start('credit nRLC on iExec account');
     const txHash = await signAndSendTx({
       web3: chain.web3,
