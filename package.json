@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "iexec sdk",
   "main": "src/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
     "iexec-oracle-contract": "^1.1.2",
-    "iexec-server-js-client": "^1.1.4",
+    "iexec-server-js-client": "^1.1.5",
     "inquirer": "^4.0.1",
     "js-sha3": "^0.7.0",
     "moment": "^2.20.0",
