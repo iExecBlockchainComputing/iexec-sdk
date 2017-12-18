@@ -1,13 +1,13 @@
 const Debug = require('debug');
+const fs = require('fs');
 const path = require('path');
 const ora = require('ora');
-const createXWHEPClient = require('xwhep-js-client');
+const createIEXECClient = require('iexec-server-js-client');
 const account = require('./account');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
 
 const debug = Debug('iexec:apps');
-const xwhep = createXWHEPClient({ hostname: 'xw.iex.ec', port: '443' });
 
 const deploy = async (chainName, cliAppName) => {
   const spinner = ora(oraOptions);
@@ -15,9 +15,10 @@ const deploy = async (chainName, cliAppName) => {
     debug('cliAppName', cliAppName);
     const chainID = utils.truffleConfig.networks[chainName].network_id;
     const appName = cliAppName || utils.iexecConfig.name;
-    const os = utils.iexecConfig.os || 'linux';
-    const cpu = utils.iexecConfig.cpu || 'amd64';
-    const type = utils.iexecConfig.type || 'binary';
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({ server: chain.server });
+
     debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
@@ -32,19 +33,15 @@ const deploy = async (chainName, cliAppName) => {
 
     const contractAddress = networks[chainID].address;
     debug('contractAddress', contractAddress);
-    const cookies = await xwhep.auth(jwtoken);
-    const res = await xwhep.registerApp(
-      cookies,
-      '',
-      '',
-      '',
-      contractAddress,
-      os,
-      cpu,
-      'file://'.concat(appPath),
-      type,
+    await iexec.getCookieByJWT(jwtoken);
+    const data = fs.readFileSync(appPath);
+    const { size } = fs.statSync(appPath);
+    await iexec.registerApp(
+      data,
+      size,
+      utils.iexecConfig.data,
+      Object.assign({ name: contractAddress }, utils.iexecConfig.app || {}),
     );
-    debug('res', res);
 
     spinner.succeed(`App deployed on iExec offchain platform. Only callable through ${chainName} dapp at: ${contractAddress}\n`);
   } catch (error) {
