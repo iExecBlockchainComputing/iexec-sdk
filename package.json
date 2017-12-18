@@ -27,6 +27,7 @@
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
     "iexec-oracle-contract": "github:iExecBlockchainComputing/iexec-oracle-contract#v1.1.1",
+    "iexec-server-js-client": "^1.0.2",
     "inquirer": "^4.0.0",
     "js-sha3": "^0.7.0",
     "moment": "^2.20.0",
@@ -36,8 +37,7 @@
     "rlc-faucet-contract": "github:iExecBlockchainComputing/rlc-faucet-contract#v1.0.2",
     "secp256k1": "^3.4.0",
     "truffle": "^4.0.3",
-    "web3": "^0.20.2",
-    "xwhep-js-client": "github:iExecBlockchainComputing/xwhep-js-client#v1.0.19"
+    "web3": "^0.20.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
