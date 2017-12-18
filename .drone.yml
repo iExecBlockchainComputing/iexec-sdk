@@ -5,6 +5,14 @@ pipeline:
       - npm install
       - npm run build
 
+  npm:
+    image: plugins/npm
+    secrets: [ npm_password ]
+    username: sulliwane
+    email: sulliwane@gmail.com
+    when:
+      event: tag
+
   publish:
     image: plugins/docker
     repo: iexechub/iexec-sdk
