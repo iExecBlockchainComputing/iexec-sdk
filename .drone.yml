@@ -1,4 +1,12 @@
 pipeline:
+  build:
+      image: node:6.4.0
+    commands:
+      - npm install
+      - npm run build
+    when:
+      event: tag
+
   publish:
     image: plugins/docker
     repo: iexechub/iexec-sdk
