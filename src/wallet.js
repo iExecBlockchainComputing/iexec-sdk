@@ -91,7 +91,7 @@ const ethFaucets = [
   {
     networkName: 'ropsten',
     name: 'faucet.ropsten.be',
-    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()),
+    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     networkName: 'ropsten',
@@ -106,7 +106,7 @@ const ethFaucets = [
         method: 'POST',
         body: JSON.stringify({ toWhom: '0x'.concat(address) }),
       },
-    ).then(res => res.json()),
+    ).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     networkName: 'rinkeby',
