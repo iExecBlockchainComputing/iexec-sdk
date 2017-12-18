@@ -13,9 +13,12 @@ const debug = Debug('iexec:submit');
 const submit = async (networkName, methodName, param) => {
   const spinner = ora(oraOptions);
   try {
+    debug('networkName', networkName);
+    debug('param', param);
     const userWallet = await wallet.load();
 
-    const fnString = methodName.concat('(', param, ')');
+    const work = param || JSON.stringify(utils.iexecConfig.work);
+    const fnString = methodName.concat('(', work, ')');
     const network = utils.truffleConfig.networks[networkName];
 
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
@@ -28,7 +31,7 @@ const submit = async (networkName, methodName, param) => {
     const dappContract = web3.eth.contract(abi).at(dappAddress);
     debug('dappAddress', dappAddress);
 
-    const unsignedTx = dappContract[methodName].getData(param);
+    const unsignedTx = dappContract[methodName].getData(work);
     debug('unsignedTx', unsignedTx);
 
     const rlcAddress = rlcJSON.networks[network.network_id].address;
