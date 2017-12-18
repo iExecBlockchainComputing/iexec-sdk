@@ -17,10 +17,6 @@ coverage
 # Dependency directory
 node_modules
 
-# Compiled JS directory
-/dist/*
-!/dist/iexec.js
-
 # Optional npm cache directory
 .npm
 
