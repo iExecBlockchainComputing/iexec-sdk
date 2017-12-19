@@ -2,7 +2,6 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const ora = require('ora');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
-const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
 const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
@@ -37,11 +36,10 @@ const save = async (account) => {
   }
 };
 
-const login = async (chainName) => {
+const login = async (authServer = 'https://auth.iex.ec') => {
   const spinner = ora(oraOptions);
   try {
-    const chain = getChains()[chainName];
-    if (chain.auth) http.setAuthServer(chain.auth);
+    http.setAuthServer(authServer.concat('/'));
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
     spinner.start('logging into iExec...');
@@ -126,7 +124,7 @@ const allow = async (chainName, amount) => {
     const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
     spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
-    spinner.succeed('Credited 10 nRLC on your iExec account, run "iexec account show" to check \n');
+    spinner.succeed(`Set you iExec account credit to ${amount} nRLC, run "iexec account show" to check \n`);
   } catch (error) {
     spinner.fail(`allow() failed with ${error}`);
     throw error;
@@ -147,8 +145,8 @@ const show = async () => {
       const rlcContract = chains[id].web3.eth.contract(rlcJSON.abi).at(rlcAddress);
       Promise.promisifyAll(rlcContract);
       const owner = '0x'.concat(userWallet.address);
-      const spender = oracleJSON.networks[id].address;
-      return rlcContract.allowanceAsync(owner, spender);
+      const escrow = escrowJSON.networks[id].address;
+      return rlcContract.allowanceAsync(owner, escrow);
     }));
     spinner.succeed('iExec account details:\n');
 

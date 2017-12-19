@@ -4,12 +4,13 @@ const cli = require('commander');
 const account = require('./account');
 
 cli
-  .option('--chain, --network <name>', 'network name', 'ropsten');
+  .option('--chain, --network <name>', 'network name', 'ropsten')
+  .option('--auth <auth>', 'auth server name', 'https://aut.iex.ec');
 
 cli
   .command('login')
   .description('login into your iexec account')
-  .action(() => account.login(cli.network).catch(() => {}));
+  .action(() => account.login(cli.auth).catch(() => {}));
 
 cli
   .command('allow <amount>')
