@@ -5,7 +5,7 @@ const account = require('./account');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')
-  .option('--auth <auth>', 'auth server name', 'https://aut.iex.ec');
+  .option('--auth <auth>', 'auth server name', 'https://auth.iex.ec');
 
 cli
   .command('login')
