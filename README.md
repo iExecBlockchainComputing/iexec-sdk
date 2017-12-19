@@ -116,8 +116,8 @@ iexec apps deploy # deploy legacy app only to iExec server
 ```
 ## submit
 ```bash
-iexec submit # submit work to previously deployed contract
-iexec submit --dapp 0xE22F4... # submit work to any dapp address
+iexec submit # submit work to your own dapp
+iexec submit --dapp 0xE22F4... # submit work to someone else dapp address
 ```
 
 ## deploy
