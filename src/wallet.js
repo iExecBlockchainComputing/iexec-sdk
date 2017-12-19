@@ -1,6 +1,5 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
-const Web3 = require('web3');
 const ora = require('ora');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
@@ -169,23 +168,13 @@ const show = async () => {
   try {
     const userWallet = await load();
 
-    const chains = {};
-
     spinner.info('Wallet:\n');
     console.log(JSON.stringify(userWallet, null, 4), '\n');
     spinner.start('Checking ETH balances...');
 
-    const networkNames = Object.keys(utils.truffleConfig.networks);
-    networkNames.forEach((name) => {
-      chains[name] = {};
-      chains[name].name = name;
-      chains[name].web3 =
-        new Web3(new Web3.providers.HttpProvider(utils.truffleConfig.networks[name].host));
-      Promise.promisifyAll(chains[name].web3.eth);
-      chains[name].id = utils.truffleConfig.networks[name].network_id;
-      chains[chains[name].id] = chains[name];
-    });
+    const chains = utils.getChains();
 
+    const networkNames = Object.keys(utils.truffleConfig.networks);
     const ethBalances = await Promise.all(networkNames.map(name =>
       chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => chains[name].web3.fromWei(balance, 'ether')).catch(() => 0)));
     spinner.info('ETH balances:\n');
@@ -198,7 +187,7 @@ const show = async () => {
     console.log('Run "iexec wallet getETH" to top up your ETH account\n');
 
     spinner.start('Checking nRLC balances...');
-    const chainIDs = Object.keys(rlcJSON.networks);
+    const chainIDs = Object.keys(rlcJSON.networks).filter(id => id in chains);
 
     const rlcBalances = await Promise.all(chainIDs.map((id) => {
       const rlcAddress = rlcJSON.networks[id].address;

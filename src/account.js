@@ -139,7 +139,7 @@ const show = async () => {
     const userWallet = await wallet.load();
     const chains = getChains();
 
-    const chainIDs = Object.keys(rlcJSON.networks);
+    const chainIDs = Object.keys(rlcJSON.networks).filter(id => id in chains);
 
     spinner.start();
     const rlcAllowances = await Promise.all(chainIDs.map((id) => {
