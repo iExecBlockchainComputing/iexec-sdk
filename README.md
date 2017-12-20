@@ -27,7 +27,7 @@ iexec --help
 > Windows users need to create an alias by running ```for /f %i in ('where iexec') do doskey iex=%i $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
 
 ## Init
-These are the basic steps you need to run before any "real" use of the SDK.
+Before any use of the SDK, make sure you did run once the below steps:
 ```bash
 iexec init # init a project
 cd iexec-init # enter the project
