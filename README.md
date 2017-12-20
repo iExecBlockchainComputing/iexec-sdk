@@ -8,8 +8,8 @@ and execute them through calls to Ethereum smart contracts.
 
 ## Ressources
 
-* A [Hello World  tutorial](https://goo.gl/REsz1j) to get your feet wet.
-* A [create your dapp  tutorial](https://goo.gl/REsz1j) to craft custom iExec Dapps and join the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee).
+* A [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
+* A [create your dapp  tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg) to craft custom iExec Dapps and join the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee).
 * An iExec explorer : https://explorer.iex.ec
 * A RLC faucet : https://faucet.iex.ec
 * A Dapp Store : https://dapps.iex.ec
@@ -27,58 +27,75 @@ iexec --help
 
 > Windows users need to create an alias by running ```for /f %i in ('where iexec') do doskey iex=%i $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
 
-You're done ! Now, let's create your first iExec application.
 
+## Submit a job on existing Dapps
 
-## Init
+You can see dapps examples in branches of [iexec-dapp-samples repository](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)   
 
-Init your iExec project using one of the many [sample iExec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
-```bash
-iexec init factorial
-cd iexec-factorial  // move into new project directory
+To interact with an existing dapp, you need to :
+- Scaffold an empty iExec project
+```
+iexec init
+cd iexec-init
 ```
 
-It will download the sample iExec project to start with.
-
-Your iExec Dapp is composed of two parts:
-1. An offchain app (under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
-2. A smart contract (under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
-
-
-## Wallet
-
-All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees and some RLC to pay for the computing power:
-```bash
+- Use or create a ethereum wallet in wallet.json
+```
 iexec wallet create
-iexec wallet getETH
-iexec wallet getRLC
 ```
-You can check how many ETH/RLC you have in your wallet:
-```bash
+- Prepare your account with eth and rlc
+```
+iexec wallet getETH 
+iexec wallet getRLC 
 iexec wallet show
 ```
+- Allow some of your RLC for off-chain computing payment
+```
+iexec account allow 5 
+iexec account show
 
-## I deploy
-Using a single command line, you can deploy your smart contract (```/contracts/Factorial.sol```) on Ethereum AND deploy your legacy application (```/apps/Factorial```) on the iExec network:
-```bash
-iexec deploy
-```
-
-## I exec
-Depending on the price of the application you want to use, you will need to credit your iExec account with some RLC before submitting a calculation:
-```bash
-iexec account allow 5
-```
-Let's submit our first calculation:
-```bash
-iexec submit 10
-```
-Each submission gives you back a transaction hash, that you need to use as a parameter to get the result of the submit:
-```bash
-iexec result txHash
 ```
 
-Congrats, your smart contract is "offchain computing ready!". Sky is the limit for you and your smart contract!
+- Configure the work params in iexec.js work section. Example for a the command line  :
+
+```
+module.exports = {
+  name: 'MyContract',
+  data: {
+    type: 'BINARY',
+    cpu: 'AMD64',
+    os: 'LINUX',
+  },
+  work: {
+    cmdline: '10',
+  }
+};
+```
+
+- Generate and send the ethereum submit transaction to the dapp smart contract
+
+```
+iexec submit --dapp "dapp address to target"
+
+```
+
+
+- See and download your result 
+```
+iexec result "your submitTxHash"
+
+```
+
+See also your transaction and result in [iExec explorer](https://explorer.iex.ec/) 
+
+## Deploy and use an existing Dapp
+
+* [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
+
+## Create and run your custom Dapp
+
+* [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg) 
+
 
 # iExec SDK API
 ## Help
