@@ -1,6 +1,5 @@
 # iExec SDK [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec)
 
-
 iExec allows Ethereum developers to create applications that can be executed off-chain.
 This package brings all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
 Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
@@ -27,75 +26,44 @@ iexec --help
 
 > Windows users need to create an alias by running ```for /f %i in ('where iexec') do doskey iex=%i $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
 
-
-## Submit a job on existing Dapps
-
-You can see dapps examples in branches of [iexec-dapp-samples repository](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)   
-
-To interact with an existing dapp, you need to :
-- Scaffold an empty iExec project
-```
-iexec init
-cd iexec-init
-```
-
-- Use or create a ethereum wallet in wallet.json
-```
-iexec wallet create
-```
-- Prepare your account with eth and rlc
-```
-iexec wallet getETH 
-iexec wallet getRLC 
-iexec wallet show
-```
-- Allow some of your RLC for off-chain computing payment
-```
-iexec account allow 5 
-iexec account show
-
+## Init
+These are the basic steps you need to run before any "real" use of the SDK.
+```bash
+iexec init # init a project
+cd iexec-init # enter the project
+iexec wallet create # create a wallet
+iexec wallet getETH # get some ETH
+iexec wallet getRLC # get some RLC
+iexec wallet show # check you received the tokens
+iexec account allow 5 # credit your account with RLC
+iexec account show # check your iExec account balance
 ```
 
-- Configure the work params in iexec.js work section. Example for a the command line  :
+## Use an existing dapp
+After the init steps, go to [iExec dapp store](https://dapps.iex.ec) and find the dapp you'd like to use, say [ffmpeg](https://dapps.iex.ec/dapp/jeremy_toussaint/ffmpeg):
+ 1. Copy its ethereum address by clicking on the network #tag (ropsten, rinkeby, mainnet).
+ 2. Replace your local ```iexec.js``` with the one of the dapp (you can find it on the [github page of the dapp](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/ffmpeg#readme))
+
+And submit your work:
+```
+iexec submit --dapp 0x928cf...
 
 ```
-module.exports = {
-  name: 'MyContract',
-  data: {
-    type: 'BINARY',
-    cpu: 'AMD64',
-    os: 'LINUX',
-  },
-  work: {
-    cmdline: '10',
-  }
-};
-```
-
-- Generate and send the ethereum submit transaction to the dapp smart contract
+Finally, copy the transaction hash given by the SDK and check the progress of your work:
 
 ```
-iexec submit --dapp "dapp address to target"
+iexec result txHash
 
 ```
+Or directly go to the [iExec explorer](https://explorer.iex.ec/) for a more visual experience.
 
+## Deploy and run an existing dapp
 
-- See and download your result 
-```
-iexec result "your submitTxHash"
+Go checkout the [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
 
-```
+## Create and deploy your own custom dapp
 
-See also your transaction and result in [iExec explorer](https://explorer.iex.ec/) 
-
-## Deploy and use an existing Dapp
-
-* [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
-
-## Create and run your custom Dapp
-
-* [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg) 
-
+Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
 
 # iExec SDK API
 ## Help
