@@ -1,6 +1,5 @@
 # iExec SDK [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec)
 
-
 iExec allows Ethereum developers to create applications that can be executed off-chain.
 This package brings all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
 Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
@@ -8,8 +7,8 @@ and execute them through calls to Ethereum smart contracts.
 
 ## Ressources
 
-* A [Hello World  tutorial](https://goo.gl/REsz1j) to get your feet wet.
-* A [create your dapp  tutorial](https://goo.gl/REsz1j) to craft custom iExec Dapps and join the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee).
+* A [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
+* A [create your dapp  tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg) to craft custom iExec Dapps and join the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee).
 * An iExec explorer : https://explorer.iex.ec
 * A RLC faucet : https://faucet.iex.ec
 * A Dapp Store : https://dapps.iex.ec
@@ -27,58 +26,44 @@ iexec --help
 
 > Windows users need to create an alias by running ```for /f %i in ('where iexec') do doskey iex=%i $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
 
-You're done ! Now, let's create your first iExec application.
-
-
 ## Init
-
-Init your iExec project using one of the many [sample iExec dapps](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/master)
+These are the basic steps you need to run before any "real" use of the SDK.
 ```bash
-iexec init factorial
-cd iexec-factorial  // move into new project directory
+iexec init # init a project
+cd iexec-init # enter the project
+iexec wallet create # create a wallet
+iexec wallet getETH # get some ETH
+iexec wallet getRLC # get some RLC
+iexec wallet show # check you received the tokens
+iexec account allow 5 # credit your account with RLC
+iexec account show # check your iExec account balance
 ```
 
-It will download the sample iExec project to start with.
+## Use an existing dapp
+After the init steps, go to [iExec dapp store](https://dapps.iex.ec) and find the dapp you'd like to use, say [ffmpeg](https://dapps.iex.ec/dapp/jeremy_toussaint/ffmpeg):
+ 1. Copy its ethereum address by clicking on the network #tag (ropsten, rinkeby, mainnet).
+ 2. Replace your local ```iexec.js``` with the one of the dapp (you can find it on the [github page of the dapp](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/ffmpeg#readme))
 
-Your iExec Dapp is composed of two parts:
-1. An offchain app (under ```/apps``` directory), which can be any kind of legacy application. The offchain app will be executed by the iExec decentralised cloud.
-2. A smart contract (under ```/contracts``` directory) that interfaces your iExec Dapp from Ethereum to the offchain app.
-
-
-## Wallet
-
-All interactions with the Ethereum blockchain need some ETH to pay for the transaction fees and some RLC to pay for the computing power:
-```bash
-iexec wallet create
-iexec wallet getETH
-iexec wallet getRLC
+And submit your work:
 ```
-You can check how many ETH/RLC you have in your wallet:
-```bash
-iexec wallet show
-```
+iexec submit --dapp 0x928cf...
 
-## I deploy
-Using a single command line, you can deploy your smart contract (```/contracts/Factorial.sol```) on Ethereum AND deploy your legacy application (```/apps/Factorial```) on the iExec network:
-```bash
-iexec deploy
 ```
+Finally, copy the transaction hash given by the SDK and check the progress of your work:
 
-## I exec
-Depending on the price of the application you want to use, you will need to credit your iExec account with some RLC before submitting a calculation:
-```bash
-iexec account allow 5
 ```
-Let's submit our first calculation:
-```bash
-iexec submit 10
-```
-Each submission gives you back a transaction hash, that you need to use as a parameter to get the result of the submit:
-```bash
 iexec result txHash
-```
 
-Congrats, your smart contract is "offchain computing ready!". Sky is the limit for you and your smart contract!
+```
+Or directly go to the [iExec explorer](https://explorer.iex.ec/) for a more visual experience.
+
+## Deploy and run an existing dapp
+
+Go checkout the [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
+
+## Create and deploy your own custom dapp
+
+Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
 
 # iExec SDK API
 ## Help
