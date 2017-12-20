@@ -34,25 +34,27 @@ const fetchResults = async (txHash, chainName, save) => {
     debug('user address', '0x'.concat(userWallet.address.toString('hex')));
     debug('providerAddress', providerAddress);
 
-    const [txReceipt, result] = await Promise.all([
-      web3.eth.getTransactionReceiptAsync(txHash),
-      oracle.getWorkAsync(txHash),
-    ]);
-    debug('txReceipt', txReceipt);
-    if (txReceipt === null) throw Error('Transaction hash does not exist');
-
-    debug('result', result);
-    if (!result[2] && !result[3]) {
-      spinner.info('PENDING...');
-      return;
-    }
-
     const chain = utils.getChains()[chainName];
     debug('chain.server', chain.server);
     const iexec = createIEXECClient({ server: chain.server });
     const { jwtoken } = await account.load();
     await iexec.getCookieByJWT(jwtoken);
-    const work = await iexec.getWorkByExternalID(txHash);
+
+    const [txReceipt, result, work] = await Promise.all([
+      web3.eth.getTransactionReceiptAsync(txHash),
+      oracle.getWorkAsync(txHash),
+      iexec.getWorkByExternalID(txHash),
+    ]);
+    debug('txReceipt', txReceipt);
+    if (txReceipt === null) throw Error('Transaction hash does not exist');
+
+    debug('result', result);
+    const status = iexec.getFieldValue(work, 'status');
+    if (status !== 'COMPLETED') {
+      spinner.info(status.concat('...'));
+      return;
+    }
+
     debug('work.xwhep.work[0]', work.xwhep.work[0]);
     let resultPath;
     const resultURI = iexec.getFieldValue(work, 'resulturi');
