@@ -3,6 +3,7 @@ const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.js
 const ROPSTEN_ORACLE_ADDRESS = oracleJSON.networks['3'].address;
 const RINKEBY_ORACLE_ADDRESS = oracleJSON.networks['4'].address;
 const KOVAN_ORACLE_ADDRESS = oracleJSON.networks['42'].address;
+const MAIN_ORACLE_ADDRESS = oracleJSON.networks['1'].address;
 const LOCAL_ORACLE_ADDRESS = 'local_oracle_address_value';
 
 module.exports = {
@@ -38,6 +39,13 @@ module.exports = {
       network_id: '42',
       constructorArgs: [KOVAN_ORACLE_ADDRESS],
       server: 'https://testxw.iex.ec:443',
+    },
+    mainnet: {
+        host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
+        port: 8545,
+        network_id: '1',
+        constructorArgs: [MAIN_ORACLE_ADDRESS],
+        server: 'https://mainxw.iex.ec:443',
     },
   },
 };
