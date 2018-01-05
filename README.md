@@ -1,3 +1,5 @@
+![iExec SDK logo](https://image.ibb.co/fq4gSG/iexec_sdk.jpg)
+
 # iExec SDK [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec)
 
 iExec allows Ethereum developers to create applications that can be executed off-chain.
