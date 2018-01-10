@@ -1,11 +1,15 @@
+matrix:
+  NODE_TAG:
+    - 9
+    - 8
+    - 6
+
 pipeline:
   build:
-    image: node:9.3.0
+    image: node:${NODE_TAG}
     commands:
       - npm install
       - npm run build
-    when:
-      event: tag
 
   npm:
     image: plugins/npm
