@@ -211,6 +211,8 @@ const show = async () => {
 };
 
 module.exports = {
+  walletFromPrivKey,
+  save,
   create,
   load,
   getETH,
