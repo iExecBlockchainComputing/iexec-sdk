@@ -7,4 +7,4 @@ cli
   .option('--chain, --network <name>', 'migrate to network name', 'ropsten')
   .parse(process.argv);
 
-migrate(cli.network).catch(() => {});
+migrate(cli.network).catch(() => process.exit(1));

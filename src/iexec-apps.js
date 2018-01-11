@@ -12,7 +12,7 @@ cli
 cli
   .command('deploy [appName]')
   .description('send app to iexec server, app binary must be located inside /apps')
-  .action(appName => apps.deploy(cli.network, appName).catch(() => {}));
+  .action(appName => apps.deploy(cli.network, appName).catch(() => process.exit(1)));
 
 cli.parse(process.argv);
 

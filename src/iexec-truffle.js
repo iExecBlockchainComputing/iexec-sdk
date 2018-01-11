@@ -8,4 +8,4 @@ const debug = Debug('iexec:iexec-truffle');
 const args = process.argv.slice(2);
 debug('args', args);
 
-truffle.run(args).catch(() => {});
+truffle.run(args).catch(() => process.exit(1));

@@ -8,4 +8,4 @@ cli
   .option('--dapp <dappAddress>', 'submit work on a specific smart contract address')
   .parse(process.argv);
 
-submit(cli.network, 'iexecSubmit', cli.args[0], cli.dapp).catch(() => {});
+submit(cli.network, 'iexecSubmit', cli.args[0], cli.dapp).catch(() => process.exit(1));

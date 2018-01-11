@@ -10,17 +10,17 @@ cli
 cli
   .command('login')
   .description('login into your iexec account')
-  .action(() => account.login(cli.auth).catch(() => {}));
+  .action(() => account.login(cli.auth).catch(() => process.exit(1)));
 
 cli
   .command('allow <amount>')
   .description('set the nRLC allowance on iexec account')
-  .action(amount => account.allow(cli.network, amount).catch(() => {}));
+  .action(amount => account.allow(cli.network, amount).catch(() => process.exit(1)));
 
 cli
   .command('show')
   .description('show iexec account status')
-  .action(() => account.show().catch(() => {}));
+  .action(() => account.show().catch(() => process.exit(1)));
 
 cli.parse(process.argv);
 
