@@ -4,7 +4,7 @@
   "description": "iExec sdk",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run build && jest cli --runInBand",
     "build": "./node_modules/.bin/babel src --out-dir dist --copy-files"
   },
   "bin": {
@@ -44,7 +44,8 @@
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.15.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "jest": "^22.0.6"
   },
   "babel": {
     "presets": [
