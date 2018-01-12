@@ -8,8 +8,8 @@ pipeline:
   build:
     image: node:${NODE_TAG}
     commands:
-      - npm install -g .
       - npm install
+      - npm -g install .
       - npm test
       - npm run build
 
