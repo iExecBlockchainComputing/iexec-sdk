@@ -4,7 +4,7 @@
   "description": "iExec sdk",
   "main": "src/index.js",
   "scripts": {
-    "test": "npm run build && jest cli --runInBand",
+    "test": "jest cli --runInBand && jest api",
     "build": "./node_modules/.bin/babel src --out-dir dist --copy-files"
   },
   "bin": {
