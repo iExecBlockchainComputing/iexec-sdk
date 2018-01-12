@@ -9,9 +9,10 @@ pipeline:
     image: node:${NODE_TAG}
     commands:
       - npm install
+      - npm run build
+      - npm cache clean
       - npm -g install .
       - npm test
-      - npm run build
 
   npm:
     image: plugins/npm
