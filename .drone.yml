@@ -10,7 +10,6 @@ pipeline:
     commands:
       - npm install
       - npm run build
-      - npm cache clean
       - npm -g install .
       - npm test
 
