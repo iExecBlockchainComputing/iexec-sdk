@@ -14,6 +14,11 @@ cli
   .description('send app to iexec server, app binary must be located inside /apps')
   .action(appName => apps.deploy(cli.network, appName).catch(() => process.exit(1)));
 
+cli
+  .command('uploadData [dataPath]')
+  .description('upload data with its description')
+  .action(dataPath => apps.uploadData(cli.network, dataPath).catch(() => process.exit(1)));
+
 cli.parse(process.argv);
 
 debug('cli.args.length', cli.args.length);

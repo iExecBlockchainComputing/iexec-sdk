@@ -22,8 +22,6 @@ const deploy = async (chainName, cliAppName) => {
     debug('appName', appName);
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
-    const appPath = path.join(process.cwd(), 'apps', appName);
-    debug('appPath', appPath);
 
     spinner.start('sending app to iExec server...');
 
@@ -34,14 +32,26 @@ const deploy = async (chainName, cliAppName) => {
     const contractAddress = networks[chainID].address;
     debug('contractAddress', contractAddress);
     await iexec.getCookieByJWT(jwtoken);
-    const data = fs.readFileSync(appPath);
-    const { size } = fs.statSync(appPath);
-    await iexec.registerApp(
-      data,
-      size,
-      utils.iexecConfig.data,
-      Object.assign({ name: contractAddress }, utils.iexecConfig.app || {}),
-    );
+
+    const appExtraFields = {};
+
+    if (!('app' in utils.iexecConfig) || utils.iexecConfig.app.type === 'DEPLOYABLE') {
+      debug('type === DEPLOYABLE');
+      const appPath = path.join(process.cwd(), 'apps', appName);
+      debug('appPath', appPath);
+      const data = fs.readFileSync(appPath);
+      const { size } = fs.statSync(appPath);
+      const dataUID = await iexec.registerData(data, size, utils.iexecConfig.data);
+      const { os, cpu } = utils.iexecConfig.data;
+      const appBinFieldName = iexec.getAppBinaryFieldName(os, cpu);
+      appExtraFields[appBinFieldName] = iexec.uid2uri(dataUID);
+    }
+
+    await iexec.registerApp(Object.assign(
+      appExtraFields,
+      { name: contractAddress },
+      utils.iexecConfig.app || {},
+    ));
 
     spinner.succeed(`App deployed on iExec offchain platform. Only callable through ${chainName} dapp at: ${contractAddress}\n`);
   } catch (error) {
@@ -50,6 +60,37 @@ const deploy = async (chainName, cliAppName) => {
   }
 };
 
+const uploadData = async (chainName, dataPath) => {
+  const spinner = ora(oraOptions);
+  try {
+    debug('dataPath', dataPath);
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({ server: chain.server });
+
+    const { jwtoken } = await account.load();
+    debug('jwtoken', jwtoken);
+
+    spinner.start('uploading data to iExec server...');
+
+    await iexec.getCookieByJWT(jwtoken);
+    const data = fs.readFileSync(dataPath);
+    const { size } = fs.statSync(dataPath);
+    const dataUID = await iexec.registerData(
+      data,
+      size,
+      utils.iexecConfig.data,
+    );
+    const dataURI = iexec.uid2uri(dataUID);
+
+    spinner.succeed(`Data uploaded on iExec offchain platform, available at ${dataURI}\n`);
+  } catch (error) {
+    spinner.fail(`deploy() failed with ${error}`);
+    throw error;
+  }
+};
+
 module.exports = {
   deploy,
+  uploadData,
 };
