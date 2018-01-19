@@ -27,6 +27,10 @@ async function init(branchName = 'init', repoURL = IEXEC_SAMPLES_REPO) {
     debug(`pulling ${branchName} from ${repoURL}...`);
     spinner.start(`pulling ${branchName}...`);
     const dirName = 'iexec-'.concat(branchName);
+    const projectFolder = path.join(process.cwd(), dirName);
+    const isProjectExists = await fs.pathExists(projectFolder);
+
+    if (isProjectExists) throw Error(`"${dirName}" directory already exists. Consider renaming it before running "iexec init"`);
 
     await execAsync(`git clone --depth=1 -b ${branchName} ${repoURL} ${dirName}`);
     await fs.remove(path.join(process.cwd(), dirName, '.git'));
