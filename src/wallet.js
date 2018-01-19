@@ -248,6 +248,49 @@ const sendETH = async (chainName, amount, to = 'iexec') => {
   }
 };
 
+const sendRLC = async (chainName, amount, to = 'iexec') => {
+  const spinner = ora(oraOptions);
+  try {
+    const userWallet = await load();
+    const toAddress = utils.getFaucetWallet(to);
+    debug('toAddress', toAddress);
+
+    const answers = await inquirer.prompt([{
+      type: 'confirm',
+      name: 'transfer',
+      message: `Do you want to send ${amount} ${chainName} nRLC to ${to}`,
+    }]);
+    if (!answers.transfer) throw Error('Transfer aborted by user.');
+
+    spinner.start(`Sending ${amount} ${chainName} nRLC to ${to}...`);
+    const chain = utils.getChains()[chainName];
+    const rlcAddress = rlcJSON.networks[chain.id].address;
+    const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
+    const transferAmount = parseInt(amount, 10);
+    const unsignedTx = rlcContract.transfer.getData(toAddress, transferAmount);
+
+    const txHash = await utils.signAndSendTx({
+      web3: chain.web3,
+      userWallet,
+      unsignedTx,
+      network: chain,
+      contractAddress: rlcAddress,
+      chainID: chain.id,
+    });
+    spinner.info(`transfer txHash: ${txHash} \n`);
+
+    spinner.start('waiting for transaction to be mined');
+    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+
+    debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
+    spinner.info(`View on etherscan: ${utils.chainToEtherscanURL(chainName).concat(txReceipt.transactionHash)}\n`);
+    spinner.succeed(`${amount} ${chainName} nRLC sent to ${to}\n`);
+  } catch (error) {
+    spinner.fail(`sendRLC() failed with ${error}`);
+    throw error;
+  }
+};
+
 module.exports = {
   walletFromPrivKey,
   save,
@@ -257,4 +300,5 @@ module.exports = {
   getRLC,
   show,
   sendETH,
+  sendRLC,
 };

@@ -139,8 +139,16 @@ const saveContractDesc = async (contractDesc) => {
 };
 
 const chainToEtherscanURL = chainName => `https://${chainName === 'mainnet' ? '' : chainName.concat('.')}etherscan.io/tx/`;
+
+const ORACLE_WALLET_ADDRESS = '0x486a5986f795d323555c0321d655f1eb78d68381';
 const getOracleWallet = (to) => {
-  const toAddress = to === 'iexec' ? '0x486a5986f795d323555c0321d655f1eb78d68381' : to;
+  const toAddress = to === 'iexec' ? ORACLE_WALLET_ADDRESS : to;
+  return toAddress;
+};
+
+const FAUCET_WALLET_ADDRESS = '0x1d78323c836d6e6681fe77128ae55923c8d5e0f0';
+const getFaucetWallet = (to) => {
+  const toAddress = to === 'iexec' ? FAUCET_WALLET_ADDRESS : to;
   return toAddress;
 };
 
@@ -154,4 +162,5 @@ module.exports = {
   saveContractDesc,
   chainToEtherscanURL,
   getOracleWallet,
+  getFaucetWallet,
 };

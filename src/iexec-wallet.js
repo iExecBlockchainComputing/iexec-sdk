@@ -32,6 +32,12 @@ cli
   .action(amount => wallet.sendETH(cli.network, amount, cli.to).catch(() => process.exit(1)));
 
 cli
+  .command('sendRLC')
+  .arguments('<amount>')
+  .description('send nRLC to an address')
+  .action(amount => wallet.sendRLC(cli.network, amount, cli.to).catch(() => process.exit(1)));
+
+cli
   .command('show')
   .description('show local wallet balances')
   .action(() => wallet.show().catch(() => process.exit(1)));
