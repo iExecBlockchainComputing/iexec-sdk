@@ -5,8 +5,7 @@ const init = require('./init');
 
 cli
   .option('--repo [name]', 'git repository name')
-  .arguments('<branch>')
-  .action(branch => init(branch, cli.repo).catch(() => process.exit(1)))
+  .action(() => init(cli.args[0], cli.repo).catch(() => process.exit(1)))
   .parse(process.argv);
 
-if (cli.args.length === 0) cli.help();
+init(cli.args[0], cli.repo).catch(() => process.exit(1));
