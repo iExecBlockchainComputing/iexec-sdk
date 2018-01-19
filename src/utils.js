@@ -152,6 +152,11 @@ const getFaucetWallet = (to) => {
   return toAddress;
 };
 
+const checkTxReceipt = (txReceipt, gasLimit) => {
+  if (txReceipt.status === '0x0') throw Error('transaction failed, state REVERTED');
+  if (txReceipt.gasUsed === gasLimit) throw Error('transaction throw, out of gas');
+};
+
 module.exports = {
   iexecConfig,
   truffleConfig,
@@ -163,4 +168,5 @@ module.exports = {
   chainToEtherscanURL,
   getOracleWallet,
   getFaucetWallet,
+  checkTxReceipt,
 };

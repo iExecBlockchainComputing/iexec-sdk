@@ -282,6 +282,9 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     spinner.start('waiting for transaction to be mined');
     const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
 
+    const tx = await chain.web3.getTransaction(txHash);
+    utils.checkTxReceipt(txReceipt, tx.gas);
+
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
     spinner.info(`View on etherscan: ${utils.chainToEtherscanURL(chainName).concat(txReceipt.transactionHash)}\n`);
     spinner.succeed(`${amount} ${chainName} nRLC sent to ${to}\n`);
