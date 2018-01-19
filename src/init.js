@@ -16,27 +16,26 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const openAsync = Promise.promisify(fs.open);
 const writeAsync = Promise.promisify(fs.write);
 
-const IEXEC_GITHUB = 'https://github.com/iExecBlockchainComputing/';
-const SAMPLES_REPO = 'iexec-dapp-samples.git';
+const IEXEC_SAMPLES_REPO = 'https://github.com/iExecBlockchainComputing/iexec-dapp-samples.git';
 const TRUFFLE_FILE_NAME = 'truffle.js';
 
 cli.parse(process.argv);
 
-async function init(branchName = 'init') {
+async function init(branchName = 'init', repoURL = IEXEC_SAMPLES_REPO) {
   const spinner = ora(oraOptions);
   try {
-    debug(`pulling ${branchName}...`);
+    debug(`pulling ${branchName} from ${repoURL}...`);
     spinner.start(`pulling ${branchName}...`);
     const dirName = 'iexec-'.concat(branchName);
 
-    await execAsync(`git clone --depth=1 -b ${branchName} ${IEXEC_GITHUB}${SAMPLES_REPO} ${dirName}`);
+    await execAsync(`git clone --depth=1 -b ${branchName} ${repoURL} ${dirName}`);
     await fs.remove(path.join(process.cwd(), dirName, '.git'));
     const truffleConfig = await readFileAsync(path.join(__dirname, TRUFFLE_FILE_NAME), 'utf8');
 
     const trufflePath = path.join(process.cwd(), dirName, TRUFFLE_FILE_NAME);
     const fd = await openAsync(trufflePath, 'wx').catch(() => undefined);
     if (fd !== undefined) {
-      debug('writing new file');
+      debug('writing new truffle.js file');
       await writeAsync(fd, truffleConfig, 0, 'utf8');
       fs.close(fd);
     }
