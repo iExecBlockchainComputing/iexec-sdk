@@ -282,7 +282,7 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     spinner.start('waiting for transaction to be mined');
     const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
 
-    const tx = await chain.web3.getTransaction(txHash);
+    const tx = await chain.web3.eth.getTransactionAsync(txHash);
     utils.checkTxReceipt(txReceipt, tx.gas);
 
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
@@ -290,6 +290,32 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     spinner.succeed(`${amount} ${chainName} nRLC sent to ${to}\n`);
   } catch (error) {
     spinner.fail(`sendRLC() failed with ${error}`);
+    throw error;
+  }
+};
+
+const sweep = async (chainName, to = 'iexec') => {
+  const spinner = ora(oraOptions);
+  try {
+    const userWallet = await load();
+
+    const chain = utils.getChains()[chainName];
+
+    const rlcAddress = rlcJSON.networks[chain.id].address;
+    const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
+    Promise.promisifyAll(rlcContract);
+    const rlcBalance = await rlcContract.balanceOfAsync('0x'.concat(userWallet.address));
+    debug('rlcBalance', rlcBalance.toNumber());
+    if (rlcBalance.toNumber() > 0) await sendRLC(chainName, rlcBalance, to);
+
+    const ethBalance = await chain.web3.eth.getBalanceAsync(userWallet.address).then(balance => chain.web3.fromWei(balance, 'ether'));
+    debug('ethBalance', ethBalance.toNumber());
+    const ethToSweep = ethBalance.toNumber() - 0.01;
+    if (ethToSweep > 0) await sendETH(chainName, ethToSweep, to);
+
+    spinner.succeed(`wallet swept to ${to}\n`);
+  } catch (error) {
+    spinner.fail(`sweep() failed with ${error}`);
     throw error;
   }
 };
@@ -304,4 +330,5 @@ module.exports = {
   show,
   sendETH,
   sendRLC,
+  sweep,
 };

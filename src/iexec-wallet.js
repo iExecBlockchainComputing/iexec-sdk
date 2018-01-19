@@ -38,6 +38,11 @@ cli
   .action(amount => wallet.sendRLC(cli.network, amount, cli.to).catch(() => process.exit(1)));
 
 cli
+  .command('sweep')
+  .description('send all ETH and RLC to an address')
+  .action(() => wallet.sweep(cli.network, cli.to).catch(() => process.exit(1)));
+
+cli
   .command('show')
   .description('show local wallet balances')
   .action(() => wallet.show().catch(() => process.exit(1)));
