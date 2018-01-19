@@ -138,6 +138,12 @@ const saveContractDesc = async (contractDesc) => {
   }
 };
 
+const chainToEtherscanURL = chainName => `https://${chainName === 'mainnet' ? '' : chainName.concat('.')}etherscan.io/tx/`;
+const getOracleWallet = (to) => {
+  const toAddress = to === 'iexec' ? '0x486a5986f795d323555c0321d655f1eb78d68381' : to;
+  return toAddress;
+};
+
 module.exports = {
   iexecConfig,
   truffleConfig,
@@ -146,4 +152,6 @@ module.exports = {
   getChains,
   loadContractDesc,
   saveContractDesc,
+  chainToEtherscanURL,
+  getOracleWallet,
 };

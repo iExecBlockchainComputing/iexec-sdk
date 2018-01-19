@@ -7,6 +7,7 @@ const wallet = require('./wallet');
 const debug = Debug('iexec:iexec-wallet');
 
 cli
+  .option('--to <address>', 'receiver address')
   .option('--chain, --network <name>', 'network name', 'ropsten');
 
 cli
@@ -23,6 +24,12 @@ cli
   .command('getRLC')
   .description('apply for nRLC from iexec faucet')
   .action(() => wallet.getRLC(cli.network).catch(() => process.exit(1)));
+
+cli
+  .command('sendETH')
+  .arguments('<amount>')
+  .description('send ETH to an address')
+  .action(amount => wallet.sendETH(cli.network, amount, cli.to).catch(() => process.exit(1)));
 
 cli
   .command('show')

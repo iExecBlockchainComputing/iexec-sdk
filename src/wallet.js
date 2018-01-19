@@ -88,12 +88,12 @@ const load = async () => {
 
 const ethFaucets = [
   {
-    networkName: 'ropsten',
+    chainName: 'ropsten',
     name: 'faucet.ropsten.be',
     getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
-    networkName: 'ropsten',
+    chainName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
     getETH: address => fetch(
       'https://ropsten.faucet.b9lab.com/tap',
@@ -108,24 +108,24 @@ const ethFaucets = [
     ).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
-    networkName: 'rinkeby',
+    chainName: 'rinkeby',
     name: 'faucet.rinkeby.io',
     getETH: () => ({ message: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH' }),
   },
   {
-    networkName: 'kovan',
+    chainName: 'kovan',
     name: 'gitter.im/kovan-testnet/faucet',
     getETH: () => ({ message: 'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH' }),
   },
 ];
 
-const getETH = async (networkName) => {
+const getETH = async (chainName) => {
   const spinner = ora(oraOptions);
   try {
     const userWallet = await load();
 
-    spinner.start(`Requesting ETH from ${networkName} faucets...`);
-    const filteredFaucets = ethFaucets.filter(e => e.networkName === networkName);
+    spinner.start(`Requesting ETH from ${chainName} faucets...`);
+    const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
     const responses = await Promise.all(filteredFaucets.map(faucet =>
       faucet.getETH(userWallet.address)));
     const responsesMessage = filteredFaucets.reduce((accu, curr, index) =>
@@ -145,14 +145,14 @@ const rlcFaucets = [
   },
 ];
 
-const getRLC = async (networkName) => {
+const getRLC = async (chainName) => {
   const spinner = ora(oraOptions);
   try {
     const userWallet = await load();
 
-    spinner.start(`Requesting ${networkName} faucet for nRLC...`);
+    spinner.start(`Requesting ${chainName} faucet for nRLC...`);
     const responses = await Promise.all(rlcFaucets.map(faucet =>
-      faucet.getRLC(networkName, userWallet.address)));
+      faucet.getRLC(chainName, userWallet.address)));
     const responsesMessage = rlcFaucets.reduce((accu, curr, index) =>
       accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
     spinner.succeed('Faucets responses:\n');
@@ -210,6 +210,44 @@ const show = async () => {
   }
 };
 
+const sendETH = async (chainName, amount, to = 'iexec') => {
+  const spinner = ora(oraOptions);
+  try {
+    const userWallet = await load();
+    const toAddress = utils.getOracleWallet(to);
+
+    const answers = await inquirer.prompt([{
+      type: 'confirm',
+      name: 'transfer',
+      message: `Do you want to send ${amount} ${chainName} ETH to ${to}`,
+    }]);
+    if (!answers.transfer) throw Error('Transfer aborted by user.');
+
+    spinner.start(`Sending ${amount} ${chainName} ETH to ${to}...`);
+    const chain = utils.getChains()[chainName];
+
+    const txHash = await utils.signAndSendTx({
+      web3: chain.web3,
+      userWallet,
+      network: chain,
+      contractAddress: toAddress,
+      value: chain.web3.toWei(amount, 'ether'),
+      chainID: chain.id,
+    });
+    spinner.info(`transfer txHash: ${txHash} \n`);
+
+    spinner.start('waiting for transaction to be mined');
+    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+
+    debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
+    spinner.info(`View on etherscan: ${utils.chainToEtherscanURL(chainName).concat(txReceipt.transactionHash)}\n`);
+    spinner.succeed(`${amount} ${chainName} ETH sent to ${to}\n`);
+  } catch (error) {
+    spinner.fail(`sendETH() failed with ${error}`);
+    throw error;
+  }
+};
+
 module.exports = {
   walletFromPrivKey,
   save,
@@ -218,4 +256,5 @@ module.exports = {
   getETH,
   getRLC,
   show,
+  sendETH,
 };
