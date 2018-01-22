@@ -46,17 +46,17 @@ After the init steps, go to [iExec dapp store](https://dapps.iex.ec) and find th
  1. Copy its ethereum address by clicking on the network #tag (ropsten, rinkeby, mainnet).
  2. Replace your local ```iexec.js``` with the one of the dapp (you can find it on the [github page of the dapp](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/ffmpeg#readme))
 
-And submit your work:
-```
-iexec submit --dapp 0x928cf...
+And submit your work to the dapp address:
+```bash
+iexec submit --dapp <dapp_address>
 
 ```
 Finally, copy the transaction hash given by the SDK and check the progress of your work:
 
+```bash
+iexec result <txHash>
 ```
-iexec result txHash
 
-```
 Or directly go to the [iExec explorer](https://explorer.iex.ec/) for a more visual experience.
 
 ## Deploy and run an existing dapp
@@ -84,6 +84,9 @@ iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
 iexec wallet show
+iexec wallet sendETH <amount> --to <eth_address>
+iexec wallet sendRLC <amount> --to <eth_address>
+iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
 ```
 ## account
 ```bash
@@ -100,6 +103,7 @@ iexec dapps show # show addresses of deployed dapps
 ## apps
 ```bash
 iexec apps deploy # deploy legacy app only to iExec server
+iexec apps uploadData <data_path> # direct data upload
 ```
 ## submit
 ```bash
@@ -115,11 +119,12 @@ iexec deploy # a combo of "iexec dapps deploy" and "iexec apps deploy"
 ## result
 You need the txHash of a work submission in order to check its result:
 ```bash
-iexec result 0xEL3D9ed... # this will log the result data
-iexec result 0xEL3D9ed... --save # this will download the result locally
+iexec result <txHash> # this will log the result data
+iexec result <txHash> --save # this will download the result locally
 ```
 
 ## iexec.js
+The ```iexec.js``` file, located in every iExec project, describes the parameters used when deploying an app, and when submitting a work.
 ```js
 module.exports = {
   name: 'Factorial',
@@ -143,6 +148,7 @@ module.exports = {
 ```
 
 ## truffle.js
+The ```truffle.js``` file, located in every iExec project, describes the parameters used when communicating with ethereum and iexec nodes.
 ```js
 module.exports = {
   networks: {
