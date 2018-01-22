@@ -12,6 +12,8 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
+    when:
+      event: tag
 
   npm:
     image: plugins/npm
@@ -20,6 +22,8 @@ pipeline:
     email: sulliwane@gmail.com
     when:
       event: tag
+      matrix:
+        NODE_TAG: 6
 
   publish:
     image: plugins/docker
@@ -30,3 +34,5 @@ pipeline:
       - ${DRONE_TAG##v}
     when:
       event: tag
+      matrix:
+        NODE_TAG: 6
