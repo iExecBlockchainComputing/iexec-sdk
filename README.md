@@ -166,5 +166,4 @@ module.exports = {
       // gas: 400000  // manually set the gas limit in gwei. Prefer 'gasLimitMultiplier'
     },
 };
-
 ```
