@@ -20,6 +20,7 @@ const fetchResults = async (txHash, chainName, save) => {
     const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
     Promise.promisifyAll(web3.eth);
     const userWallet = await wallet.load();
+    const { jwtoken } = await account.load();
 
     spinner.start('Fetching submitted job result');
 
@@ -37,7 +38,6 @@ const fetchResults = async (txHash, chainName, save) => {
     const chain = utils.getChains()[chainName];
     debug('chain.server', chain.server);
     const iexec = createIEXECClient({ server: chain.server });
-    const { jwtoken } = await account.load();
     await iexec.getCookieByJWT(jwtoken);
 
     const [txReceipt, result, work] = await Promise.all([
