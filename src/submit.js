@@ -75,7 +75,8 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
       value: callbackPrice,
       chainID: chain.id,
     });
-    spinner.info(`${fnString} txHash: ${txHash} \n`);
+    spinner.info(`${fnString} \n`);
+    spinner.info(`txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
     const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
