@@ -9,7 +9,7 @@ const LOCAL_ORACLE_ADDRESS = 'local_oracle_address_value';
 module.exports = {
   networks: {
     development: {
-      host: 'http://localhost:8545',
+      host: 'localhost',
       port: 8545,
       network_id: '*', // Match any network id,
       constructorArgs: [LOCAL_ORACLE_ADDRESS],
