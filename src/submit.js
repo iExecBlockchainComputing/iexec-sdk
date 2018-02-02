@@ -54,7 +54,7 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     const oracleContract = chain.web3.eth.contract(oracleJSON.abi).at(oracleAddress);
     Promise.promisifyAll(oracleContract);
 
-    spinner.start(`calling ${fnString}`);
+    spinner.start('calling submit...');
     const [callbackPrice, dappPrice, allowance] = await Promise.all([
       oracleContract.callbackPriceAsync(),
       oracleContract.getDappPriceAsync(dappAddress),
