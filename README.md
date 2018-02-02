@@ -26,7 +26,7 @@ iexec --version
 iexec --help
 ```
 
-> Windows users need to create an alias by running ```for /f %i in ('where iexec') do doskey iex=%i $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
+> Windows users need to create an alias by running ```for /f "delims=|" %i in ('where iexec') do doskey iex="%i" $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
 
 ## Init
 Before any use of the SDK, make sure you did run once the below steps:
