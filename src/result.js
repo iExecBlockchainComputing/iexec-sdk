@@ -13,7 +13,7 @@ const account = require('./account');
 
 const debug = Debug('iexec:result');
 
-const fetchResults = async (txHash, chainName, save) => {
+const fetchResults = async (txHash, chainName, save, cliDappAddress) => {
   const spinner = ora(oraOptions);
   try {
     const network = utils.truffleConfig.networks[chainName];
@@ -24,9 +24,9 @@ const fetchResults = async (txHash, chainName, save) => {
 
     spinner.start('Fetching submitted job result');
 
-    const contractDesc = await utils.loadContractDesc();
+    const { networks } = await utils.loadContractDesc();
 
-    const providerAddress = contractDesc.networks[network.network_id].address;
+    const providerAddress = cliDappAddress || networks[network.network_id].address;
     const oracleAddress = oracleJSON.networks[network.network_id].address;
 
     const oracle = web3.eth.contract(oracleJSON.abi).at(oracleAddress);
