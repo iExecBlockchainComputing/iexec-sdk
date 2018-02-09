@@ -30,13 +30,11 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
 
     // hit iexec server REST API to create a user on the fly
     // so it can be mandated by the bridge
-    if (cliDappAddress) {
-      const { jwtoken } = await account.load();
-      const iexec = createIEXECClient({ server: chain.server });
-      await iexec.getCookieByJWT(jwtoken);
-      const version = await iexec.get('version');
-      debug('version', version);
-    }
+    const { jwtoken } = await account.load();
+    const iexec = createIEXECClient({ server: chain.server });
+    await iexec.getCookieByJWT(jwtoken);
+    const version = await iexec.get('version');
+    debug('version', version);
 
     const dappAddress = cliDappAddress || networks[chain.id].address;
     const dappContract = chain.web3.eth.contract(abi).at(dappAddress);
