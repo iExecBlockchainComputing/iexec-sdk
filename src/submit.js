@@ -26,7 +26,7 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     const chain = utils.getChains()[chainName];
     const { abi, networks } = await utils.loadContractDesc();
 
-    if (!(chain.id in networks) && !cliDappAddress) throw Error(`No existing deployed contract on ${chainName} or no contract address provided to the cli`);
+    if (!(chain.id in networks) && !cliDappAddress) throw Error(`No existing deployed contract on ${chainName} or no --dapp contract address provided to the cli`);
 
     // hit iexec server REST API to create a user on the fly
     // so it can be mandated by the bridge
