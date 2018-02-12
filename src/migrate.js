@@ -1,6 +1,4 @@
 const Debug = require('debug');
-const Web3 = require('web3');
-const Promise = require('bluebird');
 const ora = require('ora');
 const truffle = require('./truffle-cli');
 const wallet = require('./wallet');
@@ -12,18 +10,16 @@ const debug = Debug('iexec:migrate');
 const migrate = async (chainName) => {
   const spinner = ora(oraOptions);
   try {
-    const network = utils.truffleConfig.networks[chainName];
-    const web3 = new Web3(new Web3.providers.HttpProvider(network.host));
-    Promise.promisifyAll(web3.eth);
+    const chain = utils.getChains()[chainName];
 
     await truffle.compile();
 
     const contractDesc = await utils.loadContractDesc();
     const { abi, bytecode } = contractDesc;
 
-    const Contract = web3.eth.contract(abi);
+    const Contract = chain.web3.eth.contract(abi);
 
-    const constructorArgs = network.constructorArgs || [];
+    const constructorArgs = chain.constructorArgs || [];
 
     const unsignedTx = Contract.new.getData(...constructorArgs, { data: bytecode });
     debug('unsignedTx', unsignedTx);
@@ -32,23 +28,22 @@ const migrate = async (chainName) => {
 
     spinner.start(`Deploying ${utils.iexecConfig.name} contract...`);
     const txHash = await utils.signAndSendTx({
-      web3,
+      web3: chain.web3,
       userWallet,
       unsignedTx,
-      network,
-      chainID: network.network_id,
+      network: chain,
+      chainID: chain.id,
     });
     spinner.info(`txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await utils.waitFor(web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
 
     spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
 
     spinner.start('saving contract address');
-    const chainId = parseInt(web3.version.network, 10);
-    contractDesc.networks[chainId] = { address: txReceipt.contractAddress };
+    contractDesc.networks[chain.id] = { address: txReceipt.contractAddress };
     await utils.saveContractDesc(contractDesc);
     spinner.succeed(`Dapp contract deployed on ethereum. Contract address is ${txReceipt.contractAddress} \n`);
   } catch (error) {
