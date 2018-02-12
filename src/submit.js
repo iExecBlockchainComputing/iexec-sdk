@@ -65,13 +65,11 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     if (dappPrice > allowance) throw Error(`the dapp price (${dappPrice} nRLC) is higher than your iexec credit (${allowance} nRLC).`);
 
     const txHash = await utils.signAndSendTx({
-      web3: chain.web3,
+      chain,
       userWallet,
       unsignedTx,
-      network: chain,
       contractAddress: dappAddress,
       value: callbackPrice,
-      chainID: chain.id,
     });
     spinner.info(`${fnString} \n`);
     spinner.info(`txHash: ${txHash} \n`);

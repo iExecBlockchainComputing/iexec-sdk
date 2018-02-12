@@ -80,13 +80,11 @@ const airdrop = async (chainName, csvPath, batch) => {
         debug('new nonceOffset', nonceOffset);
 
         const txHash = await signAndSendTx({
-          web3: chain.web3,
+          chain,
           userWallet,
           unsignedTx,
-          network: chain,
           contractAddress: rlcAddress,
           nonceOffset,
-          chainID: chain.id,
         });
         debug('txHash', txHash);
 

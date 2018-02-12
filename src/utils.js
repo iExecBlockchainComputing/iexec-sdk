@@ -40,23 +40,21 @@ const waitFor = async (fn, hash) => {
 };
 
 const signAndSendTx = async ({
-  web3,
+  chain,
   userWallet,
   unsignedTx,
-  network,
   contractAddress = ZERO_ADDRESS,
   value = 0,
   nonceOffset = 0,
-  chainID,
 }) => {
   try {
     const isMigrating = contractAddress === ZERO_ADDRESS;
     DEFAULT_GAS_LIMIT_MULTIPLIER = isMigrating ? 5 : 3;
 
     const [networkGasPrice, nonce, estimatedGas] = await Promise.all([
-      web3.eth.getGasPriceAsync(),
-      web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
-      web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress, from: '0x'.concat(userWallet.address) }),
+      chain.web3.eth.getGasPriceAsync(),
+      chain.web3.eth.getTransactionCountAsync('0x'.concat(userWallet.address)),
+      chain.web3.eth.estimateGasAsync({ data: unsignedTx, to: contractAddress, from: '0x'.concat(userWallet.address) }),
     ]);
 
     debug('contractAddress', contractAddress);
@@ -64,30 +62,30 @@ const signAndSendTx = async ({
     debug('nonce', nonce);
     debug('nonceOffset', nonceOffset);
     debug('estimatedGas', estimatedGas);
-    debug('value', web3.toHex(value));
+    debug('value', chain.web3.toHex(value));
 
-    const gasPriceMultiplier = network.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
-    const gasPrice = network.gasPrice || networkGasPrice * gasPriceMultiplier;
+    const gasPriceMultiplier = chain.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
+    const gasPrice = chain.gasPrice || networkGasPrice * gasPriceMultiplier;
     debug('gasPrice', gasPrice);
-    const gasLimitMultiplier = network.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
-    debug('network.gas', network.gas);
-    const gasLimit = Math.min(network.gas || estimatedGas * gasLimitMultiplier, BLOCK_GAS_LIMIT);
+    const gasLimitMultiplier = chain.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
+    debug('network.gas', chain.gas);
+    const gasLimit = Math.min(chain.gas || estimatedGas * gasLimitMultiplier, BLOCK_GAS_LIMIT);
     debug('gasLimit', gasLimit);
-    debug('chainId', chainID);
+    debug('chain.id', chain.id);
 
     const txObject = {
-      nonce: web3.toHex(nonce + nonceOffset),
-      gasPrice: web3.toHex(gasPrice),
-      gasLimit: web3.toHex(gasLimit),
-      value: web3.toHex(value),
+      nonce: chain.web3.toHex(nonce + nonceOffset),
+      gasPrice: chain.web3.toHex(gasPrice),
+      gasLimit: chain.web3.toHex(gasLimit),
+      value: chain.web3.toHex(value),
       data: unsignedTx,
-      chainId: parseInt(chainID, 10),
+      chainId: parseInt(chain.id, 10),
     };
     debug('txObject', txObject);
     if (contractAddress !== ZERO_ADDRESS) txObject.to = contractAddress;
     const { rawTx } = tx.sign(txObject, userWallet.privateKey);
 
-    const txHash = await web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
+    const txHash = await chain.web3.eth.sendRawTransactionAsync('0x'.concat(rawTx));
     return txHash;
   } catch (error) {
     debug('signAndSendTx()', error);

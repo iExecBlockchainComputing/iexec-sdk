@@ -227,12 +227,10 @@ const sendETH = async (chainName, amount, to = 'iexec') => {
     const chain = utils.getChains()[chainName];
 
     const txHash = await utils.signAndSendTx({
-      web3: chain.web3,
+      chain,
       userWallet,
-      network: chain,
       contractAddress: toAddress,
       value: chain.web3.toWei(amount, 'ether'),
-      chainID: chain.id,
     });
     spinner.info(`transfer txHash: ${txHash} \n`);
 

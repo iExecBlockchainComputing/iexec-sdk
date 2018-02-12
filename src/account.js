@@ -100,7 +100,7 @@ const allow = async (chainName, amount) => {
   const spinner = ora(oraOptions);
   try {
     const userWallet = await wallet.load();
-    const chain = getChains().chains[chainName];
+    const chain = getChains()[chainName];
     const escrowAddress = escrowJSON.networks[chain.id].address;
     const rlcAddress = rlcJSON.networks[chain.id].address;
     const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
@@ -110,12 +110,10 @@ const allow = async (chainName, amount) => {
     const unsignedTx = rlcContract.approve.getData(escrowAddress, creditAmount);
     spinner.start('credit nRLC on iExec account');
     const txHash = await signAndSendTx({
-      web3: chain.web3,
+      chain,
       userWallet,
       unsignedTx,
-      network: chain,
       contractAddress: rlcAddress,
-      chainID: chain.id,
     });
     spinner.info(`txHash: ${txHash} \n`);
 

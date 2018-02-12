@@ -28,11 +28,9 @@ const migrate = async (chainName) => {
 
     spinner.start(`Deploying ${utils.iexecConfig.name} contract...`);
     const txHash = await utils.signAndSendTx({
-      web3: chain.web3,
+      chain,
       userWallet,
       unsignedTx,
-      network: chain,
-      chainID: chain.id,
     });
     spinner.info(`txHash: ${txHash} \n`);
 
