@@ -100,8 +100,7 @@ const allow = async (chainName, amount) => {
   const spinner = ora(oraOptions);
   try {
     const userWallet = await wallet.load();
-    const chains = getChains();
-    const chain = chains[chainName];
+    const chain = getChains().chains[chainName];
     const escrowAddress = escrowJSON.networks[chain.id].address;
     const rlcAddress = rlcJSON.networks[chain.id].address;
     const rlcContract = chain.web3.eth.contract(rlcJSON.abi).at(rlcAddress);
