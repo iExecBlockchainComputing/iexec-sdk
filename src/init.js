@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const Debug = require('debug');
 const Promise = require('bluebird');
 const { exec } = require('child_process');
@@ -11,7 +9,7 @@ const oraOptions = require('./oraOptions');
 const packageJSON = require('../package.json');
 
 const execAsync = Promise.promisify(exec);
-const debug = Debug('iexec:iexec-init');
+const debug = Debug('iexec:init');
 const readFileAsync = Promise.promisify(fs.readFile);
 const openAsync = Promise.promisify(fs.open);
 const writeAsync = Promise.promisify(fs.write);
