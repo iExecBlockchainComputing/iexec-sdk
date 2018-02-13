@@ -41,11 +41,11 @@ module.exports = {
       server: 'https://testxw.iex.ec:443',
     },
     mainnet: {
-        host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
-        port: 8545,
-        network_id: '1',
-        constructorArgs: [MAIN_ORACLE_ADDRESS],
-        server: 'https://mainxw.iex.ec:443',
+      host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
+      port: 8545,
+      network_id: '1',
+      constructorArgs: [MAIN_ORACLE_ADDRESS],
+      server: 'https://mainxw.iex.ec:443',
     },
   },
 };
