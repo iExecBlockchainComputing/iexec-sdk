@@ -94,13 +94,13 @@ iexec account login
 iexec account show
 iexec account allow 5
 ```
-## dapps
+## contracts
 Coming features...
 ```bash
-iexec dapps deploy # deploy smart contract only to ethereum
-iexec dapps show # show addresses of deployed dapps
+iexec contracts deploy # deploy smart contract only to ethereum
+iexec contracts show # show addresses of deployed contracts
 ```
-## apps
+## server
 ```bash
 iexec server deploy # deploy legacy app only to iExec server
 iexec server uploadData <data_path> # direct data upload
