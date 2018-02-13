@@ -23,9 +23,9 @@ cli.command('compile', 'call truffle compile');
 
 cli.command('migrate', 'compile and deploy the contract');
 
-cli.command('apps', 'manage offchain apps');
+cli.command('server', 'manage server side apps and works');
 
-cli.command('deploy', 'combo of iexec migrate + iexec apps deploy');
+cli.command('deploy', 'combo of iexec contract deploy + iexec server deploy');
 
 cli.command('submit [param]', 'submit a job to iExec');
 

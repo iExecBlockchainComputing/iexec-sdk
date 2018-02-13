@@ -7,7 +7,7 @@ const account = require('./account');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
 
-const debug = Debug('iexec:apps');
+const debug = Debug('iexec:server');
 
 const deploy = async (chainName, cliAppName) => {
   const spinner = ora(oraOptions);
@@ -52,13 +52,13 @@ const deploy = async (chainName, cliAppName) => {
       });
     }
 
-    await iexec.registerApp(Object.assign(
+    const appUID = await iexec.registerApp(Object.assign(
       appExtraFields,
       { name: contractAddress },
       utils.iexecConfig.app || {},
     ));
 
-    spinner.succeed(`App deployed on iExec offchain platform. Only callable through ${chainName} dapp at: ${contractAddress}\n`);
+    spinner.succeed(`App ${appUID} deployed on iExec offchain platform. Only callable through ${chainName} dapp at: ${contractAddress}\n`);
   } catch (error) {
     spinner.fail(`deploy() failed with ${error}`);
     throw error;
@@ -90,7 +90,73 @@ const uploadData = async (chainName, dataPath) => {
 
     spinner.succeed(`Data uploaded on iExec offchain platform, available at ${dataURI}\n`);
   } catch (error) {
-    spinner.fail(`deploy() failed with ${error}`);
+    spinner.fail(`uploadData() failed with ${error}`);
+    throw error;
+  }
+};
+
+const submit = async (chainName, appUID) => {
+  const spinner = ora(oraOptions);
+  try {
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({ server: chain.server });
+
+    const { jwtoken } = await account.load();
+    debug('jwtoken', jwtoken);
+
+    spinner.start('submitting work to iExec server...');
+
+    await iexec.getCookieByJWT(jwtoken);
+    const workUID = await iexec.submitWork(appUID, utils.iexecConfig.work);
+
+    spinner.succeed(`Work ${workUID} submitted to iExec server\n`);
+  } catch (error) {
+    spinner.fail(`submit() failed with ${error}`);
+    throw error;
+  }
+};
+
+const result = async (workUID, chainName, save, watch) => {
+  const spinner = ora(oraOptions);
+  try {
+    debug('workUID', workUID);
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({ server: chain.server });
+
+    const { jwtoken } = await account.load();
+    debug('jwtoken', jwtoken);
+
+    spinner.start(`fetching result of work ${workUID} from iExec server...`);
+
+    await iexec.getCookieByJWT(jwtoken);
+
+    const work = watch ? await iexec.waitForWorkCompleted(workUID) : await iexec.getUID(workUID);
+    debug('work', work);
+
+    const status = iexec.getFieldValue(work, 'status');
+    if (status !== 'COMPLETED') {
+      spinner.info(status.concat('...'));
+      return;
+    }
+
+    debug('work.xwhep.work[0]', work.xwhep.work[0]);
+    let resultPath;
+    const resultURI = iexec.getFieldValue(work, 'resulturi');
+    const resultUID = iexec.uri2uid(resultURI);
+    if (save) {
+      const resultObj = await iexec.getUID(resultUID);
+      const extension = iexec.getFieldValue(resultObj, 'type').toLowerCase();
+      resultPath = path.join(process.cwd(), workUID.concat('.', extension));
+      const resultStream = fs.createWriteStream(resultPath);
+      await iexec.downloadStream(resultUID, resultStream);
+    }
+
+    spinner.succeed(`Result: ${JSON.stringify(resultURI)}\n`);
+    if (save) spinner.succeed(`Saved result to file ${resultPath}`);
+  } catch (error) {
+    spinner.fail(`result() failed with ${error}`);
     throw error;
   }
 };
@@ -98,4 +164,6 @@ const uploadData = async (chainName, dataPath) => {
 module.exports = {
   deploy,
   uploadData,
+  submit,
+  result,
 };
