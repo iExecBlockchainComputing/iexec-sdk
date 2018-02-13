@@ -102,8 +102,10 @@ iexec dapps show # show addresses of deployed dapps
 ```
 ## apps
 ```bash
-iexec apps deploy # deploy legacy app only to iExec server
-iexec apps uploadData <data_path> # direct data upload
+iexec server deploy # deploy legacy app only to iExec server
+iexec server uploadData <data_path> # direct data upload
+iexec server submit # direct work submit
+iexec server result <workUID> # direct result
 ```
 ## submit
 ```bash
