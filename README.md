@@ -18,7 +18,7 @@ and execute them through calls to Ethereum smart contracts.
 * A [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
 
 ## Install
-
+#### Using Nodejs
 Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%206.4.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 ```bash
 npm -g install iexec # install the cli
@@ -27,6 +27,16 @@ iexec --help
 ```
 
 > Windows users need to create an alias by running ```for /f "delims=|" %i in ('where iexec') do doskey iex="%i" $*``` to avoid a naming conflict. Then always use ```iex``` instead of ```iexec``` when using the SDK.
+
+#### Using Docker
+Requirements: [Docker](https://docs.docker.com/install/).
+
+```bash
+docker run \
+  --interactive --tty --rm \
+  -v $(pwd):/iexec-project -w /iexec-project \
+  iexechub/iexec-sdk --version
+```
 
 ## Init
 Before any use of the SDK, make sure you did run once the below steps:
