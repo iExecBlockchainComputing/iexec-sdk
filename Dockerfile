@@ -1,4 +1,4 @@
-FROM node:9.2.0-alpine
+FROM node:9.5.0-alpine
 
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh python2 python2-dev py-setuptools dumb-init musl linux-headers build-base ca-certificates
