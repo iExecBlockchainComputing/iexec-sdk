@@ -18,7 +18,7 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
 
 const WALLET_FILE_NAME = 'wallet.json';
-const OVERWRITE_CONFIRMATION = `${WALLET_FILE_NAME} already exists, replace it with new wallet? (y/n):`;
+const OVERWRITE_CONFIRMATION = `${WALLET_FILE_NAME} already exists, replace it with new wallet?`;
 const CREATE_CONFIRMATION = `You don't have a ${WALLET_FILE_NAME} yet, create one?`;
 
 const walletFromPrivKey = (privateKey) => {
