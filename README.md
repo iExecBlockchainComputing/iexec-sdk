@@ -32,11 +32,16 @@ iexec --help
 Requirements: [Docker](https://docs.docker.com/install/).
 
 ```bash
-docker run \
-  --interactive --tty --rm \
-  -v $(pwd):/iexec-project -w /iexec-project \
-  iexechub/iexec-sdk --version
+# For Linux users
+echo 'alias iexec="docker run --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk"'  >> ~/.bashrc && source ~/.bashrc
+# For Mac OSX users
+echo 'alias iexec="docker run --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk"'  >> ~/.bash_profile && source ~/.bash_profile
 ```
+Now run ```iexec --version``` to check all is working.
+
+## Upgrade
+* **Nodejs**: run ```npm -g install iexec```
+* **Docker**: run ```docker pull iexechub/iexec-sdk```
 
 ## Init
 Before any use of the SDK, make sure you did run once the below steps:
