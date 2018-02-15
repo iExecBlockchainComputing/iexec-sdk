@@ -140,6 +140,11 @@ iexec result <txHash> # this will log the result data
 iexec result <txHash> --save # this will download the result locally
 ```
 
+## upgrade
+```bash
+iexec upgrade # update iExec CLI tool and upgrade iExec project 
+```
+
 ## iexec.js
 The ```iexec.js``` file, located in every iExec project, describes the parameters used when deploying an app, and when submitting a work.
 ```js
