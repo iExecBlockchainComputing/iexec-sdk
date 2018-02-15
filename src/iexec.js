@@ -31,6 +31,8 @@ cli.command('submit [param]', 'submit a job to iExec');
 
 cli.command('result <txHash>', 'fetch the result of a job');
 
+cli.command('upgrade', 'upgrade iExec CLI tool and iExec project');
+
 cli.command('airdrop <csvPath>', 'airdrop RLC to all addresses in a csv file');
 
 cli.parse(process.argv);
