@@ -268,12 +268,10 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     const unsignedTx = rlcContract.transfer.getData(toAddress, transferAmount);
 
     const txHash = await utils.signAndSendTx({
-      web3: chain.web3,
+      chain,
       userWallet,
       unsignedTx,
-      network: chain,
       contractAddress: rlcAddress,
-      chainID: chain.id,
     });
     spinner.info(`transfer txHash: ${txHash} \n`);
 
