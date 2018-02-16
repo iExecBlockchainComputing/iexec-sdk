@@ -18,6 +18,7 @@ and execute them through calls to Ethereum smart contracts.
 * The iExec explorer: https://explorer.iex.ec
 * The RLC faucet: https://faucet.iex.ec
 * The [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
+* [iExec sample dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)
 
 ## Install
 #### Using Nodejs
@@ -45,7 +46,7 @@ Now run ```iexec --version``` to check all is working.
 * **Nodejs**: run ```npm -g install iexec```
 * **Docker**: run ```docker pull iexechub/iexec-sdk```
 
-## Init
+## Init & Wallet setup
 Before any use of the SDK, make sure you did run once the below steps:
 ```bash
 iexec init # init a project
@@ -59,6 +60,8 @@ iexec account show # check your iExec account balance
 ```
 
 ## Use an existing dapp
+Go checkout the [run a dapp tutorial](https://katacoda.com/sulliwane/scenarios/run-dapp), recap below:
+
 After the init steps, go to [iExec dapp store](https://dapps.iex.ec) and find the dapp you'd like to use, say [ffmpeg](https://dapps.iex.ec/dapp/jeremy_toussaint/ffmpeg):
  1. Copy its ethereum address by clicking on the network #tag (ropsten, rinkeby, mainnet).
  2. Replace your local ```iexec.js``` with the one of the dapp (you can find it on the [github page of the dapp](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/ffmpeg#readme))
@@ -71,16 +74,16 @@ iexec submit --dapp <dapp_address>
 Finally, copy the transaction hash given by the SDK and check the progress of your work:
 
 ```bash
-iexec result <txHash>
+iexec result <txHash> --dapp <dapp_address>
 ```
 
-Or directly go to the [iExec explorer](https://explorer.iex.ec/) for a more visual experience.
+Note: The [iExec explorer](https://explorer.iex.ec/) provides a more visual experience.
 
 ## Deploy and run an existing dapp
 
 Go checkout the [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
 
-## Create and deploy your own custom dapp
+## Craft and deploy your own custom dapp
 
 Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
 
