@@ -10,11 +10,14 @@ and execute them through calls to Ethereum smart contracts.
 
 ## Ressources
 
-* A [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
-* A [create your dapp  tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg) to craft custom iExec Dapps and join the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee).
-* An iExec explorer : https://explorer.iex.ec
-* A RLC faucet : https://faucet.iex.ec
-* A Dapp Store : https://dapps.iex.ec
+* Tutorials:
+ * [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
+  * [craft your own dapp  tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
+  * [Run any dapp tutorial](https://katacoda.com/sulliwane/scenarios/run-dapp)
+* Checkout the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee)
+* The iExec Dapp Store : https://dapps.iex.ec
+* The iExec explorer: https://explorer.iex.ec
+* The RLC faucet : https://faucet.iex.ec
 * A [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
 
 ## Install
@@ -142,7 +145,7 @@ iexec result <txHash> --save # this will download the result locally
 
 ## upgrade
 ```bash
-iexec upgrade # update iExec CLI tool and upgrade iExec project 
+iexec upgrade # update iExec CLI tool and upgrade iExec project
 ```
 
 ## iexec.js
