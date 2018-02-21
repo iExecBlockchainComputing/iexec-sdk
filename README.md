@@ -17,6 +17,7 @@ and execute them through calls to Ethereum smart contracts.
 * The iExec Dapp Store: https://dapps.iex.ec
 * The iExec explorer: https://explorer.iex.ec
 * The RLC faucet: https://faucet.iex.ec
+* iExec main documentation: https://docs.iex.ec
 * The [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
 * [iExec sample dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)
 
