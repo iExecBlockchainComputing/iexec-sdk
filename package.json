@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "iExec sdk",
   "main": "src/index.js",
   "scripts": {
@@ -27,27 +27,27 @@
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
     "iexec-oracle-contract": "^1.1.4",
-    "iexec-server-js-client": "^1.1.7",
+    "iexec-server-js-client": "^1.1.10",
     "inquirer": "^5.1.0",
     "is-docker": "^1.1.0",
     "js-sha3": "^0.7.0",
     "moment": "^2.20.1",
     "node-fetch": "^2.0.0",
-    "ora": "^1.4.0",
+    "ora": "^2.0.0",
     "papaparse": "^4.3.7",
     "rlc-faucet-contract": "github:iExecBlockchainComputing/rlc-faucet-contract#v1.0.2",
     "secp256k1": "^3.5.0",
     "semver": "^5.5.0",
     "truffle": "^4.0.6",
-    "web3": "^0.20.4"
+    "web3": "^0.20.5"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "eslint": "^4.17.0",
+    "eslint": "^4.18.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "jest": "^22.2.2"
+    "eslint-plugin-import": "^2.9.0",
+    "jest": "^22.4.0"
   },
   "babel": {
     "presets": [
