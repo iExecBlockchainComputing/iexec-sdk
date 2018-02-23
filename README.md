@@ -136,7 +136,7 @@ iexec submit --dapp 0xE22F4... # submit work to someone else dapp address
 
 ## deploy
 ```bash
-iexec deploy # a combo of "iexec dapps deploy" and "iexec apps deploy"
+iexec deploy # a combo of "iexec server deploy" and "iexec contracts deploy"
 ```
 
 ## result
