@@ -1,4 +1,4 @@
-![iExec SDK logo](https://image.ibb.co/fq4gSG/iexec_sdk.jpg)
+![iExec SDK logo](./iexec_sdk_logo.jpg)
 
 # iExec SDK
 [![Build Status](https://drone.iex.ec//api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
