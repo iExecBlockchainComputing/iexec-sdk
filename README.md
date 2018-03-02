@@ -95,6 +95,13 @@ Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwan
 iexec --help
 iexec --version
 ```
+## init
+To interact with the [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
+```bash
+iexec init # pull a basic project
+iexec init factorial # pull factorial project
+iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
+```
 ## truffle
 ```bash
 iexec compile # call truffle compile underhood
@@ -157,21 +164,16 @@ The ```iexec.js``` file, located in every iExec project, describes the parameter
 ```js
 module.exports = {
   name: 'Factorial',
-  // data tags used when deploying
-  // legacy app to iExec server
-  data: {  
-    type: 'BINARY',
-    cpu: 'AMD64',
-    os: 'LINUX',
-  },
-  // app tags used once when deploying
-  // legacy app to iExec server
+  // app tags used once when deploying app to iExec server
+  // iexec deploy
   app: {
-    name: 'Factorial',
+    type: 'DOCKER',
+    envvars: 'XWDOCKERIMAGE=cogniteev/echo',
   },
-  // work tags used each work submit
+  // work tags used for each work submit
+  // iexec submit
   work: {
-    cmdline: '10',
+    cmdline: 'iExec',
   }
 };
 ```
