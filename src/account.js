@@ -5,8 +5,7 @@ const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
-const sha3 = require('js-sha3');
-const secp256k1 = require('secp256k1');
+const sigUtil = require('eth-sig-util');
 const http = require('./api');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
 const wallet = require('./wallet');
@@ -43,26 +42,18 @@ const login = async (authServer = 'https://auth.iex.ec') => {
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
     spinner.start('logging into iExec...');
-    const { secret } = await http.get('secret');
-    debug('secret', secret);
 
-    const secretBuffer = Buffer.from(secret);
-    const prefixBuffer = Buffer.from('\u0019Ethereum Signed Message:\n'.concat(secret.length.toString()));
-    const msgBuffer = Buffer.concat([prefixBuffer, secretBuffer]);
-    const msgHash = '0x'.concat(sha3.keccak256(msgBuffer));
-    debug('msgHash', msgHash);
-    const msgHashBuffer = Buffer.from(sha3.keccak256(msgBuffer), 'hex');
-    debug('msgHashBuffer', msgHashBuffer);
+    const { message } = await http.get('typedmessage');
+    debug('message', message);
 
+    const msgJSON = JSON.stringify(message);
+
+    const address = '0x'.concat(userWallet.address);
     const privateKeyBuffer = Buffer.from(userWallet.privateKey, 'hex');
-    debug('privateKeyBuffer', privateKeyBuffer);
-
-    const sigBuffer = secp256k1.sign(msgHashBuffer, Buffer.from(userWallet.privateKey, 'hex'));
-
-    const signature = '0x'.concat(sigBuffer.signature.toString('hex'), (sigBuffer.recovery + 27).toString(16));
+    const signature = sigUtil.signTypedData(privateKeyBuffer, { data: message });
     debug('signature', signature);
 
-    const { jwtoken } = await http.get('auth', { msgHash, signature });
+    const { jwtoken } = await http.get('typedauth', { message: msgJSON, signature, address });
     debug('jwtoken', jwtoken);
     await save({ jwtoken });
     spinner.succeed('You are logged into iExec\n');
