@@ -99,7 +99,7 @@ iexec --version
 To interact with the [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 ```bash
 iexec init # pull a basic project
-iexec init factorial # pull factorial project
+iexec init factorial # pull factorial branch from iExec dapp registry
 iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
 ```
 ## truffle
@@ -113,9 +113,9 @@ iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
 iexec wallet show
-iexec wallet sendETH <amount> --to <eth_address>
-iexec wallet sendRLC <amount> --to <eth_address>
-iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
+iexec wallet sendETH <amount> --to <eth_address> --chain ropsten
+iexec wallet sendRLC <amount> --to <eth_address> --chain ropsten
+iexec wallet sweep --to <eth_address> --chain ropsten # drain all ETH and RLC, sending them back to iExec faucet by default
 ```
 ## account
 ```bash
@@ -138,20 +138,20 @@ iexec server result <workUID> # direct result
 ```
 ## submit
 ```bash
-iexec submit # submit work to your own dapp
-iexec submit --dapp 0xE22F4... # submit work to someone else dapp address
+iexec submit --chain ropsten # submit work to your own dapp
+iexec submit --dapp 0xE22F4...  --chain ropsten # submit work to someone else dapp address
 ```
 
 ## deploy
 ```bash
-iexec deploy # a combo of "iexec server deploy" and "iexec contracts deploy"
+iexec deploy --chain ropsten # a combo of "iexec server deploy" and "iexec contracts deploy"
 ```
 
 ## result
 You need the txHash of a work submission in order to check its result:
 ```bash
-iexec result <txHash> # this will log the result data
-iexec result <txHash> --save # this will download the result locally
+iexec result <txHash> --chain ropsten # this will log the result data
+iexec result <txHash> --save --chain ropsten # this will download the result locally
 ```
 
 ## upgrade
