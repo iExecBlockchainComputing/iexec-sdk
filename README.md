@@ -95,6 +95,7 @@ Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwan
 iexec --help
 iexec --version
 ```
+
 ## init
 To interact with the [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 ```bash
@@ -102,11 +103,13 @@ iexec init # pull a basic project
 iexec init factorial # pull factorial branch from iExec dapp registry
 iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
 ```
+
 ## truffle
 ```bash
 iexec compile # call truffle compile underhood
 iexec truffle [...] # call any truffle command
 ```
+
 ## wallet
 ```bash
 iexec wallet create
@@ -117,34 +120,23 @@ iexec wallet sendETH <amount> --to <eth_address> --chain ropsten
 iexec wallet sendRLC <amount> --to <eth_address> --chain ropsten
 iexec wallet sweep --to <eth_address> --chain ropsten # drain all ETH and RLC, sending them back to iExec faucet by default
 ```
+
 ## account
 ```bash
 iexec account login
 iexec account show
 iexec account allow 5
 ```
-## contracts
-Coming features...
+
+## deploy
 ```bash
-iexec contracts deploy # deploy smart contract only to ethereum
-iexec contracts show # show addresses of deployed contracts
+iexec deploy --chain ropsten # Deploys the smart contract on ethereum + deploy the app on iExec offchain platform
 ```
-## server
-```bash
-iexec server deploy # deploy legacy app only to iExec server
-iexec server uploadData <data_path> # direct data upload
-iexec server submit # direct work submit
-iexec server result <workUID> # direct result
-```
+
 ## submit
 ```bash
 iexec submit --chain ropsten # submit work to your own dapp
 iexec submit --dapp 0xE22F4...  --chain ropsten # submit work to someone else dapp address
-```
-
-## deploy
-```bash
-iexec deploy --chain ropsten # a combo of "iexec server deploy" and "iexec contracts deploy"
 ```
 
 ## result
@@ -157,6 +149,14 @@ iexec result <txHash> --save --chain ropsten # this will download the result loc
 ## upgrade
 ```bash
 iexec upgrade # update iExec CLI tool and upgrade iExec project
+```
+
+## server
+```bash
+iexec server deploy # deploy legacy app only to iExec server
+iexec server uploadData <data_path> # direct data upload
+iexec server submit # direct work submit
+iexec server result <workUID> # direct result
 ```
 
 ## iexec.js
