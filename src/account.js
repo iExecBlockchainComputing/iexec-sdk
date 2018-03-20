@@ -5,8 +5,7 @@ const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
 const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
-const sha3 = require('js-sha3');
-const secp256k1 = require('secp256k1');
+const EC = require('elliptic').ec;
 const http = require('./api');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
 const wallet = require('./wallet');
@@ -20,6 +19,18 @@ const writeFileAsync = Promise.promisify(fs.writeFile);
 
 const LOGIN_CONFIRMATION = 'You are not logged in yet, log in?';
 const ACCOUNT_FILE_NAME = 'account.json';
+const ec = new EC('secp256k1');
+
+const sign = (message, privateKey, noncefn, data) => {
+  const result = ec.sign(message, privateKey, { canonical: true, k: noncefn, pers: data });
+  return {
+    signature: Buffer.concat([
+      result.r.toArrayLike(Buffer, 'be', 32),
+      result.s.toArrayLike(Buffer, 'be', 32),
+    ]),
+    recovery: result.recoveryParam,
+  };
+};
 
 const save = async (account) => {
   const jsonAccount = JSON.stringify(account, null, 4);
@@ -43,26 +54,19 @@ const login = async (authServer = 'https://auth.iex.ec') => {
     const userWallet = await wallet.load();
     debug('userWallet', userWallet);
     spinner.start('logging into iExec...');
-    const { secret } = await http.get('secret');
-    debug('secret', secret);
-
-    const secretBuffer = Buffer.from(secret);
-    const prefixBuffer = Buffer.from('\u0019Ethereum Signed Message:\n'.concat(secret.length.toString()));
-    const msgBuffer = Buffer.concat([prefixBuffer, secretBuffer]);
-    const msgHash = '0x'.concat(sha3.keccak256(msgBuffer));
-    debug('msgHash', msgHash);
-    const msgHashBuffer = Buffer.from(sha3.keccak256(msgBuffer), 'hex');
-    debug('msgHashBuffer', msgHashBuffer);
+    const { message } = await http.get('message');
+    debug('message', message);
 
     const privateKeyBuffer = Buffer.from(userWallet.privateKey, 'hex');
     debug('privateKeyBuffer', privateKeyBuffer);
 
-    const sigBuffer = secp256k1.sign(msgHashBuffer, Buffer.from(userWallet.privateKey, 'hex'));
+    const sigBuffer = sign(Buffer.from(message), Buffer.from(userWallet.privateKey, 'hex'));
+    debug('sigBuffer', sigBuffer);
 
     const signature = '0x'.concat(sigBuffer.signature.toString('hex'), (sigBuffer.recovery + 27).toString(16));
     debug('signature', signature);
 
-    const { jwtoken } = await http.get('auth', { msgHash, signature });
+    const { jwtoken } = await http.get('messageauth', { message, signature, address: '0x'.concat(userWallet.address) });
     debug('jwtoken', jwtoken);
     await save({ jwtoken });
     spinner.succeed('You are logged into iExec\n');
