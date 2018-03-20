@@ -25,7 +25,6 @@
     "bluebird": "^3.5.1",
     "commander": "^2.15.0",
     "debug": "^3.1.0",
-    "eth-sig-util": "^1.4.2",
     "fs-extra": "^5.0.0",
     "iexec-oracle-contract": "^1.1.4",
     "iexec-server-js-client": "^1.2.3",
