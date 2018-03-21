@@ -23,12 +23,12 @@
   "dependencies": {
     "@warren-bank/ethereumjs-tx-sign": "^2.0.0",
     "bluebird": "^3.5.1",
-    "commander": "^2.15.0",
+    "commander": "2.15.1",
     "debug": "^3.1.0",
     "elliptic": "^6.4.0",
     "fs-extra": "^5.0.0",
-    "iexec-oracle-contract": "^1.1.4",
-    "iexec-server-js-client": "^1.2.3",
+    "iexec-oracle-contract": "1.1.5",
+    "iexec-server-js-client": "1.2.4",
     "inquirer": "^5.1.0",
     "is-docker": "^1.1.0",
     "moment": "^2.21.0",
@@ -46,7 +46,7 @@
     "eslint": "^4.19.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.9.0",
-    "jest": "^22.4.2"
+    "jest": "22.4.3"
   },
   "babel": {
     "presets": [
