@@ -155,7 +155,7 @@ iexec upgrade # update iExec CLI tool and upgrade iExec project
 ```bash
 iexec server deploy # deploy legacy app only to iExec server
 iexec server uploadData <data_path> # direct data upload
-iexec server submit # direct work submit
+iexec server submit --app <app_uid> # direct work submit
 iexec server result <workUID> # direct result
 ```
 
