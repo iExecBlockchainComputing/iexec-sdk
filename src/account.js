@@ -57,9 +57,6 @@ const login = async (authServer = 'https://auth.iex.ec') => {
     const { message } = await http.get('message');
     debug('message', message);
 
-    const privateKeyBuffer = Buffer.from(userWallet.privateKey, 'hex');
-    debug('privateKeyBuffer', privateKeyBuffer);
-
     const sigBuffer = sign(Buffer.from(message), Buffer.from(userWallet.privateKey, 'hex'));
     debug('sigBuffer', sigBuffer);
 
