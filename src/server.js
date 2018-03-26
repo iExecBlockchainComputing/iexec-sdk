@@ -47,8 +47,8 @@ const deploy = async (chainName, cliAppName) => {
       appExtraFields[appBinFieldName] = iexec.uid2uri(dataUID);
     } else if ('app' in utils.iexecConfig && utils.iexecConfig.app.type === 'DOCKER') {
       Object.assign(appExtraFields, {
-        launchscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/1887757f1a87e1bd216801a2b4610a25f0947370/src/main/resources/scripts/xwstartdocker.sh',
-        unloadscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/1887757f1a87e1bd216801a2b4610a25f0947370/src/main/resources/scripts/xwstopdocker.sh',
+        launchscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstartdocker.sh',
+        unloadscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstopdocker.sh',
       });
     }
 
