@@ -1,12 +1,10 @@
-FROM node:9.7.1-alpine
+FROM node:9.11-alpine
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh python2 python2-dev py-setuptools dumb-init musl linux-headers build-base ca-certificates
+RUN apk add --no-cache git
 
 ENV user node
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-
 
 RUN mkdir /home/$user/app
 COPY . /home/$user/app/
