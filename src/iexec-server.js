@@ -15,24 +15,34 @@ cli
 cli
   .command('deploy [appName]')
   .description('send app to iexec server, app binary must be located inside /apps')
-  .action(appName => server.deploy(cli.network, appName).catch(() => process.exit(1)));
+  .action(appName =>
+    server.deploy(cli.network, appName).catch(() => process.exit(1)));
 
 cli
   .command('uploadData [dataPath]')
   .description('upload data with its description')
-  .action(dataPath => server.uploadData(cli.network, dataPath).catch(() => process.exit(1)));
+  .action(dataPath =>
+    server.uploadData(cli.network, dataPath).catch(() => process.exit(1)));
 
 cli
   .command('submit')
   .description('directly submit a work to iExec server')
-  .action(() => server.submit(cli.network, cli.app).catch(() => process.exit(1)));
+  .action(() =>
+    server.submit(cli.network, cli.app).catch(() => process.exit(1)));
 
 cli
   .command('result')
   .arguments('<workUID>')
   .description('get result of a work from iExec server using work UID')
   .action(workUID =>
-    server.result(workUID, cli.network, cli.save, cli.watch).catch(() => process.exit(1)));
+    server
+      .result(workUID, cli.network, cli.save, cli.watch)
+      .catch(() => process.exit(1)));
+
+cli
+  .command('version')
+  .description('check iExec server version')
+  .action(() => server.version(cli.network).catch(() => process.exit(1)));
 
 cli.parse(process.argv);
 

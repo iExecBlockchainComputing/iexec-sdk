@@ -27,7 +27,9 @@ const deploy = async (chainName, cliAppName) => {
 
     const { networks } = await utils.loadContractDesc();
 
-    if (!(chainID in networks) || !networks[chainID].address) throw new Error(`Missing dapp address for ${chainName}. Need to "iexec migrate" before sending app`);
+    if (!(chainID in networks) || !networks[chainID].address) {
+      throw new Error(`Missing dapp address for ${chainName}. Need to "iexec migrate" before sending app`);
+    }
 
     const contractAddress = networks[chainID].address;
     debug('contractAddress', contractAddress);
@@ -35,20 +37,32 @@ const deploy = async (chainName, cliAppName) => {
 
     const appExtraFields = {};
 
-    if (!('app' in utils.iexecConfig) || utils.iexecConfig.app.type === 'DEPLOYABLE') {
+    if (
+      !('app' in utils.iexecConfig) ||
+      utils.iexecConfig.app.type === 'DEPLOYABLE'
+    ) {
       debug('type === DEPLOYABLE');
       const appPath = path.join(process.cwd(), 'apps', appName);
       debug('appPath', appPath);
       const data = fs.readFileSync(appPath);
       const { size } = fs.statSync(appPath);
-      const dataUID = await iexec.registerData(data, size, utils.iexecConfig.data);
+      const dataUID = await iexec.registerData(
+        data,
+        size,
+        utils.iexecConfig.data,
+      );
       const { os, cpu } = utils.iexecConfig.data;
       const appBinFieldName = iexec.getAppBinaryFieldName(os, cpu);
       appExtraFields[appBinFieldName] = iexec.uid2uri(dataUID);
-    } else if ('app' in utils.iexecConfig && utils.iexecConfig.app.type === 'DOCKER') {
+    } else if (
+      'app' in utils.iexecConfig &&
+      utils.iexecConfig.app.type === 'DOCKER'
+    ) {
       Object.assign(appExtraFields, {
-        launchscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstartdocker.sh',
-        unloadscriptshuri: 'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstopdocker.sh',
+        launchscriptshuri:
+          'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstartdocker.sh',
+        unloadscriptshuri:
+          'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstopdocker.sh',
       });
     }
 
@@ -132,7 +146,9 @@ const result = async (workUID, chainName, save, watch) => {
 
     await iexec.getCookieByJWT(jwtoken);
 
-    const work = watch ? await iexec.waitForWorkCompleted(workUID) : await iexec.getUID(workUID);
+    const work = watch
+      ? await iexec.waitForWorkCompleted(workUID)
+      : await iexec.getUID(workUID);
     debug('work', work);
 
     const status = iexec.getFieldValue(work, 'status');
@@ -161,9 +177,35 @@ const result = async (workUID, chainName, save, watch) => {
   }
 };
 
+const version = async (chainName) => {
+  const spinner = ora(oraOptions);
+  try {
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({ server: chain.server });
+
+    const { jwtoken } = await account.load();
+    debug('jwtoken', jwtoken);
+
+    spinner.start('fetching version from iExec server...');
+
+    const cookie = await iexec.getCookieByJWT(jwtoken);
+    debug('cookie', cookie);
+
+    const res = await iexec.get('version');
+    const ver = res.xwhep.Version[0].$.version;
+
+    spinner.succeed(`iExec server version: ${ver}\n`);
+  } catch (error) {
+    spinner.fail(`version() failed with ${error}`);
+    throw error;
+  }
+};
+
 module.exports = {
   deploy,
   uploadData,
   submit,
   result,
+  version,
 };
