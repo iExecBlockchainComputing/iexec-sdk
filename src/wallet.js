@@ -5,9 +5,13 @@ const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const fetch = require('node-fetch');
 const { genKeyPair } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
-const { privateToPublic } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
-const { publicToAddress } = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
+const {
+  privateToPublic,
+} = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
+const {
+  publicToAddress,
+} = require('@warren-bank/ethereumjs-tx-sign/lib/keypairs');
+const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
 
@@ -40,11 +44,13 @@ const save = async (userWallet) => {
     return fs.close(fd);
   } catch (error) {
     if (error.code === 'EEXIST') {
-      const answers = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'overwrite',
-        message: OVERWRITE_CONFIRMATION,
-      }]);
+      const answers = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'overwrite',
+          message: OVERWRITE_CONFIRMATION,
+        },
+      ]);
       if (answers.overwrite) {
         return writeFileAsync(WALLET_FILE_NAME, userJSONWallet);
       }
@@ -70,11 +76,13 @@ const load = async () => {
     return walletFromPrivKey(userWallet.privateKey);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      const answers = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'create',
-        message: CREATE_CONFIRMATION,
-      }]);
+      const answers = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'create',
+          message: CREATE_CONFIRMATION,
+        },
+      ]);
       if (answers.create) {
         return create();
       }
@@ -90,32 +98,40 @@ const ethFaucets = [
   {
     chainName: 'ropsten',
     name: 'faucet.ropsten.be',
-    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
+    getETH: address =>
+      fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
+        .then(res => res.json())
+        .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
-    getETH: address => fetch(
-      'https://ropsten.faucet.b9lab.com/tap',
-      {
+    getETH: address =>
+      fetch('https://ropsten.faucet.b9lab.com/tap', {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         method: 'POST',
         body: JSON.stringify({ toWhom: '0x'.concat(address) }),
-      },
-    ).then(res => res.json()).catch(() => ({ error: 'ETH faucet is down.' })),
+      })
+        .then(res => res.json())
+        .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'rinkeby',
     name: 'faucet.rinkeby.io',
-    getETH: () => ({ message: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH' }),
+    getETH: () => ({
+      message: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH',
+    }),
   },
   {
     chainName: 'kovan',
     name: 'gitter.im/kovan-testnet/faucet',
-    getETH: () => ({ message: 'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH' }),
+    getETH: () => ({
+      message:
+        'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH',
+    }),
   },
 ];
 
@@ -126,10 +142,18 @@ const getETH = async (chainName) => {
 
     spinner.start(`Requesting ETH from ${chainName} faucets...`);
     const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
-    const responses = await Promise.all(filteredFaucets.map(faucet =>
-      faucet.getETH(userWallet.address)));
-    const responsesMessage = filteredFaucets.reduce((accu, curr, index) =>
-      accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
+    const responses = await Promise.all(filteredFaucets.map(faucet => faucet.getETH(userWallet.address)));
+    const responsesMessage = filteredFaucets.reduce(
+      (accu, curr, index) =>
+        accu.concat(
+          '- ',
+          curr.name,
+          ' : \n',
+          JSON.stringify(responses[index], null, '\t'),
+          '\n\n',
+        ),
+      '',
+    );
     spinner.succeed('Faucets responses:\n');
     console.log(responsesMessage);
   } catch (error) {
@@ -141,7 +165,8 @@ const getETH = async (chainName) => {
 const rlcFaucets = [
   {
     name: 'faucet.iex.ec',
-    getRLC: (chainName, address) => fetch(`https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`).then(res => res.json()),
+    getRLC: (chainName, address) =>
+      fetch(`https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`).then(res => res.json()),
   },
 ];
 
@@ -151,10 +176,18 @@ const getRLC = async (chainName) => {
     const userWallet = await load();
 
     spinner.start(`Requesting ${chainName} faucet for nRLC...`);
-    const responses = await Promise.all(rlcFaucets.map(faucet =>
-      faucet.getRLC(chainName, userWallet.address)));
-    const responsesMessage = rlcFaucets.reduce((accu, curr, index) =>
-      accu.concat('- ', curr.name, ' : \n', JSON.stringify(responses[index], null, '\t'), '\n\n'), '');
+    const responses = await Promise.all(rlcFaucets.map(faucet => faucet.getRLC(chainName, userWallet.address)));
+    const responsesMessage = rlcFaucets.reduce(
+      (accu, curr, index) =>
+        accu.concat(
+          '- ',
+          curr.name,
+          ' : \n',
+          JSON.stringify(responses[index], null, '\t'),
+          '\n\n',
+        ),
+      '',
+    );
     spinner.succeed('Faucets responses:\n');
     console.log(responsesMessage);
   } catch (error) {
@@ -176,10 +209,16 @@ const show = async () => {
 
     const networkNames = Object.keys(utils.truffleConfig.networks);
     const ethBalances = await Promise.all(networkNames.map(name =>
-      chains[name].web3.eth.getBalanceAsync(userWallet.address).then(balance => chains[name].web3.fromWei(balance, 'ether')).catch(() => 0)));
+      chains[name].web3.eth
+        .getBalanceAsync(userWallet.address)
+        .then(balance => chains[name].web3.fromWei(balance, 'ether'))
+        .catch(() => 0)));
     spinner.info('ETH balances:\n');
     const ethBalancesString = ethBalances.reduce(
-      (accu, curr, index) => accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${networkNames[index]}.etherscan.io/address/${userWallet.address}\n`),
+      (accu, curr, index) =>
+        accu.concat(`  ${networkNames[index]}: \t ${curr} ETH \t\t https://${
+          networkNames[index]
+        }.etherscan.io/address/${userWallet.address}\n`),
       '',
     );
 
@@ -191,14 +230,17 @@ const show = async () => {
 
     const rlcBalances = await Promise.all(chainIDs.map((id) => {
       const rlcAddress = rlcJSON.networks[id].address;
-      const rlcContract = chains[id].web3.eth.contract(rlcJSON.abi).at(rlcAddress);
+      const rlcContract = chains[id].web3.eth
+        .contract(rlcJSON.abi)
+        .at(rlcAddress);
       Promise.promisifyAll(rlcContract);
       return rlcContract.balanceOfAsync('0x'.concat(userWallet.address));
     }));
 
     spinner.info('nRLC balances:\n');
     const rlcBalancesString = chainIDs.reduce(
-      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} nRLC\n`),
+      (accu, curr, index) =>
+        accu.concat(`  ${chains[curr].name}: \t ${rlcBalances[index]} nRLC\n`),
       '',
     );
 
@@ -216,11 +258,13 @@ const sendETH = async (chainName, amount, to = 'iexec') => {
     const userWallet = await load();
     const toAddress = utils.getOracleWallet(to);
 
-    const answers = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'transfer',
-      message: `Do you want to send ${amount} ${chainName} ETH to ${to}`,
-    }]);
+    const answers = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'transfer',
+        message: `Do you want to send ${amount} ${chainName} ETH to ${to}`,
+      },
+    ]);
     if (!answers.transfer) throw Error('Transfer aborted by user.');
 
     spinner.start(`Sending ${amount} ${chainName} ETH to ${to}...`);
@@ -235,10 +279,15 @@ const sendETH = async (chainName, amount, to = 'iexec') => {
     spinner.info(`transfer txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await utils.waitFor(
+      chain.web3.eth.getTransactionReceiptAsync,
+      txHash,
+    );
 
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: ${utils.chainToEtherscanURL(chainName).concat(txReceipt.transactionHash)}\n`);
+    spinner.info(`View on etherscan: ${utils
+      .chainToEtherscanURL(chainName)
+      .concat(txReceipt.transactionHash)}\n`);
     spinner.succeed(`${amount} ${chainName} ETH sent to ${to}\n`);
   } catch (error) {
     spinner.fail(`sendETH() failed with ${error}`);
@@ -253,11 +302,13 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     const toAddress = utils.getFaucetWallet(to);
     debug('toAddress', toAddress);
 
-    const answers = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'transfer',
-      message: `Do you want to send ${amount} ${chainName} nRLC to ${to}`,
-    }]);
+    const answers = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'transfer',
+        message: `Do you want to send ${amount} ${chainName} nRLC to ${to}`,
+      },
+    ]);
     if (!answers.transfer) throw Error('Transfer aborted by user.');
 
     spinner.start(`Sending ${amount} ${chainName} nRLC to ${to}...`);
@@ -276,13 +327,18 @@ const sendRLC = async (chainName, amount, to = 'iexec') => {
     spinner.info(`transfer txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await utils.waitFor(
+      chain.web3.eth.getTransactionReceiptAsync,
+      txHash,
+    );
 
     const tx = await chain.web3.eth.getTransactionAsync(txHash);
     utils.checkTxReceipt(txReceipt, tx.gas);
 
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: ${utils.chainToEtherscanURL(chainName).concat(txReceipt.transactionHash)}\n`);
+    spinner.info(`View on etherscan: ${utils
+      .chainToEtherscanURL(chainName)
+      .concat(txReceipt.transactionHash)}\n`);
     spinner.succeed(`${amount} ${chainName} nRLC sent to ${to}\n`);
   } catch (error) {
     spinner.fail(`sendRLC() failed with ${error}`);
@@ -304,7 +360,9 @@ const sweep = async (chainName, to = 'iexec') => {
     debug('rlcBalance', rlcBalance.toNumber());
     if (rlcBalance.toNumber() > 0) await sendRLC(chainName, rlcBalance, to);
 
-    const ethBalance = await chain.web3.eth.getBalanceAsync(userWallet.address).then(balance => chain.web3.fromWei(balance, 'ether'));
+    const ethBalance = await chain.web3.eth
+      .getBalanceAsync(userWallet.address)
+      .then(balance => chain.web3.fromWei(balance, 'ether'));
     debug('ethBalance', ethBalance.toNumber());
     const ethToSweep = ethBalance.toNumber() - 0.01;
     if (ethToSweep > 0) await sendETH(chainName, ethToSweep, to);

@@ -2,7 +2,7 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const Papa = require('papaparse');
 const ora = require('ora');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
+const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const Promise = require('bluebird');
 const moment = require('moment');
 const { getChains, signAndSendTx, waitFor } = require('./utils');
@@ -54,7 +54,10 @@ const airdrop = async (chainName, csvPath, batch) => {
     outputCSVStream.write(header);
 
     const total = csv.data.length;
-    const totalAmount = csv.data.reduce((accu, elt) => accu + parseInt(elt.amount, 10), 0);
+    const totalAmount = csv.data.reduce(
+      (accu, elt) => accu + parseInt(elt.amount, 10),
+      0,
+    );
     spinner.info(`${total} transfers to be transferred`);
     spinner.info(`${totalAmount} nRLC to be airdropped \n`);
 
@@ -65,7 +68,10 @@ const airdrop = async (chainName, csvPath, batch) => {
       try {
         transferring += 1;
         debug('start transferring index', i, elt);
-        const unsignedTx = rlcContract.transfer.getData(elt.address, elt.amount);
+        const unsignedTx = rlcContract.transfer.getData(
+          elt.address,
+          elt.amount,
+        );
 
         const newBlockNumber = await chain.web3.eth.getBlockNumberAsync();
         debug('blockNumber', blockNumber);
@@ -88,11 +94,16 @@ const airdrop = async (chainName, csvPath, batch) => {
         });
         debug('txHash', txHash);
 
-        const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+        const txReceipt = await waitFor(
+          chain.web3.eth.getTransactionReceiptAsync,
+          txHash,
+        );
         debug('txReceipt:', txReceipt);
         const tx = await chain.web3.eth.getTransactionAsync(txHash);
         debug('tx:', tx);
-        const etherscanURL = `https://${chainName === 'mainnet' ? '' : chainName.concat('.')}etherscan.io/tx/${txReceipt.transactionHash}`;
+        const etherscanURL = `https://${
+          chainName === 'mainnet' ? '' : chainName.concat('.')
+        }etherscan.io/tx/${txReceipt.transactionHash}`;
 
         transferred += 1;
         transferring -= 1;
@@ -101,7 +112,8 @@ const airdrop = async (chainName, csvPath, batch) => {
         paid += parseInt(elt.amount, 10);
         gasUsed += txReceipt.gasUsed;
         ethUsed += txReceipt.gasUsed * tx.gasPrice.toNumber();
-        spinner.succeed(`Transfered ${elt.amount} nRLC to ${elt.address} [${transferred + errored}/${total}]. View on etherscan: ${etherscanURL}\n`);
+        spinner.succeed(`Transfered ${elt.amount} nRLC to ${elt.address} [${transferred +
+            errored}/${total}]. View on etherscan: ${etherscanURL}\n`);
         spinner.start('RLC airdrop going on...');
         row.result = etherscanURL;
         row.index = i;
@@ -111,7 +123,9 @@ const airdrop = async (chainName, csvPath, batch) => {
         transferring -= 1;
         saving += 1;
 
-        spinner.fail(`Failed to transfer ${elt.amount} nRLC to ${elt.address} because ${error}`);
+        spinner.fail(`Failed to transfer ${elt.amount} nRLC to ${
+          elt.address
+        } because ${error}`);
         spinner.start('RLC airdrop going on...');
         row.result = error;
         row.index = i;
@@ -120,7 +134,7 @@ const airdrop = async (chainName, csvPath, batch) => {
     });
 
     const processTransfers = async () => {
-      debug('processCall', processCall += 1);
+      debug('processCall', (processCall += 1));
       debug('transferring', transferring);
       debug('saving', saving);
       debug('transferred', transferred);
@@ -131,7 +145,10 @@ const airdrop = async (chainName, csvPath, batch) => {
         const duration = moment.duration(endTime - startTime).humanize();
         spinner.succeed(`Processed ${transferred}/${total} transfers in ${duration}`);
         spinner.succeed(`Transfered ${paid} nRLC on ${chainName}`);
-        spinner.succeed(`Spent ${chain.web3.fromWei(ethUsed, 'ether')} ETH, and ${gasUsed} gas used`);
+        spinner.succeed(`Spent ${chain.web3.fromWei(
+          ethUsed,
+          'ether',
+        )} ETH, and ${gasUsed} gas used`);
         spinner.succeed(`${errored} failed transfers`);
         spinner.succeed(`Result saved to file "${outputCSVPath}"`);
         return;

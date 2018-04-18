@@ -3,7 +3,7 @@ const ora = require('ora');
 const Promise = require('bluebird');
 const oracleJSON = require('iexec-oracle-contract/build/contracts/IexecOracle.json');
 const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
+const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const createIEXECClient = require('iexec-server-js-client');
 const wallet = require('./wallet');
 const utils = require('./utils');
@@ -26,7 +26,9 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     const chain = utils.getChains()[chainName];
     const { abi, networks } = await utils.loadContractDesc();
 
-    if (!(chain.id in networks) && !cliDappAddress) throw Error(`No existing deployed contract on ${chainName} or no --dapp contract address provided to the cli`);
+    if (!(chain.id in networks) && !cliDappAddress) {
+      throw Error(`No existing deployed contract on ${chainName} or no --dapp contract address provided to the cli`);
+    }
 
     // hit iexec server REST API to create a user on the fly
     // so it can be mandated by the bridge
@@ -49,20 +51,27 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
 
     const escrowAddress = escrowJSON.networks[chain.id].address;
     const oracleAddress = oracleJSON.networks[chain.id].address;
-    const oracleContract = chain.web3.eth.contract(oracleJSON.abi).at(oracleAddress);
+    const oracleContract = chain.web3.eth
+      .contract(oracleJSON.abi)
+      .at(oracleAddress);
     Promise.promisifyAll(oracleContract);
 
     spinner.start('calling submit...');
     const [callbackPrice, dappPrice, allowance] = await Promise.all([
       oracleContract.callbackPriceAsync(),
       oracleContract.getDappPriceAsync(dappAddress),
-      rlcContract.allowanceAsync('0x'.concat(userWallet.address), escrowAddress),
+      rlcContract.allowanceAsync(
+        '0x'.concat(userWallet.address),
+        escrowAddress,
+      ),
     ]);
     debug('callbackPrice', callbackPrice.toNumber());
     debug('dappPrice', dappPrice.toNumber());
     debug('allowance', allowance.toNumber());
 
-    if (dappPrice > allowance) throw Error(`the dapp price (${dappPrice} nRLC) is higher than your iexec credit (${allowance} nRLC).`);
+    if (dappPrice > allowance) {
+      throw Error(`the dapp price (${dappPrice} nRLC) is higher than your iexec credit (${allowance} nRLC).`);
+    }
 
     const txHash = await utils.signAndSendTx({
       chain,
@@ -75,10 +84,15 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     spinner.info(`txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await utils.waitFor(
+      chain.web3.eth.getTransactionReceiptAsync,
+      txHash,
+    );
 
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${
+      txReceipt.transactionHash
+    }\n`);
     spinner.succeed('calculation job submitted to iExec workers \n');
   } catch (error) {
     spinner.fail(`"iexec submit" failed with ${error}`);

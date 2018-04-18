@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
 const ora = require('ora');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/FaucetRLC.json');
+const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const escrowJSON = require('iexec-oracle-contract/build/contracts/IexecOracleEscrow.json');
 const Promise = require('bluebird');
 const inquirer = require('inquirer');
@@ -22,7 +22,11 @@ const ACCOUNT_FILE_NAME = 'account.json';
 const ec = new EC('secp256k1');
 
 const sign = (message, privateKey, noncefn, data) => {
-  const result = ec.sign(message, privateKey, { canonical: true, k: noncefn, pers: data });
+  const result = ec.sign(message, privateKey, {
+    canonical: true,
+    k: noncefn,
+    pers: data,
+  });
   return {
     signature: Buffer.concat([
       result.r.toArrayLike(Buffer, 'be', 32),
@@ -57,13 +61,23 @@ const login = async (authServer = 'https://auth.iex.ec') => {
     const { message } = await http.get('message');
     debug('message', message);
 
-    const sigBuffer = sign(Buffer.from(message), Buffer.from(userWallet.privateKey, 'hex'));
+    const sigBuffer = sign(
+      Buffer.from(message),
+      Buffer.from(userWallet.privateKey, 'hex'),
+    );
     debug('sigBuffer', sigBuffer);
 
-    const signature = '0x'.concat(sigBuffer.signature.toString('hex'), (sigBuffer.recovery + 27).toString(16));
+    const signature = '0x'.concat(
+      sigBuffer.signature.toString('hex'),
+      (sigBuffer.recovery + 27).toString(16),
+    );
     debug('signature', signature);
 
-    const { jwtoken } = await http.get('messageauth', { message, signature, address: '0x'.concat(userWallet.address) });
+    const { jwtoken } = await http.get('messageauth', {
+      message,
+      signature,
+      address: '0x'.concat(userWallet.address),
+    });
     debug('jwtoken', jwtoken);
     await save({ jwtoken });
     spinner.succeed('You are logged into iExec\n');
@@ -81,11 +95,13 @@ const load = async () => {
     return account;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      const answers = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'login',
-        message: LOGIN_CONFIRMATION,
-      }]);
+      const answers = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'login',
+          message: LOGIN_CONFIRMATION,
+        },
+      ]);
       if (answers.login) {
         return login().then(() => load());
       }
@@ -119,9 +135,14 @@ const allow = async (chainName, amount) => {
     spinner.info(`txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await waitFor(
+      chain.web3.eth.getTransactionReceiptAsync,
+      txHash,
+    );
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${
+      txReceipt.transactionHash
+    }\n`);
     spinner.succeed(`Set you iExec account credit to ${amount} nRLC, run "iexec account show" to check \n`);
   } catch (error) {
     spinner.fail(`allow() failed with ${error}`);
@@ -140,7 +161,9 @@ const show = async () => {
     spinner.start();
     const rlcAllowances = await Promise.all(chainIDs.map((id) => {
       const rlcAddress = rlcJSON.networks[id].address;
-      const rlcContract = chains[id].web3.eth.contract(rlcJSON.abi).at(rlcAddress);
+      const rlcContract = chains[id].web3.eth
+        .contract(rlcJSON.abi)
+        .at(rlcAddress);
       Promise.promisifyAll(rlcContract);
       const owner = '0x'.concat(userWallet.address);
       const escrow = escrowJSON.networks[id].address;
@@ -149,7 +172,8 @@ const show = async () => {
     spinner.succeed('iExec account details:\n');
 
     const rlcAllowancesString = chainIDs.reduce(
-      (accu, curr, index) => accu.concat(`  ${chains[curr].name}: \t ${rlcAllowances[index]} nRLC\n`),
+      (accu, curr, index) =>
+        accu.concat(`  ${chains[curr].name}: \t ${rlcAllowances[index]} nRLC\n`),
       '',
     );
 
