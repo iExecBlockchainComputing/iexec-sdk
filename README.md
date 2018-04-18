@@ -183,6 +183,7 @@ iexec server deploy # deploy legacy app only to iExec server
 iexec server uploadData <data_path> # direct data upload
 iexec server submit --app <app_uid> # direct work submit
 iexec server result <workUID> # direct result
+iexec server api <fnName> [arg1] [arg2] ... # directly call api method
 ```
 
 ## iexec.js
