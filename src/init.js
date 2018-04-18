@@ -14,7 +14,8 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const openAsync = Promise.promisify(fs.open);
 const writeAsync = Promise.promisify(fs.write);
 
-const IEXEC_SAMPLES_REPO = 'https://github.com/iExecBlockchainComputing/iexec-dapp-samples.git';
+const IEXEC_SAMPLES_REPO =
+  'https://github.com/iExecBlockchainComputing/iexec-dapp-samples.git';
 const TRUFFLE_FILE_NAME = 'truffle.js';
 
 cli.parse(process.argv);
@@ -28,11 +29,16 @@ async function init(branchName = 'init', repoURL = IEXEC_SAMPLES_REPO) {
     const projectFolder = path.join(process.cwd(), dirName);
     const isProjectExists = await fs.pathExists(projectFolder);
 
-    if (isProjectExists) throw Error(`"${dirName}" directory already exists. Consider renaming it before running "iexec init"`);
+    if (isProjectExists) {
+      throw Error(`"${dirName}" directory already exists. Consider renaming it before running "iexec init"`);
+    }
 
     await execAsync(`git clone --depth=1 -b ${branchName} ${repoURL} ${dirName}`);
     await fs.remove(path.join(process.cwd(), dirName, '.git'));
-    const truffleConfig = await readFileAsync(path.join(__dirname, TRUFFLE_FILE_NAME), 'utf8');
+    const truffleConfig = await readFileAsync(
+      path.join(__dirname, TRUFFLE_FILE_NAME),
+      'utf8',
+    );
 
     const trufflePath = path.join(process.cwd(), dirName, TRUFFLE_FILE_NAME);
     const fd = await openAsync(trufflePath, 'wx').catch(() => undefined);
@@ -43,8 +49,15 @@ async function init(branchName = 'init', repoURL = IEXEC_SAMPLES_REPO) {
     }
 
     process.chdir(dirName);
-    debug('running', `npm i iexec-oracle-contract@${packageJSON.dependencies['iexec-oracle-contract']}`);
-    await execAsync(`npm i iexec-oracle-contract@${packageJSON.dependencies['iexec-oracle-contract']}`);
+    debug(
+      'running',
+      `npm i --save-exact iexec-oracle-contract@${
+        packageJSON.dependencies['iexec-oracle-contract']
+      }`,
+    );
+    await execAsync(`npm i --save-exact iexec-oracle-contract@${
+      packageJSON.dependencies['iexec-oracle-contract']
+    }`);
     await execAsync('npm i');
     spinner.succeed(`"${dirName}" folder created, your new iexec project is inside`);
     return branchName;
