@@ -15,7 +15,8 @@ cli
 cli
   .command('allow <amount>')
   .description('set the nRLC allowance on iexec account')
-  .action(amount => account.allow(cli.network, amount).catch(() => process.exit(1)));
+  .action(amount =>
+    account.allow(cli.network, amount).catch(() => process.exit(1)));
 
 cli
   .command('show')

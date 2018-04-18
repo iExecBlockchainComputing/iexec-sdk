@@ -26,7 +26,8 @@ const fetchResults = async (txHash, chainName, save, cliDappAddress) => {
 
     const { networks } = await utils.loadContractDesc();
 
-    const providerAddress = cliDappAddress || networks[network.network_id].address;
+    const providerAddress =
+      cliDappAddress || networks[network.network_id].address;
     const oracleAddress = oracleJSON.networks[network.network_id].address;
 
     const oracle = web3.eth.contract(oracleJSON.abi).at(oracleAddress);

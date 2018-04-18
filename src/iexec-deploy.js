@@ -10,4 +10,5 @@ cli
   .parse(process.argv);
 
 migrate(cli.network)
-  .then(() => server.deploy(cli.network, cli.args[0])).catch(() => process.exit(1));
+  .then(() => server.deploy(cli.network, cli.args[0]))
+  .catch(() => process.exit(1));

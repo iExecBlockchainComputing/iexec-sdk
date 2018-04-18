@@ -13,7 +13,7 @@ const makeBody = (verb, body) => {
 
 const makeQueryString = (verb, body) => {
   debug(Object.keys(body).length);
-  if (verb === 'GET' && Object.keys(body).length !== 0) return '?'.concat(querystring.stringify(body));
+  if (verb === 'GET' && Object.keys(body).length !== 0) { return '?'.concat(querystring.stringify(body)); }
   return '';
 };
 
@@ -24,13 +24,16 @@ const httpRequest = verb => async (endpoint, body = {}) => {
   debug('url', url);
   const response = await fetch(
     url,
-    Object.assign({
-      method: verb,
-      headers: {
-        Accept: 'application/json',
-        'content-type': 'application/json',
+    Object.assign(
+      {
+        method: verb,
+        headers: {
+          Accept: 'application/json',
+          'content-type': 'application/json',
+        },
       },
-    }, makeBody(verb, body)),
+      makeBody(verb, body),
+    ),
   );
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
@@ -43,7 +46,9 @@ const httpRequest = verb => async (endpoint, body = {}) => {
   throw new Error('API call error');
 };
 
-const setAuthServer = (server) => { apiBaseURL = server; };
+const setAuthServer = (server) => {
+  apiBaseURL = server;
+};
 
 module.exports = {
   get: httpRequest('GET'),

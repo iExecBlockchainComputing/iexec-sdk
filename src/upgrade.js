@@ -18,7 +18,9 @@ async function upgrade() {
     spinner.start('updating the iExec SDK...');
 
     const { versions } = await fetch('https://registry.npmjs.org/iexec').then(res => res.json());
-    const latestVersion = Object.keys(versions)[Object.keys(versions).length - 1];
+    const latestVersion = Object.keys(versions)[
+      Object.keys(versions).length - 1
+    ];
     debug('latestVersion', latestVersion);
     const currentVersion = packageJSON.version;
     debug('currentVersion', currentVersion);

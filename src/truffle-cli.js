@@ -7,28 +7,35 @@ const oraOptions = require('./oraOptions');
 const debug = Debug('iexec:truffle-cli');
 
 const rootPath = path.resolve(__dirname, '..');
-const trufflePath = path.join(rootPath, 'node_modules', 'truffle', 'build', 'cli.bundled.js');
+const trufflePath = path.join(
+  rootPath,
+  'node_modules',
+  'truffle',
+  'build',
+  'cli.bundled.js',
+);
 
-const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
-  debug('spawnAsync bin', bin);
-  debug('spawnAsync args', args);
-  const proc = args ? spawn('node', [bin, ...args]) : spawn('node', [bin]);
+const spawnAsync = (bin, args) =>
+  new Promise((resolve, reject) => {
+    debug('spawnAsync bin', bin);
+    debug('spawnAsync args', args);
+    const proc = args ? spawn('node', [bin, ...args]) : spawn('node', [bin]);
 
-  proc.stdout.on('data', data => console.log(`${data}`));
-  proc.stderr.on('data', data => console.log(`${data}`));
+    proc.stdout.on('data', data => console.log(`${data}`));
+    proc.stderr.on('data', data => console.log(`${data}`));
 
-  proc.on('close', (code) => {
-    if (code !== 0) reject();
-    resolve();
+    proc.on('close', (code) => {
+      if (code !== 0) reject();
+      resolve();
+    });
+
+    proc.on('exit', (code) => {
+      if (code !== 0) reject();
+      resolve();
+    });
+
+    proc.on('error', () => reject());
   });
-
-  proc.on('exit', (code) => {
-    if (code !== 0) reject();
-    resolve();
-  });
-
-  proc.on('error', () => reject());
-});
 
 const run = args => spawnAsync(trufflePath, args);
 

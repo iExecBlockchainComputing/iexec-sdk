@@ -7,9 +7,7 @@ const packageJSON = require('../package.json');
 const debug = Debug('iexec');
 debug('add DEBUG=* to show logs');
 
-cli
-  .description(packageJSON.description)
-  .version(packageJSON.version);
+cli.description(packageJSON.description).version(packageJSON.version);
 
 cli.command('init', 'init sample iexec dapp');
 
@@ -17,7 +15,10 @@ cli.command('wallet', 'manage local ethereum wallet');
 
 cli.command('account', 'manage iExec account');
 
-cli.command('truffle [args...]', 'execute truffle with any number of truffle arguments');
+cli.command(
+  'truffle [args...]',
+  'execute truffle with any number of truffle arguments',
+);
 
 cli.command('compile', 'call truffle compile');
 

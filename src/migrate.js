@@ -21,7 +21,9 @@ const migrate = async (chainName) => {
 
     const constructorArgs = chain.constructorArgs || [];
 
-    const unsignedTx = Contract.new.getData(...constructorArgs, { data: bytecode });
+    const unsignedTx = Contract.new.getData(...constructorArgs, {
+      data: bytecode,
+    });
     debug('unsignedTx', unsignedTx);
 
     const userWallet = await wallet.load();
@@ -35,15 +37,22 @@ const migrate = async (chainName) => {
     spinner.info(`txHash: ${txHash} \n`);
 
     spinner.start('waiting for transaction to be mined');
-    const txReceipt = await utils.waitFor(chain.web3.eth.getTransactionReceiptAsync, txHash);
+    const txReceipt = await utils.waitFor(
+      chain.web3.eth.getTransactionReceiptAsync,
+      txHash,
+    );
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
 
-    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${txReceipt.transactionHash}\n`);
+    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${
+      txReceipt.transactionHash
+    }\n`);
 
     spinner.start('saving contract address');
     contractDesc.networks[chain.id] = { address: txReceipt.contractAddress };
     await utils.saveContractDesc(contractDesc);
-    spinner.succeed(`Dapp contract deployed on ethereum. Contract address is ${txReceipt.contractAddress} \n`);
+    spinner.succeed(`Dapp contract deployed on ethereum. Contract address is ${
+      txReceipt.contractAddress
+    } \n`);
   } catch (error) {
     spinner.fail(`"iexec migrate" failed with ${error}`);
     throw error;

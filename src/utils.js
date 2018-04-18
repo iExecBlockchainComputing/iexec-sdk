@@ -69,12 +69,17 @@ const signAndSendTx = async ({
     debug('estimatedGas', estimatedGas);
     debug('value', chain.web3.toHex(value));
 
-    const gasPriceMultiplier = chain.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
+    const gasPriceMultiplier =
+      chain.gasPriceMultiplier || DEFAULT_GAS_PRICE_MULTIPLIER;
     const gasPrice = chain.gasPrice || networkGasPrice * gasPriceMultiplier;
     debug('gasPrice', gasPrice);
-    const gasLimitMultiplier = chain.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
+    const gasLimitMultiplier =
+      chain.gasLimitMultiplier || DEFAULT_GAS_LIMIT_MULTIPLIER;
     debug('network.gas', chain.gas);
-    const gasLimit = Math.min(chain.gas || estimatedGas * gasLimitMultiplier, BLOCK_GAS_LIMIT);
+    const gasLimit = Math.min(
+      chain.gas || estimatedGas * gasLimitMultiplier,
+      BLOCK_GAS_LIMIT,
+    );
     debug('gasLimit', gasLimit);
     debug('chain.id', chain.id);
 
@@ -105,8 +110,7 @@ const getChains = () => {
     networkNames.forEach((name) => {
       chains[name] = Object.assign({}, truffleConfig.networks[name]);
       chains[name].name = name;
-      chains[name].web3 =
-        new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));
+      chains[name].web3 = new Web3(new Web3.providers.HttpProvider(truffleConfig.networks[name].host));
       Promise.promisifyAll(chains[name].web3.eth);
       chains[name].id = truffleConfig.networks[name].network_id;
       chains[chains[name].id] = chains[name];
@@ -120,7 +124,11 @@ const getChains = () => {
 
 const loadContractDesc = async () => {
   try {
-    const contractDescJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
+    const contractDescJSONPath = path.join(
+      'build',
+      'contracts',
+      `${iexecConfig.name}.json`,
+    );
     const contractDescJSON = await readFileAsync(contractDescJSONPath);
     const contractDesc = JSON.parse(contractDescJSON);
     return contractDesc;
@@ -132,8 +140,15 @@ const loadContractDesc = async () => {
 
 const saveContractDesc = async (contractDesc) => {
   try {
-    const contractDescJSONPath = path.join('build', 'contracts', `${iexecConfig.name}.json`);
-    await writeFileAsync(contractDescJSONPath, JSON.stringify(contractDesc, null, 4));
+    const contractDescJSONPath = path.join(
+      'build',
+      'contracts',
+      `${iexecConfig.name}.json`,
+    );
+    await writeFileAsync(
+      contractDescJSONPath,
+      JSON.stringify(contractDesc, null, 4),
+    );
     return contractDescJSONPath;
   } catch (error) {
     debug('saveContractDesc()', error);
@@ -141,7 +156,10 @@ const saveContractDesc = async (contractDesc) => {
   }
 };
 
-const chainToEtherscanURL = chainName => `https://${chainName === 'mainnet' ? '' : chainName.concat('.')}etherscan.io/tx/`;
+const chainToEtherscanURL = chainName =>
+  `https://${
+    chainName === 'mainnet' ? '' : chainName.concat('.')
+  }etherscan.io/tx/`;
 
 const ORACLE_WALLET_ADDRESS = '0x486a5986f795d323555c0321d655f1eb78d68381';
 const getOracleWallet = (to) => {
@@ -156,8 +174,8 @@ const getFaucetWallet = (to) => {
 };
 
 const checkTxReceipt = (txReceipt, gasLimit) => {
-  if (txReceipt.status === '0x0') throw Error('transaction failed, state REVERTED');
-  if (txReceipt.gasUsed === gasLimit) throw Error('transaction throw, out of gas');
+  if (txReceipt.status === '0x0') { throw Error('transaction failed, state REVERTED'); }
+  if (txReceipt.gasUsed === gasLimit) { throw Error('transaction throw, out of gas'); }
 };
 
 module.exports = {
