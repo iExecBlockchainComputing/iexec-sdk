@@ -38,8 +38,7 @@ const deploy = async (chainName, cliAppName) => {
     const appExtraFields = {};
 
     if (
-      !('app' in utils.iexecConfig) ||
-      utils.iexecConfig.app.type === 'DEPLOYABLE'
+      !('app' in utils.iexecConfig && utils.iexecConfig.app.type === 'DOCKER')
     ) {
       debug('type === DEPLOYABLE');
       const appPath = path.join(process.cwd(), 'apps', appName);
@@ -54,16 +53,6 @@ const deploy = async (chainName, cliAppName) => {
       const { os, cpu } = utils.iexecConfig.data;
       const appBinFieldName = iexec.getAppBinaryFieldName(os, cpu);
       appExtraFields[appBinFieldName] = iexec.uid2uri(dataUID);
-    } else if (
-      'app' in utils.iexecConfig &&
-      utils.iexecConfig.app.type === 'DOCKER'
-    ) {
-      Object.assign(appExtraFields, {
-        launchscriptshuri:
-          'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstartdocker.sh',
-        unloadscriptshuri:
-          'https://raw.githubusercontent.com/iExecBlockchainComputing/xtremweb-hep/13e3433e5d106825c30bb4257771ecfc82ecfdbb/src/main/resources/scripts/xwstopdocker.sh',
-      });
     }
 
     const appUID = await iexec.registerApp(Object.assign(
@@ -124,7 +113,7 @@ const submit = async (chainName, appUID) => {
     await iexec.getCookieByJWT(jwtoken);
     const workUID = await iexec.submitWork(appUID, utils.iexecConfig.work);
 
-    spinner.succeed(`Work ${workUID} submitted to iExec server\n`);
+    spinner.succeed(`Work ${workUID} submitted to App ${appUID} iExec server\n`);
   } catch (error) {
     spinner.fail(`submit() failed with ${error}`);
     throw error;
