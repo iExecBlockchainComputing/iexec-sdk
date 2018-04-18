@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const ora = require('ora');
 const createIEXECClient = require('iexec-server-js-client');
+const xmlformat = require('xml-formatter');
 const account = require('./account');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
@@ -191,10 +192,45 @@ const version = async (chainName) => {
   }
 };
 
+const api = async (chainName, args) => {
+  const spinner = ora(oraOptions);
+  try {
+    debug('chainName', chainName);
+    const fnName = args[0];
+    const fnArgs = args.slice(1, args.length - 1);
+    debug('fnName', fnName);
+    debug('fnArgs', fnArgs);
+    const chain = utils.getChains()[chainName];
+    debug('chain.server', chain.server);
+    const iexec = createIEXECClient({
+      server: chain.server,
+      encoding: 'text',
+    });
+
+    const { jwtoken } = await account.load();
+    debug('jwtoken', jwtoken);
+
+    const methodName = fnName.concat('(', fnArgs.join(', '), ')');
+    spinner.start(`calling ${methodName} on iExec server...`);
+
+    const cookie = await iexec.getCookieByJWT(jwtoken);
+    debug('cookie', cookie);
+
+    const res = await iexec[fnName](...fnArgs);
+    debug('res', res);
+
+    spinner.succeed(`${methodName} result: ${xmlformat(res)}\n`);
+  } catch (error) {
+    spinner.fail(`api() failed with ${error}`);
+    throw error;
+  }
+};
+
 module.exports = {
   deploy,
   uploadData,
   submit,
   result,
   version,
+  api,
 };

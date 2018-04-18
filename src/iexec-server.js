@@ -44,6 +44,11 @@ cli
   .description('check iExec server version')
   .action(() => server.version(cli.network).catch(() => process.exit(1)));
 
+cli
+  .command('api')
+  .description('hit iExec server api')
+  .action(() => server.api(cli.network, cli.args).catch(() => process.exit(1)));
+
 cli.parse(process.argv);
 
 debug('cli.args.length', cli.args.length);

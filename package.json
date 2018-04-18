@@ -38,7 +38,8 @@
     "rlc-faucet-contract": "1.0.5",
     "semver": "^5.5.0",
     "truffle": "4.1.6",
-    "web3": "^0.20.6"
+    "web3": "^0.20.6",
+    "xml-formatter": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
