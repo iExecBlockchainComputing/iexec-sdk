@@ -124,7 +124,8 @@ iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
 
 ```bash
 iexec compile # call truffle compile underhood
-iexec truffle [...] # call any truffle command
+iexec migrate # call truffle migrate underhood
+iexec truffle [...] # or just call any truffle command
 ```
 
 ## wallet
