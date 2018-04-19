@@ -2,7 +2,7 @@
 
 const cli = require('commander');
 const migrate = require('./migrate');
-const { handleError } = require('./utils');
+const handleError = require('./errors');
 
 cli
   .option('--chain, --network <name>', 'migrate to network name', 'ropsten')

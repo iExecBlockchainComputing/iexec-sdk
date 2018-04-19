@@ -3,7 +3,7 @@
 const Debug = require('debug');
 const cli = require('commander');
 const wallet = require('./wallet');
-const { handleError } = require('./utils');
+const handleError = require('./errors');
 
 const debug = Debug('iexec:iexec-wallet');
 

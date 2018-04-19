@@ -2,7 +2,7 @@
 
 const cli = require('commander');
 const init = require('./init');
-const { handleError } = require('./utils');
+const handleError = require('./errors');
 
 cli.option('--repo [name]', 'git repository name').parse(process.argv);
 

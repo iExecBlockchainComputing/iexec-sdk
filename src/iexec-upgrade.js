@@ -2,7 +2,7 @@
 
 const cli = require('commander');
 const upgrade = require('./upgrade');
-const { handleError } = require('./utils');
+const handleError = require('./errors');
 
 cli.parse(process.argv);
 
