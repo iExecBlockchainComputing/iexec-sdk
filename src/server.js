@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const ora = require('ora');
 const createIEXECClient = require('iexec-server-js-client');
-const xmlformat = require('xml-formatter');
 const account = require('./account');
 const utils = require('./utils');
 const oraOptions = require('./oraOptions');
@@ -102,6 +101,8 @@ const uploadData = async (chainName, dataPath) => {
 const submit = async (chainName, appUID) => {
   const spinner = ora(oraOptions);
   try {
+    if (!appUID) throw Error('appUID undefined');
+
     const chain = utils.getChains()[chainName];
     debug('chain.server', chain.server);
     const iexec = createIEXECClient({ server: chain.server });
@@ -109,7 +110,7 @@ const submit = async (chainName, appUID) => {
     const { jwtoken } = await account.load();
     debug('jwtoken', jwtoken);
 
-    spinner.start('submitting work to iExec server...');
+    spinner.start(`submitting work to app ${appUID} on iExec server...`);
 
     await iexec.getCookieByJWT(jwtoken);
     const workUID = await iexec.submitWork(appUID, utils.iexecConfig.work);
@@ -204,7 +205,6 @@ const api = async (chainName, args) => {
     debug('chain.server', chain.server);
     const iexec = createIEXECClient({
       server: chain.server,
-      encoding: 'text',
     });
 
     const { jwtoken } = await account.load();
@@ -217,9 +217,8 @@ const api = async (chainName, args) => {
     debug('cookie', cookie);
 
     const res = await iexec[fnName](...fnArgs);
-    debug('res', res);
 
-    spinner.succeed(`${methodName} result: ${xmlformat(res)}\n`);
+    spinner.succeed(`${methodName} result: \n${JSON.stringify(res, null, 2)}`);
   } catch (error) {
     spinner.fail(`api() failed with ${error}`);
     throw error;
