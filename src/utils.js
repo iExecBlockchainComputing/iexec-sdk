@@ -182,11 +182,6 @@ const checkTxReceipt = (txReceipt, gasLimit) => {
   }
 };
 
-const handleError = (anchor) => {
-  console.log(`related documentation: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchor}`);
-  process.exit(1);
-};
-
 module.exports = {
   iexecConfig,
   truffleConfig,
@@ -199,5 +194,4 @@ module.exports = {
   getOracleWallet,
   getFaucetWallet,
   checkTxReceipt,
-  handleError,
 };
