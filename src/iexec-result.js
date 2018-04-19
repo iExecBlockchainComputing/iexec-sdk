@@ -2,6 +2,7 @@
 
 const cli = require('commander');
 const fetchResults = require('./result');
+const { handleError } = require('./utils');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')
@@ -12,8 +13,7 @@ cli
   )
   .arguments('<txHash>')
   .action(txHash =>
-    fetchResults(txHash, cli.network, cli.save, cli.dapp).catch(() =>
-      process.exit(1)))
+    fetchResults(txHash, cli.network, cli.save, cli.dapp).catch(handleError('result')))
   .parse(process.argv);
 
 if (cli.args.length === 0) cli.help();

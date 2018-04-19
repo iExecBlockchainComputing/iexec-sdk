@@ -2,7 +2,8 @@
 
 const cli = require('commander');
 const upgrade = require('./upgrade');
+const { handleError } = require('./utils');
 
 cli.parse(process.argv);
 
-upgrade().catch(() => process.exit(1));
+upgrade().catch(handleError('upgrade'));

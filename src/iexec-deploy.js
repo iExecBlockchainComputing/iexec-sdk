@@ -3,6 +3,7 @@
 const cli = require('commander');
 const migrate = require('./migrate');
 const server = require('./server');
+const { handleError } = require('./utils');
 
 cli
   .usage('[options] [appName]')
@@ -11,4 +12,4 @@ cli
 
 migrate(cli.network)
   .then(() => server.deploy(cli.network, cli.args[0]))
-  .catch(() => process.exit(1));
+  .catch(handleError('deploy'));

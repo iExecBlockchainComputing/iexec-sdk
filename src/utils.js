@@ -174,8 +174,17 @@ const getFaucetWallet = (to) => {
 };
 
 const checkTxReceipt = (txReceipt, gasLimit) => {
-  if (txReceipt.status === '0x0') { throw Error('transaction failed, state REVERTED'); }
-  if (txReceipt.gasUsed === gasLimit) { throw Error('transaction throw, out of gas'); }
+  if (txReceipt.status === '0x0') {
+    throw Error('transaction failed, state REVERTED');
+  }
+  if (txReceipt.gasUsed === gasLimit) {
+    throw Error('transaction throw, out of gas');
+  }
+};
+
+const handleError = (anchor) => {
+  console.log(`related documentation: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchor}`);
+  process.exit(1);
 };
 
 module.exports = {
@@ -190,4 +199,5 @@ module.exports = {
   getOracleWallet,
   getFaucetWallet,
   checkTxReceipt,
+  handleError,
 };

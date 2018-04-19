@@ -2,6 +2,7 @@
 
 const cli = require('commander');
 const account = require('./account');
+const { handleError } = require('./utils');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')
@@ -10,18 +11,18 @@ cli
 cli
   .command('login')
   .description('login into your iexec account')
-  .action(() => account.login(cli.auth).catch(() => process.exit(1)));
+  .action(() => account.login(cli.auth).catch(handleError('account')));
 
 cli
   .command('allow <amount>')
   .description('set the nRLC allowance on iexec account')
   .action(amount =>
-    account.allow(cli.network, amount).catch(() => process.exit(1)));
+    account.allow(cli.network, amount).catch(handleError('account')));
 
 cli
   .command('show')
   .description('show iexec account status')
-  .action(() => account.show().catch(() => process.exit(1)));
+  .action(() => account.show().catch(handleError('account')));
 
 cli.parse(process.argv);
 

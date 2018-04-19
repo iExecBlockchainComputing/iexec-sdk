@@ -3,6 +3,7 @@
 const Debug = require('debug');
 const cli = require('commander');
 const server = require('./server');
+const { handleError } = require('./utils');
 
 const debug = Debug('iexec:iexec-server');
 
@@ -16,19 +17,19 @@ cli
   .command('deploy [appName]')
   .description('send app to iexec server, app binary must be located inside /apps')
   .action(appName =>
-    server.deploy(cli.network, appName).catch(() => process.exit(1)));
+    server.deploy(cli.network, appName).catch(handleError('server')));
 
 cli
   .command('uploadData [dataPath]')
   .description('upload data with its description')
   .action(dataPath =>
-    server.uploadData(cli.network, dataPath).catch(() => process.exit(1)));
+    server.uploadData(cli.network, dataPath).catch(handleError('server')));
 
 cli
   .command('submit')
   .description('directly submit a work to iExec server')
   .action(() =>
-    server.submit(cli.network, cli.app).catch(() => process.exit(1)));
+    server.submit(cli.network, cli.app).catch(handleError('server')));
 
 cli
   .command('result')
@@ -37,17 +38,17 @@ cli
   .action(workUID =>
     server
       .result(workUID, cli.network, cli.save, cli.watch)
-      .catch(() => process.exit(1)));
+      .catch(handleError('server')));
 
 cli
   .command('version')
   .description('check iExec server version')
-  .action(() => server.version(cli.network).catch(() => process.exit(1)));
+  .action(() => server.version(cli.network).catch(handleError('server')));
 
 cli
   .command('api')
-  .description('hit iExec server api')
-  .action(() => server.api(cli.network, cli.args).catch(() => process.exit(1)));
+  .description('call iExec server api')
+  .action(() => server.api(cli.network, cli.args).catch(handleError('server')));
 
 cli.parse(process.argv);
 

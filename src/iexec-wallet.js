@@ -3,6 +3,7 @@
 const Debug = require('debug');
 const cli = require('commander');
 const wallet = require('./wallet');
+const { handleError } = require('./utils');
 
 const debug = Debug('iexec:iexec-wallet');
 
@@ -13,41 +14,41 @@ cli
 cli
   .command('create')
   .description('create a local wallet')
-  .action(() => wallet.create().catch(() => process.exit(1)));
+  .action(() => wallet.create().catch(handleError('wallet')));
 
 cli
   .command('getETH')
   .description('apply for ETH from pre-registered faucets')
-  .action(() => wallet.getETH(cli.network).catch(() => process.exit(1)));
+  .action(() => wallet.getETH(cli.network).catch(handleError('wallet')));
 
 cli
   .command('getRLC')
   .description('apply for nRLC from iexec faucet')
-  .action(() => wallet.getRLC(cli.network).catch(() => process.exit(1)));
+  .action(() => wallet.getRLC(cli.network).catch(handleError('wallet')));
 
 cli
   .command('sendETH')
   .arguments('<amount>')
   .description('send ETH to an address')
   .action(amount =>
-    wallet.sendETH(cli.network, amount, cli.to).catch(() => process.exit(1)));
+    wallet.sendETH(cli.network, amount, cli.to).catch(handleError('wallet')));
 
 cli
   .command('sendRLC')
   .arguments('<amount>')
   .description('send nRLC to an address')
   .action(amount =>
-    wallet.sendRLC(cli.network, amount, cli.to).catch(() => process.exit(1)));
+    wallet.sendRLC(cli.network, amount, cli.to).catch(handleError('wallet')));
 
 cli
   .command('sweep')
   .description('send all ETH and RLC to an address')
-  .action(() => wallet.sweep(cli.network, cli.to).catch(() => process.exit(1)));
+  .action(() => wallet.sweep(cli.network, cli.to).catch(handleError('wallet')));
 
 cli
   .command('show')
   .description('show local wallet balances')
-  .action(() => wallet.show().catch(() => process.exit(1)));
+  .action(() => wallet.show().catch(handleError('wallet')));
 
 cli.parse(process.argv);
 
