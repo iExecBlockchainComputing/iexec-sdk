@@ -1,7 +1,7 @@
 {
   "name": "iexec",
   "version": "1.7.3",
-  "description": "iExec sdk",
+  "description": "iExec SDK",
   "main": "dist/iexec-lib.js",
   "scripts": {
     "test": "jest cli --runInBand",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@warren-bank/ethereumjs-tx-sign": "^2.0.0",
     "bluebird": "^3.5.1",
+    "colors": "^1.2.1",
     "commander": "2.15.1",
     "debug": "^3.1.0",
     "elliptic": "^6.4.0",
