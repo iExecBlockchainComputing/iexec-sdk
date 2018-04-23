@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
 const wallet = require('./wallet');
 const handleError = require('./errors');
-
-const debug = Debug('iexec:iexec-wallet');
+const help = require('./help');
 
 cli
   .option('--to <address>', 'receiver address')
@@ -50,7 +48,4 @@ cli
   .description('show local wallet balances')
   .action(() => wallet.show().catch(handleError('wallet')));
 
-cli.parse(process.argv);
-
-debug('cli.args.length', cli.args.length);
-if (cli.args.length === 0) cli.help();
+help(cli);

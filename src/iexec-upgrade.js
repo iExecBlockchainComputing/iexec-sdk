@@ -3,7 +3,8 @@
 const cli = require('commander');
 const upgrade = require('./upgrade');
 const handleError = require('./errors');
+const help = require('./help');
 
-cli.parse(process.argv);
+help(cli, { checkNoArgs: false, checkWrongArgs: false });
 
 upgrade().catch(handleError('upgrade'));

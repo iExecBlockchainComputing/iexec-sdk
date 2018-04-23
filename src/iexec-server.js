@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
 const server = require('./server');
 const handleError = require('./errors');
-
-const debug = Debug('iexec:iexec-server');
+const help = require('./help');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')
@@ -50,7 +48,4 @@ cli
   .description('call iExec server api')
   .action(() => server.api(cli.network, cli.args).catch(handleError('server')));
 
-cli.parse(process.argv);
-
-debug('cli.args.length', cli.args.length);
-if (cli.args.length === 0) cli.help();
+help(cli);

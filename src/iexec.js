@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
+const help = require('./help');
 const packageJSON = require('../package.json');
-
-const debug = Debug('iexec');
-debug('add DEBUG=* to show logs');
 
 cli.description(packageJSON.description).version(packageJSON.version);
 
@@ -36,4 +33,4 @@ cli.command('upgrade', 'update iExec CLI tool and upgrade iExec project');
 
 cli.command('airdrop <csvPath>', 'airdrop RLC to all addresses in a csv file');
 
-cli.parse(process.argv);
+help(cli);

@@ -4,11 +4,13 @@ const cli = require('commander');
 const migrate = require('./migrate');
 const server = require('./server');
 const handleError = require('./errors');
+const help = require('./help');
 
 cli
   .usage('[options] [appName]')
-  .option('--chain, --network <name>', 'migrate to network name', 'ropsten')
-  .parse(process.argv);
+  .option('--chain, --network <name>', 'migrate to network name', 'ropsten');
+
+help(cli, { checkNoArgs: false, checkWrongArgs: false });
 
 migrate(cli.network)
   .then(() => server.deploy(cli.network, cli.args[0]))
