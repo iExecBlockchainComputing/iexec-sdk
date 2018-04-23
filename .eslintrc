@@ -3,6 +3,7 @@
   "extends": "airbnb-base",
   "rules": {
     "no-console": 0,
-    "max-len": "off"
+    "max-len": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_execs"] }]
   }
 }
