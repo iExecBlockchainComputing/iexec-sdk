@@ -159,7 +159,7 @@ const result = async (workUID, chainName, save, watch) => {
     const resultURI = iexec.getFieldValue(work, 'resulturi');
     const resultUID = iexec.uri2uid(resultURI);
     if (save) {
-      const resultObj = await iexec.getUID(resultUID);
+      const resultObj = await iexec.getByUID(resultUID);
       const extension = iexec.getFieldValue(resultObj, 'type').toLowerCase();
       resultPath = path.join(process.cwd(), workUID.concat('.', extension));
       const resultStream = fs.createWriteStream(resultPath);
