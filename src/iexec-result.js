@@ -7,13 +7,10 @@ const help = require('./help');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')
-  .option('--save', 'save the result to a file')
-  .option(
-    '--dapp <dappAddress>',
-    'get work result from a specific provider smart contract address',
-  )
+  .option('--save [fileName]', 'save the result to a file')
+  .option('--watch', 'watch the status of a work until COMPLETED')
   .arguments('<txHash>')
   .action(txHash =>
-    fetchResults(txHash, cli.network, cli.save, cli.dapp).catch(handleError('result')));
+    fetchResults(txHash, cli.network, cli.save, cli.watch).catch(handleError('result')));
 
 help(cli, { checkWrongArgs: false });
