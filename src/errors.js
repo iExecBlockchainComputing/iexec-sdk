@@ -1,5 +1,6 @@
 const handleError = anchorName => () => {
-  console.log(`related documentation: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchorName}`);
+  console.log('');
+  console.log(`   iExec SDK doc: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchorName}`);
   process.exit(1);
 };
 
