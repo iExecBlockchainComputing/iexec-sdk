@@ -147,6 +147,9 @@ const result = async (workUID, chainName, save, watch) => {
       ? await iexec.waitForWorkCompleted(workUID)
       : await iexec.getByUID(workUID);
     debug('work', work);
+    if (!('work' in work.xwhep)) {
+      throw Error(`No current work associated with workUID: ${workUID}`);
+    }
 
     const status = iexec.getFieldValue(work, 'status');
     if (status !== 'COMPLETED') {
@@ -154,14 +157,14 @@ const result = async (workUID, chainName, save, watch) => {
       return;
     }
 
-    debug('work.xwhep.work[0]', work.xwhep.work[0]);
     let resultPath;
     const resultURI = iexec.getFieldValue(work, 'resulturi');
     const resultUID = iexec.uri2uid(resultURI);
     if (save) {
       const resultObj = await iexec.getByUID(resultUID);
       const extension = iexec.getFieldValue(resultObj, 'type').toLowerCase();
-      resultPath = path.join(process.cwd(), workUID.concat('.', extension));
+      const fileName = save === true ? workUID : save;
+      resultPath = path.join(process.cwd(), fileName.concat('.', extension));
       const resultStream = fs.createWriteStream(resultPath);
       await iexec.downloadStream(resultUID, resultStream);
     }
