@@ -145,7 +145,7 @@ const result = async (workUID, chainName, save, watch) => {
 
     const work = watch
       ? await iexec.waitForWorkCompleted(workUID)
-      : await iexec.getUID(workUID);
+      : await iexec.getByUID(workUID);
     debug('work', work);
 
     const status = iexec.getFieldValue(work, 'status');
