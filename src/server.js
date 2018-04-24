@@ -55,16 +55,20 @@ const deploy = async (chainName, cliAppName) => {
       appExtraFields[appBinFieldName] = iexec.uid2uri(dataUID);
     }
 
-    const appUID = await iexec.registerApp(Object.assign(
+    const appDesc = Object.assign(
       appExtraFields,
       { name: contractAddress },
       utils.iexecConfig.app || {},
-    ));
+    );
+    debug('appDesc', appDesc);
+    const appUID = await iexec.registerApp(appDesc);
 
     const app = await iexec.getByUID(appUID);
     debug('app', JSON.stringify(app));
     if (!('app' in app.xwhep)) {
-      throw Error(`App name ${contractAddress} already exists on the iExec server. Please change the name before re-deploying.`);
+      throw Error(`App name ${
+        appDesc.name
+      } already exists on the iExec server. Please change the name before re-deploying.`);
     }
 
     spinner.succeed(`App ${appUID} deployed on iExec offchain platform. Only callable through ${chainName} dapp at: ${contractAddress}\n`);
