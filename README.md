@@ -167,13 +167,13 @@ You need the txHash of a work submission in order to check its result:
 
 ```bash
 iexec result <txHash> --chain ropsten # this will log the result data
-iexec result <txHash> --save --chain ropsten # this will download the result locally
+iexec result <txHash> --watch --save [fileName] --chain ropsten # this will download the result locally
 ```
 
 ## upgrade
 
 ```bash
-iexec upgrade # update iExec CLI tool and upgrade iExec project
+iexec upgrade # check if using latest iExec SDK version
 ```
 
 ## server
@@ -183,7 +183,7 @@ iexec server version # get server version
 iexec server deploy # deploy legacy app only to iExec server
 iexec server uploadData <data_path> # direct data upload
 iexec server submit --app <app_uid> # direct work submit
-iexec server result <workUID> # direct result
+iexec server result <workUID> --watch --save [fileName]# direct result
 iexec server api <fnName> [arg1] [arg2] ... # directly call api method
 ```
 
