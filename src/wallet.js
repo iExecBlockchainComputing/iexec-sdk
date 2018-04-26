@@ -212,7 +212,10 @@ const show = async () => {
       chains[name].web3.eth
         .getBalanceAsync(userWallet.address)
         .then(balance => chains[name].web3.fromWei(balance, 'ether'))
-        .catch(() => 0)));
+        .catch((error) => {
+          debug(error);
+          return 0;
+        })));
     spinner.info('ETH balances:\n');
     const ethBalancesString = ethBalances.reduce(
       (accu, curr, index) =>
