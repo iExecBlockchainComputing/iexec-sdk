@@ -10,14 +10,12 @@ module.exports = {
   networks: {
     development: {
       host: 'localhost',
-      port: 8545,
       network_id: '*', // Match any network id,
       constructorArgs: [LOCAL_ORACLE_ADDRESS],
       server: 'https://localhost:443',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
-      port: 8545,
       network_id: '3',
       constructorArgs: [ROPSTEN_ORACLE_ADDRESS],
       server: 'https://testxw.iex.ec:443',
@@ -28,21 +26,18 @@ module.exports = {
     },
     rinkeby: {
       host: 'https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq',
-      port: 8545,
       network_id: '4',
       constructorArgs: [RINKEBY_ORACLE_ADDRESS],
       server: 'https://testxw.iex.ec:443',
     },
     kovan: {
       host: 'https://kovan.infura.io/berv5GTB5cSdOJPPnqOq',
-      port: 8545,
       network_id: '42',
       constructorArgs: [KOVAN_ORACLE_ADDRESS],
       server: 'https://testxw.iex.ec:443',
     },
     mainnet: {
       host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
-      port: 8545,
       network_id: '1',
       constructorArgs: [MAIN_ORACLE_ADDRESS],
       server: 'https://mainxw.iex.ec:443',
