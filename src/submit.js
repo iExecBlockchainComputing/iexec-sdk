@@ -90,7 +90,7 @@ const submit = async (chainName, methodName, param, cliDappAddress) => {
     );
 
     debug('txReceipt:', JSON.stringify(txReceipt, null, 4));
-    spinner.info(`View on etherscan: https://${chainName}.etherscan.io/tx/${
+    spinner.info(`View on the iExec Explorer: https://explorer.iex.ec/${chainName}/tx/${
       txReceipt.transactionHash
     }\n`);
     spinner.succeed('calculation job submitted to iExec workers \n');
