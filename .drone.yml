@@ -29,7 +29,7 @@ pipeline:
     repo: iexechub/iexec-sdk
     secrets: [ docker_username, docker_password ]
     tags:
-      - latest
+      - next
       - ${DRONE_TAG##v}
     when:
       event: tag
