@@ -18,6 +18,7 @@ pipeline:
     secrets: [ npm_password ]
     username: sulliwane
     email: sulliwane@gmail.com
+    tag: next
     when:
       event: tag
       matrix:
