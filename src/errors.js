@@ -1,7 +1,9 @@
-const handleError = (error, anchorName, spinner) => {
+const { Spinner } = require('./utils');
+
+const handleError = (error, anchorName, spinner = Spinner()) => {
   spinner.fail(`command "iexec ${anchorName}" failed with ${error}`);
   console.log('');
-  console.log(`   iExec SDK doc: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchorName}`);
+  spinner.info(`iExec SDK doc: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchorName}`);
   process.exit(1);
 };
 
