@@ -1,10 +1,9 @@
 const Debug = require('debug');
 const cli = require('commander');
-const ora = require('ora');
 const fetch = require('node-fetch');
 const semver = require('semver');
 const isDocker = require('is-docker');
-const oraOptions = require('./oraOptions');
+const { Spinner, handleError } = require('./cli-helper');
 const packageJSON = require('../package.json');
 
 const debug = Debug('iexec:upgrade');
@@ -13,7 +12,7 @@ const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
 cli.parse(process.argv);
 
 async function upgrade() {
-  const spinner = ora(oraOptions);
+  const spinner = Spinner();
   try {
     spinner.start('updating the iExec SDK...');
 
@@ -36,8 +35,7 @@ async function upgrade() {
     spinner.start(`upgrading iExec project ${__dirname}...`);
     spinner.succeed(`iExec project ${__dirname} upgrade successfull`);
   } catch (error) {
-    spinner.fail(`"iexec upgrade" failed with ${error}`);
-    throw error;
+    handleError(error, 'upgrade', spinner);
   }
 }
 
