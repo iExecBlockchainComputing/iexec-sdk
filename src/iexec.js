@@ -12,26 +12,13 @@ cli.command('wallet', 'manage local ethereum wallet');
 
 cli.command('account', 'manage iExec account');
 
-cli.command(
-  'truffle [args...]',
-  'execute truffle with any number of truffle arguments',
-);
-
-cli.command('compile', 'call truffle compile');
-
-cli.command('migrate', 'compile and deploy the contract');
-
 cli.command('server', 'manage server side apps and works');
-
-cli.command('deploy', 'combo of iexec contract deploy + iexec server deploy');
 
 cli.command('submit [param]', 'submit a job to iExec');
 
 cli.command('result <txHash>', 'fetch the result of a job');
 
 cli.command('upgrade', 'update iExec CLI tool and upgrade iExec project');
-
-cli.command('airdrop <csvPath>', 'airdrop RLC to all addresses in a csv file');
 
 cli.command('app', 'manage iExec apps');
 
