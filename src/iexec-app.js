@@ -7,10 +7,10 @@ const hub = require('./hub');
 cli
   .option('--chain <name>', 'chain name', 'ropsten')
   .option(
-    '--hub [address]',
+    '--hub <address>',
     'interact with the iExec Hub at a specific smart contract address',
   )
-  .option('--user [address]', 'custom user address parameter');
+  .option('--user <address>', 'custom user address parameter');
 
 cli
   .command('create')

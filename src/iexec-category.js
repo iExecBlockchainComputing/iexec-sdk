@@ -11,7 +11,7 @@ const debug = Debug('iexec:iexec-category');
 cli
   .option('--chain <name>', 'network name', 'ropsten')
   .option(
-    '--hub [address]',
+    '--hub <address>',
     'interact with the iExec Hub at a custom smart contract address',
   );
 
