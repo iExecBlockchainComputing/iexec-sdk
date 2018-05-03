@@ -3,8 +3,7 @@
 const cli = require('commander');
 const migrate = require('./migrate');
 const server = require('./server');
-const handleError = require('./errors');
-const help = require('./help');
+const { handleError, help } = require('./cli-helper');
 
 cli
   .usage('[options] [appName]')

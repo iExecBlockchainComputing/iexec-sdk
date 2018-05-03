@@ -2,8 +2,8 @@
 
 const cli = require('commander');
 const submit = require('./submit');
-const handleError = require('./errors');
-const help = require('./help');
+const { handleError } = require('./cli-helper');
+const { help } = require('./cli-helper');
 
 cli
   .option('--chain, --network <name>', 'network name', 'ropsten')

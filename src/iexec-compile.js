@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const truffle = require('./truffle-cli');
-const handleError = require('./errors');
+const { handleError } = require('./cli-helper');
 
 const args = process.argv.slice(2);
 

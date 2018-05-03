@@ -2,8 +2,8 @@
 
 const cli = require('commander');
 const upgrade = require('./upgrade');
-const handleError = require('./errors');
-const help = require('./help');
+const { handleError } = require('./cli-helper');
+const { help } = require('./cli-helper');
 
 help(cli, { checkNoArgs: false, checkWrongArgs: false });
 

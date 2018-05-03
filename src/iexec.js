@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const help = require('./help');
+const { help } = require('./cli-helper');
 const packageJSON = require('../package.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);

@@ -2,8 +2,7 @@
 
 const Debug = require('debug');
 const cli = require('commander');
-const handleError = require('./errors');
-const help = require('./help');
+const { handleError, help } = require('./cli-helper');
 const { Spinner, loadIEXECConf, getChains } = require('./utils');
 
 const debug = Debug('iexec:iexec-category');

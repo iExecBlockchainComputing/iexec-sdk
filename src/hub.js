@@ -4,7 +4,7 @@ const {
   Spinner, loadIEXECConf, getChains, isEthAddress,
 } = require('./utils');
 const wallet = require('./wallet');
-const handleError = require('./errors');
+const { handleError } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
 

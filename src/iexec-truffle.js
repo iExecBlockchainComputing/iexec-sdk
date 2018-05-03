@@ -2,7 +2,7 @@
 
 const Debug = require('debug');
 const truffle = require('./truffle-cli');
-const handleError = require('./errors');
+const { handleError } = require('./cli-helper');
 
 const debug = Debug('iexec:iexec-truffle');
 
