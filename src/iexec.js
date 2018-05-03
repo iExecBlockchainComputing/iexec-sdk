@@ -33,4 +33,14 @@ cli.command('upgrade', 'update iExec CLI tool and upgrade iExec project');
 
 cli.command('airdrop <csvPath>', 'airdrop RLC to all addresses in a csv file');
 
+cli.command('app', 'manage iExec apps');
+
+cli.command('dataset', 'manage iExec datasets');
+
+cli.command('category', 'manage iExec categories');
+
+cli.command('workerpool', 'manage iExec workerpools');
+
+cli.command('market', 'manage iExec app');
+
 help(cli);
