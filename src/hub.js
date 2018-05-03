@@ -1,10 +1,8 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const {
-  Spinner, loadIEXECConf, getChains, isEthAddress,
-} = require('./utils');
+const { loadIEXECConf, getChains, isEthAddress } = require('./utils');
 const wallet = require('./wallet');
-const { handleError } = require('./cli-helper');
+const { handleError, Spinner } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
 
