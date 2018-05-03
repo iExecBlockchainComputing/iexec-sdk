@@ -187,30 +187,79 @@ iexec server result <workUID> --watch --save [fileName]# direct result
 iexec server api <fnName> [arg1] [arg2] ... # directly call api method
 ```
 
-## iexec.js
+## app
 
-The `iexec.js` file, located in every iExec project, describes the parameters used when deploying an app, and when submitting a work.
+```bash
+iexec app create --hub [hubAddress]# create new app
+iexec app show <address> # show app details
+iexec app show <index> --hub [hubAddress] --user [userAddress] # show app details by index
+iexec app count --hub [hubAddress] --user [userAddress] # count total number of apps
+```
 
-```js
-module.exports = {
-  name: 'Factorial',
-  // app tags used once when deploying app to iExec server
-  // iexec deploy
-  app: {
-    type: 'DOCKER',
-    envvars: 'XWDOCKERIMAGE=cogniteev/echo',
+## dataset
+
+```bash
+iexec dataset create --hub [hubAddress]# create new dataset
+iexec dataset show <address> # show dataset details
+iexec dataset show <index> --hub [hubAddress] --user [userAddress] # show dataset details using index
+iexec dataset count --hub [hubAddress] --user [userAddress] # count total number of datasets
+```
+
+## category
+
+```bash
+iexec category create --hub [hubAddress]# create new category
+iexec category show <index> --hub [hubAddress] # show category details
+iexec category count --hub [hubAddress] # count total number of categories
+```
+
+## workerpool
+
+```bash
+iexec workerpool create --hub [hubAddress]# create new workerpool
+iexec workerpool show <address> # show workerpool details
+iexec workerpool show <index> --hub [hubAddress] --user [userAddress] # show workerpool details by index
+iexec workerpool count --hub [hubAddress] --user [userAddress] # count total number of datasets
+```
+
+## iexec.json
+
+The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|datasetcategory|workerPool], or when submitting a work.
+
+```json
+{
+  "app": {
+    "name": "next-dapp1",
+    "price": 1,
+    "params": {
+      "type": "DOCKER",
+      "envvars": "XWDOCKERIMAGE=ericro/face-recognition"
+    }
   },
-  // work tags used for each work submit
-  // iexec submit
-  work: {
-    cmdline: 'iExec',
+  "dataset": {
+    "name": "next-dataset",
+    "price": 2,
+    "params": {
+      "uri": "https://data.provider.com"
+    }
   },
-};
+  "category": {
+    "name": "CAT1",
+    "description": "my category N°1",
+    "workClockTimeRef": 100
+  },
+  "workerPool": {
+    "description": "Qarnot WorkerPool ",
+    "subscriptionLockStakePolicy": 100,
+    "subscriptionMinimumStakePolicy": 100,
+    "subscriptionMinimumScorePolicy": 100
+  }
+}
 ```
 
 ## truffle.js
 
-The `truffle.js` file, located in every iExec project, describes the parameters used when communicating with ethereum and iexec nodes.
+The `truffle.js` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iexec schedulers.
 
 ```js
 module.exports = {
