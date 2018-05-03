@@ -16,8 +16,6 @@ const helpMessage = () => {
 const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
   cli.on('--help', helpMessage);
   cli.parse(process.argv);
-  // debug('cli.args', cli.args);
-  // debug('cli._execs', cli._execs);
 
   if (checkNoArgs && cli.args.length === 0) {
     console.log('');
