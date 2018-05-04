@@ -97,6 +97,11 @@ const load = async ({ suffix = true } = {}) => {
   }
 };
 
+const loadAddress = async (options) => {
+  const userWallet = await load(options);
+  return userWallet.address;
+};
+
 const signTransaction = async (rawTx) => {
   try {
     const userWallet = await load();
@@ -126,6 +131,7 @@ module.exports = {
   save,
   create,
   load,
+  loadAddress,
   accounts,
   signTransaction,
 };
