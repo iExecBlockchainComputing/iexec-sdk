@@ -87,7 +87,7 @@ cli
             } [chainID: ${chain.id}]`,
           },
         ]);
-        if (!answers.transfer) throw Error('Transfer aborted by user.');
+        if (!answers.transfer) throw Error(info.userAborted());
       }
 
       await wallet.sendETH(chain, amount, cli.to, address);

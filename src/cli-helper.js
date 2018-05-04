@@ -9,6 +9,7 @@ const info = {
   checkBalance: currency => `checking ${currency} balances...`,
   topUp: currency =>
     `Run "iexec wallet get${currency}" to top up your ${currency} account`,
+  userAborted: () => 'operation aborted by user.',
 };
 
 const desc = {
