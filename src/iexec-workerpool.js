@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help, handleError, info } = require('./cli-helper');
+const { help, handleError, desc } = require('./cli-helper');
 const hub = require('./hub');
 const { loadChain, loadIExecConf, option } = require('./loader');
 const { loadAddress } = require('./keystore');
@@ -15,7 +15,7 @@ cli
 
 cli
   .command('create')
-  .description(info.createObj(objName))
+  .description(desc.createObj(objName))
   .action(async () => {
     try {
       const [chain, iexecConf] = await Promise.all([
@@ -29,9 +29,8 @@ cli
   });
 
 cli
-  .command('show')
-  .description(info.showObj(objName))
-  .arguments('<addressOrIndex>')
+  .command('show <addressOrIndex>')
+  .description(desc.showObj(objName))
   .action(async (addressOrIndex) => {
     try {
       const [chain, walletAddress] = await Promise.all([
@@ -53,7 +52,7 @@ cli
 
 cli
   .command('count')
-  .description(info.countObj(objName))
+  .description(desc.countObj(objName))
   .action(async () => {
     try {
       const [chain, walletAddress] = await Promise.all([

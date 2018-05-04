@@ -2,27 +2,36 @@
 
 const cli = require('commander');
 const account = require('./account');
-const handleError = require('./errors');
-const help = require('./help');
+const hub = require('./hub');
+const {
+  help, handleError, option, desc,
+} = require('./cli-helper');
+
+const objName = 'account';
 
 cli
-  .option('--chain, --network <name>', 'network name', 'ropsten')
-  .option('--auth <auth>', 'auth server name', 'https://auth.iex.ec');
+  .option(...option.chain())
+  .option(...option.auth())
+  .option(...option.hub())
+  .option(...option.user());
 
 cli
   .command('login')
-  .description('login into your iexec account')
+  .description(desc.login())
   .action(() => account.login(cli.auth).catch(handleError('account')));
 
 cli
-  .command('allow <amount>')
-  .description('set the nRLC allowance on iexec account')
+  .command('deposit <amount>')
+  .description(desc.deposit())
   .action(amount =>
     account.allow(cli.network, amount).catch(handleError('account')));
 
 cli
   .command('show')
-  .description('show iexec account status')
-  .action(() => account.show().catch(handleError('account')));
+  .description(desc.showObj('iExec', objName))
+  .action(() =>
+    hub
+      .checkBalance(cli.network, cli.hub, cli.user)
+      .catch(handleError('account')));
 
 help(cli);

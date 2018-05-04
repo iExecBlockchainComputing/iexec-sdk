@@ -2,7 +2,7 @@
 
 const cli = require('commander');
 const {
-  help, handleError, info, option,
+  help, handleError, desc, option,
 } = require('./cli-helper');
 const hub = require('./hub');
 const { loadChain, loadIExecConf } = require('./loader');
@@ -17,7 +17,7 @@ cli
 
 cli
   .command('create')
-  .description(info.createObj(objName))
+  .description(desc.createObj(objName))
   .action(async () => {
     try {
       const [chain, iexecConf] = await Promise.all([
@@ -31,9 +31,8 @@ cli
   });
 
 cli
-  .command('show')
-  .description(info.showObj(objName))
-  .arguments('<addressOrIndex>')
+  .command('show <addressOrIndex>')
+  .description(desc.showObj(objName))
   .action(async (addressOrIndex) => {
     try {
       const [chain, walletAddress] = await Promise.all([
@@ -55,7 +54,7 @@ cli
 
 cli
   .command('count')
-  .description(info.countObj(objName))
+  .description(desc.countObj(objName))
   .action(async () => {
     try {
       const [chain, walletAddress] = await Promise.all([

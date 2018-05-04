@@ -2,18 +2,18 @@
 
 const cli = require('commander');
 const hub = require('./hub');
-const { handleError, help, info } = require('./cli-helper');
+const {
+  handleError, help, desc, option,
+} = require('./cli-helper');
 const { loadIExecConf, loadChain } = require('./loader');
 
 const objName = 'category';
 
-cli
-  .option('--chain <name>', info.chainName(), 'ropsten')
-  .option('--hub <address>', info.hubAddress());
+cli.option(...option.chain()).option(...option.hub());
 
 cli
   .command('create')
-  .description(info.createObj(objName))
+  .description(desc.createObj(objName))
   .action(async () => {
     try {
       const [iexecConf, chain] = await Promise.all([
@@ -27,9 +27,8 @@ cli
   });
 
 cli
-  .command('show')
-  .description(info.showObj(objName, 'hub'))
-  .arguments('<index>')
+  .command('show <index>')
+  .description(desc.showObj(objName, 'hub'))
   .action(async (index) => {
     try {
       const chain = await loadChain(cli.chain);
@@ -41,7 +40,7 @@ cli
 
 cli
   .command('count')
-  .description(info.showObj(objName, 'hub'))
+  .description(desc.showObj(objName, 'hub'))
   .action(async () => {
     try {
       const chain = await loadChain(cli.chain);

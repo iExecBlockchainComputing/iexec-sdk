@@ -6,6 +6,9 @@ const debug = Debug('help');
 
 const info = {
   waitMiners: () => 'waiting for transaction to be mined...',
+};
+
+const desc = {
   hubAddress: () =>
     'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chains.json"',
@@ -13,12 +16,14 @@ const info = {
   createObj: objName => `create a new ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
+  login: () => 'login into your iexec account',
+  deposit: () => 'deposit nRLC on your iexec account',
 };
 
 const option = {
-  chain: () => ['--chain <name>', info.chainName(), 'ropsten'],
-  hub: () => ['--hub <address>', info.hubAddress()],
-  user: () => ['--user <address>', info.userAddress()],
+  chain: () => ['--chain <name>', desc.chainName(), 'ropsten'],
+  hub: () => ['--hub <address>', desc.hubAddress()],
+  user: () => ['--user <address>', desc.userAddress()],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
 };
 
@@ -131,5 +136,6 @@ module.exports = {
   Spinner,
   handleError,
   info,
+  desc,
   option,
 };
