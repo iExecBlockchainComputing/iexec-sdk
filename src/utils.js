@@ -1,17 +1,10 @@
 const Debug = require('debug');
-const Promise = require('bluebird');
-const fs = require('fs-extra');
-const path = require('path');
 const EthJS = require('ethjs');
 const ethUtil = require('ethjs-util');
 const SignerProvider = require('./ethjs-iexec-signer');
-const keystore = require('./keystore');
-const createIEXECContracts = require('./iexec-contracts-js-client');
-// eslint-disable-next-line
-const truffleConfig = require(path.join(process.cwd(), 'truffle.js'));
+const createIExecContracts = require('./iexec-contracts-js-client');
 
 const debug = Debug('iexec:utils');
-const readFileAsync = Promise.promisify(fs.readFile);
 
 const FETCH_INTERVAL = 1000;
 const TIMEOUT = 60 * 1000;
@@ -35,33 +28,31 @@ const waitFor = async (fn, hash) => {
   }
 };
 
-const getChains = () => {
+const getChains = (from, chainsConf, { signTransaction, accounts }) => {
   try {
     const chains = {};
-    const networkNames = Object.keys(truffleConfig.networks);
-    networkNames.forEach((name) => {
-      const ethProvider = new SignerProvider(
-        truffleConfig.networks[name].host,
-        {
-          signTransaction: keystore.signTransaction,
-          accounts: keystore.accounts,
-        },
-      );
+    const chainNames = Object.keys(chainsConf.chains);
+    chainNames.forEach((name) => {
+      const chain = chainsConf.chains[name];
+      const ethProvider = new SignerProvider(chain.host, {
+        signTransaction,
+        accounts,
+      });
 
-      chains[name] = Object.assign({}, truffleConfig.networks[name]);
+      chains[name] = Object.assign({}, chain);
       chains[name].name = name;
       chains[name].ethjs = new EthJS(ethProvider);
       chains[name].EthJS = EthJS;
-      chains[name].id = truffleConfig.networks[name].network_id;
-      chains[chains[name].id] = chains[name];
-      chains[name].contracts = createIEXECContracts({
+      chains[name].contracts = createIExecContracts({
         eth: chains[name].ethjs,
         chainID: chains[name].id,
         txOptions: {
-          from: '0x1fa8602668d4bda4f45a25c8def0a619499457db',
+          from,
           chainId: parseInt(chains[name].id, 10),
         },
       });
+      // index by chainID
+      chains[chain.id] = chains[name];
     });
     return chains;
   } catch (error) {
@@ -93,22 +84,6 @@ const checkTxReceipt = (txReceipt, gasLimit) => {
   }
   if (txReceipt.gasUsed === gasLimit) {
     throw Error('transaction throw, out of gas');
-  }
-};
-
-const loadIEXECConf = async () => {
-  try {
-    const iexecConfPath = path.join(process.cwd(), 'iexec.json');
-    const iexecConfJSON = await readFileAsync(iexecConfPath);
-    const iexecConf = JSON.parse(iexecConfJSON);
-    debug('iexecConf', iexecConf);
-    return iexecConf;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new Error('Aborting. You need an iexec.json config file to continue');
-    }
-    debug('loadIEXECConf() error', error);
-    throw error;
   }
 };
 
@@ -176,14 +151,12 @@ const isEthAddress = (address, { strict = false } = {}) => {
 const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
 
 module.exports = {
-  truffleConfig,
   waitFor,
   getChains,
   chainToEtherscanURL,
   getOracleWallet,
   getFaucetWallet,
   checkTxReceipt,
-  loadIEXECConf,
   getContractAddress,
   stringifyRPCObj,
   isEthAddress,
