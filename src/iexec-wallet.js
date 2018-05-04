@@ -33,7 +33,7 @@ cli
     const spinner = Spinner();
     try {
       const res = await keystore.createAndSave({ force: cli.force || false });
-      spinner.succeed(`wallet save in "${res.fileName}":\n${JSON.stringify(
+      spinner.succeed(`wallet saved in "${res.fileName}":\n${JSON.stringify(
         res.wallet,
         null,
         2,
