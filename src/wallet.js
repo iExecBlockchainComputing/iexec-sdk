@@ -1,9 +1,8 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
 const fetch = require('node-fetch');
-const inquirer = require('inquirer');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
-const { Spinner } = require('./cli-helper');
+const { Spinner, info } = require('./cli-helper');
 const { getContractAddress, getRPCObjValue } = require('./utils');
 
 const debug = Debug('iexec:wallet');
@@ -81,7 +80,7 @@ const rlcFaucets = [
 const getRLC = async (chainName, account) => {
   const spinner = Spinner();
 
-  spinner.start(`Requesting ${chainName} faucet for nRLC...`);
+  spinner.start(`requesting ${chainName} faucet for nRLC...`);
   const responses = await Promise.all(rlcFaucets.map(faucet => faucet.getRLC(chainName, account)));
   const responsesString = rlcFaucets.reduce(
     (accu, curr, index) =>
@@ -100,19 +99,8 @@ const getRLC = async (chainName, account) => {
 
 const sendETH = async (chain, amount, to, account) => {
   const spinner = Spinner();
-
-  const answers = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'transfer',
-      message: `Do you want to send ${amount} ${
-        chain.name
-      } ETH to ${to} [chainID: ${chain.id}]`,
-    },
-  ]);
-  if (!answers.transfer) throw Error('Transfer aborted by user.');
-
-  spinner.start(`Sending ${amount} ${chain.name} ETH to ${to}...`);
+  const message = `${amount} ${chain.name} ETH from ${account} to ${to}`;
+  spinner.start(`sending ${message}...`);
 
   const txHash = await chain.ethjs.sendTransaction({
     from: account,
@@ -120,31 +108,20 @@ const sendETH = async (chain, amount, to, account) => {
     to,
     value: chain.EthJS.toWei(amount, 'ether'),
   });
-  spinner.info(`transfer txHash: ${txHash} \n`);
+  spinner.info(`transfer txHash: ${txHash}\n`);
 
-  spinner.start('waiting for transaction to be mined');
+  spinner.start(info.waitMiners());
   const txReceipt = await chain.contracts.waitForReceipt(txHash);
   debug('txReceipt:', txReceipt);
 
-  spinner.succeed(`${amount} ${chain.name} ETH sent from ${account} to ${to}\n`);
+  spinner.succeed(`Sent ${message}\n`);
   return txReceipt;
 };
 
 const sendRLC = async (chain, amount, to, token, account) => {
   const spinner = Spinner();
-
-  const answers = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'transfer',
-      message: `Do you want to send ${amount} ${
-        chain.name
-      } nRLC to ${to} [chainID: ${chain.id}]`,
-    },
-  ]);
-  if (!answers.transfer) throw Error('Transfer aborted by user.');
-
-  spinner.start(`Sending ${amount} ${chain.name} nRLC to ${to}...`);
+  const message = `${amount} ${chain.name} nRLC from ${account} to ${to}`;
+  spinner.start(`sending ${message}...`);
 
   const rlcAddress = token || getContractAddress(rlcJSON, chain.id);
   const rlcContract = chain.ethjs.contract(rlcJSON.abi).at(rlcAddress);
@@ -155,14 +132,14 @@ const sendRLC = async (chain, amount, to, token, account) => {
   });
   spinner.info(`transfer txHash: ${txHash} \n`);
 
-  spinner.start('waiting for transaction to be mined');
+  spinner.start(info.waitMiners());
   const txReceipt = await chain.contracts.waitForReceipt(txHash);
   debug('txReceipt:', txReceipt);
 
   const events = chain.contracts.decodeLogs(txReceipt.logs, rlcJSON.abi);
   debug('events', events);
 
-  spinner.succeed(`${amount} ${chain.name} nRLC sent from ${account} to ${to}\n`);
+  spinner.succeed(`Sent ${message}`);
   return events;
 };
 
