@@ -28,7 +28,17 @@ const waitFor = async (fn, hash) => {
   }
 };
 
-const getChains = (from, chainsConf, { signTransaction, accounts }) => {
+const getChains = (
+  from,
+  chainsConf,
+  {
+    signTransaction,
+    accounts,
+    signTypedData,
+    signMessage,
+    signPersonalMessage,
+  },
+) => {
   try {
     const chains = { names: Object.keys(chainsConf.chains) };
     chains.names.forEach((name) => {
@@ -36,6 +46,9 @@ const getChains = (from, chainsConf, { signTransaction, accounts }) => {
       const ethProvider = new SignerProvider(chain.host, {
         signTransaction,
         accounts,
+        signTypedData,
+        signMessage,
+        signPersonalMessage,
       });
 
       chains[name] = Object.assign({}, chain);
