@@ -3,7 +3,7 @@
 const cli = require('commander');
 const { help, handleError } = require('./cli-helper');
 const hub = require('./hub');
-const { loadChains, loadIExecConf } = require('./loader');
+const { loadChain, loadIExecConf } = require('./loader');
 const { loadAddress } = require('./keystore');
 
 const objName = 'app';
@@ -21,14 +21,14 @@ cli
   .description(`create a new ${objName}`)
   .action(async () => {
     try {
-      const [iexecConf, chains] = await Promise.all([
+      const [chain, iexecConf] = await Promise.all([
+        loadChain(cli.chain),
         loadIExecConf(),
-        loadChains(),
       ]);
       await hub.createObj(objName)(
         cli.hub,
         iexecConf[objName],
-        chains[cli.chain].contracts,
+        chain.contracts,
       );
     } catch (error) {
       handleError(error, objName);
@@ -41,8 +41,8 @@ cli
   .arguments('<addressOrIndex>')
   .action(async (addressOrIndex) => {
     try {
-      const [chains, walletAddress] = await Promise.all([
-        loadChains(),
+      const [chain, walletAddress] = await Promise.all([
+        loadChain(cli.chain),
         loadAddress(),
       ]);
       const userAddress = cli.user || walletAddress;
@@ -51,7 +51,7 @@ cli
         addressOrIndex,
         cli.hub,
         userAddress,
-        chains[cli.chain].contracts,
+        chain.contracts,
       );
     } catch (error) {
       handleError(error, objName);
@@ -63,8 +63,8 @@ cli
   .description(`get user ${objName} count`)
   .action(async () => {
     try {
-      const [chains, walletAddress] = await Promise.all([
-        loadChains(),
+      const [chain, walletAddress] = await Promise.all([
+        loadChain(cli.chain),
         loadAddress(),
       ]);
       const userAddress = cli.user || walletAddress;
@@ -73,7 +73,7 @@ cli
         cli.user,
         cli.hub,
         userAddress,
-        chains[cli.chain].contracts,
+        chain.contracts,
       );
     } catch (error) {
       handleError(error, objName);
