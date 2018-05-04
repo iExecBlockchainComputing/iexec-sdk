@@ -47,12 +47,12 @@ const createAndSave = async (options) => {
   return { wallet: userWallet, fileName };
 };
 
-const load = async ({ prefix = true, retry = true } = {}) => {
+const load = async ({ prefix = true, retry = true, lowercase } = {}) => {
   const cb = retry
     ? async () => {
       await prompt.create(WALLET_FILE_NAME);
       await createAndSave();
-      return load({ prefix, retry: false });
+      return load({ prefix, retry: false, lowercase });
     }
     : undefined;
 
@@ -60,6 +60,7 @@ const load = async ({ prefix = true, retry = true } = {}) => {
 
   const derivedUserWallet = walletFromPrivKey(privateKey, {
     prefix,
+    lowercase,
   });
   return derivedUserWallet;
 };
@@ -148,7 +149,7 @@ const sign = async (message, noncefn, data) => {
   try {
     const { privateKey } = await load({ prefix: false });
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const messageBuffer = Buffer.from(message, 'hex');
+    const messageBuffer = Buffer.from(message);
     const result = secp256k1.sign(messageBuffer, privKeyBuffer, {
       canonical: true,
       k: noncefn,
