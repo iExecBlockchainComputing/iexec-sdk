@@ -15,6 +15,13 @@ const info = {
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
 };
 
+const option = {
+  chain: () => ['--chain <name>', info.chainName(), 'ropsten'],
+  hub: () => ['--hub <address>', info.hubAddress()],
+  user: () => ['--user <address>', info.userAddress()],
+  auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
+};
+
 const helpMessage = () => {
   console.log('');
   console.log('  Links:');
@@ -124,4 +131,5 @@ module.exports = {
   Spinner,
   handleError,
   info,
+  option,
 };
