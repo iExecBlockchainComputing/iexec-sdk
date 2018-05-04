@@ -15,21 +15,21 @@ const writeFileAsync = Promise.promisify(fs.writeFile);
 const IEXEC_FILE_NAME = 'iexec.json';
 const CHAINS_FILE_NAME = 'chains.json';
 
-const saveJSONToFile = async (fileName, json, { force = false } = {}) => {
-  const userJSONWallet = JSON.stringify(json, null, 4);
+const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
+  const json = JSON.stringify(obj, null, 4);
   try {
     if (force) {
-      await writeFileAsync(fileName, userJSONWallet);
+      await writeFileAsync(fileName, json);
       return fileName;
     }
     const fd = await openAsync(fileName, 'wx');
-    await writeAsync(fd, userJSONWallet, 0, 'utf8');
+    await writeAsync(fd, json, 0, 'utf8');
     await fs.close(fd);
     return fileName;
   } catch (error) {
     if (error.code === 'EEXIST') {
       await prompt.overwrite(fileName);
-      await writeFileAsync(fileName, userJSONWallet);
+      await writeFileAsync(fileName, json);
       return fileName;
     }
     debug('saveJSONToFile()', error);
