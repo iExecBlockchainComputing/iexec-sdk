@@ -15,8 +15,8 @@ const writeFileAsync = Promise.promisify(fs.writeFile);
 const IEXEC_FILE_NAME = 'iexec.json';
 const CHAINS_FILE_NAME = 'chains.json';
 
-const saveJSONToFile = async (fileName, userWallet, { force = false } = {}) => {
-  const userJSONWallet = JSON.stringify(userWallet, null, 4);
+const saveJSONToFile = async (fileName, json, { force = false } = {}) => {
+  const userJSONWallet = JSON.stringify(json, null, 4);
   try {
     if (force) {
       await writeFileAsync(fileName, userJSONWallet);
