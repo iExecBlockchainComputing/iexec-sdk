@@ -2,9 +2,9 @@ const Debug = require('debug');
 const Promise = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
-const inquirer = require('inquirer');
 const keystore = require('./keystore');
 const { getChains } = require('./utils');
+const { prompt } = require('./cli-helper');
 
 const debug = Debug('iexec:utils');
 const openAsync = Promise.promisify(fs.open);
@@ -12,11 +12,10 @@ const writeAsync = Promise.promisify(fs.write);
 const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
 
-const saveJSON = async (
-  fileName,
-  userWallet,
-  { force = false, message = 'overwrite?' } = {},
-) => {
+const IEXEC_FILE_NAME = 'iexec.json';
+const CHAINS_FILE_NAME = 'chains.json';
+
+const saveJSONToFile = async (fileName, userWallet, { force = false } = {}) => {
   const userJSONWallet = JSON.stringify(userWallet, null, 4);
   try {
     if (force) {
@@ -29,20 +28,11 @@ const saveJSON = async (
     return fileName;
   } catch (error) {
     if (error.code === 'EEXIST') {
-      const answers = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'overwrite',
-          message,
-        },
-      ]);
-      if (answers.overwrite) {
-        await writeFileAsync(fileName, userJSONWallet);
-        return fileName;
-      }
-      throw Error('Aborted by user. keeping old wallet');
+      await prompt.overwrite(fileName);
+      await writeFileAsync(fileName, userJSONWallet);
+      return fileName;
     }
-    debug('save() error', error);
+    debug('saveJSONToFile()', error);
     throw error;
   }
 };
@@ -52,18 +42,27 @@ const loadJSONFile = async (fileName) => {
     const filePath = path.join(process.cwd(), fileName);
     const fileJSON = await readFileAsync(filePath);
     const file = JSON.parse(fileJSON);
-    debug(fileName, file);
     return file;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      throw new Error(`Aborting. You need "${fileName}" config file to continue`);
+      throw new Error(`Aborting. You need "${fileName}" file to continue`);
     }
     debug('loadFile() error', error);
     throw error;
   }
 };
-const loadIExecConf = () => loadJSONFile('iexec.json');
-const loadChainsConf = () => loadJSONFile('chains.json');
+const loadIExecConf = options => loadJSONFile(IEXEC_FILE_NAME, options);
+const loadChainsConf = options => loadJSONFile(CHAINS_FILE_NAME, options);
+
+const loadJSONAndRetry = async (fileName, retry, options = {}) => {
+  try {
+    const file = await loadJSONFile(fileName, options);
+    return file;
+  } catch (error) {
+    if (retry) return retry;
+    throw error;
+  }
+};
 
 const loadChains = async () => {
   try {
@@ -90,9 +89,10 @@ const loadChain = async (chainName) => {
 };
 
 module.exports = {
-  saveJSON,
+  saveJSONToFile,
   loadIExecConf,
   loadChainsConf,
-  loadChain,
+  loadJSONAndRetry,
   loadChains,
+  loadChain,
 };
