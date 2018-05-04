@@ -6,6 +6,13 @@ const debug = Debug('help');
 
 const info = {
   waitMiners: () => 'waiting for transaction to be mined...',
+  hubAddress: () =>
+    'interact with the iExec Hub at a custom smart contract address',
+  chainName: () => 'chain name from "chains.json", ex: ropsten',
+  userAddress: () => 'custom user address',
+  createObj: objName => `create a new ${objName}`,
+  showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
+  countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
 };
 
 const helpMessage = () => {

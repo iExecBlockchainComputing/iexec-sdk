@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help, handleError } = require('./cli-helper');
+const { help, handleError, info } = require('./cli-helper');
 const hub = require('./hub');
 const { loadChain, loadIExecConf } = require('./loader');
 const { loadAddress } = require('./keystore');
@@ -9,16 +9,13 @@ const { loadAddress } = require('./keystore');
 const objName = 'dataset';
 
 cli
-  .option('--chain <name>', 'chain name', 'ropsten')
-  .option(
-    '--hub <address>',
-    'interact with the iExec Hub at a specific smart contract address',
-  )
-  .option('--user <address>', 'custom user address parameter');
+  .option('--chain <name>', info.chainName(), 'ropsten')
+  .option('--hub <address>', info.hubAddress())
+  .option('--user <address>', info.userAddress());
 
 cli
   .command('create')
-  .description(`create a new ${objName}`)
+  .description(info.createObj(objName))
   .action(async () => {
     try {
       const [chain, iexecConf] = await Promise.all([
@@ -33,7 +30,7 @@ cli
 
 cli
   .command('show')
-  .description(`show user ${objName} details`)
+  .description(info.showObj(objName))
   .arguments('<addressOrIndex>')
   .action(async (addressOrIndex) => {
     try {
@@ -56,7 +53,7 @@ cli
 
 cli
   .command('count')
-  .description(`get user ${objName} count`)
+  .description(info.countObj(objName))
   .action(async () => {
     try {
       const [chain, walletAddress] = await Promise.all([

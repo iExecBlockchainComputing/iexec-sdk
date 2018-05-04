@@ -2,21 +2,18 @@
 
 const cli = require('commander');
 const hub = require('./hub');
-const { handleError, help } = require('./cli-helper');
+const { handleError, help, info } = require('./cli-helper');
 const { loadIExecConf, loadChain } = require('./loader');
 
 const objName = 'category';
 
 cli
-  .option('--chain <name>', 'network name', 'ropsten')
-  .option(
-    '--hub <address>',
-    'interact with the iExec Hub at a custom smart contract address',
-  );
+  .option('--chain <name>', info.chainName(), 'ropsten')
+  .option('--hub <address>', info.hubAddress());
 
 cli
   .command('create')
-  .description(`create a new ${objName}`)
+  .description(info.createObj(objName))
   .action(async () => {
     try {
       const [iexecConf, chain] = await Promise.all([
@@ -31,7 +28,7 @@ cli
 
 cli
   .command('show')
-  .description(`show all details about a ${objName}`)
+  .description(info.showObj(objName, 'hub'))
   .arguments('<index>')
   .action(async (index) => {
     try {
@@ -44,7 +41,7 @@ cli
 
 cli
   .command('count')
-  .description('count categories')
+  .description(info.showObj(objName, 'hub'))
   .action(async () => {
     try {
       const chain = await loadChain(cli.chain);
