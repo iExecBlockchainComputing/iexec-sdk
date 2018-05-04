@@ -72,8 +72,56 @@ const countObj = objName => async (
   return objCount;
 };
 
+const createCategory = async (hubAddress, obj, contracts) => {
+  const spinner = Spinner();
+  spinner.start('creating category...');
+  const txHash = await contracts.createCategory(obj, {
+    hub: hubAddress,
+  });
+
+  const txReceipt = await contracts.waitForReceipt(txHash);
+  debug('txReceipt', txReceipt);
+
+  const events = contracts.decodeHubLogs(txReceipt.logs);
+  debug('events', events);
+
+  spinner.succeed(`new category created at index ${events[0].catid}`);
+  return events;
+};
+
+const showCategory = async (index, hubAddress, contracts, objName) => {
+  const spinner = Spinner();
+  spinner.start(`showing ${objName}...`);
+
+  const category = await contracts.getCategoryByIndex(index, {
+    hub: hubAddress,
+  });
+
+  spinner.succeed(`${objName} at index ${index} details:\n${JSON.stringify(
+    category,
+    null,
+    4,
+  )}`);
+  return category;
+};
+
+const countCategory = async (hubAddress, contracts, objName) => {
+  const spinner = Spinner();
+  spinner.start(`counting ${objName}...`);
+
+  const count = await contracts.getHubCategoryCount({
+    address: hubAddress,
+  });
+
+  spinner.succeed(`iExec hub has a total of ${count} ${objName}`);
+  return count;
+};
+
 module.exports = {
   createObj,
   showObj,
   countObj,
+  createCategory,
+  showCategory,
+  countCategory,
 };
