@@ -4,6 +4,10 @@ const Ora = require('ora');
 
 const debug = Debug('help');
 
+const info = {
+  waitMiners: () => 'waiting for transaction to be mined...',
+};
+
 const helpMessage = () => {
   console.log('');
   console.log('  Links:');
@@ -112,4 +116,5 @@ module.exports = {
   help,
   Spinner,
   handleError,
+  info,
 };
