@@ -28,11 +28,11 @@ const loadChainsConf = () => loadJSONFile('chains.json');
 
 const loadChains = async () => {
   try {
-    const [userWallet, chainsConf] = await Promise.all([
-      keystore.load(),
+    const [address, chainsConf] = await Promise.all([
+      keystore.loadAddress(),
       loadChainsConf(),
     ]);
-    const chains = getChains(userWallet, chainsConf, keystore);
+    const chains = getChains(address, chainsConf, keystore);
     return chains;
   } catch (error) {
     debug('loadChains()', error);
@@ -40,8 +40,19 @@ const loadChains = async () => {
   }
 };
 
+const loadChain = async (chainName) => {
+  try {
+    const chains = await loadChains();
+    return chains[chainName];
+  } catch (error) {
+    debug('loadChain()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   loadIExecConf,
   loadChainsConf,
+  loadChain,
   loadChains,
 };
