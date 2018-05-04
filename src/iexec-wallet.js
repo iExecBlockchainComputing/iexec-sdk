@@ -6,53 +6,103 @@ const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const wallet = require('./wallet');
 const keystore = require('./keystore');
 const { handleError, help, Spinner } = require('./cli-helper');
-const {
-  getChains,
-  truffleConfig,
-  getRPCObjValue,
-  getContractAddress,
-} = require('./utils');
+const { getRPCObjValue, getContractAddress } = require('./utils');
+const { loadChains, loadChain } = require('./loader');
 
 const debug = Debug('iexec:iexec-wallet');
+const objName = 'wallet';
 
 cli
   .option('--to <address>', 'receiver address')
   .option('--chain <name>', 'chain name', 'ropsten')
-  .option('--token <address>', 'erc20 token contract address');
+  .option('--token <address>', 'custom erc20 token contract address')
+  .option('--force', 'force wallet creation even if old wallet exists', false);
 
 cli
   .command('create')
   .description('create a local wallet')
-  .action(() =>
-    wallet.create().catch((e) => {
-      debug(e);
-      handleError(e, 'wallet');
-    }));
+  .action(async () => {
+    const spinner = Spinner();
+    try {
+      const res = await keystore.createAndSave({ force: cli.force || false });
+      spinner.succeed(`wallet save in "${res.fileName}":\n${JSON.stringify(
+        res.wallet,
+        null,
+        2,
+      )}`);
+    } catch (error) {
+      handleError(error, objName, spinner);
+    }
+  });
 
 cli
   .command('getETH')
   .description('apply for ETH from pre-registered faucets')
-  .action(() => wallet.getETH(cli.chain).catch(handleError('wallet')));
+  .action(async () => {
+    try {
+      const address = await keystore.loadAddress();
+      await wallet.getETH(cli.chain, address);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('getRLC')
   .description('apply for nRLC from iexec faucet')
-  .action(() => wallet.getRLC(cli.chain).catch(handleError('wallet')));
+  .action(async () => {
+    try {
+      const address = await keystore.loadAddress();
+      await wallet.getRLC(cli.chain, address);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('sendETH <amount>')
   .description('send ETH to an address')
-  .action(amount => wallet.sendETH(cli.chain, amount, cli.to));
+  .action(async (amount) => {
+    try {
+      const [address, chain] = await Promise.all([
+        keystore.loadAddress(),
+        loadChain(cli.chain),
+      ]);
+      await wallet.sendETH(chain, amount, cli.to, address);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('sendRLC <amount>')
   .description('send nRLC to an address')
-  .action(amount => wallet.sendRLC(cli.chain, amount, cli.to, cli.token));
+  .action(async (amount) => {
+    try {
+      const [address, chain] = await Promise.all([
+        keystore.loadAddress(),
+        loadChain(cli.chain),
+      ]);
+      await wallet.sendRLC(chain, amount, cli.to, cli.token, address);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('sweep')
   .description('send all ETH and RLC to an address')
-  .action(() => wallet.sweep(cli.chain, cli.to, cli.token));
+  .action(async () => {
+    try {
+      const [address, chain] = await Promise.all([
+        keystore.loadAddress(),
+        loadChain(cli.chain),
+      ]);
+      await wallet.sweep(chain, cli.to, cli.token, address);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('show [address]')
@@ -64,12 +114,11 @@ cli
       if (address) userWallet = { address };
 
       spinner.info(`Wallet:\n${JSON.stringify(userWallet, null, 2)}\n`);
-      spinner.start('Checking ETH balances...');
+      spinner.start('checking ETH balances...');
 
-      const chains = getChains();
+      const chains = await loadChains();
 
-      const networkNames = Object.keys(truffleConfig.networks);
-      const ethBalances = await Promise.all(networkNames.map(name =>
+      const ethBalances = await Promise.all(chains.names.map(name =>
         chains[name].ethjs
           .getBalance(userWallet.address)
           .then(balance => chains[name].EthJS.fromWei(balance, 'ether'))
@@ -80,10 +129,10 @@ cli
 
       const ethBalancesString = ethBalances.reduce(
         (accu, curr, index) =>
-          accu.concat(`  [${chains[networkNames[index]].id}] ${
-            networkNames[index]
+          accu.concat(`  [${chains[chains.names[index]].id}] ${
+            chains.names[index]
           }: \t ${curr} ETH \t\t https://${
-            networkNames[index]
+            chains.names[index]
           }.etherscan.io/address/${userWallet.address}\n`),
         '',
       );
@@ -92,11 +141,12 @@ cli
 
       spinner.info('Run "iexec wallet getETH" to top up your ETH account\n');
 
-      spinner.start('Checking nRLC balances...');
+      spinner.start('checking nRLC balances...');
 
-      const rlcBalances = await Promise.all(networkNames.map((name) => {
+      const rlcBalances = await Promise.all(chains.names.map((name) => {
         const rlcAddress =
-            cli.token || getContractAddress(rlcJSON, chains[name].id);
+            cli.token ||
+            getContractAddress(rlcJSON, chains[name].id, { strict: false });
         const rlcContract = chains[name].ethjs
           .contract(rlcJSON.abi)
           .at(rlcAddress);
@@ -111,8 +161,8 @@ cli
 
       const rlcBalancesString = rlcBalances.reduce(
         (accu, curr, index) =>
-          accu.concat(`  [${chains[networkNames[index]].id}] ${
-            networkNames[index]
+          accu.concat(`  [${chains[chains.names[index]].id}] ${
+            chains.names[index]
           }: \t ${curr} nRLC\n`),
         '',
       );
