@@ -36,12 +36,17 @@ const walletFromPrivKey = (
   return userWallet;
 };
 
-const save = async (userWallet) => {
+const save = async (userWallet, { force = false } = {}) => {
   const userJSONWallet = JSON.stringify(userWallet, null, 4);
   try {
+    if (force) {
+      await writeFileAsync(WALLET_FILE_NAME, userJSONWallet);
+      return WALLET_FILE_NAME;
+    }
     const fd = await openAsync(WALLET_FILE_NAME, 'wx');
     await writeAsync(fd, userJSONWallet, 0, 'utf8');
-    return fs.close(fd);
+    await fs.close(fd);
+    return WALLET_FILE_NAME;
   } catch (error) {
     if (error.code === 'EEXIST') {
       const answers = await inquirer.prompt([
@@ -52,20 +57,20 @@ const save = async (userWallet) => {
         },
       ]);
       if (answers.overwrite) {
-        return writeFileAsync(WALLET_FILE_NAME, userJSONWallet);
+        await writeFileAsync(WALLET_FILE_NAME, userJSONWallet);
+        return WALLET_FILE_NAME;
       }
-      throw Error('keeping old wallet');
+      throw Error('Aborted by user. keeping old wallet');
     }
     debug('save() error', error);
     throw error;
   }
 };
 
-const create = async () => {
+const createAndSave = async (options) => {
   const userWallet = generate(uuidv4());
-  await save(userWallet);
-  console.log('Wallet successfully created!');
-  return userWallet;
+  const fileName = await save(userWallet, options);
+  return { wallet: userWallet, fileName };
 };
 
 const load = async ({ suffix = true } = {}) => {
@@ -87,7 +92,7 @@ const load = async ({ suffix = true } = {}) => {
         },
       ]);
       if (answers.create) {
-        return create();
+        return createAndSave();
       }
 
       throw new Error('Aborting. You need a wallet to continue');
@@ -129,7 +134,7 @@ const accounts = async () => {
 module.exports = {
   walletFromPrivKey,
   save,
-  create,
+  createAndSave,
   load,
   loadAddress,
   accounts,
