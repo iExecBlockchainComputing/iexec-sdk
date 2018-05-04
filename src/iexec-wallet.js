@@ -48,7 +48,7 @@ cli
   .description(desc.getETH())
   .action(async () => {
     try {
-      const address = await keystore.loadAddress();
+      const { address } = await keystore.load();
       await wallet.getETH(cli.chain, address);
     } catch (error) {
       handleError(error, objName);
@@ -60,7 +60,7 @@ cli
   .description(desc.getRLC())
   .action(async () => {
     try {
-      const address = await keystore.loadAddress();
+      const { address } = await keystore.load();
       await wallet.getRLC(cli.chain, address);
     } catch (error) {
       handleError(error, objName);
@@ -72,8 +72,8 @@ cli
   .description(desc.sendETH())
   .action(async (amount) => {
     try {
-      const [address, chain] = await Promise.all([
-        keystore.loadAddress(),
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
         loadChain(cli.chain),
       ]);
 
@@ -101,8 +101,8 @@ cli
   .description(desc.sendRLC())
   .action(async (amount) => {
     try {
-      const [address, chain] = await Promise.all([
-        keystore.loadAddress(),
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
         loadChain(cli.chain),
       ]);
 
@@ -130,8 +130,8 @@ cli
   .description(desc.sweep())
   .action(async () => {
     try {
-      const [address, chain] = await Promise.all([
-        keystore.loadAddress(),
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
         loadChain(cli.chain),
       ]);
       await wallet.sweep(chain, cli.to, cli.token, address);
