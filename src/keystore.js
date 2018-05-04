@@ -130,7 +130,7 @@ const signPersonalMessage = async (msgHex) => {
   }
 };
 
-const signTypedData = async (withAccount, typedData) => {
+const signTypedData = async (typedData) => {
   try {
     const { privateKey } = await load();
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
