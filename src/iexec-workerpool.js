@@ -3,15 +3,15 @@
 const cli = require('commander');
 const { help, handleError, info } = require('./cli-helper');
 const hub = require('./hub');
-const { loadChain, loadIExecConf } = require('./loader');
+const { loadChain, loadIExecConf, option } = require('./loader');
 const { loadAddress } = require('./keystore');
 
 const objName = 'workerPool';
 
 cli
-  .option('--chain <name>', info.chainName(), 'ropsten')
-  .option('--hub <address>', info.hubAddress())
-  .option('--user <address>', info.userAddress());
+  .option(...option.chain())
+  .option(...option.hub())
+  .option(...option.user());
 
 cli
   .command('create')

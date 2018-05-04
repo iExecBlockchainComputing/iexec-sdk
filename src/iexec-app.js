@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help, handleError, info } = require('./cli-helper');
+const {
+  help, handleError, info, option,
+} = require('./cli-helper');
 const hub = require('./hub');
 const { loadChain, loadIExecConf } = require('./loader');
 const { loadAddress } = require('./keystore');
@@ -9,9 +11,9 @@ const { loadAddress } = require('./keystore');
 const objName = 'app';
 
 cli
-  .option('--chain <name>', info.chainName(), 'ropsten')
-  .option('--hub <address>', info.hubAddress())
-  .option('--user <address>', info.userAddress());
+  .option(...option.chain())
+  .option(...option.hub())
+  .option(...option.user());
 
 cli
   .command('create')
