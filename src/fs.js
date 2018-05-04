@@ -6,7 +6,7 @@ const keystore = require('./keystore');
 const { getChains } = require('./utils');
 const { prompt } = require('./cli-helper');
 
-const debug = Debug('iexec:utils');
+const debug = Debug('iexec:fs');
 const openAsync = Promise.promisify(fs.open);
 const writeAsync = Promise.promisify(fs.write);
 const readFileAsync = Promise.promisify(fs.readFile);
@@ -66,8 +66,8 @@ const loadJSONAndRetry = async (fileName, retry, options = {}) => {
 
 const loadChains = async () => {
   try {
-    const [address, chainsConf] = await Promise.all([
-      keystore.loadAddress(),
+    const [{ address }, chainsConf] = await Promise.all([
+      keystore.load(),
       loadChainsConf(),
     ]);
     const chains = getChains(address, chainsConf, keystore);

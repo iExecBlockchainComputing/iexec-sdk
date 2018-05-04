@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help, handleError, desc } = require('./cli-helper');
+const {
+  help, handleError, desc, option,
+} = require('./cli-helper');
 const hub = require('./hub');
-const { loadChain, loadIExecConf, option } = require('./fs');
+const { loadIExecConf } = require('./fs');
 const { load } = require('./keystore');
+const { loadChain } = require('./chains.js');
 
 const objName = 'workerPool';
 

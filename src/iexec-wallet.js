@@ -15,7 +15,7 @@ const {
   info,
 } = require('./cli-helper');
 const { getRPCObjValue, getContractAddress } = require('./utils');
-const { loadChains, loadChain } = require('./fs');
+const { loadChains, loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-wallet');
 const objName = 'wallet';
