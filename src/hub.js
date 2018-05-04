@@ -1,102 +1,75 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const { loadIEXECConf, getChains, isEthAddress } = require('./utils');
-const wallet = require('./wallet');
-const { handleError, Spinner } = require('./cli-helper');
+const { isEthAddress } = require('./utils');
+const { Spinner } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
 
-const createObj = objName => async (chainName, hubAddress) => {
+const createObj = objName => async (hubAddress, obj, contracts) => {
   const spinner = Spinner();
-  try {
-    const iexecConf = await loadIEXECConf();
+  spinner.start(`creating ${objName}...`);
+  const txHash = await contracts.createObj(objName)(obj, {
+    hub: hubAddress,
+  });
 
-    spinner.start(`creating ${objName}...`);
-    const chain = getChains()[chainName];
+  const txReceipt = await contracts.waitForReceipt(txHash);
+  debug('txReceipt', txReceipt);
 
-    const txHash = await chain.contracts.createObj(objName)(
-      iexecConf[objName],
-      {
-        hub: hubAddress,
-      },
-    );
+  const events = contracts.decodeHubLogs(txReceipt.logs);
+  debug('events', events);
 
-    const txReceipt = await chain.contracts.waitForReceipt(txHash);
-    debug('txReceipt', txReceipt);
-
-    const events = chain.contracts.decodeHubLogs(txReceipt.logs);
-    debug('events', events);
-
-    spinner.succeed(`new ${objName} created at address ${events[0][objName]}`);
-  } catch (error) {
-    handleError(error, objName, spinner);
-  }
+  spinner.succeed(`new ${objName} created at address ${events[0][objName]}`);
+  return events;
 };
 
 const showObj = objName => async (
-  chainName,
-  cliAppAddressOrIndex,
+  objAdressOrIndex,
   cliHubAddress,
-  cliUserAddress,
+  userAddress,
+  contracts,
 ) => {
   const spinner = Spinner();
-  try {
-    const userWallet = await wallet.load();
-    const chain = getChains()[chainName];
-
-    spinner.start('creating app...');
-    let objAddress;
-    if (
-      !ethUtil.isHexString(cliAppAddressOrIndex) &&
-      Number.isInteger(Number(cliAppAddressOrIndex))
-    ) {
-      // INDEX case: need hit subHub to get obj address from index
-      const userAddress = cliUserAddress || userWallet.address;
-      debug('userAddress', userAddress);
-
-      objAddress = await chain.contracts.getUserObjAddressByIndex(objName)(
-        userAddress,
-        cliAppAddressOrIndex,
-        { hub: cliHubAddress },
-      );
-    } else if (isEthAddress(cliAppAddressOrIndex)) {
-      objAddress = cliAppAddressOrIndex;
-    } else {
-      throw Error('cli argument is neither an integer nor a valid ethereum address');
-    }
-
-    const obj = await chain.contracts.getObjProps(objName)(objAddress, {
-      hub: cliHubAddress,
-    });
-
-    spinner.succeed(`${objName} ${objAddress} details:\n${JSON.stringify(obj, null, 4)}`);
-  } catch (error) {
-    handleError(error, objName, spinner);
+  spinner.start(`showing ${objName}...`);
+  let objAddress;
+  if (
+    !ethUtil.isHexString(objAdressOrIndex) &&
+    Number.isInteger(Number(objAdressOrIndex))
+  ) {
+    // INDEX case: need hit subHub to get obj address from index
+    objAddress = await contracts.getUserObjAddressByIndex(objName)(
+      userAddress,
+      objAdressOrIndex,
+      { hub: cliHubAddress },
+    );
+  } else if (isEthAddress(objAdressOrIndex)) {
+    objAddress = objAdressOrIndex;
+  } else {
+    throw Error('argument is neither an integer index nor a valid ethereum address');
   }
+
+  const obj = await contracts.getObjProps(objName)(objAddress, {
+    hub: cliHubAddress,
+  });
+
+  spinner.succeed(`${objName} ${objAddress} details:\n${JSON.stringify(obj, null, 4)}`);
+  return obj;
 };
 
-const countObj = objName => async (chainName, cliUserAddress, hubAddress) => {
+const countObj = objName => async (
+  cliUserAddress,
+  hubAddress,
+  userAddress,
+  contracts,
+) => {
   const spinner = Spinner();
-  try {
-    const userWallet = await wallet.load();
-    const chain = getChains()[chainName];
+  spinner.start(`counting ${objName}...`);
 
-    const userAddress = cliUserAddress || userWallet.address;
-    debug('userAddress', userAddress);
+  const objCount = await contracts.getUserObjCount(objName)(userAddress, {
+    hub: hubAddress,
+  });
 
-    spinner.start(`counting ${objName}...`);
-
-    const objCount = await chain.contracts.getUserObjCount(objName)(
-      userAddress,
-      {
-        hub: hubAddress,
-      },
-    );
-
-    spinner.succeed(`user ${userAddress} has a total of ${objCount} ${objName}`);
-  } catch (error) {
-    handleError(error, objName, spinner);
-  }
+  spinner.succeed(`user ${userAddress} has a total of ${objCount} ${objName}`);
+  return objCount;
 };
 
 module.exports = {
