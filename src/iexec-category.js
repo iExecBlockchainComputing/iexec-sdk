@@ -5,7 +5,7 @@ const hub = require('./hub');
 const {
   handleError, help, desc, option,
 } = require('./cli-helper');
-const { loadIExecConf, loadChain } = require('./loader');
+const { loadIExecConf, loadChain } = require('./fs');
 
 const objName = 'category';
 

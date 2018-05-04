@@ -5,7 +5,7 @@ const {
   help, handleError, desc, option,
 } = require('./cli-helper');
 const hub = require('./hub');
-const { loadChain, loadIExecConf } = require('./loader');
+const { loadChain, loadIExecConf } = require('./fs');
 const { loadAddress } = require('./keystore');
 
 const objName = 'dataset';

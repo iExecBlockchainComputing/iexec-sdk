@@ -3,8 +3,8 @@
 const cli = require('commander');
 const { help, handleError, desc } = require('./cli-helper');
 const hub = require('./hub');
-const { loadChain, loadIExecConf, option } = require('./loader');
-const { loadAddress } = require('./keystore');
+const { loadChain, loadIExecConf, option } = require('./fs');
+const { load } = require('./keystore');
 
 const objName = 'workerPool';
 
@@ -33,11 +33,11 @@ cli
   .description(desc.showObj(objName))
   .action(async (addressOrIndex) => {
     try {
-      const [chain, walletAddress] = await Promise.all([
+      const [chain, { address }] = await Promise.all([
         loadChain(cli.chain),
-        loadAddress(),
+        load(),
       ]);
-      const userAddress = cli.user || walletAddress;
+      const userAddress = cli.user || address;
 
       hub.showObj(objName)(
         addressOrIndex,
@@ -55,11 +55,11 @@ cli
   .description(desc.countObj(objName))
   .action(async () => {
     try {
-      const [chain, walletAddress] = await Promise.all([
+      const [chain, { address }] = await Promise.all([
         loadChain(cli.chain),
-        loadAddress(),
+        load(),
       ]);
-      const userAddress = cli.user || walletAddress;
+      const userAddress = cli.user || address;
 
       hub.countObj(objName)(cli.user, cli.hub, userAddress, chain.contracts);
     } catch (error) {
