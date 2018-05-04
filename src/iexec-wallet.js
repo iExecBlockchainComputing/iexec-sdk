@@ -6,7 +6,14 @@ const inquirer = require('inquirer');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const wallet = require('./wallet');
 const keystore = require('./keystore');
-const { handleError, help, Spinner } = require('./cli-helper');
+const {
+  handleError,
+  help,
+  Spinner,
+  option,
+  desc,
+  info,
+} = require('./cli-helper');
 const { getRPCObjValue, getContractAddress } = require('./utils');
 const { loadChains, loadChain } = require('./loader');
 
@@ -14,14 +21,14 @@ const debug = Debug('iexec:iexec-wallet');
 const objName = 'wallet';
 
 cli
-  .option('--to <address>', 'receiver address')
-  .option('--chain <name>', 'chain name', 'ropsten')
-  .option('--token <address>', 'custom erc20 token contract address')
-  .option('--force', 'force wallet creation even if old wallet exists', false);
+  .option(...option.to())
+  .option(...option.chain())
+  .option(...option.token())
+  .option(...option.force());
 
 cli
   .command('create')
-  .description('create a local wallet')
+  .description(desc.createObj(objName))
   .action(async () => {
     const spinner = Spinner();
     try {
@@ -38,7 +45,7 @@ cli
 
 cli
   .command('getETH')
-  .description('apply for ETH from pre-registered faucets')
+  .description(desc.getETH())
   .action(async () => {
     try {
       const address = await keystore.loadAddress();
@@ -50,7 +57,7 @@ cli
 
 cli
   .command('getRLC')
-  .description('apply for nRLC from iexec faucet')
+  .description(desc.getRLC())
   .action(async () => {
     try {
       const address = await keystore.loadAddress();
@@ -62,7 +69,7 @@ cli
 
 cli
   .command('sendETH <amount>')
-  .description('send ETH to an address')
+  .description(desc.sendETH())
   .action(async (amount) => {
     try {
       const [address, chain] = await Promise.all([
@@ -91,7 +98,7 @@ cli
 
 cli
   .command('sendRLC <amount>')
-  .description('send nRLC to an address')
+  .description(desc.sendRLC())
   .action(async (amount) => {
     try {
       const [address, chain] = await Promise.all([
@@ -120,7 +127,7 @@ cli
 
 cli
   .command('sweep')
-  .description('send all ETH and RLC to an address')
+  .description(desc.sweep())
   .action(async () => {
     try {
       const [address, chain] = await Promise.all([
@@ -135,7 +142,7 @@ cli
 
 cli
   .command('show [address]')
-  .description('show local wallet balances')
+  .description(desc.showObj(objName, 'address'))
   .action(async (address) => {
     const spinner = Spinner();
     try {
@@ -143,7 +150,7 @@ cli
       if (address) userWallet = { address };
 
       spinner.info(`Wallet:\n${JSON.stringify(userWallet, null, 2)}\n`);
-      spinner.start('checking ETH balances...');
+      spinner.start(info.checkBalance('ETH'));
 
       const chains = await loadChains();
 
@@ -168,9 +175,9 @@ cli
 
       spinner.succeed(`ETH balances:\n\n${ethBalancesString}`);
 
-      spinner.info('Run "iexec wallet getETH" to top up your ETH account\n');
+      spinner.info(info.topUp('ETH'));
 
-      spinner.start('checking nRLC balances...');
+      spinner.start(info.checkBalance('nRLC'));
 
       const rlcBalances = await Promise.all(chains.names.map((name) => {
         const rlcAddress =
@@ -197,7 +204,7 @@ cli
       );
       spinner.succeed(`nRLC balances:\n\n${rlcBalancesString}`);
 
-      spinner.info('Run "iexec wallet getRLC" to top up your nRLC account\n');
+      spinner.info(info.topUp('RLC'));
     } catch (error) {
       handleError(error, 'wallet', spinner);
     }

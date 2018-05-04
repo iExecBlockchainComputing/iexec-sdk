@@ -6,6 +6,9 @@ const debug = Debug('help');
 
 const info = {
   waitMiners: () => 'waiting for transaction to be mined...',
+  checkBalance: currency => `checking ${currency} balances...`,
+  topUp: currency =>
+    `Run "iexec wallet get${currency}" to top up your ${currency} account`,
 };
 
 const desc = {
@@ -18,6 +21,11 @@ const desc = {
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   login: () => 'login into your iexec account',
   deposit: () => 'deposit nRLC on your iexec account',
+  getETH: () => 'apply for ETH from pre-registered faucets',
+  getRLC: () => 'apply for nRLC from iExec faucet',
+  sendETH: () => 'send ETH to an address',
+  sendRLC: () => 'send nRLC to an address',
+  sweep: () => 'send all ETH and RLC to an address',
 };
 
 const option = {
@@ -25,6 +33,13 @@ const option = {
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
+  to: () => ['--to <address>', 'receiver address'],
+  token: () => ['--token <address>', 'custom erc20 token contract address'],
+  force: () => [
+    '--force',
+    'force wallet creation even if old wallet exists',
+    false,
+  ],
 };
 
 const helpMessage = () => {
