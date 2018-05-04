@@ -2,6 +2,7 @@
 
 const Debug = require('debug');
 const cli = require('commander');
+const inquirer = require('inquirer');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const wallet = require('./wallet');
 const keystore = require('./keystore');
@@ -68,6 +69,20 @@ cli
         keystore.loadAddress(),
         loadChain(cli.chain),
       ]);
+
+      if (!cli.force) {
+        const answers = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'transfer',
+            message: `Do you want to send ${amount} ${chain.name} ETH to ${
+              cli.to
+            } [chainID: ${chain.id}]`,
+          },
+        ]);
+        if (!answers.transfer) throw Error('Transfer aborted by user.');
+      }
+
       await wallet.sendETH(chain, amount, cli.to, address);
     } catch (error) {
       handleError(error, objName);
@@ -83,6 +98,20 @@ cli
         keystore.loadAddress(),
         loadChain(cli.chain),
       ]);
+
+      if (!cli.force) {
+        const answers = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'transfer',
+            message: `Do you want to send ${amount} ${chain.name} nRLC to ${
+              cli.to
+            } [chainID: ${chain.id}]`,
+          },
+        ]);
+        if (!answers.transfer) throw Error('Transfer aborted by user.');
+      }
+
       await wallet.sendRLC(chain, amount, cli.to, cli.token, address);
     } catch (error) {
       handleError(error, objName);
