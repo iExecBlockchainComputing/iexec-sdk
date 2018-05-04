@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const colors = require('colors/safe');
 const Ora = require('ora');
+const inquirer = require('inquirer');
 
 const debug = Debug('help');
 
@@ -10,6 +11,7 @@ const info = {
   topUp: currency =>
     `Run "iexec wallet get${currency}" to top up your ${currency} account`,
   userAborted: () => 'operation aborted by user.',
+  logging: () => 'logging into iExec...',
 };
 
 const desc = {
@@ -41,6 +43,24 @@ const option = {
     'force wallet creation even if old wallet exists',
     false,
   ],
+};
+
+const question = async (message, error = 'operation aborted by user') => {
+  const answer = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'ok',
+      message,
+    },
+  ]);
+  if (answer.ok) return true;
+  throw Error(error);
+};
+
+const prompt = {
+  create: file => question(`You don't have a ${file} yet, create one?`),
+  overwrite: file =>
+    question(`${file} already exists, replace it with new one?`),
 };
 
 const helpMessage = () => {
@@ -154,4 +174,5 @@ module.exports = {
   info,
   desc,
   option,
+  prompt,
 };
