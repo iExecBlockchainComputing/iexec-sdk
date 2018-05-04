@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help } = require('./cli-helper');
+const { help, handleError } = require('./cli-helper');
 const hub = require('./hub');
+const { loadChains, loadIExecConf } = require('./loader');
+const { loadAddress } = require('./keystore');
+
+const objName = 'dataset';
 
 cli
   .option('--chain <name>', 'chain name', 'ropsten')
@@ -14,22 +18,66 @@ cli
 
 cli
   .command('create')
-  .description('create a new dataset')
-  .action(() => {
-    console.log(cli);
-    return hub.createObj('dataset')(cli.chain, cli.hub);
+  .description(`create a new ${objName}`)
+  .action(async () => {
+    try {
+      const [iexecConf, chains] = await Promise.all([
+        loadIExecConf(),
+        loadChains(),
+      ]);
+      hub.createObj(objName)(
+        cli.hub,
+        iexecConf[objName],
+        chains[cli.chain].contracts,
+      );
+    } catch (error) {
+      handleError(error, objName);
+    }
   });
 
 cli
   .command('show')
-  .description('show all details about an dataset')
+  .description(`show user ${objName} details`)
   .arguments('<addressOrIndex>')
-  .action(addressOrIndex =>
-    hub.showObj('dataset')(cli.chain, addressOrIndex, cli.hub, cli.user));
+  .action(async (addressOrIndex) => {
+    try {
+      const [chains, walletAddress] = await Promise.all([
+        loadChains(),
+        loadAddress(),
+      ]);
+      const userAddress = cli.user || walletAddress;
+
+      hub.showObj(objName)(
+        addressOrIndex,
+        cli.hub,
+        userAddress,
+        chains[cli.chain].contracts,
+      );
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('count')
-  .description('count a user datasets')
-  .action(() => hub.countObj('dataset')(cli.chain, cli.user, cli.hub));
+  .description(`get user ${objName} count`)
+  .action(async () => {
+    try {
+      const [chains, walletAddress] = await Promise.all([
+        loadChains(),
+        loadAddress(),
+      ]);
+      const userAddress = cli.user || walletAddress;
+
+      hub.countObj(objName)(
+        cli.user,
+        cli.hub,
+        userAddress,
+        chains[cli.chain].contracts,
+      );
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 help(cli);
