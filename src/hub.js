@@ -96,9 +96,9 @@ const countCategory = async (contracts, options) => {
   const spinner = Spinner();
   spinner.start(info.counting('category'));
 
-  const count = await contracts.getHubCategoryCount(options);
+  const count = await contracts.getHubContract(options).m_categoriesCount();
 
-  spinner.succeed(`iExec hub has a total of ${count} category`);
+  spinner.succeed(`iExec hub has a total of ${count[0]} category`);
   return count;
 };
 
