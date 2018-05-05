@@ -133,7 +133,8 @@ const signPersonalMessage = async (msgHex) => {
 
 const signTypedData = async (typedData) => {
   try {
-    const { privateKey } = await load();
+    debug('typedData', typedData);
+    const { privateKey } = await load({ prefix: false });
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
     const signedTypedData = sigUtil.signTypedData(privKeyBuffer, {
       data: typedData,
