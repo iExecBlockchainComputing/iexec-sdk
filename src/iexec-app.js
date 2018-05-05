@@ -6,7 +6,7 @@ const {
 } = require('./cli-helper');
 const hub = require('./hub');
 const { loadIExecConf } = require('./fs');
-const { loadAddress } = require('./keystore');
+const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
 const objName = 'app';
@@ -25,11 +25,9 @@ cli
         loadChain(cli.chain),
         loadIExecConf(),
       ]);
-      await hub.createObj(objName)(
-        cli.hub,
-        iexecConf[objName],
-        chain.contracts,
-      );
+      await hub.createObj(objName)(chain.contracts, iexecConf[objName], {
+        hub: cli.hub,
+      });
     } catch (error) {
       handleError(error, objName);
     }
@@ -40,18 +38,15 @@ cli
   .description(desc.showObj(objName))
   .action(async (addressOrIndex) => {
     try {
-      const [chain, walletAddress] = await Promise.all([
+      const [chain, { address }] = await Promise.all([
         loadChain(cli.chain),
-        loadAddress(),
+        load(),
       ]);
-      const userAddress = cli.user || walletAddress;
+      const userAddress = cli.user || address;
 
-      await hub.showObj(objName)(
-        addressOrIndex,
-        cli.hub,
-        userAddress,
-        chain.contracts,
-      );
+      await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
+        hub: cli.hub,
+      });
     } catch (error) {
       handleError(error, objName);
     }
@@ -62,18 +57,15 @@ cli
   .description(desc.countObj(objName))
   .action(async () => {
     try {
-      const [chain, walletAddress] = await Promise.all([
+      const [chain, { address }] = await Promise.all([
         loadChain(cli.chain),
-        loadAddress(),
+        load(),
       ]);
-      const userAddress = cli.user || walletAddress;
+      const userAddress = cli.user || address;
 
-      await hub.countObj(objName)(
-        cli.user,
-        cli.hub,
-        userAddress,
-        chain.contracts,
-      );
+      await hub.countObj(objName)(chain.contracts, userAddress, {
+        hub: cli.hub,
+      });
     } catch (error) {
       handleError(error, objName);
     }
