@@ -6,14 +6,12 @@ const { generate, privateToAccount } = require('ethjs-account');
 const EC = require('elliptic').ec;
 const sigUtil = require('eth-sig-util');
 const ethUtil = require('ethereumjs-util');
-const { saveJSONToFile, loadJSONAndRetry } = require('./fs');
+const { saveWalletConf, loadWalletConf } = require('./fs');
 const { prompt } = require('./cli-helper');
 
 const debug = Debug('iexec:keystore');
 const secp256k1 = new EC('secp256k1');
-
 const WALLET_FILE_NAME = 'wallet.json';
-const OVERWRITE_CONFIRMATION = `${WALLET_FILE_NAME} already exists, replace it with new wallet?`;
 
 const walletFromPrivKey = (
   privateKey,
@@ -35,11 +33,7 @@ const walletFromPrivKey = (
   return userWallet;
 };
 
-const save = (userWallet, { force = false } = {}) =>
-  saveJSONToFile(WALLET_FILE_NAME, userWallet, {
-    force,
-    message: OVERWRITE_CONFIRMATION,
-  });
+const save = saveWalletConf;
 
 const createAndSave = async (options) => {
   const userWallet = generate(uuidv4());
@@ -47,8 +41,8 @@ const createAndSave = async (options) => {
   return { wallet: userWallet, fileName };
 };
 
-const load = async ({ prefix = true, retry = true, lowercase } = {}) => {
-  const cb = retry
+const load = async ({ prefix = true, create = true, lowercase } = {}) => {
+  const cb = create
     ? async () => {
       await prompt.create(WALLET_FILE_NAME);
       await createAndSave();
@@ -56,28 +50,15 @@ const load = async ({ prefix = true, retry = true, lowercase } = {}) => {
     }
     : undefined;
 
-  const { privateKey } = await loadJSONAndRetry(WALLET_FILE_NAME, cb);
+  const { privateKey } = await loadWalletConf({
+    retry: cb,
+  });
 
   const derivedUserWallet = walletFromPrivKey(privateKey, {
     prefix,
     lowercase,
   });
   return derivedUserWallet;
-};
-
-const loadPrivateKey = async (options) => {
-  const { privateKey } = await load(options);
-  return privateKey;
-};
-
-const loadPublicKey = async (options) => {
-  const { publicKey } = await load(options);
-  return publicKey;
-};
-
-const loadAddress = async (options) => {
-  const { address } = await load(options);
-  return address;
 };
 
 const accounts = async () => {
@@ -174,9 +155,6 @@ module.exports = {
   save,
   createAndSave,
   load,
-  loadPrivateKey,
-  loadPublicKey,
-  loadAddress,
   accounts,
   signTransaction,
   signMessage,
