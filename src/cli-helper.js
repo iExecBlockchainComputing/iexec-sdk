@@ -12,6 +12,9 @@ const info = {
     `Run "iexec wallet get${currency}" to top up your ${currency} account`,
   userAborted: () => 'operation aborted by user.',
   logging: () => 'logging into iExec...',
+  creating: obj => `creating ${obj}...`,
+  showing: obj => `showing ${obj}...`,
+  counting: obj => `counting ${obj}...`,
 };
 
 const desc = {
