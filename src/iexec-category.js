@@ -21,7 +21,9 @@ cli
         loadIExecConf(),
         loadChain(cli.chain),
       ]);
-      await hub.createCategory(cli.hub, iexecConf[objName], chain.contracts);
+      await hub.createCategory(chain.contracts, iexecConf[objName], {
+        hub: cli.hub,
+      });
     } catch (error) {
       handleError(error, objName);
     }
@@ -33,7 +35,7 @@ cli
   .action(async (index) => {
     try {
       const chain = await loadChain(cli.chain);
-      await hub.showCategory(index, cli.hub, chain.contracts, objName);
+      await hub.showCategory(chain.contracts, index, { hub: cli.hub });
     } catch (error) {
       handleError(error, objName);
     }
@@ -45,7 +47,7 @@ cli
   .action(async () => {
     try {
       const chain = await loadChain(cli.chain);
-      await hub.countCategory(cli.hub, chain.contracts, objName);
+      await hub.countCategory(chain.contracts, { at: cli.hub });
     } catch (error) {
       handleError(error, objName);
     }
