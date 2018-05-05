@@ -1,8 +1,6 @@
 const Debug = require('debug');
-const EthJS = require('ethjs');
 const ethUtil = require('ethjs-util');
-const SignerProvider = require('./ethjs-iexec-signer');
-const createIExecContracts = require('./iexec-contracts-js-client');
+const jws = require('jws');
 
 const debug = Debug('iexec:utils');
 
@@ -24,51 +22,6 @@ const waitFor = async (fn, hash) => {
     return txReceipt;
   } catch (error) {
     debug('waitFor()', error);
-    throw error;
-  }
-};
-
-const getChains = (
-  from,
-  chainsConf,
-  {
-    signTransaction,
-    accounts,
-    signTypedData,
-    signMessage,
-    signPersonalMessage,
-  },
-) => {
-  try {
-    const chains = { names: Object.keys(chainsConf.chains) };
-    chains.names.forEach((name) => {
-      const chain = chainsConf.chains[name];
-      const ethProvider = new SignerProvider(chain.host, {
-        signTransaction,
-        accounts,
-        signTypedData,
-        signMessage,
-        signPersonalMessage,
-      });
-
-      chains[name] = Object.assign({}, chain);
-      chains[name].name = name;
-      chains[name].ethjs = new EthJS(ethProvider);
-      chains[name].EthJS = EthJS;
-      chains[name].contracts = createIExecContracts({
-        eth: chains[name].ethjs,
-        chainID: chains[name].id,
-        txOptions: {
-          from,
-          chainId: parseInt(chains[name].id, 10),
-        },
-      });
-      // index by chainID
-      chains[chain.id] = chains[name];
-    });
-    return chains;
-  } catch (error) {
-    debug('getChains()', error);
     throw error;
   }
 };
@@ -162,9 +115,26 @@ const isEthAddress = (address, { strict = false } = {}) => {
 
 const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
 
+const secToDate = (secs) => {
+  const t = new Date(1970, 0, 1);
+  t.setSeconds(secs);
+  return t;
+};
+
+const decodeJWTForPrint = (jwtoken) => {
+  const { payload } = jws.decode(jwtoken);
+  const tokenDetails = {
+    address: payload.blockchainaddr,
+    issuer: payload.iss,
+    'issued date': secToDate(payload.iat),
+  };
+  return tokenDetails;
+};
+
+const decodeJWT = jws.decode;
+
 module.exports = {
   waitFor,
-  getChains,
   chainToEtherscanURL,
   getOracleWallet,
   getFaucetWallet,
@@ -174,4 +144,7 @@ module.exports = {
   isEthAddress,
   getRPCObjValue,
   toUpperFirst,
+  secToDate,
+  decodeJWTForPrint,
+  decodeJWT,
 };
