@@ -133,6 +133,8 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
+const pretty = obj => JSON.stringify(obj, null, 2);
+
 const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
   const prettyObj = keys.reduce((accu, curr) => {
@@ -141,7 +143,7 @@ const prettyRPC = (rpcObj) => {
     }
     return accu;
   }, {});
-  return prettyObj;
+  return pretty(prettyObj);
 };
 
 module.exports = {
