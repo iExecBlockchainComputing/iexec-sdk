@@ -14,6 +14,7 @@ const writeFileAsync = Promise.promisify(fs.writeFile);
 
 const IEXEC_FILE_NAME = 'iexec.json';
 const CHAINS_FILE_NAME = 'chains.json';
+const ACCOUNT_FILE_NAME = 'account.json';
 
 const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
   const json = JSON.stringify(obj, null, 4);
@@ -36,6 +37,8 @@ const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
     throw error;
   }
 };
+const saveAccountConf = (obj, options) =>
+  saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
   try {
@@ -51,18 +54,19 @@ const loadJSONFile = async (fileName) => {
     throw error;
   }
 };
-const loadIExecConf = options => loadJSONFile(IEXEC_FILE_NAME, options);
-const loadChainsConf = options => loadJSONFile(CHAINS_FILE_NAME, options);
 
-const loadJSONAndRetry = async (fileName, retry, options = {}) => {
+const loadJSONAndRetry = async (fileName, options = {}) => {
   try {
     const file = await loadJSONFile(fileName, options);
     return file;
   } catch (error) {
-    if (retry) return retry;
+    if (options.retry) return options.retry;
     throw error;
   }
 };
+const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
+const loadChainsConf = options => loadJSONAndRetry(CHAINS_FILE_NAME, options);
+const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 
 const loadChains = async () => {
   try {
@@ -90,9 +94,12 @@ const loadChain = async (chainName) => {
 
 module.exports = {
   saveJSONToFile,
+  saveAccountConf,
+  loadJSONFile,
+  loadJSONAndRetry,
   loadIExecConf,
   loadChainsConf,
-  loadJSONAndRetry,
+  loadAccountConf,
   loadChains,
   loadChain,
 };
