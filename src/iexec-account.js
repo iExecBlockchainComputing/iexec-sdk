@@ -64,7 +64,7 @@ cli
 //         loadChain(cli.chain),
 //         loadIExecConf(),
 //       ]);
-//       const balancesRPC = await chain.contracts.checkBalance(userAddress, {
+//       const balancesRPC = await chain.contracts.getHubCcheckBalance(userAddress, {
 //         hub: cli.hub,
 //       });
 //     } catch (error) {
@@ -100,7 +100,7 @@ cli
         hub: cli.hub,
       });
       debug('balancesRPC', balancesRPC);
-      spinner.succeed(`Account balances:\n${JSON.stringify(prettyRPC(balancesRPC), null, 2)}`);
+      spinner.succeed(`Account balances:\n${prettyRPC(balancesRPC)}`);
     } catch (error) {
       handleError(error, objName);
     }
