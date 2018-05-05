@@ -139,7 +139,7 @@ const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
   const prettyObj = keys.reduce((accu, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
-      return Object.assign(accu, { [curr]: rpcObj[curr] });
+      return Object.assign(accu, { [curr]: rpcObj[curr].toString() });
     }
     return accu;
   }, {});
