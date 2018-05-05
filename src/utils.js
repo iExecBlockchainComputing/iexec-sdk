@@ -161,4 +161,5 @@ module.exports = {
   decodeJWTForPrint,
   decodeJWT,
   prettyRPC,
+  pretty,
 };
