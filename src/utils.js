@@ -133,6 +133,17 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
+const prettyRPC = (rpcObj) => {
+  const keys = Object.keys(rpcObj);
+  const prettyObj = keys.reduce((accu, curr) => {
+    if (Number.isNaN(parseInt(curr, 10))) {
+      return Object.assign(accu, { [curr]: rpcObj[curr] });
+    }
+    return accu;
+  }, {});
+  return prettyObj;
+};
+
 module.exports = {
   waitFor,
   chainToEtherscanURL,
@@ -147,4 +158,5 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
+  prettyRPC,
 };
