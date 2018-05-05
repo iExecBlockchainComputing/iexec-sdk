@@ -14,7 +14,7 @@ const {
   desc,
   info,
 } = require('./cli-helper');
-const { getRPCObjValue, getContractAddress } = require('./utils');
+const { getRPCObjValue, getContractAddress, pretty } = require('./utils');
 const { loadChains, loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-wallet');
@@ -33,11 +33,7 @@ cli
     const spinner = Spinner();
     try {
       const res = await keystore.createAndSave({ force: cli.force || false });
-      spinner.succeed(`wallet saved in "${res.fileName}":\n${JSON.stringify(
-        res.wallet,
-        null,
-        2,
-      )}`);
+      spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
     } catch (error) {
       handleError(error, objName, spinner);
     }
@@ -149,7 +145,7 @@ cli
       let userWallet = await keystore.load();
       if (address) userWallet = { address };
 
-      spinner.info(`Wallet:\n${JSON.stringify(userWallet, null, 2)}\n`);
+      spinner.info(`Wallet:\n${pretty(userWallet)}\n`);
       spinner.start(info.checkBalance('ETH'));
 
       const chains = await loadChains();

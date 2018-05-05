@@ -6,7 +6,7 @@ const account = require('./account');
 const keystore = require('./keystore');
 const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
-const { decodeJWTForPrint } = require('./utils');
+const { decodeJWTForPrint, prettyRPC } = require('./utils');
 const {
   help,
   handleError,
@@ -56,11 +56,22 @@ cli
   });
 
 // cli
-//   .command('deposit <amount>')
+//   .command('deposit')
 //   .description(desc.deposit())
-//   .action(amount =>
-//     account.allow(cli.network, amount).catch(handleError('account')));
-//
+//   .action(async () => {
+//     try {
+//       const [chain, iexecConf] = await Promise.all([
+//         loadChain(cli.chain),
+//         loadIExecConf(),
+//       ]);
+//       const balancesRPC = await chain.contracts.checkBalance(userAddress, {
+//         hub: cli.hub,
+//       });
+//     } catch (error) {
+//       handleError(error, objName);
+//     }
+//   });
+
 cli
   .command('show [address]')
   .description(desc.showObj('iExec', objName))
@@ -89,7 +100,7 @@ cli
         hub: cli.hub,
       });
       debug('balancesRPC', balancesRPC);
-      spinner.succeed(`Account balances:\n${JSON.stringify(balancesRPC, null, 2)}`);
+      spinner.succeed(`Account balances:\n${JSON.stringify(prettyRPC(balancesRPC), null, 2)}`);
     } catch (error) {
       handleError(error, objName);
     }

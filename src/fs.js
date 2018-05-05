@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
 const { prompt } = require('./cli-helper');
+const { pretty } = require('./utils');
 
 const debug = Debug('iexec:fs');
 const openAsync = Promise.promisify(fs.open);
@@ -16,7 +17,7 @@ const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
 
 const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
-  const json = JSON.stringify(obj, null, 4);
+  const json = pretty(obj);
   try {
     if (force) {
       await writeFileAsync(fileName, json);
