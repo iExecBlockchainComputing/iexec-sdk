@@ -41,7 +41,11 @@ const createAndSave = async (options) => {
   return { wallet: userWallet, fileName };
 };
 
-const load = async ({ prefix = true, create = true, lowercase } = {}) => {
+const load = async ({
+  prefix = true,
+  create = true,
+  lowercase = true,
+} = {}) => {
   const cb = create
     ? async () => {
       await prompt.create(WALLET_FILE_NAME);
