@@ -15,6 +15,12 @@ const info = {
   creating: obj => `creating ${obj}...`,
   showing: obj => `showing ${obj}...`,
   counting: obj => `counting ${obj}...`,
+  depositing: () => 'making deposit...',
+};
+
+const command = {
+  show: () => 'show',
+  deposit: () => 'deposit <amount>',
 };
 
 const desc = {
@@ -175,6 +181,7 @@ module.exports = {
   Spinner,
   handleError,
   info,
+  command,
   desc,
   option,
   prompt,
