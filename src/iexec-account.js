@@ -14,6 +14,7 @@ const {
   desc,
   Spinner,
   info,
+  command,
 } = require('./cli-helper');
 
 const debug = Debug('iexec:iexec-account');
@@ -24,7 +25,8 @@ cli
   .option(...option.auth())
   .option(...option.hub())
   .option(...option.user())
-  .option(...option.force());
+  .option(...option.force())
+  .option(...option.token());
 
 cli
   .command('login')
@@ -55,22 +57,22 @@ cli
     }
   });
 
-// cli
-//   .command('deposit')
-//   .description(desc.deposit())
-//   .action(async () => {
-//     try {
-//       const [chain, iexecConf] = await Promise.all([
-//         loadChain(cli.chain),
-//         loadIExecConf(),
-//       ]);
-//       const balancesRPC = await chain.contracts.getHubCcheckBalance(userAddress, {
-//         hub: cli.hub,
-//       });
-//     } catch (error) {
-//       handleError(error, objName);
-//     }
-//   });
+cli
+  .command(command.deposit())
+  .description(desc.deposit())
+  .action(async (amount) => {
+    try {
+      const chain = await loadChain(cli.chain);
+      debug('amount', amount);
+
+      await account.deposit(chain.contracts, amount, {
+        hub: cli.hub,
+        token: cli.token,
+      });
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('show [address]')
@@ -96,10 +98,12 @@ cli
       spinner.succeed(`Account token:\n${JSON.stringify(jwtForPrint, null, 2)}\n`);
 
       spinner.start(info.checkBalance('iExec account'));
-      const balancesRPC = await chain.contracts.checkBalance(userAddress, {
-        hub: cli.hub,
-      });
-      debug('balancesRPC', balancesRPC);
+      const balancesRPC = await chain.contracts
+        .getHubContract({
+          at: cli.hub,
+        })
+        .checkBalance(userAddress);
+
       spinner.succeed(`Account balances:\n${prettyRPC(balancesRPC)}`);
     } catch (error) {
       handleError(error, objName);
