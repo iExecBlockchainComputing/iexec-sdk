@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
 const jws = require('jws');
+const prettyjson = require('prettyjson');
 
 const debug = Debug('iexec:utils');
 
@@ -133,7 +134,7 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
-const pretty = obj => JSON.stringify(obj, null, 2);
+const pretty = (obj, options) => prettyjson.render(obj, options);
 
 const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
