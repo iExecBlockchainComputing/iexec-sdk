@@ -9,7 +9,7 @@ const createIExecClient = require('iexec-server-js-client');
 
 const debug = Debug('iexec:chains');
 
-const getChains = (
+const createChains = (
   from,
   chainsConf,
   {
@@ -50,7 +50,7 @@ const getChains = (
     });
     return chains;
   } catch (error) {
-    debug('getChains()', error);
+    debug('createChains()', error);
     throw error;
   }
 };
@@ -61,7 +61,7 @@ const loadChains = async () => {
       keystore.load(),
       loadChainsConf(),
     ]);
-    const chains = getChains(address, chainsConf, keystore);
+    const chains = createChains(address, chainsConf, keystore);
     return chains;
   } catch (error) {
     debug('loadChains()', error);
