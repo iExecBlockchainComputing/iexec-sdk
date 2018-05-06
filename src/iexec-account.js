@@ -24,9 +24,7 @@ const objName = 'account';
 
 cli
   .option(...option.chain())
-  .option(...option.auth())
   .option(...option.hub())
-  .option(...option.user())
   .option(...option.force());
 
 cli
