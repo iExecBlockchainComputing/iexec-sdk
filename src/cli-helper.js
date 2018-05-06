@@ -17,11 +17,15 @@ const info = {
   showing: obj => `showing ${obj}...`,
   counting: obj => `counting ${obj}...`,
   depositing: () => 'making deposit...',
+  deposited: amount => `deposited ${amount} nRLC to your iExec account`,
+  withdrawing: () => 'making withdraw...',
+  withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
 };
 
 const command = {
   show: () => 'show',
   deposit: () => 'deposit <amount>',
+  withdraw: () => 'withdraw <amount>',
 };
 
 const desc = {
@@ -34,6 +38,7 @@ const desc = {
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   login: () => 'login into your iExec account',
   deposit: () => 'deposit RLC onto your iExec account',
+  withdraw: () => 'withdraw RLC from your iExec account',
   getETH: () => 'apply for ETH from pre-registered faucets',
   getRLC: () => 'apply for nRLC from iExec faucet',
   sendETH: () => 'send ETH to an address',

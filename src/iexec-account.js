@@ -73,6 +73,22 @@ cli
   });
 
 cli
+  .command(command.withdraw())
+  .description(desc.withdraw())
+  .action(async (amount) => {
+    try {
+      const chain = await loadChain(cli.chain);
+      debug('amount', amount);
+
+      await account.withdraw(chain.contracts, amount, {
+        hub: cli.hub,
+      });
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
+
+cli
   .command('show [address]')
   .description(desc.showObj('iExec', objName))
   .action(async (address) => {
