@@ -1,9 +1,8 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
 const fetch = require('node-fetch');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
-const { Spinner, info } = require('./cli-helper');
-const { getContractAddress, getRPCObjValue } = require('./utils');
+const EthJS = require('ethjs');
+const { Spinner } = require('./cli-helper');
 
 const debug = Debug('iexec:wallet');
 
@@ -47,6 +46,40 @@ const ethFaucets = [
     }),
   },
 ];
+
+const checkBalances = async (contracts, address, { hub } = {}) => {
+  const rlcAddress = await contracts.getRLCAddress({ hub });
+  debug('rlcAddress', rlcAddress);
+
+  if (!rlcAddress) {
+    throw Error(`no RLC token address found on chain ${contracts.chainID}`);
+  }
+
+  const getETH = () =>
+    contracts.eth.getBalance(address).catch((error) => {
+      debug(error);
+      return 0;
+    });
+  const getRLC = () =>
+    contracts
+      .getRLCContract({
+        at: rlcAddress,
+      })
+      .balanceOf(address)
+      .then(({ balance }) => balance)
+      .catch((error) => {
+        debug(error);
+        return 0;
+      });
+
+  const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
+  const balances = {
+    wei: weiBalance,
+    nRLC: rlcBalance,
+  };
+  debug('balances', balances);
+  return balances;
+};
 
 const getETH = async (chainName, account) => {
   const spinner = Spinner();
@@ -97,77 +130,61 @@ const getRLC = async (chainName, account) => {
   return responses;
 };
 
-const sendETH = async (chain, amount, to, account) => {
-  const spinner = Spinner();
-  const message = `${amount} ${chain.name} ETH from ${account} to ${to}`;
-  spinner.start(`sending ${message}...`);
-
-  const txHash = await chain.ethjs.sendTransaction({
-    from: account,
+const sendETH = async (contracts, value, from, to) => {
+  const txHash = await contracts.eth.sendTransaction({
+    from,
     data: '0x',
     to,
-    value: chain.EthJS.toWei(amount, 'ether'),
+    value,
   });
-  spinner.info(`transfer txHash: ${txHash}\n`);
 
-  spinner.start(info.waitMiners());
-  const txReceipt = await chain.contracts.waitForReceipt(txHash);
+  const txReceipt = await contracts.waitForReceipt(txHash);
   debug('txReceipt:', txReceipt);
 
-  spinner.succeed(`Sent ${message}\n`);
   return txReceipt;
 };
 
-const sendRLC = async (chain, amount, to, token, account) => {
-  const spinner = Spinner();
-  const message = `${amount} ${chain.name} nRLC from ${account} to ${to}`;
-  spinner.start(`sending ${message}...`);
-
-  const rlcAddress = token || getContractAddress(rlcJSON, chain.id);
-  const rlcContract = chain.ethjs.contract(rlcJSON.abi).at(rlcAddress);
-
-  const txHash = await rlcContract.transfer(to, amount, {
-    from: account,
-    data: '0x',
-  });
-  spinner.info(`transfer txHash: ${txHash} \n`);
-
-  spinner.start(info.waitMiners());
-  const txReceipt = await chain.contracts.waitForReceipt(txHash);
-  debug('txReceipt:', txReceipt);
-
-  const events = chain.contracts.decodeLogs(txReceipt.logs, rlcJSON.abi);
-  debug('events', events);
-
-  spinner.succeed(`Sent ${message}`);
-  return events;
-};
-
-const sweep = async (chain, to, token, account) => {
-  const spinner = Spinner();
-
-  const rlcAddress = token || getContractAddress(rlcJSON, chain.id);
-  const rlcContract = chain.ethjs.contract(rlcJSON.abi).at(rlcAddress);
-
-  const rlcBalanceRPC = await rlcContract.balanceOf(account);
-  const rlcBalance = getRPCObjValue(rlcBalanceRPC);
-  debug('rlcBalance', rlcBalance.toNumber());
-  if (rlcBalance.toNumber() > 0) {
-    await sendRLC(chain.name, rlcBalance, to, token);
+const sendRLC = async (contracts, amount, to, { hub } = {}) => {
+  const rlcAddress = await contracts.getRLCAddress({ hub });
+  debug('rlcAddress', rlcAddress);
+  if (!rlcAddress) {
+    throw Error(`no RLC token address found on chain ${contracts.chainID}`);
   }
 
-  const ethBalance = await chain.ethjs
-    .getBalance(account)
-    .then(balance => chain.EthJS.fromWei(balance, 'ether'));
-  debug('ethBalance', ethBalance);
-  const ethToSweep = ethBalance - 0.01;
-  if (ethToSweep > 0) await sendETH(chain.name, ethToSweep, to);
+  const rlcContract = contracts.getRLCContract({ at: rlcAddress });
 
-  spinner.succeed(`wallet swept from ${account} to ${to}\n`);
+  const txHash = await rlcContract.transfer(to, amount);
+  debug('txHash', txHash);
+
+  const txReceipt = await contracts.waitForReceipt(txHash);
+  debug('txReceipt', txReceipt);
+
+  return txReceipt;
+};
+
+const sweep = async (contracts, address, to, { hub } = {}) => {
+  const balances = await checkBalances(contracts, address, { hub });
+
+  if (balances.nRLC.gt(new EthJS.BN(0))) {
+    await sendRLC(contracts, balances.nRLC, to, { hub });
+  }
+
+  const txFee = new EthJS.BN('10000000000000000');
+  debug('txFee.toString()', txFee.toString());
+  debug('balances.wei.toString()', balances.wei.toString());
+
+  debug('balances.wei.gt(txFee)', balances.wei.gt(txFee));
+
+  const sweepETH = balances.wei.sub(txFee);
+  debug('sweepETH.toString()', sweepETH.toString());
+  if (balances.wei.gt(new EthJS.BN(txFee))) {
+    await sendETH(contracts, sweepETH, address, to);
+  }
   return true;
 };
 
 module.exports = {
+  checkBalances,
   getETH,
   getRLC,
   sendETH,

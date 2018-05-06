@@ -2,7 +2,7 @@
 
 const Debug = require('debug');
 const cli = require('commander');
-const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
+const unit = require('ethjs-unit');
 const wallet = require('./wallet');
 const keystore = require('./keystore');
 const {
@@ -11,13 +11,11 @@ const {
   Spinner,
   option,
   desc,
-  info,
   prompt,
-  lba,
   pretty,
+  info,
 } = require('./cli-helper');
-const { getRPCObjValue, getContractAddress } = require('./utils');
-const { loadChains, loadChain } = require('./chains.js');
+const { loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-wallet');
 const objName = 'wallet';
@@ -26,7 +24,8 @@ cli
   .option(...option.to())
   .option(...option.chain())
   .option(...option.token())
-  .option(...option.force());
+  .option(...option.force())
+  .option(...option.hub());
 
 cli
   .command('create')
@@ -38,6 +37,39 @@ cli
       spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
     } catch (error) {
       handleError(error, objName, spinner);
+    }
+  });
+
+cli
+  .command('show [address]')
+  .description(desc.showObj(objName, 'address'))
+  .action(async (address) => {
+    const spinner = Spinner();
+    try {
+      const [userWallet, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cli.chain),
+      ]);
+      if (address) userWallet.address = address;
+      debug('userWallet.address', userWallet.address);
+      spinner.info(`Wallet:${pretty(userWallet)}`);
+
+      spinner.start(info.checkBalance(''));
+      const balances = await wallet.checkBalances(
+        chain.contracts,
+        userWallet.address,
+        {
+          hub: cli.hub,
+        },
+      );
+
+      const strBalances = {
+        ETH: unit.fromWei(balances.wei, 'ether'),
+        nRLC: balances.nRLC.toString(),
+      };
+      spinner.succeed(`Wallet ${cli.chain} balances [${chain.id}]:${pretty(strBalances)}`);
+    } catch (error) {
+      handleError(error, 'wallet', spinner);
     }
   });
 
@@ -69,17 +101,30 @@ cli
   .command('sendETH <amount>')
   .description(desc.sendETH())
   .action(async (amount) => {
+    const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
         loadChain(cli.chain),
       ]);
 
+      if (!cli.to) throw Error('missing --to option');
+
       if (!cli.force) {
-        await prompt.transferETH(amount, cli.chain, cli.to, chain.id);
+        await prompt.transferETH(
+          unit.toWei(amount, 'ether'),
+          cli.chain,
+          cli.to,
+          chain.id,
+        );
       }
 
-      await wallet.sendETH(chain, amount, cli.to, address);
+      const message = `${amount} ${cli.chain} ETH from ${address} to ${cli.to}`;
+      spinner.start(`sending ${message}...`);
+
+      await wallet.sendETH(chain.contracts, amount, address, cli.to);
+
+      spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
       handleError(error, objName);
     }
@@ -89,17 +134,27 @@ cli
   .command('sendRLC <amount>')
   .description(desc.sendRLC())
   .action(async (amount) => {
+    const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
         loadChain(cli.chain),
       ]);
 
+      if (!cli.to) throw Error('missing --to option');
+
       if (!cli.force) {
         await prompt.transferRLC(amount, cli.chain, cli.to, chain.id);
       }
 
-      await wallet.sendRLC(chain, amount, cli.to, cli.token, address);
+      const message = `${amount} ${cli.chain} nRLC from ${address} to ${
+        cli.to
+      }`;
+      spinner.start(`sending ${message}...`);
+
+      await wallet.sendRLC(chain.contracts, amount, cli.to, { hub: cli.hub });
+
+      spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
       handleError(error, objName);
     }
@@ -109,92 +164,26 @@ cli
   .command('sweep')
   .description(desc.sweep())
   .action(async () => {
+    const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
         loadChain(cli.chain),
       ]);
 
+      if (!cli.to) throw Error('missing --to option');
+
       if (!cli.force) {
         await prompt.sweep(cli.chain, cli.to, chain.id);
       }
 
-      await wallet.sweep(chain, cli.to, cli.token, address);
+      spinner.start('sweeping wallet...');
+
+      await wallet.sweep(chain.contracts, address, cli.to, { hub: cli.hub });
+
+      spinner.succeed(`Wallet swept from ${address} to ${cli.to}\n`);
     } catch (error) {
       handleError(error, objName);
-    }
-  });
-
-cli
-  .command('show [address]')
-  .description(desc.showObj(objName, 'address'))
-  .action(async (address) => {
-    const spinner = Spinner();
-    try {
-      const [userWallet, chains] = await Promise.all([
-        keystore.load(),
-        loadChains(),
-      ]);
-      if (address) userWallet.address = address;
-
-      spinner.info(`Wallet:${pretty(userWallet)}`);
-
-      spinner.start(info.checkBalance('ETH'));
-      const ethBalances = await Promise.all(chains.names.map(name =>
-        chains[name].ethjs
-          .getBalance(userWallet.address)
-          .then(balance => chains[name].EthJS.fromWei(balance, 'ether'))
-          .catch((error) => {
-            debug(error);
-            return 0;
-          })));
-
-      const ethBalancesStrObj = ethBalances.reduce(
-        (accu, curr, index) =>
-          Object.assign(accu, {
-            [`[${chains[chains.names[index]].id}] ${
-              chains.names[index]
-            }`]: curr.toString().concat(' ETH'),
-          }),
-        {},
-      );
-
-      spinner.succeed(`ETH balances:${pretty(ethBalancesStrObj)}`);
-
-      spinner.info(lba(info.topUp('ETH')));
-
-      spinner.start(info.checkBalance('nRLC'));
-
-      const rlcBalances = await Promise.all(chains.names.map((name) => {
-        const rlcAddress =
-            cli.token ||
-            getContractAddress(rlcJSON, chains[name].id, { strict: false });
-        const rlcContract = chains[name].ethjs
-          .contract(rlcJSON.abi)
-          .at(rlcAddress);
-        return rlcContract
-          .balanceOf(userWallet.address)
-          .then(e => getRPCObjValue(e))
-          .catch((error) => {
-            debug(error);
-            return 0;
-          });
-      }));
-
-      const rlcBalancesObjStr = rlcBalances.reduce(
-        (accu, curr, index) =>
-          Object.assign(accu, {
-            [`[${chains[chains.names[index]].id}] ${
-              chains.names[index]
-            }`]: curr.toString().concat(' nRLC'),
-          }),
-        {},
-      );
-      spinner.succeed(`nRLC balances:${pretty(rlcBalancesObjStr)}`);
-
-      spinner.info(lba(info.topUp('RLC')));
-    } catch (error) {
-      handleError(error, 'wallet', spinner);
     }
   });
 
