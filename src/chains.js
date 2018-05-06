@@ -1,10 +1,10 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
 const EthJS = require('ethjs');
+const SignerProvider = require('ethjs-custom-signer');
+const createIExecContracts = require('iexec-contracts-js-client');
 const keystore = require('./keystore');
 const { loadChainsConf } = require('./fs');
-const SignerProvider = require('./ethjs-iexec-signer');
-const createIExecContracts = require('./iexec-contracts-js-client');
 const createIExecClient = require('iexec-server-js-client');
 
 const debug = Debug('iexec:chains');
