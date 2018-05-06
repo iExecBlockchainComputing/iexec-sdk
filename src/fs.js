@@ -15,7 +15,7 @@ const IEXEC_FILE_NAME = 'iexec.json';
 const CHAINS_FILE_NAME = 'chain.json';
 const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
-const DEPLOYED_FILE_NAME = 'app.json';
+const DEPLOYED_FILE_NAME = 'deployed.json';
 
 const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
   const json = pretty(obj);
