@@ -5,7 +5,7 @@ const {
   help, handleError, desc, option,
 } = require('./cli-helper');
 const hub = require('./hub');
-const { loadIExecConf } = require('./fs');
+const { loadIExecConf, saveObj } = require('./fs');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
@@ -26,9 +26,14 @@ cli
         loadIExecConf(),
       ]);
       const hubAddress = cli.hub || chain.hub;
-      await hub.createObj(objName)(chain.contracts, iexecConf[objName], {
-        hub: hubAddress,
-      });
+      const events = await hub.createObj(objName)(
+        chain.contracts,
+        iexecConf[objName],
+        {
+          hub: hubAddress,
+        },
+      );
+      await saveObj(objName, chain.id, events[0][objName]);
     } catch (error) {
       handleError(error, objName);
     }
