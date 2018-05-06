@@ -120,38 +120,84 @@ iexec init factorial # pull factorial branch from iExec dapp registry
 iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
 ```
 
-## truffle
-
-```bash
-iexec compile # call truffle compile underhood
-iexec migrate # call truffle migrate underhood
-iexec truffle [...] # or just call any truffle command
-```
-
 ## wallet
 
 ```bash
+# OPTIONS
+# --chain <chainName>
+# --to <address>
+# --force
+# --hub <address>
 iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
-iexec wallet show
-iexec wallet sendETH <amount> --to <eth_address> --chain ropsten
-iexec wallet sendRLC <amount> --to <eth_address> --chain ropsten
-iexec wallet sweep --to <eth_address> --chain ropsten # drain all ETH and RLC, sending them back to iExec faucet by default
+iexec wallet show [address] # optional address to show other people's wallet
+iexec wallet sendETH <amount> --to <eth_address>
+iexec wallet sendRLC <amount> --to <eth_address>
+iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
 ```
 
 ## account
 
 ```bash
+# OPTIONS
+# --chain <chainName>
+# --force
+# --hub <address>
 iexec account login
-iexec account show
-iexec account allow 5
+iexec account show [address] # optional address to show other people's account
+iexec account deposit <amount>
+iexec account withdraw <amount>
 ```
 
-## deploy
+## app
 
 ```bash
-iexec deploy --chain ropsten # Deploys the smart contract on ethereum + deploy the app on iExec offchain platform
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec app create # create new app
+iexec app show <address> # show app details
+iexec app show <index> # show app details by index
+iexec app count --user <userAddress> # count user total number of app
+```
+
+## dataset
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec dataset create # create new dataset
+iexec dataset show <address> # show dataset details
+iexec dataset show <index> # show dataset details by index
+iexec dataset count --user <userAddress> # count user total number of dataset
+```
+
+## category
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+iexec category create # create new category
+iexec category show <index> # show category details by index
+iexec category count # count hub total number of category
+```
+
+## workerpool
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec workerpool create # create new workerpool
+iexec workerpool show <address> # show workerpool details
+iexec workerpool show <index> # show workerpool details by index
+iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
 ## submit
@@ -185,41 +231,6 @@ iexec server uploadData <data_path> # direct data upload
 iexec server submit --app <app_uid> # direct work submit
 iexec server result <workUID> --watch --save [fileName]# direct result
 iexec server api <fnName> [arg1] [arg2] ... # directly call api method
-```
-
-## app
-
-```bash
-iexec app create --hub [hubAddress]# create new app
-iexec app show <address> # show app details
-iexec app show <index> --hub [hubAddress] --user [userAddress] # show app details by index
-iexec app count --hub [hubAddress] --user [userAddress] # count total number of apps
-```
-
-## dataset
-
-```bash
-iexec dataset create --hub [hubAddress]# create new dataset
-iexec dataset show <address> # show dataset details
-iexec dataset show <index> --hub [hubAddress] --user [userAddress] # show dataset details using index
-iexec dataset count --hub [hubAddress] --user [userAddress] # count total number of datasets
-```
-
-## category
-
-```bash
-iexec category create --hub [hubAddress]# create new category
-iexec category show <index> --hub [hubAddress] # show category details
-iexec category count --hub [hubAddress] # count total number of categories
-```
-
-## workerpool
-
-```bash
-iexec workerpool create --hub [hubAddress]# create new workerpool
-iexec workerpool show <address> # show workerpool details
-iexec workerpool show <index> --hub [hubAddress] --user [userAddress] # show workerpool details by index
-iexec workerpool count --hub [hubAddress] --user [userAddress] # count total number of datasets
 ```
 
 ## iexec.json
@@ -257,25 +268,38 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 }
 ```
 
-## truffle.js
+## chains.json
 
-The `truffle.js` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iexec schedulers.
+The `chains.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec schedulers. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
 
-```js
-module.exports = {
-  networks: {
-    ropsten: {
-      // ETH node relay config
-      host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
-      port: 8545,
-      network_id: '3',
-      constructorArgs: [ROPSTEN_ORACLE_ADDRESS],
-      // iExec server used to deploy legacy app
-      server: 'https://testxw.iex.ec:443',
-      // gasPriceMultiplier: 2,  // use factor 2 of the network estimated gasPrice
-      // gasLimitMultiplier: 4,  // use factor 4 of the network estimated gasLimit
-      // gasPrice: 21000000000  // manually set the gasPrice in gwei. Prefer 'gasPriceMultiplier'
-      // gas: 400000  // manually set the gas limit in gwei. Prefer 'gasLimitMultiplier'
+```json
+{
+  "chains": {
+    "development": {
+      "host": "localhost",
+      "id": "*",
+      "server": "https://localhost:443"
     },
-};
+    "ropsten": {
+      "host": "https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "3",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "rinkeby": {
+      "host": "https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "4",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "kovan": {
+      "host": "https://kovan.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "42",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "mainnet": {
+      "host": "https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ",
+      "id": "1",
+      "server": "https://mainxw.iex.ec:443"
+    }
+  }
+}
 ```
