@@ -1,6 +1,6 @@
 {
   "chains": {
-    "development": {
+    "dev": {
       "host": "localhost",
       "id": "*",
       "server": "https://localhost:443"
