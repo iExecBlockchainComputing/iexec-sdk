@@ -110,7 +110,7 @@ cli
           userWallet.address
         } differ, you should run "iexec login" to sync them\n`);
       }
-      spinner.succeed(`Account token:${pretty(jwtForPrint)}`);
+      spinner.info(`Account token:${pretty(jwtForPrint)}`);
 
       spinner.start(info.checkBalance('iExec account'));
       const balancesRPC = await chain.contracts

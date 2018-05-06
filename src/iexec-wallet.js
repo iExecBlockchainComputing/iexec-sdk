@@ -53,7 +53,7 @@ cli
       const hubAddress = cli.hub || chain.hub;
       if (address) userWallet.address = address;
       debug('userWallet.address', userWallet.address);
-      spinner.info(`Wallet:${pretty(userWallet)}`);
+      spinner.info(`Wallet file:${pretty(userWallet)}`);
 
       spinner.start(info.checkBalance(''));
       const balances = await wallet.checkBalances(
