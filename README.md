@@ -5,23 +5,16 @@
 [![Build Status](https://drone.iex.ec//api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
 
-iExec allows Ethereum developers to create applications that can be executed off-chain.
-This package brings all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
-Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
-and execute them through calls to Ethereum smart contracts.
+The iExec SDK is a CLI and a JS library that allows developers to interact with iExec decentralized marketplace in order to run off-chain computations.
 
 ## Ressources
 
-* [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
-* [Craft your own dapp tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
-* [Run any dapp tutorial](https://katacoda.com/sulliwane/scenarios/run-dapp)
-* Checkout the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee)
 * The iExec Dapp Store: https://dapps.iex.ec
 * The iExec explorer: https://explorer.iex.ec
 * The RLC faucet: https://faucet.iex.ec
 * iExec main documentation: https://docs.iex.ec
 * The [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
-* [iExec sample dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)
+* [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 
 ## Install
 
