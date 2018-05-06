@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
 const jws = require('jws');
-const prettyjson = require('prettyjson');
 
 const debug = Debug('iexec:utils');
 
@@ -134,19 +133,6 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
-const pretty = (obj, options) => prettyjson.render(obj, options);
-
-const prettyRPC = (rpcObj) => {
-  const keys = Object.keys(rpcObj);
-  const prettyObj = keys.reduce((accu, curr) => {
-    if (Number.isNaN(parseInt(curr, 10))) {
-      return Object.assign(accu, { [curr]: rpcObj[curr].toString() });
-    }
-    return accu;
-  }, {});
-  return pretty(prettyObj);
-};
-
 module.exports = {
   waitFor,
   chainToEtherscanURL,
@@ -161,6 +147,4 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
-  prettyRPC,
-  pretty,
 };
