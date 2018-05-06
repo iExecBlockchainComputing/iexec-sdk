@@ -3,7 +3,6 @@ const Promise = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
 const { prompt } = require('./cli-helper');
-const { pretty } = require('./utils');
 
 const debug = Debug('iexec:fs');
 const openAsync = Promise.promisify(fs.open);
@@ -18,7 +17,7 @@ const WALLET_FILE_NAME = 'wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 
 const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
-  const json = pretty(obj);
+  const json = JSON.stringify(obj, null, 2);
   try {
     if (force) {
       await writeFileAsync(fileName, json);
@@ -42,6 +41,8 @@ const saveAccountConf = (obj, options) =>
   saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
 const saveWalletConf = (obj, options) =>
   saveJSONToFile(WALLET_FILE_NAME, obj, options);
+const saveDeployedConf = (obj, options) =>
+  saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
   try {
@@ -59,12 +60,13 @@ const loadJSONFile = async (fileName) => {
   }
 };
 
-const loadJSONAndRetry = (fileName, options = {}) => {
+const loadJSONAndRetry = async (fileName, options = {}) => {
   try {
-    return loadJSONFile(fileName, options);
+    const file = await loadJSONFile(fileName, options);
+    return file;
   } catch (error) {
     debug('loadJSONAndRetry', error);
-    if (options.retry) return options.retry;
+    if (options.retry) return options.retry();
     throw error;
   }
 };
@@ -75,10 +77,26 @@ const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
 const loadDeployedConf = options =>
   loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
+const saveObj = async (objName, chainID, address) => {
+  try {
+    const deployedConf = await loadDeployedConf({ retry: () => ({}) });
+    debug('deployedConf', deployedConf);
+
+    if (typeof deployedConf[objName] !== 'object') deployedConf[objName] = {};
+    deployedConf[objName][chainID] = address;
+
+    await saveDeployedConf(deployedConf, { force: true });
+  } catch (error) {
+    debug('saveObj()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   saveJSONToFile,
   saveAccountConf,
   saveWalletConf,
+  saveDeployedConf,
   loadJSONFile,
   loadJSONAndRetry,
   loadIExecConf,
@@ -86,4 +104,5 @@ module.exports = {
   loadAccountConf,
   loadWalletConf,
   loadDeployedConf,
+  saveObj,
 };
