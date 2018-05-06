@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const { isEthAddress, prettyRPC, pretty } = require('./utils');
-const { Spinner, info } = require('./cli-helper');
+const { isEthAddress } = require('./utils');
+const { Spinner, info, prettyRPC } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
 
@@ -49,7 +49,7 @@ const showObj = objName => async (
 
   const obj = await contracts.getObjProps(objName)(objAddress);
 
-  spinner.succeed(`${objName} ${objAddress} details:\n${pretty(obj)}`);
+  spinner.succeed(`${objName} ${objAddress} details:${prettyRPC(obj)}`);
   return obj;
 };
 
@@ -88,7 +88,7 @@ const showCategory = async (contracts, index, options) => {
 
   const categoryRPC = await contracts.getCategoryByIndex(index, options);
 
-  spinner.succeed(`category at index ${index} details:\n${prettyRPC(categoryRPC)}`);
+  spinner.succeed(`category at index ${index} details:${prettyRPC(categoryRPC)}`);
   return categoryRPC;
 };
 
