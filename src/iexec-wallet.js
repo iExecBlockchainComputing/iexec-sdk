@@ -23,7 +23,6 @@ const objName = 'wallet';
 cli
   .option(...option.to())
   .option(...option.chain())
-  .option(...option.token())
   .option(...option.force())
   .option(...option.hub());
 
