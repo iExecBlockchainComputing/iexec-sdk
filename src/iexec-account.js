@@ -60,10 +60,11 @@ cli
   .action(async (amount) => {
     try {
       const chain = await loadChain(cli.chain);
+      const hubAddress = cli.hub || chain.hub;
       debug('amount', amount);
 
       await account.deposit(chain.contracts, amount, {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);
@@ -76,10 +77,11 @@ cli
   .action(async (amount) => {
     try {
       const chain = await loadChain(cli.chain);
+      const hubAddress = cli.hub || chain.hub;
       debug('amount', amount);
 
       await account.withdraw(chain.contracts, amount, {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);
@@ -97,6 +99,7 @@ cli
         keystore.load(),
         loadAccountConf(),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       const userAddress = address || userWallet.address;
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
@@ -112,7 +115,7 @@ cli
       spinner.start(info.checkBalance('iExec account'));
       const balancesRPC = await chain.contracts
         .getHubContract({
-          at: cli.hub,
+          at: hubAddress,
         })
         .checkBalance(userAddress);
 

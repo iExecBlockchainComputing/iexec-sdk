@@ -25,8 +25,9 @@ cli
         loadChain(cli.chain),
         loadIExecConf(),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       await hub.createObj(objName)(chain.contracts, iexecConf[objName], {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);
@@ -42,10 +43,11 @@ cli
         loadChain(cli.chain),
         load(),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       const userAddress = cli.user || address;
 
       await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);
@@ -61,10 +63,11 @@ cli
         loadChain(cli.chain),
         load(),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       const userAddress = cli.user || address;
 
       await hub.countObj(objName)(chain.contracts, userAddress, {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);

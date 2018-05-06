@@ -21,8 +21,9 @@ cli
         loadIExecConf(),
         loadChain(cli.chain),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       await hub.createCategory(chain.contracts, iexecConf[objName], {
-        hub: cli.hub,
+        hub: hubAddress,
       });
     } catch (error) {
       handleError(error, objName);
@@ -35,7 +36,8 @@ cli
   .action(async (index) => {
     try {
       const chain = await loadChain(cli.chain);
-      await hub.showCategory(chain.contracts, index, { hub: cli.hub });
+      const hubAddress = cli.hub || chain.hub;
+      await hub.showCategory(chain.contracts, index, { hub: hubAddress });
     } catch (error) {
       handleError(error, objName);
     }
@@ -47,7 +49,8 @@ cli
   .action(async () => {
     try {
       const chain = await loadChain(cli.chain);
-      await hub.countCategory(chain.contracts, { at: cli.hub });
+      const hubAddress = cli.hub || chain.hub;
+      await hub.countCategory(chain.contracts, { at: hubAddress });
     } catch (error) {
       handleError(error, objName);
     }

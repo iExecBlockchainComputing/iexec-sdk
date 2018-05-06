@@ -50,6 +50,7 @@ cli
         keystore.load(),
         loadChain(cli.chain),
       ]);
+      const hubAddress = cli.hub || chain.hub;
       if (address) userWallet.address = address;
       debug('userWallet.address', userWallet.address);
       spinner.info(`Wallet:${pretty(userWallet)}`);
@@ -59,7 +60,7 @@ cli
         chain.contracts,
         userWallet.address,
         {
-          hub: cli.hub,
+          hub: hubAddress,
         },
       );
 
@@ -140,6 +141,7 @@ cli
         keystore.load(),
         loadChain(cli.chain),
       ]);
+      const hubAddress = cli.hub || chain.hub;
 
       if (!cli.to) throw Error('missing --to option');
 
@@ -152,7 +154,9 @@ cli
       }`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendRLC(chain.contracts, amount, cli.to, { hub: cli.hub });
+      await wallet.sendRLC(chain.contracts, amount, cli.to, {
+        hub: hubAddress,
+      });
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
@@ -170,6 +174,7 @@ cli
         keystore.load(),
         loadChain(cli.chain),
       ]);
+      const hubAddress = cli.hub || chain.hub;
 
       if (!cli.to) throw Error('missing --to option');
 
@@ -179,7 +184,7 @@ cli
 
       spinner.start('sweeping wallet...');
 
-      await wallet.sweep(chain.contracts, address, cli.to, { hub: cli.hub });
+      await wallet.sweep(chain.contracts, address, cli.to, { hub: hubAddress });
 
       spinner.succeed(`Wallet swept from ${address} to ${cli.to}\n`);
     } catch (error) {
