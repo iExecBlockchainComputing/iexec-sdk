@@ -108,22 +108,18 @@ cli
         keystore.load(),
         loadChain(cli.chain),
       ]);
+      const weiAmount = unit.toWei(amount, 'ether');
 
       if (!cli.to) throw Error('missing --to option');
 
       if (!cli.force) {
-        await prompt.transferETH(
-          unit.toWei(amount, 'ether'),
-          cli.chain,
-          cli.to,
-          chain.id,
-        );
+        await prompt.transferETH(amount, cli.chain, cli.to, chain.id);
       }
 
       const message = `${amount} ${cli.chain} ETH from ${address} to ${cli.to}`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendETH(chain.contracts, amount, address, cli.to);
+      await wallet.sendETH(chain.contracts, weiAmount, address, cli.to);
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
