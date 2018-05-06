@@ -24,7 +24,7 @@ const auth = async (address, iexec, eth) => {
   return jwtoken;
 };
 
-const deposit = async (contracts, amount, { hub, token } = {}) => {
+const deposit = async (contracts, amount, { hub } = {}) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
 
@@ -36,13 +36,13 @@ const deposit = async (contracts, amount, { hub, token } = {}) => {
     }`);
   }
 
-  const rlcAddress = token || contracts.rlcAddress;
+  const hubContract = contracts.getHubContract({
+    at: hubAddress,
+  });
+  const { rlcAddress } = contracts.rlcAddress
+    ? { rlcAddress: contracts.rlcAddress }
+    : await hubContract.getRLCAddress();
   debug('rlcAddress', rlcAddress);
-  if (!rlcAddress) {
-    throw Error(`no rlc address provided, and no existing rlc contract on chain ${
-      contracts.chainID
-    }`);
-  }
 
   const allowTxHash = await contracts
     .getRLCContract({
@@ -53,11 +53,7 @@ const deposit = async (contracts, amount, { hub, token } = {}) => {
   const allowEvents = contracts.decodeHubLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
 
-  const txHash = await contracts
-    .getHubContract({
-      at: hub,
-    })
-    .deposit(amount);
+  const txHash = await hubContract.deposit(amount);
   debug('txHash', txHash);
 
   const txReceipt = await contracts.waitForReceipt(txHash);

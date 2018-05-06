@@ -27,8 +27,7 @@ cli
   .option(...option.auth())
   .option(...option.hub())
   .option(...option.user())
-  .option(...option.force())
-  .option(...option.token());
+  .option(...option.force());
 
 cli
   .command('login')
@@ -65,7 +64,6 @@ cli
 
       await account.deposit(chain.contracts, amount, {
         hub: cli.hub,
-        token: cli.token,
       });
     } catch (error) {
       handleError(error, objName);
