@@ -6,7 +6,7 @@ const account = require('./account');
 const keystore = require('./keystore');
 const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
-const { decodeJWTForPrint, prettyRPC } = require('./utils');
+const { decodeJWTForPrint } = require('./utils');
 const {
   help,
   handleError,
@@ -15,6 +15,8 @@ const {
   Spinner,
   info,
   command,
+  prettyRPC,
+  pretty,
 } = require('./cli-helper');
 
 const debug = Debug('iexec:iexec-account');
@@ -47,11 +49,7 @@ cli
       );
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
-      spinner.succeed(`You are logged into iExec. Login token saved into "${fileName}":\n${JSON.stringify(
-        jwtForPrint,
-        null,
-        2,
-      )}`);
+      spinner.succeed(`You are logged into iExec. Login token saved into "${fileName}":${pretty(jwtForPrint)}`);
     } catch (error) {
       handleError(error, objName, spinner);
     }
@@ -95,7 +93,7 @@ cli
           userWallet.address
         } differ, you should run "iexec login" to sync them\n`);
       }
-      spinner.succeed(`Account token:\n${JSON.stringify(jwtForPrint, null, 2)}\n`);
+      spinner.succeed(`Account token:${pretty(jwtForPrint)}`);
 
       spinner.start(info.checkBalance('iExec account'));
       const balancesRPC = await chain.contracts
@@ -104,7 +102,7 @@ cli
         })
         .checkBalance(userAddress);
 
-      spinner.succeed(`Account balances:\n${prettyRPC(balancesRPC)}`);
+      spinner.succeed(`Account balances:${prettyRPC(balancesRPC)}`);
     } catch (error) {
       handleError(error, objName);
     }
