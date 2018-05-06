@@ -12,9 +12,10 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
 
 const IEXEC_FILE_NAME = 'iexec.json';
-const CHAINS_FILE_NAME = 'chains.json';
+const CHAINS_FILE_NAME = 'chain.json';
 const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
+const DEPLOYED_FILE_NAME = 'app.json';
 
 const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
   const json = pretty(obj);
@@ -71,6 +72,8 @@ const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
 const loadChainsConf = options => loadJSONAndRetry(CHAINS_FILE_NAME, options);
 const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
+const loadDeployedConf = options =>
+  loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
 module.exports = {
   saveJSONToFile,
@@ -82,4 +85,5 @@ module.exports = {
   loadChainsConf,
   loadAccountConf,
   loadWalletConf,
+  loadDeployedConf,
 };
