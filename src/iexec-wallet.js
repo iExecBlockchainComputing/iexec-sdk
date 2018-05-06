@@ -2,7 +2,6 @@
 
 const Debug = require('debug');
 const cli = require('commander');
-const inquirer = require('inquirer');
 const rlcJSON = require('rlc-faucet-contract/build/contracts/RLC.json');
 const wallet = require('./wallet');
 const keystore = require('./keystore');
@@ -13,8 +12,11 @@ const {
   option,
   desc,
   info,
+  prompt,
+  lba,
+  pretty,
 } = require('./cli-helper');
-const { getRPCObjValue, getContractAddress, pretty } = require('./utils');
+const { getRPCObjValue, getContractAddress } = require('./utils');
 const { loadChains, loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-wallet');
@@ -74,16 +76,7 @@ cli
       ]);
 
       if (!cli.force) {
-        const answers = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'transfer',
-            message: `Do you want to send ${amount} ${chain.name} ETH to ${
-              cli.to
-            } [chainID: ${chain.id}]`,
-          },
-        ]);
-        if (!answers.transfer) throw Error(info.userAborted());
+        await prompt.transferETH(amount, cli.chain, cli.to, chain.id);
       }
 
       await wallet.sendETH(chain, amount, cli.to, address);
@@ -103,16 +96,7 @@ cli
       ]);
 
       if (!cli.force) {
-        const answers = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'transfer',
-            message: `Do you want to send ${amount} ${chain.name} nRLC to ${
-              cli.to
-            } [chainID: ${chain.id}]`,
-          },
-        ]);
-        if (!answers.transfer) throw Error('Transfer aborted by user.');
+        await prompt.transferRLC(amount, cli.chain, cli.to, chain.id);
       }
 
       await wallet.sendRLC(chain, amount, cli.to, cli.token, address);
@@ -130,6 +114,11 @@ cli
         keystore.load(),
         loadChain(cli.chain),
       ]);
+
+      if (!cli.force) {
+        await prompt.sweep(cli.chain, cli.to, chain.id);
+      }
+
       await wallet.sweep(chain, cli.to, cli.token, address);
     } catch (error) {
       handleError(error, objName);
@@ -142,14 +131,15 @@ cli
   .action(async (address) => {
     const spinner = Spinner();
     try {
-      let userWallet = await keystore.load();
-      if (address) userWallet = { address };
+      const [userWallet, chains] = await Promise.all([
+        keystore.load(),
+        loadChains(),
+      ]);
+      if (address) userWallet.address = address;
 
-      spinner.info(`Wallet:\n${pretty(userWallet)}\n`);
+      spinner.info(`Wallet:${pretty(userWallet)}`);
+
       spinner.start(info.checkBalance('ETH'));
-
-      const chains = await loadChains();
-
       const ethBalances = await Promise.all(chains.names.map(name =>
         chains[name].ethjs
           .getBalance(userWallet.address)
@@ -159,19 +149,19 @@ cli
             return 0;
           })));
 
-      const ethBalancesString = ethBalances.reduce(
+      const ethBalancesStrObj = ethBalances.reduce(
         (accu, curr, index) =>
-          accu.concat(`  [${chains[chains.names[index]].id}] ${
-            chains.names[index]
-          }: \t ${curr} ETH \t\t https://${
-            chains.names[index]
-          }.etherscan.io/address/${userWallet.address}\n`),
-        '',
+          Object.assign(accu, {
+            [`[${chains[chains.names[index]].id}] ${
+              chains.names[index]
+            }`]: curr.toString().concat(' ETH'),
+          }),
+        {},
       );
 
-      spinner.succeed(`ETH balances:\n\n${ethBalancesString}`);
+      spinner.succeed(`ETH balances:${pretty(ethBalancesStrObj)}`);
 
-      spinner.info(info.topUp('ETH'));
+      spinner.info(lba(info.topUp('ETH')));
 
       spinner.start(info.checkBalance('nRLC'));
 
@@ -191,16 +181,18 @@ cli
           });
       }));
 
-      const rlcBalancesString = rlcBalances.reduce(
+      const rlcBalancesObjStr = rlcBalances.reduce(
         (accu, curr, index) =>
-          accu.concat(`  [${chains[chains.names[index]].id}] ${
-            chains.names[index]
-          }: \t ${curr} nRLC\n`),
-        '',
+          Object.assign(accu, {
+            [`[${chains[chains.names[index]].id}] ${
+              chains.names[index]
+            }`]: curr.toString().concat(' nRLC'),
+          }),
+        {},
       );
-      spinner.succeed(`nRLC balances:\n\n${rlcBalancesString}`);
+      spinner.succeed(`nRLC balances:${pretty(rlcBalancesObjStr)}`);
 
-      spinner.info(info.topUp('RLC'));
+      spinner.info(lba(info.topUp('RLC')));
     } catch (error) {
       handleError(error, 'wallet', spinner);
     }
