@@ -42,7 +42,6 @@ const createChains = (
         chainID: chains[name].id,
         txOptions: {
           from,
-          chainId: parseInt(chains[name].id, 10),
         },
       });
       // index by chainID
