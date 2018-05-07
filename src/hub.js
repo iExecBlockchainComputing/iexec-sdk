@@ -7,7 +7,7 @@ const debug = Debug('iexec:hub');
 
 const createObj = objName => async (contracts, obj, options) => {
   const spinner = Spinner();
-  spinner.start(info.creating(objName));
+  spinner.start(info.deploying(objName));
 
   const txHash = await contracts.createObj(objName)(obj, options);
 
@@ -17,7 +17,7 @@ const createObj = objName => async (contracts, obj, options) => {
   const events = contracts.decodeHubLogs(txReceipt.logs);
   debug('events', events);
 
-  spinner.succeed(`new ${objName} created at address ${events[0][objName]}`);
+  spinner.succeed(`new ${objName} deployed at address ${events[0][objName]}`);
   return events;
 };
 

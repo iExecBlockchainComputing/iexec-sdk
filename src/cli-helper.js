@@ -14,6 +14,7 @@ const info = {
   userAborted: () => 'operation aborted by user.',
   logging: () => 'logging into iExec...',
   creating: obj => `creating ${obj}...`,
+  deploying: obj => `deploying ${obj}...`,
   showing: obj => `showing ${obj}...`,
   counting: obj => `counting ${obj}...`,
   depositing: () => 'making deposit...',

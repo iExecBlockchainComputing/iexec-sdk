@@ -10,7 +10,7 @@ const {
   pretty,
 } = require('./cli-helper');
 const hub = require('./hub');
-const { loadIExecConf, saveObj } = require('./fs');
+const { loadIExecConf, saveObj, saveDeployedObj } = require('./fs');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
@@ -51,7 +51,7 @@ cli
           hub: hubAddress,
         },
       );
-      await saveObj(objName, chain.id, events[0][objName]);
+      await saveDeployedObj(objName, chain.id, events[0][objName]);
     } catch (error) {
       handleError(error, objName);
     }
