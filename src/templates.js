@@ -93,8 +93,6 @@ const createOrder = (side) => {
   return sellLimitOrder;
 };
 
-const assignOrder = (iexecConf, order) => Object.assign(iexecConf, { order });
-
 module.exports = {
   main,
   app,
@@ -104,5 +102,4 @@ module.exports = {
   chains,
   defaultOrder,
   createOrder,
-  assignOrder,
 };
