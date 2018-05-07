@@ -17,8 +17,8 @@ cli
   .option(...option.user());
 
 cli
-  .command('create')
-  .description(desc.createObj(objName))
+  .command('deploy')
+  .description(desc.deployObj(objName))
   .action(async () => {
     try {
       const [chain, iexecConf] = await Promise.all([

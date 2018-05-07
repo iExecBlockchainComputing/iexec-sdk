@@ -150,7 +150,7 @@ iexec account withdraw <amount>
 # --chain <chainName>
 # --hub <address>
 # --user <address>
-iexec app create # create new app
+iexec app deploy # deploy new app
 iexec app show <address> # show app details
 iexec app show <index> # show app details by index
 iexec app count --user <userAddress> # count user total number of app
@@ -163,7 +163,7 @@ iexec app count --user <userAddress> # count user total number of app
 # --chain <chainName>
 # --hub <address>
 # --user <address>
-iexec dataset create # create new dataset
+iexec dataset deploy # deploy new dataset
 iexec dataset show <address> # show dataset details
 iexec dataset show <index> # show dataset details by index
 iexec dataset count --user <userAddress> # count user total number of dataset
@@ -187,7 +187,7 @@ iexec category count # count hub total number of category
 # --chain <chainName>
 # --hub <address>
 # --user <address>
-iexec workerpool create # create new workerpool
+iexec workerpool deploy # deploy new workerpool
 iexec workerpool show <address> # show workerpool details
 iexec workerpool show <index> # show workerpool details by index
 iexec workerpool count --user <userAddress> # count user total number of workerpool
