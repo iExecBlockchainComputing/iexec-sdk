@@ -48,12 +48,7 @@ const ethFaucets = [
 ];
 
 const checkBalances = async (contracts, address, { hub } = {}) => {
-  const rlcAddress = await contracts.getRLCAddress({ hub });
-  debug('rlcAddress', rlcAddress);
-
-  if (!rlcAddress) {
-    throw Error(`no RLC token address found on chain ${contracts.chainID}`);
-  }
+  const rlcAddress = await contracts.fetchRLCAddress({ hub });
 
   const getETH = () =>
     contracts.eth.getBalance(address).catch((error) => {
@@ -145,11 +140,8 @@ const sendETH = async (contracts, value, from, to) => {
 };
 
 const sendRLC = async (contracts, amount, to, { hub } = {}) => {
-  const rlcAddress = await contracts.getRLCAddress({ hub });
+  const rlcAddress = await contracts.fetchRLCAddress({ hub });
   debug('rlcAddress', rlcAddress);
-  if (!rlcAddress) {
-    throw Error(`no RLC token address found on chain ${contracts.chainID}`);
-  }
 
   const rlcContract = contracts.getRLCContract({ at: rlcAddress });
 
