@@ -14,6 +14,9 @@ const info = {
   userAborted: () => 'operation aborted by user.',
   logging: () => 'logging into iExec...',
   creating: obj => `creating ${obj}...`,
+  placing: obj => `placing ${obj}...`,
+  filling: obj => `filling ${obj}...`,
+  cancelling: obj => `cancelling ${obj}...`,
   deploying: obj => `deploying ${obj}...`,
   showing: obj => `showing ${obj}...`,
   counting: obj => `counting ${obj}...`,
@@ -27,6 +30,8 @@ const command = {
   show: () => 'show',
   deposit: () => 'deposit <amount>',
   withdraw: () => 'withdraw <amount>',
+  fill: () => 'fill <orderID>',
+  cancel: () => 'cancel <orderID>',
 };
 
 const desc = {
@@ -36,7 +41,10 @@ const desc = {
   userAddress: () => 'custom user address',
   initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
+  placeObj: objName => `place a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
+  fill: objName => `fill an ${objName} to execute a work`,
+  cancel: objName => `cancel an ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   login: () => 'login into your iExec account',
@@ -53,6 +61,8 @@ const option = {
   chain: () => ['--chain <name>', desc.chainName(), 'ropsten'],
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
+  buy: () => ['--buy', 'init a buy order'],
+  sell: () => ['--sell', 'init a sell order'],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
@@ -187,12 +197,12 @@ const oraOptions = {
 const Spinner = () => Ora(oraOptions);
 
 const handleError = (error, cli, spinner = Spinner()) => {
-  debug('cli', cli);
-  const lastArg = cli.args[0]._name;
+  const lastArg = cli.args[cli.args.length - 1];
+  const lastCommandName = typeof lastArg === 'object' ? lastArg._name : '';
   const commandName = cli._name
     .split('-')
     .join(' ')
-    .concat(' ', lastArg);
+    .concat(' ', lastCommandName);
   console.log('\n');
   spinner.fail(`command "${commandName}" failed with ${error}`);
   cli.help();
