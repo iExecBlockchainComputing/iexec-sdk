@@ -150,6 +150,7 @@ iexec account withdraw <amount>
 # --chain <chainName>
 # --hub <address>
 # --user <address>
+iexec app init # init new app
 iexec app deploy # deploy new app
 iexec app show <address> # show app details
 iexec app show <index> # show app details by index
@@ -163,10 +164,25 @@ iexec app count --user <userAddress> # count user total number of app
 # --chain <chainName>
 # --hub <address>
 # --user <address>
+iexec dataset init # init new app
 iexec dataset deploy # deploy new dataset
 iexec dataset show <address> # show dataset details
 iexec dataset show <index> # show dataset details by index
 iexec dataset count --user <userAddress> # count user total number of dataset
+```
+
+## workerpool
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec workerpool init # init new workerpool
+iexec workerpool deploy # deploy new workerpool
+iexec workerpool show <address> # show workerpool details
+iexec workerpool show <index> # show workerpool details by index
+iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
 ## category
@@ -178,19 +194,6 @@ iexec dataset count --user <userAddress> # count user total number of dataset
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count hub total number of category
-```
-
-## workerpool
-
-```bash
-# OPTIONS
-# --chain <chainName>
-# --hub <address>
-# --user <address>
-iexec workerpool deploy # deploy new workerpool
-iexec workerpool show <address> # show workerpool details
-iexec workerpool show <index> # show workerpool details by index
-iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
 ## submit

@@ -33,6 +33,7 @@ const desc = {
     'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chains.json"',
   userAddress: () => 'custom user address',
+  initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,

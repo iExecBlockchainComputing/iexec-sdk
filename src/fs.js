@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
 const { prompt } = require('./cli-helper');
+const templates = require('./templates');
 
 const debug = Debug('iexec:fs');
 const openAsync = Promise.promisify(fs.open);
@@ -11,7 +12,7 @@ const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
 
 const IEXEC_FILE_NAME = 'iexec.json';
-const CHAINS_FILE_NAME = 'chain.json';
+const CHAIN_FILE_NAME = 'chain.json';
 const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
@@ -37,12 +38,16 @@ const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
     throw error;
   }
 };
+const saveIExecConf = (obj, options) =>
+  saveJSONToFile(IEXEC_FILE_NAME, obj, options);
 const saveAccountConf = (obj, options) =>
   saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
 const saveWalletConf = (obj, options) =>
   saveJSONToFile(WALLET_FILE_NAME, obj, options);
 const saveDeployedConf = (obj, options) =>
   saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
+const saveChainConf = (obj, options) =>
+  saveJSONToFile(CHAIN_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
   try {
@@ -71,13 +76,25 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
   }
 };
 const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainsConf = options => loadJSONAndRetry(CHAINS_FILE_NAME, options);
+const loadChainsConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
 const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
 const loadDeployedConf = options =>
   loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
-const saveObj = async (objName, chainID, address) => {
+const saveObj = async (objName, { obj } = {}) => {
+  try {
+    const iexecConf = await loadIExecConf();
+    iexecConf[objName] = obj || templates[objName];
+    const fileName = await saveIExecConf(iexecConf, { force: true });
+    return { saved: iexecConf[objName], fileName };
+  } catch (error) {
+    debug('saveObj()', error);
+    throw error;
+  }
+};
+
+const saveDeployedObj = async (objName, chainID, address) => {
   try {
     const deployedConf = await loadDeployedConf({ retry: () => ({}) });
     debug('deployedConf', deployedConf);
@@ -87,7 +104,7 @@ const saveObj = async (objName, chainID, address) => {
 
     await saveDeployedConf(deployedConf, { force: true });
   } catch (error) {
-    debug('saveObj()', error);
+    debug('saveDeployedObj()', error);
     throw error;
   }
 };
@@ -97,6 +114,7 @@ module.exports = {
   saveAccountConf,
   saveWalletConf,
   saveDeployedConf,
+  saveChainConf,
   loadJSONFile,
   loadJSONAndRetry,
   loadIExecConf,
@@ -104,5 +122,6 @@ module.exports = {
   loadAccountConf,
   loadWalletConf,
   loadDeployedConf,
+  saveDeployedObj,
   saveObj,
 };

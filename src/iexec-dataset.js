@@ -2,7 +2,12 @@
 
 const cli = require('commander');
 const {
-  help, handleError, desc, option,
+  help,
+  handleError,
+  desc,
+  option,
+  Spinner,
+  pretty,
 } = require('./cli-helper');
 const hub = require('./hub');
 const { loadIExecConf, saveObj } = require('./fs');
@@ -15,6 +20,19 @@ cli
   .option(...option.chain())
   .option(...option.hub())
   .option(...option.user());
+
+cli
+  .command('init')
+  .description(desc.initObj(objName))
+  .action(async () => {
+    const spinner = Spinner();
+    try {
+      const { saved, fileName } = await saveObj(objName);
+      spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('deploy')
