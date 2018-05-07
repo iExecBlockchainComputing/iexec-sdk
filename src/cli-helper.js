@@ -187,7 +187,6 @@ const oraOptions = {
 const Spinner = () => Ora(oraOptions);
 
 const handleError = (error, cli, spinner = Spinner()) => {
-  debug('cli', cli);
   const lastArg = cli.rawArgs[cli.rawArgs.length - 1];
   const commandName = cli._name
     .split('-')
@@ -195,7 +194,6 @@ const handleError = (error, cli, spinner = Spinner()) => {
     .concat(' ', lastArg);
   console.log('\n');
   spinner.fail(`command "${commandName}" failed with ${error}`);
-  console.log('\n');
   cli.help();
   process.exit(1);
 };
