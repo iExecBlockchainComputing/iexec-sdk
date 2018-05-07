@@ -10,7 +10,7 @@ const {
   Spinner,
   pretty,
 } = require('./cli-helper');
-const { loadIExecConf, saveObj } = require('./fs');
+const { loadIExecConf, initObj } = require('./fs');
 const { loadChain } = require('./chains.js');
 
 const objName = 'category';
@@ -23,7 +23,7 @@ cli
   .action(async () => {
     const spinner = Spinner();
     try {
-      const { saved, fileName } = await saveObj(objName);
+      const { saved, fileName } = await initObj(objName);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
       handleError(error, cli);
