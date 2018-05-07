@@ -182,6 +182,23 @@ iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
+## order
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --sell
+# --buy
+iexec order init --buy # init new buy order
+iexec order init --sell # init new sell order
+iexec order place # place an order at limit price
+iexec order show <orderID> # show an order
+iexec order fill <orderID> # fill an order at market price and start work execution
+iexec order cancel <orderID> # cancel an order
+iexec order count # count marketplace total number of order
+```
+
 ## category
 
 ```bash
