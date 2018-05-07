@@ -4,6 +4,6 @@
   "rules": {
     "no-console": 0,
     "max-len": "off",
-    "no-underscore-dangle": ["error", { "allow": ["_execs"] }]
+    "no-underscore-dangle": ["error", { "allow": ["_execs", "_name"] }]
   }
 }
