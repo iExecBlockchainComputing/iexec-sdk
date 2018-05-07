@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { prompt } = require('./cli-helper');
 const templates = require('./templates');
-const { createOrder, assignOrder } = require('./templates');
+const { createOrder } = require('./templates');
 
 const debug = Debug('iexec:fs');
 const openAsync = Promise.promisify(fs.open);
@@ -110,8 +110,9 @@ const initOrder = async (side) => {
   try {
     const iexecConf = await loadIExecConf();
     const order = createOrder(side);
-    const newIExecConf = assignOrder(iexecConf, order);
-    const fileName = await saveIExecConf(newIExecConf, { force: true });
+    if (typeof iexecConf.order !== 'object') iexecConf.order = {};
+    iexecConf.order[side] = order;
+    const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: order, fileName };
   } catch (error) {
     debug('initOrder()', error);
