@@ -109,6 +109,18 @@ const saveDeployedObj = async (objName, chainID, address) => {
   }
 };
 
+const loadDeployedObj = async (objName) => {
+  try {
+    const deployedConf = await loadDeployedConf({ retry: () => ({}) });
+
+    if (typeof deployedConf[objName] !== 'object') return {};
+    return deployedConf[objName];
+  } catch (error) {
+    debug('loadDeployedObj', error);
+    throw error;
+  }
+};
+
 module.exports = {
   saveJSONToFile,
   saveAccountConf,
@@ -124,4 +136,5 @@ module.exports = {
   loadDeployedConf,
   saveDeployedObj,
   saveObj,
+  loadDeployedObj,
 };

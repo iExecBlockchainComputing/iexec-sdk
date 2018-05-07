@@ -10,7 +10,12 @@ const {
   pretty,
 } = require('./cli-helper');
 const hub = require('./hub');
-const { loadIExecConf, saveObj, saveDeployedObj } = require('./fs');
+const {
+  loadIExecConf,
+  saveObj,
+  saveDeployedObj,
+  loadDeployedObj,
+} = require('./fs');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
@@ -58,16 +63,19 @@ cli
   });
 
 cli
-  .command('show <addressOrIndex>')
+  .command('show [addressOrIndex]')
   .description(desc.showObj(objName))
-  .action(async (addressOrIndex) => {
+  .action(async (cliAddressOrIndex) => {
     try {
-      const [chain, { address }] = await Promise.all([
+      const [chain, { address }, deployedObj] = await Promise.all([
         loadChain(cli.chain),
         load(),
+        loadDeployedObj(objName),
       ]);
+
       const hubAddress = cli.hub || chain.hub;
       const userAddress = cli.user || address;
+      const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
 
       await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
         hub: hubAddress,
