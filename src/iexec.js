@@ -1,12 +1,36 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { help } = require('./cli-helper');
+const {
+  handleError,
+  help,
+  Spinner,
+  pretty,
+  desc,
+  option,
+} = require('./cli-helper');
+const { initIExecConf, initChainConf } = require('./fs');
 const packageJSON = require('../package.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
 
-cli.command('init', 'init sample iexec dapp');
+cli.option(...option.force());
+
+cli
+  .command('init')
+  .description(desc.initObj('project'))
+  .action(async () => {
+    const spinner = Spinner();
+    try {
+      const { saved, fileName } = await initIExecConf({ force: cli.force });
+      spinner.info(`Here is your main config "${fileName}":${pretty(saved)}`);
+      const chainRes = await initChainConf({ force: cli.force });
+      spinner.info(`Here is your chain config "${chainRes.fileName}":${pretty(chainRes.saved)}`);
+      spinner.succeed('iExec project is ready\n');
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 cli.command('wallet', 'manage local ethereum wallet');
 

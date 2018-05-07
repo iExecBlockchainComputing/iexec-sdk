@@ -76,20 +76,31 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
   }
 };
 const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainsConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
+const loadChainConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
 const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
 const loadDeployedConf = options =>
   loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
-const saveObj = async (objName, { obj } = {}) => {
+const initIExecConf = async (options) => {
+  const iexecConf = Object.assign(templates.main, { app: templates.app });
+  const fileName = await saveIExecConf(iexecConf, options);
+  return { saved: iexecConf, fileName };
+};
+
+const initChainConf = async (options) => {
+  const fileName = await saveChainConf(templates.chains, options);
+  return { saved: templates.chains, fileName };
+};
+
+const initObj = async (objName, { obj } = {}) => {
   try {
-    const iexecConf = await loadIExecConf();
+    const iexecConf = await loadIExecConf({ retry: initIExecConf });
     iexecConf[objName] = obj || templates[objName];
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: iexecConf[objName], fileName };
   } catch (error) {
-    debug('saveObj()', error);
+    debug('initObj()', error);
     throw error;
   }
 };
@@ -110,15 +121,10 @@ const saveDeployedObj = async (objName, chainID, address) => {
 };
 
 const loadDeployedObj = async (objName) => {
-  try {
-    const deployedConf = await loadDeployedConf({ retry: () => ({}) });
+  const deployedConf = await loadDeployedConf({ retry: () => ({}) });
 
-    if (typeof deployedConf[objName] !== 'object') return {};
-    return deployedConf[objName];
-  } catch (error) {
-    debug('loadDeployedObj', error);
-    throw error;
-  }
+  if (typeof deployedConf[objName] !== 'object') return {};
+  return deployedConf[objName];
 };
 
 module.exports = {
@@ -130,11 +136,13 @@ module.exports = {
   loadJSONFile,
   loadJSONAndRetry,
   loadIExecConf,
-  loadChainsConf,
+  loadChainConf,
   loadAccountConf,
   loadWalletConf,
   loadDeployedConf,
   saveDeployedObj,
-  saveObj,
+  initObj,
+  initIExecConf,
   loadDeployedObj,
+  initChainConf,
 };
