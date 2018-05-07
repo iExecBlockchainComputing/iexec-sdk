@@ -48,7 +48,7 @@ cli
       const jwtForPrint = decodeJWTForPrint(jwtoken);
       spinner.succeed(`You are logged into iExec. Login token saved into "${fileName}":${pretty(jwtForPrint)}`);
     } catch (error) {
-      handleError(error, objName, spinner);
+      handleError(error, cli, spinner);
     }
   });
 
@@ -65,7 +65,7 @@ cli
         hub: hubAddress,
       });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -82,7 +82,7 @@ cli
         hub: hubAddress,
       });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -119,7 +119,7 @@ cli
 
       spinner.succeed(`Account balances:${prettyRPC(balancesRPC)}`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 

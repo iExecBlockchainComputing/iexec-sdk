@@ -35,7 +35,7 @@ cli
       const res = await keystore.createAndSave({ force: cli.force || false });
       spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
     } catch (error) {
-      handleError(error, objName, spinner);
+      handleError(error, cli, spinner);
     }
   });
 
@@ -69,7 +69,7 @@ cli
       };
       spinner.succeed(`Wallet ${cli.chain} balances [${chain.id}]:${pretty(strBalances)}`);
     } catch (error) {
-      handleError(error, 'wallet', spinner);
+      handleError(error, cli, spinner);
     }
   });
 
@@ -81,7 +81,7 @@ cli
       const { address } = await keystore.load();
       await wallet.getETH(cli.chain, address);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -93,7 +93,7 @@ cli
       const { address } = await keystore.load();
       await wallet.getRLC(cli.chain, address);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -122,7 +122,7 @@ cli
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -155,7 +155,7 @@ cli
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -183,7 +183,7 @@ cli
 
       spinner.succeed(`Wallet swept from ${address} to ${cli.to}\n`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 

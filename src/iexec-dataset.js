@@ -35,7 +35,7 @@ cli
       const { saved, fileName } = await saveObj(objName);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -58,7 +58,7 @@ cli
       );
       await saveDeployedObj(objName, chain.id, events[0][objName]);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -81,7 +81,7 @@ cli
         hub: hubAddress,
       });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -101,7 +101,7 @@ cli
         hub: hubAddress,
       });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 

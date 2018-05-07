@@ -186,10 +186,17 @@ const oraOptions = {
 
 const Spinner = () => Ora(oraOptions);
 
-const handleError = (error, anchorName, spinner = Spinner()) => {
-  spinner.fail(`command "iexec ${anchorName}" failed with ${error}`);
-  console.log('');
-  spinner.info(`iExec SDK doc: https://github.com/iExecBlockchainComputing/iexec-sdk#${anchorName}`);
+const handleError = (error, cli, spinner = Spinner()) => {
+  debug('cli', cli);
+  const lastArg = cli.rawArgs[cli.rawArgs.length - 1];
+  const commandName = cli._name
+    .split('-')
+    .join(' ')
+    .concat(' ', lastArg);
+  console.log('\n');
+  spinner.fail(`command "${commandName}" failed with ${error}`);
+  console.log('\n');
+  cli.help();
   process.exit(1);
 };
 

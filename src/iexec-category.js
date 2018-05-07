@@ -26,7 +26,7 @@ cli
       const { saved, fileName } = await saveObj(objName);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -44,7 +44,7 @@ cli
         hub: hubAddress,
       });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -57,7 +57,7 @@ cli
       const hubAddress = cli.hub || chain.hub;
       await hub.showCategory(chain.contracts, index, { hub: hubAddress });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
@@ -70,7 +70,7 @@ cli
       const hubAddress = cli.hub || chain.hub;
       await hub.countCategory(chain.contracts, { at: hubAddress });
     } catch (error) {
-      handleError(error, objName);
+      handleError(error, cli);
     }
   });
 
