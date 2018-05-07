@@ -4,7 +4,7 @@ const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
 const createIExecContracts = require('iexec-contracts-js-client');
 const keystore = require('./keystore');
-const { loadChainsConf } = require('./fs');
+const { loadChainConf } = require('./fs');
 const createIExecClient = require('iexec-server-js-client');
 
 const debug = Debug('iexec:chains');
@@ -59,7 +59,7 @@ const loadChains = async () => {
   try {
     const [{ address }, chainsConf] = await Promise.all([
       keystore.load(),
-      loadChainsConf(),
+      loadChainConf(),
     ]);
     const chains = createChains(address, chainsConf, keystore);
     return chains;
