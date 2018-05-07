@@ -73,8 +73,6 @@ const createCategory = async (contracts, obj, options) => {
   const txHash = await contracts.createCategory(obj, options);
 
   const txReceipt = await contracts.waitForReceipt(txHash);
-  debug('txReceipt', txReceipt);
-
   const events = contracts.decodeHubLogs(txReceipt.logs);
   debug('events', events);
 

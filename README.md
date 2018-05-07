@@ -191,6 +191,7 @@ iexec workerpool count --user <userAddress> # count user total number of workerp
 # OPTIONS
 # --chain <chainName>
 # --hub <address>
+iexec category init # init new category
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count hub total number of category

@@ -36,6 +36,7 @@ const desc = {
   userAddress: () => 'custom user address',
   initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
+  createObj: objName => `deploy a new ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   login: () => 'login into your iExec account',

@@ -3,14 +3,32 @@
 const cli = require('commander');
 const hub = require('./hub');
 const {
-  handleError, help, desc, option,
+  handleError,
+  help,
+  desc,
+  option,
+  Spinner,
+  pretty,
 } = require('./cli-helper');
-const { loadIExecConf } = require('./fs');
+const { loadIExecConf, saveObj } = require('./fs');
 const { loadChain } = require('./chains.js');
 
 const objName = 'category';
 
 cli.option(...option.chain()).option(...option.hub());
+
+cli
+  .command('init')
+  .description(desc.initObj(objName))
+  .action(async () => {
+    const spinner = Spinner();
+    try {
+      const { saved, fileName } = await saveObj(objName);
+      spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
+    } catch (error) {
+      handleError(error, objName);
+    }
+  });
 
 cli
   .command('create')
