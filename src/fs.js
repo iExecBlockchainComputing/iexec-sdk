@@ -59,7 +59,7 @@ const loadJSONFile = async (fileName) => {
   } catch (error) {
     debug('loadFile() error', error);
     if (error.code === 'ENOENT') {
-      throw new Error(`Aborting. You need "${fileName}" file to continue`);
+      throw new Error(`Missing "${fileName}" file, did you forget to run "iexec init"?`);
     }
     throw error;
   }
@@ -95,7 +95,7 @@ const initChainConf = async (options) => {
 
 const initObj = async (objName, { obj } = {}) => {
   try {
-    const iexecConf = await loadIExecConf({ retry: initIExecConf });
+    const iexecConf = await loadIExecConf();
     iexecConf[objName] = obj || templates[objName];
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: iexecConf[objName], fileName };
