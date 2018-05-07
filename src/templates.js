@@ -42,9 +42,10 @@ const category = {
 const chains = {
   chains: {
     dev: {
-      host: 'localhost',
-      id: '*',
+      host: 'http://localhost:8545',
+      id: '1337',
       server: 'https://localhost:443',
+      hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
