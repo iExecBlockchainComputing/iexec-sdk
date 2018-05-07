@@ -187,7 +187,8 @@ const oraOptions = {
 const Spinner = () => Ora(oraOptions);
 
 const handleError = (error, cli, spinner = Spinner()) => {
-  const lastArg = cli.rawArgs[cli.rawArgs.length - 1];
+  debug('cli', cli);
+  const lastArg = cli.args[0]._name;
   const commandName = cli._name
     .split('-')
     .join(' ')
