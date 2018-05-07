@@ -52,6 +52,6 @@ cli.command('category', 'manage iExec categories');
 
 cli.command('workerpool', 'manage iExec workerpools');
 
-cli.command('market', 'manage iExec app');
+cli.command('order', 'manage iExec marketplace orders');
 
 help(cli);
