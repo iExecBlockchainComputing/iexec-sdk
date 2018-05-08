@@ -211,13 +211,6 @@ iexec category show <index> # show category details by index
 iexec category count # count hub total number of category
 ```
 
-## submit
-
-```bash
-iexec submit --chain ropsten # submit work to your own dapp
-iexec submit --dapp 0xE22F4...  --chain ropsten # submit work to someone else dapp address
-```
-
 ## result
 
 You need the txHash of a work submission in order to check its result:
