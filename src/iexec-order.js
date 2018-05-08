@@ -20,20 +20,15 @@ const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
 cli
-  .option(...option.chain())
-  .option(...option.hub())
-  .option(...option.sell())
-  .option(...option.buy());
-
-cli
   .command('init')
   .option(...option.sell())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
+      debug('cmd.sell', cmd.sell);
       const side = cmd.sell ? 'sell' : 'buy';
-
+      debug('side', side);
       const { saved, fileName } = await initOrder(side);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
