@@ -13,7 +13,8 @@ test('iexec wallet create', () =>
 
 test(
   'iexec wallet show',
-  () => expect(execAsync('iexec wallet show')).resolves.not.toBe(1),
+  () =>
+    expect(execAsync('iexec wallet show --chain kovan')).resolves.not.toBe(1),
   10000,
 );
 
