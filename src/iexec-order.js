@@ -22,6 +22,7 @@ const objName = 'order';
 cli
   .command('init')
   .option(...option.sell())
+  .option(...option.buy())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
