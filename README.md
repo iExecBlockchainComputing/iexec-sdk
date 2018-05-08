@@ -23,7 +23,7 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%206.4.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 
 ```bash
-npm -g install iexec # install the cli
+npm -g install iexec@next # install the cli
 iexec --version
 iexec --help
 ```
@@ -36,17 +36,17 @@ Requirements: [Docker](https://docs.docker.com/install/).
 
 ```bash
 # For Linux users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bashrc && source ~/.bashrc
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:next'"'"'' >> ~/.bashrc && source ~/.bashrc
 # For Mac OSX users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bash_profile && source ~/.bash_profile
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:next'"'"'' >> ~/.bash_profile && source ~/.bash_profile
 ```
 
 Now run `iexec --version` to check all is working.
 
 ## Upgrade
 
-* **Nodejs**: run `npm -g install iexec`
-* **Docker**: run `docker pull iexechub/iexec-sdk`
+* **Nodejs**: run `npm -g install iexec@next`
+* **Docker**: run `docker pull iexechub/iexec-sdk:next`
 
 ## Init & Wallet setup
 
