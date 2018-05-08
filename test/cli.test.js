@@ -11,12 +11,12 @@ test('iexec init', () => {
 test('iexec wallet create', () =>
   expect(execAsync('iexec wallet create --force')).resolves.not.toBe(1));
 
-test(
-  'iexec wallet show',
-  () =>
-    expect(execAsync('iexec wallet show --chain kovan')).resolves.not.toBe(1),
-  10000,
-);
+// test(
+//   'iexec wallet show',
+//   () =>
+//     expect(execAsync('iexec wallet show --chain kovan')).resolves.not.toBe(1),
+//     10000,
+// );
 
 test('iexec account login', () =>
   expect(execAsync('iexec account login --force')).resolves.not.toBe(1));
