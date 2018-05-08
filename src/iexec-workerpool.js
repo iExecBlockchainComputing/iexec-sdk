@@ -22,11 +22,6 @@ const { loadChain } = require('./chains.js');
 const objName = 'workerPool';
 
 cli
-  .option(...option.chain())
-  .option(...option.hub())
-  .option(...option.user());
-
-cli
   .command('init')
   .description(desc.initObj(objName))
   .action(async () => {
@@ -41,14 +36,16 @@ cli
 
 cli
   .command('deploy')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.deployObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     try {
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
       const events = await hub.createObj(objName)(
         chain.contracts,
         iexecConf[objName],
@@ -64,17 +61,20 @@ cli
 
 cli
   .command('show [addressOrIndex]')
+  .option(...option.chain())
+  .option(...option.hub())
+  .option(...option.user())
   .description(desc.showObj(objName))
-  .action(async (cliAddressOrIndex) => {
+  .action(async (cliAddressOrIndex, cmd) => {
     try {
       const [chain, { address }, deployedObj] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         load(),
         loadDeployedObj(objName),
       ]);
 
-      const hubAddress = cli.hub || chain.hub;
-      const userAddress = cli.user || address;
+      const hubAddress = cmd.hub || chain.hub;
+      const userAddress = cmd.user || address;
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
 
       await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
@@ -87,15 +87,18 @@ cli
 
 cli
   .command('count')
+  .option(...option.chain())
+  .option(...option.hub())
+  .option(...option.user())
   .description(desc.countObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     try {
       const [chain, { address }] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         load(),
       ]);
-      const hubAddress = cli.hub || chain.hub;
-      const userAddress = cli.user || address;
+      const hubAddress = cmd.hub || chain.hub;
+      const userAddress = cmd.user || address;
 
       await hub.countObj(objName)(chain.contracts, userAddress, {
         hub: hubAddress,

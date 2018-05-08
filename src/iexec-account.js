@@ -23,27 +23,22 @@ const debug = Debug('iexec:iexec-account');
 const objName = 'account';
 
 cli
-  .option(...option.chain())
-  .option(...option.hub())
-  .option(...option.force());
-
-cli
   .command('login')
+  .option(...option.chain())
+  .option(...option.force())
   .description(desc.login())
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
       const [chain, { address }] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         keystore.load({ lowercase: true }),
       ]);
-
+      const force = cmd.force || false;
+      debug('force', force);
       const jwtoken = await account.auth(address, chain.iexec, chain.ethjs);
 
-      const fileName = await saveAccountConf(
-        { jwtoken },
-        { force: cli.force || false },
-      );
+      const fileName = await saveAccountConf({ jwtoken }, { force });
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
       spinner.succeed(`You are logged into iExec. Login token saved into "${fileName}":${pretty(jwtForPrint)}`);
@@ -54,11 +49,13 @@ cli
 
 cli
   .command(command.deposit())
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.deposit())
-  .action(async (amount) => {
+  .action(async (amount, cmd) => {
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
       debug('amount', amount);
 
       await account.deposit(chain.contracts, amount, {
@@ -71,11 +68,13 @@ cli
 
 cli
   .command(command.withdraw())
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.withdraw())
-  .action(async (amount) => {
+  .action(async (amount, cmd) => {
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
       debug('amount', amount);
 
       await account.withdraw(chain.contracts, amount, {
@@ -88,16 +87,18 @@ cli
 
 cli
   .command('show [address]')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.showObj('iExec', objName))
-  .action(async (address) => {
+  .action(async (address, cmd) => {
     const spinner = Spinner();
     try {
       const [chain, userWallet, { jwtoken }] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         keystore.load(),
         loadAccountConf(),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
       const userAddress = address || userWallet.address;
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);

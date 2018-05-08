@@ -21,18 +21,15 @@ const debug = Debug('iexec:iexec-wallet');
 const objName = 'wallet';
 
 cli
-  .option(...option.to())
+  .command('create')
   .option(...option.chain())
   .option(...option.force())
-  .option(...option.hub());
-
-cli
-  .command('create')
   .description(desc.createObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const res = await keystore.createAndSave({ force: cli.force || false });
+      const force = cmd.force || false;
+      const res = await keystore.createAndSave({ force });
       spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
     } catch (error) {
       handleError(error, cli, spinner);
@@ -41,15 +38,17 @@ cli
 
 cli
   .command('show [address]')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.showObj(objName, 'address'))
-  .action(async (address) => {
+  .action(async (address, cmd) => {
     const spinner = Spinner();
     try {
       const [userWallet, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
       if (address) userWallet.address = address;
       debug('userWallet.address', userWallet.address);
       spinner.info(`Wallet file:${pretty(userWallet)}`);
@@ -67,7 +66,7 @@ cli
         ETH: unit.fromWei(balances.wei, 'ether'),
         nRLC: balances.nRLC.toString(),
       };
-      spinner.succeed(`Wallet ${cli.chain} balances [${chain.id}]:${pretty(strBalances)}`);
+      spinner.succeed(`Wallet ${cmd.chain} balances [${chain.id}]:${pretty(strBalances)}`);
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -75,11 +74,12 @@ cli
 
 cli
   .command('getETH')
+  .option(...option.chain())
   .description(desc.getETH())
-  .action(async () => {
+  .action(async (cmd) => {
     try {
       const { address } = await keystore.load();
-      await wallet.getETH(cli.chain, address);
+      await wallet.getETH(cmd.chain, address);
     } catch (error) {
       handleError(error, cli);
     }
@@ -87,11 +87,12 @@ cli
 
 cli
   .command('getRLC')
+  .option(...option.chain())
   .description(desc.getRLC())
-  .action(async () => {
+  .action(async (cmd) => {
     try {
       const { address } = await keystore.load();
-      await wallet.getRLC(cli.chain, address);
+      await wallet.getRLC(cmd.chain, address);
     } catch (error) {
       handleError(error, cli);
     }
@@ -99,26 +100,29 @@ cli
 
 cli
   .command('sendETH <amount>')
+  .option(...option.chain())
+  .option(...option.to())
+  .option(...option.force())
   .description(desc.sendETH())
-  .action(async (amount) => {
+  .action(async (amount, cmd) => {
     const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
       ]);
       const weiAmount = unit.toWei(amount, 'ether');
 
-      if (!cli.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('missing --to option');
 
-      if (!cli.force) {
-        await prompt.transferETH(amount, cli.chain, cli.to, chain.id);
+      if (!cmd.force) {
+        await prompt.transferETH(amount, cmd.chain, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${cli.chain} ETH from ${address} to ${cli.to}`;
+      const message = `${amount} ${cmd.chain} ETH from ${address} to ${cmd.to}`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendETH(chain.contracts, weiAmount, address, cli.to);
+      await wallet.sendETH(chain.contracts, weiAmount, address, cmd.to);
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
@@ -128,28 +132,31 @@ cli
 
 cli
   .command('sendRLC <amount>')
+  .option(...option.chain())
+  .option(...option.to())
+  .option(...option.force())
   .description(desc.sendRLC())
-  .action(async (amount) => {
+  .action(async (amount, cmd) => {
     const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
 
-      if (!cli.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('missing --to option');
 
-      if (!cli.force) {
-        await prompt.transferRLC(amount, cli.chain, cli.to, chain.id);
+      if (!cmd.force) {
+        await prompt.transferRLC(amount, cmd.chain, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${cli.chain} nRLC from ${address} to ${
-        cli.to
+      const message = `${amount} ${cmd.chain} nRLC from ${address} to ${
+        cmd.to
       }`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendRLC(chain.contracts, amount, cli.to, {
+      await wallet.sendRLC(chain.contracts, amount, cmd.to, {
         hub: hubAddress,
       });
 
@@ -161,27 +168,29 @@ cli
 
 cli
   .command('sweep')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.sweep())
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
 
-      if (!cli.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('missing --to option');
 
-      if (!cli.force) {
-        await prompt.sweep(cli.chain, cli.to, chain.id);
+      if (!cmd.force) {
+        await prompt.sweep(cmd.chain, cmd.to, chain.id);
       }
 
       spinner.start('sweeping wallet...');
 
-      await wallet.sweep(chain.contracts, address, cli.to, { hub: hubAddress });
+      await wallet.sweep(chain.contracts, address, cmd.to, { hub: hubAddress });
 
-      spinner.succeed(`Wallet swept from ${address} to ${cli.to}\n`);
+      spinner.succeed(`Wallet swept from ${address} to ${cmd.to}\n`);
     } catch (error) {
       handleError(error, cli);
     }

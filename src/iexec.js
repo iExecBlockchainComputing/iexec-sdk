@@ -14,17 +14,16 @@ const packageJSON = require('../package.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
 
-cli.option(...option.force());
-
 cli
   .command('init')
+  .option(...option.force())
   .description(desc.initObj('project'))
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const { saved, fileName } = await initIExecConf({ force: cli.force });
+      const { saved, fileName } = await initIExecConf({ force: cmd.force });
       spinner.info(`Here is your main config "${fileName}":${pretty(saved)}`);
-      const chainRes = await initChainConf({ force: cli.force });
+      const chainRes = await initChainConf({ force: cmd.force });
       spinner.info(`Here is your chain config "${chainRes.fileName}":${pretty(chainRes.saved)}`);
       spinner.succeed('iExec project is ready\n');
     } catch (error) {
@@ -37,8 +36,6 @@ cli.command('wallet', 'manage local ethereum wallet');
 cli.command('account', 'manage iExec account');
 
 cli.command('server', 'manage server side apps and works');
-
-cli.command('submit [param]', 'submit a job to iExec');
 
 cli.command('result <txHash>', 'fetch the result of a job');
 

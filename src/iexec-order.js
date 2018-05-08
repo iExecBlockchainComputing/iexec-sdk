@@ -27,11 +27,12 @@ cli
 
 cli
   .command('init')
+  .option(...option.sell())
   .description(desc.initObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const side = cli.sell ? 'sell' : 'buy';
+      const side = cmd.sell ? 'sell' : 'buy';
 
       const { saved, fileName } = await initOrder(side);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
@@ -42,15 +43,17 @@ cli
 
 cli
   .command('place')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.placeObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
 
       if (!(objName in iexecConf) || !('sell' in iexecConf[objName])) {
         throw Error('Missing order. You probably forgot to run "iexec order init --sell"');
@@ -86,15 +89,17 @@ cli
 
 cli
   .command(command.fill())
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.fill(objName))
-  .action(async (orderID) => {
+  .action(async (orderID, cmd) => {
     const spinner = Spinner();
     try {
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
 
       if (!(objName in iexecConf) || !('buy' in iexecConf[objName])) {
         throw Error('Missing order. You probably forgot to run "iexec order init --buy"');
@@ -137,12 +142,14 @@ cli
 
 cli
   .command(command.cancel())
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.cancel(objName))
-  .action(async (orderID) => {
+  .action(async (orderID, cmd) => {
     const spinner = Spinner();
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
 
       spinner.start(info.cancelling(objName));
       const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
@@ -163,12 +170,14 @@ cli
 
 cli
   .command('show <orderID>')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.showObj(objName, 'marketplace'))
-  .action(async (orderID) => {
+  .action(async (orderID, cmd) => {
     const spinner = Spinner();
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
 
       spinner.start(info.showing(objName));
       const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
@@ -185,12 +194,14 @@ cli
 
 cli
   .command('count')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.countObj(objName, 'marketplace'))
-  .action(async () => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
 
       spinner.start(info.counting(objName));
       const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({

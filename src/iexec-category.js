@@ -15,8 +15,6 @@ const { loadChain } = require('./chains.js');
 
 const objName = 'category';
 
-cli.option(...option.chain()).option(...option.hub());
-
 cli
   .command('init')
   .description(desc.initObj(objName))
@@ -32,14 +30,16 @@ cli
 
 cli
   .command('create')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.createObj(objName))
-  .action(async () => {
+  .action(async (cmd) => {
     try {
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cli.chain),
+        loadChain(cmd.chain),
       ]);
-      const hubAddress = cli.hub || chain.hub;
+      const hubAddress = cmd.hub || chain.hub;
       await hub.createCategory(chain.contracts, iexecConf[objName], {
         hub: hubAddress,
       });
@@ -50,11 +50,13 @@ cli
 
 cli
   .command('show <index>')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.showObj(objName, 'hub'))
-  .action(async (index) => {
+  .action(async (index, cmd) => {
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
       await hub.showCategory(chain.contracts, index, { hub: hubAddress });
     } catch (error) {
       handleError(error, cli);
@@ -63,11 +65,13 @@ cli
 
 cli
   .command('count')
+  .option(...option.chain())
+  .option(...option.hub())
   .description(desc.showObj(objName, 'hub'))
-  .action(async () => {
+  .action(async (cmd) => {
     try {
-      const chain = await loadChain(cli.chain);
-      const hubAddress = cli.hub || chain.hub;
+      const chain = await loadChain(cmd.chain);
+      const hubAddress = cmd.hub || chain.hub;
       await hub.countCategory(chain.contracts, { at: hubAddress });
     } catch (error) {
       handleError(error, cli);
