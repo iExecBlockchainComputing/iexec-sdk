@@ -66,11 +66,7 @@ const option = {
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
-  force: () => [
-    '--force',
-    'force wallet creation even if old wallet exists',
-    false,
-  ],
+  force: () => ['--force', 'force wallet creation even if old wallet exists'],
 };
 
 const question = async (message, error = 'operation aborted by user') => {
@@ -98,36 +94,6 @@ prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);
 prompt.transferRLC = (...args) => prompt.transfer('nRLC', ...args);
 prompt.sweep = (...args) =>
   prompt.transfer('ETH and RLC', 'all wallet', ...args);
-
-const helpMessage = () => {
-  console.log('');
-  console.log('  Links:');
-  console.log('');
-  console.log('    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-api');
-  console.log('    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues');
-  console.log('    help: https://slack.iex.ec');
-  console.log('');
-};
-
-const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
-  cli.on('--help', helpMessage);
-  cli.parse(process.argv);
-
-  if (checkNoArgs && cli.args.length === 0) {
-    console.log('');
-    console.log(colors.red('  missing argument'));
-    cli.help();
-  } else if (checkWrongArgs) {
-    if (typeof cli.args[cli.args.length - 1] !== 'object') {
-      debug('not an object');
-      if (!cli._execs[cli.args[0]]) {
-        console.log('');
-        console.log(colors.red(`  unknown command "${cli.args[0]}"`));
-        cli.help();
-      }
-    }
-  }
-};
 
 const oraOptions = {
   color: 'yellow',
@@ -194,6 +160,35 @@ const oraOptions = {
   },
 };
 
+const helpMessage =
+  '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
+const outputHelpMessage = () => console.log(helpMessage);
+const helpCB = (mess) => {
+  const newMessage = mess.concat(helpMessage);
+  console.log(newMessage);
+  process.exit(1);
+};
+
+const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
+  cli.on('--help', outputHelpMessage);
+  cli.parse(process.argv);
+
+  if (checkNoArgs && cli.args.length === 0) {
+    console.log('');
+    console.log(colors.red('  missing argument'));
+    cli.help(helpCB);
+  } else if (checkWrongArgs) {
+    if (typeof cli.args[cli.args.length - 1] !== 'object') {
+      debug('not an object');
+      if (!cli._execs[cli.args[0]]) {
+        console.log('');
+        console.log(colors.red(`  unknown command "${cli.args[0]}"`));
+        cli.help(helpCB);
+      }
+    }
+  }
+};
+
 const Spinner = () => Ora(oraOptions);
 
 const handleError = (error, cli, spinner = Spinner()) => {
@@ -205,8 +200,7 @@ const handleError = (error, cli, spinner = Spinner()) => {
     .concat(' ', lastCommandName);
   console.log('\n');
   spinner.fail(`command "${commandName}" failed with ${error}`);
-  cli.help();
-  process.exit(1);
+  cli.help(helpCB);
 };
 
 const lbb = (str = '') => `\n${str}`;
