@@ -4,10 +4,9 @@ const ethjsUtil = require('ethjs-util');
 const ethjsSigner = require('ethjs-signer');
 const { generate, privateToAccount } = require('ethjs-account');
 const EC = require('elliptic').ec;
-const sigUtil = require('eth-sig-util');
-const ethUtil = require('ethereumjs-util');
 const { saveWalletConf, loadWalletConf } = require('./fs');
 const { prompt } = require('./cli-helper');
+const sigUtils = require('./sig-utils');
 
 const debug = Debug('iexec:keystore');
 const secp256k1 = new EC('secp256k1');
@@ -91,11 +90,13 @@ const signTransaction = async (rawTx) => {
 
 const signMessage = async (message) => {
   try {
-    const { privateKey } = await load();
-    const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
-    const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
-    const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
-    return signedMessage;
+    debug('message', message);
+    // const { privateKey } = await load();
+    // const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
+    // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
+    // const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
+    // return signedMessage;
+    throw Error('eth_sign not implemented');
   } catch (error) {
     debug('signMessage()', error);
     throw error;
@@ -104,12 +105,14 @@ const signMessage = async (message) => {
 
 const signPersonalMessage = async (msgHex) => {
   try {
-    const { privateKey } = await load({ prefix: false });
-    const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const signedPersonalMess = sigUtil.personalSign(privKeyBuffer, {
-      data: msgHex,
-    });
-    return signedPersonalMess;
+    debug('msgHex', msgHex);
+    throw Error('personal_sign not implemented');
+    // const { privateKey } = await load({ prefix: false });
+    // const privKeyBuffer = Buffer.from(privateKey, 'hex');
+    // const signedPersonalMess = sigUtil.personalSign(privKeyBuffer, {
+    //   data: msgHex,
+    // });
+    // return signedPersonalMess;
   } catch (error) {
     debug('signPersonalMessage()', error);
     throw error;
@@ -118,10 +121,9 @@ const signPersonalMessage = async (msgHex) => {
 
 const signTypedData = async (typedData) => {
   try {
-    debug('typedData', typedData);
     const { privateKey } = await load({ prefix: false });
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const signedTypedData = sigUtil.signTypedData(privKeyBuffer, {
+    const signedTypedData = sigUtils.signTypedData(privKeyBuffer, {
       data: typedData,
     });
     return signedTypedData;
