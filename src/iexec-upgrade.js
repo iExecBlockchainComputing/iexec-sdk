@@ -36,10 +36,10 @@ async function upgrade() {
     }
     spinner.succeed(`You have the latest version of iExec SDK → ${currentVersion}`);
 
-    spinner.start(`upgrading iExec project ${__dirname}...`);
-    spinner.succeed(`iExec project ${__dirname} upgrade successfull`);
+    // spinner.start(`upgrading iExec project ${__dirname}...`);
+    // spinner.succeed(`iExec project ${__dirname} upgrade successfull`);
   } catch (error) {
-    handleError(error, 'upgrade', spinner);
+    handleError(error, cli, spinner);
   }
 }
 upgrade();
