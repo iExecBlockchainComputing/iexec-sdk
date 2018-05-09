@@ -34,7 +34,7 @@
     "ethjs-unit": "^0.1.6",
     "ethjs-util": "^0.1.4",
     "fs-extra": "^5.0.0",
-    "iexec-contracts-js-client": "2.0.3",
+    "iexec-contracts-js-client": "2.0.4",
     "iexec-server-js-client": "^2.0.0",
     "inquirer": "5.2.0",
     "is-docker": "^1.1.0",
