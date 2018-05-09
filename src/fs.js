@@ -18,7 +18,11 @@ const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 
-const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
+const saveJSONToFile = async (
+  fileName,
+  obj,
+  { force = false, strict = true } = {},
+) => {
   const json = JSON.stringify(obj, null, 2);
   try {
     if (force) {
@@ -31,9 +35,12 @@ const saveJSONToFile = async (fileName, obj, { force = false } = {}) => {
     return fileName;
   } catch (error) {
     if (error.code === 'EEXIST') {
-      await prompt.overwrite(fileName);
-      await writeFileAsync(fileName, json);
-      return fileName;
+      const answer = await prompt.overwrite(fileName, { strict });
+      if (answer) {
+        await writeFileAsync(fileName, json);
+        return fileName;
+      }
+      return '';
     }
     debug('saveJSONToFile()', error);
     throw error;

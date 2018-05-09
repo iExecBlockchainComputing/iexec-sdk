@@ -69,7 +69,10 @@ const option = {
   force: () => ['--force', 'force wallet creation even if old wallet exists'],
 };
 
-const question = async (message, error = 'operation aborted by user') => {
+const question = async (
+  message,
+  { error = 'operation aborted by user', strict = true },
+) => {
   const answer = await inquirer.prompt([
     {
       type: 'confirm',
@@ -78,14 +81,15 @@ const question = async (message, error = 'operation aborted by user') => {
     },
   ]);
   if (answer.ok) return true;
-  throw Error(error);
+  if (strict) throw Error(error);
+  return false;
 };
 
 const prompt = {
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
-  overwrite: file =>
-    question(`${file} already exists, replace it with new one?`),
+  overwrite: (file, options) =>
+    question(`${file} already exists, replace it with new one?`, options),
   transfer: (currency, amount, chainName, to, chainID) =>
     question(`Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`),
 };
