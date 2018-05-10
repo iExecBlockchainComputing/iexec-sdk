@@ -1,7 +1,8 @@
-FROM node:9.11-alpine
+FROM node:10-alpine
 
 RUN apk add --no-cache git
 
+ENV NODE_NO_WARNINGS 1
 ENV user node
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
@@ -15,6 +16,8 @@ USER $user
 RUN mkdir /home/$user/.npm-global
 
 WORKDIR /home/$user/app
-RUN npm -g i --no-optional
+RUN npm install
+RUN npm run build
+RUN npm -g install . --no-optional
 
 ENTRYPOINT ["iexec"]
