@@ -42,7 +42,7 @@ test('iexec truffle version', () =>
 test('iexec server version', () =>
   expect(execAsync('iexec server version')).resolves.not.toBe(1));
 
-test('iexec upgrade', () =>
-  expect(execAsync('iexec upgrade')).resolves.not.toBe(1));
+// test('iexec upgrade', () =>
+//   expect(execAsync('iexec upgrade')).resolves.not.toBe(1));
 
 afterAll(() => fs.remove('iexec-init'));
