@@ -40,12 +40,13 @@ iexec --help
 #### Using Docker
 
 Requirements: [Docker](https://docs.docker.com/install/).
+Don't forget to change "1.7.7" to the version you want to use. "latest" did not work (as of 10/05/2018).
 
 ```bash
 # For Linux users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bashrc && source ~/.bashrc
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:1.7.7'"'"'' >> ~/.bashrc && source ~/.bashrc
 # For Mac OSX users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bash_profile && source ~/.bash_profile
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:1.7.7'"'"'' >> ~/.bash_profile && source ~/.bash_profile
 ```
 
 Now run `iexec --version` to check all is working.
