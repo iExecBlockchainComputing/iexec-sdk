@@ -27,7 +27,7 @@
     "commander": "2.15.1",
     "debug": "3.1.0",
     "elliptic": "6.4.0",
-    "ethjs": "0.3.7",
+    "ethjs": "0.3.9",
     "ethjs-account": "0.1.4",
     "ethjs-custom-signer": "1.0.1",
     "ethjs-signer": "0.1.1",
