@@ -17,7 +17,7 @@ const createObj = objName => async (contracts, obj, options) => {
   const events = contracts.decodeHubLogs(txReceipt.logs);
   debug('events', events);
 
-  spinner.succeed(`new ${objName} deployed at address ${events[0][objName]}`);
+  spinner.succeed(`Deployed new ${objName} at address ${events[0][objName]}`);
   return events;
 };
 
@@ -62,7 +62,7 @@ const countObj = objName => async (contracts, userAddress, options) => {
     options,
   );
 
-  spinner.succeed(`user ${userAddress} has a total of ${objCount} ${objName}`);
+  spinner.succeed(`User ${userAddress} has a total of ${objCount} ${objName}`);
   return objCount;
 };
 
@@ -76,7 +76,7 @@ const createCategory = async (contracts, obj, options) => {
   const events = contracts.decodeHubLogs(txReceipt.logs);
   debug('events', events);
 
-  spinner.succeed(`new category created at index ${events[0].catid}`);
+  spinner.succeed(`New category created at index ${events[0].catid}`);
   return events;
 };
 
@@ -86,7 +86,7 @@ const showCategory = async (contracts, index, options) => {
 
   const categoryRPC = await contracts.getCategoryByIndex(index, options);
 
-  spinner.succeed(`category at index ${index} details:${prettyRPC(categoryRPC)}`);
+  spinner.succeed(`Category at index ${index} details:${prettyRPC(categoryRPC)}`);
   return categoryRPC;
 };
 
