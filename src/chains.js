@@ -3,9 +3,10 @@ const Promise = require('bluebird');
 const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
 const createIExecContracts = require('iexec-contracts-js-client');
+const createIExecClient = require('iexec-server-js-client');
 const keystore = require('./keystore');
 const { loadChainConf } = require('./fs');
-const createIExecClient = require('iexec-server-js-client');
+const { Spinner } = require('./cli-helper');
 
 const debug = Debug('iexec:chains');
 
@@ -70,20 +71,27 @@ const loadChains = async () => {
 };
 
 const loadChain = async (chainName) => {
+  const spinner = Spinner();
   try {
     const chains = await loadChains();
     if (chainName) {
       if (!(chainName in chains)) {
         throw Error(`missing "${chainName}" chain in "chains.json"`);
       }
+      spinner.info(`using chain [${chainName}]`);
       return chains[chainName];
     }
     if (chains.default) {
       if (!(chains.default in chains)) {
         throw Error(`missing "${chains.default}" chain in "chains.json"`);
       }
+      spinner.info(`using chain [${chains.default}]`);
+      return chains[chains.default];
     }
-    if ('ropsten' in chains) return chains.ropsten;
+    if ('ropsten' in chains) {
+      spinner.info('using chain [ropsten]');
+      return chains.ropsten;
+    }
     throw Error('missing chain parameter. Check your "chains.json" file');
   } catch (error) {
     debug('loadChain()', error);
