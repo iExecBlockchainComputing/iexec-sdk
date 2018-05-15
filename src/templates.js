@@ -80,7 +80,9 @@ const sellLimitOrder = {
 const buyMarketOrder = {
   app: '0x88f29bef874957012ed55fd4968c296c9e4ec69e',
   dataset: '0xcc4859eadf58b1507a6dc0c031715c8089ec03aa',
-  params: '{"cmdline":"--help"}',
+  params: {
+    cmdline: '--help',
+  },
 };
 
 const defaultOrder = {
