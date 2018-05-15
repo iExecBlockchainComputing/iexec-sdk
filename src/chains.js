@@ -61,6 +61,7 @@ const loadChains = async () => {
       loadChainConf(),
     ]);
     const chains = createChains(address, chainsConf, keystore);
+    if (chainsConf.default) chains.default = chainsConf.default;
     return chains;
   } catch (error) {
     debug('loadChains()', error);
@@ -71,7 +72,19 @@ const loadChains = async () => {
 const loadChain = async (chainName) => {
   try {
     const chains = await loadChains();
-    return chains[chainName];
+    if (chainName) {
+      if (!(chainName in chains)) {
+        throw Error(`missing "${chainName}" chain in "chains.json"`);
+      }
+      return chains[chainName];
+    }
+    if (chains.default) {
+      if (!(chains.default in chains)) {
+        throw Error(`missing "${chains.default}" chain in "chains.json"`);
+      }
+    }
+    if ('ropsten' in chains) return chains.ropsten;
+    throw Error('missing chain parameter. Check your "chains.json" file');
   } catch (error) {
     debug('loadChain()', error);
     throw error;

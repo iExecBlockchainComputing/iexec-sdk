@@ -58,7 +58,7 @@ const desc = {
 };
 
 const option = {
-  chain: () => ['--chain <name>', desc.chainName(), 'ropsten'],
+  chain: () => ['--chain <name>', desc.chainName()],
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
   buy: () => ['--buy', 'init a buy order'],
