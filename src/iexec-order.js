@@ -113,14 +113,14 @@ cli
       const buyMarketOrder = iexecConf[objName].buy;
       debug('buyMarketOrder', buyMarketOrder);
       debug('buyMarketOrder.params', buyMarketOrder.params);
-      const params = JSON.stringify(JSON.parse(buyMarketOrder.params));
-      debug('work params', params);
+      const workParams = JSON.stringify(buyMarketOrder.params);
+      debug('workParams', workParams);
       const args = [
         orderID,
         orderRPC.workerpool,
         buyMarketOrder.app,
         '0x0000000000000000000000000000000000000000',
-        params,
+        workParams,
         '0x0000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000',
       ];
