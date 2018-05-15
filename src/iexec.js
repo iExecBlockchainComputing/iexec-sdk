@@ -87,4 +87,6 @@ cli.command('workerpool', 'manage iExec workerpools');
 
 cli.command('order', 'manage iExec marketplace orders');
 
+cli.command('work', 'manage iExec works');
+
 help(cli);
