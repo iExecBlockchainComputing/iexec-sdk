@@ -13,7 +13,7 @@ const {
   info,
   command,
 } = require('./cli-helper');
-const { loadIExecConf, initOrder } = require('./fs');
+const { loadIExecConf, initOrder, saveDeployedObj } = require('./fs');
 const { loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-order');
@@ -112,13 +112,15 @@ cli
 
       const buyMarketOrder = iexecConf[objName].buy;
       debug('buyMarketOrder', buyMarketOrder);
-
+      debug('buyMarketOrder.params', buyMarketOrder.params);
+      const params = JSON.stringify(JSON.parse(buyMarketOrder.params));
+      debug('work params', params);
       const args = [
         orderID,
         orderRPC.workerpool,
         buyMarketOrder.app,
         '0x0000000000000000000000000000000000000000',
-        buyMarketOrder.params,
+        params,
         '0x0000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000',
       ];
@@ -128,9 +130,13 @@ cli
         .getHubContract({ at: hubAddress })
         .buyForWorkOrder(...args);
       const txReceipt = await chain.contracts.waitForReceipt(txHash);
-      const events = chain.contracts.decodeMarketplaceLogs(txReceipt.logs);
+      const events = chain.contracts.decodeHubLogs(txReceipt.logs);
       debug('events', events);
-      spinner.succeed(`Filled new ${objName} with ID ${events[0][0]}`);
+      spinner.succeed(`Filled ${objName} with ID ${orderID}`);
+      spinner.succeed(`New work at ${events[0].woid} submitted to workerpool ${
+        events[0].workerPool
+      }`);
+      await saveDeployedObj('work', chain.id, events[0].woid);
     } catch (error) {
       handleError(error, cli);
     }
