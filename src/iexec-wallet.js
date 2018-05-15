@@ -66,7 +66,7 @@ cli
         ETH: unit.fromWei(balances.wei, 'ether'),
         nRLC: balances.nRLC.toString(),
       };
-      spinner.succeed(`Wallet ${cmd.chain} balances [${chain.id}]:${pretty(strBalances)}`);
+      spinner.succeed(`Wallet ${chain.name} balances [${chain.id}]:${pretty(strBalances)}`);
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -78,8 +78,11 @@ cli
   .description(desc.getETH())
   .action(async (cmd) => {
     try {
-      const { address } = await keystore.load();
-      await wallet.getETH(cmd.chain, address);
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      await wallet.getETH(chain.name, address);
     } catch (error) {
       handleError(error, cli);
     }
@@ -91,8 +94,11 @@ cli
   .description(desc.getRLC())
   .action(async (cmd) => {
     try {
-      const { address } = await keystore.load();
-      await wallet.getRLC(cmd.chain, address);
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      await wallet.getRLC(chain.name, address);
     } catch (error) {
       handleError(error, cli);
     }
@@ -116,10 +122,12 @@ cli
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
-        await prompt.transferETH(amount, cmd.chain, cmd.to, chain.id);
+        await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${cmd.chain} ETH from ${address} to ${cmd.to}`;
+      const message = `${amount} ${chain.name} ETH from ${address} to ${
+        cmd.to
+      }`;
       spinner.start(`sending ${message}...`);
 
       await wallet.sendETH(chain.contracts, weiAmount, address, cmd.to);
@@ -148,10 +156,10 @@ cli
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
-        await prompt.transferRLC(amount, cmd.chain, cmd.to, chain.id);
+        await prompt.transferRLC(amount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${cmd.chain} nRLC from ${address} to ${
+      const message = `${amount} ${chain.name} nRLC from ${address} to ${
         cmd.to
       }`;
       spinner.start(`sending ${message}...`);
@@ -183,7 +191,7 @@ cli
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
-        await prompt.sweep(cmd.chain, cmd.to, chain.id);
+        await prompt.sweep(chain.name, cmd.to, chain.id);
       }
 
       spinner.start('sweeping wallet...');
