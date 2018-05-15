@@ -199,6 +199,14 @@ iexec order cancel <orderID> # cancel an order
 iexec order count # count marketplace total number of order
 ```
 
+## work
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec work show [address] # show a work
+```
+
 ## category
 
 ```bash
