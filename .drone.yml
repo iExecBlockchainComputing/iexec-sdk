@@ -20,7 +20,7 @@ pipeline:
     secrets: [ npm_password ]
     username: sulliwane
     email: sulliwane@gmail.com
-    tag: next
+    tag: latest
     when:
       event: tag
       matrix:
@@ -31,7 +31,7 @@ pipeline:
     repo: iexechub/iexec-sdk
     secrets: [ docker_username, docker_password ]
     tags:
-      - next
+      - latest
       - ${DRONE_TAG##v}
     when:
       event: tag
