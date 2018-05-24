@@ -44,6 +44,7 @@ const createChains = (
         txOptions: {
           from,
         },
+        hubAddress: chains[name].hub,
       });
       // index by chainID
       chains[chain.id] = chains[name];

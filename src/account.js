@@ -28,27 +28,13 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
 
-  const hubAddress = hub || contracts.hubAddress;
-  debug('hubAddress', hubAddress);
-  if (!hubAddress) {
-    throw Error(`no hub address provided, and no existing hub contract on chain ${
-      contracts.chainID
-    }`);
-  }
-
-  const hubContract = contracts.getHubContract({
-    at: hubAddress,
-  });
-  const { rlcAddress } = contracts.rlcAddress
-    ? { rlcAddress: contracts.rlcAddress }
-    : await hubContract.getRLCAddress();
-  debug('rlcAddress', rlcAddress);
-
+  const hubContract = contracts.getHubContract({ at: hub });
+  const rlcAddress = await contracts.fetchRLCAddress();
   const allowTxHash = await contracts
     .getRLCContract({
       at: rlcAddress,
     })
-    .approve(hubAddress, amount);
+    .approve(hub || contracts.hubAddress, amount);
   const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
   const allowEvents = contracts.decodeHubLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
