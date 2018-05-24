@@ -9,12 +9,15 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 
 ## Ressources
 
+* The iExec Explorer: https://explorer.iex.ec
+* The iExec Marketplace
 * The iExec Dapp Store: https://dapps.iex.ec
-* The iExec explorer: https://explorer.iex.ec
+* The iExec Pools registry
 * The RLC faucet: https://faucet.iex.ec
 * iExec main documentation: https://docs.iex.ec
-* The [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
-* [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
+* The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
+* The iExec [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
+* [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
 
 ## Install
 
@@ -48,52 +51,6 @@ Now run `iexec --version` to check all is working.
 * **Nodejs**: run `npm -g install iexec@next`
 * **Docker**: run `docker pull iexechub/iexec-sdk:next`
 
-## Init & Wallet setup
-
-Before any use of the SDK, make sure you did run once the below steps:
-
-```bash
-iexec init # init a project
-cd iexec-init # enter the project
-iexec wallet create # create a wallet
-iexec wallet getETH # get some ETH
-iexec wallet getRLC # get some RLC
-iexec wallet show # check you received the tokens
-iexec account allow 5 # credit your account with RLC
-iexec account show # check your iExec account balance
-```
-
-## Use an existing dapp
-
-Go checkout the [run a dapp tutorial](https://katacoda.com/sulliwane/scenarios/run-dapp), recap below:
-
-After the init steps, go to [iExec dapp store](https://dapps.iex.ec) and find the dapp you'd like to use, say [ffmpeg](https://dapps.iex.ec/dapp/jeremy_toussaint/ffmpeg):
-
-1.  Copy its ethereum address by clicking on the network #tag (ropsten, rinkeby, mainnet).
-2.  Replace your local `iexec.js` with the one of the dapp (you can find it on the [github page of the dapp](https://github.com/iExecBlockchainComputing/iexec-dapp-samples/tree/ffmpeg#readme))
-
-And submit your work to the dapp address:
-
-```bash
-iexec submit --dapp <dapp_address>
-```
-
-Finally, copy the transaction hash given by the SDK and check the progress of your work:
-
-```bash
-iexec result <txHash> --dapp <dapp_address>
-```
-
-Note: The [iExec explorer](https://explorer.iex.ec/) provides a more visual experience.
-
-## Deploy and run an existing dapp
-
-Go checkout the [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
-
-## Craft and deploy your own custom dapp
-
-Go checkout the [Ffmpeg step by step tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
-
 # iExec SDK API
 
 ## Help
@@ -108,9 +65,7 @@ iexec --version
 To interact with the [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 
 ```bash
-iexec init # pull a basic project
-iexec init factorial # pull factorial branch from iExec dapp registry
-iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
+iexec init # create all files necessary to get started
 ```
 
 ## wallet
@@ -204,7 +159,9 @@ iexec order count # count marketplace total number of order
 ```bash
 # OPTIONS
 # --chain <chainName>
+# --watch
 iexec work show [address] # show a work
+iexec work download [address] # download a work result
 ```
 
 ## category
@@ -217,15 +174,6 @@ iexec category init # init new category
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count hub total number of category
-```
-
-## result
-
-You need the txHash of a work submission in order to check its result:
-
-```bash
-iexec result <txHash> --chain ropsten # this will log the result data
-iexec result <txHash> --watch --save [fileName] --chain ropsten # this will download the result locally
 ```
 
 ## upgrade
