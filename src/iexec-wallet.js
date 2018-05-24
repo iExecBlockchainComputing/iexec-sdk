@@ -1,51 +1,207 @@
 #!/usr/bin/env node
 
+const Debug = require('debug');
 const cli = require('commander');
+const unit = require('ethjs-unit');
 const wallet = require('./wallet');
-const handleError = require('./errors');
-const help = require('./help');
+const keystore = require('./keystore');
+const {
+  handleError,
+  help,
+  Spinner,
+  option,
+  desc,
+  prompt,
+  pretty,
+  info,
+} = require('./cli-helper');
+const { loadChain } = require('./chains.js');
 
-cli
-  .option('--to <address>', 'receiver address')
-  .option('--chain, --network <name>', 'network name', 'ropsten');
+const debug = Debug('iexec:iexec-wallet');
+const objName = 'wallet';
 
 cli
   .command('create')
-  .description('create a local wallet')
-  .action(() => wallet.create().catch(handleError('wallet')));
+  .option(...option.chain())
+  .option(...option.force())
+  .description(desc.createObj(objName))
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const force = cmd.force || false;
+      const res = await keystore.createAndSave({ force });
+      spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+    } catch (error) {
+      handleError(error, cli, spinner);
+    }
+  });
+
+cli
+  .command('show [address]')
+  .option(...option.chain())
+  .option(...option.hub())
+  .description(desc.showObj(objName, 'address'))
+  .action(async (address, cmd) => {
+    const spinner = Spinner();
+    try {
+      const [userWallet, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      const hubAddress = cmd.hub || chain.hub;
+      if (address) userWallet.address = address;
+      debug('userWallet.address', userWallet.address);
+      spinner.info(`Wallet file:${pretty(userWallet)}`);
+
+      spinner.start(info.checkBalance(''));
+      const balances = await wallet.checkBalances(
+        chain.contracts,
+        userWallet.address,
+        {
+          hub: hubAddress,
+        },
+      );
+
+      const strBalances = {
+        ETH: unit.fromWei(balances.wei, 'ether'),
+        nRLC: balances.nRLC.toString(),
+      };
+      spinner.succeed(`Wallet ${chain.name} balances [${chain.id}]:${pretty(strBalances)}`);
+    } catch (error) {
+      handleError(error, cli, spinner);
+    }
+  });
 
 cli
   .command('getETH')
-  .description('apply for ETH from pre-registered faucets')
-  .action(() => wallet.getETH(cli.network).catch(handleError('wallet')));
+  .option(...option.chain())
+  .description(desc.getETH())
+  .action(async (cmd) => {
+    try {
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      await wallet.getETH(chain.name, address);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 cli
   .command('getRLC')
-  .description('apply for nRLC from iexec faucet')
-  .action(() => wallet.getRLC(cli.network).catch(handleError('wallet')));
+  .option(...option.chain())
+  .description(desc.getRLC())
+  .action(async (cmd) => {
+    try {
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      await wallet.getRLC(chain.name, address);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 cli
-  .command('sendETH')
-  .arguments('<amount>')
-  .description('send ETH to an address')
-  .action(amount =>
-    wallet.sendETH(cli.network, amount, cli.to).catch(handleError('wallet')));
+  .command('sendETH <amount>')
+  .option(...option.chain())
+  .option(...option.to())
+  .option(...option.force())
+  .description(desc.sendETH())
+  .action(async (amount, cmd) => {
+    const spinner = Spinner();
+    try {
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      const weiAmount = unit.toWei(amount, 'ether');
+
+      if (!cmd.to) throw Error('missing --to option');
+
+      if (!cmd.force) {
+        await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
+      }
+
+      const message = `${amount} ${chain.name} ETH from ${address} to ${
+        cmd.to
+      }`;
+      spinner.start(`sending ${message}...`);
+
+      await wallet.sendETH(chain.contracts, weiAmount, address, cmd.to);
+
+      spinner.succeed(`Sent ${message}\n`);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 cli
-  .command('sendRLC')
-  .arguments('<amount>')
-  .description('send nRLC to an address')
-  .action(amount =>
-    wallet.sendRLC(cli.network, amount, cli.to).catch(handleError('wallet')));
+  .command('sendRLC <amount>')
+  .option(...option.chain())
+  .option(...option.to())
+  .option(...option.force())
+  .description(desc.sendRLC())
+  .action(async (amount, cmd) => {
+    const spinner = Spinner();
+    try {
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      const hubAddress = cmd.hub || chain.hub;
+
+      if (!cmd.to) throw Error('missing --to option');
+
+      if (!cmd.force) {
+        await prompt.transferRLC(amount, chain.name, cmd.to, chain.id);
+      }
+
+      const message = `${amount} ${chain.name} nRLC from ${address} to ${
+        cmd.to
+      }`;
+      spinner.start(`sending ${message}...`);
+
+      await wallet.sendRLC(chain.contracts, amount, cmd.to, {
+        hub: hubAddress,
+      });
+
+      spinner.succeed(`Sent ${message}\n`);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 cli
   .command('sweep')
-  .description('send all ETH and RLC to an address')
-  .action(() => wallet.sweep(cli.network, cli.to).catch(handleError('wallet')));
+  .option(...option.chain())
+  .option(...option.hub())
+  .description(desc.sweep())
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain),
+      ]);
+      const hubAddress = cmd.hub || chain.hub;
 
-cli
-  .command('show')
-  .description('show local wallet balances')
-  .action(() => wallet.show().catch(handleError('wallet')));
+      if (!cmd.to) throw Error('missing --to option');
+
+      if (!cmd.force) {
+        await prompt.sweep(chain.name, cmd.to, chain.id);
+      }
+
+      spinner.start('sweeping wallet...');
+
+      await wallet.sweep(chain.contracts, address, cmd.to, { hub: hubAddress });
+
+      spinner.succeed(`Wallet swept from ${address} to ${cmd.to}\n`);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
 
 help(cli);

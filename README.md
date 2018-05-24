@@ -5,23 +5,16 @@
 [![Build Status](https://drone.iex.ec//api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
 
-iExec allows Ethereum developers to create applications that can be executed off-chain.
-This package brings all the tools to develop, deploy and execute Dapps on Ethereum and iExec.
-Using these tools, you will be able to deploy any legacy applications in the iExec infrastructure
-and execute them through calls to Ethereum smart contracts.
+The iExec SDK is a CLI and a JS library that allows developers to interact with iExec decentralized marketplace in order to run off-chain computations.
 
 ## Ressources
 
-* [Hello World tutorial](https://www.katacoda.com/sulliwane/scenarios/hello-world)
-* [Craft your own dapp tutorial](https://www.katacoda.com/sulliwane/scenarios/ffmpeg)
-* [Run any dapp tutorial](https://katacoda.com/sulliwane/scenarios/run-dapp)
-* Checkout the [iExec dapp challenge](https://medium.com/iex-ec/the-iexec-%C3%B0app-challenge-150k-of-grants-to-win-abf6798b31ee)
 * The iExec Dapp Store: https://dapps.iex.ec
 * The iExec explorer: https://explorer.iex.ec
 * The RLC faucet: https://faucet.iex.ec
 * iExec main documentation: https://docs.iex.ec
 * The [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
-* [iExec sample dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapp-samples)
+* [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 
 ## Install
 
@@ -30,7 +23,7 @@ and execute them through calls to Ethereum smart contracts.
 Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%206.4.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 
 ```bash
-npm -g install iexec # install the cli
+npm -g install iexec@next # install the cli
 iexec --version
 iexec --help
 ```
@@ -43,17 +36,17 @@ Requirements: [Docker](https://docs.docker.com/install/).
 
 ```bash
 # For Linux users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bashrc && source ~/.bashrc
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:next'"'"'' >> ~/.bashrc && source ~/.bashrc
 # For Mac OSX users
-echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk'"'"'' >> ~/.bash_profile && source ~/.bash_profile
+echo 'alias iexec='"'"'docker run -e DEBUG=$DEBUG --interactive --tty --rm -v $(pwd):/iexec-project -w /iexec-project iexechub/iexec-sdk:next'"'"'' >> ~/.bash_profile && source ~/.bash_profile
 ```
 
 Now run `iexec --version` to check all is working.
 
 ## Upgrade
 
-* **Nodejs**: run `npm -g install iexec`
-* **Docker**: run `docker pull iexechub/iexec-sdk`
+* **Nodejs**: run `npm -g install iexec@next`
+* **Docker**: run `docker pull iexechub/iexec-sdk:next`
 
 ## Init & Wallet setup
 
@@ -120,45 +113,110 @@ iexec init factorial # pull factorial branch from iExec dapp registry
 iexec init <branch> --repo <my_github_repo> # pull from custom dapp registry
 ```
 
-## truffle
-
-```bash
-iexec compile # call truffle compile underhood
-iexec migrate # call truffle migrate underhood
-iexec truffle [...] # or just call any truffle command
-```
-
 ## wallet
 
 ```bash
+# OPTIONS
+# --chain <chainName>
+# --to <address>
+# --force
+# --hub <address>
 iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
-iexec wallet show
-iexec wallet sendETH <amount> --to <eth_address> --chain ropsten
-iexec wallet sendRLC <amount> --to <eth_address> --chain ropsten
-iexec wallet sweep --to <eth_address> --chain ropsten # drain all ETH and RLC, sending them back to iExec faucet by default
+iexec wallet show [address] # optional address to show other people's wallet
+iexec wallet sendETH <amount> --to <eth_address>
+iexec wallet sendRLC <amount> --to <eth_address>
+iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
 ```
 
 ## account
 
 ```bash
+# OPTIONS
+# --chain <chainName>
+# --force
+# --hub <address>
 iexec account login
-iexec account show
-iexec account allow 5
+iexec account show [address] # optional address to show other people's account
+iexec account deposit <amount>
+iexec account withdraw <amount>
 ```
 
-## deploy
+## app
 
 ```bash
-iexec deploy --chain ropsten # Deploys the smart contract on ethereum + deploy the app on iExec offchain platform
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec app init # init new app
+iexec app deploy # deploy new app
+iexec app show [address|index] # show app details
+iexec app count --user <userAddress> # count user total number of app
 ```
 
-## submit
+## dataset
 
 ```bash
-iexec submit --chain ropsten # submit work to your own dapp
-iexec submit --dapp 0xE22F4...  --chain ropsten # submit work to someone else dapp address
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec dataset init # init new app
+iexec dataset deploy # deploy new dataset
+iexec dataset show [address|index] # show dataset details
+iexec dataset count --user <userAddress> # count user total number of dataset
+```
+
+## workerpool
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --user <address>
+iexec workerpool init # init new workerpool
+iexec workerpool deploy # deploy new workerpool
+iexec workerpool show [address|index] # show workerpool details
+iexec workerpool count --user <userAddress> # count user total number of workerpool
+```
+
+## order
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+# --sell
+# --buy
+iexec order init --buy # init new buy order
+iexec order init --sell # init new sell order
+iexec order place # place an order at limit price
+iexec order show <orderID> # show an order
+iexec order fill <orderID> # fill an order at market price and start work execution
+iexec order cancel <orderID> # cancel an order
+iexec order count # count marketplace total number of order
+```
+
+## work
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec work show [address] # show a work
+```
+
+## category
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --hub <address>
+iexec category init # init new category
+iexec category create # create new category
+iexec category show <index> # show category details by index
+iexec category count # count hub total number of category
 ```
 
 ## result
@@ -187,46 +245,73 @@ iexec server result <workUID> --watch --save [fileName]# direct result
 iexec server api <fnName> [arg1] [arg2] ... # directly call api method
 ```
 
-## iexec.js
+## iexec.json
 
-The `iexec.js` file, located in every iExec project, describes the parameters used when deploying an app, and when submitting a work.
+The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|datasetcategory|workerPool], or when submitting a work.
 
-```js
-module.exports = {
-  name: 'Factorial',
-  // app tags used once when deploying app to iExec server
-  // iexec deploy
-  app: {
-    type: 'DOCKER',
-    envvars: 'XWDOCKERIMAGE=cogniteev/echo',
+```json
+{
+  "app": {
+    "name": "next-dapp1",
+    "price": 1,
+    "params": {
+      "type": "DOCKER",
+      "envvars": "XWDOCKERIMAGE=ericro/face-recognition"
+    }
   },
-  // work tags used for each work submit
-  // iexec submit
-  work: {
-    cmdline: 'iExec',
+  "dataset": {
+    "name": "next-dataset",
+    "price": 2,
+    "params": {
+      "uri": "https://data.provider.com"
+    }
   },
-};
+  "category": {
+    "name": "CAT1",
+    "description": "my category N°1",
+    "workClockTimeRef": 100
+  },
+  "workerPool": {
+    "description": "Qarnot WorkerPool ",
+    "subscriptionLockStakePolicy": 100,
+    "subscriptionMinimumStakePolicy": 100,
+    "subscriptionMinimumScorePolicy": 100
+  }
+}
 ```
 
-## truffle.js
+## chains.json
 
-The `truffle.js` file, located in every iExec project, describes the parameters used when communicating with ethereum and iexec nodes.
+The `chains.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec schedulers. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
 
-```js
-module.exports = {
-  networks: {
-    ropsten: {
-      // ETH node relay config
-      host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
-      port: 8545,
-      network_id: '3',
-      constructorArgs: [ROPSTEN_ORACLE_ADDRESS],
-      // iExec server used to deploy legacy app
-      server: 'https://testxw.iex.ec:443',
-      // gasPriceMultiplier: 2,  // use factor 2 of the network estimated gasPrice
-      // gasLimitMultiplier: 4,  // use factor 4 of the network estimated gasLimit
-      // gasPrice: 21000000000  // manually set the gasPrice in gwei. Prefer 'gasPriceMultiplier'
-      // gas: 400000  // manually set the gas limit in gwei. Prefer 'gasLimitMultiplier'
+```json
+{
+  "chains": {
+    "development": {
+      "host": "localhost",
+      "id": "*",
+      "server": "https://localhost:443"
     },
-};
+    "ropsten": {
+      "host": "https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "3",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "rinkeby": {
+      "host": "https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "4",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "kovan": {
+      "host": "https://kovan.infura.io/berv5GTB5cSdOJPPnqOq",
+      "id": "42",
+      "server": "https://testxw.iex.ec:443"
+    },
+    "mainnet": {
+      "host": "https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ",
+      "id": "1",
+      "server": "https://mainxw.iex.ec:443"
+    }
+  }
+}
 ```
