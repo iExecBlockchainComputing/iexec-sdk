@@ -37,7 +37,7 @@ const createChains = (
       chains[name].name = name;
       chains[name].ethjs = new EthJS(ethProvider);
       chains[name].EthJS = EthJS;
-      chains[name].iexec = createIExecClient({ server: chain.server });
+      if (chain.scheduler) { chains[name].iexec = createIExecClient({ server: chain.scheduler }); }
       chains[name].contracts = createIExecContracts({
         eth: chains[name].ethjs,
         chainID: chains[name].id,

@@ -44,28 +44,28 @@ const chains = {
     dev: {
       host: 'http://localhost:8545',
       id: '1337',
-      server: 'https://localhost:443',
+      scheduler: 'https://localhost:443',
       hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '3',
-      server: 'https://testxw.iex.ec:443',
+      scheduler: 'https://testxw.iex.ec:443',
     },
     rinkeby: {
       host: 'https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '4',
-      server: 'https://testxw.iex.ec:443',
+      scheduler: 'https://testxw.iex.ec:443',
     },
     kovan: {
       host: 'https://kovan.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '42',
-      server: 'https://testxw.iex.ec:443',
+      scheduler: 'https://testxw.iex.ec:443',
     },
     mainnet: {
       host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
       id: '1',
-      server: 'https://mainxw.iex.ec:443',
+      scheduler: 'https://mainxw.iex.ec:443',
     },
   },
 };
