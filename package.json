@@ -4,7 +4,7 @@
   "description": "iExec SDK",
   "main": "dist/iexec-lib.js",
   "scripts": {
-    "test": "jest cli --runInBand --forceExit",
+    "test": "jest cli --runInBand --forceExit --detectOpenHandles",
     "build": "./node_modules/.bin/babel src --out-dir dist --copy-files"
   },
   "bin": {
