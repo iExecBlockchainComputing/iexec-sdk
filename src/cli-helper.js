@@ -67,6 +67,11 @@ const option = {
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
   force: () => ['--force', 'force wallet creation even if old wallet exists'],
+  watch: () => ['--watch', 'watch a work status changes'],
+  download: () => [
+    '--download',
+    'download a work result data to local filesystem, if completed',
+  ],
 };
 
 const question = async (
