@@ -37,7 +37,9 @@ const createChains = (
       chains[name].name = name;
       chains[name].ethjs = new EthJS(ethProvider);
       chains[name].EthJS = EthJS;
-      if (chain.scheduler) { chains[name].iexec = createIExecClient({ server: chain.scheduler }); }
+      if (chain.scheduler) {
+        chains[name].iexec = createIExecClient({ server: chain.scheduler });
+      }
       chains[name].contracts = createIExecContracts({
         eth: chains[name].ethjs,
         chainID: chains[name].id,
@@ -89,8 +91,8 @@ const loadChain = async (chainName) => {
       spinner.info(`using chain [${chains.default}]`);
       return chains[chains.default];
     }
-    if ('ropsten' in chains) {
-      spinner.info('using chain [ropsten]');
+    if ('kovan' in chains) {
+      spinner.info('using chain [kovan]');
       return chains.ropsten;
     }
     throw Error('missing chain parameter. Check your "chains.json" file');
