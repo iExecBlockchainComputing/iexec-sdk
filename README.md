@@ -160,8 +160,8 @@ iexec order count # count marketplace total number of order
 # OPTIONS
 # --chain <chainName>
 # --watch
-iexec work show [address] # show a work
-iexec work download [address] # download a work result
+# --download
+iexec work show [address] --watch --download # show a work, watch its status changes and download it when completed
 ```
 
 ## category
@@ -182,15 +182,11 @@ iexec category count # count hub total number of category
 iexec upgrade # check if using latest iExec SDK version
 ```
 
-## server
+## scheduler
 
 ```bash
-iexec server version # get server version
-iexec server deploy # deploy legacy app only to iExec server
-iexec server uploadData <data_path> # direct data upload
-iexec server submit --app <app_uid> # direct work submit
-iexec server result <workUID> --watch --save [fileName]# direct result
-iexec server api <fnName> [arg1] [arg2] ... # directly call api method
+iexec scheduler show # show scheduler details
+iexec scheduler api # direct call of scheduler API methods
 ```
 
 ## iexec.json
