@@ -40,9 +40,8 @@ cli
         loadDeployedObj(deployedName),
       ]);
       const address = deployedObj[chain.id];
-      const { saved, fileName } = await initOrder(side, {
-        ...(address && { [deployedName]: address }),
-      });
+      const overwrite = address ? { [deployedName]: address } : {};
+      const { saved, fileName } = await initOrder(side, overwrite);
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
       handleError(error, cli);
