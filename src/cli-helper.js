@@ -21,9 +21,11 @@ const info = {
   showing: obj => `showing ${obj}...`,
   counting: obj => `counting ${obj}...`,
   depositing: () => 'making deposit...',
+  watching: obj => `watching ${obj}...`,
   deposited: amount => `deposited ${amount} nRLC to your iExec account`,
   withdrawing: () => 'making withdraw...',
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
+  downloaded: path => `downloaded work result to file ${path}`,
 };
 
 const command = {
