@@ -113,10 +113,10 @@ const initObj = async (objName, { obj } = {}) => {
   }
 };
 
-const initOrder = async (side) => {
+const initOrder = async (side, overwrite) => {
   try {
     const iexecConf = await loadIExecConf();
-    const order = createOrder(side);
+    const order = createOrder(side, overwrite);
     if (typeof iexecConf.order !== 'object') iexecConf.order = {};
     iexecConf.order[side] = order;
     const fileName = await saveIExecConf(iexecConf, { force: true });

@@ -13,7 +13,12 @@ const {
   info,
   command,
 } = require('./cli-helper');
-const { loadIExecConf, initOrder, saveDeployedObj } = require('./fs');
+const {
+  loadIExecConf,
+  initOrder,
+  saveDeployedObj,
+  loadDeployedObj,
+} = require('./fs');
 const { loadChain } = require('./chains.js');
 
 const debug = Debug('iexec:iexec-order');
@@ -29,8 +34,15 @@ cli
     try {
       debug('cmd.sell', cmd.sell);
       const side = cmd.sell ? 'sell' : 'buy';
-      debug('side', side);
-      const { saved, fileName } = await initOrder(side);
+      const deployedName = side === 'buy' ? 'app' : 'workerPool';
+      const [chain, deployedObj] = await Promise.all([
+        loadChain(cmd.chain),
+        loadDeployedObj(deployedName),
+      ]);
+      const address = deployedObj[chain.id];
+      const { saved, fileName } = await initOrder(side, {
+        ...(address && { [deployedName]: address }),
+      });
       spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
     } catch (error) {
       handleError(error, cli);
@@ -62,7 +74,7 @@ cli
         sellLimitOrder.category,
         0,
         sellLimitOrder.value,
-        sellLimitOrder.workerpool,
+        sellLimitOrder.workerPool,
         sellLimitOrder.volume,
       ];
       debug('args', args);
