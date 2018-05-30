@@ -44,42 +44,37 @@ const chains = {
     dev: {
       host: 'http://localhost:8545',
       id: '1337',
-      scheduler: 'https://localhost:443',
       hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '3',
-      scheduler: 'https://testxw.iex.ec:443',
     },
     rinkeby: {
       host: 'https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '4',
-      scheduler: 'https://testxw.iex.ec:443',
     },
     kovan: {
       host: 'https://kovan.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '42',
-      scheduler: 'https://testxw.iex.ec:443',
     },
     mainnet: {
       host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
       id: '1',
-      scheduler: 'https://mainxw.iex.ec:443',
     },
   },
 };
 
 const sellLimitOrder = {
   category: 1,
-  value: 1,
-  workerpool: '0x597fa45586a1f4879605c0b8c04c4100a918ee0d',
+  value: 10,
+  workerPool: '0x0000000000000000000000000000000000000000',
   volume: 1,
 };
 
 const buyMarketOrder = {
-  app: '0x88f29bef874957012ed55fd4968c296c9e4ec69e',
-  dataset: '0xcc4859eadf58b1507a6dc0c031715c8089ec03aa',
+  app: '0x0000000000000000000000000000000000000000',
+  dataset: '0x0000000000000000000000000000000000000000',
   params: {
     cmdline: '--help',
   },
@@ -90,9 +85,9 @@ const defaultOrder = {
   buy: buyMarketOrder,
 };
 
-const createOrder = (side) => {
-  if (side === 'buy') return buyMarketOrder;
-  return sellLimitOrder;
+const createOrder = (side, overwrite = {}) => {
+  if (side === 'buy') return Object.assign({}, buyMarketOrder, overwrite);
+  return Object.assign({}, sellLimitOrder, overwrite);
 };
 
 module.exports = {
