@@ -45,22 +45,27 @@ const chains = {
       host: 'http://localhost:8545',
       id: '1337',
       hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
+      scheduler: 'https://pool1api.iex.ec',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '3',
+      scheduler: 'https://pool1api.iex.ec',
     },
     rinkeby: {
       host: 'https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '4',
+      scheduler: 'https://pool1api.iex.ec',
     },
     kovan: {
       host: 'https://kovan.infura.io/berv5GTB5cSdOJPPnqOq',
       id: '42',
+      scheduler: 'https://pool1api.iex.ec',
     },
     mainnet: {
       host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
       id: '1',
+      scheduler: 'https://pool1api.iex.ec',
     },
   },
 };
