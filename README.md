@@ -9,15 +9,15 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 
 ## Ressources
 
-* The iExec Dapp Store: https://dapps.iex.ec
-* The iExec Marketplace: https://market.iex.ec
-* The iExec Explorer: https://explorer.iex.ec
-* The iExec Pools registry: https://pools.iex.ec
-* The RLC faucet: https://faucet.iex.ec
-* iExec main documentation: https://docs.iex.ec
-* The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
-* The iExec [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
-* [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
+- The iExec Dapp Store: https://dapps.iex.ec
+- The iExec Marketplace: https://market.iex.ec
+- The iExec Explorer: https://explorer.iex.ec
+- The iExec Pools registry: https://pools.iex.ec
+- The RLC faucet: https://faucet.iex.ec
+- iExec main documentation: https://docs.iex.ec
+- The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
+- The iExec [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
+- [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
 
 ## Install
 
@@ -48,8 +48,8 @@ Now run `iexec --version` to check all is working.
 
 ## Upgrade
 
-* **Nodejs**: run `npm -g install iexec@next`
-* **Docker**: run `docker pull iexechub/iexec-sdk:next`
+- **Nodejs**: run `npm -g install iexec@next`
+- **Docker**: run `docker pull iexechub/iexec-sdk:next`
 
 # iExec SDK API
 
@@ -61,8 +61,6 @@ iexec --version
 ```
 
 ## init
-
-To interact with the [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry)
 
 ```bash
 iexec init # create all files necessary to get started
