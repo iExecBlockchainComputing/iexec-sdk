@@ -25,7 +25,7 @@ const ethFaucets = [
           'Content-Type': 'application/json',
         },
         method: 'POST',
-        body: JSON.stringify({ toWhom: '0x'.concat(address) }),
+        body: JSON.stringify({ toWhom: address }),
       })
         .then(res => res.json())
         .catch(() => ({ error: 'ETH faucet is down.' })),
