@@ -71,9 +71,7 @@ cli.command('wallet', 'manage local ethereum wallet');
 
 cli.command('account', 'manage iExec account');
 
-cli.command('server', 'manage server side apps and works');
-
-cli.command('result <txHash>', 'fetch the result of a job');
+cli.command('scheduler', 'interact with an iExec scheduler');
 
 cli.command('upgrade', 'update iExec CLI tool and upgrade iExec project');
 
