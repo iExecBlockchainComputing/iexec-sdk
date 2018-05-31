@@ -107,7 +107,7 @@ cli
       ) {
         spinner.warn(`Your token address ${jwtForPrint.address} and your wallet address ${
           userWallet.address
-        } differ, you should run "iexec login" to sync them\n`);
+        } differ, you should run "iexec account login" to sync them\n`);
       }
       spinner.info(`Account token:${pretty(jwtForPrint)}`);
 
