@@ -28,6 +28,7 @@ cli
   .command('init')
   .option(...option.sell())
   .option(...option.buy())
+  .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
