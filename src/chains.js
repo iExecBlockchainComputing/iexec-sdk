@@ -93,7 +93,7 @@ const loadChain = async (chainName) => {
     }
     if ('kovan' in chains) {
       spinner.info('using chain [kovan]');
-      return chains.ropsten;
+      return chains.kovan;
     }
     throw Error('missing chain parameter. Check your "chains.json" file');
   } catch (error) {
