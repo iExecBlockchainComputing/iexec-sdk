@@ -135,6 +135,16 @@ iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
+## orderbook
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --category [ID]
+# --pool [address]
+iexec orderbook show --category 5 # show orderbook for category 5
+```
+
 ## order
 
 ```bash

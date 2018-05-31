@@ -74,6 +74,8 @@ const option = {
     '--download',
     'download a work result data to local filesystem, if completed',
   ],
+  category: () => ['--category [ID]', 'specify the work category'],
+  pool: () => ['--pool [address]', 'filter by worker pool address'],
 };
 
 const question = async (

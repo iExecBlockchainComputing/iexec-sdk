@@ -1,6 +1,8 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
 const jws = require('jws');
+const fetch = require('node-fetch');
+const qs = require('query-string');
 
 const debug = Debug('iexec:utils');
 
@@ -59,6 +61,54 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
+const API_URL = 'https://gateway.iex.ec/';
+// const API_URL = 'http://localhost:3000/';
+
+const makeBody = (verb, body) => {
+  if (verb === 'GET') return {};
+  return { body: JSON.stringify(body) };
+};
+
+const makeQueryString = (verb, body) => {
+  if (verb === 'GET' && Object.keys(body).length !== 0) {
+    return '?'.concat(qs.stringify(body));
+  }
+  return '';
+};
+
+const httpRequest = verb => async (endpoint, body = {}, api = API_URL) => {
+  const baseURL = api;
+  const queryString = makeQueryString(verb, body);
+  const url = baseURL.concat(endpoint, queryString);
+  const response = await fetch(
+    url,
+    Object.assign(
+      {
+        method: verb,
+        headers: {
+          Accept: 'application/json',
+          'content-type': 'application/json',
+        },
+      },
+      makeBody(verb, body),
+    ),
+  );
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.indexOf('application/json') !== -1) {
+    const json = await response.json();
+    if (json.ok) return json;
+    if (json.error) throw new Error(json.error);
+  } else {
+    throw new Error('the http response is not of JSON type');
+  }
+  throw new Error('API call error');
+};
+
+const http = {
+  get: httpRequest('GET'),
+  post: httpRequest('POST'),
+};
+
 module.exports = {
   getContractAddress,
   isEthAddress,
@@ -66,4 +116,5 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
+  http,
 };

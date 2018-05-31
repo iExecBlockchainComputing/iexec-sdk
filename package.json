@@ -43,6 +43,7 @@
     "node-fetch": "2.1.2",
     "ora": "2.1.0",
     "prettyjson": "1.2.1",
+    "query-string": "^6.1.0",
     "semver": "5.5.0",
     "uuid": "3.2.1"
   },
