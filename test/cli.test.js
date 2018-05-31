@@ -52,3 +52,12 @@ test('iexec order init --buy', () =>
 
 test('iexec upgrade', () =>
   expect(execAsync(`${iexecPath} upgrade`)).resolves.not.toBe(1));
+
+test('iexec order count', () =>
+  expect(execAsync(`${iexecPath} order count`)).resolves.not.toBe(1));
+
+test('iexec workerpool count', () =>
+  expect(execAsync(`${iexecPath} app count`)).resolves.not.toBe(1));
+
+test('iexec orderbook show', () =>
+  expect(execAsync(`${iexecPath} orderbook show`)).resolves.not.toBe(1));
