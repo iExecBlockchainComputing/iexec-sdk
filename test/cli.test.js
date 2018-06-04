@@ -50,9 +50,6 @@ test('iexec order init --sell', () =>
 test('iexec order init --buy', () =>
   expect(execAsync(`${iexecPath} order init --buy`)).resolves.not.toBe(1));
 
-test('iexec upgrade', () =>
-  expect(execAsync(`${iexecPath} upgrade`)).resolves.not.toBe(1));
-
 test('iexec order count', () =>
   expect(execAsync(`${iexecPath} order count`)).resolves.not.toBe(1));
 
