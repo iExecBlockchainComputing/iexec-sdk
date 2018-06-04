@@ -21,6 +21,7 @@ const {
   loadDeployedObj,
 } = require('./fs');
 const { loadChain } = require('./chains.js');
+const keystore = require('./keystore');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -116,9 +117,10 @@ cli
   .action(async (orderID, cmd) => {
     const spinner = Spinner();
     try {
-      const [chain, iexecConf] = await Promise.all([
+      const [chain, iexecConf, { address }] = await Promise.all([
         loadChain(cmd.chain),
         loadIExecConf(),
+        keystore.load(),
       ]);
       const hubAddress = cmd.hub || chain.hub;
 
@@ -135,7 +137,7 @@ cli
       const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
         hub: hubAddress,
       });
-      const [orderRPC, appPriceRPC] = await Promise.all([
+      const [orderRPC, appPriceRPC, balanceRLC] = await Promise.all([
         chain.contracts
           .getMarketplaceContract({ at: marketplaceAddress })
           .getMarketOrder(orderID),
@@ -146,11 +148,22 @@ cli
             debug('m_appPrice()', error);
             throw Error(`Error with app ${buyMarketOrder.app}`);
           }),
+        await chain.contracts
+          .getHubContract({
+            at: hubAddress,
+          })
+          .checkBalance(address),
       ]);
-
       debug('orderRPC', orderRPC);
       debug('appPriceRPC', appPriceRPC);
+      debug('balanceRLC', balanceRLC);
 
+      const total = appPriceRPC[0].add(orderRPC.value);
+      if (balanceRLC.stake.lt(total)) {
+        throw Error(`total work price ${total} nRLC is higher than your iExec account balance ${
+          balanceRLC.stake
+        } nRLC. You should probably run "iexec wallet deposit"`);
+      }
       spinner.info(`app price: ${appPriceRPC[0]} nRLC for app ${buyMarketOrder.app}`);
       spinner.info(`workerpool price: ${orderRPC.value} nRLC for workerpool ${
         orderRPC.workerpool
@@ -158,7 +171,6 @@ cli
       spinner.info(`work parameters: ${pretty(buyMarketOrder.params)}`);
 
       if (!cmd.force) {
-        const total = appPriceRPC[0].add(orderRPC.value);
         await prompt.fillOrder(total, orderID);
       }
 
