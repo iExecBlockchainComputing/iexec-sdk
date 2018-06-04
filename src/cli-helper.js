@@ -80,7 +80,7 @@ const option = {
 
 const question = async (
   message,
-  { error = 'operation aborted by user', strict = true },
+  { error = 'operation aborted by user', strict = true } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
