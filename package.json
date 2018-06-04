@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "2.2.11",
+  "version": "2.2.12",
   "description": "iExec SDK",
   "main": "dist/iexec-lib.js",
   "scripts": {
@@ -46,7 +46,7 @@
     "prettyjson": "1.2.1",
     "query-string": "^6.1.0",
     "semver": "5.5.0",
-    "update-check-es5": "^1.5.2",
+    "update-check-es5": "1.5.4",
     "uuid": "3.2.1"
   },
   "devDependencies": {
