@@ -101,6 +101,10 @@ const prompt = {
     question(`${file} already exists, replace it with new one?`, options),
   transfer: (currency, amount, chainName, to, chainID) =>
     question(`Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`),
+  fillOrder: (amount, orderID) =>
+    question(`Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`),
+  placeOrder: (volume, category, value) =>
+    question(`Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);

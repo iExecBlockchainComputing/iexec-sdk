@@ -12,6 +12,7 @@ const {
   prettyRPC,
   info,
   command,
+  prompt,
 } = require('./cli-helper');
 const {
   loadIExecConf,
@@ -53,6 +54,7 @@ cli
   .command('place')
   .option(...option.chain())
   .option(...option.hub())
+  .option(...option.force())
   .description(desc.placeObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
@@ -64,10 +66,20 @@ cli
       const hubAddress = cmd.hub || chain.hub;
 
       if (!(objName in iexecConf) || !('sell' in iexecConf[objName])) {
-        throw Error('Missing order. You probably forgot to run "iexec order init --sell"');
+        throw Error('Missing sell order. You probably forgot to run "iexec order init --sell"');
       }
       const sellLimitOrder = iexecConf[objName].sell;
       debug('sellLimitOrder', sellLimitOrder);
+
+      spinner.info(`sell order: ${pretty(sellLimitOrder)}`);
+
+      if (!cmd.force) {
+        await prompt.placeOrder(
+          sellLimitOrder.volume,
+          sellLimitOrder.category,
+          sellLimitOrder.value,
+        );
+      }
 
       const args = [
         2,
@@ -99,6 +111,7 @@ cli
   .command(command.fill())
   .option(...option.chain())
   .option(...option.hub())
+  .option(...option.force())
   .description(desc.fill(objName))
   .action(async (orderID, cmd) => {
     const spinner = Spinner();
@@ -110,23 +123,45 @@ cli
       const hubAddress = cmd.hub || chain.hub;
 
       if (!(objName in iexecConf) || !('buy' in iexecConf[objName])) {
-        throw Error('Missing order. You probably forgot to run "iexec order init --buy"');
+        throw Error('Missing buy order. You probably forgot to run "iexec order init --buy"');
       }
-
-      spinner.start(info.filling(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
-      const orderRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .getMarketOrder(orderID);
-      debug('orderRPC', orderRPC);
-
       const buyMarketOrder = iexecConf[objName].buy;
       debug('buyMarketOrder', buyMarketOrder);
       debug('buyMarketOrder.params', buyMarketOrder.params);
       const workParams = JSON.stringify(buyMarketOrder.params);
       debug('workParams', workParams);
+
+      spinner.start(info.filling(objName));
+      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
+        hub: hubAddress,
+      });
+      const [orderRPC, appPriceRPC] = await Promise.all([
+        chain.contracts
+          .getMarketplaceContract({ at: marketplaceAddress })
+          .getMarketOrder(orderID),
+        chain.contracts
+          .getAppContract({ at: buyMarketOrder.app })
+          .m_appPrice()
+          .catch((error) => {
+            debug('m_appPrice()', error);
+            throw Error(`Error with app ${buyMarketOrder.app}`);
+          }),
+      ]);
+
+      debug('orderRPC', orderRPC);
+      debug('appPriceRPC', appPriceRPC);
+
+      spinner.info(`app price: ${appPriceRPC[0]} nRLC for app ${buyMarketOrder.app}`);
+      spinner.info(`workerpool price: ${orderRPC.value} nRLC for workerpool ${
+        orderRPC.workerpool
+      }`);
+      spinner.info(`work parameters: ${pretty(buyMarketOrder.params)}`);
+
+      if (!cmd.force) {
+        const total = appPriceRPC[0].add(orderRPC.value);
+        await prompt.fillOrder(total, orderID);
+      }
+
       const args = [
         orderID,
         orderRPC.workerpool,
