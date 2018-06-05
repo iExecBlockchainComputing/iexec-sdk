@@ -62,9 +62,7 @@ Now run `iexec --version` to check all is working.
 
 ## Katacoda
 
-- Init project katacoda: to come...
-- Deploy app katacoda: to come...
-- Buy market order and trigger a work tutorial: to come...
+Katacoda is an in-browser terminal that allows you to remotely follow tutorials without installing the SDK on your machine: https://www.katacoda.com/sulliwane/scenarios/sdk-v2-tutorial
 
 ## Text
 
