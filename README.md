@@ -51,6 +51,55 @@ Now run `iexec --version` to check all is working.
 - **Nodejs**: run `npm -g install iexec`
 - **Docker**: run `docker pull iexechub/iexec-sdk`
 
+# Tutorials
+
+## Video
+
+- SDK Video series link: https://goo.gl/1AfnSH
+- Init project video: https://www.youtube.com/watch?v=afBIv-84C9U
+- Deploy app video: https://www.youtube.com/watch?v=EltDUaYU8lQ
+- Buy market order and trigger a work video: https://www.youtube.com/watch?v=x7Sy8PcGcMg
+
+## Katacoda
+
+- Init project katacoda: to come...
+- Deploy app katacoda: to come...
+- Buy market order and trigger a work tutorial: to come...
+
+## Text
+
+### Init project
+
+required steps before following any other workflow.
+
+```bash
+iexec init # create all required files
+iexec wallet getETH # ask faucet for ETH
+iexec wallet getRLC # ask iExec faucet for RLC
+iexec account deposit 200 # deposit RLC on your iExec account, so you can buy orders
+iexec wallet show
+iexec account show
+```
+
+### Deploy an app
+
+```bash
+iexec app count # check if you have already deployed apps
+iexec app init # reset app fields in iexec.json
+iexec app deploy # deploy app on Ethereum
+iexec app show # show details of deployed app
+```
+
+### Buy & Run work using Marketplace
+
+```bash
+iexec order init --buy # init work order fields in iexec.json
+vi iexec.json # edit iexec.json and customize the buy order fields. Particularly work params field.
+iexec orderbook show --category 5 # show orderbook and choose an order ID
+iexec order fill <orderID> # fill order using its ID
+iexec work show --watch --download # watch progress of the submitted work, and download its result when completed
+```
+
 # iExec SDK API
 
 ## Help
