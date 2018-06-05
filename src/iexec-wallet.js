@@ -178,6 +178,7 @@ cli
   .command('sweep')
   .option(...option.chain())
   .option(...option.hub())
+  .option(...option.to())
   .description(desc.sweep())
   .action(async (cmd) => {
     const spinner = Spinner();
