@@ -80,7 +80,7 @@ cli
       if (cmd.watch && !['COMPLETED', 'CLAIMED'].includes(workStatusName)) {
         spinner.start(info.watching(objName));
         workStatusName = await waitForWorkStatus(
-          chain.contracts.getWorkContract({ at: address }).m_status,
+          chain.contracts.getWorkContract({ at: objAddress }).m_status,
           workStatusName,
         );
         obj = await chain.contracts.getObjProps(objName)(objAddress);
