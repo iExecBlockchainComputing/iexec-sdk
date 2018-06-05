@@ -62,7 +62,7 @@ Now run `iexec --version` to check all is working.
 
 ## Katacoda
 
-Katacoda is an in-browser terminal that allows you to remotely follow tutorials without installing the SDK on your machine: https://www.katacoda.com/sulliwane/scenarios/sdk-v2-tutorial
+Katacoda is an in-browser terminal that allows you to remotely follow tutorials without the need to install the SDK on your machine: https://www.katacoda.com/sulliwane/scenarios/sdk-v2-tutorial
 
 ## Text
 
