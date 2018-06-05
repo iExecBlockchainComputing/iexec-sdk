@@ -174,6 +174,8 @@ cli
         await prompt.fillOrder(total, orderID);
       }
 
+      spinner.start(info.filling(objName));
+
       const args = [
         orderID,
         orderRPC.workerpool,
