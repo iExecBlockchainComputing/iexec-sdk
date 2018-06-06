@@ -26,6 +26,8 @@ const info = {
   withdrawing: () => 'making withdraw...',
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
   downloaded: path => `downloaded work result to file ${path}`,
+  missingAddress: obj =>
+    `${obj} address not provided to CLI AND missing in deployed.json`,
 };
 
 const command = {

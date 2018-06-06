@@ -68,6 +68,8 @@ cli
 
       const objAddress = address || deployedObj[chain.id];
 
+      if (!objAddress) throw Error(info.missingAddress(objName));
+
       spinner.start(info.showing(objName));
       let obj = await chain.contracts.getObjProps(objName)(objAddress);
       debug('obj', obj);

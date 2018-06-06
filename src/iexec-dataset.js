@@ -8,6 +8,7 @@ const {
   option,
   Spinner,
   pretty,
+  info,
 } = require('./cli-helper');
 const hub = require('./hub');
 const {
@@ -76,6 +77,8 @@ cli
       const hubAddress = cmd.hub || chain.hub;
       const userAddress = cmd.user || address;
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+
+      if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
         hub: hubAddress,
