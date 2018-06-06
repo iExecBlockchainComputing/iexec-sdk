@@ -73,7 +73,7 @@ const option = {
   force: () => ['--force', 'force wallet creation even if old wallet exists'],
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
-    '--download',
+    '--download [fileName]',
     'download a work result data to local filesystem, if completed',
   ],
   category: () => ['--category [ID]', 'specify the work category'],

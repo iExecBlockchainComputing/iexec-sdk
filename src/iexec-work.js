@@ -103,9 +103,11 @@ cli
             .getFieldValue(resultObj, 'type')
             .toLowerCase();
 
+          const fileName =
+            typeof cmd.download === 'string' ? cmd.download : objAddress;
           const resultPath = path.join(
             process.cwd(),
-            objAddress.concat('.', extension),
+            fileName.concat('.', extension),
           );
           const resultStream = fs.createWriteStream(resultPath);
           await scheduler.downloadStream(resultUID, resultStream);
