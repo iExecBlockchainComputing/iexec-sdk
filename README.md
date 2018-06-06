@@ -21,6 +21,8 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 
 ## Install
 
+All three major OS are supported (linux, OSX, windows).
+
 #### Using Nodejs
 
 Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%206.4.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
@@ -30,8 +32,6 @@ npm -g install iexec # install the cli
 iexec --version
 iexec --help
 ```
-
-> Windows users need to create an alias by running `for /f "delims=|" %i in ('where iexec') do doskey iex="%i" $*` to avoid a naming conflict. Then always use `iex` instead of `iexec` when using the SDK.
 
 #### Using Docker
 
