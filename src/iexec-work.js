@@ -105,7 +105,7 @@ cli
 
           const resultPath = path.join(
             process.cwd(),
-            address.concat('.', extension),
+            objAddress.concat('.', extension),
           );
           const resultStream = fs.createWriteStream(resultPath);
           await scheduler.downloadStream(resultUID, resultStream);
