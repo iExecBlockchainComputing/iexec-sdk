@@ -98,7 +98,7 @@ iexec order fill <orderID> # fill order using its ID
 iexec work show --watch --download # watch progress of the submitted work, and download its result when completed
 ```
 
-# iExec SDK API
+# iExec SDK CLI API
 
 ## Help
 
