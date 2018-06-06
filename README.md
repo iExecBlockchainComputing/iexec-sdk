@@ -215,7 +215,7 @@ iexec order count # count marketplace total number of order
 # OPTIONS
 # --chain <chainName>
 # --watch
-# --download
+# --download [fileName]
 iexec work show [address] --watch --download # show a work, watch its status changes and download it when completed
 ```
 
