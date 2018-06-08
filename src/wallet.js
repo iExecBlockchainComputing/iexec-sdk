@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const Promise = require('bluebird');
-const fetch = require('node-fetch');
+const fetch = require('cross-fetch');
 const EthJS = require('ethjs');
 const { Spinner } = require('./cli-helper');
 

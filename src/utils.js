@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
 const jws = require('jws');
-const fetch = require('node-fetch');
+const fetch = require('cross-fetch');
 const qs = require('query-string');
 
 const debug = Debug('iexec:utils');
