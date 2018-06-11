@@ -329,19 +329,19 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 ## Methods
 
 - [iexec.wallet.checkBalances](#walletcheckbalances)
-- iexec.wallet.getETH
-- iexec.wallet.getRLC
-- iexec.wallet.sendETH
-- iexec.wallet.sendRLC
-- iexec.account.auth
-- iexec.account.deposit
-- iexec.account.withdraw
-- iexec.hub.createObj
-- iexec.hub.showObj
-- iexec.hub.countObj
-- iexec.hub.createCategory
-- iexec.hub.showCategory
-- iexec.hub.countCategory
+- [iexec.wallet.getETH](#walletgeteth)
+- [iexec.wallet.getRLC](#walletgetrlc)
+- [iexec.wallet.sendETH](#walletsendeth)
+- [iexec.wallet.sendRLC](#walletsendeth)
+- [iexec.account.auth](#accountauth)
+- [iexec.account.deposit](#accountdeposit)
+- [iexec.account.withdraw](#accountwithdraw)
+- [iexec.hub.createObj](#hubcreateobj)
+- [iexec.hub.showObj](#hubshowobj)
+- [iexec.hub.countObj](#hubcountobj)
+- [iexec.hub.createCategory](#hubcreatecategory)
+- [iexec.hub.showCategory](#hubshowcategory)
+- [iexec.hub.countCategory](#hubcountcategory)
 
 ### wallet.checkBalances
 
