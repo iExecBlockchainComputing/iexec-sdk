@@ -339,9 +339,6 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 - [iexec.hub.createObj](#hubcreateobj)
 - [iexec.hub.showObj](#hubshowobj)
 - [iexec.hub.countObj](#hubcountobj)
-- [iexec.hub.createCategory](#hubcreatecategory)
-- [iexec.hub.showCategory](#hubshowcategory)
-- [iexec.hub.countCategory](#hubcountcategory)
 
 ### wallet.checkBalances
 
@@ -444,3 +441,61 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `txReceipt` **Object** the ethereum transaction receipt
+
+### hub.createObj
+
+**Parameters**
+
+- `objName` **String** the object type name (app|workerPool|dataset)
+
+**Return** Below Function:
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `obj` **Object** the object to create
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `events` **Object** the decoded logs from the transaction receipt
+
+### hub.showObj
+
+**Parameters**
+
+- `objName` **String** the object type name (app|workerPool|dataset)
+
+**Return** Below Function:
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `objAdressOrIndex` **String** the object address or index
+- `userAddress` **String** the user address to query for
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `obj` **Object** All the properties of the object
+
+### hub.countObj
+
+**Parameters**
+
+- `objName` **String** the object type name (app|workerPool|dataset)
+
+**Return** Below Function:
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `userAddress` **String** the user address to query for
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `objCount` **BN** The total count of object
