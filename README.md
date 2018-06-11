@@ -332,7 +332,7 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 - [iexec.wallet.getETH](#walletgeteth)
 - [iexec.wallet.getRLC](#walletgetrlc)
 - [iexec.wallet.sendETH](#walletsendeth)
-- [iexec.wallet.sendRLC](#walletsendeth)
+- [iexec.wallet.sendRLC](#walletsendrlc)
 - [iexec.account.auth](#accountauth)
 - [iexec.account.deposit](#accountdeposit)
 - [iexec.account.withdraw](#accountwithdraw)
@@ -355,6 +355,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
   - `balances.wei` **BN** ether balance in wei
   - `balances.nRLC` **BN** RLC balance in nano RLC
 
+**Example**
+
+```js
+// wallet.checkBalances
+```
+
 ### wallet.getETH
 
 **Parameters**
@@ -366,6 +372,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 - `responses` **Array of String** String response from each faucet api
 
+**Example**
+
+```js
+// wallet.getETH
+```
+
 ### wallet.getRLC
 
 **Parameters**
@@ -376,6 +388,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `responses` **Array of String** String response from each faucet api
+
+**Example**
+
+```js
+// wallet.getRLC
+```
 
 ### wallet.sendETH
 
@@ -389,6 +407,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `txReceipt` **Object** the ethereum transaction receipt
+
+**Example**
+
+```js
+// wallet.sendETH
+```
 
 ### wallet.sendRLC
 
@@ -404,6 +428,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 - `txReceipt` **Object** the ethereum transaction receipt
 
+**Example**
+
+```js
+// wallet.sendRLC
+```
+
 ### account.auth
 
 **Parameters**
@@ -415,6 +445,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `jwtoken` **String** the iExec jwt token
+
+**Example**
+
+```js
+// account.auth
+```
 
 ### account.deposit
 
@@ -429,6 +465,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 - `txReceipt` **Object** the ethereum transaction receipt
 
+**Example**
+
+```js
+// account.deposit
+```
+
 ### account.withdraw
 
 **Parameters**
@@ -441,6 +483,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `txReceipt` **Object** the ethereum transaction receipt
+
+**Example**
+
+```js
+// wallet.withdraw
+```
 
 ### hub.createObj
 
@@ -460,6 +508,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `events` **Object** the decoded logs from the transaction receipt
+
+**Example**
+
+```js
+// hub.createObj
+```
 
 ### hub.showObj
 
@@ -481,6 +535,12 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 - `obj` **Object** All the properties of the object
 
+**Example**
+
+```js
+// hub.showObj
+```
+
 ### hub.countObj
 
 **Parameters**
@@ -499,3 +559,9 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Return** (Promise)
 
 - `objCount` **BN** The total count of object
+
+**Example**
+
+```js
+// hub.countObj
+```
