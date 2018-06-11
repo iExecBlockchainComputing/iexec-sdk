@@ -314,3 +314,133 @@ The `chains.json` file, located in every iExec project, describes the parameters
   }
 }
 ```
+
+# iExec Library API
+
+[Work In Progress] Although we'll try to avoid any API change, the Lib API may still evolve a little bit based on beta-tester feedbacks.
+
+iExec SDK can be imported in your code as a library/module, and it's compatible with old JS engines:
+
+- \>= Node v6.4
+- \>= Firefox v22
+- \>= Chrome v28
+- \>= IE 9
+
+## Methods
+
+- [iexec.wallet.checkBalances](#walletcheckbalances)
+- iexec.wallet.getETH
+- iexec.wallet.getRLC
+- iexec.wallet.sendETH
+- iexec.wallet.sendRLC
+- iexec.account.auth
+- iexec.account.deposit
+- iexec.account.withdraw
+- iexec.hub.createObj
+- iexec.hub.showObj
+- iexec.hub.countObj
+- iexec.hub.createCategory
+- iexec.hub.showCategory
+- iexec.hub.countCategory
+
+### wallet.checkBalances
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `address` **String** the address to check balances on
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `balances` **Object**
+  - `balances.wei` **BN** ether balance in wei
+  - `balances.nRLC` **BN** RLC balance in nano RLC
+
+### wallet.getETH
+
+**Parameters**
+
+- `chainName` **String** name of the chain (ropsten|rinkeby|kovan)
+- `address` **String** the address to ask ETH for
+
+**Return** (Promise)
+
+- `responses` **Array of String** String response from each faucet api
+
+### wallet.getRLC
+
+**Parameters**
+
+- `chainName` **String** name of the chain (ropsten|rinkeby|kovan)
+- `address` **String** the address to ask ETH for
+
+**Return** (Promise)
+
+- `responses` **Array of String** String response from each faucet api
+
+### wallet.sendETH
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `amouont` **String** the amount of nano RLC to send to
+- `from` **String** the address the is sending ETH
+- `to` **String** the address that is receiving the amount of ETH
+
+**Return** (Promise)
+
+- `txReceipt` **Object** the ethereum transaction receipt
+
+### wallet.sendRLC
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `amount` **String** the amount of nano RLC to send to
+- `to` **String** the address that will receive the amount of nRLC
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `txReceipt` **Object** the ethereum transaction receipt
+
+### account.auth
+
+**Parameters**
+
+- `amount` **String** the amount of nano RLC to send to
+- `scheduler` **Object** an [iexec scheduler](https://github.com/iExecBlockchainComputing/iexec-server-js-client) object
+- `ethjs` **Object** [Ethjs](https://github.com/ethjs/ethjs) client
+
+**Return** (Promise)
+
+- `jwtoken` **String** the iExec jwt token
+
+### account.deposit
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `amount` **String** the amount of nano RLC to deposit in iExec account
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `txReceipt` **Object** the ethereum transaction receipt
+
+### account.withdraw
+
+**Parameters**
+
+- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
+- `amount` **String** the amount of nano RLC to deposit in iExec account
+- `options` **Object** [optional] options
+  - `options.hub` **String** custom hub address
+
+**Return** (Promise)
+
+- `txReceipt` **Object** the ethereum transaction receipt
