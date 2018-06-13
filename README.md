@@ -121,6 +121,7 @@ iexec init # create all files necessary to get started
 # --to <address>
 # --force
 # --hub <address>
+# --password <password>
 iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
@@ -128,6 +129,8 @@ iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet sendETH <amount> --to <eth_address>
 iexec wallet sendRLC <amount> --to <eth_address>
 iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
+iexec wallet encrypt --password <password> # save encrypted-wallet.json from wallet.json
+iexec wallet decrypt --password <password> # save wallet.json from encrypted-wallet.json
 ```
 
 ## account
