@@ -66,9 +66,9 @@ const load = async ({
 
 const accounts = async () => {
   try {
-    const userWallet = await load();
+    const { address } = await load();
 
-    return userWallet.address;
+    return address;
   } catch (error) {
     debug('accounts()', error);
     throw error;
