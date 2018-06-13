@@ -59,6 +59,10 @@ const desc = {
   sendETH: () => 'send ETH to an address',
   sendRLC: () => 'send nRLC to an address',
   sweep: () => 'send all ETH and RLC to an address',
+  encryptWallet: () =>
+    'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
+  decryptWallet: () =>
+    'decrypt encrypted-wallet.json into wallet.json (clear format)',
 };
 
 const option = {
@@ -78,6 +82,10 @@ const option = {
   ],
   category: () => ['--category [ID]', 'specify the work category'],
   pool: () => ['--pool [address]', 'filter by worker pool address'],
+  password: () => [
+    '--password <password>',
+    'password used to encrypt the wallet',
+  ],
 };
 
 const question = async (
@@ -116,6 +124,8 @@ prompt.sweep = (...args) =>
 
 const oraOptions = {
   color: 'yellow',
+  // stream: process.stdout,
+  // enabled: true,
   spinner: {
     interval: 80,
     frames: [

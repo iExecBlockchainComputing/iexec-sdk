@@ -205,4 +205,38 @@ cli
     }
   });
 
+cli
+  .command('encrypt')
+  .option(...option.password())
+  .option(...option.force())
+  .description(desc.encryptWallet())
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const force = cmd.force || false;
+      if (!cmd.password) throw Error('missing --password option');
+      const res = await keystore.encryptAndSave(cmd.password, { force });
+      spinner.succeed(`encrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+    } catch (error) {
+      handleError(error, cli, spinner);
+    }
+  });
+
+cli
+  .command('decrypt')
+  .option(...option.password())
+  .option(...option.force())
+  .description(desc.decryptWallet())
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const force = cmd.force || false;
+      if (!cmd.password) throw Error('missing --password option');
+      const res = await keystore.decryptAndSave(cmd.password, { force });
+      spinner.succeed(`decrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+    } catch (error) {
+      handleError(error, cli, spinner);
+    }
+  });
+
 help(cli);

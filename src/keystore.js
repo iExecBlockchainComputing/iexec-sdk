@@ -4,7 +4,13 @@ const ethjsUtil = require('ethjs-util');
 const ethjsSigner = require('ethjs-signer');
 const { generate, privateToAccount } = require('ethjs-account');
 const EC = require('elliptic').ec;
-const { saveWalletConf, loadWalletConf } = require('./fs');
+const { Wallet } = require('ethers');
+const {
+  saveWalletConf,
+  loadWalletConf,
+  saveEncryptedWalletConf,
+  loadEncryptedWalletConf,
+} = require('./fs');
 const { prompt } = require('./cli-helper');
 const sigUtils = require('./sig-utils');
 
@@ -71,6 +77,39 @@ const accounts = async () => {
     return address;
   } catch (error) {
     debug('accounts()', error);
+    throw error;
+  }
+};
+
+const encryptAndSave = async (password, options) => {
+  try {
+    const { privateKey } = await load();
+    const wallet = new Wallet(privateKey);
+    const encryptedJSON = await wallet.encrypt(password);
+    const encrypted = await JSON.parse(encryptedJSON);
+    debug('encrypted', encrypted);
+    const fileName = await saveEncryptedWalletConf(encrypted, options);
+    return { wallet: encrypted, fileName };
+  } catch (error) {
+    debug('encryptAndSave()', error);
+    throw error;
+  }
+};
+
+const decryptAndSave = async (password, options) => {
+  try {
+    const encrypted = await loadEncryptedWalletConf();
+    const encryptedJSON = JSON.stringify(encrypted);
+    const { privateKey } = await Wallet.fromEncryptedWallet(
+      encryptedJSON,
+      password,
+    );
+    const wallet = walletFromPrivKey(privateKey);
+    debug('wallet', wallet);
+    const fileName = await save(wallet, options);
+    return { wallet, fileName };
+  } catch (error) {
+    debug('decryptAndSave()', error);
     throw error;
   }
 };
@@ -160,6 +199,8 @@ module.exports = {
   walletFromPrivKey,
   save,
   createAndSave,
+  encryptAndSave,
+  decryptAndSave,
   load,
   accounts,
   signTransaction,

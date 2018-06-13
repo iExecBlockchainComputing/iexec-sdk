@@ -16,6 +16,7 @@ const IEXEC_FILE_NAME = 'iexec.json';
 const CHAIN_FILE_NAME = 'chain.json';
 const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
+const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 
 const saveJSONToFile = async (
@@ -52,6 +53,8 @@ const saveAccountConf = (obj, options) =>
   saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
 const saveWalletConf = (obj, options) =>
   saveJSONToFile(WALLET_FILE_NAME, obj, options);
+const saveEncryptedWalletConf = (obj, options) =>
+  saveJSONToFile(ENCRYPTED_WALLET_FILE_NAME, obj, options);
 const saveDeployedConf = (obj, options) =>
   saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
 const saveChainConf = (obj, options) =>
@@ -87,6 +90,8 @@ const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
 const loadChainConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
 const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
+const loadEncryptedWalletConf = options =>
+  loadJSONAndRetry(ENCRYPTED_WALLET_FILE_NAME, options);
 const loadDeployedConf = options =>
   loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
@@ -153,6 +158,7 @@ module.exports = {
   saveJSONToFile,
   saveAccountConf,
   saveWalletConf,
+  saveEncryptedWalletConf,
   saveDeployedConf,
   saveChainConf,
   loadJSONFile,
@@ -161,6 +167,7 @@ module.exports = {
   loadChainConf,
   loadAccountConf,
   loadWalletConf,
+  loadEncryptedWalletConf,
   loadDeployedConf,
   saveDeployedObj,
   initObj,
