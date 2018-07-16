@@ -208,7 +208,7 @@ iexec order init --buy # init new buy order
 iexec order init --sell # init new sell order
 iexec order place # place an order at limit price
 iexec order show <orderID> # show an order
-iexec order fill <orderID> # fill an order at market price and start work execution
+iexec order fill <orderID> # fill an order at market price and start work execution. Allows the option --force.
 iexec order cancel <orderID> # cancel an order
 iexec order count # count marketplace total number of order
 ```
