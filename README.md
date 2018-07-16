@@ -7,7 +7,7 @@
 
 The iExec SDK is a CLI and a JS library that allows developers to interact with iExec decentralized marketplace in order to run off-chain computations.
 
-## Ressources
+## Resources
 
 - The iExec Dapp Store: https://dapps.iex.ec
 - The iExec Marketplace: https://market.iex.ec
