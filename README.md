@@ -203,6 +203,7 @@ iexec orderbook show --category 5 # show orderbook for category 5
 # --hub <address>
 # --sell
 # --buy
+# --force
 iexec order init --buy # init new buy order
 iexec order init --sell # init new sell order
 iexec order place # place an order at limit price
