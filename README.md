@@ -103,8 +103,10 @@ iexec work show --watch --download # watch progress of the submitted work, and d
 ## Help
 
 ```bash
-iexec --help
 iexec --version
+iexec --help
+iexec app --help
+iexec orderbook --help
 ```
 
 ## init
@@ -289,6 +291,7 @@ The `chains.json` file, located in every iExec project, describes the parameters
 
 ```json
 {
+  "default": "kovan",
   "chains": {
     "development": {
       "host": "localhost",
@@ -569,3 +572,20 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 ```js
 // hub.countObj
 ```
+
+# iExec SDK CLI fork/spawn
+
+If your program is not written in javascript, your last option to use the SDK would be to spawn it as a seperate process (sometimes called FORK operation). After each SDK run you should check the exit code returned by the SDK to know if the operation was sucessfull or not:
+
+- 0 = successful
+- 1 = error
+
+Finally, you could choose to parse the SDK stdout/stderr to access more information. ex:
+
+- `iexec orderbook show &> out.txt`
+- `iexec orderbook show |& grep .`
+
+Warning:
+
+- The stdout/stderr is subject to changes (this is what makes this solution brittle)
+- The node and docker version have some slight differences in their stdout/stderr
