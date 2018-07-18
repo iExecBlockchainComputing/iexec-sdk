@@ -575,7 +575,7 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 # iExec SDK CLI fork/spawn
 
-If your program is not written in javascript, your last option to use the SDK would be to spawn it as a seperate process (sometimes called FORK operation). After each SDK run you should check the exit code returned by the SDK to know if the operation was sucessfull or not:
+If your program is not written in javascript, your last option to use the SDK would be to spawn it as a seperate process (sometimes called FORK operation). After each SDK run you should check the exit code returned by the SDK to know if the operation was sucessfull or not `echo $?`:
 
 - 0 = successful
 - 1 = error
