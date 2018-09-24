@@ -32,8 +32,8 @@ const showObj = objName => async (
 
   let objAddress;
   if (
-    !ethUtil.isHexString(objAdressOrIndex) &&
-    Number.isInteger(Number(objAdressOrIndex))
+    !ethUtil.isHexString(objAdressOrIndex)
+    && Number.isInteger(Number(objAdressOrIndex))
   ) {
     // INDEX case: need hit subHub to get obj address from index
     objAddress = await contracts.getUserObjAddressByIndex(objName)(
@@ -44,7 +44,9 @@ const showObj = objName => async (
   } else if (isEthAddress(objAdressOrIndex)) {
     objAddress = objAdressOrIndex;
   } else {
-    throw Error('argument is neither an integer index nor a valid ethereum address');
+    throw Error(
+      'argument is neither an integer index nor a valid ethereum address',
+    );
   }
 
   const obj = await contracts.getObjProps(objName)(objAddress);
@@ -86,7 +88,9 @@ const showCategory = async (contracts, index, options) => {
 
   const categoryRPC = await contracts.getCategoryByIndex(index, options);
 
-  spinner.succeed(`Category at index ${index} details:${prettyRPC(categoryRPC)}`);
+  spinner.succeed(
+    `Category at index ${index} details:${prettyRPC(categoryRPC)}`,
+  );
   return categoryRPC;
 };
 
