@@ -47,18 +47,12 @@ const saveJSONToFile = async (
     throw error;
   }
 };
-const saveIExecConf = (obj, options) =>
-  saveJSONToFile(IEXEC_FILE_NAME, obj, options);
-const saveAccountConf = (obj, options) =>
-  saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
-const saveWalletConf = (obj, options) =>
-  saveJSONToFile(WALLET_FILE_NAME, obj, options);
-const saveEncryptedWalletConf = (obj, options) =>
-  saveJSONToFile(ENCRYPTED_WALLET_FILE_NAME, obj, options);
-const saveDeployedConf = (obj, options) =>
-  saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
-const saveChainConf = (obj, options) =>
-  saveJSONToFile(CHAIN_FILE_NAME, obj, options);
+const saveIExecConf = (obj, options) => saveJSONToFile(IEXEC_FILE_NAME, obj, options);
+const saveAccountConf = (obj, options) => saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
+const saveWalletConf = (obj, options) => saveJSONToFile(WALLET_FILE_NAME, obj, options);
+const saveEncryptedWalletConf = (obj, options) => saveJSONToFile(ENCRYPTED_WALLET_FILE_NAME, obj, options);
+const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
+const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
   try {
@@ -70,7 +64,9 @@ const loadJSONFile = async (fileName) => {
   } catch (error) {
     debug('loadFile() error', error);
     if (error.code === 'ENOENT') {
-      throw new Error(`Missing "${fileName}" file, did you forget to run "iexec init"?`);
+      throw new Error(
+        `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+      );
     }
     throw error;
   }
@@ -90,10 +86,8 @@ const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
 const loadChainConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
 const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
 const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
-const loadEncryptedWalletConf = options =>
-  loadJSONAndRetry(ENCRYPTED_WALLET_FILE_NAME, options);
-const loadDeployedConf = options =>
-  loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
+const loadEncryptedWalletConf = options => loadJSONAndRetry(ENCRYPTED_WALLET_FILE_NAME, options);
+const loadDeployedConf = options => loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
 const initIExecConf = async (options) => {
   const iexecConf = Object.assign(templates.main, { app: templates.app });
