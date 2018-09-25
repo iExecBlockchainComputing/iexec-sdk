@@ -9,8 +9,7 @@ const debug = Debug('help');
 const info = {
   waitMiners: () => 'waiting for transaction to be mined...',
   checkBalance: currency => `checking ${currency} balances...`,
-  topUp: currency =>
-    `Run "iexec wallet get${currency}" to ask faucets for ${currency}`,
+  topUp: currency => `Run "iexec wallet get${currency}" to ask faucets for ${currency}`,
   userAborted: () => 'operation aborted by user.',
   logging: () => 'logging into iExec...',
   creating: obj => `creating ${obj}...`,
@@ -26,8 +25,7 @@ const info = {
   withdrawing: () => 'making withdraw...',
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
   downloaded: path => `downloaded work result to file ${path}`,
-  missingAddress: obj =>
-    `${obj} address not provided to CLI AND missing in deployed.json`,
+  missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
 };
 
 const command = {
@@ -39,8 +37,7 @@ const command = {
 };
 
 const desc = {
-  hubAddress: () =>
-    'interact with the iExec Hub at a custom smart contract address',
+  hubAddress: () => 'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chains.json"',
   userAddress: () => 'custom user address',
   initObj: objName => `init a new ${objName}`,
@@ -59,10 +56,8 @@ const desc = {
   sendETH: () => 'send ETH to an address',
   sendRLC: () => 'send nRLC to an address',
   sweep: () => 'send all ETH and RLC to an address',
-  encryptWallet: () =>
-    'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
-  decryptWallet: () =>
-    'decrypt encrypted-wallet.json into wallet.json (clear format)',
+  encryptWallet: () => 'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
+  decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
 };
 
 const option = {
@@ -107,20 +102,21 @@ const question = async (
 const prompt = {
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
-  overwrite: (file, options) =>
-    question(`${file} already exists, replace it with new one?`, options),
-  transfer: (currency, amount, chainName, to, chainID) =>
-    question(`Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`),
-  fillOrder: (amount, orderID) =>
-    question(`Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`),
-  placeOrder: (volume, category, value) =>
-    question(`Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`),
+  overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
+  transfer: (currency, amount, chainName, to, chainID) => question(
+    `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`,
+  ),
+  fillOrder: (amount, orderID) => question(
+    `Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`,
+  ),
+  placeOrder: (volume, category, value) => question(
+    `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
+  ),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);
 prompt.transferRLC = (...args) => prompt.transfer('nRLC', ...args);
-prompt.sweep = (...args) =>
-  prompt.transfer('ETH and RLC', 'all wallet', ...args);
+prompt.sweep = (...args) => prompt.transfer('ETH and RLC', 'all wallet', ...args);
 
 const oraOptions = {
   color: 'yellow',
@@ -189,8 +185,7 @@ const oraOptions = {
   },
 };
 
-const helpMessage =
-  '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
+const helpMessage = '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
 const outputHelpMessage = () => console.log(helpMessage);
 const helpCB = (mess) => {
   const newMessage = mess.concat(helpMessage);
