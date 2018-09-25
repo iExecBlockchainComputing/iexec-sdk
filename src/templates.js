@@ -41,6 +41,7 @@ const category = {
 
 const chains = {
   chains: {
+    default: 'kovan',
     dev: {
       host: 'http://localhost:8545',
       id: '1337',
@@ -48,22 +49,22 @@ const chains = {
       scheduler: 'https://pool1api.iex.ec',
     },
     ropsten: {
-      host: 'https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq',
+      host: 'https://ropsten.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
       id: '3',
       scheduler: 'https://pool1api.iex.ec',
     },
     rinkeby: {
-      host: 'https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq',
+      host: 'https://rinkeby.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
       id: '4',
       scheduler: 'https://pool1api.iex.ec',
     },
     kovan: {
-      host: 'https://kovan.infura.io/berv5GTB5cSdOJPPnqOq',
+      host: 'https://kovan.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
       id: '42',
       scheduler: 'https://pool1api.iex.ec',
     },
     mainnet: {
-      host: 'https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ',
+      host: 'https://mainnet.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
       id: '1',
       scheduler: 'https://pool1api.iex.ec',
     },
