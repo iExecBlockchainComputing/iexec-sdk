@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const Promise = require('bluebird');
 const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
 const createIExecContracts = require('iexec-contracts-js-client');
