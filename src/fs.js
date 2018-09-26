@@ -2,6 +2,11 @@ const Debug = require('debug');
 const Promise = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
+const {
+  validateChainsConf,
+  validateWalletConf,
+  validateAccountConf,
+} = require('iexec-schema-validator');
 const { prompt } = require('./cli-helper');
 const templates = require('./templates');
 const { createOrder } = require('./templates');
@@ -55,37 +60,63 @@ const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, ob
 const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
-  try {
-    const filePath = path.join(process.cwd(), fileName);
-    debug('loading filePath', filePath);
-    const fileJSON = await readFileAsync(filePath, 'utf8');
-    const file = JSON.parse(fileJSON);
-    return file;
-  } catch (error) {
-    debug('loadFile() error', error);
-    if (error.code === 'ENOENT') {
-      throw new Error(
-        `Missing "${fileName}" file, did you forget to run "iexec init"?`,
-      );
-    }
-    throw error;
-  }
+  const filePath = path.join(process.cwd(), fileName);
+  debug('loading filePath', filePath);
+  const fileJSON = await readFileAsync(filePath, 'utf8');
+  const file = JSON.parse(fileJSON);
+  return file;
 };
 
 const loadJSONAndRetry = async (fileName, options = {}) => {
   try {
+    debug('options', options);
     const file = await loadJSONFile(fileName, options);
+
+    if (options.validate) {
+      options.validate(file);
+      debug('valid', fileName);
+    }
     return file;
   } catch (error) {
     debug('loadJSONAndRetry', error);
-    if (options.retry) return options.retry();
-    throw error;
+
+    if (error.code === 'ENOENT') {
+      if (options.retry) return options.retry();
+      throw new Error(
+        `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+      );
+    }
+    throw new Error(`${error} in ${fileName}`);
   }
 };
 const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainConf = options => loadJSONAndRetry(CHAIN_FILE_NAME, options);
-const loadAccountConf = options => loadJSONAndRetry(ACCOUNT_FILE_NAME, options);
-const loadWalletConf = options => loadJSONAndRetry(WALLET_FILE_NAME, options);
+const loadChainConf = options => loadJSONAndRetry(
+  CHAIN_FILE_NAME,
+  Object.assign(
+    {
+      validate: validateChainsConf,
+    },
+    options,
+  ),
+);
+const loadAccountConf = options => loadJSONAndRetry(
+  ACCOUNT_FILE_NAME,
+  Object.assign(
+    {
+      validate: validateAccountConf,
+    },
+    options,
+  ),
+);
+const loadWalletConf = options => loadJSONAndRetry(
+  WALLET_FILE_NAME,
+  Object.assign(
+    {
+      validate: validateWalletConf,
+    },
+    options,
+  ),
+);
 const loadEncryptedWalletConf = options => loadJSONAndRetry(ENCRYPTED_WALLET_FILE_NAME, options);
 const loadDeployedConf = options => loadJSONAndRetry(DEPLOYED_FILE_NAME, options);
 
