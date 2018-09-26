@@ -40,19 +40,19 @@ function addHexPrefix(str) {
 function elementaryName(name) {
   if (name.startsWith('int[')) {
     return `int256${name.slice(3)}`;
-  } else if (name === 'int') {
+  } if (name === 'int') {
     return 'int256';
-  } else if (name.startsWith('uint[')) {
+  } if (name.startsWith('uint[')) {
     return `uint256${name.slice(4)}`;
-  } else if (name === 'uint') {
+  } if (name === 'uint') {
     return 'uint256';
-  } else if (name.startsWith('fixed[')) {
+  } if (name.startsWith('fixed[')) {
     return `fixed128x128${name.slice(5)}`;
-  } else if (name === 'fixed') {
+  } if (name === 'fixed') {
     return 'fixed128x128';
-  } else if (name.startsWith('ufixed[')) {
+  } if (name.startsWith('ufixed[')) {
     return `ufixed128x128${name.slice(6)}`;
-  } else if (name === 'ufixed') {
+  } if (name === 'ufixed') {
     return 'ufixed128x128';
   }
   return name;
@@ -70,9 +70,9 @@ function parseNumber(arg) {
       return new BN(ethjsUtil.stripHexPrefix(arg), 16);
     }
     return new BN(arg, 10);
-  } else if (type === 'number') {
+  } if (type === 'number') {
     return new BN(arg);
-  } else if (arg.toArray) {
+  } if (arg.toArray) {
     // assume this is a BN for the moment, replace with BN.isBN soon
     return arg;
   }
@@ -115,7 +115,9 @@ const solidityPack = (types, values) => {
 
       num = parseNumber(value);
       if (num.bitLength() > size) {
-        throw new Error(`Supplied uint exceeds width: ${size} vs ${num.bitLength()}`);
+        throw new Error(
+          `Supplied uint exceeds width: ${size} vs ${num.bitLength()}`,
+        );
       }
 
       ret.push(num.toArrayLike(Buffer, 'be', size / 8));
@@ -127,7 +129,9 @@ const solidityPack = (types, values) => {
 
       num = parseNumber(value);
       if (num.bitLength() > size) {
-        throw new Error(`Supplied int exceeds width: ${size} vs ${num.bitLength()}`);
+        throw new Error(
+          `Supplied int exceeds width: ${size} vs ${num.bitLength()}`,
+        );
       }
 
       ret.push(num.toTwos(size).toArrayLike(Buffer, 'be', size / 8));
@@ -153,7 +157,9 @@ const typedSignatureHash = (typedData) => {
   const error = new Error('Expect argument to be non-empty array');
   if (typeof typedData !== 'object' || !typedData.length) throw error;
 
-  const data = typedData.map(e => (e.type === 'bytes' ? Buffer.toBuffer(e.value) : e.value));
+  const data = typedData.map(
+    e => (e.type === 'bytes' ? Buffer.toBuffer(e.value) : e.value),
+  );
   const types = typedData.map(e => e.type);
   const schema = typedData.map((e) => {
     if (!e.name) throw error;
