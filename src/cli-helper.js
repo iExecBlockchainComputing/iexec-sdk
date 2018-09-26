@@ -26,6 +26,7 @@ const info = {
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
   downloaded: path => `downloaded work result to file ${path}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
+  checking: obj => `checking ${obj}...`,
 };
 
 const command = {
@@ -58,6 +59,7 @@ const desc = {
   sweep: () => 'send all ETH and RLC to an address',
   encryptWallet: () => 'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
   decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
+  info: () => 'show iExec contracts addresses',
 };
 
 const option = {

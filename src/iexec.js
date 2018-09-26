@@ -9,6 +9,7 @@ const {
   handleError,
   help,
   Spinner,
+  info,
   pretty,
   desc,
   option,
@@ -26,14 +27,18 @@ const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
 const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
 
 async function main() {
-  const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(debug);
+  const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
+    debug,
+  );
 
   if (update) {
     const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
     const spin = Spinner();
-    spin.info(`iExec SDK update available ${packageJSON.version} →  ${
-      update.latest
-    }, Run "${upgradeCMD}" to update\n`);
+    spin.info(
+      `iExec SDK update available ${packageJSON.version} →  ${
+        update.latest
+      }, Run "${upgradeCMD}" to update\n`,
+    );
   }
 
   cli
@@ -49,12 +54,18 @@ async function main() {
           strict: false,
         });
         if (fileName) {
-          spinner.info(`Here is your main config "${fileName}":${pretty(saved)}`);
+          spinner.info(
+            `Here is your main config "${fileName}":${pretty(saved)}`,
+          );
         }
 
         const chainRes = await initChainConf({ force, strict: false });
         if (chainRes.fileName) {
-          spinner.info(`Here is your chain config "${chainRes.fileName}":${pretty(chainRes.saved)}`);
+          spinner.info(
+            `Here is your chain config "${chainRes.fileName}":${pretty(
+              chainRes.saved,
+            )}`,
+          );
         }
 
         const walletRes = await keystore.createAndSave({
@@ -62,7 +73,11 @@ async function main() {
           strict: false,
         });
         if (walletRes.fileName) {
-          spinner.info(`wallet saved in "${walletRes.fileName}":\n${pretty(walletRes.wallet)}`);
+          spinner.info(
+            `wallet saved in "${walletRes.fileName}":\n${pretty(
+              walletRes.wallet,
+            )}`,
+          );
         }
 
         const [chain, keys] = await Promise.all([
@@ -80,7 +95,11 @@ async function main() {
           { force: true },
         );
         const jwtForPrint = decodeJWTForPrint(jwtoken);
-        spinner.succeed(`You are logged into iExec. Login token saved into "${accountfileName}":${pretty(jwtForPrint)}`);
+        spinner.succeed(
+          `You are logged into iExec. Login token saved into "${accountfileName}":${pretty(
+            jwtForPrint,
+          )}`,
+        );
 
         spinner.succeed('iExec project is ready\n');
       } catch (error) {
@@ -107,6 +126,57 @@ async function main() {
   cli.command('order', 'manage iExec marketplace orders');
 
   cli.command('work', 'manage iExec works');
+
+  cli
+    .command('info')
+    .option(...option.chain())
+    .option(...option.hub())
+    .description(desc.info())
+    .action(async (cmd) => {
+      const spinner = Spinner();
+      try {
+        const chain = await loadChain(cmd.chain);
+        const hubAddress = cmd.hub || chain.hub;
+
+        spinner.start(info.checking('iExec contracts info'));
+
+        const [
+          rlcAddress,
+          marketplaceAddress,
+          appHubAddress,
+          datasetHubAddress,
+          workerPoolHubAddress,
+        ] = await Promise.all([
+          chain.contracts.fetchRLCAddress({
+            hub: hubAddress,
+          }),
+          chain.contracts.fetchMarketplaceAddress({
+            hub: hubAddress,
+          }),
+          chain.contracts.fetchAppHubAddress({
+            hub: hubAddress,
+          }),
+          chain.contracts.fetchDatasetHubAddress({
+            hub: hubAddress,
+          }),
+          chain.contracts.fetchWorkerPoolHubAddress({
+            hub: hubAddress,
+          }),
+        ]);
+
+        const iexecAddresses = {
+          'hub address': hubAddress || chain.contracts.hubAddress,
+          'RLC ERC20 address': rlcAddress,
+          'marketplace address': marketplaceAddress,
+          'app hub address': appHubAddress,
+          'dataset hub address': datasetHubAddress,
+          'workerPool hub address': workerPoolHubAddress,
+        };
+        spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`);
+      } catch (error) {
+        handleError(error, cli);
+      }
+    });
 
   help(cli);
 }

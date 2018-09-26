@@ -62,3 +62,5 @@ test('iexec order count', () => expect(execAsync(`${iexecPath} order count`)).re
 test('iexec workerpool count', () => expect(execAsync(`${iexecPath} app count`)).resolves.not.toBe(1));
 
 test('iexec orderbook show', () => expect(execAsync(`${iexecPath} orderbook show`)).resolves.not.toBe(1));
+
+test('iexec info', () => expect(execAsync(`${iexecPath} info`)).resolves.not.toBe(1));
