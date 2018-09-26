@@ -11,13 +11,13 @@ const {
   desc,
   option,
   Spinner,
-  prettyRPC,
   info,
 } = require('./cli-helper');
 const keystore = require('./keystore');
 const { loadDeployedObj, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains.js');
 const { decodeJWTForPrint } = require('./utils');
+const work = require('./work');
 
 const debug = Debug('iexec:iexec-work');
 const objName = 'work';
@@ -73,43 +73,11 @@ cli
 
       if (!objAddress) throw Error(info.missingAddress(objName));
 
-      spinner.start(info.showing(objName));
-      let obj = await chain.contracts.getObjProps(objName)(objAddress);
-      debug('obj', obj);
-      let workStatusName = statusMap[obj.m_status.toString()];
-      debug('workStatusName', workStatusName);
+      const workResult = await work.show(chain.contracts, objAddress, cmd);
 
-      obj.m_statusName = workStatusName;
-      spinner.succeed(
-        `${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(
-          obj,
-        )}`,
-      );
-
-      if (cmd.watch && !['COMPLETED', 'CLAIMED'].includes(workStatusName)) {
-        spinner.start(info.watching(objName));
-        workStatusName = await waitForWorkStatus(
-          chain.contracts.getWorkContract({ at: objAddress }).m_status,
-          workStatusName,
-        );
-        obj = await chain.contracts.getObjProps(objName)(objAddress);
-        obj.m_statusName = workStatusName;
-        spinner.succeed(
-          `${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(
-            obj,
-          )}`,
-        );
-      }
       if (cmd.download) {
         const jwtForPrint = decodeJWTForPrint(jwtoken);
-        debug(
-          'userWallet.address.toLowerCase()',
-          userWallet.address.toLowerCase(),
-        );
-        debug(
-          'jwtForPrint.address.toLowerCase()',
-          jwtForPrint.address.toLowerCase(),
-        );
+
         if (
           userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
         ) {
@@ -117,13 +85,14 @@ cli
             info.tokenAndWalletDiffer(userWallet.address, jwtForPrint.address),
           );
         }
-        if (workStatusName === 'COMPLETED') {
-          const server = 'https://'.concat(obj.m_uri.split('/')[2]);
+
+        if (workResult.workStatusName === 'COMPLETED') {
+          const server = 'https://'.concat(workResult.m_uri.split('/')[2]);
           debug('server', server);
           const scheduler = createIExecClient({ server });
           await scheduler.getCookieByJWT(jwtoken);
 
-          const resultUID = scheduler.uri2uid(obj.m_uri);
+          const resultUID = scheduler.uri2uid(workResult.m_uri);
           debug('resultUID', resultUID);
           const resultObj = await scheduler.getByUID(resultUID);
           const extension = scheduler
