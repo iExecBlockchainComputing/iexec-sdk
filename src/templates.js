@@ -40,8 +40,8 @@ const category = {
 };
 
 const chains = {
+  default: 'kovan',
   chains: {
-    default: 'kovan',
     dev: {
       host: 'http://localhost:8545',
       id: '1337',
