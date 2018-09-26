@@ -41,7 +41,11 @@ cli
       const fileName = await saveAccountConf({ jwtoken }, { force });
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
-      spinner.succeed(`You are logged into iExec. Login token saved into "${fileName}":${pretty(jwtForPrint)}`);
+      spinner.succeed(
+        `You are logged into iExec. Login token saved into "${fileName}":${pretty(
+          jwtForPrint,
+        )}`,
+      );
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -105,9 +109,9 @@ cli
       if (
         userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
       ) {
-        spinner.warn(`Your token address ${jwtForPrint.address} and your wallet address ${
-          userWallet.address
-        } differ, you should run "iexec account login" to sync them\n`);
+        spinner.warn(
+          info.tokenAndWalletDiffer(userWallet.address, jwtForPrint.address),
+        );
       }
       spinner.info(`Account token:${pretty(jwtForPrint)}`);
 

@@ -14,8 +14,10 @@ const {
   prettyRPC,
   info,
 } = require('./cli-helper');
+const keystore = require('./keystore');
 const { loadDeployedObj, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains.js');
+const { decodeJWTForPrint } = require('./utils');
 
 const debug = Debug('iexec:iexec-work');
 const objName = 'work';
@@ -58,10 +60,11 @@ cli
   .action(async (address, cmd) => {
     const spinner = Spinner();
     try {
-      const [chain, deployedObj, { jwtoken }] = await Promise.all([
+      const [chain, deployedObj, { jwtoken }, userWallet] = await Promise.all([
         loadChain(cmd.chain),
         loadDeployedObj(objName),
         loadAccountConf(),
+        keystore.load(),
       ]);
       debug('cmd.watch', cmd.watch);
       debug('cmd.download', cmd.download);
@@ -77,7 +80,11 @@ cli
       debug('workStatusName', workStatusName);
 
       obj.m_statusName = workStatusName;
-      spinner.succeed(`${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(obj)}`);
+      spinner.succeed(
+        `${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(
+          obj,
+        )}`,
+      );
 
       if (cmd.watch && !['COMPLETED', 'CLAIMED'].includes(workStatusName)) {
         spinner.start(info.watching(objName));
@@ -87,9 +94,29 @@ cli
         );
         obj = await chain.contracts.getObjProps(objName)(objAddress);
         obj.m_statusName = workStatusName;
-        spinner.succeed(`${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(obj)}`);
+        spinner.succeed(
+          `${objName} ${objAddress} status is ${workStatusName}, details:${prettyRPC(
+            obj,
+          )}`,
+        );
       }
       if (cmd.download) {
+        const jwtForPrint = decodeJWTForPrint(jwtoken);
+        debug(
+          'userWallet.address.toLowerCase()',
+          userWallet.address.toLowerCase(),
+        );
+        debug(
+          'jwtForPrint.address.toLowerCase()',
+          jwtForPrint.address.toLowerCase(),
+        );
+        if (
+          userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
+        ) {
+          spinner.warn(
+            info.tokenAndWalletDiffer(userWallet.address, jwtForPrint.address),
+          );
+        }
         if (workStatusName === 'COMPLETED') {
           const server = 'https://'.concat(obj.m_uri.split('/')[2]);
           debug('server', server);
@@ -103,8 +130,7 @@ cli
             .getFieldValue(resultObj, 'type')
             .toLowerCase();
 
-          const fileName =
-            typeof cmd.download === 'string' ? cmd.download : objAddress;
+          const fileName = typeof cmd.download === 'string' ? cmd.download : objAddress;
           const resultPath = path.join(
             process.cwd(),
             fileName.concat('.', extension),
@@ -113,7 +139,9 @@ cli
           await scheduler.downloadStream(resultUID, resultStream);
           spinner.succeed(info.downloaded(resultPath));
         } else {
-          spinner.info('--download option ignored because work status is not COMPLETED');
+          spinner.info(
+            '--download option ignored because work status is not COMPLETED',
+          );
         }
       }
     } catch (error) {

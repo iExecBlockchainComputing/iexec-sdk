@@ -27,6 +27,7 @@ const info = {
   downloaded: path => `downloaded work result to file ${path}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
   checking: obj => `checking ${obj}...`,
+  tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
 };
 
 const command = {
