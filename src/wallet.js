@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const Promise = require('bluebird');
 const fetch = require('cross-fetch');
 const EthJS = require('ethjs');
 const { Spinner } = require('./cli-helper');
@@ -10,25 +9,23 @@ const ethFaucets = [
   {
     chainName: 'ropsten',
     name: 'faucet.ropsten.be',
-    getETH: address =>
-      fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
-        .then(res => res.json())
-        .catch(() => ({ error: 'ETH faucet is down.' })),
+    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
+      .then(res => res.json())
+      .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
-    getETH: address =>
-      fetch('https://ropsten.faucet.b9lab.com/tap', {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({ toWhom: address }),
-      })
-        .then(res => res.json())
-        .catch(() => ({ error: 'ETH faucet is down.' })),
+    getETH: address => fetch('https://ropsten.faucet.b9lab.com/tap', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({ toWhom: address }),
+    })
+      .then(res => res.json())
+      .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'rinkeby',
@@ -50,22 +47,20 @@ const ethFaucets = [
 const checkBalances = async (contracts, address, { hub } = {}) => {
   const rlcAddress = await contracts.fetchRLCAddress({ hub });
 
-  const getETH = () =>
-    contracts.eth.getBalance(address).catch((error) => {
+  const getETH = () => contracts.eth.getBalance(address).catch((error) => {
+    debug(error);
+    return 0;
+  });
+  const getRLC = () => contracts
+    .getRLCContract({
+      at: rlcAddress,
+    })
+    .balanceOf(address)
+    .then(({ balance }) => balance)
+    .catch((error) => {
       debug(error);
       return 0;
     });
-  const getRLC = () =>
-    contracts
-      .getRLCContract({
-        at: rlcAddress,
-      })
-      .balanceOf(address)
-      .then(({ balance }) => balance)
-      .catch((error) => {
-        debug(error);
-        return 0;
-      });
 
   const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
   const balances = {
@@ -81,16 +76,17 @@ const getETH = async (chainName, account) => {
   spinner.start(`requesting ETH from ${chainName} faucets...`);
 
   const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
-  const responses = await Promise.all(filteredFaucets.map(faucet => faucet.getETH(account)));
+  const responses = await Promise.all(
+    filteredFaucets.map(faucet => faucet.getETH(account)),
+  );
   const responsesString = filteredFaucets.reduce(
-    (accu, curr, index) =>
-      accu.concat(
-        '- ',
-        curr.name,
-        ' : \n',
-        JSON.stringify(responses[index], null, '\t'),
-        '\n\n',
-      ),
+    (accu, curr, index) => accu.concat(
+      '- ',
+      curr.name,
+      ' : \n',
+      JSON.stringify(responses[index], null, '\t'),
+      '\n\n',
+    ),
     '',
   );
   spinner.succeed(`Faucets responses:\n${responsesString}`);
@@ -100,8 +96,9 @@ const getETH = async (chainName, account) => {
 const rlcFaucets = [
   {
     name: 'faucet.iex.ec',
-    getRLC: (chainName, address) =>
-      fetch(`https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`).then(res => res.json()),
+    getRLC: (chainName, address) => fetch(
+      `https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`,
+    ).then(res => res.json()),
   },
 ];
 
@@ -109,16 +106,17 @@ const getRLC = async (chainName, account) => {
   const spinner = Spinner();
 
   spinner.start(`requesting ${chainName} faucet for nRLC...`);
-  const responses = await Promise.all(rlcFaucets.map(faucet => faucet.getRLC(chainName, account)));
+  const responses = await Promise.all(
+    rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
+  );
   const responsesString = rlcFaucets.reduce(
-    (accu, curr, index) =>
-      accu.concat(
-        '- ',
-        curr.name,
-        ' : \n',
-        JSON.stringify(responses[index], null, '\t'),
-        '\n\n',
-      ),
+    (accu, curr, index) => accu.concat(
+      '- ',
+      curr.name,
+      ' : \n',
+      JSON.stringify(responses[index], null, '\t'),
+      '\n\n',
+    ),
     '',
   );
   spinner.succeed(`Faucets responses:\n${responsesString}`);
