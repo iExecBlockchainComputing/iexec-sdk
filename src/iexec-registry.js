@@ -7,7 +7,6 @@ const sizeOf = require('image-size');
 const path = require('path');
 const {
   validateDapp,
-  validateDataset,
   validatePool,
   validateDeployedConf,
 } = require('iexec-schema-validator');
@@ -34,7 +33,9 @@ const objectMap = {
   },
   dataset: {
     name: 'dataset',
-    validate: validateDataset,
+    validate: () => {
+      throw Error('dataset not implemented yet');
+    },
     registry: repo.concat('iexec-dapps-registry'),
   },
   workerpool: {
