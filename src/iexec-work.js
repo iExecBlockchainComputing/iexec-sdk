@@ -22,35 +22,6 @@ const work = require('./work');
 const debug = Debug('iexec:iexec-work');
 const objName = 'work';
 
-const statusMap = {
-  0: 'UNSET',
-  1: 'ACTIVE',
-  2: 'REVEALING',
-  3: 'CLAIMED',
-  4: 'COMPLETED',
-};
-const FETCH_INTERVAL = 5000;
-const sleep = ms => new Promise(res => setTimeout(res, ms));
-
-const waitForWorkStatus = async (getWorkStatusFn, prevStatus, counter = 0) => {
-  try {
-    const workStatus = await getWorkStatusFn();
-    debug('workStatus', workStatus);
-    const workStatusName = statusMap[workStatus[0].toString()];
-    debug('workStatusName', workStatusName);
-    if (workStatusName === 'COMPLETED') return workStatusName;
-    if (workStatusName === 'CLAIMED') return workStatusName;
-    if (workStatusName !== prevStatus) {
-      console.log('new status change', workStatusName);
-    }
-    await sleep(FETCH_INTERVAL);
-    return waitForWorkStatus(getWorkStatusFn, workStatusName, counter + 1);
-  } catch (error) {
-    debug('waitForWorkStatus()', error);
-    throw error;
-  }
-};
-
 cli
   .command('show [address]')
   .option(...option.chain())
