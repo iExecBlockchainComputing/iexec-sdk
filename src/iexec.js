@@ -127,6 +127,8 @@ async function main() {
 
   cli.command('work', 'manage iExec works');
 
+  cli.command('registry', 'interact with iExec registry');
+
   cli
     .command('info')
     .option(...option.chain())

@@ -28,6 +28,8 @@ const info = {
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
   checking: obj => `checking ${obj}...`,
   tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
+  valid: obj => `${obj} is valid`,
+  notValid: obj => `${obj} is NOT valid`,
 };
 
 const command = {
@@ -61,6 +63,7 @@ const desc = {
   encryptWallet: () => 'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
   decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
   info: () => 'show iExec contracts addresses',
+  validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
 };
 
 const option = {

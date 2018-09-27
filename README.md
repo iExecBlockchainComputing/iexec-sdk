@@ -100,13 +100,14 @@ iexec work show --watch --download # watch progress of the submitted work, and d
 
 # iExec SDK CLI API
 
-## Help
+## Help & Info
 
 ```bash
 iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
+iexec info --chain kovan
 ```
 
 ## init
@@ -237,10 +238,10 @@ iexec category show <index> # show category details by index
 iexec category count # count hub total number of category
 ```
 
-## upgrade
+## registry
 
 ```bash
-iexec upgrade # check if using latest iExec SDK version
+iexec registry validate app # validate an object description [app, dataset, workerpool]
 ```
 
 ## scheduler
