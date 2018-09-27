@@ -142,15 +142,35 @@ cli
       debug('workParams', workParams);
 
       spinner.start(info.filling(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
 
-      const countRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .m_orderCount();
+      // fault detection
+      const [marketplaceAddress, appHubAddress] = await Promise.all([
+        chain.contracts.fetchMarketplaceAddress({
+          hub: hubAddress,
+        }),
+        chain.contracts.fetchAppHubAddress({
+          hub: hubAddress,
+        }),
+      ]);
 
+      const [countRPC, isAppRegistered] = await Promise.all([
+        chain.contracts
+          .getMarketplaceContract({ at: marketplaceAddress })
+          .m_orderCount(),
+        chain.contracts
+          .getAppHubContract({ at: appHubAddress })
+          .isAppRegistered(buyMarketOrder.app),
+      ]);
+
+      if (!isAppRegistered[0]) {
+        throw Error(
+          `no iExec app deployed at address ${buyMarketOrder.app} [${
+            chain.name
+          }]`,
+        );
+      }
       if (parseInt(orderID, 10) > parseInt(countRPC[0].toString(), 10)) throw Error(`${objName} with ID ${orderID} does not exist`);
+      // fault detection
 
       const [orderRPC, appPriceRPC, balanceRLC] = await Promise.all([
         chain.contracts
