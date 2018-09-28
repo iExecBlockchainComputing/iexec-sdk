@@ -57,7 +57,7 @@ cli
           );
         }
 
-        if (workResult.workStatusName === 'COMPLETED') {
+        if (workResult.m_statusName === 'COMPLETED') {
           const server = 'https://'.concat(workResult.m_uri.split('/')[2]);
           debug('server', server);
           const scheduler = createIExecClient({ server });
