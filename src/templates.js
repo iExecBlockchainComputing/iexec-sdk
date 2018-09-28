@@ -1,5 +1,6 @@
 const main = {
-  description: 'My iExec ressource description',
+  description:
+    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe to your users what your application does',
   license: 'MIT',
   author: '?',
   social: {
