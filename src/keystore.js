@@ -100,7 +100,7 @@ const decryptAndSave = async (password, options) => {
   try {
     const encrypted = await loadEncryptedWalletConf();
     const encryptedJSON = JSON.stringify(encrypted);
-    const { privateKey } = await Wallet.fromEncryptedWallet(
+    const { privateKey } = await Wallet.fromEncryptedJson(
       encryptedJSON,
       password,
     );

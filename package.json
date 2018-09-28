@@ -28,7 +28,7 @@
     "cross-fetch": "2.2.2",
     "debug": "4.0.1",
     "elliptic": "6.4.1",
-    "ethers": "3.0.29",
+    "ethers": "4.0.0",
     "ethjs": "0.4.0",
     "ethjs-account": "0.1.4",
     "ethjs-custom-signer": "1.0.1",
