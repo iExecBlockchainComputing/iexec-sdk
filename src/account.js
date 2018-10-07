@@ -56,9 +56,11 @@ const withdraw = async (contracts, amount, { hub } = {}) => {
   const hubAddress = hub || contracts.hubAddress;
   debug('hubAddress', hubAddress);
   if (!hubAddress) {
-    throw Error(`no hub address provided, and no existing hub contract on chain ${
-      contracts.chainID
-    }`);
+    throw Error(
+      `no hub address provided, and no existing hub contract on chain ${
+        contracts.chainID
+      }`,
+    );
   }
 
   const txHash = await contracts
