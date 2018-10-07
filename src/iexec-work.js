@@ -89,4 +89,29 @@ cli
     }
   });
 
+cli
+  .command('claim [address]')
+  .option(...option.chain())
+  .option(...option.hub())
+  .description(desc.claimObj(objName))
+  .action(async (address, cmd) => {
+    try {
+      const [chain, deployedObj, wallet] = await Promise.all([
+        loadChain(cmd.chain),
+        loadDeployedObj(objName),
+        keystore.load(),
+      ]);
+      const hubAddress = cmd.hub || chain.hub;
+      const objAddress = address || deployedObj[chain.id];
+
+      if (!objAddress) throw Error(info.missingAddress(objName));
+
+      await work.claim(chain.contracts, objAddress, wallet.address, {
+        hub: hubAddress,
+      });
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
 help(cli);
