@@ -80,7 +80,29 @@ cli
           spinner.succeed(info.downloaded(resultPath));
         } else {
           spinner.info(
-            '--download option ignored because work status is not COMPLETED',
+            '--download option ignored because work status is not "COMPLETED"',
+          );
+        }
+      }
+      if (['ACTIVE', 'REVEALING'].includes(workResult.m_statusName)) {
+        const workerPoolContract = await chain.contracts.getWorkerPoolContract({
+          at: workResult.m_workerpool,
+        });
+        const consensuDetails = await workerPoolContract.getConsensusDetails(
+          objAddress,
+        );
+
+        const consensusTimeout = consensuDetails.c_consensusTimeout.toNumber();
+        const consensusTimeoutDate = new Date(consensusTimeout * 1000);
+
+        const now = Math.floor(Date.now() / 1000);
+        if (now < consensusTimeout) {
+          spinner.info(
+            `if work is not "COMPLETED" after ${consensusTimeoutDate} you can claim the work to get a full refund using "iexec work claim"`,
+          );
+        } else {
+          spinner.info(
+            `consensus timeout date ${consensusTimeoutDate} exceeded but consensus not reached. You can claim the work to get a full refund using "iexec work claim"`,
           );
         }
       }
