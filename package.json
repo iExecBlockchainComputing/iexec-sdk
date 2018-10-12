@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "2.2.25",
+  "version": "2.2.26",
   "description": "iExec SDK",
   "main": "dist/iexec-lib.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "ethjs-util": "0.1.6",
     "fs-extra": "7.0.0",
     "iexec-contracts-js-client": "2.0.15",
-    "iexec-schema-validator": "2.0.2",
+    "iexec-schema-validator": "2.0.3",
     "iexec-server-js-client": "2.0.3",
     "image-size": "0.6.3",
     "inquirer": "6.2.0",
