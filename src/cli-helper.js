@@ -90,6 +90,7 @@ const option = {
     '--password <password>',
     'password used to encrypt the wallet',
   ],
+  scheduler: () => ['--scheduler <host>', 'scheduler host uri'],
 };
 
 const question = async (

@@ -14,12 +14,13 @@ const {
 const { loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains.js');
 
-const debug = Debug('iexec:iexec-work');
+const debug = Debug('iexec:iexec-scheduler');
 const objName = 'scheduler';
 
 cli
   .command('show')
   .option(...option.chain())
+  .option(...option.scheduler())
   .description(desc.showObj('version', objName))
   .action(async (cmd) => {
     const spinner = Spinner();
@@ -28,6 +29,14 @@ cli
         loadChain(cmd.chain),
         loadAccountConf(),
       ]);
+
+      iexec.server = cmd.scheduler || iexec.server;
+      if (!iexec.server) {
+        throw Error(
+          'missing scheduler field in chain.json or scheduler cli argument',
+        );
+      }
+
       spinner.start(info.showing('version', objName));
       debug('scheduler', scheduler);
       const cookie = await iexec.getCookieByJWT(jwtoken);
