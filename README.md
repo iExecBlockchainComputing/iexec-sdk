@@ -226,6 +226,22 @@ iexec order count # count marketplace total number of order
 iexec work show [address] --watch --download # show a work, watch its status changes and download it when completed
 ```
 
+## sgx
+
+```bash
+# OPTIONS
+# --chain <chainName>
+# --application <appName | app0xAddress>
+# --keysFolderPath <path>
+# --inputsFolderPath <path>
+# --encryptedOutputsFolder <path>
+# --outputsFolderPath <path>
+# --secretManagementService <hostname/IP>
+# --remoteFileSystem <serviceName>
+iexec sgx encryptedpush --application iexechub/sgx-scone:blender
+iexec sgx decrypt
+```
+
 ## category
 
 ```bash
