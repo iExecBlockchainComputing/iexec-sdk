@@ -32,6 +32,7 @@ const info = {
   tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
   valid: obj => `${obj} is valid`,
   notValid: obj => `${obj} is NOT valid`,
+  sgxInit: () => 'created SGX folders tree structure',
 };
 
 const command = {
@@ -67,6 +68,9 @@ const desc = {
   decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
+  encryptpush: () => 'encrypt work input data + upload it to file hosting service',
+  decrypt: () => 'decrypt work result',
+  sgxInit: () => 'init the SGX folders tree structure',
 };
 
 const option = {
@@ -91,6 +95,31 @@ const option = {
     'password used to encrypt the wallet',
   ],
   scheduler: () => ['--scheduler <host>', 'scheduler host uri'],
+  application: () => ['--application <name>', 'dockerhub app name'],
+  secretManagementService: () => [
+    '--secretManagementService <hostname>',
+    'SCONE secret management service url or IP',
+  ],
+  remoteFileSystem: () => [
+    '--remoteFileSystem <name>',
+    'file hosting service name',
+  ],
+  keysFolderPath: () => [
+    '--keysFolderPath <path>',
+    'path of folder containing encrypt/decrypt keys',
+  ],
+  inputsFolderPath: () => [
+    '--inputsFolderPath <path>',
+    'path of folder containing encrypted input data',
+  ],
+  outputsFolderPath: () => [
+    '--outputsFolderPath <path>',
+    'path of folder containing encrypted work result',
+  ],
+  encryptedOutputsFolder: () => [
+    '--encryptedOutputsFolder <path>',
+    'path of folder containing decrypted work result',
+  ],
 };
 
 const question = async (

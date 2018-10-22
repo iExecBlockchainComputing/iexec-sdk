@@ -127,6 +127,8 @@ async function main() {
 
   cli.command('work', 'manage iExec works');
 
+  cli.command('sgx', 'interact with Intel SGX');
+
   cli.command('registry', 'interact with iExec registry');
 
   cli
