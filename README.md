@@ -238,8 +238,9 @@ iexec work show [address] --watch --download # show a work, watch its status cha
 # --outputsFolderPath <path>
 # --secretManagementService <hostname/IP>
 # --remoteFileSystem <serviceName>
-iexec sgx encryptedpush --application iexechub/sgx-scone:blender
-iexec sgx decrypt
+iexec sgx init # init the SGX folders tree structure
+iexec sgx encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
+iexec sgx decrypt # decrypt work result
 ```
 
 ## category
