@@ -103,7 +103,7 @@ cli
   .option(...option.application())
   .option(...option.secretManagementService())
   .option(...option.remoteFileSystem())
-  .description(desc.encryptpush())
+  .description(desc.encryptedpush())
   .action(async (cmd) => {
     const spinner = Spinner();
     try {

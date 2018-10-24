@@ -68,7 +68,7 @@ const desc = {
   decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
-  encryptpush: () => 'encrypt work input data + upload it to file hosting service',
+  encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
   sgxInit: () => 'init the SGX folders tree structure',
 };
