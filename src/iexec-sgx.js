@@ -188,8 +188,6 @@ cli
         `${decryptedOutputPath}:/decryptedOutputs`,
         'iexechub/sgx-scone:cli',
         'decrypt',
-        '--application',
-        cmd.appName,
       ]);
       spinner.succeed(`data decrypted in folder ${decryptedOutputPath}`);
     } catch (error) {
