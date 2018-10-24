@@ -22,7 +22,6 @@ const objName = 'wallet';
 
 cli
   .command('create')
-  .option(...option.chain())
   .option(...option.force())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
