@@ -74,7 +74,7 @@ required steps before following any other workflow.
 iexec init # create all required files
 iexec wallet getETH # ask faucet for ETH
 iexec wallet getRLC # ask iExec faucet for RLC
-iexec account deposit 200 # deposit RLC on your iExec account, so you can buy orders
+iexec account deposit 200 # deposit nRLC on your iExec account, so you can buy orders
 iexec wallet show
 iexec account show
 ```

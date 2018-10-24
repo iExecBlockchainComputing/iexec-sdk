@@ -27,7 +27,7 @@ const outputsFolderName = 'outputs';
 const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
-  let errorMessage;
+  let errorMessage = '';
   const proc = args ? spawn(bin, args) : spawn(bin);
 
   proc.stdout.on('data', data => console.log(`${data}`));
