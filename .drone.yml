@@ -23,8 +23,8 @@ pipeline:
     email: sulliwane@gmail.com
     tag: latest
     when:
-      branch: master
       event: tag
+      branch: master
       matrix:
         NODE_TAG: 8
 
@@ -35,8 +35,8 @@ pipeline:
     email: sulliwane@gmail.com
     tag: next
     when:
-      branch: next
       event: tag
+      branch: next
       matrix:
         NODE_TAG: 8
 
@@ -48,8 +48,8 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      branch: master
       event: tag
+      branch: master
       matrix:
         NODE_TAG: 8
 
@@ -61,7 +61,7 @@ pipeline:
       - next
       - ${DRONE_TAG##v}
     when:
-      branch: next
       event: tag
+      branch: next
       matrix:
         NODE_TAG: 8
