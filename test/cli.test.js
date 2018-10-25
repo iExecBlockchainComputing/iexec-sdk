@@ -45,6 +45,8 @@ test(
 
 test('iexec app init', () => expect(execAsync(`${iexecPath} app init`)).resolves.not.toBe(1));
 
+test('iexec order init --buy', () => expect(execAsync(`${iexecPath} order init --buy`)).resolves.not.toBe(1));
+
 test('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
 
 test('iexec app count', () => expect(execAsync(`${iexecPath} app count`)).resolves.not.toBe(1));
