@@ -1,9 +1,9 @@
 matrix:
   NODE_TAG:
+    - 11
     - 10
     - 9
     - 8
-    - 6
 
 pipeline:
   build:
@@ -18,23 +18,50 @@ pipeline:
 
   npm:
     image: plugins/npm
-    secrets: [ npm_password ]
+    secrets: [npm_password]
     username: sulliwane
     email: sulliwane@gmail.com
     tag: latest
     when:
+      branch: master
       event: tag
       matrix:
-        NODE_TAG: 6
+        NODE_TAG: 8
 
-  publish:
+  npm_next:
+    image: plugins/npm
+    secrets: [npm_password]
+    username: sulliwane
+    email: sulliwane@gmail.com
+    tag: next
+    when:
+      branch: next
+      event: tag
+      matrix:
+        NODE_TAG: 8
+
+  dockerhub:
     image: plugins/docker
     repo: iexechub/iexec-sdk
-    secrets: [ docker_username, docker_password ]
+    secrets: [docker_username, docker_password]
     tags:
       - latest
       - ${DRONE_TAG##v}
     when:
+      branch: master
       event: tag
       matrix:
-        NODE_TAG: 6
+        NODE_TAG: 8
+
+  dockerhub_next:
+    image: plugins/docker
+    repo: iexechub/iexec-sdk
+    secrets: [docker_username, docker_password]
+    tags:
+      - next
+      - ${DRONE_TAG##v}
+    when:
+      branch: next
+      event: tag
+      matrix:
+        NODE_TAG: 8
