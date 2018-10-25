@@ -13,7 +13,7 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      ref: [refs/tags/*]
+      event: tag
 
   npm:
     image: plugins/npm
@@ -22,7 +22,8 @@ pipeline:
     email: sulliwane@gmail.com
     tag: latest
     when:
-      ref: [refs/heads/master, refs/tags/*]
+      event: tag
+      ref: [refs/heads/master]
       matrix:
         NODE_TAG: 8
 
@@ -33,7 +34,8 @@ pipeline:
     email: sulliwane@gmail.com
     tag: next
     when:
-      ref: [refs/heads/next, refs/tags/*]
+      event: tag
+      ref: [refs/heads/next]
       matrix:
         NODE_TAG: 8
 
@@ -45,7 +47,8 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/heads/master, refs/tags/*]
+      event: tag
+      ref: [refs/heads/master]
       matrix:
         NODE_TAG: 8
 
@@ -57,6 +60,7 @@ pipeline:
       - next
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/heads/next, refs/tags/*]
+      event: tag
+      ref: [refs/heads/next]
       matrix:
         NODE_TAG: 8
