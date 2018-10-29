@@ -24,6 +24,19 @@ const auth = async (address, iexec, eth) => {
   return jwtoken;
 };
 
+const checkBalance = async (contracts, address, { hub } = {}) => {
+  const clerkAddress = await contracts.fetchClerkAddress({ hub });
+  const clerkContract = contracts.getClerkContract({
+    at: clerkAddress,
+  });
+  const balance = await clerkContract.viewAccountABILegacy(address);
+  debug('balance', balance);
+  return {
+    stake: balance[0],
+    locked: balance[1],
+  };
+};
+
 const deposit = async (contracts, amount, { hub } = {}) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
@@ -79,6 +92,7 @@ const withdraw = async (contracts, amount, { hub } = {}) => {
 
 module.exports = {
   auth,
+  checkBalance,
   deposit,
   withdraw,
 };

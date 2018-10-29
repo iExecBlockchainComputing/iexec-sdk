@@ -116,11 +116,12 @@ cli
       spinner.info(`Account token:${pretty(jwtForPrint)}`);
 
       spinner.start(info.checkBalance('iExec account'));
-      const balancesRPC = await chain.contracts
-        .getHubContract({
-          at: hubAddress,
-        })
-        .checkBalance(userAddress);
+
+      const balancesRPC = await account.checkBalance(
+        chain.contracts,
+        userAddress,
+        hubAddress,
+      );
 
       spinner.succeed(`Account balances:${prettyRPC(balancesRPC)}`);
     } catch (error) {
