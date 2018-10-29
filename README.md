@@ -226,7 +226,7 @@ iexec order count # count marketplace total number of order
 iexec work show [address] --watch --download # show a work, watch its status changes and download it when completed
 ```
 
-## sgx
+## tee
 
 ```bash
 # OPTIONS
@@ -238,9 +238,9 @@ iexec work show [address] --watch --download # show a work, watch its status cha
 # --outputsFolderPath <path>
 # --secretManagementService <hostname/IP>
 # --remoteFileSystem <serviceName>
-iexec sgx init # init the SGX folders tree structure
-iexec sgx encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
-iexec sgx decrypt # decrypt work result
+iexec tee init # init the TEE folders tree structure
+iexec tee encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
+iexec tee decrypt # decrypt work result
 ```
 
 ## category
