@@ -131,6 +131,11 @@ cli
         debug('appName', appName);
       }
 
+      await spawnAsync('docker', [
+        'pull',
+        'iexechub/sgx-scone:cli',
+      ]);
+
       const secretManagementService = [
         '--secretManagementService',
         cmd.secretManagementService,
@@ -176,6 +181,12 @@ cli
       } = createSGXPaths(cmd);
 
       spinner.start('decrypting');
+
+      await spawnAsync('docker', [
+        'pull',
+        'iexechub/sgx-scone:cli',
+      ]);
+
       await spawnAsync('docker', [
         'run',
         '-t',
