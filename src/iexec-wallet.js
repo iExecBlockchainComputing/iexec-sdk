@@ -195,13 +195,6 @@ cli
 
       if (!cmd.to) throw Error('missing --to option');
 
-      const balances = await wallet.checkBalances(chain.contracts, address, {
-        hub: hubAddress,
-      });
-      if (balances.nRLCLocked && balances.nRLCLocked > 0) {
-        await prompt.lockedRlc(balances.nRLCLocked, chain.name);
-      }
-
       if (!cmd.force) {
         await prompt.sweep(chain.name, cmd.to, chain.id);
       }
