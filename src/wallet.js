@@ -45,18 +45,25 @@ const ethFaucets = [
 ];
 
 const checkBalances = async (contracts, address, { hub } = {}) => {
-  const rlcAddress = await contracts.fetchRLCAddress({ hub });
+  const clerkAddress = await contracts.fetchClerkAddress({ hub });
 
   const getETH = () => contracts.eth.getBalance(address).catch((error) => {
     debug(error);
     return 0;
   });
   const getRLC = () => contracts
-    .getRLCContract({
-      at: rlcAddress,
+    .getClerkContract({
+      at: clerkAddress,
     })
-    .balanceOf(address)
-    .then(({ balance }) => balance)
+  // abi legacy
+    .viewAccountABILegacy(address)
+    .then((balance) => {
+      debug('balance', balance);
+      return {
+        stake: balance[0],
+        locked: balance[1],
+      };
+    })
     .catch((error) => {
       debug(error);
       return 0;
@@ -65,7 +72,8 @@ const checkBalances = async (contracts, address, { hub } = {}) => {
   const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
   const balances = {
     wei: weiBalance,
-    nRLC: rlcBalance,
+    nRLC: rlcBalance.stake,
+    nRLCLocked: rlcBalance.locked,
   };
   debug('balances', balances);
   return balances;
