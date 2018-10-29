@@ -145,6 +145,9 @@ const prompt = {
   transfer: (currency, amount, chainName, to, chainID) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`,
   ),
+  lockedRlc: (amount, chainName) => question(
+    `You have ${amount} locked nRLC in your wallet on ${chainName} chain, locked nRLC can't be transfered. Do you want ton continue?`,
+  ),
   fillOrder: (amount, orderID) => question(
     `Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`,
   ),
