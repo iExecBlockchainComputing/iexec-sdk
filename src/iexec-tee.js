@@ -16,9 +16,9 @@ const {
 const { loadChain } = require('./chains.js');
 const { isEthAddress } = require('./utils');
 
-const debug = Debug('iexec:iexec-sgx');
+const debug = Debug('iexec:iexec-tee');
 
-const sgxFolderName = 'sgx';
+const teeFolderName = 'tee';
 const keysFolderName = 'keys';
 const inputsFolderName = 'inputs';
 const encryptedOutputsFolderName = 'encryptedOutputs';
@@ -52,13 +52,13 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
 
 const createSGXPaths = (cmd = {}) => {
   const keysPath = cmd.keysFolderPath
-    || path.join(process.cwd(), sgxFolderName, keysFolderName);
+    || path.join(process.cwd(), teeFolderName, keysFolderName);
   const inputsPath = cmd.inputsFolderPath
-    || path.join(process.cwd(), sgxFolderName, inputsFolderName);
+    || path.join(process.cwd(), teeFolderName, inputsFolderName);
   const encryptedOutputsPath = cmd.encryptedOutputsFolder
-    || path.join(process.cwd(), sgxFolderName, encryptedOutputsFolderName);
+    || path.join(process.cwd(), teeFolderName, encryptedOutputsFolderName);
   const decryptedOutputPath = cmd.outputsFolderPath
-    || path.join(process.cwd(), sgxFolderName, outputsFolderName);
+    || path.join(process.cwd(), teeFolderName, outputsFolderName);
   const paths = {
     keysPath,
     inputsPath,
@@ -71,11 +71,11 @@ const createSGXPaths = (cmd = {}) => {
 
 cli
   .command('init')
-  .description(desc.sgxInit())
+  .description(desc.teeInit())
   .action(async () => {
     try {
       const spinner = Spinner();
-      spinner.start('creating SGX folder tree structure');
+      spinner.start('creating TEE folder tree structure');
       const {
         keysPath,
         inputsPath,
@@ -89,7 +89,7 @@ cli
         fs.ensureDir(decryptedOutputPath),
       ]);
 
-      spinner.succeed(info.sgxInit());
+      spinner.succeed(info.teeInit());
     } catch (error) {
       handleError(error, cli);
     }

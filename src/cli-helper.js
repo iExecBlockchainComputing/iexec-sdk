@@ -32,7 +32,7 @@ const info = {
   tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
   valid: obj => `${obj} is valid`,
   notValid: obj => `${obj} is NOT valid`,
-  sgxInit: () => 'created SGX folders tree structure',
+  teeInit: () => 'created TEE folders tree structure',
 };
 
 const command = {
@@ -70,7 +70,7 @@ const desc = {
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
-  sgxInit: () => 'init the SGX folders tree structure',
+  teeInit: () => 'init the TEE folders tree structure',
 };
 
 const option = {
