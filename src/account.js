@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { Spinner, info } = require('./cli-helper');
+const { Spinner, info, checkEvent } = require('./cli-helper');
 
 const debug = Debug('iexec:account');
 
@@ -63,6 +63,7 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
   const allowEvents = contracts.decodeRLCLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
+  if (!checkEvent('Allowance', allowEvents)) throw Error('Allowance not confirmed');
 
   const escrowContract = contracts.getEscrowContract({
     at: escrowAddress,
@@ -74,6 +75,8 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const txReceipt = await contracts.waitForReceipt(txHash);
   const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
+
+  if (!checkEvent('Deposit', events)) throw Error('Deposit not confirmed');
 
   spinner.succeed(info.deposited(amount));
 };
@@ -105,6 +108,8 @@ const withdraw = async (contracts, amount, { hub } = {}) => {
   const txReceipt = await contracts.waitForReceipt(txHash);
   const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
+
+  if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
 
   spinner.succeed(info.withdrawed(amount));
 };

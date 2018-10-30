@@ -22,7 +22,9 @@ const getContractAddress = (desc, chainID, { strict = true } = {}) => {
     }
     if (!('address' in desc.networks[chainID])) {
       if (strict) {
-        throw Error(`missing address key in contract JSON description for chainID: ${chainID}`);
+        throw Error(
+          `missing address key in contract JSON description for chainID: ${chainID}`,
+        );
       }
       return undefined;
     }
@@ -39,6 +41,16 @@ const isEthAddress = (address, { strict = false } = {}) => {
     throw Error(`address ${address} is not a valid Ethereum address`);
   }
   return isHexString;
+};
+
+/* eslint no-underscore-dangle: ["error", { "allow": ["_eventName"] }] */
+const checkEvent = (eventName, events) => {
+  let confirm = false;
+  events.forEach((event) => {
+    debug('event', event._eventName);
+    if (event._eventName === eventName) confirm = true;
+  });
+  return confirm;
 };
 
 const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
@@ -112,6 +124,7 @@ const http = {
 module.exports = {
   getContractAddress,
   isEthAddress,
+  checkEvent,
   toUpperFirst,
   secToDate,
   decodeJWTForPrint,
