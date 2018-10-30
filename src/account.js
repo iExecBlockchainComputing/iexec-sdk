@@ -92,15 +92,18 @@ const withdraw = async (contracts, amount, { hub } = {}) => {
     );
   }
 
-  const txHash = await contracts
-    .getHubContract({
-      at: hub,
-    })
-    .withdraw(amount);
+  const escrowAddress = await contracts.fetchEscrowAddress({ hub: hubAddress });
+  debug('escrowAddress', escrowAddress);
+
+  const escrowContract = contracts.getEscrowContract({
+    at: escrowAddress,
+  });
+
+  const txHash = await escrowContract.withdraw(amount);
   debug('txHash', txHash);
 
   const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeHubLogs(txReceipt.logs);
+  const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
 
   spinner.succeed(info.withdrawed(amount));
