@@ -1,5 +1,6 @@
 const Debug = require('debug');
-const { Spinner, info, checkEvent } = require('./cli-helper');
+const { Spinner, info } = require('./cli-helper');
+const { checkEvent } = require('./utils');
 
 const debug = Debug('iexec:account');
 
