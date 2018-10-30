@@ -41,22 +41,38 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
 
-  const hubContract = contracts.getHubContract({ at: hub });
+  const hubAddress = hub || contracts.hubAddress;
+  debug('hubAddress', hubAddress);
+  if (!hubAddress) {
+    throw Error(
+      `no hub address provided, and no existing hub contract on chain ${
+        contracts.chainID
+      }`,
+    );
+  }
+
+  const escrowAddress = await contracts.fetchEscrowAddress({ hub: hubAddress });
+  debug('escrowAddress', escrowAddress);
+
   const rlcAddress = await contracts.fetchRLCAddress();
   const allowTxHash = await contracts
     .getRLCContract({
       at: rlcAddress,
     })
-    .approve(hub || contracts.hubAddress, amount);
+    .approve(escrowAddress, amount);
   const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
-  const allowEvents = contracts.decodeHubLogs(allowTxReceipt.logs);
+  const allowEvents = contracts.decodeRLCLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
 
-  const txHash = await hubContract.deposit(amount);
+  const escrowContract = contracts.getEscrowContract({
+    at: escrowAddress,
+  });
+
+  const txHash = await escrowContract.deposit(amount);
   debug('txHash', txHash);
 
   const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeHubLogs(txReceipt.logs);
+  const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
 
   spinner.succeed(info.deposited(amount));
