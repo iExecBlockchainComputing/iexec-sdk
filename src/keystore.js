@@ -74,7 +74,7 @@ const accounts = async () => {
   try {
     const { address } = await load();
 
-    return address;
+    return [address];
   } catch (error) {
     debug('accounts()', error);
     throw error;
