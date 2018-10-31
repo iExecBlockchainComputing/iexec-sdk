@@ -54,17 +54,13 @@ cli
 cli
   .command(command.deposit())
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.deposit())
   .action(async (amount, cmd) => {
     try {
       const chain = await loadChain(cmd.chain);
-      const hubAddress = cmd.hub || chain.hub;
       debug('amount', amount);
 
-      await account.deposit(chain.contracts, amount, {
-        hub: hubAddress,
-      });
+      await account.deposit(chain.contracts, amount);
     } catch (error) {
       handleError(error, cli);
     }
@@ -73,17 +69,13 @@ cli
 cli
   .command(command.withdraw())
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.withdraw())
   .action(async (amount, cmd) => {
     try {
       const chain = await loadChain(cmd.chain);
-      const hubAddress = cmd.hub || chain.hub;
       debug('amount', amount);
 
-      await account.withdraw(chain.contracts, amount, {
-        hub: hubAddress,
-      });
+      await account.withdraw(chain.contracts, amount);
     } catch (error) {
       handleError(error, cli);
     }
@@ -92,7 +84,6 @@ cli
 cli
   .command('show [address]')
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.showObj('iExec', objName))
   .action(async (address, cmd) => {
     const spinner = Spinner();
@@ -102,7 +93,6 @@ cli
         keystore.load(),
         loadAccountConf(),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
       const userAddress = address || userWallet.address;
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
@@ -120,7 +110,6 @@ cli
       const balancesRPC = await account.checkBalance(
         chain.contracts,
         userAddress,
-        hubAddress,
       );
 
       spinner.succeed(`Account balances:${prettyRPC(balancesRPC)}`);

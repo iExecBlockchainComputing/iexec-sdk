@@ -25,8 +25,8 @@ const auth = async (address, iexec, eth) => {
   return jwtoken;
 };
 
-const checkBalance = async (contracts, address, { hub } = {}) => {
-  const clerkAddress = await contracts.fetchClerkAddress({ hub });
+const checkBalance = async (contracts, address) => {
+  const clerkAddress = await contracts.fetchClerkAddress();
   const clerkContract = contracts.getClerkContract({
     at: clerkAddress,
   });
@@ -38,21 +38,11 @@ const checkBalance = async (contracts, address, { hub } = {}) => {
   };
 };
 
-const deposit = async (contracts, amount, { hub } = {}) => {
+const deposit = async (contracts, amount) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
 
-  const hubAddress = hub || contracts.hubAddress;
-  debug('hubAddress', hubAddress);
-  if (!hubAddress) {
-    throw Error(
-      `no hub address provided, and no existing hub contract on chain ${
-        contracts.chainID
-      }`,
-    );
-  }
-
-  const escrowAddress = await contracts.fetchEscrowAddress({ hub: hubAddress });
+  const escrowAddress = await contracts.fetchEscrowAddress();
   debug('escrowAddress', escrowAddress);
 
   const rlcAddress = await contracts.fetchRLCAddress();
@@ -64,7 +54,7 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
   const allowEvents = contracts.decodeRLCLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
-  if (!checkEvent('Allowance', allowEvents)) throw Error('Allowance not confirmed');
+  if (!checkEvent('Approval', allowEvents)) throw Error('Approval not confirmed');
 
   const escrowContract = contracts.getEscrowContract({
     at: escrowAddress,
@@ -76,27 +66,16 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const txReceipt = await contracts.waitForReceipt(txHash);
   const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
-
   if (!checkEvent('Deposit', events)) throw Error('Deposit not confirmed');
 
   spinner.succeed(info.deposited(amount));
 };
 
-const withdraw = async (contracts, amount, { hub } = {}) => {
+const withdraw = async (contracts, amount) => {
   const spinner = Spinner();
   spinner.start(info.withdrawing());
 
-  const hubAddress = hub || contracts.hubAddress;
-  debug('hubAddress', hubAddress);
-  if (!hubAddress) {
-    throw Error(
-      `no hub address provided, and no existing hub contract on chain ${
-        contracts.chainID
-      }`,
-    );
-  }
-
-  const escrowAddress = await contracts.fetchEscrowAddress({ hub: hubAddress });
+  const escrowAddress = await contracts.fetchEscrowAddress();
   debug('escrowAddress', escrowAddress);
 
   const escrowContract = contracts.getEscrowContract({
@@ -109,7 +88,6 @@ const withdraw = async (contracts, amount, { hub } = {}) => {
   const txReceipt = await contracts.waitForReceipt(txHash);
   const events = contracts.decodeEscrowLogs(txReceipt.logs);
   debug('events', events);
-
   if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
 
   spinner.succeed(info.withdrawed(amount));
