@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
+const ethers = require('ethers');
 const createIExecContracts = require('iexec-contracts-js-client');
 const createIExecClient = require('iexec-server-js-client');
 const keystore = require('./keystore');
@@ -24,7 +25,7 @@ const createChains = (
     const chains = { names: Object.keys(chainsConf.chains) };
     chains.names.forEach((name) => {
       const chain = chainsConf.chains[name];
-      const ethProvider = new SignerProvider(chain.host, {
+      const signerProvider = new SignerProvider(chain.host, {
         signTransaction,
         accounts,
         signTypedData,
@@ -34,7 +35,10 @@ const createChains = (
 
       chains[name] = Object.assign({}, chain);
       chains[name].name = name;
-      chains[name].ethjs = new EthJS(ethProvider);
+      chains[name].ethjs = new EthJS(signerProvider);
+      chains[name].ethProvider = new ethers.providers.Web3Provider(
+        signerProvider,
+      );
       chains[name].EthJS = EthJS;
       chains[name].iexec = createIExecClient({
         server: chain.scheduler,
@@ -42,6 +46,7 @@ const createChains = (
       });
       chains[name].contracts = createIExecContracts({
         eth: chains[name].ethjs,
+        ethProvider: chains[name].ethProvider,
         chainID: chains[name].id,
         txOptions: {
           from,

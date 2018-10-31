@@ -30,41 +30,40 @@ const checkBalance = async (contracts, address) => {
   const clerkContract = contracts.getClerkContract({
     at: clerkAddress,
   });
-  const balance = await clerkContract.viewAccountABILegacy(address);
-  debug('balance', balance);
-  return {
-    stake: balance[0],
-    locked: balance[1],
+  const { stake, locked } = await clerkContract.viewAccount(address);
+  const balance = {
+    stake,
+    locked,
   };
+  debug('balance', balance);
+  return balance;
 };
 
 const deposit = async (contracts, amount) => {
   const spinner = Spinner();
   spinner.start(info.depositing());
 
-  const escrowAddress = await contracts.fetchEscrowAddress();
-  debug('escrowAddress', escrowAddress);
+  const clerkAddress = await contracts.fetchClerkAddress();
 
   const rlcAddress = await contracts.fetchRLCAddress();
-  const allowTxHash = await contracts
+  debug('rlcAddress', rlcAddress);
+  const allowTx = await contracts
     .getRLCContract({
       at: rlcAddress,
     })
-    .approve(escrowAddress, amount);
-  const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
+    .approve(clerkAddress, amount);
+  const allowTxReceipt = await allowTx.wait();
   const allowEvents = contracts.decodeRLCLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
   if (!checkEvent('Approval', allowEvents)) throw Error('Approval not confirmed');
 
-  const escrowContract = contracts.getEscrowContract({
-    at: escrowAddress,
+  const clerkContract = contracts.getClerkContract({
+    at: clerkAddress,
   });
 
-  const txHash = await escrowContract.deposit(amount);
-  debug('txHash', txHash);
-
-  const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeEscrowLogs(txReceipt.logs);
+  const tx = await clerkContract.deposit(amount);
+  const txReceipt = await tx.wait();
+  const events = contracts.decodeClerkLogs(txReceipt.logs);
   debug('events', events);
   if (!checkEvent('Deposit', events)) throw Error('Deposit not confirmed');
 
@@ -75,18 +74,17 @@ const withdraw = async (contracts, amount) => {
   const spinner = Spinner();
   spinner.start(info.withdrawing());
 
-  const escrowAddress = await contracts.fetchEscrowAddress();
-  debug('escrowAddress', escrowAddress);
+  const clerkAddress = await contracts.fetchClerkAddress();
 
-  const escrowContract = contracts.getEscrowContract({
-    at: escrowAddress,
+  const clerkContract = contracts.getClerkContract({
+    at: clerkAddress,
   });
 
-  const txHash = await escrowContract.withdraw(amount);
+  const txHash = await clerkContract.withdraw(amount);
   debug('txHash', txHash);
 
   const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeEscrowLogs(txReceipt.logs);
+  const events = contracts.decodeclerkLogs(txReceipt.logs);
   debug('events', events);
   if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
 
