@@ -80,11 +80,9 @@ const withdraw = async (contracts, amount) => {
     at: clerkAddress,
   });
 
-  const txHash = await clerkContract.withdraw(amount);
-  debug('txHash', txHash);
-
-  const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeclerkLogs(txReceipt.logs);
+  const tx = await clerkContract.withdraw(amount);
+  const txReceipt = await tx.wait();
+  const events = contracts.decodeClerkLogs(txReceipt.logs);
   debug('events', events);
   if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
 
