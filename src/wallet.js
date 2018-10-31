@@ -46,7 +46,7 @@ const ethFaucets = [
 
 const checkBalances = async (contracts, address) => {
   const rlcAddress = await contracts.fetchRLCAddress();
-  const getETH = () => contracts.ethProvider.getBalance(address).catch((error) => {
+  const getETH = () => contracts.ethSigner.provider.getBalance(address).catch((error) => {
     debug(error);
     return 0;
   });
@@ -122,14 +122,13 @@ const getRLC = async (chainName, account) => {
 };
 
 const sendETH = async (contracts, value, from, to) => {
-  const txHash = await contracts.eth.sendTransaction({
-    from,
+  const tx = await contracts.ethSigner.sendTransaction({
     data: '0x',
     to,
     value,
   });
 
-  const txReceipt = await contracts.waitForReceipt(txHash);
+  const txReceipt = await tx.wait();
   debug('txReceipt:', txReceipt);
 
   return txReceipt;
@@ -141,10 +140,8 @@ const sendRLC = async (contracts, amount, to) => {
 
   const rlcContract = contracts.getRLCContract({ at: rlcAddress });
 
-  const txHash = await rlcContract.transfer(to, amount);
-  debug('txHash', txHash);
-
-  const txReceipt = await contracts.waitForReceipt(txHash);
+  const tx = await rlcContract.transfer(to, amount);
+  const txReceipt = await tx.wait();
   debug('txReceipt', txReceipt);
 
   return txReceipt;

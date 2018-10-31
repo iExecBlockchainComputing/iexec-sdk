@@ -36,9 +36,9 @@ const createChains = (
       chains[name] = Object.assign({}, chain);
       chains[name].name = name;
       chains[name].ethjs = new EthJS(signerProvider);
-      chains[name].ethProvider = new ethers.providers.Web3Provider(
+      chains[name].ethSigner = new ethers.providers.Web3Provider(
         signerProvider,
-      );
+      ).getSigner();
       chains[name].EthJS = EthJS;
       chains[name].iexec = createIExecClient({
         server: chain.scheduler,
@@ -46,7 +46,7 @@ const createChains = (
       });
       chains[name].contracts = createIExecContracts({
         eth: chains[name].ethjs,
-        ethProvider: chains[name].ethProvider,
+        ethSigner: chains[name].ethSigner,
         chainID: chains[name].id,
         txOptions: {
           from,

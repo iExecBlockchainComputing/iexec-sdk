@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const Debug = require('debug');
+const ethers = require('ethers');
 const cli = require('commander');
 const unit = require('ethjs-unit');
 const wallet = require('./wallet');
@@ -29,7 +30,9 @@ cli
     try {
       const force = cmd.force || false;
       const res = await keystore.createAndSave({ force });
-      spinner.succeed(`wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+      spinner.succeed(
+        `wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
+      );
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -60,7 +63,9 @@ cli
         ETH: unit.fromWei(balances.wei, 'ether'),
         nRLC: balances.nRLC.toString(),
       };
-      spinner.succeed(`Wallet ${chain.name} balances [${chain.id}]:${pretty(strBalances)}`);
+      spinner.succeed(
+        `Wallet ${chain.name} balances [${chain.id}]:${pretty(strBalances)}`,
+      );
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -111,8 +116,7 @@ cli
         keystore.load(),
         loadChain(cmd.chain),
       ]);
-      const weiAmount = unit.toWei(amount, 'ether');
-
+      const weiAmount = ethers.utils.parseEther(amount).toHexString();
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
@@ -205,7 +209,9 @@ cli
       const force = cmd.force || false;
       if (!cmd.password) throw Error('missing --password option');
       const res = await keystore.encryptAndSave(cmd.password, { force });
-      spinner.succeed(`encrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+      spinner.succeed(
+        `encrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
+      );
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -222,7 +228,9 @@ cli
       const force = cmd.force || false;
       if (!cmd.password) throw Error('missing --password option');
       const res = await keystore.decryptAndSave(cmd.password, { force });
-      spinner.succeed(`decrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`);
+      spinner.succeed(
+        `decrypted wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
+      );
     } catch (error) {
       handleError(error, cli, spinner);
     }
