@@ -44,9 +44,8 @@ const ethFaucets = [
   },
 ];
 
-const checkBalances = async (contracts, address, { hub } = {}) => {
-  const rlcAddress = await contracts.fetchRLCAddress({ hub });
-
+const checkBalances = async (contracts, address) => {
+  const rlcAddress = await contracts.fetchRLCAddress();
   const getETH = () => contracts.eth.getBalance(address).catch((error) => {
     debug(error);
     return 0;
@@ -137,8 +136,8 @@ const sendETH = async (contracts, value, from, to) => {
   return txReceipt;
 };
 
-const sendRLC = async (contracts, amount, to, { hub } = {}) => {
-  const rlcAddress = await contracts.fetchRLCAddress({ hub });
+const sendRLC = async (contracts, amount, to) => {
+  const rlcAddress = await contracts.fetchRLCAddress();
   debug('rlcAddress', rlcAddress);
 
   const rlcContract = contracts.getRLCContract({ at: rlcAddress });
@@ -152,11 +151,11 @@ const sendRLC = async (contracts, amount, to, { hub } = {}) => {
   return txReceipt;
 };
 
-const sweep = async (contracts, address, to, { hub } = {}) => {
-  const balances = await checkBalances(contracts, address, { hub });
+const sweep = async (contracts, address, to) => {
+  const balances = await checkBalances(contracts, address);
 
   if (balances.nRLC.gt(new EthJS.BN(0))) {
-    await sendRLC(contracts, balances.nRLC, to, { hub });
+    await sendRLC(contracts, balances.nRLC, to);
   }
 
   const txFee = new EthJS.BN('10000000000000000');

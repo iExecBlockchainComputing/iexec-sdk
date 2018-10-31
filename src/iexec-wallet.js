@@ -38,7 +38,6 @@ cli
 cli
   .command('show [address]')
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.showObj(objName, 'address'))
   .action(async (address, cmd) => {
     const spinner = Spinner();
@@ -47,7 +46,6 @@ cli
         keystore.load(),
         loadChain(cmd.chain),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
       if (address) userWallet.address = address;
       debug('userWallet.address', userWallet.address);
       spinner.info(`Wallet file:${pretty(userWallet)}`);
@@ -56,9 +54,6 @@ cli
       const balances = await wallet.checkBalances(
         chain.contracts,
         userWallet.address,
-        {
-          hub: hubAddress,
-        },
       );
 
       const strBalances = {
@@ -150,7 +145,6 @@ cli
         keystore.load(),
         loadChain(cmd.chain),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
 
       if (!cmd.to) throw Error('missing --to option');
 
@@ -163,9 +157,7 @@ cli
       }`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendRLC(chain.contracts, amount, cmd.to, {
-        hub: hubAddress,
-      });
+      await wallet.sendRLC(chain.contracts, amount, cmd.to);
 
       spinner.succeed(`Sent ${message}\n`);
     } catch (error) {
@@ -176,7 +168,6 @@ cli
 cli
   .command('sweep')
   .option(...option.chain())
-  .option(...option.hub())
   .option(...option.to())
   .description(desc.sweep())
   .action(async (cmd) => {
@@ -186,7 +177,6 @@ cli
         keystore.load(),
         loadChain(cmd.chain),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
 
       if (!cmd.to) throw Error('missing --to option');
 
@@ -196,7 +186,7 @@ cli
 
       spinner.start('sweeping wallet...');
 
-      await wallet.sweep(chain.contracts, address, cmd.to, { hub: hubAddress });
+      await wallet.sweep(chain.contracts, address, cmd.to);
 
       spinner.succeed(`Wallet swept from ${address} to ${cmd.to}\n`);
     } catch (error) {
