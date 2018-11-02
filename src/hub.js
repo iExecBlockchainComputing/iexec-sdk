@@ -9,17 +9,12 @@ const createObj = objName => async (contracts, obj, options) => {
   const spinner = Spinner();
   spinner.start(info.deploying(objName));
 
-  const txHash = await contracts.createObj(objName)(obj, options);
+  const logs = await contracts.createObj(objName)(obj, options);
 
-  const txReceipt = await contracts.waitForReceipt(txHash);
-  debug('txReceipt', txReceipt);
-
-  const events = contracts.decodeHubLogs(txReceipt.logs);
-  debug('events', events);
-
-  spinner.succeed(`Deployed new ${objName} at address ${events[0][objName]}`);
-  return events;
+  spinner.succeed(`Deployed new ${objName} at address ${logs[0][objName]}`);
+  return logs;
 };
+const createApp = createObj('dapp');
 
 const showObj = objName => async (
   contracts,
@@ -106,6 +101,7 @@ const countCategory = async (contracts, options) => {
 
 module.exports = {
   createObj,
+  createApp,
   showObj,
   countObj,
   createCategory,

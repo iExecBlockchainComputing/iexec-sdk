@@ -11,12 +11,13 @@ const main = {
 };
 
 const app = {
+  owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dapp',
-  price: 1,
   params: {
     type: 'DOCKER',
     envvars: 'XWDOCKERIMAGE=hello-world',
   },
+  hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
 const dataset = {

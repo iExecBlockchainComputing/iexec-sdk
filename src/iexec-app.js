@@ -29,7 +29,11 @@ cli
     const spinner = Spinner();
     try {
       const { saved, fileName } = await initObj(objName);
-      spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
+      spinner.succeed(
+        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+      );
     } catch (error) {
       handleError(error, cli);
     }
@@ -41,20 +45,21 @@ cli
   .option(...option.hub())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
+    const pocoName = 'dapp';
     try {
       const [chain, iexecConf] = await Promise.all([
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
       const hubAddress = cmd.hub || chain.hub;
-      const events = await hub.createObj(objName)(
+      const logs = await hub.createObj(pocoName)(
         chain.contracts,
         iexecConf[objName],
         {
           hub: hubAddress,
         },
       );
-      await saveDeployedObj(objName, chain.id, events[0][objName]);
+      await saveDeployedObj(objName, chain.id, logs[0][pocoName]);
     } catch (error) {
       handleError(error, cli);
     }
