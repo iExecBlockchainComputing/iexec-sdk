@@ -21,11 +21,12 @@ const app = {
 };
 
 const dataset = {
+  owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
-  price: 2,
   params: {
     arg1: 'value1',
   },
+  hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
 const workerPool = {

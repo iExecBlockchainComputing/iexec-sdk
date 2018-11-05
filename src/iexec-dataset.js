@@ -21,6 +21,7 @@ const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
 const objName = 'dataset';
+const pocoName = 'data';
 
 cli
   .command('init')
@@ -29,7 +30,11 @@ cli
     const spinner = Spinner();
     try {
       const { saved, fileName } = await initObj(objName);
-      spinner.succeed(`Saved default ${objName} in "${fileName}", you can edit it:${pretty(saved)}`);
+      spinner.succeed(
+        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+      );
     } catch (error) {
       handleError(error, cli);
     }
@@ -38,7 +43,6 @@ cli
 cli
   .command('deploy')
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     try {
@@ -46,15 +50,11 @@ cli
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
-      const events = await hub.createObj(objName)(
+      const logs = await hub.createObj(pocoName)(
         chain.contracts,
         iexecConf[objName],
-        {
-          hub: hubAddress,
-        },
       );
-      await saveDeployedObj(objName, chain.id, events[0][objName]);
+      await saveDeployedObj(objName, chain.id, logs[0][pocoName]);
     } catch (error) {
       handleError(error, cli);
     }
@@ -63,7 +63,6 @@ cli
 cli
   .command('show [addressOrIndex]')
   .option(...option.chain())
-  .option(...option.hub())
   .option(...option.user())
   .description(desc.showObj(objName))
   .action(async (cliAddressOrIndex, cmd) => {
@@ -74,15 +73,12 @@ cli
         loadDeployedObj(objName),
       ]);
 
-      const hubAddress = cmd.hub || chain.hub;
       const userAddress = cmd.user || address;
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
-      await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress, {
-        hub: hubAddress,
-      });
+      await hub.showObj(pocoName)(chain.contracts, addressOrIndex, userAddress);
     } catch (error) {
       handleError(error, cli);
     }
@@ -91,7 +87,6 @@ cli
 cli
   .command('count')
   .option(...option.chain())
-  .option(...option.hub())
   .option(...option.user())
   .description(desc.countObj(objName))
   .action(async (cmd) => {
@@ -100,12 +95,9 @@ cli
         loadChain(cmd.chain),
         load(),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
       const userAddress = cmd.user || address;
 
-      await hub.countObj(objName)(chain.contracts, userAddress, {
-        hub: hubAddress,
-      });
+      await hub.countObj(pocoName)(chain.contracts, userAddress);
     } catch (error) {
       handleError(error, cli);
     }
