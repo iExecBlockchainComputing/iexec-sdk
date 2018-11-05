@@ -78,7 +78,7 @@ cli
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
-      await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress);
+      await hub.showObj(pocoName)(chain.contracts, addressOrIndex, userAddress);
     } catch (error) {
       handleError(error, cli);
     }
