@@ -21,6 +21,7 @@ const { load } = require('./keystore');
 const { loadChain } = require('./chains.js');
 
 const objName = 'app';
+const pocoName = 'dapp';
 
 cli
   .command('init')
@@ -44,7 +45,6 @@ cli
   .option(...option.chain())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
-    const pocoName = 'dapp';
     try {
       const [chain, iexecConf] = await Promise.all([
         loadChain(cmd.chain),
@@ -97,7 +97,7 @@ cli
       ]);
       const userAddress = cmd.user || address;
 
-      await hub.countObj(objName)(chain.contracts, userAddress);
+      await hub.countObj(pocoName)(chain.contracts, userAddress);
     } catch (error) {
       handleError(error, cli);
     }
