@@ -67,14 +67,11 @@ const createCategory = async (contracts, obj, options) => {
   const spinner = Spinner();
   spinner.start(info.creating('category'));
 
-  const txHash = await contracts.createCategory(obj, options);
+  const logs = await contracts.createCategory(obj, options);
+  debug('logs', logs);
 
-  const txReceipt = await contracts.waitForReceipt(txHash);
-  const events = contracts.decodeHubLogs(txReceipt.logs);
-  debug('events', events);
-
-  spinner.succeed(`New category created at index ${events[0].catid}`);
-  return events;
+  spinner.succeed(`New category created at index ${logs[0].catid}`);
+  return logs;
 };
 
 const showCategory = async (contracts, index, options) => {
@@ -93,9 +90,9 @@ const countCategory = async (contracts, options) => {
   const spinner = Spinner();
   spinner.start(info.counting('category'));
 
-  const count = await contracts.getHubContract(options).m_categoriesCount();
+  const count = await contracts.getHubContract(options).countCategory();
 
-  spinner.succeed(`iExec hub has a total of ${count[0]} category`);
+  spinner.succeed(`iExec hub has a total of ${count} category`);
   return count;
 };
 
