@@ -19,6 +19,7 @@ const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
 const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
+const ORDERS_FILE_NAME = 'orders.json';
 
 const saveJSONToFile = async (
   fileName,
@@ -54,6 +55,7 @@ const saveWalletConf = (obj, options) => saveJSONToFile(WALLET_FILE_NAME, obj, o
 const saveEncryptedWalletConf = (obj, options) => saveJSONToFile(ENCRYPTED_WALLET_FILE_NAME, obj, options);
 const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
 const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
+const saveSignedOrders = (obj, options) => saveJSONToFile(ORDERS_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName) => {
   const filePath = path.join(process.cwd(), fileName);
@@ -176,6 +178,20 @@ const saveDeployedObj = async (objName, chainID, address) => {
   }
 };
 
+const saveSignedOrder = async (orderName, chainID, signedOrder) => {
+  try {
+    const signedOrders = {};
+
+    if (typeof signedOrders[orderName] !== 'object') signedOrders[orderName] = {};
+    signedOrders[orderName][chainID] = signedOrder;
+
+    await saveSignedOrders(signedOrders, { force: true });
+  } catch (error) {
+    debug('saveDeployedObj()', error);
+    throw error;
+  }
+};
+
 const loadDeployedObj = async (objName) => {
   const deployedConf = await loadDeployedConf({ retry: () => ({}) });
 
@@ -190,6 +206,7 @@ module.exports = {
   saveEncryptedWalletConf,
   saveDeployedConf,
   saveChainConf,
+  saveSignedOrder,
   loadJSONFile,
   loadJSONAndRetry,
   loadIExecConf,
@@ -210,4 +227,5 @@ module.exports = {
   WALLET_FILE_NAME,
   ENCRYPTED_WALLET_FILE_NAME,
   DEPLOYED_FILE_NAME,
+  ORDERS_FILE_NAME,
 };

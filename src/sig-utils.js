@@ -3,6 +3,7 @@ const ethjsUtil = require('ethjs-util');
 const EC = require('elliptic').ec;
 const BN = require('bn.js');
 const keccak256 = require('js-sha3').keccak_256;
+const ethers = require('ethers');
 
 const debug = Debug('iexec:sig-utils');
 const secp256k1 = new EC('secp256k1');
@@ -149,6 +150,9 @@ const soliditySHA3 = (types, values) => {
   const solSHA3 = Buffer.from(keccak256(solPack), 'hex');
   return solSHA3;
 };
+
+const ethersKeccak256 = bufferOrHexString => ethers.utils.keccak256(bufferOrHexString);
+
 /**
  * @param typedData - Array of data along with types, as per EIP712.
  * @returns Buffer
@@ -238,6 +242,45 @@ const signTypedData = (privateKey, msgParams) => {
   return hex;
 };
 
+const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
+
+const hashStruct = (type, members, obj) => {
+  const typeHash = ethersKeccak256(Buffer.from(type, 'utf8'));
+  const types = ['bytes32'].concat(
+    members.map(e => (e.type === 'string' ? 'bytes32' : e.type)),
+  );
+  const values = [typeHash].concat(
+    members.map(
+      e => (e.type === 'string'
+        ? ethersKeccak256(Buffer.from(obj[e.name], 'utf8'))
+        : obj[e.name]),
+    ),
+  );
+  debug('types', types);
+  debug('values', values);
+  const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
+  debug('encoded', encoded);
+  const structHash = ethersKeccak256(encoded);
+  return structHash;
+};
+const signStructHash = (key, structHash, sepratorHash) => {
+  const solSha3 = ethers.utils.solidityKeccak256(
+    ['bytes', 'bytes32', 'bytes32'],
+    ['0x1901', sepratorHash, structHash],
+  );
+  debug('solSha3', solSha3);
+  const sig = ecsign(Buffer.from(solSha3.substr(2), 'hex'), key);
+  debug('sig', sig);
+  const sign = {
+    r: addHexPrefix(sig.r.toString('hex')),
+    s: addHexPrefix(sig.s.toString('hex')),
+    v: sig.v,
+  };
+  return sign;
+};
 module.exports = {
   signTypedData,
+  signStructHash,
+  hashStruct,
+  getSalt,
 };

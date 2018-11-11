@@ -41,6 +41,7 @@ const command = {
   withdraw: () => 'withdraw <amount>',
   fill: () => 'fill <orderID>',
   cancel: () => 'cancel <orderID>',
+  signOrder: () => 'signorder',
 };
 
 const desc = {
@@ -71,6 +72,7 @@ const desc = {
   encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
   sgxInit: () => 'init the SGX folders tree structure',
+  signorder: objName => `sign an order allowing to use a ${objName}`,
 };
 
 const option = {
