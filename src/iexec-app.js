@@ -128,6 +128,7 @@ cli
 cli
   .command(command.signOrder())
   .option(...option.chain())
+  .description(desc.sign(orderName))
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
@@ -135,9 +136,11 @@ cli
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const orderObj = iexecConf[objName.concat('order')];
-      const clerkAddress = await chain.contracts.fetchClerkAddress();
+      const orderObj = iexecConf[orderName];
 
+      await order.verifyOwner(orderName, orderObj, chain.contracts);
+
+      const clerkAddress = await chain.contracts.fetchClerkAddress();
       const domainObj = {
         name: 'iExecODB',
         version: '3.0-alpha',
@@ -149,7 +152,7 @@ cli
 
       await saveSignedOrder(objName, chain.id, signedOrder);
       spinner.succeed(
-        `Order signed for ${objName} saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
+        `${orderName} signed and saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
           signedOrder,
         )}`,
       );

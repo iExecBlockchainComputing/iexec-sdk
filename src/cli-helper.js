@@ -72,7 +72,7 @@ const desc = {
   encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
   sgxInit: () => 'init the SGX folders tree structure',
-  signorder: objName => `sign an order allowing to use a ${objName}`,
+  sign: objName => `sign a ${objName}`,
 };
 
 const option = {
