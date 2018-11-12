@@ -4,6 +4,7 @@ const cli = require('commander');
 const {
   help,
   handleError,
+  command,
   desc,
   option,
   Spinner,
@@ -11,17 +12,22 @@ const {
   info,
 } = require('./cli-helper');
 const hub = require('./hub');
+const order = require('./order');
 const {
   loadIExecConf,
   initObj,
   saveDeployedObj,
   loadDeployedObj,
+  saveSignedOrder,
+  ORDERS_FILE_NAME,
 } = require('./fs');
 const { load } = require('./keystore');
-const { loadChain } = require('./chains.js');
+const { loadChain } = require('./chains');
+const { getEIP712Domain } = require('./sig-utils');
 
 const objName = 'workerPool';
 const pocoName = 'pool';
+const orderName = 'poolorder';
 
 cli
   .command('init')
@@ -99,6 +105,54 @@ cli
       const userAddress = cmd.user || address;
 
       await hub.countObj(pocoName)(chain.contracts, userAddress);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
+cli
+  .command('initorder')
+  .description(desc.initObj(orderName))
+  .action(async () => {
+    const spinner = Spinner();
+    try {
+      const { saved, fileName } = await initObj(orderName);
+      spinner.succeed(
+        `Saved default ${objName} order in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+      );
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
+cli
+  .command(command.signOrder())
+  .option(...option.chain())
+  .description(desc.sign(orderName))
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const [chain, iexecConf] = await Promise.all([
+        loadChain(cmd.chain),
+        loadIExecConf(),
+      ]);
+      const orderObj = iexecConf[orderName];
+
+      await order.verifyOwner(orderName, orderObj, chain.contracts);
+
+      const clerkAddress = await chain.contracts.fetchClerkAddress();
+      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
+
+      const signedOrder = await order.signPoolOrder(orderObj, domainObj);
+
+      await saveSignedOrder(objName, chain.id, signedOrder);
+      spinner.succeed(
+        `${orderName} signed and saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
+          signedOrder,
+        )}`,
+      );
     } catch (error) {
       handleError(error, cli);
     }

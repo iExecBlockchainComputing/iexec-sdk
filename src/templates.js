@@ -57,6 +57,18 @@ const workerPool = {
   subscriptionMinimumScorePolicy: 100,
 };
 
+const poolorder = {
+  pool: '0x0000000000000000000000000000000000000000',
+  poolprice: 0,
+  volume: 1,
+  category: 1,
+  trust: 100,
+  tag: '0x0',
+  dapprestrict: '0x0000000000000000000000000000000000000000',
+  datarestrict: '0x0000000000000000000000000000000000000000',
+  userrestrict: '0x0000000000000000000000000000000000000000',
+};
+
 const category = {
   name: 'CAT1',
   description: 'new hub category',
@@ -125,6 +137,7 @@ module.exports = {
   chains,
   apporder,
   dataorder,
+  poolorder,
   defaultOrder,
   createOrder,
 };

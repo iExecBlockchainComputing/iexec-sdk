@@ -47,6 +47,24 @@ const objDesc = {
     contractPropName: 'data',
     contractName: 'data',
   },
+  poolorder: {
+    structType:
+      'PoolOrder(address pool,uint256 poolprice,uint256 volume,uint256 tag,uint256 category,uint256 trust,address dapprestrict,address datarestrict,address userrestrict,bytes32 salt)',
+    structMembers: [
+      { name: 'pool', type: 'address' },
+      { name: 'poolprice', type: 'uint256' },
+      { name: 'volume', type: 'uint256' },
+      { name: 'tag', type: 'uint256' },
+      { name: 'category', type: 'uint256' },
+      { name: 'trust', type: 'uint256' },
+      { name: 'dapprestrict', type: 'address' },
+      { name: 'datarestrict', type: 'address' },
+      { name: 'userrestrict', type: 'address' },
+      { name: 'salt', type: 'bytes32' },
+    ],
+    contractPropName: 'pool',
+    contractName: 'pool',
+  },
 };
 
 const verifyOwner = async (orderName, orderObj, contracts) => {
@@ -93,9 +111,11 @@ const signOrder = async (orderName, orderObj, domainObj) => {
 
 const signDappOrder = (order, domain) => signOrder('apporder', order, domain);
 const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
+const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
 
 module.exports = {
   verifyOwner,
   signDappOrder,
   signDataOrder,
+  signPoolOrder,
 };
