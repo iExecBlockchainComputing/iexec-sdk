@@ -242,6 +242,13 @@ const signTypedData = (privateKey, msgParams) => {
   return hex;
 };
 
+const getEIP712Domain = (chainId, verifyingContract) => ({
+  name: 'iExecODB',
+  version: '3.0-alpha',
+  chainId,
+  verifyingContract,
+});
+
 const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
 
 const hashStruct = (type, members, obj) => {
@@ -283,4 +290,5 @@ module.exports = {
   signStructHash,
   hashStruct,
   getSalt,
+  getEIP712Domain,
 };

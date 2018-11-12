@@ -21,7 +21,8 @@ const {
   ORDERS_FILE_NAME,
 } = require('./fs');
 const { load } = require('./keystore');
-const { loadChain } = require('./chains.js');
+const { getEIP712Domain } = require('./sig-utils');
+const { loadChain } = require('./chains');
 const order = require('./order');
 
 const objName = 'app';
@@ -110,7 +111,7 @@ cli
 
 cli
   .command('initorder')
-  .description(desc.initObj(orderName)) // todo
+  .description(desc.initObj(orderName))
   .action(async () => {
     const spinner = Spinner();
     try {
@@ -141,12 +142,7 @@ cli
       await order.verifyOwner(orderName, orderObj, chain.contracts);
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
-      const domainObj = {
-        name: 'iExecODB',
-        version: '3.0-alpha',
-        chainId: chain.contracts.chainID,
-        verifyingContract: clerkAddress,
-      };
+      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
 
       const signedOrder = await order.signDappOrder(orderObj, domainObj);
 

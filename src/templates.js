@@ -39,6 +39,16 @@ const dataset = {
   hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
+const dataorder = {
+  data: '0x0000000000000000000000000000000000000000',
+  dataprice: 0,
+  volume: 1,
+  tag: '0x0',
+  dapprestrict: '0x0000000000000000000000000000000000000000',
+  poolrestrict: '0x0000000000000000000000000000000000000000',
+  userrestrict: '0x0000000000000000000000000000000000000000',
+};
+
 const workerPool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
@@ -114,6 +124,7 @@ module.exports = {
   category,
   chains,
   apporder,
+  dataorder,
   defaultOrder,
   createOrder,
 };
