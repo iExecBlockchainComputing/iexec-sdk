@@ -139,11 +139,10 @@ cli
       ]);
       const orderObj = iexecConf[orderName];
 
-      await order.verifyOwner(orderName, orderObj, chain.contracts);
+      await order.checkContractOwner(orderName, orderObj, chain.contracts);
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
       const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
-
       const signedOrder = await order.signDappOrder(orderObj, domainObj);
 
       await saveSignedOrder(objName, chain.id, signedOrder);

@@ -88,7 +88,7 @@ const objDesc = {
   },
 };
 
-const verifyOwner = async (orderName, orderObj, contracts) => {
+const checkContractOwner = async (orderName, orderObj, contracts) => {
   const contractAddress = orderObj[objDesc[orderName].contractPropName];
   const contract = contracts.getContract(objDesc[orderName].contractName)({
     at: contractAddress,
@@ -136,7 +136,7 @@ const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
 const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
 
 module.exports = {
-  verifyOwner,
+  checkContractOwner,
   signDappOrder,
   signDataOrder,
   signPoolOrder,
