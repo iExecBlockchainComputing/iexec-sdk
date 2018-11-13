@@ -14,7 +14,6 @@ const createObj = objName => async (contracts, obj, options) => {
   spinner.succeed(`Deployed new ${objName} at address ${logs[0][objName]}`);
   return logs;
 };
-const createApp = createObj('dapp');
 
 const showObj = objName => async (
   contracts,
@@ -98,7 +97,6 @@ const countCategory = async (contracts, options) => {
 
 module.exports = {
   createObj,
-  createApp,
   showObj,
   countObj,
   createCategory,
