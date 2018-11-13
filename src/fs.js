@@ -125,6 +125,7 @@ const loadDeployedConf = options => loadJSONAndRetry(
     options,
   ),
 );
+const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, options);
 
 const initIExecConf = async (options) => {
   const iexecConf = Object.assign(templates.main, { app: templates.app });
@@ -180,10 +181,10 @@ const saveDeployedObj = async (objName, chainID, address) => {
 
 const saveSignedOrder = async (orderName, chainID, signedOrder) => {
   try {
-    const signedOrders = {};
+    const signedOrders = await loadSignedOrders({ retry: () => ({}) });
 
-    if (typeof signedOrders[orderName] !== 'object') signedOrders[orderName] = {};
-    signedOrders[orderName][chainID] = signedOrder;
+    if (typeof signedOrders[chainID] !== 'object') signedOrders[chainID] = {};
+    signedOrders[chainID][orderName] = signedOrder;
 
     await saveSignedOrders(signedOrders, { force: true });
   } catch (error) {
@@ -215,6 +216,7 @@ module.exports = {
   loadWalletConf,
   loadEncryptedWalletConf,
   loadDeployedConf,
+  loadSignedOrders,
   saveDeployedObj,
   initObj,
   initIExecConf,
