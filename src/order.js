@@ -65,6 +65,27 @@ const objDesc = {
     contractPropName: 'pool',
     contractName: 'pool',
   },
+  userorder: {
+    structType:
+      'UserOrder(address dapp,uint256 dappmaxprice,address data,uint256 datamaxprice,address pool,uint256 poolmaxprice,address requester,uint256 volume,uint256 tag,uint256 category,uint256 trust,address beneficiary,address callback,string params,bytes32 salt)',
+    structMembers: [
+      { name: 'dapp', type: 'address' },
+      { name: 'dappmaxprice', type: 'uint256' },
+      { name: 'data', type: 'address' },
+      { name: 'datamaxprice', type: 'uint256' },
+      { name: 'pool', type: 'address' },
+      { name: 'poolmaxprice', type: 'uint256' },
+      { name: 'requester', type: 'address' },
+      { name: 'volume', type: 'uint256' },
+      { name: 'tag', type: 'uint256' },
+      { name: 'category', type: 'uint256' },
+      { name: 'trust', type: 'uint256' },
+      { name: 'beneficiary', type: 'address' },
+      { name: 'callback', type: 'address' },
+      { name: 'params', type: 'string' },
+      { name: 'salt', type: 'bytes32' },
+    ],
+  },
 };
 
 const verifyOwner = async (orderName, orderObj, contracts) => {
@@ -112,10 +133,12 @@ const signOrder = async (orderName, orderObj, domainObj) => {
 const signDappOrder = (order, domain) => signOrder('apporder', order, domain);
 const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
 const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
+const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
 
 module.exports = {
   verifyOwner,
   signDappOrder,
   signDataOrder,
   signPoolOrder,
+  signUserOrder,
 };

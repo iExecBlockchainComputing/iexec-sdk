@@ -69,6 +69,22 @@ const poolorder = {
   userrestrict: '0x0000000000000000000000000000000000000000',
 };
 
+const userorder = {
+  dapp: '0x0000000000000000000000000000000000000000',
+  dappmaxprice: 0,
+  data: '0x0000000000000000000000000000000000000000',
+  datamaxprice: 0,
+  pool: '0x0000000000000000000000000000000000000000',
+  poolmaxprice: 0,
+  volume: 1,
+  category: 1,
+  trust: 100,
+  tag: '0x0',
+  beneficiary: '0x0000000000000000000000000000000000000000',
+  callback: '0x0000000000000000000000000000000000000000',
+  params: "{ cmdline: '--help' }",
+};
+
 const category = {
   name: 'CAT1',
   description: 'new hub category',
@@ -138,6 +154,7 @@ module.exports = {
   apporder,
   dataorder,
   poolorder,
+  userorder,
   defaultOrder,
   createOrder,
 };
