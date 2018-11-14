@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const { getSalt } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
+const { checkEvent } = require('./utils');
 
 const debug = Debug('iexec:order');
 
@@ -30,6 +31,8 @@ const objDesc = {
     ],
     contractPropName: 'dapp',
     contractName: 'dapp',
+    cancelMethode: 'cancelDappOrder',
+    cancelEvent: 'ClosedDappOrder',
   },
   dataorder: {
     structType:
@@ -46,6 +49,8 @@ const objDesc = {
     ],
     contractPropName: 'data',
     contractName: 'data',
+    cancelMethode: 'cancelDataOrder',
+    cancelEvent: 'ClosedDataOrder',
   },
   poolorder: {
     structType:
@@ -64,6 +69,8 @@ const objDesc = {
     ],
     contractPropName: 'pool',
     contractName: 'pool',
+    cancelMethode: 'cancelPoolOrder',
+    cancelEvent: 'ClosedPoolOrder',
   },
   userorder: {
     structType:
@@ -85,7 +92,29 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
+    cancelMethode: 'cancelUserOrder',
+    cancelEvent: 'ClosedUserOrder',
   },
+  sign: {
+    structMembers: [
+      { name: 'v', type: 'uint8' },
+      { name: 'r', type: 'bytes32' },
+      { name: 's', type: 'bytes32' },
+    ],
+  },
+};
+
+const objToStructArray = (objName, obj) => {
+  const reducer = (total, current) => total.concat([obj[current.name]]);
+  const struct = objDesc[objName].structMembers.reduce(reducer, []);
+  return struct;
+};
+
+const signedOrderToStruct = (orderName, orderObj) => {
+  const unsigned = objToStructArray(orderName, orderObj);
+  const sign = objToStructArray('sign', orderObj.sign);
+  const signed = unsigned.concat([sign]);
+  return signed;
 };
 
 const checkContractOwner = async (orderName, orderObj, contracts) => {
@@ -129,11 +158,21 @@ const signOrder = async (orderName, orderObj, domainObj) => {
   debug('signedOrder', signedOrder);
   return signedOrder;
 };
-
 const signDappOrder = (order, domain) => signOrder('apporder', order, domain);
 const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
 const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
 const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
+
+const cancelOrder = async (orderName, orderObj, contracts) => {
+  const args = signedOrderToStruct(orderName, orderObj);
+  const clerkContact = contracts.getClerkContract();
+  const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
+  const txReceipt = await tx.wait();
+  const logs = contracts.decodeClerkLogs(txReceipt.logs);
+  debug('logs', logs);
+  if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+  return true;
+};
 
 module.exports = {
   checkContractOwner,
@@ -141,4 +180,5 @@ module.exports = {
   signDataOrder,
   signPoolOrder,
   signUserOrder,
+  cancelOrder,
 };

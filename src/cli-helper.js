@@ -42,6 +42,7 @@ const command = {
   fill: () => 'fill <orderID>',
   cancel: () => 'cancel <orderID>',
   signOrder: () => 'signorder',
+  cancelOrder: () => 'cancelorder',
 };
 
 const desc = {
@@ -73,6 +74,7 @@ const desc = {
   decrypt: () => 'decrypt work result',
   sgxInit: () => 'init the SGX folders tree structure',
   sign: objName => `sign a ${objName}`,
+  cancelOrder: objName => `cancel a signed ${objName}`,
 };
 
 const option = {

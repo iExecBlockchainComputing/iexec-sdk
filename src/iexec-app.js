@@ -18,6 +18,7 @@ const {
   saveDeployedObj,
   loadDeployedObj,
   saveSignedOrder,
+  loadSignedOrders,
   ORDERS_FILE_NAME,
 } = require('./fs');
 const { load } = require('./keystore');
@@ -155,4 +156,26 @@ cli
       handleError(error, cli);
     }
   });
+
+cli
+  .command(command.cancelOrder())
+  .option(...option.chain())
+  .description(desc.cancelOrder(orderName))
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      const [chain, signedOrders] = await Promise.all([
+        loadChain(cmd.chain),
+        loadSignedOrders(),
+      ]);
+      const orderToCancel = signedOrders[chain.id][orderName];
+      spinner.start('canceling order');
+      await order.cancelOrder('apporder', orderToCancel, chain.contracts);
+      // todo delete from ?
+      spinner.succeed(`${orderName} successfully canceled`);
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
 help(cli);
