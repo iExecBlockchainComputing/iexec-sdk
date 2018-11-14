@@ -144,7 +144,7 @@ cli
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
       const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
-      const signedOrder = await order.signDappOrder(orderObj, domainObj);
+      const signedOrder = await order.signAppOrder(orderObj, domainObj);
 
       await saveSignedOrder(orderName, chain.id, signedOrder);
       spinner.succeed(
@@ -170,7 +170,7 @@ cli
       ]);
       const orderToCancel = signedOrders[chain.id][orderName];
       spinner.start('canceling order');
-      await order.cancelOrder('apporder', orderToCancel, chain.contracts);
+      await order.cancelAppOrder(orderToCancel, chain.contracts);
       // todo delete from ?
       spinner.succeed(`${orderName} successfully canceled`);
     } catch (error) {

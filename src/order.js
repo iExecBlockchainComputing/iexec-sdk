@@ -158,7 +158,7 @@ const signOrder = async (orderName, orderObj, domainObj) => {
   debug('signedOrder', signedOrder);
   return signedOrder;
 };
-const signDappOrder = (order, domain) => signOrder('apporder', order, domain);
+const signAppOrder = (order, domain) => signOrder('apporder', order, domain);
 const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
 const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
 const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
@@ -173,12 +173,19 @@ const cancelOrder = async (orderName, orderObj, contracts) => {
   if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
   return true;
 };
+const cancelAppOrder = (order, domain) => cancelOrder('apporder', order, domain);
+const cancelDataOrder = (order, domain) => cancelOrder('dataorder', order, domain);
+const cancelPoolOrder = (order, domain) => cancelOrder('poolorder', order, domain);
+const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domain);
 
 module.exports = {
   checkContractOwner,
-  signDappOrder,
+  cancelAppOrder,
+  cancelDataOrder,
+  cancelPoolOrder,
+  cancelUserOrder,
+  signAppOrder,
   signDataOrder,
   signPoolOrder,
   signUserOrder,
-  cancelOrder,
 };
