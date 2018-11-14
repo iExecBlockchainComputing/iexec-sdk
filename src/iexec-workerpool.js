@@ -146,7 +146,7 @@ cli
       const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
       const signedOrder = await order.signPoolOrder(orderObj, domainObj);
 
-      await saveSignedOrder(objName, chain.id, signedOrder);
+      await saveSignedOrder(orderName, chain.id, signedOrder);
       spinner.succeed(
         `${orderName} signed and saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
           signedOrder,
