@@ -111,23 +111,6 @@ cli
   });
 
 cli
-  .command('initorder')
-  .description(desc.initObj(orderName))
-  .action(async () => {
-    const spinner = Spinner();
-    try {
-      const { saved, fileName } = await initObj(orderName);
-      spinner.succeed(
-        `Saved default ${objName} order in "${fileName}", you can edit it:${pretty(
-          saved,
-        )}`,
-      );
-    } catch (error) {
-      handleError(error, cli);
-    }
-  });
-
-cli
   .command(command.signOrder())
   .option(...option.chain())
   .description(desc.sign(orderName))
