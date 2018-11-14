@@ -11,7 +11,6 @@ const { Spinner } = require('./cli-helper');
 const debug = Debug('iexec:chains');
 
 const createChains = (
-  from,
   chainsConf,
   {
     signTransaction,
@@ -48,9 +47,6 @@ const createChains = (
         eth: chains[name].ethjs,
         ethSigner: chains[name].ethSigner,
         chainID: chains[name].id,
-        txOptions: {
-          from,
-        },
         hubAddress: chains[name].hub,
       });
       // index by chainID
@@ -65,11 +61,8 @@ const createChains = (
 
 const loadChains = async () => {
   try {
-    const [{ address }, chainsConf] = await Promise.all([
-      keystore.load(),
-      loadChainConf(),
-    ]);
-    const chains = createChains(address, chainsConf, keystore);
+    const chainsConf = await loadChainConf();
+    const chains = createChains(chainsConf, keystore);
     if (chainsConf.default) chains.default = chainsConf.default;
     return chains;
   } catch (error) {
