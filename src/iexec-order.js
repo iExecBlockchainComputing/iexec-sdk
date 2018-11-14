@@ -28,28 +28,67 @@ const objName = 'order';
 
 cli
   .command('init')
-  .option(...option.sell())
-  .option(...option.buy())
+  .option(...option.appOrder())
+  .option(...option.dataOrder())
+  .option(...option.poolOrder())
+  .option(...option.userOrder())
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      debug('cmd.sell', cmd.sell);
-      const side = cmd.sell ? 'sell' : 'buy';
-      const deployedName = side === 'buy' ? 'app' : 'workerPool';
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(cmd.chain),
-        loadDeployedObj(deployedName),
-      ]);
-      const address = deployedObj[chain.id];
-      const overwrite = address ? { [deployedName]: address } : {};
-      const { saved, fileName } = await initOrder(side, overwrite);
-      spinner.succeed(
-        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-          saved,
-        )}`,
-      );
+      debug('cmd.app', cmd.app);
+      debug('cmd.data', cmd.data);
+      debug('cmd.pool', cmd.pool);
+      debug('cmd.user', cmd.user);
+      const initAll = !(cmd.app || cmd.data || cmd.pool || cmd.user);
+      debug('initAll', initAll);
+
+      const chain = await loadChain(cmd.chain);
+      const initAppOrder = async () => {
+        const deployedObj = await loadDeployedObj('app');
+        const address = deployedObj[chain.id];
+        const overwrite = address ? { dapp: address } : {};
+        const { saved, fileName } = await initOrder('apporder', overwrite);
+        return { objName: 'apporder', saved, fileName };
+      };
+
+      const initDataOrder = async () => {
+        const deployedObj = await loadDeployedObj('dataset');
+        const address = deployedObj[chain.id];
+        const overwrite = address ? { data: address } : {};
+        const { saved, fileName } = await initOrder('dataorder', overwrite);
+        return { objName: 'dataorder', saved, fileName };
+      };
+
+      const initPoolOrder = async () => {
+        const deployedObj = await loadDeployedObj('workerPool');
+        const address = deployedObj[chain.id];
+        const overwrite = address ? { pool: address } : {};
+        const { saved, fileName } = await initOrder('poolorder', overwrite);
+        return { objName: 'poolorder', saved, fileName };
+      };
+
+      const initUserOrder = async () => {
+        const { address } = await keystore.load();
+        const overwrite = address ? { requester: address } : {};
+        const { saved, fileName } = await initOrder('userorder', overwrite);
+        return { objName: 'userorder', saved, fileName };
+      };
+
+      const initResult = [];
+      if (cmd.app || initAll) initResult.push(await initAppOrder());
+      if (cmd.data || initAll) initResult.push(await initDataOrder());
+      if (cmd.pool || initAll) initResult.push(await initPoolOrder());
+      if (cmd.user || initAll) initResult.push(await initUserOrder());
+
+      debug('initResult', initResult);
+
+      initResult.map(e => spinner.succeed(
+        `Saved default ${e.objName} in "${
+          e.fileName
+        }", you can edit it:${pretty(e.saved)}`,
+      ));
     } catch (error) {
       handleError(error, cli);
     }

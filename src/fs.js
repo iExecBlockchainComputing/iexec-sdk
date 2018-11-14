@@ -150,12 +150,12 @@ const initObj = async (objName, { obj } = {}) => {
   }
 };
 
-const initOrder = async (side, overwrite) => {
+const initOrder = async (orderName, overwrite) => {
   try {
     const iexecConf = await loadIExecConf();
-    const order = createOrder(side, overwrite);
+    const order = createOrder(orderName, overwrite);
     if (typeof iexecConf.order !== 'object') iexecConf.order = {};
-    iexecConf.order[side] = order;
+    iexecConf[orderName] = order;
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: order, fileName };
   } catch (error) {

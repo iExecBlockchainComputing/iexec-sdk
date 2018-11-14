@@ -20,16 +20,6 @@ const app = {
   hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
-const apporder = {
-  dapp: '0x0000000000000000000000000000000000000000',
-  dappprice: 123456789,
-  volume: 1234567890,
-  tag: '0x0',
-  datarestrict: '0x0000000000000000000000000000000000000000',
-  poolrestrict: '0x0000000000000000000000000000000000000000',
-  userrestrict: '0x0000000000000000000000000000000000000000',
-};
-
 const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
@@ -37,16 +27,6 @@ const dataset = {
     arg1: 'value1',
   },
   hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-};
-
-const dataorder = {
-  data: '0x0000000000000000000000000000000000000000',
-  dataprice: 0,
-  volume: 1,
-  tag: '0x0',
-  dapprestrict: '0x0000000000000000000000000000000000000000',
-  poolrestrict: '0x0000000000000000000000000000000000000000',
-  userrestrict: '0x0000000000000000000000000000000000000000',
 };
 
 const workerPool = {
@@ -57,32 +37,51 @@ const workerPool = {
   subscriptionMinimumScorePolicy: 100,
 };
 
-const poolorder = {
-  pool: '0x0000000000000000000000000000000000000000',
-  poolprice: 0,
-  volume: 1,
-  category: 1,
-  trust: 100,
-  tag: '0x0',
-  dapprestrict: '0x0000000000000000000000000000000000000000',
-  datarestrict: '0x0000000000000000000000000000000000000000',
-  userrestrict: '0x0000000000000000000000000000000000000000',
-};
-
-const userorder = {
-  dapp: '0x0000000000000000000000000000000000000000',
-  dappmaxprice: 0,
-  data: '0x0000000000000000000000000000000000000000',
-  datamaxprice: 0,
-  pool: '0x0000000000000000000000000000000000000000',
-  poolmaxprice: 0,
-  volume: 1,
-  category: 1,
-  trust: 100,
-  tag: '0x0',
-  beneficiary: '0x0000000000000000000000000000000000000000',
-  callback: '0x0000000000000000000000000000000000000000',
-  params: "{ cmdline: '--help' }",
+const order = {
+  apporder: {
+    dapp: '0x0000000000000000000000000000000000000000',
+    dappprice: 0,
+    volume: 1,
+    tag: '0x0',
+    datarestrict: '0x0000000000000000000000000000000000000000',
+    poolrestrict: '0x0000000000000000000000000000000000000000',
+    userrestrict: '0x0000000000000000000000000000000000000000',
+  },
+  dataorder: {
+    data: '0x0000000000000000000000000000000000000000',
+    dataprice: 0,
+    volume: 1,
+    tag: '0x0',
+    dapprestrict: '0x0000000000000000000000000000000000000000',
+    poolrestrict: '0x0000000000000000000000000000000000000000',
+    userrestrict: '0x0000000000000000000000000000000000000000',
+  },
+  poolorder: {
+    pool: '0x0000000000000000000000000000000000000000',
+    poolprice: 0,
+    volume: 1,
+    category: 1,
+    trust: 100,
+    tag: '0x0',
+    dapprestrict: '0x0000000000000000000000000000000000000000',
+    datarestrict: '0x0000000000000000000000000000000000000000',
+    userrestrict: '0x0000000000000000000000000000000000000000',
+  },
+  userorder: {
+    dapp: '0x0000000000000000000000000000000000000000',
+    dappmaxprice: 0,
+    data: '0x0000000000000000000000000000000000000000',
+    datamaxprice: 0,
+    pool: '0x0000000000000000000000000000000000000000',
+    poolmaxprice: 0,
+    volume: 1,
+    category: 1,
+    trust: 100,
+    tag: '0x0',
+    beneficiary: '0x0000000000000000000000000000000000000000',
+    callback: '0x0000000000000000000000000000000000000000',
+    params: "{ cmdline: '--help' }",
+  },
 };
 
 const category = {
@@ -139,9 +138,8 @@ const defaultOrder = {
   buy: buyMarketOrder,
 };
 
-const createOrder = (side, overwrite = {}) => {
-  if (side === 'buy') return Object.assign({}, buyMarketOrder, overwrite);
-  return Object.assign({}, sellLimitOrder, overwrite);
+const createOrder = (orderName, overwrite = {}) => {
+  return Object.assign({}, order[orderName], overwrite);
 };
 
 module.exports = {
@@ -151,10 +149,6 @@ module.exports = {
   workerPool,
   category,
   chains,
-  apporder,
-  dataorder,
-  poolorder,
-  userorder,
   defaultOrder,
   createOrder,
 };
