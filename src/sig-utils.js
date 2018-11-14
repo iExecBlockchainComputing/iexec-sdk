@@ -41,19 +41,26 @@ function addHexPrefix(str) {
 function elementaryName(name) {
   if (name.startsWith('int[')) {
     return `int256${name.slice(3)}`;
-  } if (name === 'int') {
+  }
+  if (name === 'int') {
     return 'int256';
-  } if (name.startsWith('uint[')) {
+  }
+  if (name.startsWith('uint[')) {
     return `uint256${name.slice(4)}`;
-  } if (name === 'uint') {
+  }
+  if (name === 'uint') {
     return 'uint256';
-  } if (name.startsWith('fixed[')) {
+  }
+  if (name.startsWith('fixed[')) {
     return `fixed128x128${name.slice(5)}`;
-  } if (name === 'fixed') {
+  }
+  if (name === 'fixed') {
     return 'fixed128x128';
-  } if (name.startsWith('ufixed[')) {
+  }
+  if (name.startsWith('ufixed[')) {
     return `ufixed128x128${name.slice(6)}`;
-  } if (name === 'ufixed') {
+  }
+  if (name === 'ufixed') {
     return 'ufixed128x128';
   }
   return name;
@@ -71,9 +78,11 @@ function parseNumber(arg) {
       return new BN(ethjsUtil.stripHexPrefix(arg), 16);
     }
     return new BN(arg, 10);
-  } if (type === 'number') {
+  }
+  if (type === 'number') {
     return new BN(arg);
-  } if (arg.toArray) {
+  }
+  if (arg.toArray) {
     // assume this is a BN for the moment, replace with BN.isBN soon
     return arg;
   }
@@ -263,10 +272,7 @@ const hashStruct = (type, members, obj) => {
         : obj[e.name]),
     ),
   );
-  debug('types', types);
-  debug('values', values);
   const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
-  debug('encoded', encoded);
   const structHash = ethersKeccak256(encoded);
   return structHash;
 };
@@ -275,9 +281,7 @@ const signStructHash = (key, structHash, sepratorHash) => {
     ['bytes', 'bytes32', 'bytes32'],
     ['0x1901', sepratorHash, structHash],
   );
-  debug('solSha3', solSha3);
   const sig = ecsign(Buffer.from(solSha3.substr(2), 'hex'), key);
-  debug('sig', sig);
   const sign = {
     r: addHexPrefix(sig.r.toString('hex')),
     s: addHexPrefix(sig.s.toString('hex')),
@@ -286,9 +290,9 @@ const signStructHash = (key, structHash, sepratorHash) => {
   return sign;
 };
 module.exports = {
+  getEIP712Domain,
   signTypedData,
+  getSalt,
   signStructHash,
   hashStruct,
-  getSalt,
-  getEIP712Domain,
 };
