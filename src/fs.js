@@ -186,7 +186,8 @@ const saveSignedOrder = async (orderName, chainID, signedOrder) => {
     if (typeof signedOrders[chainID] !== 'object') signedOrders[chainID] = {};
     signedOrders[chainID][orderName] = signedOrder;
 
-    await saveSignedOrders(signedOrders, { force: true });
+    const fileName = await saveSignedOrders(signedOrders, { force: true });
+    return { saved: orderName, fileName };
   } catch (error) {
     debug('saveDeployedObj()', error);
     throw error;
