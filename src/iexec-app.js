@@ -4,7 +4,6 @@ const cli = require('commander');
 const {
   help,
   handleError,
-  command,
   desc,
   option,
   Spinner,
@@ -17,15 +16,12 @@ const {
   initObj,
   saveDeployedObj,
   loadDeployedObj,
-  loadSignedOrders,
 } = require('./fs');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains');
-const order = require('./order');
 
 const objName = 'app';
 const pocoName = 'dapp';
-const orderName = objName.concat('order');
 
 cli
   .command('init')
@@ -102,27 +98,6 @@ cli
       const userAddress = cmd.user || address;
 
       await hub.countObj(pocoName)(chain.contracts, userAddress);
-    } catch (error) {
-      handleError(error, cli);
-    }
-  });
-
-cli
-  .command(command.cancelOrder())
-  .option(...option.chain())
-  .description(desc.cancelOrder(orderName))
-  .action(async (cmd) => {
-    const spinner = Spinner();
-    try {
-      const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain),
-        loadSignedOrders(),
-      ]);
-      const orderToCancel = signedOrders[chain.id][orderName];
-      spinner.start('canceling order');
-      await order.cancelAppOrder(orderToCancel, chain.contracts);
-      // todo delete from ?
-      spinner.succeed(`${orderName} successfully canceled`);
     } catch (error) {
       handleError(error, cli);
     }
