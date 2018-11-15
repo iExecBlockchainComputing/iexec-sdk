@@ -42,9 +42,8 @@ const command = {
   deposit: () => 'deposit <amount>',
   withdraw: () => 'withdraw <amount>',
   fill: () => 'fill <orderID>',
-  cancel: () => 'cancel <orderID>',
+  cancel: () => 'cancel',
   sign: () => 'sign',
-  cancelOrder: () => 'cancelorder',
 };
 
 const desc = {
@@ -91,6 +90,10 @@ const option = {
   signDataOrder: () => ['--data', 'sign a selling dataorder'],
   signPoolOrder: () => ['--pool', 'sign a selling poolorder'],
   signUserOrder: () => ['--user', 'sign a buying userorder'],
+  cancelAppOrder: () => ['--app', 'cancel a signed apporder'],
+  cancelDataOrder: () => ['--data', 'cancel a signed dataorder'],
+  cancelPoolOrder: () => ['--pool', 'cancel a signed poolorder'],
+  cancelUserOrder: () => ['--user', 'cancel a signed userorder'],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
@@ -163,6 +166,7 @@ const prompt = {
   placeOrder: (volume, category, value) => question(
     `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
   ),
+  cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName} ? ${order}`),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);

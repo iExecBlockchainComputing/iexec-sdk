@@ -180,6 +180,7 @@ const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domai
 
 module.exports = {
   checkContractOwner,
+  cancelOrder,
   cancelAppOrder,
   cancelDataOrder,
   cancelPoolOrder,

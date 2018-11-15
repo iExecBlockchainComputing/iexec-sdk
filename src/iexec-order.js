@@ -20,6 +20,7 @@ const {
   saveDeployedObj,
   loadDeployedObj,
   saveSignedOrder,
+  loadSignedOrders,
 } = require('./fs');
 const { loadChain } = require('./chains.js');
 const keystore = require('./keystore');
@@ -368,44 +369,41 @@ cli
 
 cli
   .command(command.cancel())
+  .option(...option.cancelAppOrder())
+  .option(...option.cancelDataOrder())
+  .option(...option.cancelPoolOrder())
+  .option(...option.cancelUserOrder())
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.cancel(objName))
-  .action(async (orderID, cmd) => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const chain = await loadChain(cmd.chain);
-      const hubAddress = cmd.hub || chain.hub;
+      if (!(cmd.app || cmd.data || cmd.pool || cmd.user)) throw new Error('No option specified, you should choose one');
 
-      spinner.start(info.cancelling(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
+      const [chain, signedOrders] = await Promise.all([
+        loadChain(cmd.chain),
+        loadSignedOrders(),
+      ]);
 
-      const countRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .m_orderCount();
+      const cancelOrder = async (orderName) => {
+        const orderToCancel = signedOrders[chain.id][orderName];
+        if (!orderToCancel) {
+          throw new Error(
+            `Missing signed ${orderName} for chain ${
+              chain.id
+            } in "orders.json"`,
+          );
+        }
+        await prompt.cancelOrder(orderName, pretty(orderToCancel));
+        spinner.start('canceling order');
+        await order.cancelOrder(orderName, orderToCancel, chain.contracts);
+        spinner.succeed(`${orderName} successfully canceled`);
+      };
 
-      if (parseInt(orderID, 10) > parseInt(countRPC[0].toString(), 10)) throw Error(`${objName} with ID ${orderID} does not exist`);
-
-      const orderRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .getMarketOrder(orderID);
-
-      if (orderRPC.direction.toString() !== '2') {
-        throw Error(
-          `${objName} with ID ${orderID} is already closed and so cannot be cancelled. You could run "iexec order show ${orderID}" for more details`,
-        );
-      }
-
-      const txHash = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .closeMarketOrder(orderID);
-      debug('txHash', txHash);
-      const txReceipt = await chain.contracts.waitForReceipt(txHash);
-      const events = chain.contracts.decodeMarketplaceLogs(txReceipt.logs);
-      debug('events', events);
-      spinner.succeed(`Cancelled ${objName} with ID ${events[0][0]}`);
+      if (cmd.app) await cancelOrder('apporder');
+      if (cmd.data) await cancelOrder('dataorder');
+      if (cmd.pool) await cancelOrder('poolorder');
+      if (cmd.user) await cancelOrder('userorder');
     } catch (error) {
       handleError(error, cli);
     }
