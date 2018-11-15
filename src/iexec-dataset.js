@@ -109,34 +109,4 @@ cli
     }
   });
 
-cli
-  .command(command.signOrder())
-  .option(...option.chain())
-  .description(desc.sign(orderName))
-  .action(async (cmd) => {
-    const spinner = Spinner();
-    try {
-      const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain),
-        loadIExecConf(),
-      ]);
-      const orderObj = iexecConf[orderName];
-
-      await order.checkContractOwner(orderName, orderObj, chain.contracts);
-
-      const clerkAddress = await chain.contracts.fetchClerkAddress();
-      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
-      const signedOrder = await order.signDataOrder(orderObj, domainObj);
-
-      await saveSignedOrder(orderName, chain.id, signedOrder);
-      spinner.succeed(
-        `${orderName} signed and saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
-          signedOrder,
-        )}`,
-      );
-    } catch (error) {
-      handleError(error, cli);
-    }
-  });
-
 help(cli);

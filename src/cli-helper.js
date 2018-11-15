@@ -33,6 +33,8 @@ const info = {
   valid: obj => `${obj} is valid`,
   notValid: obj => `${obj} is NOT valid`,
   sgxInit: () => 'created SGX folders tree structure',
+  missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
+  orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
 const command = {
@@ -41,7 +43,7 @@ const command = {
   withdraw: () => 'withdraw <amount>',
   fill: () => 'fill <orderID>',
   cancel: () => 'cancel <orderID>',
-  signOrder: () => 'signorder',
+  sign: () => 'sign',
   cancelOrder: () => 'cancelorder',
 };
 
@@ -73,7 +75,7 @@ const desc = {
   encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
   sgxInit: () => 'init the SGX folders tree structure',
-  sign: objName => `sign a ${objName}`,
+  sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
 };
 
@@ -81,10 +83,14 @@ const option = {
   chain: () => ['--chain <name>', desc.chainName()],
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
-  appOrder: () => ['--app', 'init an app sell order'],
-  dataOrder: () => ['--data', 'init a data sell order'],
-  poolOrder: () => ['--pool', 'init a workerpool sell order'],
-  userOrder: () => ['--user', 'init a user buy order'],
+  initAppOrder: () => ['--app', 'init an app sell order'],
+  initDataOrder: () => ['--data', 'init a data sell order'],
+  initPoolOrder: () => ['--pool', 'init a workerpool sell order'],
+  initUserOrder: () => ['--user', 'init a user buy order'],
+  signAppOrder: () => ['--app', 'sign an selling apporder'],
+  signDataOrder: () => ['--data', 'sign a selling dataorder'],
+  signPoolOrder: () => ['--pool', 'sign a selling poolorder'],
+  signUserOrder: () => ['--user', 'sign a buying userorder'],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],

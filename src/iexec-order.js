@@ -19,19 +19,22 @@ const {
   initOrder,
   saveDeployedObj,
   loadDeployedObj,
+  saveSignedOrder,
 } = require('./fs');
 const { loadChain } = require('./chains.js');
 const keystore = require('./keystore');
+const order = require('./order');
+const { getEIP712Domain } = require('./sig-utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
 cli
   .command('init')
-  .option(...option.appOrder())
-  .option(...option.dataOrder())
-  .option(...option.poolOrder())
-  .option(...option.userOrder())
+  .option(...option.initAppOrder())
+  .option(...option.initDataOrder())
+  .option(...option.initPoolOrder())
+  .option(...option.initUserOrder())
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
@@ -46,108 +49,180 @@ cli
 
       const chain = await loadChain(cmd.chain);
       const initAppOrder = async () => {
+        spinner.start('creating apporder');
         const deployedObj = await loadDeployedObj('app');
         const address = deployedObj[chain.id];
         const overwrite = address ? { dapp: address } : {};
         const { saved, fileName } = await initOrder('apporder', overwrite);
-        return { objName: 'apporder', saved, fileName };
+        spinner.succeed(
+          `Saved default apporder in "${fileName}", you can edit it:${pretty(
+            saved,
+          )}`,
+        );
       };
 
       const initDataOrder = async () => {
+        spinner.start('creating dataorder');
         const deployedObj = await loadDeployedObj('dataset');
         const address = deployedObj[chain.id];
         const overwrite = address ? { data: address } : {};
         const { saved, fileName } = await initOrder('dataorder', overwrite);
-        return { objName: 'dataorder', saved, fileName };
+        spinner.succeed(
+          `Saved default apporder in "${fileName}", you can edit it:${pretty(
+            saved,
+          )}`,
+        );
       };
 
       const initPoolOrder = async () => {
+        spinner.start('creating poolorder');
         const deployedObj = await loadDeployedObj('workerPool');
         const address = deployedObj[chain.id];
         const overwrite = address ? { pool: address } : {};
         const { saved, fileName } = await initOrder('poolorder', overwrite);
-        return { objName: 'poolorder', saved, fileName };
+        spinner.succeed(
+          `Saved default apporder in "${fileName}", you can edit it:${pretty(
+            saved,
+          )}`,
+        );
       };
 
       const initUserOrder = async () => {
+        spinner.start('creating userorder');
         const { address } = await keystore.load();
         const overwrite = address ? { requester: address } : {};
         const { saved, fileName } = await initOrder('userorder', overwrite);
-        return { objName: 'userorder', saved, fileName };
+        spinner.succeed(
+          `Saved default userorder in "${fileName}", you can edit it:${pretty(
+            saved,
+          )}`,
+        );
       };
 
-      const initResult = [];
-      if (cmd.app || initAll) initResult.push(await initAppOrder());
-      if (cmd.data || initAll) initResult.push(await initDataOrder());
-      if (cmd.pool || initAll) initResult.push(await initPoolOrder());
-      if (cmd.user || initAll) initResult.push(await initUserOrder());
-
-      debug('initResult', initResult);
-
-      initResult.map(e => spinner.succeed(
-        `Saved default ${e.objName} in "${
-          e.fileName
-        }", you can edit it:${pretty(e.saved)}`,
-      ));
+      if (cmd.app || initAll) await initAppOrder();
+      if (cmd.data || initAll) await initDataOrder();
+      if (cmd.pool || initAll) await initPoolOrder();
+      if (cmd.user || initAll) await initUserOrder();
     } catch (error) {
       handleError(error, cli);
     }
   });
 
 cli
-  .command('place')
+  .command(command.sign())
+  .option(...option.signAppOrder())
+  .option(...option.signDataOrder())
+  .option(...option.signPoolOrder())
+  .option(...option.signUserOrder())
   .option(...option.chain())
-  .option(...option.hub())
-  .option(...option.force())
-  .description(desc.placeObj(objName))
+  .description(desc.sign())
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
+      const signAll = !(cmd.app || cmd.data || cmd.pool || cmd.user);
+      debug('signAll', signAll);
+
       const [chain, iexecConf] = await Promise.all([
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
 
-      if (!(objName in iexecConf) || !('sell' in iexecConf[objName])) {
-        throw Error(
-          'Missing sell order. You probably forgot to run "iexec order init --sell"',
+      const clerkAddress = await chain.contracts.fetchClerkAddress();
+      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
+
+      const signAppOrder = async () => {
+        spinner.start('signing apporder');
+        const orderObj = iexecConf.apporder;
+        if (!orderObj) {
+          throw new Error(info.missingOrder('apporder', 'app'));
+        }
+        await chain.contracts.checkDeployedDapp(orderObj.dapp, {
+          strict: true,
+        });
+        await order.checkContractOwner('apporder', orderObj, chain.contracts, {
+          strict: true,
+        });
+        const signedOrder = await order.signAppOrder(orderObj, domainObj);
+        const { saved, fileName } = await saveSignedOrder(
+          'apporder',
+          chain.id,
+          signedOrder,
         );
-      }
-      const sellLimitOrder = iexecConf[objName].sell;
-      debug('sellLimitOrder', sellLimitOrder);
-
-      spinner.info(`sell order: ${pretty(sellLimitOrder)}`);
-
-      if (!cmd.force) {
-        await prompt.placeOrder(
-          sellLimitOrder.volume,
-          sellLimitOrder.category,
-          sellLimitOrder.value,
+        spinner.succeed(
+          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
         );
-      }
+      };
 
-      const args = [
-        2,
-        sellLimitOrder.category,
-        0,
-        sellLimitOrder.value,
-        sellLimitOrder.workerPool,
-        sellLimitOrder.volume,
-      ];
-      debug('args', args);
+      const signDataOrder = async () => {
+        spinner.start('signing dataorder');
+        const orderObj = iexecConf.dataorder;
+        if (!orderObj) {
+          throw new Error(info.missingOrder('dataorder', 'data'));
+        }
+        await chain.contracts.checkDeployedData(orderObj.data, {
+          strict: true,
+        });
+        await order.checkContractOwner('dataorder', orderObj, chain.contracts, {
+          strict: true,
+        });
+        const signedOrder = await order.signDataOrder(orderObj, domainObj);
+        const { saved, fileName } = await saveSignedOrder(
+          'dataorder',
+          chain.id,
+          signedOrder,
+        );
+        spinner.succeed(
+          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+        );
+      };
 
-      spinner.start(info.placing(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
-      const txHash = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .createMarketOrder(...args);
-      const txReceipt = await chain.contracts.waitForReceipt(txHash);
-      const events = chain.contracts.decodeMarketplaceLogs(txReceipt.logs);
-      debug('events', events);
-      spinner.succeed(`Placed new ${objName} with ID ${events[0][0]}`);
+      const signPoolOrder = async () => {
+        spinner.start('signing poolorder');
+        const orderObj = iexecConf.poolorder;
+        if (!orderObj) {
+          throw new Error(info.missingOrder('poolorder', 'pool'));
+        }
+        await chain.contracts.checkDeployedPool(orderObj.pool, {
+          strict: true,
+        });
+        await order.checkContractOwner('poolorder', orderObj, chain.contracts, {
+          strict: true,
+        });
+        const signedOrder = await order.signPoolOrder(orderObj, domainObj);
+        const { saved, fileName } = await saveSignedOrder(
+          'poolorder',
+          chain.id,
+          signedOrder,
+        );
+        spinner.succeed(
+          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+        );
+      };
+
+      const signUserOrder = async () => {
+        spinner.start('signing userorder');
+        const orderObj = iexecConf.userorder;
+        if (!orderObj) {
+          throw new Error(info.missingOrder('userorder', 'user'));
+        }
+        await chain.contracts.checkDeployedDapp(orderObj.dapp, {
+          strict: true,
+        });
+        const signedOrder = await order.signUserOrder(orderObj, domainObj);
+        const { saved, fileName } = await saveSignedOrder(
+          'userorder',
+          chain.id,
+          signedOrder,
+        );
+        spinner.succeed(
+          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+        );
+      };
+
+      if (cmd.app || signAll) await signAppOrder();
+      if (cmd.data || signAll) await signDataOrder();
+      if (cmd.pool || signAll) await signPoolOrder();
+      if (cmd.user || signAll) await signUserOrder();
     } catch (error) {
       handleError(error, cli);
     }
