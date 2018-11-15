@@ -17,12 +17,9 @@ const {
   initObj,
   saveDeployedObj,
   loadDeployedObj,
-  saveSignedOrder,
   loadSignedOrders,
-  ORDERS_FILE_NAME,
 } = require('./fs');
 const { load } = require('./keystore');
-const { getEIP712Domain } = require('./sig-utils');
 const { loadChain } = require('./chains');
 const order = require('./order');
 

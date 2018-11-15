@@ -4,15 +4,7 @@ const Debug = require('debug');
 const cli = require('commander');
 const account = require('./account');
 const keystore = require('./keystore');
-const order = require('./order');
-const {
-  saveAccountConf,
-  loadAccountConf,
-  loadIExecConf,
-  initObj,
-  saveSignedOrder,
-  ORDERS_FILE_NAME,
-} = require('./fs');
+const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
 const { decodeJWTForPrint } = require('./utils');
 const {
@@ -26,11 +18,9 @@ const {
   prettyRPC,
   pretty,
 } = require('./cli-helper');
-const { getEIP712Domain } = require('./sig-utils');
 
 const debug = Debug('iexec:iexec-account');
 const objName = 'account';
-const orderName = 'userorder';
 
 cli
   .command('login')
@@ -123,41 +113,6 @@ cli
       );
 
       spinner.succeed(`Account balances:${prettyRPC(balancesRPC)}`);
-    } catch (error) {
-      handleError(error, cli);
-    }
-  });
-
-cli
-  .command(command.signOrder())
-  .option(...option.chain())
-  .description(desc.sign(orderName))
-  .action(async (cmd) => {
-    const spinner = Spinner();
-    try {
-      const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain),
-        loadIExecConf(),
-      ]);
-
-      const { address } = await keystore.load();
-      const orderObj = Object.assign(iexecConf[orderName], {
-        requester: address,
-      });
-
-      await chain.contracts.checkDeployedDapp(orderObj.dapp, { strict: true });
-
-      const clerkAddress = await chain.contracts.fetchClerkAddress();
-      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
-
-      const signedOrder = await order.signUserOrder(orderObj, domainObj);
-
-      await saveSignedOrder(objName, chain.id, signedOrder);
-      spinner.succeed(
-        `${orderName} signed and saved in ${ORDERS_FILE_NAME}, you can share it:${pretty(
-          signedOrder,
-        )}`,
-      );
     } catch (error) {
       handleError(error, cli);
     }

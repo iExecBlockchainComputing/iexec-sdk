@@ -4,7 +4,6 @@ const cli = require('commander');
 const {
   help,
   handleError,
-  command,
   desc,
   option,
   Spinner,
@@ -12,22 +11,17 @@ const {
   info,
 } = require('./cli-helper');
 const hub = require('./hub');
-const order = require('./order');
 const {
   loadIExecConf,
   initObj,
   saveDeployedObj,
   loadDeployedObj,
-  saveSignedOrder,
-  ORDERS_FILE_NAME,
 } = require('./fs');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains');
-const { getEIP712Domain } = require('./sig-utils');
 
 const objName = 'dataset';
 const pocoName = 'data';
-const orderName = 'dataorder';
 
 cli
   .command('init')
