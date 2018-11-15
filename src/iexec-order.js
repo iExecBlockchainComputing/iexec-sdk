@@ -17,7 +17,6 @@ const {
 const {
   loadIExecConf,
   initOrder,
-  saveDeployedObj,
   loadDeployedObj,
   saveSignedOrder,
   loadSignedOrders,
@@ -133,7 +132,7 @@ cli
 
       const signAppOrder = async () => {
         spinner.start('signing apporder');
-        const orderObj = iexecConf.apporder;
+        const orderObj = iexecConf.order.apporder;
         if (!orderObj) {
           throw new Error(info.missingOrder('apporder', 'app'));
         }
@@ -156,7 +155,7 @@ cli
 
       const signDataOrder = async () => {
         spinner.start('signing dataorder');
-        const orderObj = iexecConf.dataorder;
+        const orderObj = iexecConf.order.dataorder;
         if (!orderObj) {
           throw new Error(info.missingOrder('dataorder', 'data'));
         }
@@ -179,7 +178,7 @@ cli
 
       const signPoolOrder = async () => {
         spinner.start('signing poolorder');
-        const orderObj = iexecConf.poolorder;
+        const orderObj = iexecConf.order.poolorder;
         if (!orderObj) {
           throw new Error(info.missingOrder('poolorder', 'pool'));
         }
@@ -202,7 +201,7 @@ cli
 
       const signUserOrder = async () => {
         spinner.start('signing userorder');
-        const orderObj = iexecConf.userorder;
+        const orderObj = iexecConf.order.userorder;
         if (!orderObj) {
           throw new Error(info.missingOrder('userorder', 'user'));
         }
@@ -232,136 +231,62 @@ cli
 cli
   .command(command.fill())
   .option(...option.chain())
-  .option(...option.hub())
   .option(...option.force())
   .description(desc.fill(objName))
-  .action(async (orderID, cmd) => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      const [chain, iexecConf, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain),
-        loadIExecConf(),
-        keystore.load(),
+        loadSignedOrders(),
       ]);
-      const hubAddress = cmd.hub || chain.hub;
+      debug('signedOrders', signedOrders);
 
-      if (!(objName in iexecConf) || !('buy' in iexecConf[objName])) {
-        throw Error(
-          'Missing buy order. You probably forgot to run "iexec order init --buy"',
+      const appOrder = signedOrders[chain.id].apporder;
+      const dataOrder = signedOrders[chain.id].dataorder;
+      const poolOrder = signedOrders[chain.id].poolorder;
+      const userOrder = signedOrders[chain.id].userorder;
+
+      if (!appOrder) throw new Error('Missing apporder');
+      if (!dataOrder) throw new Error('Missing dataorder');
+      if (!poolOrder) throw new Error('Missing poolorder');
+      debug('appOrder', appOrder);
+      debug('dataOrder', dataOrder);
+      debug('poolOrder', poolOrder);
+
+      if (!userOrder) {
+        throw new Error('Missing userorder');
+      }
+      debug('userOrder', userOrder);
+
+      const useDataset = userOrder.data !== '0x0000000000000000000000000000000000000000';
+      const useWorkerpool = userOrder.pool !== '0x0000000000000000000000000000000000000000';
+
+      if (userOrder.dapp !== appOrder.dapp) {
+        throw new Error(
+          'dapp address mismatch between userorder and dapporder',
         );
       }
-      const buyMarketOrder = iexecConf[objName].buy;
-      debug('buyMarketOrder', buyMarketOrder);
-      debug('buyMarketOrder.params', buyMarketOrder.params);
-      const workParams = JSON.stringify(buyMarketOrder.params);
-      debug('workParams', workParams);
-
-      spinner.start(info.filling(objName));
-
-      // fault detection
-      const [marketplaceAddress, appHubAddress] = await Promise.all([
-        chain.contracts.fetchMarketplaceAddress({
-          hub: hubAddress,
-        }),
-        chain.contracts.fetchAppHubAddress({
-          hub: hubAddress,
-        }),
-      ]);
-
-      const [countRPC, isAppRegistered] = await Promise.all([
-        chain.contracts
-          .getMarketplaceContract({ at: marketplaceAddress })
-          .m_orderCount(),
-        chain.contracts
-          .getAppHubContract({ at: appHubAddress })
-          .isAppRegistered(buyMarketOrder.app),
-      ]);
-
-      if (!isAppRegistered[0]) {
-        throw Error(
-          `no iExec app deployed at address ${buyMarketOrder.app} [${
-            chain.name
-          }]`,
+      if (useDataset && userOrder.data !== dataOrder.data) {
+        throw new Error(
+          'data address mismatch between userorder and dataorder',
         );
       }
-      if (parseInt(orderID, 10) > parseInt(countRPC[0].toString(), 10)) throw Error(`${objName} with ID ${orderID} does not exist`);
-      // fault detection
-
-      const [orderRPC, appPriceRPC, balanceRLC] = await Promise.all([
-        chain.contracts
-          .getMarketplaceContract({ at: marketplaceAddress })
-          .getMarketOrder(orderID),
-        chain.contracts
-          .getAppContract({ at: buyMarketOrder.app })
-          .m_appPrice()
-          .catch((error) => {
-            debug('m_appPrice()', error);
-            throw Error(`Error with app ${buyMarketOrder.app}`);
-          }),
-        await chain.contracts
-          .getHubContract({
-            at: hubAddress,
-          })
-          .checkBalance(address),
-      ]);
-      debug('orderRPC', orderRPC);
-      debug('appPriceRPC', appPriceRPC);
-      debug('balanceRLC', balanceRLC);
-
-      if (orderRPC.direction.toString() !== '2') {
-        throw Error(
-          `${objName} with ID ${orderID} is already closed and so cannot be filled. You could run "iexec order show ${orderID}" for more details`,
+      if (useWorkerpool && userOrder.pool !== poolOrder.pool) {
+        throw new Error(
+          'pool address mismatch between userorder and poolorder',
         );
-      }
-
-      const total = appPriceRPC[0].add(orderRPC.value);
-      if (balanceRLC.stake.lt(total)) {
-        throw Error(
-          `total work price ${total} nRLC is higher than your iExec account balance ${
-            balanceRLC.stake
-          } nRLC. You should probably run "iexec wallet deposit"`,
-        );
-      }
-      spinner.info(
-        `app price: ${appPriceRPC[0]} nRLC for app ${buyMarketOrder.app}`,
-      );
-      spinner.info(
-        `workerpool price: ${orderRPC.value} nRLC for workerpool ${
-          orderRPC.workerpool
-        }`,
-      );
-      spinner.info(`work parameters: ${pretty(buyMarketOrder.params)}`);
-
-      if (!cmd.force) {
-        await prompt.fillOrder(total, orderID);
       }
 
       spinner.start(info.filling(objName));
-
-      const args = [
-        orderID,
-        orderRPC.workerpool,
-        buyMarketOrder.app,
-        '0x0000000000000000000000000000000000000000',
-        workParams,
-        '0x0000000000000000000000000000000000000000',
-        '0x0000000000000000000000000000000000000000',
-      ];
-      debug('args', args);
-
-      const txHash = await chain.contracts
-        .getHubContract({ at: hubAddress })
-        .buyForWorkOrder(...args);
-      const txReceipt = await chain.contracts.waitForReceipt(txHash);
-      const events = chain.contracts.decodeHubLogs(txReceipt.logs);
-      debug('events', events);
-      spinner.succeed(`Filled ${objName} with ID ${orderID}`);
-      spinner.succeed(
-        `New work at ${events[0].woid} submitted to workerpool ${
-          events[0].workerPool
-        }`,
+      const { dealid, volume } = await order.matchOrders(
+        appOrder,
+        useDataset ? dataOrder : undefined,
+        poolOrder,
+        userOrder,
+        chain.contracts,
       );
-      await saveDeployedObj('work', chain.id, events[0].woid);
+      spinner.succeed(`order successfully filled with dealid ${dealid}`);
     } catch (error) {
       handleError(error, cli);
     }

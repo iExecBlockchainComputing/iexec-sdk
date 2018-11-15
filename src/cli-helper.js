@@ -41,7 +41,7 @@ const command = {
   show: () => 'show',
   deposit: () => 'deposit <amount>',
   withdraw: () => 'withdraw <amount>',
-  fill: () => 'fill <orderID>',
+  fill: () => 'fill',
   cancel: () => 'cancel',
   sign: () => 'sign',
 };

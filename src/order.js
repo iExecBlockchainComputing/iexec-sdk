@@ -1,9 +1,25 @@
 const Debug = require('debug');
 const { getSalt } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
-const { checkEvent } = require('./utils');
+const { checkEvent, getEventFromLogs } = require('./utils');
 
 const debug = Debug('iexec:order');
+
+const NULLDATASET = {
+  data: '0x0000000000000000000000000000000000000000',
+  dataprice: 0,
+  volume: 0,
+  tag: 0,
+  dapprestrict: '0x0000000000000000000000000000000000000000',
+  poolrestrict: '0x0000000000000000000000000000000000000000',
+  userrestrict: '0x0000000000000000000000000000000000000000',
+  salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  sign: {
+    r: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    s: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    v: 0,
+  },
+};
 
 const objDesc = {
   EIP712Domain: {
@@ -178,6 +194,44 @@ const cancelDataOrder = (order, domain) => cancelOrder('dataorder', order, domai
 const cancelPoolOrder = (order, domain) => cancelOrder('poolorder', order, domain);
 const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domain);
 
+const matchOrders = async (
+  appOrder,
+  dataOrder = NULLDATASET,
+  poolOrder,
+  userOrder,
+  contracts,
+) => {
+  const appOrderStruct = signedOrderToStruct('apporder', appOrder);
+  const dataOrderStruct = signedOrderToStruct('dataorder', dataOrder);
+  const poolOrderStruct = signedOrderToStruct('poolorder', poolOrder);
+  const userOrderStruct = signedOrderToStruct('userorder', userOrder);
+
+  const clerkContact = contracts.getClerkContract();
+  debug('appOrderStruct', appOrderStruct);
+  debug('dataOrderStruct', dataOrderStruct);
+  debug('poolOrderStruct', poolOrderStruct);
+  debug('userOrderStruct', userOrderStruct);
+  let logs;
+  try {
+    const tx = await clerkContact.matchOrders(
+      appOrderStruct,
+      dataOrderStruct,
+      poolOrderStruct,
+      userOrderStruct,
+    );
+    const txReceipt = await tx.wait();
+    logs = contracts.decodeClerkLogs(txReceipt.logs);
+  } catch (error) {
+    debug('matchOrders() error', error);
+    throw error;
+  }
+  debug('logs', logs);
+  const matchEvent = 'OrdersMatched';
+  if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
+  const { dealid, volume } = getEventFromLogs(matchEvent, logs);
+  return { dealid, volume };
+};
+
 module.exports = {
   checkContractOwner,
   cancelOrder,
@@ -189,4 +243,5 @@ module.exports = {
   signDataOrder,
   signPoolOrder,
   signUserOrder,
+  matchOrders,
 };

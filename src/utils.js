@@ -53,6 +53,18 @@ const checkEvent = (eventName, events) => {
   return confirm;
 };
 
+const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
+  let eventFound = {};
+  events.forEach((event) => {
+    debug('event', event._eventName);
+    if (event._eventName === eventName) {
+      eventFound = event;
+    }
+  });
+  if (!eventFound && strict) throw new Error(`unknown event ${eventName}`);
+  return eventFound;
+};
+
 const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
 
 const secToDate = (secs) => {
@@ -125,6 +137,7 @@ module.exports = {
   getContractAddress,
   isEthAddress,
   checkEvent,
+  getEventFromLogs,
   toUpperFirst,
   secToDate,
   decodeJWTForPrint,

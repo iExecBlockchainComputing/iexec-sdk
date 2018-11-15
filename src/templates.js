@@ -138,9 +138,7 @@ const defaultOrder = {
   buy: buyMarketOrder,
 };
 
-const createOrder = (orderName, overwrite = {}) => {
-  return Object.assign({}, order[orderName], overwrite);
-};
+const createOrder = (orderName, overwrite = {}) => Object.assign({}, order[orderName], overwrite);
 
 module.exports = {
   main,
