@@ -278,6 +278,17 @@ cli
         );
       }
 
+      await order.checkRemainingVolume('apporder', appOrder, chain.contracts);
+      if (useDataset) {
+        await order.checkRemainingVolume(
+          'dataorder',
+          dataOrder,
+          chain.contracts,
+        );
+      }
+      await order.checkRemainingVolume('poolorder', poolOrder, chain.contracts);
+      await order.checkRemainingVolume('userorder', userOrder, chain.contracts);
+
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(
         appOrder,
@@ -286,7 +297,9 @@ cli
         userOrder,
         chain.contracts,
       );
-      spinner.succeed(`order successfully filled with dealid ${dealid}`);
+      spinner.succeed(
+        `${volume} work successfully purchased with dealid ${dealid}`,
+      );
     } catch (error) {
       handleError(error, cli);
     }

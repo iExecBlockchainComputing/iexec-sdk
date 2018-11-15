@@ -1,4 +1,5 @@
 const Debug = require('debug');
+const ethers = require('ethers');
 const { getSalt, hashStruct } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
 const { checkEvent, getEventFromLogs } = require('./utils');
@@ -148,7 +149,13 @@ const checkContractOwner = async (orderName, orderObj, contracts) => {
   return true;
 };
 
-const viewVolumeConsumed = async (orderName, order, contracts) => {
+const checkRemainingVolume = async (
+  orderName,
+  order,
+  contracts,
+  { strict = true } = {},
+) => {
+  const initial = ethers.utils.bigNumberify(order.volume);
   const orderHash = hashStruct(
     objDesc[orderName].structType,
     objDesc[orderName].structMembers,
@@ -156,8 +163,9 @@ const viewVolumeConsumed = async (orderName, order, contracts) => {
   );
   const clerkContract = contracts.getClerkContract();
   const consumed = await clerkContract.viewConsumed(orderHash);
-  debug('consumed', consumed);
-  return consumed;
+  const remain = initial.sub(consumed);
+  if (remain.lte(ethers.utils.bigNumberify(0)) && strict) throw new Error(`${orderName} is fully consumed`);
+  return remain;
 };
 
 const signOrder = async (orderName, orderObj, domainObj) => {
@@ -251,7 +259,7 @@ module.exports = {
   cancelDataOrder,
   cancelPoolOrder,
   cancelUserOrder,
-  viewVolumeConsumed,
+  checkRemainingVolume,
   signAppOrder,
   signDataOrder,
   signPoolOrder,
