@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { getSalt } = require('./sig-utils');
+const { getSalt, hashStruct } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
 const { checkEvent, getEventFromLogs } = require('./utils');
 
@@ -148,6 +148,18 @@ const checkContractOwner = async (orderName, orderObj, contracts) => {
   return true;
 };
 
+const viewVolumeConsumed = async (orderName, order, contracts) => {
+  const orderHash = hashStruct(
+    objDesc[orderName].structType,
+    objDesc[orderName].structMembers,
+    order,
+  );
+  const clerkContract = contracts.getClerkContract();
+  const consumed = await clerkContract.viewConsumed(orderHash);
+  debug('consumed', consumed);
+  return consumed;
+};
+
 const signOrder = async (orderName, orderObj, domainObj) => {
   const domain = {
     structType: objDesc.EIP712Domain.structType,
@@ -239,6 +251,7 @@ module.exports = {
   cancelDataOrder,
   cancelPoolOrder,
   cancelUserOrder,
+  viewVolumeConsumed,
   signAppOrder,
   signDataOrder,
   signPoolOrder,
