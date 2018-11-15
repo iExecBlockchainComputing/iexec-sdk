@@ -266,11 +266,10 @@ const hashStruct = (type, members, obj) => {
     members.map(e => (e.type === 'string' ? 'bytes32' : e.type)),
   );
   const values = [typeHash].concat(
-    members.map(
-      e => (e.type === 'string'
-        ? ethersKeccak256(Buffer.from(obj[e.name], 'utf8'))
-        : obj[e.name]),
-    ),
+    members.map((e) => {
+      if (e.type === 'string') return ethersKeccak256(Buffer.from(obj[e.name], 'utf8'));
+      return obj[e.name];
+    }),
   );
   const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
   const structHash = ethersKeccak256(encoded);
