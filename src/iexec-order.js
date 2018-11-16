@@ -28,6 +28,7 @@ const keystore = require('./keystore');
 const order = require('./order');
 const account = require('./account');
 const { getEIP712Domain } = require('./sig-utils');
+const templates = require('./templates');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -249,21 +250,63 @@ cli
       const appOrder = signedOrders[chain.id].apporder;
       const dataOrder = signedOrders[chain.id].dataorder;
       const poolOrder = signedOrders[chain.id].poolorder;
-      const userOrder = signedOrders[chain.id].userorder;
+      const userOrderInput = signedOrders[chain.id].userorder;
+
+      const useDataset = userOrderInput
+        ? userOrderInput.data !== '0x0000000000000000000000000000000000000000'
+        : !!dataOrder;
+      debug('useDataset', useDataset);
 
       if (!appOrder) throw new Error('Missing apporder');
-      if (!dataOrder) throw new Error('Missing dataorder');
+      if (!dataOrder && useDataset) throw new Error('Missing dataorder');
       if (!poolOrder) throw new Error('Missing poolorder');
-      debug('appOrder', appOrder);
-      debug('dataOrder', dataOrder);
-      debug('poolOrder', poolOrder);
 
+      const appVolume = await order.checkRemainingVolume(
+        'apporder',
+        appOrder,
+        chain.contracts,
+      );
+      const dataVolume = useDataset && dataOrder
+        ? await order.checkRemainingVolume(
+          'dataorder',
+          dataOrder,
+          chain.contracts,
+        )
+        : new BN(2).pow(new BN(256)).sub(new BN(1));
+      const poolVolume = await order.checkRemainingVolume(
+        'poolorder',
+        poolOrder,
+        chain.contracts,
+      );
+
+      const computeUserOrder = async () => {
+        const [{ address }, clerkAddress] = await Promise.all([
+          keystore.load(),
+          chain.contracts.fetchClerkAddress(),
+        ]);
+        const volume = minBn([appVolume, dataVolume, poolVolume]);
+        const unsignedOrder = templates.createOrder('userorder', {
+          dapp: appOrder.dapp,
+          dappmaxprice: appOrder.dappprice,
+          data: useDataset
+            ? dataOrder.data
+            : '0x0000000000000000000000000000000000000000',
+          datamaxprice: useDataset ? dataOrder.dataprice : '0',
+          pool: poolOrder.pool,
+          poolmaxprice: poolOrder.poolprice,
+          requester: address,
+          volume: volume.toString(),
+        });
+        await prompt.signGeneratedOrder('userorder', pretty(unsignedOrder));
+        const domain = getEIP712Domain(chain.id, clerkAddress);
+        const signed = order.signUserOrder(unsignedOrder, domain);
+        return signed;
+      };
+
+      const userOrder = userOrderInput || (await computeUserOrder());
       if (!userOrder) {
         throw new Error('Missing userorder');
       }
-      debug('userOrder', userOrder);
-
-      const useDataset = userOrder.data !== '0x0000000000000000000000000000000000000000';
       const useWorkerpool = userOrder.pool !== '0x0000000000000000000000000000000000000000';
 
       // address matching check
@@ -283,23 +326,6 @@ cli
         );
       }
       // volumes check
-      const appVolume = await order.checkRemainingVolume(
-        'apporder',
-        appOrder,
-        chain.contracts,
-      );
-      const dataVolume = useDataset
-        ? await order.checkRemainingVolume(
-          'dataorder',
-          dataOrder,
-          chain.contracts,
-        )
-        : new BN(2).pow(new BN(256)).sub(new BN(1));
-      const poolVolume = await order.checkRemainingVolume(
-        'poolorder',
-        poolOrder,
-        chain.contracts,
-      );
       const userVolume = await order.checkRemainingVolume(
         'userorder',
         userOrder,
@@ -336,7 +362,7 @@ cli
       const totalCost = costPerWork.mul(maxVolume);
       const payableVolume = stake.div(costPerWork);
       if (stake.lt(totalCost) && !cmd.force) await prompt.limitedStake(totalCost, stake, payableVolume);
-      // send matchOrder
+      // all checks passed send matchOrder
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(
         appOrder,
