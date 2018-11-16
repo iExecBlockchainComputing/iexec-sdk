@@ -166,7 +166,16 @@ const prompt = {
   placeOrder: (volume, category, value) => question(
     `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
   ),
-  cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName} ? ${order}`),
+  cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
+  signGeneratedOrder: (orderName, order) => question(
+    `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
+  ),
+  limitedVolume: (available, ask) => question(
+    `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
+  ),
+  limitedStake: (totalCost, stake, payableVolume) => question(
+    `total cost is ${totalCost} nRLC and you have ${stake} nRLC staked on your account. Your stake allows you to purchase ${payableVolume} work, do you want to continue?`,
+  ),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);
