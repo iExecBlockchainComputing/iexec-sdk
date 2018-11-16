@@ -146,24 +146,24 @@ async function main() {
 
         const [
           rlcAddress,
-          marketplaceAddress,
-          appHubAddress,
-          datasetHubAddress,
-          workerPoolHubAddress,
+          clerkAddress,
+          dappRegistryAddress,
+          dataRegistryAddress,
+          poolRegistryAddress,
         ] = await Promise.all([
           chain.contracts.fetchRLCAddress({
             hub: hubAddress,
           }),
-          chain.contracts.fetchMarketplaceAddress({
+          chain.contracts.fetchClerkAddress({
             hub: hubAddress,
           }),
-          chain.contracts.fetchAppHubAddress({
+          chain.contracts.fetchDappRegistryAddress({
             hub: hubAddress,
           }),
-          chain.contracts.fetchDatasetHubAddress({
+          chain.contracts.fetchDataRegistryAddress({
             hub: hubAddress,
           }),
-          chain.contracts.fetchWorkerPoolHubAddress({
+          chain.contracts.fetchPoolRegistryAddress({
             hub: hubAddress,
           }),
         ]);
@@ -171,10 +171,10 @@ async function main() {
         const iexecAddresses = {
           'hub address': hubAddress || chain.contracts.hubAddress,
           'RLC ERC20 address': rlcAddress,
-          'marketplace address': marketplaceAddress,
-          'app hub address': appHubAddress,
-          'dataset hub address': datasetHubAddress,
-          'workerPool hub address': workerPoolHubAddress,
+          'clerk address': clerkAddress,
+          'dapp registry address': dappRegistryAddress,
+          'data registry address': dataRegistryAddress,
+          'pool registry address': poolRegistryAddress,
         };
         spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`);
       } catch (error) {
