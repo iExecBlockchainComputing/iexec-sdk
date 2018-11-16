@@ -29,7 +29,10 @@ cli
   .action(async () => {
     const spinner = Spinner();
     try {
-      const { saved, fileName } = await initObj(objName);
+      const { address } = await load();
+      const { saved, fileName } = await initObj(objName, {
+        overwrite: { owner: address },
+      });
       spinner.succeed(
         `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
           saved,

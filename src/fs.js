@@ -9,7 +9,6 @@ const {
 } = require('iexec-schema-validator');
 const { prompt } = require('./cli-helper');
 const templates = require('./templates');
-const { createOrder } = require('./templates');
 
 const debug = Debug('iexec:fs');
 
@@ -138,10 +137,10 @@ const initChainConf = async (options) => {
   return { saved: templates.chains, fileName };
 };
 
-const initObj = async (objName, { obj } = {}) => {
+const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   try {
     const iexecConf = await loadIExecConf();
-    iexecConf[objName] = obj || templates[objName];
+    iexecConf[objName] = obj || templates.overwriteObject(templates[objName], overwrite);
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: iexecConf[objName], fileName };
   } catch (error) {
@@ -153,7 +152,7 @@ const initObj = async (objName, { obj } = {}) => {
 const initOrder = async (orderName, overwrite) => {
   try {
     const iexecConf = await loadIExecConf();
-    const order = createOrder(orderName, overwrite);
+    const order = templates.createOrder(orderName, overwrite);
     if (typeof iexecConf.order !== 'object') iexecConf.order = {};
     iexecConf.order[orderName] = order;
     const fileName = await saveIExecConf(iexecConf, { force: true });

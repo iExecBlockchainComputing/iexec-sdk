@@ -119,6 +119,7 @@ const chains = {
 };
 
 const createOrder = (orderName, overwrite = {}) => Object.assign({}, order[orderName], overwrite);
+const overwriteObject = (obj, overwrite = {}) => Object.assign({}, obj, overwrite);
 
 module.exports = {
   main,
@@ -127,5 +128,6 @@ module.exports = {
   workerPool,
   category,
   chains,
+  overwriteObject,
   createOrder,
 };
