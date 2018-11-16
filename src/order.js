@@ -1,8 +1,8 @@
 const Debug = require('debug');
-const ethers = require('ethers');
+const BN = require('bn.js');
 const { getSalt, hashStruct } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
-const { checkEvent, getEventFromLogs } = require('./utils');
+const { checkEvent, getEventFromLogs, ethersBnToBn } = require('./utils');
 
 const debug = Debug('iexec:order');
 
@@ -155,16 +155,16 @@ const checkRemainingVolume = async (
   contracts,
   { strict = true } = {},
 ) => {
-  const initial = ethers.utils.bigNumberify(order.volume);
+  const initial = new BN(order.volume);
   const orderHash = hashStruct(
     objDesc[orderName].structType,
     objDesc[orderName].structMembers,
     order,
   );
   const clerkContract = contracts.getClerkContract();
-  const consumed = await clerkContract.viewConsumed(orderHash);
+  const consumed = ethersBnToBn(await clerkContract.viewConsumed(orderHash));
   const remain = initial.sub(consumed);
-  if (remain.lte(ethers.utils.bigNumberify(0)) && strict) throw new Error(`${orderName} is fully consumed`);
+  if (remain.lte(new BN(0)) && strict) throw new Error(`${orderName} is fully consumed`);
   return remain;
 };
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const Debug = require('debug');
+const BN = require('bn.js');
 const cli = require('commander');
 const {
   help,
@@ -24,6 +25,7 @@ const {
 const { loadChain } = require('./chains.js');
 const keystore = require('./keystore');
 const order = require('./order');
+const account = require('./account');
 const { getEIP712Domain } = require('./sig-utils');
 
 const debug = Debug('iexec:iexec-order');
@@ -277,18 +279,68 @@ cli
           'pool address mismatch between userorder and poolorder',
         );
       }
-
-      await order.checkRemainingVolume('apporder', appOrder, chain.contracts);
-      if (useDataset) {
-        await order.checkRemainingVolume(
+      // volumes check
+      const appVolume = await order.checkRemainingVolume(
+        'apporder',
+        appOrder,
+        chain.contracts,
+      );
+      debug('appVolume', appVolume);
+      const dataVolume = useDataset
+        ? await order.checkRemainingVolume(
           'dataorder',
           dataOrder,
           chain.contracts,
+        )
+        : new BN(
+          '99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999',
+        );
+      debug('dataVolume', dataVolume);
+      const poolVolume = await order.checkRemainingVolume(
+        'poolorder',
+        poolOrder,
+        chain.contracts,
+      );
+      debug('poolVolume', poolVolume);
+      const userVolume = await order.checkRemainingVolume(
+        'userorder',
+        userOrder,
+        chain.contracts,
+      );
+      debug('userVolume', userVolume);
+
+      // price check
+      const poolPrice = new BN(poolOrder.poolprice);
+      const poolMaxPrice = new BN(userOrder.poolmaxprice);
+      const appPrice = new BN(appOrder.dappprice);
+      const appMaxPrice = new BN(userOrder.dappmaxprice);
+      const dataPrice = useDataset ? new BN(dataOrder.dataprice) : new BN(0);
+      const dataMaxPrice = new BN(userOrder.datamaxprice);
+      if (appMaxPrice.lt(appPrice)) throw new Error(`dappmaxprice to low, expected ${appPrice.toString()}`);
+      if (poolMaxPrice.lt(poolPrice)) {
+        throw new Error(
+          `poolmaxprice to low, expected ${poolPrice.toString()}`,
         );
       }
-      await order.checkRemainingVolume('poolorder', poolOrder, chain.contracts);
-      await order.checkRemainingVolume('userorder', userOrder, chain.contracts);
-
+      if (dataMaxPrice.lt(dataPrice)) {
+        throw new Error(
+          `datamaxprice to low, expected ${dataPrice.toString()}`,
+        );
+      }
+      // account stake check
+      const costPerWork = appPrice.add(dataPrice).add(poolPrice);
+      debug('costPerWork', costPerWork);
+      const { stake } = await account.checkBalance(
+        chain.contracts,
+        userOrder.requester,
+      );
+      debug('stake', stake);
+      if (stake.lt(costPerWork)) {
+        throw new Error(
+          `Cost per work is ${costPerWork.toString()} nRLC and you have ${stake.toString()} nRLC staked on your account. You should run "iexec account deposit <amount>" to top up your account`,
+        );
+      }
+      // send matchOrder
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(
         appOrder,
