@@ -118,26 +118,6 @@ const chains = {
   },
 };
 
-const sellLimitOrder = {
-  category: 1,
-  value: 10,
-  workerPool: '0x0000000000000000000000000000000000000000',
-  volume: 1,
-};
-
-const buyMarketOrder = {
-  app: '0x0000000000000000000000000000000000000000',
-  dataset: '0x0000000000000000000000000000000000000000',
-  params: {
-    cmdline: '--help',
-  },
-};
-
-const defaultOrder = {
-  sell: sellLimitOrder,
-  buy: buyMarketOrder,
-};
-
 const createOrder = (orderName, overwrite = {}) => Object.assign({}, order[orderName], overwrite);
 
 module.exports = {
@@ -147,6 +127,5 @@ module.exports = {
   workerPool,
   category,
   chains,
-  defaultOrder,
   createOrder,
 };
