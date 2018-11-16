@@ -264,6 +264,7 @@ cli
       const useDataset = userOrder.data !== '0x0000000000000000000000000000000000000000';
       const useWorkerpool = userOrder.pool !== '0x0000000000000000000000000000000000000000';
 
+      // address matching check
       if (userOrder.dapp !== appOrder.dapp) {
         throw new Error(
           'dapp address mismatch between userorder and dapporder',
