@@ -78,9 +78,7 @@ const createCategory = async (contracts, obj, options) => {
 const showCategory = async (contracts, index, options) => {
   const spinner = Spinner();
   spinner.start(info.showing('category'));
-
   const categoryRPC = await contracts.getCategoryByIndex(index, options);
-
   spinner.succeed(
     `Category at index ${index} details:${prettyRPC(categoryRPC)}`,
   );
@@ -91,10 +89,12 @@ const countCategory = async (contracts, options) => {
   const spinner = Spinner();
   spinner.start(info.counting('category'));
 
-  const count = await contracts.getHubContract(options).countCategory();
+  const countBN = ethersBnToBn(
+    await contracts.getHubContract(options).countCategory(),
+  );
 
-  spinner.succeed(`iExec hub has a total of ${count} category`);
-  return count;
+  spinner.succeed(`iExec hub has a total of ${countBN} category`);
+  return countBN;
 };
 
 module.exports = {
