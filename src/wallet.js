@@ -1,7 +1,8 @@
 const Debug = require('debug');
 const fetch = require('cross-fetch');
-const EthJS = require('ethjs');
+const BN = require('bn.js');
 const { Spinner } = require('./cli-helper');
+const { ethersBnToBn } = require('./utils');
 
 const debug = Debug('iexec:wallet');
 
@@ -62,8 +63,8 @@ const checkBalances = async (contracts, address) => {
 
   const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
   const balances = {
-    wei: weiBalance,
-    nRLC: rlcBalance,
+    wei: ethersBnToBn(weiBalance),
+    nRLC: ethersBnToBn(rlcBalance),
   };
   debug('balances', balances);
   return balances;
@@ -150,11 +151,11 @@ const sendRLC = async (contracts, amount, to) => {
 const sweep = async (contracts, address, to) => {
   const balances = await checkBalances(contracts, address);
 
-  if (balances.nRLC.gt(new EthJS.BN(0))) {
+  if (balances.nRLC.gt(new BN(0))) {
     await sendRLC(contracts, balances.nRLC, to);
   }
 
-  const txFee = new EthJS.BN('10000000000000000');
+  const txFee = new BN('10000000000000000');
   debug('txFee.toString()', txFee.toString());
   debug('balances.wei.toString()', balances.wei.toString());
 
@@ -162,7 +163,7 @@ const sweep = async (contracts, address, to) => {
 
   const sweepETH = balances.wei.sub(txFee);
   debug('sweepETH.toString()', sweepETH.toString());
-  if (balances.wei.gt(new EthJS.BN(txFee))) {
+  if (balances.wei.gt(new BN(txFee))) {
     await sendETH(contracts, sweepETH, address, to);
   }
   return true;

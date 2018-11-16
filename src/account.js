@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const { Spinner, info } = require('./cli-helper');
-const { checkEvent } = require('./utils');
+const { checkEvent, ethersBnToBn } = require('./utils');
 
 const debug = Debug('iexec:account');
 
@@ -32,8 +32,8 @@ const checkBalance = async (contracts, address) => {
   });
   const { stake, locked } = await clerkContract.viewAccount(address);
   const balance = {
-    stake,
-    locked,
+    stake: ethersBnToBn(stake),
+    locked: ethersBnToBn(locked),
   };
   debug('balance', balance);
   return balance;
