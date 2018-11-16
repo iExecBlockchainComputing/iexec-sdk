@@ -15,6 +15,7 @@ const {
   command,
   prompt,
 } = require('./cli-helper');
+const { minBn } = require('./utils');
 const {
   loadIExecConf,
   initOrder,
@@ -116,6 +117,7 @@ cli
   .option(...option.signDataOrder())
   .option(...option.signPoolOrder())
   .option(...option.signUserOrder())
+  .option(...option.force())
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
@@ -286,30 +288,25 @@ cli
         appOrder,
         chain.contracts,
       );
-      debug('appVolume', appVolume);
       const dataVolume = useDataset
         ? await order.checkRemainingVolume(
           'dataorder',
           dataOrder,
           chain.contracts,
         )
-        : new BN(
-          '99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999',
-        );
-      debug('dataVolume', dataVolume);
+        : new BN(2).pow(new BN(256)).sub(new BN(1));
       const poolVolume = await order.checkRemainingVolume(
         'poolorder',
         poolOrder,
         chain.contracts,
       );
-      debug('poolVolume', poolVolume);
       const userVolume = await order.checkRemainingVolume(
         'userorder',
         userOrder,
         chain.contracts,
       );
-      debug('userVolume', userVolume);
-
+      const maxVolume = minBn([appVolume, dataVolume, poolVolume, userVolume]);
+      if (userVolume.gt(maxVolume) && !cmd.force) await prompt.limitedVolume(maxVolume, userVolume);
       // price check
       const poolPrice = new BN(poolOrder.poolprice);
       const poolMaxPrice = new BN(userOrder.poolmaxprice);
@@ -317,20 +314,15 @@ cli
       const appMaxPrice = new BN(userOrder.dappmaxprice);
       const dataPrice = useDataset ? new BN(dataOrder.dataprice) : new BN(0);
       const dataMaxPrice = new BN(userOrder.datamaxprice);
-      if (appMaxPrice.lt(appPrice)) throw new Error(`dappmaxprice to low, expected ${appPrice.toString()}`);
+      if (appMaxPrice.lt(appPrice)) throw new Error(`dappmaxprice to low, expected ${appPrice}`);
       if (poolMaxPrice.lt(poolPrice)) {
-        throw new Error(
-          `poolmaxprice to low, expected ${poolPrice.toString()}`,
-        );
+        throw new Error(`poolmaxprice to low, expected ${poolPrice}`);
       }
       if (dataMaxPrice.lt(dataPrice)) {
-        throw new Error(
-          `datamaxprice to low, expected ${dataPrice.toString()}`,
-        );
+        throw new Error(`datamaxprice to low, expected ${dataPrice}`);
       }
       // account stake check
       const costPerWork = appPrice.add(dataPrice).add(poolPrice);
-      debug('costPerWork', costPerWork);
       const { stake } = await account.checkBalance(
         chain.contracts,
         userOrder.requester,
@@ -338,9 +330,12 @@ cli
       debug('stake', stake);
       if (stake.lt(costPerWork)) {
         throw new Error(
-          `Cost per work is ${costPerWork.toString()} nRLC and you have ${stake.toString()} nRLC staked on your account. You should run "iexec account deposit <amount>" to top up your account`,
+          `cost per work is ${costPerWork} nRLC and you have ${stake} nRLC staked on your account. You should run "iexec account deposit <amount>" to top up your account`,
         );
       }
+      const totalCost = costPerWork.mul(maxVolume);
+      const payableVolume = stake.div(costPerWork);
+      if (stake.lt(totalCost) && !cmd.force) await prompt.limitedStake(totalCost, stake, payableVolume);
       // send matchOrder
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(

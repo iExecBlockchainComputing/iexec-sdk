@@ -11,6 +11,15 @@ const debug = Debug('iexec:utils');
 const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
+const minBn = (bnArray) => {
+  let min = new BN(bnArray[0]);
+  bnArray.map((e) => {
+    if (e.lt(min)) min = e;
+    return min;
+  });
+  return min;
+};
+
 const getContractAddress = (desc, chainID, { strict = true } = {}) => {
   try {
     if (!('networks' in desc)) {
@@ -143,6 +152,7 @@ module.exports = {
   isEthAddress,
   checkEvent,
   getEventFromLogs,
+  minBn,
   bnToEthersBn,
   ethersBnToBn,
   toUpperFirst,
