@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const { isEthAddress } = require('./utils');
+const { isEthAddress, ethersBnToBn } = require('./utils');
 const { Spinner, info, prettyRPC } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
@@ -53,13 +53,15 @@ const countObj = objName => async (contracts, userAddress, options) => {
   const spinner = Spinner();
   spinner.start(info.counting(objName));
 
-  const objCount = await contracts.getUserObjCount(objName)(
-    userAddress,
-    options,
+  const objCountBN = ethersBnToBn(
+    await contracts.getUserObjCount(objName)(userAddress, options),
   );
+  debug('objCountBN', objCountBN);
 
-  spinner.succeed(`User ${userAddress} has a total of ${objCount} ${objName}`);
-  return objCount;
+  spinner.succeed(
+    `User ${userAddress} has a total of ${objCountBN} ${objName}`,
+  );
+  return objCountBN;
 };
 
 const createCategory = async (contracts, obj, options) => {

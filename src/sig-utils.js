@@ -268,6 +268,8 @@ const hashStruct = (type, members, obj) => {
   const values = [typeHash].concat(
     members.map((e) => {
       if (e.type === 'string') return ethersKeccak256(Buffer.from(obj[e.name], 'utf8'));
+      if (e.type === 'uint256') return ethers.utils.bigNumberify(obj[e.name]);
+      if (e.type === 'uint8') return ethers.utils.bigNumberify(obj[e.name]);
       return obj[e.name];
     }),
   );
