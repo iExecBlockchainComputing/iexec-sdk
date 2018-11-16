@@ -3,8 +3,13 @@ const ethUtil = require('ethjs-util');
 const jws = require('jws');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
+const BN = require('bn.js');
+const ethers = require('ethers');
 
 const debug = Debug('iexec:utils');
+
+const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
+const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
 const getContractAddress = (desc, chainID, { strict = true } = {}) => {
   try {
@@ -138,6 +143,8 @@ module.exports = {
   isEthAddress,
   checkEvent,
   getEventFromLogs,
+  bnToEthersBn,
+  ethersBnToBn,
   toUpperFirst,
   secToDate,
   decodeJWTForPrint,
