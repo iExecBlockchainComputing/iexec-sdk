@@ -161,7 +161,10 @@ const checkRemainingVolume = async (
     objDesc[orderName].structMembers,
     order,
   );
-  const clerkContract = contracts.getClerkContract();
+  const clerkAddress = await contracts.fetchClerkAddress();
+  const clerkContract = contracts.getClerkContract({
+    at: clerkAddress,
+  });
   const consumed = ethersBnToBn(await clerkContract.viewConsumed(orderHash));
   const remain = initial.sub(consumed);
   if (remain.lte(new BN(0)) && strict) throw new Error(`${orderName} is fully consumed`);
@@ -201,7 +204,8 @@ const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
-  const clerkContact = contracts.getClerkContract();
+  const clerkAddress = await contracts.fetchClerkAddress();
+  const clerkContact = contracts.getClerkContract({ at: clerkAddress });
   const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
   const txReceipt = await tx.wait();
   const logs = contracts.decodeClerkLogs(txReceipt.logs);
@@ -226,7 +230,8 @@ const matchOrders = async (
   const poolOrderStruct = signedOrderToStruct('poolorder', poolOrder);
   const userOrderStruct = signedOrderToStruct('userorder', userOrder);
 
-  const clerkContact = contracts.getClerkContract();
+  const clerkAddress = await contracts.fetchClerkAddress();
+  const clerkContact = contracts.getClerkContract({ at: clerkAddress });
   debug('appOrderStruct', appOrderStruct);
   debug('dataOrderStruct', dataOrderStruct);
   debug('poolOrderStruct', poolOrderStruct);
