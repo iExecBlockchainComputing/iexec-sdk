@@ -360,8 +360,12 @@ cli
         );
       }
       const totalCost = costPerWork.mul(maxVolume);
-      const payableVolume = stake.div(costPerWork);
-      if (stake.lt(totalCost) && !cmd.force) await prompt.limitedStake(totalCost, stake, payableVolume);
+      if (stake.lt(totalCost) && !cmd.force) {
+        const payableVolume = costPerWork.isZero()
+          ? new BN(0)
+          : stake.div(costPerWork);
+        await prompt.limitedStake(totalCost, stake, payableVolume);
+      }
       // all checks passed send matchOrder
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(
