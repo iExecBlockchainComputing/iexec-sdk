@@ -12,6 +12,8 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
+    when:
+      branch: [ master, next ]
 
   npm:
     image: plugins/npm
