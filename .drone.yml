@@ -12,8 +12,6 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
-    when:
-      ref: [refs/tags/v*]
 
   npm:
     image: plugins/npm
