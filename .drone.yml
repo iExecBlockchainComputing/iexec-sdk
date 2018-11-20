@@ -1,7 +1,6 @@
 matrix:
   NODE_TAG:
     - 10
-    - 9
     - 8
 
 pipeline:
