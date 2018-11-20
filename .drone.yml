@@ -63,4 +63,4 @@ services:
   ethereum:
     image: iexechub/poco-chain
     entrypoint: [ "/home/parity/bin/parity" ]
-    command: [ "--chain /iexec-poco/parity/spec.json --config /iexec-poco/parity/authority.toml -d /iexec-poco/parity/data --geth" ]
+    command: [ "--chain", "/iexec-poco/parity/spec.json", "--config", "/iexec-poco/parity/authority.toml", "-d", "/iexec-poco/parity/data", "--geth" ]
