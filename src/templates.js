@@ -95,7 +95,7 @@ const chains = {
   chains: {
     dev: {
       host: 'http://localhost:8545',
-      id: '1337',
+      id: '17',
       hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
       scheduler: 'https://pool1api.iex.ec',
     },
