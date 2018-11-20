@@ -23,9 +23,13 @@ test('iexec init', async () => {
 
 test('iexec wallet create', () => expect(execAsync(`${iexecPath} wallet create --force`)).resolves.not.toBe(1));
 
-test('iexec wallet encrypt', () => expect(
-  execAsync(`${iexecPath} wallet encrypt --password toto --force`),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet encrypt',
+  () => expect(
+    execAsync(`${iexecPath} wallet encrypt --password toto --force`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 test(
   'iexec wallet decrypt',
