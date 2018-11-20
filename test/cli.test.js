@@ -27,9 +27,13 @@ test('iexec wallet encrypt', () => expect(
   execAsync(`${iexecPath} wallet encrypt --password toto --force`),
 ).resolves.not.toBe(1));
 
-test('iexec wallet decrypt', () => expect(
-  execAsync(`${iexecPath} wallet decrypt --password toto --force`),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet decrypt',
+  () => expect(
+    execAsync(`${iexecPath} wallet decrypt --password toto --force`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 test('iexec wallet show', () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1));
 
@@ -58,7 +62,7 @@ test('iexec account show', () => expect(execAsync(`${iexecPath} account show`)).
 test(
   'iexec account deposit 1000',
   () => expect(execAsync(`${iexecPath} account deposit 1000`)).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec account withdraw 1000',
