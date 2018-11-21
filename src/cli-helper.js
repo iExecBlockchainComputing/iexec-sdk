@@ -97,7 +97,11 @@ const option = {
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
-  force: () => ['--force', 'force wallet creation even if old wallet exists'],
+  forceCreate: () => [
+    '--force',
+    'force wallet creation even if old wallet exists',
+  ],
+  force: () => ['--force', 'force perform action without prompting user'],
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
     '--download [fileName]',
