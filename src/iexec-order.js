@@ -390,6 +390,7 @@ cli
   .option(...option.cancelPoolOrder())
   .option(...option.cancelUserOrder())
   .option(...option.chain())
+  .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
     const spinner = Spinner();
@@ -410,7 +411,7 @@ cli
             } in "orders.json"`,
           );
         }
-        await prompt.cancelOrder(orderName, pretty(orderToCancel));
+        if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
         spinner.start('canceling order');
         await order.cancelOrder(orderName, orderToCancel, chain.contracts);
         spinner.succeed(`${orderName} successfully canceled`);
