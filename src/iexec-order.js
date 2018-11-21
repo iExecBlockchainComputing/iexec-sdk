@@ -384,6 +384,49 @@ cli
   });
 
 cli
+  .command(command.publish())
+  .option(...option.publishAppOrder())
+  .option(...option.publishDataOrder())
+  .option(...option.publishPoolOrder())
+  .option(...option.publishUserOrder())
+  .option(...option.force())
+  .option(...option.chain())
+  .description(desc.publish(objName))
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      if (!(cmd.app || cmd.data || cmd.pool || cmd.user)) throw new Error('No option specified, you should choose one');
+
+      const [chain, signedOrders] = await Promise.all([
+        loadChain(cmd.chain),
+        loadSignedOrders(),
+      ]);
+
+      const publishOrder = async (orderName) => {
+        const orderToPublish = signedOrders[chain.id][orderName];
+        if (!orderToPublish) {
+          throw new Error(
+            `Missing signed ${orderName} for chain ${
+              chain.id
+            } in "orders.json"`,
+          );
+        }
+        if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+        spinner.start('publishing order');
+        await order.publishOrder(chain.id, orderName, orderToPublish);
+        spinner.succeed(`${orderName} successfully published`);
+      };
+
+      if (cmd.app) await publishOrder('apporder');
+      if (cmd.data) await publishOrder('dataorder');
+      if (cmd.pool) await publishOrder('poolorder');
+      if (cmd.user) await publishOrder('userorder');
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
+cli
   .command(command.cancel())
   .option(...option.cancelAppOrder())
   .option(...option.cancelDataOrder())

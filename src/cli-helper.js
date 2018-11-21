@@ -44,6 +44,7 @@ const command = {
   fill: () => 'fill',
   cancel: () => 'cancel',
   sign: () => 'sign',
+  publish: () => 'publish',
 };
 
 const desc = {
@@ -76,6 +77,7 @@ const desc = {
   sgxInit: () => 'init the SGX folders tree structure',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
+  publish: objName => `publish a signed ${objName}`,
 };
 
 const option = {
@@ -94,6 +96,22 @@ const option = {
   cancelDataOrder: () => ['--data', 'cancel a signed dataorder'],
   cancelPoolOrder: () => ['--pool', 'cancel a signed poolorder'],
   cancelUserOrder: () => ['--user', 'cancel a signed userorder'],
+  publishAppOrder: () => [
+    '--app',
+    'publish a signed apporder on iExec marketplace',
+  ],
+  publishDataOrder: () => [
+    '--data',
+    'publish a signed dataorder on iExec marketplace',
+  ],
+  publishPoolOrder: () => [
+    '--pool',
+    'publish a signed poolorder on iExec marketplace',
+  ],
+  publishUserOrder: () => [
+    '--user',
+    'publish a signed userorder on iExec marketplace',
+  ],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
@@ -171,6 +189,7 @@ const prompt = {
     `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
+  publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
   signGeneratedOrder: (orderName, order) => question(
     `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
   ),

@@ -2,7 +2,9 @@ const Debug = require('debug');
 const BN = require('bn.js');
 const { getSalt, hashStruct } = require('./sig-utils');
 const { signStruct, load } = require('./keystore.js');
-const { checkEvent, getEventFromLogs, ethersBnToBn } = require('./utils');
+const {
+  checkEvent, getEventFromLogs, ethersBnToBn, http,
+} = require('./utils');
 
 const debug = Debug('iexec:order');
 
@@ -50,6 +52,7 @@ const objDesc = {
     contractName: 'dapp',
     cancelMethode: 'cancelDappOrder',
     cancelEvent: 'ClosedDappOrder',
+    apiEndpoint: 'apporders',
   },
   dataorder: {
     structType:
@@ -68,6 +71,7 @@ const objDesc = {
     contractName: 'data',
     cancelMethode: 'cancelDataOrder',
     cancelEvent: 'ClosedDataOrder',
+    apiEndpoint: 'datasetorders',
   },
   poolorder: {
     structType:
@@ -88,6 +92,7 @@ const objDesc = {
     contractName: 'pool',
     cancelMethode: 'cancelPoolOrder',
     cancelEvent: 'ClosedPoolOrder',
+    apiEndpoint: 'workerpoolorders',
   },
   userorder: {
     structType:
@@ -111,6 +116,7 @@ const objDesc = {
     ],
     cancelMethode: 'cancelUserOrder',
     cancelEvent: 'ClosedUserOrder',
+    apiEndpoint: 'requestorders',
   },
   sign: {
     structMembers: [
@@ -218,6 +224,20 @@ const cancelDataOrder = (order, domain) => cancelOrder('dataorder', order, domai
 const cancelPoolOrder = (order, domain) => cancelOrder('poolorder', order, domain);
 const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domain);
 
+const publishOrder = async (chainID, orderName, orderToPublish) => {
+  try {
+    const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
+    debug('endpoint', endpoint);
+    const body = { chainID, order: orderToPublish };
+    debug('body', body);
+    const response = await http.post(endpoint, body);
+    debug('response', response);
+  } catch (error) {
+    debug('publishOrder()', error);
+    throw error;
+  }
+};
+
 const matchOrders = async (
   appOrder,
   dataOrder = NULLDATASET,
@@ -265,6 +285,7 @@ module.exports = {
   cancelPoolOrder,
   cancelUserOrder,
   checkRemainingVolume,
+  publishOrder,
   signAppOrder,
   signDataOrder,
   signPoolOrder,

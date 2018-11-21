@@ -191,6 +191,7 @@ iexec order init # init all kind of orders
 iexec order init --app --data --pool --user # specify the kind of order to init
 iexec order sign # sign all initialized orders
 iexec order sign --app --data --pool --user # sign the specific initialized orders
+iexec order publish --app --data --pool --user # publish the specific signed orders on iExec marketplace
 iexec order place # NOT IMPLEMENTED
 iexec order show <orderID> # NOT IMPLEMENTED
 iexec order fill # fill a set of signed orders (app + data + pool + user) and return a dealID
