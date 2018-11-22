@@ -413,8 +413,14 @@ cli
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
         spinner.start('publishing order');
-        await order.publishOrder(chain.id, orderName, orderToPublish);
-        spinner.succeed(`${orderName} successfully published`);
+        const orderHash = await order.publishOrder(
+          chain.id,
+          orderName,
+          orderToPublish,
+        );
+        spinner.succeed(
+          `${orderName} successfully published whith orderHash ${orderHash}`,
+        );
       };
 
       if (cmd.app) await publishOrder('apporder');

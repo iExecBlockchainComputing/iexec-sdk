@@ -232,6 +232,10 @@ const publishOrder = async (chainID, orderName, orderToPublish) => {
     debug('body', body);
     const response = await http.post(endpoint, body);
     debug('response', response);
+    if (response.ok && response.saved && response.saved.orderHash) {
+      return response.saved.orderHash;
+    }
+    throw new Error('An error occured while publishing order');
   } catch (error) {
     debug('publishOrder()', error);
     throw error;
