@@ -1,10 +1,13 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { getSalt, hashStruct } = require('./sig-utils');
-const { signStruct, load } = require('./keystore.js');
 const {
-  checkEvent, getEventFromLogs, ethersBnToBn, http,
+  checkEvent,
+  getEventFromLogs,
+  ethersBnToBn,
+  http,
+  getSalt,
 } = require('./utils');
+const { hashStruct } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
@@ -127,6 +130,13 @@ const objDesc = {
   },
 };
 
+const getEIP712Domain = (chainId, verifyingContract) => ({
+  name: 'iExecODB',
+  version: '3.0-alpha',
+  chainId,
+  verifyingContract,
+});
+
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
   const struct = objDesc[objName].structMembers.reduce(reducer, []);
@@ -140,19 +150,13 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const checkContractOwner = async (orderName, orderObj, contracts) => {
+const getContractOwner = async (orderName, orderObj, contracts) => {
   const contractAddress = orderObj[objDesc[orderName].contractPropName];
   const contract = contracts.getContract(objDesc[orderName].contractName)({
     at: contractAddress,
   });
   const owner = await contract.m_owner();
-  const { address } = await load();
-  if (owner.toLowerCase() !== address.toLowerCase()) {
-    throw new Error(
-      `only owner ${owner} can sign order for contract ${address}`,
-    );
-  }
-  return true;
+  return owner;
 };
 
 const checkRemainingVolume = async (
@@ -177,36 +181,56 @@ const checkRemainingVolume = async (
   return remain;
 };
 
-const signOrder = async (orderName, orderObj, domainObj) => {
-  const domain = {
-    structType: objDesc.EIP712Domain.structType,
-    structMembers: objDesc.EIP712Domain.structMembers,
-    values: domainObj,
-  };
-  debug('domain', domain);
-
+const signOrder = async (orderName, orderObj, domainObj, eth) => {
   const salt = getSalt();
-  debug('salt', salt);
-
   const saltedOrderObj = Object.assign(orderObj, { salt });
-  const order = {
-    structType: objDesc[orderName].structType,
-    structMembers: objDesc[orderName].structMembers,
-    values: saltedOrderObj,
-  };
-  debug('order', order);
 
-  const sign = await signStruct(order, domain);
+  const domain = [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'verifyingContract', type: 'address' },
+  ];
+
+  const order = objDesc[orderName].structMembers;
+
+  const types = {};
+  types.EIP712Domain = domain;
+  types[orderName] = order;
+
+  const message = orderObj;
+
+  const typedData = {
+    types,
+    domain: domainObj,
+    primaryType: orderName,
+    message,
+  };
+
+  const signTypedDatav3 = data => new Promise((resolve, reject) => {
+    eth.currentProvider.sendAsync(
+      {
+        method: 'eth_signTypedData_v3',
+        params: [null, data],
+      },
+      (err, { result }) => {
+        if (err) reject(err);
+        resolve(result);
+      },
+    );
+  });
+
+  const sign = await signTypedDatav3(typedData);
   debug('sign', sign);
 
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   debug('signedOrder', signedOrder);
   return signedOrder;
 };
-const signAppOrder = (order, domain) => signOrder('apporder', order, domain);
-const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
-const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
-const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
+const signAppOrder = (order, domain, eth) => signOrder('apporder', order, domain, eth);
+const signDataOrder = (order, domain, eth) => signOrder('dataorder', order, domain, eth);
+const signPoolOrder = (order, domain, eth) => signOrder('poolorder', order, domain, eth);
+const signUserOrder = (order, domain, eth) => signOrder('userorder', order, domain, eth);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
@@ -282,7 +306,8 @@ const matchOrders = async (
 };
 
 module.exports = {
-  checkContractOwner,
+  getEIP712Domain,
+  getContractOwner,
   cancelOrder,
   cancelAppOrder,
   cancelDataOrder,

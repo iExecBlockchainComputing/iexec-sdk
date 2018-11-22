@@ -16,6 +16,7 @@ const createChains = (
     signTransaction,
     accounts,
     signTypedData,
+    signTypedDatav3,
     signMessage,
     signPersonalMessage,
   },
@@ -28,6 +29,7 @@ const createChains = (
         signTransaction,
         accounts,
         signTypedData,
+        signTypedDatav3,
         signMessage,
         signPersonalMessage,
       });

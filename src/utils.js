@@ -147,6 +147,55 @@ const http = {
   post: httpRequest('POST'),
 };
 
+const gatewayAuth = async (chainID, address, eth) => {
+  try {
+    debug('gatewayAuth()');
+
+    const { data } = await httpRequest('POST')('challenge', {
+      chainID,
+    });
+    debug('data', data);
+
+    const typedData = JSON.parse(data);
+    debug('typedData', typedData);
+
+    const signTypedDatav3 = td => new Promise((resolve, reject) => {
+      eth.currentProvider.sendAsync(
+        {
+          method: 'eth_signTypedData_v3',
+          params: [null, td],
+        },
+        (err, { result }) => {
+          if (err) reject(err);
+          resolve(result);
+        },
+      );
+    });
+
+    const sign = await signTypedDatav3(typedData);
+    debug('sign', sign);
+
+    const serializedSign = '0x'
+      .concat(sign.r.substr(2))
+      .concat(sign.s.substr(2))
+      .concat(sign.v.toString(16));
+
+    const body = {
+      data,
+      address,
+      sig: serializedSign,
+    };
+    const response = await httpRequest('POST')('testauth', body);
+    debug('response', response);
+    return response;
+  } catch (error) {
+    debug('gatewayAuth() error', error);
+    throw error;
+  }
+};
+
+const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
+
 module.exports = {
   getContractAddress,
   isEthAddress,
@@ -159,5 +208,7 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
+  gatewayAuth,
   http,
+  getSalt,
 };

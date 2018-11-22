@@ -15,7 +15,7 @@ const {
   command,
   prompt,
 } = require('./cli-helper');
-const { minBn } = require('./utils');
+const { minBn, gatewayAuth, gatewayAuthLegacy } = require('./utils');
 const {
   loadIExecConf,
   initOrder,
@@ -27,7 +27,6 @@ const { loadChain } = require('./chains.js');
 const keystore = require('./keystore');
 const order = require('./order');
 const account = require('./account');
-const { getEIP712Domain } = require('./sig-utils');
 const templates = require('./templates');
 
 const debug = Debug('iexec:iexec-order');
@@ -133,7 +132,10 @@ cli
       ]);
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
-      const domainObj = getEIP712Domain(chain.contracts.chainID, clerkAddress);
+      const domainObj = order.getEIP712Domain(
+        chain.contracts.chainID,
+        clerkAddress,
+      );
 
       const signAppOrder = async () => {
         spinner.start('signing apporder');
@@ -144,10 +146,14 @@ cli
         await chain.contracts.checkDeployedDapp(orderObj.dapp, {
           strict: true,
         });
-        await order.checkContractOwner('apporder', orderObj, chain.contracts, {
+        await order.getContractOwner('apporder', orderObj, chain.contracts, {
           strict: true,
         });
-        const signedOrder = await order.signAppOrder(orderObj, domainObj);
+        const signedOrder = await order.signAppOrder(
+          orderObj,
+          domainObj,
+          chain.ethjs,
+        );
         const { saved, fileName } = await saveSignedOrder(
           'apporder',
           chain.id,
@@ -167,10 +173,14 @@ cli
         await chain.contracts.checkDeployedData(orderObj.data, {
           strict: true,
         });
-        await order.checkContractOwner('dataorder', orderObj, chain.contracts, {
+        await order.getContractOwner('dataorder', orderObj, chain.contracts, {
           strict: true,
         });
-        const signedOrder = await order.signDataOrder(orderObj, domainObj);
+        const signedOrder = await order.signDataOrder(
+          orderObj,
+          domainObj,
+          chain.ethjs,
+        );
         const { saved, fileName } = await saveSignedOrder(
           'dataorder',
           chain.id,
@@ -190,10 +200,14 @@ cli
         await chain.contracts.checkDeployedPool(orderObj.pool, {
           strict: true,
         });
-        await order.checkContractOwner('poolorder', orderObj, chain.contracts, {
+        await order.getContractOwner('poolorder', orderObj, chain.contracts, {
           strict: true,
         });
-        const signedOrder = await order.signPoolOrder(orderObj, domainObj);
+        const signedOrder = await order.signPoolOrder(
+          orderObj,
+          domainObj,
+          chain.ethjs,
+        );
         const { saved, fileName } = await saveSignedOrder(
           'poolorder',
           chain.id,
@@ -213,7 +227,11 @@ cli
         await chain.contracts.checkDeployedDapp(orderObj.dapp, {
           strict: true,
         });
-        const signedOrder = await order.signUserOrder(orderObj, domainObj);
+        const signedOrder = await order.signUserOrder(
+          orderObj,
+          domainObj,
+          chain.ethjs,
+        );
         const { saved, fileName } = await saveSignedOrder(
           'userorder',
           chain.id,
@@ -298,7 +316,7 @@ cli
           volume: volume.toString(),
         });
         await prompt.signGeneratedOrder('userorder', pretty(unsignedOrder));
-        const domain = getEIP712Domain(chain.id, clerkAddress);
+        const domain = order.getEIP712Domain(chain.id, clerkAddress);
         const signed = order.signUserOrder(unsignedOrder, domain);
         return signed;
       };
