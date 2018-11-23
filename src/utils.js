@@ -165,9 +165,9 @@ const gatewayAuth = async (chainID, address, eth) => {
           method: 'eth_signTypedData_v3',
           params: [null, td],
         },
-        (err, { result }) => {
+        (err, result) => {
           if (err) reject(err);
-          resolve(result);
+          resolve(result.result);
         },
       );
     });

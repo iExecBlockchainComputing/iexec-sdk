@@ -11,14 +11,14 @@ const { hashStruct } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
-const NULLDATASET = {
-  data: '0x0000000000000000000000000000000000000000',
-  dataprice: '0',
+const NULL_DATASETORDER = {
+  dataset: '0x0000000000000000000000000000000000000000',
+  datasetprice: '0',
   volume: '0',
   tag: '0',
-  dapprestrict: '0x0000000000000000000000000000000000000000',
-  poolrestrict: '0x0000000000000000000000000000000000000000',
-  userrestrict: '0x0000000000000000000000000000000000000000',
+  apprestrict: '0x0000000000000000000000000000000000000000',
+  workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+  requesterrestrict: '0x0000000000000000000000000000000000000000',
   salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
   sign: {
     r: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -38,70 +38,70 @@ const objDesc = {
     ],
   },
   apporder: {
-    primaryType: 'DappOrder',
+    primaryType: 'AppOrder',
     structMembers: [
-      { name: 'dapp', type: 'address' },
-      { name: 'dappprice', type: 'uint256' },
+      { name: 'app', type: 'address' },
+      { name: 'appprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
-      { name: 'datarestrict', type: 'address' },
-      { name: 'poolrestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'datasetrestrict', type: 'address' },
+      { name: 'workerpoolrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'dapp',
-    contractName: 'dapp',
-    cancelMethode: 'cancelDappOrder',
-    cancelEvent: 'ClosedDappOrder',
+    contractPropName: 'app',
+    contractName: 'app',
+    cancelMethode: 'cancelAppOrder',
+    cancelEvent: 'ClosedAppOrder',
     apiEndpoint: 'apporders',
   },
-  dataorder: {
-    primaryType: 'DataOrder',
+  datasetorder: {
+    primaryType: 'DatasetOrder',
     structMembers: [
-      { name: 'data', type: 'address' },
-      { name: 'dataprice', type: 'uint256' },
+      { name: 'dataset', type: 'address' },
+      { name: 'datasetprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
-      { name: 'dapprestrict', type: 'address' },
-      { name: 'poolrestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'apprestrict', type: 'address' },
+      { name: 'workerpoolrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'data',
-    contractName: 'data',
-    cancelMethode: 'cancelDataOrder',
-    cancelEvent: 'ClosedDataOrder',
+    contractPropName: 'dataset',
+    contractName: 'dataset',
+    cancelMethode: 'cancelDatasetOrder',
+    cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: 'datasetorders',
   },
-  poolorder: {
-    primaryType: 'PoolOrder',
+  workerpoolorder: {
+    primaryType: 'WorkerpoolOrder',
     structMembers: [
-      { name: 'pool', type: 'address' },
-      { name: 'poolprice', type: 'uint256' },
+      { name: 'workerpool', type: 'address' },
+      { name: 'workerpoolprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
       { name: 'category', type: 'uint256' },
       { name: 'trust', type: 'uint256' },
-      { name: 'dapprestrict', type: 'address' },
-      { name: 'datarestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'apprestrict', type: 'address' },
+      { name: 'datasetrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'pool',
-    contractName: 'pool',
-    cancelMethode: 'cancelPoolOrder',
-    cancelEvent: 'ClosedPoolOrder',
+    contractPropName: 'workerpool',
+    contractName: 'workerpool',
+    cancelMethode: 'cancelWorkerpoolOrder',
+    cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: 'workerpoolorders',
   },
-  userorder: {
-    primaryType: 'UserOrder',
+  requestorder: {
+    primaryType: 'RequestOrder',
     structMembers: [
-      { name: 'dapp', type: 'address' },
-      { name: 'dappmaxprice', type: 'uint256' },
-      { name: 'data', type: 'address' },
-      { name: 'datamaxprice', type: 'uint256' },
-      { name: 'pool', type: 'address' },
-      { name: 'poolmaxprice', type: 'uint256' },
+      { name: 'app', type: 'address' },
+      { name: 'appmaxprice', type: 'uint256' },
+      { name: 'dataset', type: 'address' },
+      { name: 'datasetmaxprice', type: 'uint256' },
+      { name: 'workerpool', type: 'address' },
+      { name: 'workerpoolmaxprice', type: 'uint256' },
       { name: 'requester', type: 'address' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
@@ -112,8 +112,8 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
-    cancelMethode: 'cancelUserOrder',
-    cancelEvent: 'ClosedUserOrder',
+    cancelMethode: 'cancelRequestOrder',
+    cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: 'requestorders',
   },
   sign: {
@@ -208,9 +208,9 @@ const signOrder = async (orderName, orderObj, domainObj, eth) => {
         method: 'eth_signTypedData_v3',
         params: [null, data],
       },
-      (err, { result }) => {
+      (err, result) => {
         if (err) reject(err);
-        resolve(result);
+        resolve(result.result);
       },
     );
   });
@@ -223,9 +223,9 @@ const signOrder = async (orderName, orderObj, domainObj, eth) => {
   return signedOrder;
 };
 const signAppOrder = (order, domain, eth) => signOrder('apporder', order, domain, eth);
-const signDataOrder = (order, domain, eth) => signOrder('dataorder', order, domain, eth);
-const signPoolOrder = (order, domain, eth) => signOrder('poolorder', order, domain, eth);
-const signUserOrder = (order, domain, eth) => signOrder('userorder', order, domain, eth);
+const signDatasetOrder = (order, domain, eth) => signOrder('datasetorder', order, domain, eth);
+const signWorkerpoolOrder = (order, domain, eth) => signOrder('workerpoolorder', order, domain, eth);
+const signRequestOrder = (order, domain, eth) => signOrder('requestorder', order, domain, eth);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
@@ -239,9 +239,9 @@ const cancelOrder = async (orderName, orderObj, contracts) => {
   return true;
 };
 const cancelAppOrder = (order, domain) => cancelOrder('apporder', order, domain);
-const cancelDataOrder = (order, domain) => cancelOrder('dataorder', order, domain);
-const cancelPoolOrder = (order, domain) => cancelOrder('poolorder', order, domain);
-const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domain);
+const cancelDatasetOrder = (order, domain) => cancelOrder('datasetorder', order, domain);
+const cancelWorkerpoolOrder = (order, domain) => cancelOrder('workerpoolorder', order, domain);
+const cancelRequestOrder = (order, domain) => cancelOrder('requestorder', order, domain);
 
 const publishOrder = async (chainID, orderName, orderToPublish) => {
   try {
@@ -263,41 +263,45 @@ const publishOrder = async (chainID, orderName, orderToPublish) => {
 
 const matchOrders = async (
   appOrder,
-  dataOrder = NULLDATASET,
-  poolOrder,
-  userOrder,
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder,
+  requestOrder,
   contracts,
 ) => {
-  const appOrderStruct = signedOrderToStruct('apporder', appOrder);
-  const dataOrderStruct = signedOrderToStruct('dataorder', dataOrder);
-  const poolOrderStruct = signedOrderToStruct('poolorder', poolOrder);
-  const userOrderStruct = signedOrderToStruct('userorder', userOrder);
-
-  const clerkAddress = await contracts.fetchClerkAddress();
-  const clerkContact = contracts.getClerkContract({ at: clerkAddress });
-  debug('appOrderStruct', appOrderStruct);
-  debug('dataOrderStruct', dataOrderStruct);
-  debug('poolOrderStruct', poolOrderStruct);
-  debug('userOrderStruct', userOrderStruct);
-  let logs;
   try {
+    const appOrderStruct = signedOrderToStruct('apporder', appOrder);
+    const datasetOrderStruct = signedOrderToStruct(
+      'datasetorder',
+      datasetOrder,
+    );
+    const workerpoolOrderStruct = signedOrderToStruct(
+      'workerpoolorder',
+      workerpoolOrder,
+    );
+    const requestOrderStruct = signedOrderToStruct(
+      'requestorder',
+      requestOrder,
+    );
+
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
     const tx = await clerkContact.matchOrders(
       appOrderStruct,
-      dataOrderStruct,
-      poolOrderStruct,
-      userOrderStruct,
+      datasetOrderStruct,
+      workerpoolOrderStruct,
+      requestOrderStruct,
     );
     const txReceipt = await tx.wait();
-    logs = contracts.decodeClerkLogs(txReceipt.logs);
+    const logs = contracts.decodeClerkLogs(txReceipt.logs);
+    debug('logs', logs);
+    const matchEvent = 'OrdersMatched';
+    if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
+    const { dealid, volume } = getEventFromLogs(matchEvent, logs);
+    return { dealid, volume };
   } catch (error) {
     debug('matchOrders() error', error);
     throw error;
   }
-  debug('logs', logs);
-  const matchEvent = 'OrdersMatched';
-  if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
-  const { dealid, volume } = getEventFromLogs(matchEvent, logs);
-  return { dealid, volume };
 };
 
 module.exports = {
@@ -305,14 +309,14 @@ module.exports = {
   getContractOwner,
   cancelOrder,
   cancelAppOrder,
-  cancelDataOrder,
-  cancelPoolOrder,
-  cancelUserOrder,
+  cancelDatasetOrder,
+  cancelWorkerpoolOrder,
+  cancelRequestOrder,
   checkRemainingVolume,
   publishOrder,
   signAppOrder,
-  signDataOrder,
-  signPoolOrder,
-  signUserOrder,
+  signDatasetOrder,
+  signWorkerpoolOrder,
+  signRequestOrder,
   matchOrders,
 };
