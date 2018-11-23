@@ -91,8 +91,8 @@ iexec app show # show details of deployed app
 ### Buy & Run work using Marketplace
 
 ```bash
-iexec order init --app --data --pool # init work order fields in iexec.json
-iexec order sign --app --data --pool # sign initialized orders
+iexec order init --app --dataset --workerpool # init work order fields in iexec.json
+iexec order sign --app --dataset --workerpool # sign initialized orders
 iexec order fill # fill all signed orders
 ```
 
@@ -188,14 +188,14 @@ iexec workerpool count --user <userAddress> # count user total number of workerp
 # --chain <chainName>
 # --force
 iexec order init # init all kind of orders
-iexec order init --app --data --pool --user # specify the kind of order to init
+iexec order init --app --dataset --workerpool --request # specify the kind of order to init
 iexec order sign # sign all initialized orders
-iexec order sign --app --data --pool --user # sign the specific initialized orders
-iexec order publish --app --data --pool --user # publish the specific signed orders on iExec marketplace
+iexec order sign --app --dataset --workerpool --request # sign the specific initialized orders
+iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec marketplace
 iexec order place # NOT IMPLEMENTED
 iexec order show <orderID> # NOT IMPLEMENTED
-iexec order fill # fill a set of signed orders (app + data + pool + user) and return a dealID
-iexec order cancel --app --data --pool --user # cancel a specific signed order
+iexec order fill # fill a set of signed orders (app + dataset + workerpool + request) and return a dealID
+iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
 ```
 
 ## deal/task
@@ -249,7 +249,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 {
   "app": {
     "owner": "0x0000000000000000000000000000000000000000",
-    "name": "my-dapp",
+    "name": "my-app",
     "params": {
       "type": "DOCKER",
       "envvars": "XWDOCKERIMAGE=hello-world"
@@ -269,7 +269,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
     "description": "my category N°1",
     "workClockTimeRef": 100
   },
-  "workerPool": {
+  "workerpool": {
     "owner": "0x0000000000000000000000000000000000000000",
     "description": "my-workerpool",
     "subscriptionLockStakePolicy": "100",
@@ -278,41 +278,41 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
   },
   "order": {
     "apporder": {
-      "dapp": "0x0000000000000000000000000000000000000000",
-      "dappprice": "0",
+      "app": "0x0000000000000000000000000000000000000000",
+      "appprice": "0",
       "volume": "1",
       "tag": "0",
-      "datarestrict": "0x0000000000000000000000000000000000000000",
-      "poolrestrict": "0x0000000000000000000000000000000000000000",
-      "userrestrict": "0x0000000000000000000000000000000000000000"
+      "datasetrestrict": "0x0000000000000000000000000000000000000000",
+      "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000"
     },
-    "dataorder": {
-      "data": "0x0000000000000000000000000000000000000000",
-      "dataprice": "0",
+    "datasetorder": {
+      "dataset": "0x0000000000000000000000000000000000000000",
+      "datasetprice": "0",
       "volume": "1",
       "tag": "0",
-      "dapprestrict": "0x0000000000000000000000000000000000000000",
-      "poolrestrict": "0x0000000000000000000000000000000000000000",
-      "userrestrict": "0x0000000000000000000000000000000000000000"
+      "apprestrict": "0x0000000000000000000000000000000000000000",
+      "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000"
     },
-    "poolorder": {
-      "pool": "0x0000000000000000000000000000000000000000",
-      "poolprice": "0",
+    "workerpoolorder": {
+      "workerpool": "0x0000000000000000000000000000000000000000",
+      "workerpoolprice": "0",
       "volume": "1",
       "category": "1",
       "trust": "100",
       "tag": "0",
-      "dapprestrict": "0x0000000000000000000000000000000000000000",
-      "datarestrict": "0x0000000000000000000000000000000000000000",
-      "userrestrict": "0x0000000000000000000000000000000000000000"
+      "apprestrict": "0x0000000000000000000000000000000000000000",
+      "datasetrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000"
     },
-    "userorder": {
-      "dapp": "0x0000000000000000000000000000000000000000",
-      "dappmaxprice": "0",
-      "data": "0x0000000000000000000000000000000000000000",
-      "datamaxprice": "0",
-      "pool": "0x0000000000000000000000000000000000000000",
-      "poolmaxprice": "0",
+    "requestorder": {
+      "app": "0x0000000000000000000000000000000000000000",
+      "appmaxprice": "0",
+      "dataset": "0x0000000000000000000000000000000000000000",
+      "datasetmaxprice": "0",
+      "workerpool": "0x0000000000000000000000000000000000000000",
+      "workerpoolmaxprice": "0",
       "volume": "1",
       "category": "1",
       "trust": "100",
