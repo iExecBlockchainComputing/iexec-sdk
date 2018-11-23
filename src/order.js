@@ -29,8 +29,7 @@ const NULLDATASET = {
 
 const objDesc = {
   EIP712Domain: {
-    structType:
-      'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)',
+    primaryType: 'EIP712Domain',
     structMembers: [
       { name: 'name', type: 'string' },
       { name: 'version', type: 'string' },
@@ -39,8 +38,7 @@ const objDesc = {
     ],
   },
   apporder: {
-    structType:
-      'DappOrder(address dapp,uint256 dappprice,uint256 volume,uint256 tag,address datarestrict,address poolrestrict,address userrestrict,bytes32 salt)',
+    primaryType: 'DappOrder',
     structMembers: [
       { name: 'dapp', type: 'address' },
       { name: 'dappprice', type: 'uint256' },
@@ -58,8 +56,7 @@ const objDesc = {
     apiEndpoint: 'apporders',
   },
   dataorder: {
-    structType:
-      'DataOrder(address data,uint256 dataprice,uint256 volume,uint256 tag,address dapprestrict,address poolrestrict,address userrestrict,bytes32 salt)',
+    primaryType: 'DataOrder',
     structMembers: [
       { name: 'data', type: 'address' },
       { name: 'dataprice', type: 'uint256' },
@@ -77,8 +74,7 @@ const objDesc = {
     apiEndpoint: 'datasetorders',
   },
   poolorder: {
-    structType:
-      'PoolOrder(address pool,uint256 poolprice,uint256 volume,uint256 tag,uint256 category,uint256 trust,address dapprestrict,address datarestrict,address userrestrict,bytes32 salt)',
+    primaryType: 'PoolOrder',
     structMembers: [
       { name: 'pool', type: 'address' },
       { name: 'poolprice', type: 'uint256' },
@@ -98,8 +94,7 @@ const objDesc = {
     apiEndpoint: 'workerpoolorders',
   },
   userorder: {
-    structType:
-      'UserOrder(address dapp,uint256 dappmaxprice,address data,uint256 datamaxprice,address pool,uint256 poolmaxprice,address requester,uint256 volume,uint256 tag,uint256 category,uint256 trust,address beneficiary,address callback,string params,bytes32 salt)',
+    primaryType: 'UserOrder',
     structMembers: [
       { name: 'dapp', type: 'address' },
       { name: 'dappmaxprice', type: 'uint256' },
@@ -167,7 +162,7 @@ const checkRemainingVolume = async (
 ) => {
   const initial = new BN(order.volume);
   const orderHash = hashStruct(
-    objDesc[orderName].structType,
+    objDesc[orderName].primaryType,
     objDesc[orderName].structMembers,
     order,
   );
@@ -196,19 +191,19 @@ const signOrder = async (orderName, orderObj, domainObj, eth) => {
 
   const types = {};
   types.EIP712Domain = domain;
-  types[orderName] = order;
+  types[objDesc[orderName].primaryType] = order;
 
   const message = orderObj;
 
   const typedData = {
     types,
     domain: domainObj,
-    primaryType: orderName,
+    primaryType: objDesc[orderName].primaryType,
     message,
   };
 
   const signTypedDatav3 = data => new Promise((resolve, reject) => {
-    eth.currentProvider.sendAsync(
+    eth.sendAsync(
       {
         method: 'eth_signTypedData_v3',
         params: [null, data],

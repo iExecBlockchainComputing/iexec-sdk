@@ -249,7 +249,23 @@ const signTypedData = (privateKey, msgParams) => {
   return hex;
 };
 
-const hashStruct = (type, members, obj) => {
+const getStructType = (primaryType, members) => {
+  const reducer = (oldValue, e) => {
+    let newValue = oldValue;
+    if (newValue) newValue = newValue.concat(',');
+    newValue = newValue.concat(e.type.concat(' ').concat(e.name));
+    return newValue;
+  };
+  const args = members.reduce(reducer, String(''));
+  const structType = primaryType
+    .concat('(')
+    .concat(args)
+    .concat(')');
+  return structType;
+};
+
+const hashStruct = (primaryType, members, obj) => {
+  const type = getStructType(primaryType, members);
   const typeHash = ethersKeccak256(Buffer.from(type, 'utf8'));
   const types = ['bytes32'].concat(
     members.map(e => (e.type === 'string' ? 'bytes32' : e.type)),
@@ -266,6 +282,7 @@ const hashStruct = (type, members, obj) => {
   const structHash = ethersKeccak256(encoded);
   return structHash;
 };
+
 const signStructHash = (key, structHash, sepratorHash) => {
   const solSha3 = ethers.utils.solidityKeccak256(
     ['bytes', 'bytes32', 'bytes32'],
@@ -282,51 +299,26 @@ const signStructHash = (key, structHash, sepratorHash) => {
 
 const signTypedDatav3 = async (privateKey, typedData) => {
   try {
+    debug('privateKey', privateKey);
+    debug('typedData', typedData);
+
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
 
-    const getStructTypeFromTypes = (structName, types) => {
-      const reducer = (oldValue, e) => {
-        let newValue = oldValue;
-        if (newValue) newValue = newValue.concat(',');
-        newValue = newValue.concat(e.type.concat(' ').concat(e.name));
-        return newValue;
-      };
-      const members = types[structName].reduce(reducer, String(''));
-      const structType = structName
-        .concat('(')
-        .concat(members)
-        .concat(')');
-      return structType;
-    };
-
-    const domain = {
-      structType: getStructTypeFromTypes('EIP712Domain', typedData.types),
-      structMembers: typedData.types.EIP712Domain,
-      values: typedData.domain,
-    };
-
-    const message = {
-      structType: getStructTypeFromTypes(
-        typedData.primaryType,
-        typedData.types,
-      ),
-      structMembers: typedData.types[typedData.primaryType],
-      values: typedData.message,
-    };
-
     const domainSeparator = hashStruct(
-      domain.structType,
-      domain.structMembers,
-      domain.values,
+      'EIP712Domain',
+      typedData.types.EIP712Domain,
+      typedData.domain,
     );
+    debug('domainSeparator', domainSeparator);
 
-    const structHash = hashStruct(
-      message.structType,
-      message.structMembers,
-      message.values,
+    const messageHash = hashStruct(
+      typedData.primaryType,
+      typedData.types[typedData.primaryType],
+      typedData.message,
     );
+    debug('messageHash', messageHash);
 
-    const sign = signStructHash(privKeyBuffer, structHash, domainSeparator);
+    const sign = signStructHash(privKeyBuffer, messageHash, domainSeparator);
     debug('sign', sign);
     return sign;
   } catch (error) {

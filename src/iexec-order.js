@@ -152,7 +152,7 @@ cli
         const signedOrder = await order.signAppOrder(
           orderObj,
           domainObj,
-          chain.ethjs,
+          chain.ethjs.currentProvider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'apporder',
@@ -179,7 +179,7 @@ cli
         const signedOrder = await order.signDataOrder(
           orderObj,
           domainObj,
-          chain.ethjs,
+          chain.ethjs.currentProvider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'dataorder',
@@ -206,7 +206,7 @@ cli
         const signedOrder = await order.signPoolOrder(
           orderObj,
           domainObj,
-          chain.ethjs,
+          chain.ethjs.currentProvider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'poolorder',
@@ -230,7 +230,7 @@ cli
         const signedOrder = await order.signUserOrder(
           orderObj,
           domainObj,
-          chain.ethjs,
+          chain.ethjs.currentProvider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'userorder',

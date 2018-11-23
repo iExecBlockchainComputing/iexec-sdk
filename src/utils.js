@@ -160,7 +160,7 @@ const gatewayAuth = async (chainID, address, eth) => {
     debug('typedData', typedData);
 
     const signTypedDatav3 = td => new Promise((resolve, reject) => {
-      eth.currentProvider.sendAsync(
+      eth.sendAsync(
         {
           method: 'eth_signTypedData_v3',
           params: [null, td],
