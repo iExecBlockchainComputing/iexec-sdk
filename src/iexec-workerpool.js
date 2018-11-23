@@ -20,8 +20,7 @@ const {
 const { load } = require('./keystore');
 const { loadChain } = require('./chains');
 
-const objName = 'workerPool';
-const pocoName = 'pool';
+const objName = 'workerpool';
 
 cli
   .command('init')
@@ -54,11 +53,11 @@ cli
         loadIExecConf(),
       ]);
 
-      const logs = await hub.createObj(pocoName)(
+      const logs = await hub.createObj(objName)(
         chain.contracts,
         iexecConf[objName],
       );
-      await saveDeployedObj(objName, chain.id, logs[0][pocoName]);
+      await saveDeployedObj(objName, chain.id, logs[0][objName]);
     } catch (error) {
       handleError(error, cli);
     }
@@ -82,7 +81,7 @@ cli
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
-      await hub.showObj(pocoName)(chain.contracts, addressOrIndex, userAddress);
+      await hub.showObj(objName)(chain.contracts, addressOrIndex, userAddress);
     } catch (error) {
       handleError(error, cli);
     }
@@ -101,7 +100,7 @@ cli
       ]);
       const userAddress = cmd.user || address;
 
-      await hub.countObj(pocoName)(chain.contracts, userAddress);
+      await hub.countObj(objName)(chain.contracts, userAddress);
     } catch (error) {
       handleError(error, cli);
     }

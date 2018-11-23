@@ -12,7 +12,7 @@ const main = {
 
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'my-dapp',
+  name: 'my-app',
   params: {
     type: 'DOCKER',
     envvars: 'XWDOCKERIMAGE=hello-world',
@@ -29,7 +29,7 @@ const dataset = {
   hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
-const workerPool = {
+const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
   subscriptionLockStakePolicy: '100',
@@ -125,7 +125,7 @@ module.exports = {
   main,
   app,
   dataset,
-  workerPool,
+  workerpool,
   category,
   chains,
   overwriteObject,
