@@ -172,37 +172,17 @@ const signTypedData = async (typedData) => {
   }
 };
 
-const signStruct = async (struct, domain) => {
+const signTypedDatav3 = async (address, typedData) => {
   try {
     const { privateKey } = await load({ prefix: false });
-    const privKeyBuffer = Buffer.from(privateKey, 'hex');
-
-    const domainSeparator = sigUtils.hashStruct(
-      domain.structType,
-      domain.structMembers,
-      domain.values,
-    );
-    debug('domainSeparator', domainSeparator);
-
-    const structHash = sigUtils.hashStruct(
-      struct.structType,
-      struct.structMembers,
-      struct.values,
-    );
-    debug('structHash', structHash);
-
-    const sign = sigUtils.signStructHash(
-      privKeyBuffer,
-      structHash,
-      domainSeparator,
-    );
-    debug('sign', sign);
-    return sign;
+    const signedTypedData = sigUtils.signTypedDatav3(privateKey, typedData);
+    return signedTypedData;
   } catch (error) {
-    debug('signStruct()', error);
+    debug('signTypedDatav3()', error);
     throw error;
   }
 };
+
 const sign = async (message, noncefn, data) => {
   try {
     const { privateKey } = await load({ prefix: false });
@@ -238,6 +218,6 @@ module.exports = {
   signMessage,
   signPersonalMessage,
   signTypedData,
-  signStruct,
   sign,
+  signTypedDatav3,
 };

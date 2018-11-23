@@ -91,11 +91,9 @@ iexec app show # show details of deployed app
 ### Buy & Run work using Marketplace
 
 ```bash
-iexec order init --buy # init work order fields in iexec.json
-vi iexec.json # edit iexec.json and customize the buy order fields. Particularly work params field.
-iexec orderbook show --category 5 # show orderbook and choose an order ID
-iexec order fill <orderID> # fill order using its ID
-iexec work show --watch --download # watch progress of the submitted work, and download its result when completed
+iexec order init --app --data --pool # init work order fields in iexec.json
+iexec order sign --app --data --pool # sign initialized orders
+iexec order fill # fill all signed orders
 ```
 
 # iExec SDK CLI API
@@ -123,7 +121,6 @@ iexec init # create all files necessary to get started
 # --chain <chainName>
 # --to <address>
 # --force
-# --hub <address>
 # --password <password>
 iexec wallet create
 iexec wallet getETH
@@ -142,7 +139,6 @@ iexec wallet decrypt --password <password> # save wallet.json from encrypted-wal
 # OPTIONS
 # --chain <chainName>
 # --force
-# --hub <address>
 iexec account login
 iexec account show [address] # optional address to show other people's account
 iexec account deposit <amount>
@@ -154,7 +150,6 @@ iexec account withdraw <amount>
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --hub <address>
 # --user <address>
 iexec app init # init new app
 iexec app deploy # deploy new app
@@ -167,7 +162,6 @@ iexec app count --user <userAddress> # count user total number of app
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --hub <address>
 # --user <address>
 iexec dataset init # init new app
 iexec dataset deploy # deploy new dataset
@@ -180,7 +174,6 @@ iexec dataset count --user <userAddress> # count user total number of dataset
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --hub <address>
 # --user <address>
 iexec workerpool init # init new workerpool
 iexec workerpool deploy # deploy new workerpool
@@ -188,42 +181,29 @@ iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
-## orderbook
-
-```bash
-# OPTIONS
-# --chain <chainName>
-# --category [ID]
-# --pool [address]
-iexec orderbook show --category 5 # show orderbook for category 5
-```
-
 ## order
 
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --hub <address>
-# --sell
-# --buy
 # --force
-iexec order init --buy # init new buy order
-iexec order init --sell # init new sell order
-iexec order place # place an order at limit price
-iexec order show <orderID> # show an order
-iexec order fill <orderID> # fill an order at market price and start work execution
-iexec order cancel <orderID> # cancel an order
-iexec order count # count marketplace total number of order
+iexec order init # init all kind of orders
+iexec order init --app --data --pool --user # specify the kind of order to init
+iexec order sign # sign all initialized orders
+iexec order sign --app --data --pool --user # sign the specific initialized orders
+iexec order publish --app --data --pool --user # publish the specific signed orders on iExec marketplace
+iexec order place # NOT IMPLEMENTED
+iexec order show <orderID> # NOT IMPLEMENTED
+iexec order fill # fill a set of signed orders (app + data + pool + user) and return a dealID
+iexec order cancel --app --data --pool --user # cancel a specific signed order
 ```
 
-## work
+## deal/task
 
 ```bash
 # OPTIONS
-# --chain <chainName>
-# --watch
-# --download [fileName]
-iexec work show [address] --watch --download # show a work, watch its status changes and download it when completed
+# NOT reimplemented
+# WIP
 ```
 
 ## sgx
@@ -248,17 +228,10 @@ iexec sgx decrypt # decrypt work result
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --hub <address>
 iexec category init # init new category
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count hub total number of category
-```
-
-## registry
-
-```bash
-iexec registry validate app # validate an object description [app, dataset, workerpool]
 ```
 
 ## scheduler
@@ -275,19 +248,21 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 ```json
 {
   "app": {
-    "name": "next-dapp1",
-    "price": 1,
+    "owner": "0x0000000000000000000000000000000000000000",
+    "name": "my-dapp",
     "params": {
       "type": "DOCKER",
-      "envvars": "XWDOCKERIMAGE=ericro/face-recognition"
-    }
+      "envvars": "XWDOCKERIMAGE=hello-world"
+    },
+    "hash": "0x0000000000000000000000000000000000000000000000000000000000000000"
   },
   "dataset": {
-    "name": "next-dataset",
-    "price": 2,
+    "owner": "0x0000000000000000000000000000000000000000",
+    "name": "my-dataset",
     "params": {
-      "uri": "https://data.provider.com"
-    }
+      "arg1": "value1"
+    },
+    "hash": "0x0000000000000000000000000000000000000000000000000000000000000000"
   },
   "category": {
     "name": "CAT1",
@@ -295,10 +270,57 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
     "workClockTimeRef": 100
   },
   "workerPool": {
-    "description": "Qarnot WorkerPool ",
-    "subscriptionLockStakePolicy": 100,
-    "subscriptionMinimumStakePolicy": 100,
-    "subscriptionMinimumScorePolicy": 100
+    "owner": "0x0000000000000000000000000000000000000000",
+    "description": "my-workerpool",
+    "subscriptionLockStakePolicy": "100",
+    "subscriptionMinimumStakePolicy": "100",
+    "subscriptionMinimumScorePolicy": "100"
+  },
+  "order": {
+    "apporder": {
+      "dapp": "0x0000000000000000000000000000000000000000",
+      "dappprice": "0",
+      "volume": "1",
+      "tag": "0",
+      "datarestrict": "0x0000000000000000000000000000000000000000",
+      "poolrestrict": "0x0000000000000000000000000000000000000000",
+      "userrestrict": "0x0000000000000000000000000000000000000000"
+    },
+    "dataorder": {
+      "data": "0x0000000000000000000000000000000000000000",
+      "dataprice": "0",
+      "volume": "1",
+      "tag": "0",
+      "dapprestrict": "0x0000000000000000000000000000000000000000",
+      "poolrestrict": "0x0000000000000000000000000000000000000000",
+      "userrestrict": "0x0000000000000000000000000000000000000000"
+    },
+    "poolorder": {
+      "pool": "0x0000000000000000000000000000000000000000",
+      "poolprice": "0",
+      "volume": "1",
+      "category": "1",
+      "trust": "100",
+      "tag": "0",
+      "dapprestrict": "0x0000000000000000000000000000000000000000",
+      "datarestrict": "0x0000000000000000000000000000000000000000",
+      "userrestrict": "0x0000000000000000000000000000000000000000"
+    },
+    "userorder": {
+      "dapp": "0x0000000000000000000000000000000000000000",
+      "dappmaxprice": "0",
+      "data": "0x0000000000000000000000000000000000000000",
+      "datamaxprice": "0",
+      "pool": "0x0000000000000000000000000000000000000000",
+      "poolmaxprice": "0",
+      "volume": "1",
+      "category": "1",
+      "trust": "100",
+      "tag": "0",
+      "beneficiary": "0x0000000000000000000000000000000000000000",
+      "callback": "0x0000000000000000000000000000000000000000",
+      "params": "{ cmdline: '--help' }"
+    }
   }
 }
 ```

@@ -170,9 +170,7 @@ const typedSignatureHash = (typedData) => {
   const error = new Error('Expect argument to be non-empty array');
   if (typeof typedData !== 'object' || !typedData.length) throw error;
 
-  const data = typedData.map(
-    e => (e.type === 'bytes' ? Buffer.toBuffer(e.value) : e.value),
-  );
+  const data = typedData.map(e => (e.type === 'bytes' ? Buffer.toBuffer(e.value) : e.value));
   const types = typedData.map(e => e.type);
   const schema = typedData.map((e) => {
     if (!e.name) throw error;
@@ -251,16 +249,23 @@ const signTypedData = (privateKey, msgParams) => {
   return hex;
 };
 
-const getEIP712Domain = (chainId, verifyingContract) => ({
-  name: 'iExecODB',
-  version: '3.0-alpha',
-  chainId,
-  verifyingContract,
-});
+const getStructType = (primaryType, members) => {
+  const reducer = (oldValue, e) => {
+    let newValue = oldValue;
+    if (newValue) newValue = newValue.concat(',');
+    newValue = newValue.concat(e.type.concat(' ').concat(e.name));
+    return newValue;
+  };
+  const args = members.reduce(reducer, String(''));
+  const structType = primaryType
+    .concat('(')
+    .concat(args)
+    .concat(')');
+  return structType;
+};
 
-const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
-
-const hashStruct = (type, members, obj) => {
+const hashStruct = (primaryType, members, obj) => {
+  const type = getStructType(primaryType, members);
   const typeHash = ethersKeccak256(Buffer.from(type, 'utf8'));
   const types = ['bytes32'].concat(
     members.map(e => (e.type === 'string' ? 'bytes32' : e.type)),
@@ -277,6 +282,7 @@ const hashStruct = (type, members, obj) => {
   const structHash = ethersKeccak256(encoded);
   return structHash;
 };
+
 const signStructHash = (key, structHash, sepratorHash) => {
   const solSha3 = ethers.utils.solidityKeccak256(
     ['bytes', 'bytes32', 'bytes32'],
@@ -290,10 +296,39 @@ const signStructHash = (key, structHash, sepratorHash) => {
   };
   return sign;
 };
+
+const signTypedDatav3 = async (privateKey, typedData) => {
+  try {
+    debug('privateKey', privateKey);
+    debug('typedData', typedData);
+
+    const privKeyBuffer = Buffer.from(privateKey, 'hex');
+
+    const domainSeparator = hashStruct(
+      'EIP712Domain',
+      typedData.types.EIP712Domain,
+      typedData.domain,
+    );
+    debug('domainSeparator', domainSeparator);
+
+    const messageHash = hashStruct(
+      typedData.primaryType,
+      typedData.types[typedData.primaryType],
+      typedData.message,
+    );
+    debug('messageHash', messageHash);
+
+    const sign = signStructHash(privKeyBuffer, messageHash, domainSeparator);
+    debug('sign', sign);
+    return sign;
+  } catch (error) {
+    debug('signStruct()', error);
+    throw error;
+  }
+};
+
 module.exports = {
-  getEIP712Domain,
   signTypedData,
-  getSalt,
-  signStructHash,
+  signTypedDatav3,
   hashStruct,
 };

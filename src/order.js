@@ -1,19 +1,24 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { getSalt, hashStruct } = require('./sig-utils');
-const { signStruct, load } = require('./keystore.js');
-const { checkEvent, getEventFromLogs, ethersBnToBn } = require('./utils');
+const {
+  checkEvent,
+  getEventFromLogs,
+  ethersBnToBn,
+  http,
+  getSalt,
+} = require('./utils');
+const { hashStruct } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
-const NULLDATASET = {
-  data: '0x0000000000000000000000000000000000000000',
-  dataprice: '0',
+const NULL_DATASETORDER = {
+  dataset: '0x0000000000000000000000000000000000000000',
+  datasetprice: '0',
   volume: '0',
   tag: '0',
-  dapprestrict: '0x0000000000000000000000000000000000000000',
-  poolrestrict: '0x0000000000000000000000000000000000000000',
-  userrestrict: '0x0000000000000000000000000000000000000000',
+  apprestrict: '0x0000000000000000000000000000000000000000',
+  workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+  requesterrestrict: '0x0000000000000000000000000000000000000000',
   salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
   sign: {
     r: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -24,8 +29,7 @@ const NULLDATASET = {
 
 const objDesc = {
   EIP712Domain: {
-    structType:
-      'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)',
+    primaryType: 'EIP712Domain',
     structMembers: [
       { name: 'name', type: 'string' },
       { name: 'version', type: 'string' },
@@ -34,71 +38,70 @@ const objDesc = {
     ],
   },
   apporder: {
-    structType:
-      'DappOrder(address dapp,uint256 dappprice,uint256 volume,uint256 tag,address datarestrict,address poolrestrict,address userrestrict,bytes32 salt)',
+    primaryType: 'AppOrder',
     structMembers: [
-      { name: 'dapp', type: 'address' },
-      { name: 'dappprice', type: 'uint256' },
+      { name: 'app', type: 'address' },
+      { name: 'appprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
-      { name: 'datarestrict', type: 'address' },
-      { name: 'poolrestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'datasetrestrict', type: 'address' },
+      { name: 'workerpoolrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'dapp',
-    contractName: 'dapp',
-    cancelMethode: 'cancelDappOrder',
-    cancelEvent: 'ClosedDappOrder',
+    contractPropName: 'app',
+    contractName: 'app',
+    cancelMethode: 'cancelAppOrder',
+    cancelEvent: 'ClosedAppOrder',
+    apiEndpoint: 'apporders',
   },
-  dataorder: {
-    structType:
-      'DataOrder(address data,uint256 dataprice,uint256 volume,uint256 tag,address dapprestrict,address poolrestrict,address userrestrict,bytes32 salt)',
+  datasetorder: {
+    primaryType: 'DatasetOrder',
     structMembers: [
-      { name: 'data', type: 'address' },
-      { name: 'dataprice', type: 'uint256' },
+      { name: 'dataset', type: 'address' },
+      { name: 'datasetprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
-      { name: 'dapprestrict', type: 'address' },
-      { name: 'poolrestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'apprestrict', type: 'address' },
+      { name: 'workerpoolrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'data',
-    contractName: 'data',
-    cancelMethode: 'cancelDataOrder',
-    cancelEvent: 'ClosedDataOrder',
+    contractPropName: 'dataset',
+    contractName: 'dataset',
+    cancelMethode: 'cancelDatasetOrder',
+    cancelEvent: 'ClosedDatasetOrder',
+    apiEndpoint: 'datasetorders',
   },
-  poolorder: {
-    structType:
-      'PoolOrder(address pool,uint256 poolprice,uint256 volume,uint256 tag,uint256 category,uint256 trust,address dapprestrict,address datarestrict,address userrestrict,bytes32 salt)',
+  workerpoolorder: {
+    primaryType: 'WorkerpoolOrder',
     structMembers: [
-      { name: 'pool', type: 'address' },
-      { name: 'poolprice', type: 'uint256' },
+      { name: 'workerpool', type: 'address' },
+      { name: 'workerpoolprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
       { name: 'category', type: 'uint256' },
       { name: 'trust', type: 'uint256' },
-      { name: 'dapprestrict', type: 'address' },
-      { name: 'datarestrict', type: 'address' },
-      { name: 'userrestrict', type: 'address' },
+      { name: 'apprestrict', type: 'address' },
+      { name: 'datasetrestrict', type: 'address' },
+      { name: 'requesterrestrict', type: 'address' },
       { name: 'salt', type: 'bytes32' },
     ],
-    contractPropName: 'pool',
-    contractName: 'pool',
-    cancelMethode: 'cancelPoolOrder',
-    cancelEvent: 'ClosedPoolOrder',
+    contractPropName: 'workerpool',
+    contractName: 'workerpool',
+    cancelMethode: 'cancelWorkerpoolOrder',
+    cancelEvent: 'ClosedWorkerpoolOrder',
+    apiEndpoint: 'workerpoolorders',
   },
-  userorder: {
-    structType:
-      'UserOrder(address dapp,uint256 dappmaxprice,address data,uint256 datamaxprice,address pool,uint256 poolmaxprice,address requester,uint256 volume,uint256 tag,uint256 category,uint256 trust,address beneficiary,address callback,string params,bytes32 salt)',
+  requestorder: {
+    primaryType: 'RequestOrder',
     structMembers: [
-      { name: 'dapp', type: 'address' },
-      { name: 'dappmaxprice', type: 'uint256' },
-      { name: 'data', type: 'address' },
-      { name: 'datamaxprice', type: 'uint256' },
-      { name: 'pool', type: 'address' },
-      { name: 'poolmaxprice', type: 'uint256' },
+      { name: 'app', type: 'address' },
+      { name: 'appmaxprice', type: 'uint256' },
+      { name: 'dataset', type: 'address' },
+      { name: 'datasetmaxprice', type: 'uint256' },
+      { name: 'workerpool', type: 'address' },
+      { name: 'workerpoolmaxprice', type: 'uint256' },
       { name: 'requester', type: 'address' },
       { name: 'volume', type: 'uint256' },
       { name: 'tag', type: 'uint256' },
@@ -109,8 +112,9 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
-    cancelMethode: 'cancelUserOrder',
-    cancelEvent: 'ClosedUserOrder',
+    cancelMethode: 'cancelRequestOrder',
+    cancelEvent: 'ClosedRequestOrder',
+    apiEndpoint: 'requestorders',
   },
   sign: {
     structMembers: [
@@ -120,6 +124,13 @@ const objDesc = {
     ],
   },
 };
+
+const getEIP712Domain = (chainId, verifyingContract) => ({
+  name: 'iExecODB',
+  version: '3.0-alpha',
+  chainId,
+  verifyingContract,
+});
 
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
@@ -134,19 +145,13 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const checkContractOwner = async (orderName, orderObj, contracts) => {
+const getContractOwner = async (orderName, orderObj, contracts) => {
   const contractAddress = orderObj[objDesc[orderName].contractPropName];
   const contract = contracts.getContract(objDesc[orderName].contractName)({
     at: contractAddress,
   });
   const owner = await contract.m_owner();
-  const { address } = await load();
-  if (owner.toLowerCase() !== address.toLowerCase()) {
-    throw new Error(
-      `only owner ${owner} can sign order for contract ${address}`,
-    );
-  }
-  return true;
+  return owner;
 };
 
 const checkRemainingVolume = async (
@@ -157,7 +162,7 @@ const checkRemainingVolume = async (
 ) => {
   const initial = new BN(order.volume);
   const orderHash = hashStruct(
-    objDesc[orderName].structType,
+    objDesc[orderName].primaryType,
     objDesc[orderName].structMembers,
     order,
   );
@@ -171,36 +176,56 @@ const checkRemainingVolume = async (
   return remain;
 };
 
-const signOrder = async (orderName, orderObj, domainObj) => {
-  const domain = {
-    structType: objDesc.EIP712Domain.structType,
-    structMembers: objDesc.EIP712Domain.structMembers,
-    values: domainObj,
-  };
-  debug('domain', domain);
-
+const signOrder = async (orderName, orderObj, domainObj, eth) => {
   const salt = getSalt();
-  debug('salt', salt);
-
   const saltedOrderObj = Object.assign(orderObj, { salt });
-  const order = {
-    structType: objDesc[orderName].structType,
-    structMembers: objDesc[orderName].structMembers,
-    values: saltedOrderObj,
-  };
-  debug('order', order);
 
-  const sign = await signStruct(order, domain);
+  const domain = [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'verifyingContract', type: 'address' },
+  ];
+
+  const order = objDesc[orderName].structMembers;
+
+  const types = {};
+  types.EIP712Domain = domain;
+  types[objDesc[orderName].primaryType] = order;
+
+  const message = orderObj;
+
+  const typedData = {
+    types,
+    domain: domainObj,
+    primaryType: objDesc[orderName].primaryType,
+    message,
+  };
+
+  const signTypedDatav3 = data => new Promise((resolve, reject) => {
+    eth.sendAsync(
+      {
+        method: 'eth_signTypedData_v3',
+        params: [null, data],
+      },
+      (err, result) => {
+        if (err) reject(err);
+        resolve(result.result);
+      },
+    );
+  });
+
+  const sign = await signTypedDatav3(typedData);
   debug('sign', sign);
 
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   debug('signedOrder', signedOrder);
   return signedOrder;
 };
-const signAppOrder = (order, domain) => signOrder('apporder', order, domain);
-const signDataOrder = (order, domain) => signOrder('dataorder', order, domain);
-const signPoolOrder = (order, domain) => signOrder('poolorder', order, domain);
-const signUserOrder = (order, domain) => signOrder('userorder', order, domain);
+const signAppOrder = (order, domain, eth) => signOrder('apporder', order, domain, eth);
+const signDatasetOrder = (order, domain, eth) => signOrder('datasetorder', order, domain, eth);
+const signWorkerpoolOrder = (order, domain, eth) => signOrder('workerpoolorder', order, domain, eth);
+const signRequestOrder = (order, domain, eth) => signOrder('requestorder', order, domain, eth);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
@@ -214,60 +239,84 @@ const cancelOrder = async (orderName, orderObj, contracts) => {
   return true;
 };
 const cancelAppOrder = (order, domain) => cancelOrder('apporder', order, domain);
-const cancelDataOrder = (order, domain) => cancelOrder('dataorder', order, domain);
-const cancelPoolOrder = (order, domain) => cancelOrder('poolorder', order, domain);
-const cancelUserOrder = (order, domain) => cancelOrder('userorder', order, domain);
+const cancelDatasetOrder = (order, domain) => cancelOrder('datasetorder', order, domain);
+const cancelWorkerpoolOrder = (order, domain) => cancelOrder('workerpoolorder', order, domain);
+const cancelRequestOrder = (order, domain) => cancelOrder('requestorder', order, domain);
+
+const publishOrder = async (chainID, orderName, orderToPublish) => {
+  try {
+    const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
+    debug('endpoint', endpoint);
+    const body = { chainID, order: orderToPublish };
+    debug('body', body);
+    const response = await http.post(endpoint, body);
+    debug('response', response);
+    if (response.ok && response.saved && response.saved.orderHash) {
+      return response.saved.orderHash;
+    }
+    throw new Error('An error occured while publishing order');
+  } catch (error) {
+    debug('publishOrder()', error);
+    throw error;
+  }
+};
 
 const matchOrders = async (
   appOrder,
-  dataOrder = NULLDATASET,
-  poolOrder,
-  userOrder,
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder,
+  requestOrder,
   contracts,
 ) => {
-  const appOrderStruct = signedOrderToStruct('apporder', appOrder);
-  const dataOrderStruct = signedOrderToStruct('dataorder', dataOrder);
-  const poolOrderStruct = signedOrderToStruct('poolorder', poolOrder);
-  const userOrderStruct = signedOrderToStruct('userorder', userOrder);
-
-  const clerkAddress = await contracts.fetchClerkAddress();
-  const clerkContact = contracts.getClerkContract({ at: clerkAddress });
-  debug('appOrderStruct', appOrderStruct);
-  debug('dataOrderStruct', dataOrderStruct);
-  debug('poolOrderStruct', poolOrderStruct);
-  debug('userOrderStruct', userOrderStruct);
-  let logs;
   try {
+    const appOrderStruct = signedOrderToStruct('apporder', appOrder);
+    const datasetOrderStruct = signedOrderToStruct(
+      'datasetorder',
+      datasetOrder,
+    );
+    const workerpoolOrderStruct = signedOrderToStruct(
+      'workerpoolorder',
+      workerpoolOrder,
+    );
+    const requestOrderStruct = signedOrderToStruct(
+      'requestorder',
+      requestOrder,
+    );
+
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
     const tx = await clerkContact.matchOrders(
       appOrderStruct,
-      dataOrderStruct,
-      poolOrderStruct,
-      userOrderStruct,
+      datasetOrderStruct,
+      workerpoolOrderStruct,
+      requestOrderStruct,
     );
     const txReceipt = await tx.wait();
-    logs = contracts.decodeClerkLogs(txReceipt.logs);
+    const logs = contracts.decodeClerkLogs(txReceipt.logs);
+    debug('logs', logs);
+    const matchEvent = 'OrdersMatched';
+    if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
+    const { dealid, volume } = getEventFromLogs(matchEvent, logs);
+    return { dealid, volume };
   } catch (error) {
     debug('matchOrders() error', error);
     throw error;
   }
-  debug('logs', logs);
-  const matchEvent = 'OrdersMatched';
-  if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
-  const { dealid, volume } = getEventFromLogs(matchEvent, logs);
-  return { dealid, volume };
 };
 
 module.exports = {
-  checkContractOwner,
+  getEIP712Domain,
+  getContractOwner,
   cancelOrder,
   cancelAppOrder,
-  cancelDataOrder,
-  cancelPoolOrder,
-  cancelUserOrder,
+  cancelDatasetOrder,
+  cancelWorkerpoolOrder,
+  cancelRequestOrder,
   checkRemainingVolume,
+  publishOrder,
   signAppOrder,
-  signDataOrder,
-  signPoolOrder,
-  signUserOrder,
+  signDatasetOrder,
+  signWorkerpoolOrder,
+  signRequestOrder,
   matchOrders,
 };

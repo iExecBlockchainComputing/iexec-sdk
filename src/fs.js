@@ -149,7 +149,7 @@ const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   }
 };
 
-const initOrder = async (orderName, overwrite) => {
+const initOrderObj = async (orderName, overwrite) => {
   try {
     const iexecConf = await loadIExecConf();
     const order = templates.createOrder(orderName, overwrite);
@@ -222,7 +222,7 @@ module.exports = {
   initIExecConf,
   loadDeployedObj,
   initChainConf,
-  initOrder,
+  initOrderObj,
   IEXEC_FILE_NAME,
   CHAIN_FILE_NAME,
   ACCOUNT_FILE_NAME,

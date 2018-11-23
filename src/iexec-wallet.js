@@ -23,7 +23,7 @@ const objName = 'wallet';
 
 cli
   .command('create')
-  .option(...option.force())
+  .option(...option.forceCreate())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner();

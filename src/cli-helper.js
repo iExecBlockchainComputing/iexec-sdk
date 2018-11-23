@@ -44,6 +44,7 @@ const command = {
   fill: () => 'fill',
   cancel: () => 'cancel',
   sign: () => 'sign',
+  publish: () => 'publish',
 };
 
 const desc = {
@@ -76,6 +77,7 @@ const desc = {
   sgxInit: () => 'init the SGX folders tree structure',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
+  publish: objName => `publish a signed ${objName}`,
 };
 
 const option = {
@@ -83,21 +85,44 @@ const option = {
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
   initAppOrder: () => ['--app', 'init an app sell order'],
-  initDataOrder: () => ['--data', 'init a data sell order'],
-  initPoolOrder: () => ['--pool', 'init a workerpool sell order'],
-  initUserOrder: () => ['--user', 'init a user buy order'],
+  initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
+  initWorkerpoolOrder: () => ['--workerpool', 'init a workerpool sell order'],
+  initRequestOrder: () => ['--request', 'init a buy request order'],
   signAppOrder: () => ['--app', 'sign an selling apporder'],
-  signDataOrder: () => ['--data', 'sign a selling dataorder'],
-  signPoolOrder: () => ['--pool', 'sign a selling poolorder'],
-  signUserOrder: () => ['--user', 'sign a buying userorder'],
+  signDatasetOrder: () => ['--dataset', 'sign a selling datasetorder'],
+  signWorkerpoolOrder: () => ['--workerpool', 'sign a selling workerpoolorder'],
+  signRequestOrder: () => ['--request', 'sign a buying userorder'],
   cancelAppOrder: () => ['--app', 'cancel a signed apporder'],
-  cancelDataOrder: () => ['--data', 'cancel a signed dataorder'],
-  cancelPoolOrder: () => ['--pool', 'cancel a signed poolorder'],
-  cancelUserOrder: () => ['--user', 'cancel a signed userorder'],
+  cancelDatasetOrder: () => ['--dataset', 'cancel a signed datasetorder'],
+  cancelWorkerpoolOrder: () => [
+    '--workerpool',
+    'cancel a signed workerpoolorder',
+  ],
+  cancelRequestOrder: () => ['--request', 'cancel a signed userorder'],
+  publishAppOrder: () => [
+    '--app',
+    'publish a signed apporder on iExec marketplace',
+  ],
+  publishDatasetOrder: () => [
+    '--dataset',
+    'publish a signed datasetorder on iExec marketplace',
+  ],
+  publishWorkerpoolOrder: () => [
+    '--workerpool',
+    'publish a signed workerpoolorder on iExec marketplace',
+  ],
+  publishRequestOrder: () => [
+    '--request',
+    'publish a signed requestorder on iExec marketplace',
+  ],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
-  force: () => ['--force', 'force wallet creation even if old wallet exists'],
+  forceCreate: () => [
+    '--force',
+    'force wallet creation even if old wallet exists',
+  ],
+  force: () => ['--force', 'force perform action without prompting user'],
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
     '--download [fileName]',
@@ -167,6 +192,7 @@ const prompt = {
     `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
+  publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
   signGeneratedOrder: (orderName, order) => question(
     `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
   ),

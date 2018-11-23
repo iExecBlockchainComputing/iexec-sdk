@@ -12,7 +12,7 @@ const main = {
 
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'my-dapp',
+  name: 'my-app',
   params: {
     type: 'DOCKER',
     envvars: 'XWDOCKERIMAGE=hello-world',
@@ -29,7 +29,7 @@ const dataset = {
   hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
-const workerPool = {
+const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
   subscriptionLockStakePolicy: '100',
@@ -39,41 +39,41 @@ const workerPool = {
 
 const order = {
   apporder: {
-    dapp: '0x0000000000000000000000000000000000000000',
-    dappprice: '0',
+    app: '0x0000000000000000000000000000000000000000',
+    appprice: '0',
     volume: '1',
     tag: '0',
-    datarestrict: '0x0000000000000000000000000000000000000000',
-    poolrestrict: '0x0000000000000000000000000000000000000000',
-    userrestrict: '0x0000000000000000000000000000000000000000',
+    datasetrestrict: '0x0000000000000000000000000000000000000000',
+    workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+    requesterrestrict: '0x0000000000000000000000000000000000000000',
   },
-  dataorder: {
-    data: '0x0000000000000000000000000000000000000000',
-    dataprice: '0',
+  datasetorder: {
+    dataset: '0x0000000000000000000000000000000000000000',
+    datasetprice: '0',
     volume: '1',
     tag: '0',
-    dapprestrict: '0x0000000000000000000000000000000000000000',
-    poolrestrict: '0x0000000000000000000000000000000000000000',
-    userrestrict: '0x0000000000000000000000000000000000000000',
+    apprestrict: '0x0000000000000000000000000000000000000000',
+    workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+    requesterrestrict: '0x0000000000000000000000000000000000000000',
   },
-  poolorder: {
-    pool: '0x0000000000000000000000000000000000000000',
-    poolprice: '0',
+  workerpoolorder: {
+    workerpool: '0x0000000000000000000000000000000000000000',
+    workerpoolprice: '0',
     volume: '1',
     category: '1',
     trust: '100',
     tag: '0',
-    dapprestrict: '0x0000000000000000000000000000000000000000',
-    datarestrict: '0x0000000000000000000000000000000000000000',
-    userrestrict: '0x0000000000000000000000000000000000000000',
+    apprestrict: '0x0000000000000000000000000000000000000000',
+    datasetrestrict: '0x0000000000000000000000000000000000000000',
+    requesterrestrict: '0x0000000000000000000000000000000000000000',
   },
-  userorder: {
-    dapp: '0x0000000000000000000000000000000000000000',
-    dappmaxprice: '0',
-    data: '0x0000000000000000000000000000000000000000',
-    datamaxprice: '0',
-    pool: '0x0000000000000000000000000000000000000000',
-    poolmaxprice: '0',
+  requestorder: {
+    app: '0x0000000000000000000000000000000000000000',
+    appmaxprice: '0',
+    dataset: '0x0000000000000000000000000000000000000000',
+    datasetmaxprice: '0',
+    workerpool: '0x0000000000000000000000000000000000000000',
+    workerpoolmaxprice: '0',
     volume: '1',
     category: '1',
     trust: '100',
@@ -95,7 +95,7 @@ const chains = {
   chains: {
     dev: {
       host: 'http://localhost:8545',
-      id: '1337',
+      id: '17',
       hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
       scheduler: 'https://pool1api.iex.ec',
     },
@@ -125,7 +125,7 @@ module.exports = {
   main,
   app,
   dataset,
-  workerPool,
+  workerpool,
   category,
   chains,
   overwriteObject,
