@@ -142,12 +142,13 @@ const httpRequest = verb => async (endpoint, body = {}, api = API_URL) => {
   throw new Error('API call error');
 };
 
-const http = {
-  get: httpRequest('GET'),
-  post: httpRequest('POST'),
-};
-
-const gatewayAuth = async (chainID, address, eth) => {
+const gatewayAuth = async (
+  chainID,
+  address,
+  eth,
+  endpoint,
+  { postBody = {} } = {},
+) => {
   try {
     debug('gatewayAuth()');
 
@@ -180,18 +181,29 @@ const gatewayAuth = async (chainID, address, eth) => {
       .concat(sign.s.substr(2))
       .concat(sign.v.toString(16));
 
-    const body = {
-      data,
-      address,
-      sig: serializedSign,
-    };
-    const response = await httpRequest('POST')('testauth', body);
+    const body = Object.assign(
+      {
+        auth: {
+          data,
+          address,
+          sig: serializedSign,
+        },
+      },
+      postBody,
+    );
+    const response = await httpRequest('POST')(endpoint, body);
     debug('response', response);
     return response;
   } catch (error) {
     debug('gatewayAuth() error', error);
     throw error;
   }
+};
+
+const http = {
+  get: httpRequest('GET'),
+  post: httpRequest('POST'),
+  authorizedPost: gatewayAuth,
 };
 
 const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
