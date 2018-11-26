@@ -10,6 +10,7 @@ pipeline:
       - npm install
       - npm run build
       - npm -g install .
+      - npm test
     when:
       branch: [master, next]
 
@@ -19,7 +20,6 @@ pipeline:
       - npm install
       - npm run build
       - npm -g install .
-      - npm test
     when:
       ref: [refs/tags/v*]
 
