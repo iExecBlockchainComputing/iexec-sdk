@@ -12,7 +12,17 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      branch: [ master, next ]
+      branch: [master, next]
+
+  build_on_tag:
+    image: node:${NODE_TAG}
+    commands:
+      - npm install
+      - npm run build
+      - npm -g install .
+      - npm test
+    when:
+      ref: [refs/tags/v*]
 
   npm:
     image: plugins/npm
@@ -63,5 +73,3 @@ pipeline:
 services:
   ethereum:
     image: iexechub/poco-chain
-    entrypoint: [ "/home/parity/bin/parity" ]
-    command: [ "--chain", "/iexec-poco/parity/spec.json", "--config", "/iexec-poco/parity/authority.toml", "-d", "/iexec-poco/parity/data", "--geth" ]
