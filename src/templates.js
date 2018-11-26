@@ -34,7 +34,6 @@ const workerpool = {
   description: 'my-workerpool',
   subscriptionLockStakePolicy: '100',
   subscriptionMinimumStakePolicy: '100',
-  subscriptionMinimumScorePolicy: '100',
 };
 
 const order = {
