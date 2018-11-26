@@ -41,6 +41,7 @@ test(
 
 test('iexec wallet show', () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1));
 
+// CHAIN.JSON
 test('edit chain.json', () => expect(
   execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}",' chain.json`)
     .then(
