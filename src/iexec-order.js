@@ -14,7 +14,7 @@ const {
   command,
   prompt,
 } = require('./cli-helper');
-const { minBn, gatewayAuth, gatewayAuthLegacy } = require('./utils');
+const { minBn } = require('./utils');
 const {
   loadIExecConf,
   initOrderObj,
@@ -55,7 +55,6 @@ cli
       debug('initAll', initAll);
 
       const chain = await loadChain(cmd.chain);
-
 
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
