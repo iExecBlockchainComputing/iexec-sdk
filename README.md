@@ -12,7 +12,7 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 - The iExec Dapp Store: https://dapps.iex.ec
 - The iExec Marketplace: https://market.iex.ec
 - The iExec Explorer: https://explorer.iex.ec
-- The iExec Pools registry: https://pools.iex.ec
+- The iExec Workerpool registry: https://pools.iex.ec
 - The RLC faucet: https://faucet.iex.ec
 - iExec main documentation: https://docs.iex.ec
 - The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
