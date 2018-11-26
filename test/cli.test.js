@@ -1,6 +1,7 @@
 const { exec } = require('child_process');
 const Promise = require('bluebird');
 const ethers = require('ethers');
+const fs = require('fs');
 
 const { DRONE } = process.env;
 const execAsync = Promise.promisify(exec);
@@ -15,9 +16,13 @@ const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 test('iexec init', async () => {
   const block4 = await ethRPC.getBlock(4);
   const { creates } = await ethRPC.getTransaction(block4.transactions[0]);
-  console.log('hubAddress', creates);
   hubAddress = creates;
+  console.log('hubAddress', hubAddress);
   process.chdir('test');
+  console.log(`Current directory: ${process.cwd()}`);
+  fs.readdirSync(process.cwd()).forEach((file) => {
+    console.log(file);
+  });
   return expect(execAsync(`${iexecPath} init --force`)).resolves.not.toBe(1);
 });
 
@@ -62,59 +67,59 @@ test('edit wallet.json', () => expect(
 test('iexec info', () => expect(execAsync(`${iexecPath} info`)).resolves.not.toBe(1));
 
 // ACCOUNT
-test('iexec account login', () => expect(execAsync(`${iexecPath} account login --force`)).resolves.not.toBe(1));
-test('iexec account show', () => expect(execAsync(`${iexecPath} account show`)).resolves.not.toBe(1));
-test(
-  'iexec account deposit 1000',
-  () => expect(execAsync(`${iexecPath} account deposit 1000`)).resolves.not.toBe(1),
-  15000,
-);
-test(
-  'iexec account withdraw 1000',
-  () => expect(execAsync(`${iexecPath} account withdraw 1000`)).resolves.not.toBe(
-    1,
-  ),
-  10000,
-);
-
-// APP
-test('iexec app init', () => expect(execAsync(`${iexecPath} app init`)).resolves.not.toBe(1));
-test(
-  'iexec app deploy',
-  () => expect(execAsync(`${iexecPath} app deploy`)).resolves.not.toBe(1),
-  10000,
-);
-test('iexec app show 1', () => expect(execAsync(`${iexecPath} app show 1`)).resolves.not.toBe(1));
-test('iexec app count', () => expect(execAsync(`${iexecPath} app count`)).resolves.not.toBe(1));
-
-// DATASET
-test('iexec dataset init', () => expect(execAsync(`${iexecPath} dataset init`)).resolves.not.toBe(1));
-test(
-  'iexec dataset deploy',
-  () => expect(execAsync(`${iexecPath} dataset deploy`)).resolves.not.toBe(1),
-  10000,
-);
-test('iexec dataset show 1', () => expect(execAsync(`${iexecPath} dataset show 1`)).resolves.not.toBe(1));
-test('iexec dataset count', () => expect(execAsync(`${iexecPath} dataset count`)).resolves.not.toBe(1));
-
-// WORKERPOOL
-test('iexec workerpool init', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
-test(
-  'iexec workerpool deploy',
-  () => expect(execAsync(`${iexecPath} workerpool deploy`)).resolves.not.toBe(1),
-  10000,
-);
-test('iexec workerpool show 1', () => expect(execAsync(`${iexecPath} workerpool show 1`)).resolves.not.toBe(1));
-test('iexec workerpool count', () => expect(execAsync(`${iexecPath} workerpool count`)).resolves.not.toBe(1));
-
-// CATEGORY
-test('iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
-test(
-  'iexec category create',
-  () => expect(execAsync(`${iexecPath} category create`)).resolves.not.toBe(1),
-  10000,
-);
-test('iexec category show 1', () => expect(execAsync(`${iexecPath} category show 1`)).resolves.not.toBe(1));
+// test('iexec account login', () => expect(execAsync(`${iexecPath} account login --force`)).resolves.not.toBe(1));
+// test('iexec account show', () => expect(execAsync(`${iexecPath} account show`)).resolves.not.toBe(1));
+// test(
+//   'iexec account deposit 1000',
+//   () => expect(execAsync(`${iexecPath} account deposit 1000`)).resolves.not.toBe(1),
+//   15000,
+// );
+// test(
+//   'iexec account withdraw 1000',
+//   () => expect(execAsync(`${iexecPath} account withdraw 1000`)).resolves.not.toBe(
+//     1,
+//   ),
+//   10000,
+// );
+//
+// // APP
+// test('iexec app init', () => expect(execAsync(`${iexecPath} app init`)).resolves.not.toBe(1));
+// test(
+//   'iexec app deploy',
+//   () => expect(execAsync(`${iexecPath} app deploy`)).resolves.not.toBe(1),
+//   10000,
+// );
+// test('iexec app show 1', () => expect(execAsync(`${iexecPath} app show 1`)).resolves.not.toBe(1));
+// test('iexec app count', () => expect(execAsync(`${iexecPath} app count`)).resolves.not.toBe(1));
+//
+// // DATASET
+// test('iexec dataset init', () => expect(execAsync(`${iexecPath} dataset init`)).resolves.not.toBe(1));
+// test(
+//   'iexec dataset deploy',
+//   () => expect(execAsync(`${iexecPath} dataset deploy`)).resolves.not.toBe(1),
+//   10000,
+// );
+// test('iexec dataset show 1', () => expect(execAsync(`${iexecPath} dataset show 1`)).resolves.not.toBe(1));
+// test('iexec dataset count', () => expect(execAsync(`${iexecPath} dataset count`)).resolves.not.toBe(1));
+//
+// // WORKERPOOL
+// test('iexec workerpool init', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
+// test(
+//   'iexec workerpool deploy',
+//   () => expect(execAsync(`${iexecPath} workerpool deploy`)).resolves.not.toBe(1),
+//   10000,
+// );
+// test('iexec workerpool show 1', () => expect(execAsync(`${iexecPath} workerpool show 1`)).resolves.not.toBe(1));
+// test('iexec workerpool count', () => expect(execAsync(`${iexecPath} workerpool count`)).resolves.not.toBe(1));
+//
+// // CATEGORY
+// test('iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
+// test(
+//   'iexec category create',
+//   () => expect(execAsync(`${iexecPath} category create`)).resolves.not.toBe(1),
+//   10000,
+// );
+// test('iexec category show 1', () => expect(execAsync(`${iexecPath} category show 1`)).resolves.not.toBe(1));
 // test('iexec category count', () => expect(execAsync(`${iexecPath} category count`)).resolves.not.toBe(1));
 
 // ORDER
