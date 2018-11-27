@@ -20,6 +20,7 @@ const account = require('./account');
 const { loadChain } = require('./chains');
 const { decodeJWTForPrint } = require('./utils');
 const packageJSON = require('../package.json');
+const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
 const debug = Debug('iexec');
@@ -168,7 +169,13 @@ async function main() {
           }),
         ]);
 
+        const pocoVersion = packagelockJSON
+          && packagelockJSON.dependencies
+          && packagelockJSON.dependencies['iexec-poco']
+          && packagelockJSON.dependencies['iexec-poco'].version;
+
         const iexecAddresses = {
+          'iExec PoCo version': pocoVersion,
           'hub address': hubAddress || chain.contracts.hubAddress,
           'RLC ERC20 address': rlcAddress,
           'clerk address': clerkAddress,
