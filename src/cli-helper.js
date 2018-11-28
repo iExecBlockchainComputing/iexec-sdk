@@ -115,6 +115,13 @@ const option = {
     '--request',
     'publish a signed requestorder on iExec marketplace',
   ],
+  showAppOrder: () => ['--app [orderHash]', 'show an apporder'],
+  showDatasetOrder: () => ['--dataset [orderHash]', 'show a datasetorder'],
+  showWorkerpoolOrder: () => [
+    '--workerpool [orderHash]',
+    'show a workerpoolorder',
+  ],
+  showRequestOrder: () => ['--request [orderHash]', 'show a requestorder'],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],

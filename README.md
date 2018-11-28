@@ -193,7 +193,7 @@ iexec order sign # sign all initialized orders
 iexec order sign --app --dataset --workerpool --request # sign the specific initialized orders
 iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec marketplace
 iexec order place # NOT IMPLEMENTED
-iexec order show <orderID> # NOT IMPLEMENTED
+iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec marketplace
 iexec order fill # fill a set of signed orders (app + dataset + workerpool + request) and return a dealID
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
 ```

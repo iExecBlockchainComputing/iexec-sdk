@@ -57,6 +57,22 @@ const isEthAddress = (address, { strict = false } = {}) => {
   return isHexString;
 };
 
+const isBytes32 = (str, { strict = true } = {}) => {
+  if (typeof str !== 'string') {
+    if (strict) throw new Error('type missmatch');
+    return false;
+  }
+  if (str.length !== 66) {
+    if (strict) throw new Error('incorrect length');
+    return false;
+  }
+  if (str.substr(0, 2) !== '0x') {
+    if (strict) throw new Error('incorrect hex format');
+    return false;
+  }
+  return true;
+};
+
 /* eslint no-underscore-dangle: ["error", { "allow": ["_eventName"] }] */
 const checkEvent = (eventName, events) => {
   let confirm = false;
@@ -211,6 +227,7 @@ const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.util
 module.exports = {
   getContractAddress,
   isEthAddress,
+  isBytes32,
   checkEvent,
   getEventFromLogs,
   minBn,

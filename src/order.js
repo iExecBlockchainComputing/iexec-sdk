@@ -261,6 +261,33 @@ const publishOrder = async (chainID, orderName, orderToPublish) => {
   }
 };
 
+const showOrder = async (chainID, orderName, { orderHash } = {}) => {
+  try {
+    const endpoint = objDesc[orderName].apiEndpoint;
+    debug('endpoint', endpoint);
+    const body = {
+      chainID,
+      sort: {
+        publicationTimestamp: -1,
+      },
+      limit: 1,
+    };
+    if (orderHash) body.find = { orderHash };
+    debug('body', body);
+    const response = await http.post(endpoint, body);
+    debug('response', response);
+    if (response.ok && response.orders) {
+      const order = response.orders[0];
+      if (order) return order;
+      throw new Error('Order not published');
+    }
+    throw new Error('An error occured while getting order');
+  } catch (error) {
+    debug('publishOrder()', error);
+    throw error;
+  }
+};
+
 const matchOrders = async (
   appOrder,
   datasetOrder = NULL_DATASETORDER,
@@ -314,6 +341,7 @@ module.exports = {
   cancelRequestOrder,
   checkRemainingVolume,
   publishOrder,
+  showOrder,
   signAppOrder,
   signDatasetOrder,
   signWorkerpoolOrder,

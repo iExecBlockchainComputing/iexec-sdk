@@ -14,7 +14,7 @@ const {
   command,
   prompt,
 } = require('./cli-helper');
-const { minBn } = require('./utils');
+const { minBn, isBytes32 } = require('./utils');
 const {
   loadIExecConf,
   initOrderObj,
@@ -418,7 +418,11 @@ cli
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) throw new Error('No option specified, you should choose one');
+      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+        throw new Error(
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+        );
+      }
 
       const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain),
@@ -426,7 +430,7 @@ cli
       ]);
 
       const publishOrder = async (orderName) => {
-        const orderToPublish = signedOrders[chain.id][orderName];
+        const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
         if (!orderToPublish) {
           throw new Error(
             `Missing signed ${orderName} for chain ${
@@ -467,7 +471,11 @@ cli
   .action(async (cmd) => {
     const spinner = Spinner();
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) throw new Error('No option specified, you should choose one');
+      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+        throw new Error(
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+        );
+      }
 
       const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain),
@@ -499,33 +507,50 @@ cli
   });
 
 cli
-  .command('show [orderHash]')
+  .command('show')
+  .option(...option.showAppOrder())
+  .option(...option.showDatasetOrder())
+  .option(...option.showWorkerpoolOrder())
+  .option(...option.showRequestOrder())
   .option(...option.chain())
-  .option(...option.hub())
   .description(desc.showObj(objName, 'marketplace'))
-  .action(async (orderID, cmd) => {
+  .action(async (cmd) => {
     const spinner = Spinner();
     try {
+      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+        throw new Error(
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+        );
+      }
+
       const chain = await loadChain(cmd.chain);
-      const hubAddress = cmd.hub || chain.hub;
 
-      spinner.start(info.showing(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
-      const countRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .m_orderCount();
+      const showOrder = async (orderName, cmdInput) => {
+        const findOption = {};
+        if (isBytes32(cmdInput, { strict: false })) {
+          findOption.orderHash = cmdInput;
+        } else {
+          spinner.info(
+            `no order hash specified, showing last ${orderName} published`,
+          );
+        }
+        spinner.start(info.showing(orderName));
+        const orderToShow = await order.showOrder(
+          chain.id,
+          orderName,
+          findOption,
+        );
+        spinner.succeed(
+          `${orderName} with orderHash ${
+            orderToShow.orderHash
+          } details:${pretty(orderToShow)}`,
+        );
+      };
 
-      if (parseInt(orderID, 10) > parseInt(countRPC[0].toString(), 10)) throw Error(`${objName} with ID ${orderID} does not exist`);
-
-      const orderRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .getMarketOrder(orderID);
-
-      spinner.succeed(
-        `${objName} with ID ${orderID} details:${prettyRPC(orderRPC)}`,
-      );
+      if (cmd.app) await showOrder('apporder', cmd.app);
+      if (cmd.dataset) await showOrder('datasetorder', cmd.dataset);
+      if (cmd.workerpool) await showOrder('workerpoolorder', cmd.workerpool);
+      if (cmd.request) await showOrder('requestorder', cmd.request);
     } catch (error) {
       handleError(error, cli);
     }
