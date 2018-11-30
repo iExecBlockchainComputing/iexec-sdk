@@ -22,7 +22,7 @@ cli
   .command(command.show())
   .option(...option.chain())
   .option(...option.category())
-  .option(...option.pool())
+  .option(...option.workerpool())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
     const spinner = Spinner();
@@ -30,23 +30,37 @@ cli
       const chain = await loadChain(cmd.chain);
       debug('cmd.id', cmd.id);
       debug('cmd.category', cmd.category);
-      debug('cmd.pool', cmd.pool);
+      debug('cmd.workerpool', cmd.workerpool);
       spinner.start(info.showing(objName));
-      const orderbook = await http.get('orderbook', {
+      const response = await http.get('orderbook', {
         chainID: chain.id,
         category: cmd.category,
-        workerPool: cmd.pool,
+        workerpool: cmd.workerpool,
       });
-      debug('orderbook', orderbook);
-      const orders = orderbook.orders.map(e => ({
-        id: e.marketorderIdx,
-        price: e.value,
-        pool: e.workerpool,
+      debug('response', response);
+      const workerpoolOrders = response.orderbook.workerpoolOrders.map(e => ({
+        orderHash: e.orderHash,
         category: e.category,
-        timestamp: e.blockTimestamp,
+        price: e.workerpoolprice,
+        remainingVolume: e.remain,
+        workerpool: e.workerpool,
+        publicationTimestamp: e.publicationTimestamp,
       }));
-      if (orders.length !== 0) {
-        spinner.succeed(`${objName} details:${pretty(orders)}`);
+      const requestOrders = response.orderbook.requestOrders.map(e => ({
+        orderHash: e.orderHash,
+        category: e.category,
+        price: e.workerpoolmaxprice,
+        remainingVolume: e.remain,
+        workerpool: e.workerpool,
+        publicationTimestamp: e.publicationTimestamp,
+      }));
+      if (workerpoolOrders.length !== 0 || requestOrders.length !== 0) {
+        if (workerpoolOrders.length !== 0) {
+          spinner.succeed(
+            `workerpool orders details:${pretty(workerpoolOrders)}`,
+          );
+        }
+        if (requestOrders.length !== 0) spinner.succeed(`request orders details:${pretty(requestOrders)}`);
       } else spinner.succeed('empty order book');
       spinner.info('trade in the browser at https://market.iex.ec');
     } catch (error) {
