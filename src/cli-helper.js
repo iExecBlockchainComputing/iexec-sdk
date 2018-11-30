@@ -45,6 +45,7 @@ const command = {
   cancel: () => 'cancel',
   sign: () => 'sign',
   publish: () => 'publish',
+  unpublish: () => 'unpublish',
 };
 
 const desc = {
@@ -78,6 +79,7 @@ const desc = {
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
   publish: objName => `publish a signed ${objName}`,
+  unpublish: objName => `unpublish a signed ${objName}`,
 };
 
 const option = {
@@ -114,6 +116,22 @@ const option = {
   publishRequestOrder: () => [
     '--request',
     'publish a signed requestorder on iExec marketplace',
+  ],
+  unpublishAppOrder: () => [
+    '--app [orderHash]',
+    'unpublish a signed apporder from iExec marketplace',
+  ],
+  unpublishDatasetOrder: () => [
+    '--dataset [orderHash]',
+    'unpublish a signed datasetorder from iExec marketplace',
+  ],
+  unpublishWorkerpoolOrder: () => [
+    '--workerpool [orderHash]',
+    'unpublish a signed workerpoolorder from iExec marketplace',
+  ],
+  unpublishRequestOrder: () => [
+    '--request [orderHash]',
+    'unpublish a signed requestorder from iExec marketplace',
   ],
   showAppOrder: () => ['--app [orderHash]', 'show an apporder'],
   showDatasetOrder: () => ['--dataset [orderHash]', 'show a datasetorder'],
@@ -209,6 +227,7 @@ const prompt = {
   limitedStake: (totalCost, stake, payableVolume) => question(
     `total cost is ${totalCost} nRLC and you have ${stake} nRLC staked on your account. Your stake allows you to purchase ${payableVolume} work, do you want to continue?`,
   ),
+  unpublishFromJsonFile: (orderName, order) => question(`Do you want to unpublish the following ${orderName}? ${order}`),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);

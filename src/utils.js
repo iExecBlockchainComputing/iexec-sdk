@@ -163,10 +163,20 @@ const gatewayAuth = async (
   address,
   eth,
   endpoint,
-  { postBody = {} } = {},
+  { body = {} } = {},
 ) => {
   try {
-    debug('gatewayAuth()');
+    debug(
+      'gatewayAuth()',
+      'endpoint',
+      endpoint,
+      'address',
+      address,
+      'chainID',
+      chainID,
+    );
+
+    debug('body', body);
 
     const { data } = await httpRequest('POST')('challenge', {
       chainID,
@@ -197,7 +207,7 @@ const gatewayAuth = async (
       .concat(sign.s.substr(2))
       .concat(sign.v.toString(16));
 
-    const body = Object.assign(
+    const authBody = Object.assign(
       {
         auth: {
           data,
@@ -205,9 +215,9 @@ const gatewayAuth = async (
           sig: serializedSign,
         },
       },
-      postBody,
+      body,
     );
-    const response = await httpRequest('POST')(endpoint, body);
+    const response = await httpRequest('POST')(endpoint, authBody);
     debug('response', response);
     return response;
   } catch (error) {

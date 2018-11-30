@@ -9,7 +9,6 @@ const {
   option,
   Spinner,
   pretty,
-  prettyRPC,
   info,
   command,
   prompt,
@@ -439,7 +438,7 @@ cli
           );
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
-        spinner.start('publishing order');
+        spinner.start(`publishing ${orderName}`);
         const orderHash = await order.publishOrder(
           chain.id,
           orderName,
@@ -454,6 +453,80 @@ cli
       if (cmd.dataset) await publishOrder('datasetorder');
       if (cmd.workerpool) await publishOrder('workerpoolorder');
       if (cmd.request) await publishOrder('requestorder');
+    } catch (error) {
+      handleError(error, cli);
+    }
+  });
+
+cli
+  .command(command.unpublish())
+  .option(...option.unpublishAppOrder())
+  .option(...option.unpublishDatasetOrder())
+  .option(...option.unpublishWorkerpoolOrder())
+  .option(...option.unpublishRequestOrder())
+  .option(...option.chain())
+  .option(...option.force())
+  .description(desc.unpublish(objName))
+  .action(async (cmd) => {
+    const spinner = Spinner();
+    try {
+      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+        throw new Error(
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+        );
+      }
+
+      const [chain, signedOrders, { address }] = await Promise.all([
+        loadChain(cmd.chain),
+        loadSignedOrders(),
+        keystore.load(),
+      ]);
+
+      const unpublishOrder = async (orderName, orderHash) => {
+        let orderHashToUnpublish;
+        if (isBytes32(orderHash, { strict: false })) {
+          orderHashToUnpublish = orderHash;
+        } else {
+          spinner.info(
+            `No orderHash specified for unpublish ${orderName}, using orders.json`,
+          );
+          const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
+          if (!orderToUnpublish) {
+            throw new Error(
+              `No orderHash specified and no signed ${orderName} found for chain ${
+                chain.id
+              } in "orders.json"`,
+            );
+          }
+          orderHashToUnpublish = order.getOrderHash(
+            orderName,
+            orderToUnpublish,
+          );
+          if (!cmd.force) {
+            await prompt.unpublishFromJsonFile(
+              orderName,
+              pretty(orderToUnpublish),
+            );
+          }
+        }
+
+        spinner.start(`unpublishing ${orderName}`);
+        const unpublished = await order.unpublishOrder(
+          chain.id,
+          address,
+          chain.ethjs.currentProvider,
+          orderName,
+          orderHashToUnpublish,
+        );
+        spinner.succeed(
+          `${orderName} whith orderHash ${unpublished} successfully unpublished`,
+        );
+      };
+
+      if (cmd.app) await unpublishOrder('apporder', cmd.app);
+      if (cmd.dataset) await unpublishOrder('datasetorder', cmd.dataset);
+      if (cmd.workerpool) await unpublishOrder('workerpoolorder', cmd.workerpool);
+      if (cmd.request) await unpublishOrder('requestorder', cmd.request);
     } catch (error) {
       handleError(error, cli);
     }

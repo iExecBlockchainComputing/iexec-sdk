@@ -154,6 +154,12 @@ const getContractOwner = async (orderName, orderObj, contracts) => {
   return owner;
 };
 
+const getOrderHash = (orderName, order) => hashStruct(
+  objDesc[orderName].primaryType,
+  objDesc[orderName].structMembers,
+  order,
+);
+
 const checkRemainingVolume = async (
   orderName,
   order,
@@ -161,11 +167,7 @@ const checkRemainingVolume = async (
   { strict = true } = {},
 ) => {
   const initial = new BN(order.volume);
-  const orderHash = hashStruct(
-    objDesc[orderName].primaryType,
-    objDesc[orderName].structMembers,
-    order,
-  );
+  const orderHash = getOrderHash(orderName, order);
   const clerkAddress = await contracts.fetchClerkAddress();
   const clerkContract = contracts.getClerkContract({
     at: clerkAddress,
@@ -261,6 +263,30 @@ const publishOrder = async (chainID, orderName, orderToPublish) => {
   }
 };
 
+const unpublishOrder = async (chainID, address, eth, orderName, orderHash) => {
+  try {
+    const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
+    debug('endpoint', endpoint);
+    const body = { chainID, orderHash };
+    debug('body', body);
+    const response = await http.authorizedPost(
+      chainID,
+      address,
+      eth,
+      endpoint,
+      { body },
+    );
+    debug('response', response);
+    if (response.ok && response.unpublished) {
+      return response.unpublished;
+    }
+    throw new Error('An error occured while unpublishing order');
+  } catch (error) {
+    debug('publishOrder()', error);
+    throw error;
+  }
+};
+
 const showOrder = async (chainID, orderName, { orderHash } = {}) => {
   try {
     const endpoint = objDesc[orderName].apiEndpoint;
@@ -333,6 +359,7 @@ const matchOrders = async (
 
 module.exports = {
   getEIP712Domain,
+  getOrderHash,
   getContractOwner,
   cancelOrder,
   cancelAppOrder,
@@ -341,6 +368,7 @@ module.exports = {
   cancelRequestOrder,
   checkRemainingVolume,
   publishOrder,
+  unpublishOrder,
   showOrder,
   signAppOrder,
   signDatasetOrder,
