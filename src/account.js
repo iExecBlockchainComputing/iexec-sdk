@@ -3,6 +3,9 @@ const { Spinner, info } = require('./cli-helper');
 
 const debug = Debug('iexec:account');
 
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+const NODES_SYNC_TIME = 10000;
+
 const auth = async (address, iexec, eth) => {
   const spinner = Spinner();
   spinner.start(info.logging());
@@ -38,6 +41,8 @@ const deposit = async (contracts, amount, { hub } = {}) => {
   const allowTxReceipt = await contracts.waitForReceipt(allowTxHash);
   const allowEvents = contracts.decodeHubLogs(allowTxReceipt.logs);
   debug('allowEvents', allowEvents);
+
+  await sleep(NODES_SYNC_TIME);
 
   const txHash = await hubContract.deposit(amount);
   debug('txHash', txHash);
