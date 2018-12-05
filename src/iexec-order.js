@@ -106,9 +106,10 @@ cli
       );
       debug('signAll', signAll);
 
-      const [chain, iexecConf] = await Promise.all([
+      const [chain, iexecConf, { address }] = await Promise.all([
         loadChain(cmd.chain),
         loadIExecConf(),
+        keystore.load(),
       ]);
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
@@ -126,9 +127,13 @@ cli
         await chain.contracts.checkDeployedApp(orderObj.app, {
           strict: true,
         });
-        await order.getContractOwner('apporder', orderObj, chain.contracts, {
-          strict: true,
-        });
+        const owner = await order.getContractOwner(
+          'apporder',
+          orderObj,
+          chain.contracts,
+        );
+        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
+
         const signedOrder = await order.signAppOrder(
           orderObj,
           domainObj,
@@ -153,14 +158,14 @@ cli
         await chain.contracts.checkDeployedDataset(orderObj.dataset, {
           strict: true,
         });
-        await order.getContractOwner(
+
+        const owner = await order.getContractOwner(
           'datasetorder',
           orderObj,
           chain.contracts,
-          {
-            strict: true,
-          },
         );
+        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
+
         const signedOrder = await order.signDatasetOrder(
           orderObj,
           domainObj,
@@ -185,14 +190,14 @@ cli
         await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
           strict: true,
         });
-        await order.getContractOwner(
+
+        const owner = await order.getContractOwner(
           'workerpoolorder',
           orderObj,
           chain.contracts,
-          {
-            strict: true,
-          },
         );
+        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
+
         const signedOrder = await order.signWorkerpoolOrder(
           orderObj,
           domainObj,
@@ -320,19 +325,24 @@ cli
         !== '0x0000000000000000000000000000000000000000';
 
       // address matching check
-      if (requestOrder.app !== appOrder.app) {
+      if (requestOrder.app.toLowerCase() !== appOrder.app.toLowerCase()) {
         throw new Error(
           'app address mismatch between requestorder and apporder',
         );
       }
-      if (useDataset && requestOrder.dataset !== datasetOrder.dataset) {
+      if (
+        useDataset
+        && requestOrder.dataset.toLowerCase()
+          !== datasetOrder.dataset.toLowerCase()
+      ) {
         throw new Error(
           'dataset address mismatch between requestorder and datasetorder',
         );
       }
       if (
         useWorkerpool
-        && requestOrder.workerpool !== workerpoolOrder.workerpool
+        && requestOrder.workerpool.toLowerCase()
+          !== workerpoolOrder.workerpool.toLowerCase()
       ) {
         throw new Error(
           'workerpool address mismatch between requestorder and workerpoolorder',

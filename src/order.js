@@ -6,6 +6,7 @@ const {
   ethersBnToBn,
   http,
   getSalt,
+  checksummedAddress,
 } = require('./utils');
 const { hashStruct } = require('./sig-utils');
 
@@ -150,7 +151,7 @@ const getContractOwner = async (orderName, orderObj, contracts) => {
   const contract = contracts.getContract(objDesc[orderName].contractName)({
     at: contractAddress,
   });
-  const owner = await contract.m_owner();
+  const owner = checksummedAddress(await contract.m_owner());
   return owner;
 };
 

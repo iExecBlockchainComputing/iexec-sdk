@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const { isEthAddress, ethersBnToBn } = require('./utils');
+const { isEthAddress, ethersBnToBn, checksummedAddress } = require('./utils');
 const { Spinner, info, prettyRPC } = require('./cli-helper');
 
 const debug = Debug('iexec:hub');
@@ -10,9 +10,10 @@ const createObj = objName => async (contracts, obj, options) => {
   spinner.start(info.deploying(objName));
 
   const logs = await contracts.createObj(objName)(obj, options);
+  const address = checksummedAddress(logs[0][objName]);
 
-  spinner.succeed(`Deployed new ${objName} at address ${logs[0][objName]}`);
-  return logs;
+  spinner.succeed(`Deployed new ${objName} at address ${address}`);
+  return address;
 };
 
 const showObj = objName => async (

@@ -11,6 +11,8 @@ const debug = Debug('iexec:utils');
 const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
+const checksummedAddress = address => ethers.utils.getAddress(address);
+
 const minBn = (bnArray) => {
   let min = new BN(bnArray[0]);
   bnArray.map((e) => {
@@ -237,6 +239,7 @@ const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.util
 module.exports = {
   getContractAddress,
   isEthAddress,
+  checksummedAddress,
   isBytes32,
   checkEvent,
   getEventFromLogs,

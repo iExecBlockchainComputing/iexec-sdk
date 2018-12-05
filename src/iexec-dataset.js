@@ -52,11 +52,11 @@ cli
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
-      const logs = await hub.createObj(objName)(
+      const address = await hub.createObj(objName)(
         chain.contracts,
         iexecConf[objName],
       );
-      await saveDeployedObj(objName, chain.id, logs[0][objName]);
+      await saveDeployedObj(objName, chain.id, address);
     } catch (error) {
       handleError(error, cli);
     }

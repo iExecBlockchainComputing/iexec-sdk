@@ -17,7 +17,7 @@ const auth = async (address, iexec, eth) => {
 
   const { jwtoken } = await iexec.getJWTBySignature(
     msgJSON,
-    address,
+    address.toLowerCase(),
     signature,
   );
   debug('jwtoken', jwtoken);

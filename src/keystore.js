@@ -65,7 +65,6 @@ const load = async ({
 
   const derivedUserWallet = walletFromPrivKey(privateKey, {
     prefix,
-    lowercase,
   });
   return derivedUserWallet;
 };
