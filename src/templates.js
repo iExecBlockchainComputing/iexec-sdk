@@ -32,8 +32,6 @@ const dataset = {
 const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
-  subscriptionLockStakePolicy: '100',
-  subscriptionMinimumStakePolicy: '100',
 };
 
 const order = {
