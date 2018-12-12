@@ -455,7 +455,7 @@ cli
           orderToPublish,
         );
         spinner.succeed(
-          `${orderName} successfully published whith orderHash ${orderHash}`,
+          `${orderName} successfully published with orderHash ${orderHash}`,
         );
       };
 
@@ -529,7 +529,7 @@ cli
           orderHashToUnpublish,
         );
         spinner.succeed(
-          `${orderName} whith orderHash ${unpublished} successfully unpublished`,
+          `${orderName} with orderHash ${unpublished} successfully unpublished`,
         );
       };
 
