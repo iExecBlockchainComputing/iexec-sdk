@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
+const multiaddr = require('multiaddr');
 const {
   help,
   handleError,
@@ -52,9 +53,14 @@ cli
         loadChain(cmd.chain),
         loadIExecConf(),
       ]);
+      const datasetMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr)
+        .buffer;
+      const datasetToDeploy = Object.assign({}, iexecConf[objName], {
+        multiaddr: datasetMultiaddrBuffer,
+      });
       const address = await hub.createObj(objName)(
         chain.contracts,
-        iexecConf[objName],
+        datasetToDeploy,
       );
       await saveDeployedObj(objName, chain.id, address);
     } catch (error) {

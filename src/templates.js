@@ -13,20 +13,13 @@ const main = {
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-app',
-  params: {
-    type: 'DOCKER',
-    envvars: 'XWDOCKERIMAGE=hello-world',
-  },
-  hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  multiaddr: '/dns4/hub.docker.com/tcp/443',
 };
 
 const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
-  params: {
-    arg1: 'value1',
-  },
-  hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
 };
 
 const workerpool = {
