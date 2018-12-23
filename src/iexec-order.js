@@ -137,7 +137,7 @@ cli
         const signedOrder = await order.signAppOrder(
           orderObj,
           domainObj,
-          chain.ethjs.currentProvider,
+          chain.ethSigner.provider._web3Provider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'apporder',
@@ -169,7 +169,7 @@ cli
         const signedOrder = await order.signDatasetOrder(
           orderObj,
           domainObj,
-          chain.ethjs.currentProvider,
+          chain.ethSigner.provider._web3Provider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'datasetorder',
@@ -201,7 +201,7 @@ cli
         const signedOrder = await order.signWorkerpoolOrder(
           orderObj,
           domainObj,
-          chain.ethjs.currentProvider,
+          chain.ethSigner.provider._web3Provider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'workerpoolorder',
@@ -225,7 +225,7 @@ cli
         const signedOrder = await order.signRequestOrder(
           orderObj,
           domainObj,
-          chain.ethjs.currentProvider,
+          chain.ethSigner.provider._web3Provider,
         );
         const { saved, fileName } = await saveSignedOrder(
           'requestorder',
@@ -524,7 +524,7 @@ cli
         const unpublished = await order.unpublishOrder(
           chain.id,
           address,
-          chain.ethjs.currentProvider,
+          chain.ethSigner.provider._web3Provider,
           orderName,
           orderHashToUnpublish,
         );

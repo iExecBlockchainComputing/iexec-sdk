@@ -26,11 +26,7 @@ const auth = async (address, iexec, eth) => {
 };
 
 const checkBalance = async (contracts, address) => {
-  const clerkAddress = await contracts.fetchClerkAddress();
-  const clerkContract = contracts.getClerkContract({
-    at: clerkAddress,
-  });
-  const { stake, locked } = await clerkContract.viewAccount(address);
+  const { stake, locked } = await contracts.checkBalance(address);
   const balance = {
     stake: ethersBnToBn(stake),
     locked: ethersBnToBn(locked),

@@ -46,7 +46,6 @@ const createChains = (
         authURL: chainsConf.auth,
       });
       chains[name].contracts = createIExecContracts({
-        eth: chains[name].ethjs,
         ethSigner: chains[name].ethSigner,
         chainID: chains[name].id,
         hubAddress: chains[name].hub,
