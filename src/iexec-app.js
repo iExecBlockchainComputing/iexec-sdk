@@ -54,8 +54,13 @@ cli
         loadIExecConf(),
       ]);
       const appMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
+      const appMREnclaveBuffer = Buffer.from(
+        iexecConf[objName].mrenclave,
+        'utf8',
+      );
       const appToDeploy = Object.assign({}, iexecConf[objName], {
         multiaddr: appMultiaddrBuffer,
+        mrenclave: appMREnclaveBuffer,
       });
       const address = await hub.createObj(objName)(
         chain.contracts,
