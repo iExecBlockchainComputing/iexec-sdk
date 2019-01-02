@@ -21,6 +21,17 @@ test('iexec init', async () => {
   return expect(execAsync(`${iexecPath} init --force`)).resolves.not.toBe(1);
 });
 
+// CHAIN.JSON
+test('edit chain.json', () => expect(
+  execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}",' chain.json`)
+    .then(
+      execAsync(`sed -i '/"default"/c"default": "${chainName}",' chain.json`),
+    )
+    .then(
+      execAsync(`sed -i '/"host"/c"host": "${ethereumURL}",' chain.json`),
+    ),
+).resolves.not.toBe(1));
+
 test('iexec wallet create', () => expect(execAsync(`${iexecPath} wallet create --force`)).resolves.not.toBe(1));
 
 test(
@@ -41,17 +52,7 @@ test(
 
 test('iexec wallet show', () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1));
 
-// CHAIN.JSON
-test('edit chain.json', () => expect(
-  execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}",' chain.json`)
-    .then(
-      execAsync(`sed -i '/"default"/c"default": "${chainName}",' chain.json`),
-    )
-    .then(
-      execAsync(`sed -i '/"host"/c"host": "${ethereumURL}",' chain.json`),
-    ),
-).resolves.not.toBe(1));
-
+// REPLACE WALLET
 test('edit wallet.json', () => expect(
   execAsync(
     'sed -i \'/"privateKey"/c"privateKey": "0xeb7877df435d1edf3f2dc94bf6784f20592d5d3235ef86a44002f2f6e58efd09",\' wallet.json',
