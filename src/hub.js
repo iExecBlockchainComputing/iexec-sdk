@@ -6,13 +6,8 @@ const { Spinner, info, prettyRPC } = require('./cli-helper');
 const debug = Debug('iexec:hub');
 
 const createObj = objName => async (contracts, obj, options) => {
-  const spinner = Spinner();
-  spinner.start(info.deploying(objName));
-
   const logs = await contracts.createObj(objName)(obj, options);
   const address = checksummedAddress(logs[0][objName]);
-
-  spinner.succeed(`Deployed new ${objName} at address ${address}`);
   return address;
 };
 
@@ -22,8 +17,6 @@ const showObj = objName => async (
   userAddress,
   options,
 ) => {
-  const spinner = Spinner();
-  spinner.start(info.showing(objName));
 
   let objAddress;
   if (
@@ -45,23 +38,15 @@ const showObj = objName => async (
   }
 
   const obj = await contracts.getObjProps(objName)(objAddress);
-
-  spinner.succeed(`${objName} ${objAddress} details:${prettyRPC(obj)}`);
-  return obj;
+  return { obj, objAddress };
 };
 
 const countObj = objName => async (contracts, userAddress, options) => {
-  const spinner = Spinner();
-  spinner.start(info.counting(objName));
 
   const objCountBN = ethersBnToBn(
     await contracts.getUserObjCount(objName)(userAddress, options),
   );
   debug('objCountBN', objCountBN);
-
-  spinner.succeed(
-    `User ${userAddress} has a total of ${objCountBN} ${objName}`,
-  );
   return objCountBN;
 };
 
