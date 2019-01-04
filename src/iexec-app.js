@@ -53,7 +53,7 @@ deploy
     const spinner = Spinner(cmd);
     try {
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadIExecConf(),
       ]);
       const appMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
@@ -90,7 +90,7 @@ show
     const spinner = Spinner(cmd);
     try {
       const [chain, { address }, deployedObj] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         load(),
         loadDeployedObj(objName),
       ]);
@@ -124,7 +124,7 @@ count
     const spinner = Spinner(cmd);
     try {
       const [chain, { address }] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         load(),
       ]);
       const userAddress = cmd.user || address;
