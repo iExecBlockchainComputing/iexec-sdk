@@ -28,6 +28,8 @@ const order = require('./order');
 const account = require('./account');
 const templates = require('./templates');
 
+/* eslint no-underscore-dangle: ["error", { "allow": ["_web3Provider"] }] */
+
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
