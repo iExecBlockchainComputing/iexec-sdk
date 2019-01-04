@@ -72,8 +72,7 @@ const loadChains = async () => {
   }
 };
 
-const loadChain = async (chainName) => {
-  const spinner = Spinner();
+const loadChain = async (chainName, spinner = Spinner()) => {
   try {
     const chains = await loadChains();
     if (chainName) {

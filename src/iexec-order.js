@@ -4,6 +4,7 @@ const BN = require('bn.js');
 const cli = require('commander');
 const {
   help,
+  addGlobalOptions,
   handleError,
   desc,
   option,
@@ -30,8 +31,9 @@ const templates = require('./templates');
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
-cli
-  .command('init')
+const init = cli.command('init');
+addGlobalOptions(init);
+init
   .option(...option.initAppOrder())
   .option(...option.initDatasetOrder())
   .option(...option.initWorkerpoolOrder())
@@ -39,7 +41,7 @@ cli
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       debug('cmd.app', cmd.app);
       debug('cmd.dataset', cmd.dataset);
@@ -53,7 +55,7 @@ cli
       );
       debug('initAll', initAll);
 
-      const chain = await loadChain(cmd.chain);
+      const chain = await loadChain(cmd.chain, spinner);
 
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
@@ -74,6 +76,7 @@ cli
           `Saved default ${orderName} in "${fileName}", you can edit it:${pretty(
             saved,
           )}`,
+          { raw: { order: saved } },
         );
       };
 
@@ -82,12 +85,13 @@ cli
       if (cmd.workerpool || initAll) await initOrder('workerpool');
       if (cmd.request || initAll) await initOrder('request');
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command(command.sign())
+const sign = cli.command(command.sign());
+addGlobalOptions(sign);
+sign
   .option(...option.signAppOrder())
   .option(...option.signDatasetOrder())
   .option(...option.signWorkerpoolOrder())
@@ -96,7 +100,7 @@ cli
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       const signAll = !(
         cmd.app
@@ -107,7 +111,7 @@ cli
       debug('signAll', signAll);
 
       const [chain, iexecConf, { address }] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadIExecConf(),
         keystore.load(),
       ]);
@@ -146,6 +150,7 @@ cli
         );
         spinner.succeed(
           info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          { raw: { order: signedOrder } },
         );
       };
 
@@ -178,6 +183,7 @@ cli
         );
         spinner.succeed(
           info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          { raw: { order: signedOrder } },
         );
       };
 
@@ -210,6 +216,7 @@ cli
         );
         spinner.succeed(
           info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          { raw: { order: signedOrder } },
         );
       };
 
@@ -234,6 +241,7 @@ cli
         );
         spinner.succeed(
           info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          { raw: { order: signedOrder } },
         );
       };
 
@@ -242,20 +250,21 @@ cli
       if (cmd.workerpool || signAll) await signWorkerpoolOrder();
       if (cmd.request || signAll) await signRequestOrder();
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command(command.fill())
+const fill = cli.command(command.fill());
+addGlobalOptions(fill);
+fill
   .option(...option.chain())
   .option(...option.force())
   .description(desc.fill(objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadSignedOrders(),
       ]);
       debug('signedOrders', signedOrders);
@@ -311,7 +320,12 @@ cli
           requester: address,
           volume: volume.toString(),
         });
-        await prompt.signGeneratedOrder('requestorder', pretty(unsignedOrder));
+        if (!cmd.force && !cmd.raw) {
+          await prompt.signGeneratedOrder(
+            'requestorder',
+            pretty(unsignedOrder),
+          );
+        }
         const domain = order.getEIP712Domain(chain.id, clerkAddress);
         const signed = order.signRequestOrder(unsignedOrder, domain);
         return signed;
@@ -360,7 +374,7 @@ cli
         workerpoolVolume,
         requestVolume,
       ]);
-      if (requestVolume.gt(maxVolume) && !cmd.force) await prompt.limitedVolume(maxVolume, requestVolume);
+      if (requestVolume.gt(maxVolume) && !cmd.force && !cmd.raw) await prompt.limitedVolume(maxVolume, requestVolume);
       // price check
       const workerpoolPrice = new BN(workerpoolOrder.workerpoolprice);
       const workerpoolMaxPrice = new BN(requestOrder.workerpoolmaxprice);
@@ -392,7 +406,7 @@ cli
         );
       }
       const totalCost = costPerWork.mul(maxVolume);
-      if (stake.lt(totalCost) && !cmd.force) {
+      if (stake.lt(totalCost) && !cmd.force && !cmd.raw) {
         const payableVolume = costPerWork.isZero()
           ? new BN(0)
           : stake.div(costPerWork);
@@ -409,14 +423,16 @@ cli
       );
       spinner.succeed(
         `${volume} work successfully purchased with dealid ${dealid}`,
+        { raw: { dealid, volume } },
       );
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command(command.publish())
+const publish = cli.command(command.publish());
+addGlobalOptions(publish);
+publish
   .option(...option.publishAppOrder())
   .option(...option.publishDatasetOrder())
   .option(...option.publishWorkerpoolOrder())
@@ -425,7 +441,9 @@ cli
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    debug('cmd', cmd);
+    debug('cmd.parent', cmd.parent);
+    const spinner = Spinner(cmd.parent);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
         throw new Error(
@@ -434,7 +452,7 @@ cli
       }
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadSignedOrders(),
       ]);
 
@@ -447,7 +465,7 @@ cli
             } in "orders.json"`,
           );
         }
-        if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+        if (!cmd.force && !cmd.raw) await prompt.publishOrder(orderName, pretty(orderToPublish));
         spinner.start(`publishing ${orderName}`);
         const orderHash = await order.publishOrder(
           chain.id,
@@ -456,6 +474,7 @@ cli
         );
         spinner.succeed(
           `${orderName} successfully published with orderHash ${orderHash}`,
+          { raw: { orderHash } },
         );
       };
 
@@ -464,12 +483,13 @@ cli
       if (cmd.workerpool) await publishOrder('workerpoolorder');
       if (cmd.request) await publishOrder('requestorder');
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command(command.unpublish())
+const unpublish = cli.command(command.unpublish());
+addGlobalOptions(unpublish);
+unpublish
   .option(...option.unpublishAppOrder())
   .option(...option.unpublishDatasetOrder())
   .option(...option.unpublishWorkerpoolOrder())
@@ -478,7 +498,7 @@ cli
   .option(...option.force())
   .description(desc.unpublish(objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
         throw new Error(
@@ -487,7 +507,7 @@ cli
       }
 
       const [chain, signedOrders, { address }] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -512,7 +532,7 @@ cli
             orderName,
             orderToUnpublish,
           );
-          if (!cmd.force) {
+          if (!cmd.force && !cmd.raw) {
             await prompt.unpublishFromJsonFile(
               orderName,
               pretty(orderToUnpublish),
@@ -530,6 +550,7 @@ cli
         );
         spinner.succeed(
           `${orderName} with orderHash ${unpublished} successfully unpublished`,
+          { raw: { orderHash: unpublished } },
         );
       };
 
@@ -538,12 +559,13 @@ cli
       if (cmd.workerpool) await unpublishOrder('workerpoolorder', cmd.workerpool);
       if (cmd.request) await unpublishOrder('requestorder', cmd.request);
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command(command.cancel())
+const cancel = cli.command(command.cancel());
+addGlobalOptions(cancel);
+cancel
   .option(...option.cancelAppOrder())
   .option(...option.cancelDatasetOrder())
   .option(...option.cancelWorkerpoolOrder())
@@ -552,7 +574,7 @@ cli
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
         throw new Error(
@@ -561,7 +583,7 @@ cli
       }
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, spinner),
         loadSignedOrders(),
       ]);
 
@@ -574,7 +596,7 @@ cli
             } in "orders.json"`,
           );
         }
-        if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+        if (!cmd.force && !cmd.raw) await prompt.cancelOrder(orderName, pretty(orderToCancel));
         spinner.start(`canceling ${orderName}`);
         await order.cancelOrder(orderName, orderToCancel, chain.contracts);
         spinner.succeed(`${orderName} successfully canceled`);
@@ -585,12 +607,13 @@ cli
       if (cmd.workerpool) await cancelOrder('workerpoolorder');
       if (cmd.request) await cancelOrder('requestorder');
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command('show')
+const show = cli.command('show');
+addGlobalOptions(show);
+show
   .option(...option.showAppOrder())
   .option(...option.showDatasetOrder())
   .option(...option.showWorkerpoolOrder())
@@ -598,7 +621,7 @@ cli
   .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
         throw new Error(
@@ -606,7 +629,7 @@ cli
         );
       }
 
-      const chain = await loadChain(cmd.chain);
+      const chain = await loadChain(cmd.chain, spinner);
 
       const showOrder = async (orderName, cmdInput) => {
         const findOption = {};
@@ -627,6 +650,7 @@ cli
           `${orderName} with orderHash ${
             orderToShow.orderHash
           } details:${pretty(orderToShow)}`,
+          { raw: { order: orderToShow } },
         );
       };
 
@@ -635,19 +659,20 @@ cli
       if (cmd.workerpool) await showOrder('workerpoolorder', cmd.workerpool);
       if (cmd.request) await showOrder('requestorder', cmd.request);
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command('count')
+const count = cli.command('count');
+addGlobalOptions(count);
+count
   .option(...option.chain())
   .option(...option.hub())
   .description(desc.countObj(objName, 'marketplace'))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain);
+      const chain = await loadChain(cmd.chain, spinner);
       const hubAddress = cmd.hub || chain.hub;
 
       spinner.start(info.counting(objName));
@@ -659,9 +684,12 @@ cli
         .m_orderCount();
 
       debug('countRPC', countRPC);
-      spinner.succeed(`iExec marketplace has a total of ${countRPC[0]} orders`);
+      spinner.succeed(
+        `iExec marketplace has a total of ${countRPC[0]} orders`,
+        { raw: { count: countRPC[0] } },
+      );
     } catch (error) {
-      handleError(error, cli, spinner);
+      handleError(error, cli, cmd);
     }
   });
 

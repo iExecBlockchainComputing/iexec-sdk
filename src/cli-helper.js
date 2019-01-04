@@ -49,6 +49,7 @@ const command = {
 };
 
 const desc = {
+  raw: () => 'use raw output',
   hubAddress: () => 'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chains.json"',
   userAddress: () => 'custom user address',
@@ -83,6 +84,7 @@ const desc = {
 };
 
 const option = {
+  raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
@@ -185,6 +187,10 @@ const option = {
     '--encryptedOutputsFolder <path>',
     'path of folder containing decrypted work result',
   ],
+};
+
+const addGlobalOptions = (cli) => {
+  cli.option(...option.raw());
 };
 
 const question = async (
@@ -329,18 +335,46 @@ const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
   }
 };
 
-const Spinner = () => Ora(oraOptions);
+const Spinner = (cmd) => {
+  // debug('Spinner use raw', !!(cmd && cmd.raw));
+  if (cmd && cmd.raw) {
+    const nothing = () => {};
+    const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify(Object.assign({ ok: true }, raw)));
+    const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify(Object.assign({ ok: false }, raw)));
+    return {
+      start: nothing,
+      stop: nothing,
+      info: nothing,
+      warn: nothing,
+      succeed,
+      fail,
+    };
+  }
+  return Ora(oraOptions);
+};
 
-const handleError = (error, cli, spinner = Spinner()) => {
+const handleError = (error, cli, cmd) => {
+  const spinner = Spinner(cmd);
   const lastArg = cli.args[cli.args.length - 1];
   const lastCommandName = typeof lastArg === 'object' ? lastArg._name : '';
   const commandName = cli._name
     .split('-')
     .join(' ')
     .concat(' ', lastCommandName);
-  console.log('\n');
-  spinner.fail(`command "${commandName}" failed with ${error}`);
-  cli.help(helpCB);
+  if (!cmd || !cmd.raw) {
+    console.log('\n');
+  }
+  spinner.fail(`command "${commandName}" failed with ${error}`, {
+    raw: {
+      command: commandName,
+      error: error.message,
+    },
+  });
+  if (cmd && cmd.raw) {
+    process.exit(1);
+  } else {
+    cli.help(helpCB);
+  }
 };
 
 const lbb = (str = '') => `\n${str}`;
@@ -368,6 +402,7 @@ module.exports = {
   command,
   desc,
   option,
+  addGlobalOptions,
   prompt,
   pretty,
   prettyRPC,
