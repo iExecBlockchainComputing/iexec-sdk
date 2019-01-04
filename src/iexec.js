@@ -47,7 +47,7 @@ async function main() {
     .option(...option.force())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
-      const spinner = Spinner();
+      const spinner = Spinner(cmd);
       try {
         const { force } = cmd;
         const { saved, fileName } = await initIExecConf({
@@ -85,11 +85,14 @@ async function main() {
           loadChain('ropsten'),
           keystore.load({ lowercase: true }),
         ]);
+
+        spinner.start(info.logging());
         const jwtoken = await account.auth(
           keys.address,
           chain.iexec,
           chain.ethjs,
         );
+        spinner.stop();
 
         const accountfileName = await saveAccountConf(
           { jwtoken },

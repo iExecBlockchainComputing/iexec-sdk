@@ -1,13 +1,10 @@
 const Debug = require('debug');
-const { Spinner, info } = require('./cli-helper');
 const { checkEvent, ethersBnToBn } = require('./utils');
 
 const debug = Debug('iexec:account');
 
-const auth = async (address, iexec, eth) => {
-  const spinner = Spinner();
-  spinner.start(info.logging());
 
+const auth = async (address, iexec, eth) => {
   const { message } = await iexec.getTypedMessage();
   debug('message', message);
   const msgJSON = JSON.stringify(message);
@@ -21,7 +18,6 @@ const auth = async (address, iexec, eth) => {
     signature,
   );
   debug('jwtoken', jwtoken);
-  spinner.stop();
   return jwtoken;
 };
 
@@ -36,11 +32,7 @@ const checkBalance = async (contracts, address) => {
 };
 
 const deposit = async (contracts, amount) => {
-  const spinner = Spinner();
-  spinner.start(info.depositing());
-
   const clerkAddress = await contracts.fetchClerkAddress();
-
   const rlcAddress = await contracts.fetchRLCAddress();
   debug('rlcAddress', rlcAddress);
   const allowTx = await contracts
@@ -56,33 +48,25 @@ const deposit = async (contracts, amount) => {
   const clerkContract = contracts.getClerkContract({
     at: clerkAddress,
   });
-
   const tx = await clerkContract.deposit(amount);
   const txReceipt = await tx.wait();
   const events = contracts.decodeClerkLogs(txReceipt.logs);
   debug('events', events);
   if (!checkEvent('Deposit', events)) throw Error('Deposit not confirmed');
-
-  spinner.succeed(info.deposited(amount));
+  return amount;
 };
 
 const withdraw = async (contracts, amount) => {
-  const spinner = Spinner();
-  spinner.start(info.withdrawing());
-
   const clerkAddress = await contracts.fetchClerkAddress();
-
   const clerkContract = contracts.getClerkContract({
     at: clerkAddress,
   });
-
   const tx = await clerkContract.withdraw(amount);
   const txReceipt = await tx.wait();
   const events = contracts.decodeClerkLogs(txReceipt.logs);
   debug('events', events);
   if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
-
-  spinner.succeed(info.withdrawed(amount));
+  return amount;
 };
 
 module.exports = {
