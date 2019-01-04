@@ -116,22 +116,27 @@ test(
   10000,
 );
 test('iexec category show 1', () => expect(execAsync(`${iexecPath} category show 1`)).resolves.not.toBe(1));
-// test('iexec category count', () => expect(execAsync(`${iexecPath} category count`)).resolves.not.toBe(1));
+test('iexec category count', () => expect(execAsync(`${iexecPath} category count`)).resolves.not.toBe(1));
 
 // ORDER
-// test('iexec order init', () => expect(execAsync(`${iexecPath} order init`)).resolves.not.toBe(1));
-// test('iexec order init --app', () => expect(execAsync(`${iexecPath} order init --app`)).resolves.not.toBe(1));
-// test('iexec order init --data', () => expect(execAsync(`${iexecPath} order init --data`)).resolves.not.toBe(1));
-// test('iexec order init --pool', () => expect(execAsync(`${iexecPath} order init --pool`)).resolves.not.toBe(1));
-// test('iexec order init --user', () => expect(execAsync(`${iexecPath} order init --user`)).resolves.not.toBe(1));
-//
-// // Uncomment when PoCo v3 deployed
-// test.skip('iexec order sign', () => expect(execAsync(`${iexecPath} order sign`)).resolves.not.toBe(1));
-// test.skip('iexec order sign --app', () => expect(execAsync(`${iexecPath} order sign --app`)).resolves.not.toBe(1));
-// test.skip('iexec order sign --data', () => expect(execAsync(`${iexecPath} order sign --data`)).resolves.not.toBe(1));
-// test.skip('iexec order sign --pool', () => expect(execAsync(`${iexecPath} order sign --pool`)).resolves.not.toBe(1));
-// test.skip('iexec order sign --user', () => expect(execAsync(`${iexecPath} order sign --user`)).resolves.not.toBe(1));
-//
+test('iexec order init', () => expect(execAsync(`${iexecPath} order init`)).resolves.not.toBe(1));
+test('iexec order init --app', () => expect(execAsync(`${iexecPath} order init --app`)).resolves.not.toBe(1));
+test('iexec order init --dataset', () => expect(execAsync(`${iexecPath} order init --dataset`)).resolves.not.toBe(1));
+test('iexec order init --workerpool', () => expect(execAsync(`${iexecPath} order init --workerpool`)).resolves.not.toBe(
+  1,
+));
+test('iexec order init --request', () => expect(execAsync(`${iexecPath} order init --request`)).resolves.not.toBe(1));
+
+// need to edit app
+test.skip('iexec order sign', () => expect(execAsync(`${iexecPath} order sign`)).resolves.not.toBe(1));
+test('iexec order sign --app', () => expect(execAsync(`${iexecPath} order sign --app`)).resolves.not.toBe(1));
+test('iexec order sign --dataset', () => expect(execAsync(`${iexecPath} order sign --dataset`)).resolves.not.toBe(1));
+test('iexec order sign --workerpool', () => expect(execAsync(`${iexecPath} order sign --workerpool`)).resolves.not.toBe(
+  1,
+));
+// need to edit app
+test.skip('iexec order sign --request', () => expect(execAsync(`${iexecPath} order sign --request`)).resolves.not.toBe(1));
+
 // // Uncomment when update schema-validator
 // test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
 // test.skip('iexec registry validate dataset', () => expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
