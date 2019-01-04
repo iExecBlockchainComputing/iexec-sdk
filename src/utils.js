@@ -8,8 +8,35 @@ const ethers = require('ethers');
 
 const debug = Debug('iexec:utils');
 
+/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_eventName"] }] */
+
+const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
+
 const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
+
+const bnifyNestedEthersBn = (obj) => {
+  const objOut = {};
+  debug(obj);
+  Object.entries(obj).forEach((e) => {
+    const [k, v] = e;
+    if (isEthersBn(v)) objOut[k] = v.toString();
+    else if (typeof v === 'object') objOut[k] = bnifyNestedEthersBn(v);
+    else objOut[k] = v;
+  });
+  return objOut;
+};
+
+const strigifyNestedBn = (obj) => {
+  const objOut = {};
+  Object.entries(obj).forEach((e) => {
+    const [k, v] = e;
+    if (v instanceof BN) objOut[k] = v.toString();
+    else if (typeof v === 'object') objOut[k] = strigifyNestedBn(v);
+    else objOut[k] = v;
+  });
+  return objOut;
+};
 
 const checksummedAddress = address => ethers.utils.getAddress(address);
 
@@ -75,7 +102,6 @@ const isBytes32 = (str, { strict = true } = {}) => {
   return true;
 };
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_eventName"] }] */
 const checkEvent = (eventName, events) => {
   let confirm = false;
   events.forEach((event) => {
@@ -246,6 +272,8 @@ module.exports = {
   minBn,
   bnToEthersBn,
   ethersBnToBn,
+  bnifyNestedEthersBn,
+  strigifyNestedBn,
   toUpperFirst,
   secToDate,
   decodeJWTForPrint,

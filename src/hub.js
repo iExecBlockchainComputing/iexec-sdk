@@ -1,7 +1,11 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const { isEthAddress, ethersBnToBn, checksummedAddress } = require('./utils');
-const { Spinner, info, prettyRPC } = require('./cli-helper');
+const {
+  isEthAddress,
+  ethersBnToBn,
+  checksummedAddress,
+  bnifyNestedEthersBn,
+} = require('./utils');
 
 const debug = Debug('iexec:hub');
 
@@ -17,7 +21,6 @@ const showObj = objName => async (
   userAddress,
   options,
 ) => {
-
   let objAddress;
   if (
     !ethUtil.isHexString(objAdressOrIndex)
@@ -37,12 +40,13 @@ const showObj = objName => async (
     );
   }
 
-  const obj = await contracts.getObjProps(objName)(objAddress);
+  const obj = bnifyNestedEthersBn(
+    await contracts.getObjProps(objName)(objAddress),
+  );
   return { obj, objAddress };
 };
 
 const countObj = objName => async (contracts, userAddress, options) => {
-
   const objCountBN = ethersBnToBn(
     await contracts.getUserObjCount(objName)(userAddress, options),
   );
@@ -53,9 +57,14 @@ const countObj = objName => async (contracts, userAddress, options) => {
 const createCategory = async (contracts, obj, options) => {
   const logs = await contracts.createCategory(obj, options);
   debug('logs', logs);
+  return logs[0].catid;
 };
 
 const showCategory = async (contracts, index, options) => {
+  const category = bnifyNestedEthersBn(
+    await contracts.getCategoryByIndex(index, options),
+  );
+  return category;
 };
 
 const countCategory = async (contracts, options) => {
