@@ -51,35 +51,17 @@ const countObj = objName => async (contracts, userAddress, options) => {
 };
 
 const createCategory = async (contracts, obj, options) => {
-  const spinner = Spinner();
-  spinner.start(info.creating('category'));
-
   const logs = await contracts.createCategory(obj, options);
   debug('logs', logs);
-
-  spinner.succeed(`New category created at index ${logs[0].catid}`);
-  return logs;
 };
 
 const showCategory = async (contracts, index, options) => {
-  const spinner = Spinner();
-  spinner.start(info.showing('category'));
-  const categoryRPC = await contracts.getCategoryByIndex(index, options);
-  spinner.succeed(
-    `Category at index ${index} details:${prettyRPC(categoryRPC)}`,
-  );
-  return categoryRPC;
 };
 
 const countCategory = async (contracts, options) => {
-  const spinner = Spinner();
-  spinner.start(info.counting('category'));
-
   const countBN = ethersBnToBn(
     await contracts.getHubContract(options).countCategory(),
   );
-
-  spinner.succeed(`iExec hub has a total of ${countBN} category`);
   return countBN;
 };
 
