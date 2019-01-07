@@ -129,11 +129,11 @@ async function main() {
 
   cli.command('order', 'manage iExec marketplace orders');
 
-  cli.command('work', 'manage iExec works');
+  cli.command('task', 'manage iExec tasks');
 
   cli.command('sgx', 'interact with Intel SGX');
 
-  cli.command('registry', 'interact with iExec registry');
+  // cli.command('registry', 'interact with iExec registry');
 
   cli
     .command('info')
