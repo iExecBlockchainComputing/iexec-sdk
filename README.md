@@ -88,11 +88,11 @@ iexec app deploy # deploy app on Ethereum
 iexec app show # show details of deployed app
 ```
 
-### Buy & Run work using Marketplace
+### Buy & Run task using Marketplace
 
 ```bash
-iexec order init --app --dataset --workerpool # init work order fields in iexec.json
-iexec order sign --app --dataset --workerpool # sign initialized orders
+iexec order init --app --dataset --workerpool --request # init orders fields in iexec.json
+iexec order sign --app --dataset --workerpool --request # sign initialized orders
 iexec order fill # fill all signed orders
 ```
 
@@ -198,12 +198,23 @@ iexec order fill # fill a set of signed orders (app + dataset + workerpool + req
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
 ```
 
-## deal/task
+## deal
 
 ```bash
 # OPTIONS
 # NOT reimplemented
 # WIP
+```
+
+## task
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec task show <taskid> # show task identified by taskid
+iexec task show <taskid> --watch # wait for task to be COMPLETED or CLAIMED
+iexec task show <taskid> --download # NOT IMPLEMENTED YET
+iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 ```
 
 ## sgx
@@ -620,10 +631,10 @@ If your program is not written in javascript, your last option to use the SDK wo
 - 0 = successful
 - 1 = error
 
-Finally, you could choose to parse the SDK stdout/stderr to access more information. ex:
+Finally, you could choose to parse the SDK stdout/stderr to access more information. Use the global option --raw to get json formated output. ex:
 
-- `iexec orderbook show &> out.txt`
-- `iexec orderbook show |& grep .`
+- `iexec orderbook show --raw &> out.txt`
+- `iexec orderbook show --raw |& grep .`
 
 Warning:
 
