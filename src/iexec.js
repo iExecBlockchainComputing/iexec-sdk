@@ -6,6 +6,7 @@ require('babel-polyfill');
 const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
 const {
+  addGlobalOptions,
   handleError,
   help,
   Spinner,
@@ -42,14 +43,15 @@ async function main() {
     );
   }
 
-  cli
-    .command('init')
+  const init = cli.command('init');
+  addGlobalOptions(init);
+  init
     .option(...option.force())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
       const spinner = Spinner(cmd);
       try {
-        const { force } = cmd;
+        const force = cmd.force || cmd.raw;
         const { saved, fileName } = await initIExecConf({
           force,
           strict: false,
@@ -82,7 +84,7 @@ async function main() {
         }
 
         const [chain, keys] = await Promise.all([
-          loadChain('ropsten'),
+          loadChain('ropsten', spinner),
           keystore.load({ lowercase: true }),
         ]);
 
@@ -99,7 +101,7 @@ async function main() {
           { force: true },
         );
         const jwtForPrint = decodeJWTForPrint(jwtoken);
-        spinner.succeed(
+        spinner.info(
           `You are logged into iExec. Login token saved into "${accountfileName}":${pretty(
             jwtForPrint,
           )}`,
@@ -107,7 +109,7 @@ async function main() {
 
         spinner.succeed('iExec project is ready\n');
       } catch (error) {
-        handleError(error, cli);
+        handleError(error, cli, cmd);
       }
     });
 
@@ -137,15 +139,16 @@ async function main() {
 
   // cli.command('registry', 'interact with iExec registry');
 
-  cli
-    .command('info')
+  const infoCmd = cli.command('info');
+  addGlobalOptions(infoCmd);
+  infoCmd
     .option(...option.chain())
     .option(...option.hub())
     .description(desc.info())
     .action(async (cmd) => {
-      const spinner = Spinner();
+      const spinner = Spinner(cmd);
       try {
-        const chain = await loadChain(cmd.chain);
+        const chain = await loadChain(cmd.chain, spinner);
         const hubAddress = cmd.hub || chain.hub;
 
         spinner.start(info.checking('iExec contracts info'));
@@ -188,9 +191,18 @@ async function main() {
           'dataset registry address': datasetRegistryAddress,
           'workerpool registry address': workerpoolRegistryAddress,
         };
-        spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`);
+        spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`, {
+          raw: {
+            pocoVersion,
+            hubAddress: hubAddress || chain.contracts.hubAddress,
+            rlcAddress,
+            appRegistryAddress,
+            datasetRegistryAddress,
+            workerpoolRegistryAddress,
+          },
+        });
       } catch (error) {
-        handleError(error, cli);
+        handleError(error, cli, cmd);
       }
     });
 
