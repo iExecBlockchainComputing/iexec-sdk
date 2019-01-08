@@ -33,10 +33,9 @@ show
       spinner.start(info.showing(objName));
       const dealResult = await deal.show(chain.contracts, dealid);
 
-
       const cleanDeal = stringifyNestedBn(dealResult);
       spinner.succeed(`Deal ${dealid} details: ${pretty(cleanDeal)}`, {
-        raw: { deal: cleanDeal, claimable },
+        raw: { deal: cleanDeal },
       });
     } catch (error) {
       handleError(error, cli, cmd);
