@@ -74,6 +74,13 @@ const countCategory = async (contracts, options) => {
   return countBN;
 };
 
+const getTimeoutRatio = async (contracts, options) => {
+  const timeoutRatio = ethersBnToBn(
+    await contracts.getHubContract(options).FINAL_DEADLINE_RATIO(),
+  );
+  return timeoutRatio;
+};
+
 module.exports = {
   createObj,
   showObj,
@@ -81,4 +88,5 @@ module.exports = {
   createCategory,
   showCategory,
   countCategory,
+  getTimeoutRatio,
 };

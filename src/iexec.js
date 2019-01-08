@@ -131,6 +131,8 @@ async function main() {
 
   cli.command('task', 'manage iExec tasks');
 
+  cli.command('deal', 'manage iExec deals');
+
   cli.command('sgx', 'interact with Intel SGX');
 
   // cli.command('registry', 'interact with iExec registry');
