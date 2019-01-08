@@ -8,7 +8,7 @@ const ethers = require('ethers');
 
 const debug = Debug('iexec:utils');
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_eventName"] }] */
+/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
@@ -17,23 +17,25 @@ const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
 const bnifyNestedEthersBn = (obj) => {
   const objOut = {};
-  debug(obj);
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
-    if (isEthersBn(v)) objOut[k] = v.toString();
+    if (isEthersBn(v)) {
+      objOut[k] = ethersBnToBn(v);
+    } else if (typeof v === 'object' && v._hex) objOut[k] = new BN(v._hex.substring(2), 16);
     else if (typeof v === 'object') objOut[k] = bnifyNestedEthersBn(v);
     else objOut[k] = v;
   });
   return objOut;
 };
 
-const strigifyNestedBn = (obj) => {
+const stringifyNestedBn = (obj) => {
   const objOut = {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
     if (v instanceof BN) objOut[k] = v.toString();
-    else if (typeof v === 'object') objOut[k] = strigifyNestedBn(v);
-    else objOut[k] = v;
+    else if (typeof v === 'object') {
+      objOut[k] = stringifyNestedBn(v);
+    } else objOut[k] = v;
   });
   return objOut;
 };
@@ -100,6 +102,20 @@ const isBytes32 = (str, { strict = true } = {}) => {
     return false;
   }
   return true;
+};
+
+const cleanRPC = (rpcObj) => {
+  const keys = Object.keys(rpcObj);
+  const cleanObj = keys.reduce((accu, curr) => {
+    if (Number.isNaN(parseInt(curr, 10))) {
+      const value = typeof rpcObj[curr] === 'object'
+        ? cleanRPC(rpcObj[curr])
+        : rpcObj[curr];
+      return Object.assign(accu, { [curr]: value });
+    }
+    return accu;
+  }, {});
+  return cleanObj;
 };
 
 const checkEvent = (eventName, events) => {
@@ -267,13 +283,14 @@ module.exports = {
   isEthAddress,
   checksummedAddress,
   isBytes32,
+  cleanRPC,
   checkEvent,
   getEventFromLogs,
   minBn,
   bnToEthersBn,
   ethersBnToBn,
   bnifyNestedEthersBn,
-  strigifyNestedBn,
+  stringifyNestedBn,
   toUpperFirst,
   secToDate,
   decodeJWTForPrint,

@@ -18,7 +18,7 @@ const {
   saveDeployedObj,
   loadDeployedObj,
 } = require('./fs');
-const { strigifyNestedBn } = require('./utils');
+const { stringifyNestedBn } = require('./utils');
 const { load } = require('./keystore');
 const { loadChain } = require('./chains');
 
@@ -97,7 +97,7 @@ show
         addressOrIndex,
         userAddress,
       );
-      const cleanObj = strigifyNestedBn(obj);
+      const cleanObj = stringifyNestedBn(obj);
       spinner.succeed(`${objName} ${objAddress} details:${pretty(cleanObj)}`, {
         raw: { address: objAddress, workerpool: cleanObj },
       });

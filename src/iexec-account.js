@@ -6,7 +6,7 @@ const account = require('./account');
 const keystore = require('./keystore');
 const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
-const { decodeJWTForPrint, strigifyNestedBn } = require('./utils');
+const { decodeJWTForPrint, stringifyNestedBn } = require('./utils');
 const {
   help,
   addGlobalOptions,
@@ -122,7 +122,7 @@ show
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);
-      const cleanBalance = strigifyNestedBn(balances);
+      const cleanBalance = stringifyNestedBn(balances);
       spinner.succeed(`Account balances:${pretty(cleanBalance)}`, {
         raw: { balance: cleanBalance },
       });

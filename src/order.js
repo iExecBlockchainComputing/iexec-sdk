@@ -16,7 +16,7 @@ const NULL_DATASETORDER = {
   dataset: '0x0000000000000000000000000000000000000000',
   datasetprice: '0',
   volume: '0',
-  tag: '0',
+  tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
   apprestrict: '0x0000000000000000000000000000000000000000',
   workerpoolrestrict: '0x0000000000000000000000000000000000000000',
   requesterrestrict: '0x0000000000000000000000000000000000000000',
@@ -44,7 +44,7 @@ const objDesc = {
       { name: 'app', type: 'address' },
       { name: 'appprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
-      { name: 'tag', type: 'uint256' },
+      { name: 'tag', type: 'bytes32' },
       { name: 'datasetrestrict', type: 'address' },
       { name: 'workerpoolrestrict', type: 'address' },
       { name: 'requesterrestrict', type: 'address' },
@@ -62,7 +62,7 @@ const objDesc = {
       { name: 'dataset', type: 'address' },
       { name: 'datasetprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
-      { name: 'tag', type: 'uint256' },
+      { name: 'tag', type: 'bytes32' },
       { name: 'apprestrict', type: 'address' },
       { name: 'workerpoolrestrict', type: 'address' },
       { name: 'requesterrestrict', type: 'address' },
@@ -80,7 +80,7 @@ const objDesc = {
       { name: 'workerpool', type: 'address' },
       { name: 'workerpoolprice', type: 'uint256' },
       { name: 'volume', type: 'uint256' },
-      { name: 'tag', type: 'uint256' },
+      { name: 'tag', type: 'bytes32' },
       { name: 'category', type: 'uint256' },
       { name: 'trust', type: 'uint256' },
       { name: 'apprestrict', type: 'address' },
@@ -105,7 +105,7 @@ const objDesc = {
       { name: 'workerpoolmaxprice', type: 'uint256' },
       { name: 'requester', type: 'address' },
       { name: 'volume', type: 'uint256' },
-      { name: 'tag', type: 'uint256' },
+      { name: 'tag', type: 'bytes32' },
       { name: 'category', type: 'uint256' },
       { name: 'trust', type: 'uint256' },
       { name: 'beneficiary', type: 'address' },
@@ -338,8 +338,8 @@ const matchOrders = async (
     );
 
     const clerkAddress = await contracts.fetchClerkAddress();
-    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
-    const tx = await clerkContact.matchOrders(
+    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const tx = await clerkContract.matchOrders(
       appOrderStruct,
       datasetOrderStruct,
       workerpoolOrderStruct,

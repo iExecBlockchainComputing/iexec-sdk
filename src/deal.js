@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { http, isBytes32 } = require('./utils');
+const { isBytes32, cleanRPC, bnifyNestedEthersBn } = require('./utils');
 
 const debug = Debug('iexec:deal');
 const objName = 'deal';
@@ -7,9 +7,11 @@ const objName = 'deal';
 const show = async (contracts, dealid) => {
   try {
     if (!isBytes32(dealid, { strict: false })) throw Error('invalid dealid');
-    const { chainID } = contracts;
-    const body = { chainID, dealid };
-    const { deal } = await http.post('deal', body);
+    const clerkAddress = contracts.fetchClerkAddress();
+    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const deal = bnifyNestedEthersBn(
+      cleanRPC(await clerkContract.viewDeal(dealid)),
+    );
     return deal;
   } catch (error) {
     debug('show()', error);
