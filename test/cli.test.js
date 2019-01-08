@@ -127,15 +127,38 @@ test('iexec order init --workerpool', () => expect(execAsync(`${iexecPath} order
 ));
 test('iexec order init --request', () => expect(execAsync(`${iexecPath} order init --request`)).resolves.not.toBe(1));
 
-// need to edit app
-test.skip('iexec order sign', () => expect(execAsync(`${iexecPath} order sign`)).resolves.not.toBe(1));
+// edit order
+test('edit requestOrder app iexec.json => use deployed app', () => expect(
+  execAsync(
+    'sed -i \'s/"app": "0x0000000000000000000000000000000000000000",/"app": "\'$(grep \'"17":\' deployed.json | head -1 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
+  ),
+).resolves.not.toBe(1));
+test('edit requestOrder dataset iexec.json => use deployed dataset', () => expect(
+  execAsync(
+    'sed -i \'s/"dataset": "0x0000000000000000000000000000000000000000",/"dataset": "\'$(grep \'"17":\' deployed.json | head -2 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
+  ),
+).resolves.not.toBe(1));
+test('edit requestOrder workerpool iexec.json => use deployed workerpool', () => expect(
+  execAsync(
+    'sed -i \'s/"workerpool": "0x0000000000000000000000000000000000000000",/"workerpool": "\'$(grep \'"17":\' deployed.json | head -3 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
+  ),
+).resolves.not.toBe(1));
+
+test('iexec order sign', () => expect(execAsync(`${iexecPath} order sign`)).resolves.not.toBe(1));
 test('iexec order sign --app', () => expect(execAsync(`${iexecPath} order sign --app`)).resolves.not.toBe(1));
 test('iexec order sign --dataset', () => expect(execAsync(`${iexecPath} order sign --dataset`)).resolves.not.toBe(1));
 test('iexec order sign --workerpool', () => expect(execAsync(`${iexecPath} order sign --workerpool`)).resolves.not.toBe(
   1,
 ));
-// need to edit app
-test.skip('iexec order sign --request', () => expect(execAsync(`${iexecPath} order sign --request`)).resolves.not.toBe(1));
+test('iexec order sign --request', () => expect(execAsync(`${iexecPath} order sign --request`)).resolves.not.toBe(1));
+
+test(
+  'iexec order fill',
+  () => expect(
+    execAsync(`${iexecPath} order fill --raw > 'iexec order fill.stdout'`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // // Uncomment when update schema-validator
 // test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
