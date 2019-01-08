@@ -41,6 +41,7 @@ cli
 cli
   .command('show [address]')
   .option(...option.chain())
+  .option(...option.showPrivateKey())
   .description(desc.showObj(objName, 'address'))
   .action(async (address, cmd) => {
     const spinner = Spinner();
@@ -50,8 +51,12 @@ cli
         loadChain(cmd.chain),
       ]);
       if (address) userWallet.address = address;
-      debug('userWallet.address', userWallet.address);
-      spinner.info(`Wallet file:${pretty(userWallet)}`);
+      const displayedWallet = Object.assign(
+        {},
+        cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
+        { publicKey: userWallet.publicKey, address: userWallet.address },
+      );
+      spinner.info(`Wallet file:${pretty(displayedWallet)}`);
 
       spinner.start(info.checkBalance(''));
       const balances = await wallet.checkBalances(

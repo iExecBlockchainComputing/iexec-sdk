@@ -126,6 +126,7 @@ iexec wallet create
 iexec wallet getETH
 iexec wallet getRLC
 iexec wallet show [address] # optional address to show other people's wallet
+iexec wallet show --show-private-key # allow to display wallet private key
 iexec wallet sendETH <amount> --to <eth_address>
 iexec wallet sendRLC <amount> --to <eth_address>
 iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default

@@ -150,6 +150,10 @@ const option = {
     'force wallet creation even if old wallet exists',
   ],
   force: () => ['--force', 'force perform action without prompting user'],
+  showPrivateKey: () => [
+    '--show-private-key',
+    'allow to display walletprivate key',
+  ],
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
     '--download [fileName]',
