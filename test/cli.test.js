@@ -1,6 +1,8 @@
 const { exec } = require('child_process');
 const Promise = require('bluebird');
 const ethers = require('ethers');
+const fs = require('fs-extra');
+const path = require('path');
 
 const { DRONE } = process.env;
 const execAsync = Promise.promisify(exec);
@@ -11,6 +13,13 @@ const ethereumURL = `http://${ethereumHost}:8545`;
 const chainName = 'dev';
 let hubAddress;
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
+
+const loadJSONFile = async (fileName) => {
+  const filePath = path.join(process.cwd(), fileName);
+  const fileJSON = await fs.readFile(filePath, 'utf8');
+  const file = JSON.parse(fileJSON);
+  return file;
+};
 
 test('iexec init', async () => {
   const block4 = await ethRPC.getBlock(4);
@@ -82,7 +91,9 @@ test(
 test('iexec app init', () => expect(execAsync(`${iexecPath} app init`)).resolves.not.toBe(1));
 test(
   'iexec app deploy',
-  () => expect(execAsync(`${iexecPath} app deploy`)).resolves.not.toBe(1),
+  () => expect(
+    execAsync(`${iexecPath} app deploy --raw > appDeploy_stdout.json`),
+  ).resolves.not.toBe(1),
   10000,
 );
 test('iexec app show 1', () => expect(execAsync(`${iexecPath} app show 1`)).resolves.not.toBe(1));
@@ -92,7 +103,11 @@ test('iexec app count', () => expect(execAsync(`${iexecPath} app count`)).resolv
 test('iexec dataset init', () => expect(execAsync(`${iexecPath} dataset init`)).resolves.not.toBe(1));
 test(
   'iexec dataset deploy',
-  () => expect(execAsync(`${iexecPath} dataset deploy`)).resolves.not.toBe(1),
+  () => expect(
+    execAsync(
+      `${iexecPath} dataset deploy --raw > datasetDeploy_stdout.json`,
+    ),
+  ).resolves.not.toBe(1),
   10000,
 );
 test('iexec dataset show 1', () => expect(execAsync(`${iexecPath} dataset show 1`)).resolves.not.toBe(1));
@@ -102,7 +117,11 @@ test('iexec dataset count', () => expect(execAsync(`${iexecPath} dataset count`)
 test('iexec workerpool init', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
 test(
   'iexec workerpool deploy',
-  () => expect(execAsync(`${iexecPath} workerpool deploy`)).resolves.not.toBe(1),
+  () => expect(
+    execAsync(
+      `${iexecPath} workerpool deploy --raw > workerpoolDeploy_stdout.json`,
+    ),
+  ).resolves.not.toBe(1),
   10000,
 );
 test('iexec workerpool show 1', () => expect(execAsync(`${iexecPath} workerpool show 1`)).resolves.not.toBe(1));
@@ -128,21 +147,30 @@ test('iexec order init --workerpool', () => expect(execAsync(`${iexecPath} order
 test('iexec order init --request', () => expect(execAsync(`${iexecPath} order init --request`)).resolves.not.toBe(1));
 
 // edit order
-test('edit requestOrder app iexec.json => use deployed app', () => expect(
-  execAsync(
-    'sed -i \'s/"app": "0x0000000000000000000000000000000000000000",/"app": "\'$(grep \'"17":\' deployed.json | head -1 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
-  ),
-).resolves.not.toBe(1));
-test('edit requestOrder dataset iexec.json => use deployed dataset', () => expect(
-  execAsync(
-    'sed -i \'s/"dataset": "0x0000000000000000000000000000000000000000",/"dataset": "\'$(grep \'"17":\' deployed.json | head -2 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
-  ),
-).resolves.not.toBe(1));
-test('edit requestOrder workerpool iexec.json => use deployed workerpool', () => expect(
-  execAsync(
-    'sed -i \'s/"workerpool": "0x0000000000000000000000000000000000000000",/"workerpool": "\'$(grep \'"17":\' deployed.json | head -3 | tail -1 | cut -d\'"\' -f4)\'",/\' iexec.json',
-  ),
-).resolves.not.toBe(1));
+test('edit requestOrder app iexec.json => use deployed app', async () => {
+  const { address } = await loadJSONFile('appDeploy_stdout.json');
+  return expect(
+    execAsync(
+      `sed -i 's/"app": "0x0000000000000000000000000000000000000000",/"app": "${address}",/' iexec.json`,
+    ),
+  ).resolves.not.toBe(1);
+});
+test('edit requestOrder dataset iexec.json => use deployed dataset', async () => {
+  const { address } = await loadJSONFile('datasetDeploy_stdout.json');
+  return expect(
+    execAsync(
+      `sed -i 's/"dataset": "0x0000000000000000000000000000000000000000",/"dataset": "${address}",/' iexec.json`,
+    ),
+  ).resolves.not.toBe(1);
+});
+test('edit requestOrder workerpool iexec.json => use deployed workerpool', async () => {
+  const { address } = await loadJSONFile('workerpoolDeploy_stdout.json');
+  return expect(
+    execAsync(
+      `sed -i 's/"workerpool": "0x0000000000000000000000000000000000000000",/"workerpool": "${address}",/' iexec.json`,
+    ),
+  ).resolves.not.toBe(1);
+});
 
 test('iexec order sign', () => expect(execAsync(`${iexecPath} order sign`)).resolves.not.toBe(1));
 test('iexec order sign --app', () => expect(execAsync(`${iexecPath} order sign --app`)).resolves.not.toBe(1));
@@ -155,10 +183,20 @@ test('iexec order sign --request', () => expect(execAsync(`${iexecPath} order si
 test(
   'iexec order fill',
   () => expect(
-    execAsync(`${iexecPath} order fill --raw > 'iexec order fill.stdout'`),
+    execAsync(`${iexecPath} order fill --raw > 'orderFill_stdout.json'`),
   ).resolves.not.toBe(1),
   10000,
 );
+
+// DEAL
+test('iexec deal show', async () => {
+  const { dealid } = await loadJSONFile('orderFill_stdout.json');
+  return expect(
+    execAsync(
+      `${iexecPath} deal show ${dealid} --raw > 'dealShow_stdout.json' `,
+    ),
+  ).resolves.not.toBe(1);
+});
 
 // // Uncomment when update schema-validator
 // test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
