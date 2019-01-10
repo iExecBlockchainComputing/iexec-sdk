@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
+const os = require('os');
 const {
   validateChainsConf,
   validateWalletConf,
@@ -23,24 +24,37 @@ const ORDERS_FILE_NAME = 'orders.json';
 const saveJSONToFile = async (
   fileName,
   obj,
-  { force = false, strict = true } = {},
+  { force = false, strict = true, fileDir } = {},
 ) => {
   const json = JSON.stringify(obj, null, 2);
   try {
-    if (force) {
-      await fs.writeFile(fileName, json);
-      return fileName;
+    let filePath;
+    if (fileDir) {
+      await fs.ensureDir(fileDir);
+      filePath = path.join(fileDir, fileName);
+    } else {
+      filePath = fileName;
     }
-    const fd = await fs.open(fileName, 'wx');
+    if (force) {
+      await fs.writeFile(filePath, json);
+      return filePath;
+    }
+    const fd = await fs.open(filePath, 'wx');
     await fs.write(fd, json, 0, 'utf8');
     await fs.close(fd);
-    return fileName;
+    return filePath;
   } catch (error) {
     if (error.code === 'EEXIST') {
       const answer = await prompt.overwrite(fileName, { strict });
       if (answer) {
-        await fs.writeFile(fileName, json);
-        return fileName;
+        let filePath;
+        if (fileDir) {
+          filePath = path.join(fileDir, fileName);
+        } else {
+          filePath = fileName;
+        }
+        await fs.writeFile(filePath, json);
+        return filePath;
       }
       return '';
     }
@@ -48,16 +62,27 @@ const saveJSONToFile = async (
     throw error;
   }
 };
+
+const saveWallet = (obj, deflautFileName, options) => {
+  const fileName = options.walletName || deflautFileName;
+  return saveJSONToFile(fileName, obj, options);
+};
+const saveWalletConf = (obj, options) => saveWallet(obj, WALLET_FILE_NAME, options);
+const saveEncryptedWalletConf = (obj, options) => saveWallet(obj, ENCRYPTED_WALLET_FILE_NAME, options);
+
 const saveIExecConf = (obj, options) => saveJSONToFile(IEXEC_FILE_NAME, obj, options);
 const saveAccountConf = (obj, options) => saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
-const saveWalletConf = (obj, options) => saveJSONToFile(WALLET_FILE_NAME, obj, options);
-const saveEncryptedWalletConf = (obj, options) => saveJSONToFile(ENCRYPTED_WALLET_FILE_NAME, obj, options);
 const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
 const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
 const saveSignedOrders = (obj, options) => saveJSONToFile(ORDERS_FILE_NAME, obj, options);
 
-const loadJSONFile = async (fileName) => {
-  const filePath = path.join(process.cwd(), fileName);
+const loadJSONFile = async (fileName, { fileDir } = {}) => {
+  let filePath;
+  if (fileDir) {
+    filePath = path.join(fileDir, fileName);
+  } else {
+    filePath = path.join(process.cwd(), fileName);
+  }
   debug('loading filePath', filePath);
   const fileJSON = await fs.readFile(filePath, 'utf8');
   const file = JSON.parse(fileJSON);
@@ -105,8 +130,8 @@ const loadAccountConf = options => loadJSONAndRetry(
     options,
   ),
 );
-const loadWalletConf = options => loadJSONAndRetry(
-  WALLET_FILE_NAME,
+const loadWalletConf = options => loadJSONFile(
+  options.fileName || WALLET_FILE_NAME,
   Object.assign(
     {
       validate: validateWalletConf,
@@ -114,7 +139,7 @@ const loadWalletConf = options => loadJSONAndRetry(
     options,
   ),
 );
-const loadEncryptedWalletConf = options => loadJSONAndRetry(ENCRYPTED_WALLET_FILE_NAME, options);
+const loadEncryptedWalletConf = options => loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
 const loadDeployedConf = options => loadJSONAndRetry(
   DEPLOYED_FILE_NAME,
   Object.assign(

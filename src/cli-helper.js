@@ -57,6 +57,8 @@ const desc = {
   deployObj: objName => `deploy a new ${objName}`,
   placeObj: objName => `place a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
+  createWallet: () => 'create a new wallet',
+  importWallet: () => 'import a wallet from an ethereum private key',
   fill: objName => `fill an ${objName} to execute a work`,
   cancel: objName => `cancel an ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
@@ -165,6 +167,22 @@ const option = {
     '--password <password>',
     'password used to encrypt the wallet',
   ],
+  unencrypted: () => [
+    '--unencrypted',
+    'generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored)',
+  ],
+  keystoredir: () => [
+    '--keystoredir <path>',
+    "specify the wallet directory <'global'|'local'|custom>",
+  ],
+  walletAddress: () => [
+    '--wallet-address <walletAddress>',
+    'specify the address of the wallet to use',
+  ],
+  walletFileName: () => [
+    '--wallet-file <walletFileName>',
+    'specify the name of the wallet file to use',
+  ],
   scheduler: () => ['--scheduler <host>', 'scheduler host uri'],
   application: () => ['--application <name>', 'dockerhub app name'],
   secretManagementService: () => [
@@ -197,6 +215,19 @@ const addGlobalOptions = (cli) => {
   cli.option(...option.raw());
 };
 
+const addWalletCreateOptions = (cli) => {
+  cli.option(...option.password());
+  cli.option(...option.unencrypted());
+  cli.option(...option.keystoredir());
+};
+
+const addWalletLoadOptions = (cli) => {
+  cli.option(...option.password());
+  cli.option(...option.walletFileName());
+  cli.option(...option.walletAddress());
+  cli.option(...option.keystoredir());
+};
+
 const question = async (
   message,
   { error = 'operation aborted by user', strict = true } = {},
@@ -213,7 +244,37 @@ const question = async (
   return false;
 };
 
+const promptPassword = async (
+  message,
+  { error = 'operation aborted by user', strict = true } = {},
+) => {
+  const answer = await inquirer.prompt([
+    {
+      type: 'password',
+      name: 'pw',
+      message,
+    },
+  ]);
+  if (answer.pw) return answer.pw;
+  if (strict) throw Error(error);
+  return promptPassword(message, { error, strict });
+};
+
+const promptConfirmedPassword = async (
+  message,
+  confirmation = 'Please confirm your password',
+) => {
+  const pw1 = await promptPassword(message, { strict: false });
+  const pw2 = await promptPassword(confirmation, {
+    error: 'Password missmatch',
+  });
+  if (pw1 === pw2) return pw1;
+  throw Error('Password missmatch');
+};
+
 const prompt = {
+  password: message => promptPassword(message),
+  confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
   overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
@@ -357,6 +418,82 @@ const Spinner = (cmd) => {
   return Ora(oraOptions);
 };
 
+const computeWalletCreateOptions = async (cmd) => {
+  const spinner = Spinner(cmd);
+  try {
+    let pw;
+    if (cmd.password) {
+      pw = cmd.password;
+      spinner.warn(
+        'option --password may be unsafe, make sure to know what you do',
+      );
+    } else if (!cmd.unencrypted) {
+      pw = await prompt.confimedPassword(
+        'Please choose a password for wallet encryption',
+      );
+    }
+    if (!pw && !cmd.unencrypted) {
+      throw Error('missing wallet password');
+    }
+    if (pw && cmd.unencrypted) {
+      spinner.warn('option --unencrypted will be ingnored');
+    }
+    if (cmd.unencrypted) {
+      spinner.warn(
+        'using --unencrypted will generate unprotected unecrypted wallet, this is unsafe, make sure to know what you do',
+      );
+    }
+
+    const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
+    const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
+    const path = cmd.keystoredir
+      && cmd.keystoredir !== 'local'
+      && cmd.keystoredir !== 'global'
+      ? cmd.keystoredir
+      : false;
+
+    return {
+      keystore: {
+        global,
+        local,
+        path,
+        password: pw,
+      },
+    };
+  } catch (error) {
+    debug('computeWalletCreateOptions()', error);
+    throw error;
+  }
+};
+
+const computeWalletLoadOptions = (cmd) => {
+  try {
+    const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
+    const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
+    const path = cmd.keystoredir
+      && cmd.keystoredir !== 'local'
+      && cmd.keystoredir !== 'global'
+      ? cmd.keystoredir
+      : false;
+    const password = cmd.password || false;
+    const walletFileName = cmd.walletFileName || false;
+    const walletAddress = cmd.walletAddress || false;
+    return {
+      keystore: {
+        global,
+        local,
+        path,
+        walletAddress,
+        walletFileName,
+        password,
+      },
+    };
+  } catch (error) {
+    debug('computeWalletLoadOptions()', error);
+    throw error;
+  }
+};
+
 const handleError = (error, cli, cmd) => {
   const spinner = Spinner(cmd);
   const lastArg = cli.args[cli.args.length - 1];
@@ -407,6 +544,10 @@ module.exports = {
   desc,
   option,
   addGlobalOptions,
+  addWalletCreateOptions,
+  addWalletLoadOptions,
+  computeWalletCreateOptions,
+  computeWalletLoadOptions,
   prompt,
   pretty,
   prettyRPC,

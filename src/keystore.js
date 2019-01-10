@@ -1,4 +1,7 @@
 const Debug = require('debug');
+const os = require('os');
+const path = require('path');
+const fs = require('fs-extra');
 const uuidv4 = require('uuid/v4');
 const ethjsUtil = require('ethjs-util');
 const ethjsSigner = require('ethjs-signer');
@@ -11,19 +14,37 @@ const {
   saveEncryptedWalletConf,
   loadEncryptedWalletConf,
 } = require('./fs');
-const { prompt } = require('./cli-helper');
+const { prompt, option } = require('./cli-helper');
 const sigUtils = require('./sig-utils');
 
 const debug = Debug('iexec:keystore');
 const secp256k1 = new EC('secp256k1');
+
 const WALLET_FILE_NAME = 'wallet.json';
+const osDefaultPathMap = {
+  linux: {
+    keystoredir: '.ethereum/keystore',
+    datadir: '.config/iexec',
+  },
+  darwin: {
+    keystoredir: 'Library/Ethereum/keystore',
+    datadir: 'Library/iexec',
+  },
+  win32: {
+    keystoredir: 'AppData/Roaming/Ethereum/keystore',
+    datadir: 'AppData/Roaming/iexec',
+  },
+  fallback: {
+    keystoredir: '',
+    datadir: '',
+  },
+};
 
 const walletFromPrivKey = (
   privateKey,
   { prefix = true, lowercase = false } = {},
 ) => {
   const userWallet = privateToAccount(privateKey);
-
   const walletKeys = Object.keys(userWallet);
   if (!prefix) {
     walletKeys.forEach((e) => {
@@ -38,185 +59,296 @@ const walletFromPrivKey = (
   return userWallet;
 };
 
-const save = saveWalletConf;
-
-const createAndSave = async (options) => {
-  const userWallet = generate(uuidv4());
-  const fileName = await save(userWallet, options);
-  return { wallet: userWallet, fileName };
-};
-
-const load = async ({
-  prefix = true,
-  create = true,
-  lowercase = true,
-} = {}) => {
-  const cb = create
-    ? async () => {
-      await prompt.create(WALLET_FILE_NAME);
-      await createAndSave();
-      return load({ prefix, retry: false, lowercase });
-    }
-    : undefined;
-
-  const { privateKey } = await loadWalletConf({
-    retry: cb,
-  });
-
-  const derivedUserWallet = walletFromPrivKey(privateKey, {
-    prefix,
-  });
-  return derivedUserWallet;
-};
-
-const accounts = async () => {
+const decrypt = async (encryptedJSON, password) => {
   try {
-    const { address } = await load();
-
-    return [address];
+    const { privateKey } = await Wallet.fromEncryptedJson(
+      JSON.stringify(encryptedJSON),
+      password,
+    );
+    const wallet = walletFromPrivKey(privateKey);
+    return wallet;
   } catch (error) {
-    debug('accounts()', error);
+    debug('decrypt()', error);
     throw error;
   }
 };
 
-const encryptAndSave = async (password, options) => {
+const encrypt = async (privateKey, password) => {
   try {
-    const { privateKey } = await load();
     const wallet = new Wallet(privateKey);
     const encryptedJSON = await wallet.encrypt(password);
     const encrypted = await JSON.parse(encryptedJSON);
-    debug('encrypted', encrypted);
-    const fileName = await saveEncryptedWalletConf(encrypted, options);
-    return { wallet: encrypted, fileName };
+    return encrypted;
   } catch (error) {
     debug('encryptAndSave()', error);
     throw error;
   }
 };
 
-const decryptAndSave = async (password, options) => {
-  try {
-    const encrypted = await loadEncryptedWalletConf();
-    const encryptedJSON = JSON.stringify(encrypted);
-    const { privateKey } = await Wallet.fromEncryptedJson(
-      encryptedJSON,
-      password,
+const saveWallet = async (userWallet, options) => {
+  // keystoredir
+  let fileDir;
+  if (options.keystore && options.keystore.global) {
+    const keystoredir = osDefaultPathMap[os.platform()]
+      ? osDefaultPathMap[os.platform()].keystoredir
+      : osDefaultPathMap.fallback.keystoredir;
+    fileDir = path.join(os.homedir(), keystoredir);
+  } else if (options.keystore && options.keystore.path) {
+    fileDir = path.join(os.homedir(), options.keystore.path);
+  }
+
+  // encryted
+  if (options.keystore && options.keystore.password) {
+    const encryptedWallet = await encrypt(
+      userWallet.privateKey,
+      options.keystore.password,
     );
-    const wallet = walletFromPrivKey(privateKey);
-    debug('wallet', wallet);
-    const fileName = await save(wallet, options);
-    return { wallet, fileName };
-  } catch (error) {
-    debug('decryptAndSave()', error);
-    throw error;
-  }
-};
-
-const signTransaction = async (rawTx) => {
-  try {
-    const { privateKey } = await load();
-
-    const signedTx = ethjsSigner.sign(rawTx, privateKey);
-
-    return signedTx;
-  } catch (error) {
-    debug('signTransaction()', error);
-    throw error;
-  }
-};
-
-const signMessage = async (message) => {
-  try {
-    debug('message', message);
-    // const { privateKey } = await load();
-    // const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
-    // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
-    // const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
-    // return signedMessage;
-    throw Error('eth_sign not implemented');
-  } catch (error) {
-    debug('signMessage()', error);
-    throw error;
-  }
-};
-
-const signPersonalMessage = async (msgHex) => {
-  try {
-    debug('msgHex', msgHex);
-    throw Error('personal_sign not implemented');
-    // const { privateKey } = await load({ prefix: false });
-    // const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    // const signedPersonalMess = sigUtil.personalSign(privKeyBuffer, {
-    //   data: msgHex,
-    // });
-    // return signedPersonalMess;
-  } catch (error) {
-    debug('signPersonalMessage()', error);
-    throw error;
-  }
-};
-
-const signTypedData = async (typedData) => {
-  try {
-    const { privateKey } = await load({ prefix: false });
-    const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const signedTypedData = sigUtils.signTypedData(privKeyBuffer, {
-      data: typedData,
-    });
-    return signedTypedData;
-  } catch (error) {
-    debug('signTypedData()', error);
-    throw error;
-  }
-};
-
-const signTypedDatav3 = async (address, typedData) => {
-  try {
-    const { privateKey } = await load({ prefix: false });
-    const signedTypedData = sigUtils.signTypedDatav3(privateKey, typedData);
-    return signedTypedData;
-  } catch (error) {
-    debug('signTypedDatav3()', error);
-    throw error;
-  }
-};
-
-const sign = async (message, noncefn, data) => {
-  try {
-    const { privateKey } = await load({ prefix: false });
-    const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const messageBuffer = Buffer.from(message);
-    const result = secp256k1.sign(messageBuffer, privKeyBuffer, {
-      canonical: true,
-      k: noncefn,
-      pers: data,
-    });
-    return {
-      signature: Buffer.concat([
-        result.r.toArrayLike(Buffer, 'be', 32),
-        result.s.toArrayLike(Buffer, 'be', 32),
-      ]),
-      recovery: result.recoveryParam,
+    // Wallet name
+    const now = new Date();
+    const pad = (number) => {
+      if (number < 10) {
+        return `0${number}`;
+      }
+      return number;
     };
-  } catch (error) {
-    debug('sign()', error);
-    throw error;
+    const creationDate = `${now.getUTCFullYear()}-${pad(
+      now.getUTCMonth() + 1,
+    )}-${pad(now.getUTCDay())}T${pad(now.getUTCHours())}-${pad(
+      now.getUTCMinutes(),
+    )}-${pad(now.getUTCSeconds())}.${(now.getUTCMilliseconds() / 1000)
+      .toFixed(3)
+      .slice(2, 5)}000000Z`;
+    const walletName = `UTC--${creationDate}--${userWallet.address.slice(2)}`;
+
+    const fileName = await saveEncryptedWalletConf(
+      encryptedWallet,
+      Object.assign({}, options, { walletName }, { fileDir }),
+    );
+    return { wallet: encryptedWallet, fileName, address: userWallet.address };
   }
+  // decrypted
+  const fileName = await saveWalletConf(userWallet, options);
+  return { wallet: userWallet, fileName, address: userWallet.address };
+};
+
+const createAndSave = async (options) => {
+  const userWallet = generate(uuidv4());
+  return saveWallet(userWallet, options);
+};
+
+const importPrivateKeyAndSave = async (privateKey, options) => {
+  const userWallet = walletFromPrivKey(privateKey);
+  return saveWallet(userWallet, options);
+};
+
+const Keystore = (options) => {
+  let { password } = options.keystore;
+  // keystoreDir
+  let fileDir;
+  if (options.keystore && options.keystore.global) {
+    const keystoredir = osDefaultPathMap[os.platform()]
+      ? osDefaultPathMap[os.platform()].keystoredir
+      : osDefaultPathMap.fallback.keystoredir;
+    fileDir = path.join(os.homedir(), keystoredir);
+  } else if (options.keystore && options.keystore.path) {
+    fileDir = path.join(os.homedir(), options.keystore.path);
+  } else {
+    fileDir = process.cwd();
+  }
+
+  const getWalletFileName = async () => {
+    if (options.keystore.walletFileName) {
+      return options.keystore.walletFileName;
+    }
+    if (options.keystore.walletAddress) {
+      const files = await fs.readdir(fileDir);
+      const matchingFiles = files.filter((e) => {
+        const address = e.split('--')[2];
+        return (
+          address
+          && ('0x'.concat(address).toLowerCase()
+            === options.keystore.walletAddress.toLowerCase()
+            || address.toLowerCase()
+              === options.keystore.walletAddress.toLowerCase())
+        );
+      });
+      if (matchingFiles[0]) {
+        return matchingFiles[0];
+      }
+      throw Error(
+        `no wallet file matching address ${
+          options.keystore.walletAddress
+        } found in ${fileDir}`,
+      );
+    }
+    return null;
+  };
+
+  // load wallet from FS
+  const load = async ({ prefix = true } = {}) => {
+    const isValidKeystoreDir = (await fs.stat(fileDir)).isDirectory();
+    if (!isValidKeystoreDir) throw Error('invalid keystoredir');
+    const fileName = await getWalletFileName();
+    // try local unencrypted
+    let pk;
+    if (!fileName) {
+      try {
+        const loadingOptions = Object.assign(
+          {},
+          { fileName: WALLET_FILE_NAME },
+        );
+        const { privateKey } = await loadWalletConf(loadingOptions);
+        pk = privateKey;
+      } catch (error) {
+        debug('try load unecrypted', error);
+        throw Error(
+          `Missing option ${option.walletAddress()[0]} or ${
+            option.walletFileName()[0]
+          } and no wallet.json found in working directory`,
+        );
+      }
+    }
+    // try encrypted
+    if (!pk) {
+      try {
+        const loadingOptions = Object.assign({}, { fileName }, { fileDir });
+        const encryptedWallet = await loadEncryptedWalletConf(loadingOptions);
+        if (!password) password = await prompt.password('Wallet password');
+        const wallet = await decrypt(encryptedWallet, password);
+        pk = wallet.privateKey;
+      } catch (error) {
+        debug('try load unecrypted', error);
+        throw error;
+      }
+    }
+
+    const derivedUserWallet = walletFromPrivKey(pk, {
+      prefix,
+    });
+    return derivedUserWallet;
+  };
+
+  const accounts = async () => {
+    try {
+      let walletAddress;
+      try {
+        walletAddress = (await load()).address;
+      } catch (error) {
+        debug('accounts() loading wallet', error);
+      }
+      const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+      return [walletAddress || NULL_ADDRESS];
+    } catch (error) {
+      debug('accounts()', error);
+      throw error;
+    }
+  };
+
+  const signTransaction = async (rawTx) => {
+    try {
+      const { privateKey } = await load();
+      const signedTx = ethjsSigner.sign(rawTx, privateKey);
+      return signedTx;
+    } catch (error) {
+      debug('signTransaction()', error);
+      throw error;
+    }
+  };
+
+  const signMessage = async (message) => {
+    try {
+      debug('message', message);
+      // const { privateKey } = await load();
+      // const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
+      // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
+      // const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
+      // return signedMessage;
+      throw Error('eth_sign not implemented');
+    } catch (error) {
+      debug('signMessage()', error);
+      throw error;
+    }
+  };
+
+  const signPersonalMessage = async (msgHex) => {
+    try {
+      debug('msgHex', msgHex);
+      throw Error('personal_sign not implemented');
+      // const { privateKey } = await load({ prefix: false });
+      // const privKeyBuffer = Buffer.from(privateKey, 'hex');
+      // const signedPersonalMess = sigUtil.personalSign(privKeyBuffer, {
+      //   data: msgHex,
+      // });
+      // return signedPersonalMess;
+    } catch (error) {
+      debug('signPersonalMessage()', error);
+      throw error;
+    }
+  };
+
+  const signTypedData = async (typedData) => {
+    try {
+      const { privateKey } = await load({ prefix: false });
+      const privKeyBuffer = Buffer.from(privateKey, 'hex');
+      const signedTypedData = sigUtils.signTypedData(privKeyBuffer, {
+        data: typedData,
+      });
+      return signedTypedData;
+    } catch (error) {
+      debug('signTypedData()', error);
+      throw error;
+    }
+  };
+
+  const signTypedDatav3 = async (address, typedData) => {
+    try {
+      const { privateKey } = await load({ prefix: false });
+      const signedTypedData = sigUtils.signTypedDatav3(privateKey, typedData);
+      return signedTypedData;
+    } catch (error) {
+      debug('signTypedDatav3()', error);
+      throw error;
+    }
+  };
+
+  const sign = async (message, noncefn, data) => {
+    try {
+      const { privateKey } = await load({ prefix: false });
+      const privKeyBuffer = Buffer.from(privateKey, 'hex');
+      const messageBuffer = Buffer.from(message);
+      const result = secp256k1.sign(messageBuffer, privKeyBuffer, {
+        canonical: true,
+        k: noncefn,
+        pers: data,
+      });
+      return {
+        signature: Buffer.concat([
+          result.r.toArrayLike(Buffer, 'be', 32),
+          result.s.toArrayLike(Buffer, 'be', 32),
+        ]),
+        recovery: result.recoveryParam,
+      };
+    } catch (error) {
+      debug('sign()', error);
+      throw error;
+    }
+  };
+
+  return {
+    load,
+    accounts,
+    signTransaction,
+    signMessage,
+    signPersonalMessage,
+    signTypedData,
+    sign,
+    signTypedDatav3,
+  };
 };
 
 module.exports = {
+  Keystore,
   walletFromPrivKey,
-  save,
+  importPrivateKeyAndSave,
   createAndSave,
-  encryptAndSave,
-  decryptAndSave,
-  load,
-  accounts,
-  signTransaction,
-  signMessage,
-  signPersonalMessage,
-  signTypedData,
-  sign,
-  signTypedDatav3,
 };
