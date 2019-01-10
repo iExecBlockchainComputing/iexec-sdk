@@ -3,13 +3,15 @@
 const Debug = require('debug');
 const cli = require('commander');
 const account = require('./account');
-const keystore = require('./keystore');
+const { Keystore } = require('./keystore');
 const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
 const { decodeJWTForPrint, stringifyNestedBn } = require('./utils');
 const {
   help,
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   option,
   desc,
@@ -24,6 +26,7 @@ const objName = 'account';
 
 const login = cli.command('login');
 addGlobalOptions(login);
+addWalletLoadOptions(login);
 login
   .option(...option.chain())
   .option(...option.force())
@@ -31,9 +34,11 @@ login
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const [chain, { address }] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [{ address }, chain] = await Promise.all([
         keystore.load({ lowercase: true }),
+        loadChain(cmd.chain, keystore, { spinner }),
       ]);
       const force = cmd.force || cmd.raw || false;
       debug('force', force);
@@ -57,13 +62,16 @@ login
 
 const deposit = cli.command(command.deposit());
 addGlobalOptions(deposit);
+addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
   .description(desc.deposit())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(cmd.chain, keystore, { spinner });
       debug('amount', amount);
       spinner.start(info.depositing());
       const depositedeAmount = await account.deposit(chain.contracts, amount);
@@ -77,13 +85,16 @@ deposit
 
 const withdraw = cli.command(command.withdraw());
 addGlobalOptions(withdraw);
+addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
   .description(desc.withdraw())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(cmd.chain, keystore, { spinner });
       debug('amount', amount);
       spinner.start(info.withdrawing());
       const withdrawedAmount = await account.withdraw(chain.contracts, amount);
@@ -97,22 +108,34 @@ withdraw
 
 const show = cli.command('show [address]');
 addGlobalOptions(show);
+addWalletLoadOptions(show);
 show
   .option(...option.chain())
   .description(desc.showObj('iExec', objName))
   .action(async (address, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const [chain, userWallet, { jwtoken }] = await Promise.all([
-        loadChain(cmd.chain, spinner),
-        keystore.load(),
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+
+      let userWallet;
+      try {
+        userWallet = await keystore.load();
+      } catch (error) {
+        if (error.message === 'invalid password') throw error;
+      }
+      if (!userWallet && !address) throw Error('Missing address or wallet');
+
+      const [chain, { jwtoken }] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner }),
         loadAccountConf(),
       ]);
       const userAddress = address || userWallet.address;
 
       const jwtForPrint = decodeJWTForPrint(jwtoken);
       if (
-        userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
+        userWallet
+        && userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
       ) {
         spinner.warn(
           info.tokenAndWalletDiffer(userWallet.address, jwtForPrint.address),
