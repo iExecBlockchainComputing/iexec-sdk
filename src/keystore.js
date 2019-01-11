@@ -88,20 +88,20 @@ const encrypt = async (privateKey, password) => {
 const saveWallet = async (userWallet, options) => {
   // keystoredir
   let fileDir;
-  if (options.keystore && options.keystore.global) {
+  if (options.walletOptions && options.walletOptions.global) {
     const keystoredir = osDefaultPathMap[os.platform()]
       ? osDefaultPathMap[os.platform()].keystoredir
       : osDefaultPathMap.fallback.keystoredir;
     fileDir = path.join(os.homedir(), keystoredir);
-  } else if (options.keystore && options.keystore.path) {
-    fileDir = path.join(os.homedir(), options.keystore.path);
+  } else if (options.walletOptions && options.walletOptions.path) {
+    fileDir = path.join(os.homedir(), options.walletOptions.path);
   }
 
   // encryted
-  if (options.keystore && options.keystore.password) {
+  if (options.walletOptions && options.walletOptions.password) {
     const encryptedWallet = await encrypt(
       userWallet.privateKey,
-      options.keystore.password,
+      options.walletOptions.password,
     );
     // Wallet name
     const now = new Date();
@@ -141,35 +141,34 @@ const importPrivateKeyAndSave = async (privateKey, options) => {
   return saveWallet(userWallet, options);
 };
 
-const Keystore = (options) => {
-  let { password } = options.keystore;
+const Keystore = ({ walletOptions, isSigner = true } = {}) => {
+  let password = (walletOptions && walletOptions.password) || false;
   // keystoreDir
   let fileDir;
-  if (options.keystore && options.keystore.global) {
+  if (walletOptions && walletOptions.global) {
     const keystoredir = osDefaultPathMap[os.platform()]
       ? osDefaultPathMap[os.platform()].keystoredir
       : osDefaultPathMap.fallback.keystoredir;
     fileDir = path.join(os.homedir(), keystoredir);
-  } else if (options.keystore && options.keystore.path) {
-    fileDir = path.join(os.homedir(), options.keystore.path);
+  } else if (walletOptions && walletOptions.path) {
+    fileDir = path.join(os.homedir(), walletOptions.path);
   } else {
     fileDir = process.cwd();
   }
 
   const getWalletFileName = async () => {
-    if (options.keystore.walletFileName) {
-      return options.keystore.walletFileName;
+    if (walletOptions.walletFileName) {
+      return walletOptions.walletFileName;
     }
-    if (options.keystore.walletAddress) {
+    if (walletOptions.walletAddress) {
       const files = await fs.readdir(fileDir);
       const matchingFiles = files.filter((e) => {
         const address = e.split('--')[2];
         return (
           address
           && ('0x'.concat(address).toLowerCase()
-            === options.keystore.walletAddress.toLowerCase()
-            || address.toLowerCase()
-              === options.keystore.walletAddress.toLowerCase())
+            === walletOptions.walletAddress.toLowerCase()
+            || address.toLowerCase() === walletOptions.walletAddress.toLowerCase())
         );
       });
       if (matchingFiles[0]) {
@@ -177,7 +176,7 @@ const Keystore = (options) => {
       }
       throw Error(
         `no wallet file matching address ${
-          options.keystore.walletAddress
+          walletOptions.walletAddress
         } found in ${fileDir}`,
       );
     }
@@ -230,14 +229,16 @@ const Keystore = (options) => {
 
   const accounts = async () => {
     try {
+      debug('accounts');
       let walletAddress;
       try {
         walletAddress = (await load()).address;
       } catch (error) {
         debug('accounts() loading wallet', error);
+        if (isSigner) throw error;
+        walletAddress = '0x0000000000000000000000000000000000000000';
       }
-      const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-      return [walletAddress || NULL_ADDRESS];
+      return [walletAddress];
     } catch (error) {
       debug('accounts()', error);
       throw error;
@@ -246,6 +247,7 @@ const Keystore = (options) => {
 
   const signTransaction = async (rawTx) => {
     try {
+      debug('signTransaction');
       const { privateKey } = await load();
       const signedTx = ethjsSigner.sign(rawTx, privateKey);
       return signedTx;
@@ -257,7 +259,7 @@ const Keystore = (options) => {
 
   const signMessage = async (message) => {
     try {
-      debug('message', message);
+      debug('signMessage', message);
       // const { privateKey } = await load();
       // const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
       // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
@@ -313,6 +315,7 @@ const Keystore = (options) => {
 
   const sign = async (message, noncefn, data) => {
     try {
+      debug('sign');
       const { privateKey } = await load({ prefix: false });
       const privKeyBuffer = Buffer.from(privateKey, 'hex');
       const messageBuffer = Buffer.from(message);

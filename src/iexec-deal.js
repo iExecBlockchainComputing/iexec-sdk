@@ -5,6 +5,8 @@ const cli = require('commander');
 const {
   help,
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -13,7 +15,7 @@ const {
   pretty,
 } = require('./cli-helper');
 const { stringifyNestedBn } = require('./utils');
-const keystore = require('./keystore');
+const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const deal = require('./deal');
 
@@ -22,13 +24,16 @@ const objName = 'deal';
 
 const show = cli.command('show <dealid>');
 addGlobalOptions(show);
+addWalletLoadOptions(show);
 show
   .option(...option.chain())
   .description(desc.showObj(objName))
   .action(async (dealid, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
 
       spinner.start(info.showing(objName));
       const dealResult = await deal.show(chain.contracts, dealid);
@@ -44,18 +49,21 @@ show
 
 const claim = cli.command('claim <dealid>');
 addGlobalOptions(claim);
+addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
   .description(desc.claimObj(objName))
   .action(async (dealid, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const [chain, wallet] = await Promise.all([
-        loadChain(cmd.chain, spinner),
-        keystore.load(),
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [chain, [address]] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner }),
+        keystore.account(),
       ]);
       spinner.start(info.claiming(objName));
-      const txHash = await deal.claim(chain.contracts, dealid, wallet.address);
+      const txHash = await deal.claim(chain.contracts, dealid, address);
       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);

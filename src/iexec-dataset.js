@@ -23,7 +23,7 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const { NULL_ADDRESS } = require('./utils');
+const { NULL_ADDRESS, isEthAddress } = require('./utils');
 
 const objName = 'dataset';
 
@@ -34,7 +34,9 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
   const spinner = Spinner(cmd);
   try {
     const walletOptions = await computeWalletLoadOptions(cmd);
-    const keystore = Keystore(walletOptions);
+    const keystore = Keystore(
+      Object.assign({}, walletOptions, { isSigner: false }),
+    );
     const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
       overwrite: { owner: address },
@@ -94,7 +96,9 @@ show
   .action(async (cliAddressOrIndex, cmd) => {
     const spinner = Spinner(cmd);
     const walletOptions = await computeWalletLoadOptions(cmd);
-    const keystore = Keystore(walletOptions);
+    const keystore = Keystore(
+      Object.assign({}, walletOptions, { isSigner: false }),
+    );
     try {
       const [chain, [address], deployedObj] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
@@ -102,10 +106,11 @@ show
         loadDeployedObj(objName),
       ]);
 
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
-      if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
-
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+
+      const isAddress = isEthAddress(addressOrIndex, { strict: false });
+      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
@@ -134,7 +139,9 @@ count
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
+      const keystore = Keystore(
+        Object.assign({}, walletOptions, { isSigner: false }),
+      );
       const [chain, [address]] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         keystore.accounts(),

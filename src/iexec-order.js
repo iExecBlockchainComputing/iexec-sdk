@@ -5,6 +5,8 @@ const cli = require('commander');
 const {
   help,
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -23,7 +25,7 @@ const {
   loadSignedOrders,
 } = require('./fs');
 const { loadChain } = require('./chains.js');
-const keystore = require('./keystore');
+const { Keystore } = require('./keystore');
 const order = require('./order');
 const account = require('./account');
 const templates = require('./templates');
@@ -35,6 +37,7 @@ const objName = 'order';
 
 const init = cli.command('init');
 addGlobalOptions(init);
+addWalletLoadOptions(init);
 init
   .option(...option.initAppOrder())
   .option(...option.initDatasetOrder())
@@ -45,10 +48,6 @@ init
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      debug('cmd.app', cmd.app);
-      debug('cmd.dataset', cmd.dataset);
-      debug('cmd.workerpool', cmd.workerpool);
-      debug('cmd.request', cmd.request);
       const initAll = !(
         cmd.app
         || cmd.dataset
@@ -57,14 +56,16 @@ init
       );
       debug('initAll', initAll);
 
-      const chain = await loadChain(cmd.chain, spinner);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(cmd.chain, keystore, { spinner });
 
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
         spinner.start(`creating ${orderName}`);
         const overwrite = {};
         if (resourceName === 'request') {
-          const { address } = await keystore.load();
+          const [address] = await keystore.accounts();
           overwrite.requester = address;
         } else {
           const deployedObj = await loadDeployedObj(resourceName);
@@ -93,6 +94,7 @@ init
 
 const sign = cli.command(command.sign());
 addGlobalOptions(sign);
+addWalletLoadOptions(sign);
 sign
   .option(...option.signAppOrder())
   .option(...option.signDatasetOrder())
@@ -112,8 +114,10 @@ sign
       );
       debug('signAll', signAll);
 
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [chain, iexecConf, { address }] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
         keystore.load(),
       ]);
@@ -258,6 +262,7 @@ sign
 
 const fill = cli.command(command.fill());
 addGlobalOptions(fill);
+addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
@@ -265,8 +270,10 @@ fill
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
       ]);
       debug('signedOrders', signedOrders);
@@ -454,7 +461,7 @@ publish
       }
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, Keystore(), { spinner }),
         loadSignedOrders(),
       ]);
 
@@ -491,6 +498,7 @@ publish
 
 const unpublish = cli.command(command.unpublish());
 addGlobalOptions(unpublish);
+addWalletLoadOptions(unpublish);
 unpublish
   .option(...option.unpublishAppOrder())
   .option(...option.unpublishDatasetOrder())
@@ -508,8 +516,11 @@ unpublish
         );
       }
 
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+
       const [chain, signedOrders, { address }] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -567,6 +578,7 @@ unpublish
 
 const cancel = cli.command(command.cancel());
 addGlobalOptions(cancel);
+addWalletLoadOptions(cancel);
 cancel
   .option(...option.cancelAppOrder())
   .option(...option.cancelDatasetOrder())
@@ -584,9 +596,13 @@ cancel
         );
       }
 
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
+        // keystore.load(),
       ]);
 
       const cancelOrder = async (orderName) => {
@@ -660,36 +676,6 @@ show
       if (cmd.dataset) await showOrder('datasetorder', cmd.dataset);
       if (cmd.workerpool) await showOrder('workerpoolorder', cmd.workerpool);
       if (cmd.request) await showOrder('requestorder', cmd.request);
-    } catch (error) {
-      handleError(error, cli, cmd);
-    }
-  });
-
-const count = cli.command('count');
-addGlobalOptions(count);
-count
-  .option(...option.chain())
-  .option(...option.hub())
-  .description(desc.countObj(objName, 'marketplace'))
-  .action(async (cmd) => {
-    const spinner = Spinner(cmd);
-    try {
-      const chain = await loadChain(cmd.chain, spinner);
-      const hubAddress = cmd.hub || chain.hub;
-
-      spinner.start(info.counting(objName));
-      const marketplaceAddress = await chain.contracts.fetchMarketplaceAddress({
-        hub: hubAddress,
-      });
-      const countRPC = await chain.contracts
-        .getMarketplaceContract({ at: marketplaceAddress })
-        .m_orderCount();
-
-      debug('countRPC', countRPC);
-      spinner.succeed(
-        `iExec marketplace has a total of ${countRPC[0]} orders`,
-        { raw: { count: countRPC[0] } },
-      );
     } catch (error) {
       handleError(error, cli, cmd);
     }

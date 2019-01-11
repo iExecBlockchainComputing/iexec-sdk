@@ -116,7 +116,9 @@ show
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
+      const keystore = Keystore(
+        Object.assign({}, walletOptions, { isSigner: false }),
+      );
 
       let userWallet;
       try {

@@ -453,7 +453,7 @@ const computeWalletCreateOptions = async (cmd) => {
       : false;
 
     return {
-      keystore: {
+      walletOptions: {
         global,
         local,
         path,
@@ -479,7 +479,7 @@ const computeWalletLoadOptions = (cmd) => {
     const walletFileName = cmd.walletFileName || false;
     const walletAddress = cmd.walletAddress || false;
     return {
-      keystore: {
+      walletOptions: {
         global,
         local,
         path,
