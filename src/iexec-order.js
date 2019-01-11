@@ -57,7 +57,9 @@ init
       debug('initAll', initAll);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
+      const keystore = Keystore(
+        Object.assign(walletOptions, { isSigner: false }),
+      );
       const chain = await loadChain(cmd.chain, keystore, { spinner });
 
       const initOrder = async (resourceName) => {

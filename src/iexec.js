@@ -79,12 +79,13 @@ async function main() {
           Object.assign({}, { force }, walletOptions),
         );
         spinner.info(
-          `Your wallet address is ${walletRes.address} wallet saved in "${
+          `Your wallet address is ${walletRes.address} wallet file saved in "${
             walletRes.fileName
           }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
         );
+        spinner.warn('You must backup your wallet file in a safe place!');
 
-        walletOptions.walletAddress = walletRes.address;
+        walletOptions.walletOptions.walletAddress = walletRes.address;
         const keystore = Keystore(walletOptions);
         const [chain, keys] = await Promise.all([
           loadChain('ropsten', keystore, { spinner }),

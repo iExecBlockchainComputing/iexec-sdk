@@ -476,7 +476,7 @@ const computeWalletLoadOptions = (cmd) => {
       ? cmd.keystoredir
       : false;
     const password = cmd.password || false;
-    const walletFileName = cmd.walletFileName || false;
+    const walletFileName = cmd.walletFile || false;
     const walletAddress = cmd.walletAddress || false;
     return {
       walletOptions: {

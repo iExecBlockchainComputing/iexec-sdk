@@ -48,6 +48,7 @@ create
         `wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
         { raw: res },
       );
+      spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
       handleError(error, cli, spinner);
     }
@@ -72,6 +73,7 @@ importPk
         `wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
         { raw: res },
       );
+      spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
       handleError(error, cli, spinner);
     }
