@@ -50,21 +50,33 @@ test('edit chain.json', () => expect(
     ),
 ).resolves.not.toBe(1));
 
-test('iexec wallet create', () => expect(
-  execAsync(`${iexecPath} wallet create --password test --force`),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet create',
+  () => expect(
+    execAsync(`${iexecPath} wallet create --password test --force`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
-test('iexec wallet import', () => expect(
-  execAsync(
-    `${iexecPath} wallet import ${PRIVATE_KEY} --password test --force --raw > walletImport_stdout.json`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet import',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet import ${PRIVATE_KEY} --password test --force --raw > walletImport_stdout.json`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
-test('iexec wallet show (+ wallet from address)', () => expect(
-  execAsync(
-    `${iexecPath} wallet show --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet show (+ wallet from address)',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet show --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 test('iexec wallet show (+ wallet from file name)', async () => {
   const { fileName } = await loadJSONFile('walletImport_stdout.json');
@@ -74,23 +86,35 @@ test('iexec wallet show (+ wallet from file name)', async () => {
       `${iexecPath} wallet show --password test --wallet-file ${walletFile}`,
     ),
   ).resolves.not.toBe(1);
-});
+}, 10000);
 
-test('iexec wallet show (wrong password)', () => expect(
-  execAsync(
-    `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS}`,
+test(
+  'iexec wallet show (wrong password)',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS}`,
+    ),
+  ).rejects.not.toBe(1),
+  10000,
+);
+
+test(
+  'iexec wallet show (missing wallet file)',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS2}`,
+    ),
+  ).rejects.not.toBe(1),
+  10000,
+);
+
+test(
+  'iexec wallet show [address]',
+  () => expect(execAsync(`${iexecPath} wallet show ${ADDRESS}`)).resolves.not.toBe(
+    1,
   ),
-).rejects.not.toBe(1));
-
-test('iexec wallet show (missing wallet file)', () => expect(
-  execAsync(
-    `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS2}`,
-  ),
-).rejects.not.toBe(1));
-
-test('iexec wallet show [address]', () => expect(execAsync(`${iexecPath} wallet show ${ADDRESS}`)).resolves.not.toBe(
-  1,
-));
+  10000,
+);
 
 // INFO
 test('iexec info', () => expect(execAsync(`${iexecPath} info`)).resolves.not.toBe(1));
@@ -105,14 +129,22 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec account show (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} account show --password test --wallet-address ${ADDRESS}`,
+test(
+  'iexec account show (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} account show --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec account show [address]',
+  () => expect(execAsync(`${iexecPath} account show ${ADDRESS}`)).resolves.not.toBe(
+    1,
   ),
-).resolves.not.toBe(1));
-test('iexec account show [address]', () => expect(execAsync(`${iexecPath} account show ${ADDRESS}`)).resolves.not.toBe(
-  1,
-));
+  10000,
+);
 test(
   'iexec account deposit 1000 (+ wallet)',
   () => expect(
@@ -120,7 +152,7 @@ test(
       `${iexecPath} account deposit 1000 --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  15000,
+  20000,
 );
 test(
   'iexec account withdraw 1000 (+ wallet)',
@@ -134,11 +166,15 @@ test(
 
 // APP
 test('iexec app init (no wallet)', () => expect(execAsync(`${iexecPath} app init`)).resolves.not.toBe(1));
-test('iexec app init (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} app init --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec app init (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} app init --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 test(
   'iexec app deploy (+ wallet)',
   () => expect(
@@ -148,30 +184,50 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec app show 1 (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} app show 1 --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
-test('iexec app show 1 --user [address]', () => expect(
-  execAsync(`${iexecPath} app show 1 --user ${ADDRESS}`),
-).resolves.not.toBe(1));
-test('iexec app count (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} app count --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
-test('iexec app count --user [address]', () => expect(
-  execAsync(`${iexecPath} app count --user ${ADDRESS}`),
-).resolves.not.toBe(1));
+test(
+  'iexec app show 1 (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} app show 1 --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec app show 1 --user [address]',
+  () => expect(
+    execAsync(`${iexecPath} app show 1 --user ${ADDRESS}`),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec app count (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} app count --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec app count --user [address]',
+  () => expect(
+    execAsync(`${iexecPath} app count --user ${ADDRESS}`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // DATASET
 test('iexec dataset init (no wallet)', () => expect(execAsync(`${iexecPath} dataset init`)).resolves.not.toBe(1));
-test('iexec dataset init (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} dataset init --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec dataset init (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} dataset init --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 test(
   'iexec dataset deploy (+ wallet)',
   () => expect(
@@ -181,30 +237,46 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec dataset show 1 (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} dataset show 1 --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec dataset show 1 (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} dataset show 1 --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 test('iexec dataset show 1 --user [address]', () => expect(
   execAsync(`${iexecPath} dataset show 1 --user ${ADDRESS}`),
 ).resolves.not.toBe(1));
-test('iexec dataset count (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} dataset count --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
-test('iexec dataset count --user [address]', () => expect(
-  execAsync(`${iexecPath} dataset count --user ${ADDRESS}`),
-).resolves.not.toBe(1));
+test(
+  'iexec dataset count (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} dataset count --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec dataset count --user [address]',
+  () => expect(
+    execAsync(`${iexecPath} dataset count --user ${ADDRESS}`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // WORKERPOOL
 test('iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
-test('iexec workerpool init (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} workerpool init --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec workerpool init (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} workerpool init --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 test(
   'iexec workerpool deploy (+ wallet)',
   () => expect(
@@ -214,22 +286,40 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec workerpool show 1 (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} workerpool show 1 --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
-test('iexec workerpool show 1 --user [address]', () => expect(
-  execAsync(`${iexecPath} workerpool show --password test --user ${ADDRESS}`),
-).resolves.not.toBe(1));
-test('iexec workerpool count (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} workerpool count --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
-test('iexec workerpool count --user', () => expect(
-  execAsync(`${iexecPath} workerpool count --user ${ADDRESS}`),
-).resolves.not.toBe(1));
+test(
+  'iexec workerpool show 1 (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} workerpool show 1 --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec workerpool show 1 --user [address]',
+  () => expect(
+    execAsync(
+      `${iexecPath} workerpool show --password test --user ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec workerpool count (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} workerpool count --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec workerpool count --user',
+  () => expect(
+    execAsync(`${iexecPath} workerpool count --user ${ADDRESS}`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // CATEGORY
 test('iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
@@ -253,11 +343,15 @@ test('iexec order init --workerpool', () => expect(execAsync(`${iexecPath} order
   1,
 ));
 test('iexec order init --request', () => expect(execAsync(`${iexecPath} order init --request`)).resolves.not.toBe(1));
-test('iexec order init --request (+ wallet)', () => expect(
-  execAsync(
-    `${iexecPath} order init --request --password test --wallet-address ${ADDRESS}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec order init --request (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order init --request --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // edit order
 test('edit requestOrder app iexec.json => use deployed app', async () => {
