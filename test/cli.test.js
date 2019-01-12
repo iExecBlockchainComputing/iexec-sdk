@@ -161,7 +161,7 @@ test(
       `${iexecPath} account withdraw 1000 --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 
 // APP
@@ -182,7 +182,7 @@ test(
       `${iexecPath} app deploy --password test --wallet-address ${ADDRESS} --raw > appDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec app show 1 (+ wallet)',
@@ -235,7 +235,7 @@ test(
       `${iexecPath} dataset deploy --password test --wallet-address ${ADDRESS} --raw > datasetDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec dataset show 1 (+ wallet)',
@@ -284,7 +284,7 @@ test(
       `${iexecPath} workerpool deploy --password test --wallet-address ${ADDRESS} --raw > workerpoolDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec workerpool show 1 (+ wallet)',
@@ -330,7 +330,7 @@ test(
       `${iexecPath} category create --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test('iexec category show 1', () => expect(execAsync(`${iexecPath} category show 1`)).resolves.not.toBe(1));
 test('iexec category count', () => expect(execAsync(`${iexecPath} category count`)).resolves.not.toBe(1));
@@ -386,7 +386,7 @@ test(
       `${iexecPath} order sign --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  20000,
+  30000,
 );
 test(
   'iexec order sign --app (+ wallet)',
@@ -395,7 +395,7 @@ test(
       `${iexecPath} order sign --app --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec order sign --dataset (+ wallet)',
@@ -404,7 +404,7 @@ test(
       `${iexecPath} order sign --dataset --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec order sign --workerpool (+ wallet)',
@@ -413,7 +413,7 @@ test(
       `${iexecPath} order sign --workerpool --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 test(
   'iexec order sign --request (+ wallet)',
@@ -422,7 +422,7 @@ test(
       `${iexecPath} order sign --request --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 
 test(
@@ -432,7 +432,7 @@ test(
       `${iexecPath} order fill --password test --wallet-address ${ADDRESS} --raw > 'orderFill_stdout.json'`,
     ),
   ).resolves.not.toBe(1),
-  10000,
+  15000,
 );
 
 // DEAL
@@ -459,36 +459,60 @@ test('iexec deal show', async () => {
 //
 
 // keystoredir custom
-test('iexec wallet import --keystoredir [path]', () => expect(
-  execAsync(
-    `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir temp/iexecSDKTest`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet import --keystoredir [path]',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir temp/iexecSDKTest`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
-test('iexec wallet show --keystoredir [path] --wallet-address', () => expect(
-  execAsync(
-    `${iexecPath} wallet show --password customPath --keystoredir temp/iexecSDKTest --wallet-address ${ADDRESS2}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet show --keystoredir [path] --wallet-address',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet show --password customPath --keystoredir temp/iexecSDKTest --wallet-address ${ADDRESS2}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // keystoredir local
-test('iexec wallet import --keystoredir local', () => expect(
-  execAsync(
-    `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase'  --keystoredir local`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet import --keystoredir local',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase'  --keystoredir local`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
-test('iexec wallet show --keystoredir local --wallet-address', () => expect(
-  execAsync(
-    `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${ADDRESS3}`,
-  ),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet show --keystoredir local --wallet-address',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${ADDRESS3}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // unecrypted wallet
-test('iexec wallet import --unencrypted', () => expect(
-  execAsync(`${iexecPath} wallet import ${PRIVATE_KEY2} --unencrypted`),
-).resolves.not.toBe(1));
+test(
+  'iexec wallet import --unencrypted',
+  () => expect(
+    execAsync(`${iexecPath} wallet import ${PRIVATE_KEY2} --unencrypted`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
-test('iexec wallet show (unencrypted wallet.json)', () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1));
+test(
+  'iexec wallet show (unencrypted wallet.json)',
+  () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1),
+  10000,
+);
 
 test('remove unencrypted wallet.json', () => expect(execAsync('rm wallet.json')).resolves.not.toBe(1));
