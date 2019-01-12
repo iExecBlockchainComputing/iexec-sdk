@@ -7,6 +7,8 @@ const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
 const {
   addGlobalOptions,
+  addWalletCreateOptions,
+  computeWalletCreateOptions,
   handleError,
   help,
   Spinner,
@@ -16,7 +18,7 @@ const {
   option,
 } = require('./cli-helper');
 const { initIExecConf, initChainConf, saveAccountConf } = require('./fs');
-const keystore = require('./keystore');
+const { Keystore, createAndSave } = require('./keystore');
 const account = require('./account');
 const { loadChain } = require('./chains');
 const { decodeJWTForPrint } = require('./utils');
@@ -45,6 +47,7 @@ async function main() {
 
   const init = cli.command('init');
   addGlobalOptions(init);
+  addWalletCreateOptions(init);
   init
     .option(...option.force())
     .description(desc.initObj('project'))
@@ -71,20 +74,21 @@ async function main() {
           );
         }
 
-        const walletRes = await keystore.createAndSave({
-          force,
-          strict: false,
-        });
-        if (walletRes.fileName) {
-          spinner.info(
-            `wallet saved in "${walletRes.fileName}":\n${pretty(
-              walletRes.wallet,
-            )}`,
-          );
-        }
+        const walletOptions = await computeWalletCreateOptions(cmd);
+        const walletRes = await createAndSave(
+          Object.assign({}, { force }, walletOptions),
+        );
+        spinner.info(
+          `Your wallet address is ${walletRes.address} wallet file saved in "${
+            walletRes.fileName
+          }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
+        );
+        spinner.warn('You must backup your wallet file in a safe place!');
 
+        walletOptions.walletOptions.walletAddress = walletRes.address;
+        const keystore = Keystore(walletOptions);
         const [chain, keys] = await Promise.all([
-          loadChain('ropsten', spinner),
+          loadChain('ropsten', keystore, { spinner }),
           keystore.load({ lowercase: true }),
         ]);
 
@@ -107,7 +111,16 @@ async function main() {
           )}`,
         );
 
-        spinner.succeed('iExec project is ready\n');
+        const raw = Object.assign(
+          {},
+          walletRes && { walletAddress: walletRes.address },
+          walletRes && { walletFile: walletRes.fileName },
+          fileName && { configFile: fileName },
+          chainRes && { chainConfigFile: chainRes.fileName },
+        );
+        spinner.succeed('iExec project is ready\n', {
+          raw,
+        });
       } catch (error) {
         handleError(error, cli, cmd);
       }
@@ -148,7 +161,11 @@ async function main() {
     .action(async (cmd) => {
       const spinner = Spinner(cmd);
       try {
-        const chain = await loadChain(cmd.chain, spinner);
+        const chain = await loadChain(
+          cmd.chain,
+          Keystore({ isSigner: false }),
+          { spinner },
+        );
         const hubAddress = cmd.hub || chain.hub;
 
         spinner.start(info.checking('iExec contracts info'));

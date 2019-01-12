@@ -2,7 +2,7 @@ const Debug = require('debug');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
 const { Spinner } = require('./cli-helper');
-const { ethersBnToBn } = require('./utils');
+const { ethersBnToBn, bnToEthersBn } = require('./utils');
 
 const debug = Debug('iexec:wallet');
 
@@ -152,19 +152,18 @@ const sweep = async (contracts, address, to) => {
   const balances = await checkBalances(contracts, address);
 
   if (balances.nRLC.gt(new BN(0))) {
-    await sendRLC(contracts, balances.nRLC, to);
+    await sendRLC(contracts, bnToEthersBn(balances.nRLC), to);
   }
 
   const txFee = new BN('10000000000000000');
   debug('txFee.toString()', txFee.toString());
   debug('balances.wei.toString()', balances.wei.toString());
-
   debug('balances.wei.gt(txFee)', balances.wei.gt(txFee));
 
   const sweepETH = balances.wei.sub(txFee);
   debug('sweepETH.toString()', sweepETH.toString());
   if (balances.wei.gt(new BN(txFee))) {
-    await sendETH(contracts, sweepETH, address, to);
+    await sendETH(contracts, bnToEthersBn(sweepETH), address, to);
   }
   return true;
 };

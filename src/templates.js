@@ -87,7 +87,7 @@ const chains = {
     dev: {
       host: 'http://localhost:8545',
       id: '17',
-      hub: '0xc4e4a08bf4c6fd11028b714038846006e27d7be8',
+      hub: '0x60E25C038D70A15364DAc11A042DB1dD7A2cccBC',
       scheduler: 'https://pool1api.iex.ec',
     },
     ropsten: {

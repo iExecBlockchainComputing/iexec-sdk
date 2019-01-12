@@ -15,6 +15,7 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
 const { http } = require('./utils');
+const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-orderbook');
 const objName = 'orderbook';
@@ -31,7 +32,9 @@ show
     try {
       if (cmd.category === undefined) throw new Error('Missing option --category');
 
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
       debug('cmd.id', cmd.id);
       debug('cmd.category', cmd.category);
       debug('cmd.workerpool', cmd.workerpool);

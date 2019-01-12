@@ -5,6 +5,8 @@ const cli = require('commander');
 const {
   help,
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -12,7 +14,7 @@ const {
   info,
   pretty,
 } = require('./cli-helper');
-const keystore = require('./keystore');
+const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const task = require('./task');
 
@@ -29,7 +31,9 @@ show
   .action(async (taskid, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
       debug('cmd.watch', cmd.watch);
       debug('cmd.download', cmd.download);
 
@@ -78,14 +82,17 @@ show
 
 const claim = cli.command('claim <taskid>');
 addGlobalOptions(claim);
+addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [chain, wallet] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         keystore.load(),
       ]);
       spinner.start(info.claiming(objName));

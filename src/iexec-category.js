@@ -4,6 +4,8 @@ const cli = require('commander');
 const hub = require('./hub');
 const {
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   help,
   desc,
@@ -14,6 +16,7 @@ const {
 } = require('./cli-helper');
 const { loadIExecConf, initObj } = require('./fs');
 const { loadChain } = require('./chains.js');
+const { Keystore } = require('./keystore');
 
 const objName = 'category';
 
@@ -36,22 +39,25 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
 
 const create = cli.command('create');
 addGlobalOptions(create);
+addWalletLoadOptions(create);
 create
   .option(...option.chain())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, keystore, { spinner }),
       ]);
       spinner.start(info.creating('category'));
       const catidBN = await hub.createCategory(
         chain.contracts,
         iexecConf[objName],
       );
-      spinner.succeed(`New category created at index ${catidBN}`, {
+      spinner.succeed(`New category created with catid ${catidBN}`, {
         raw: { catid: catidBN.toString() },
       });
     } catch (error) {
@@ -67,13 +73,15 @@ show
   .action(async (index, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
       spinner.start(info.showing('category'));
       const category = await hub.showCategory(chain.contracts, index);
       category.workClockTimeRef = category.workClockTimeRef.toString();
       spinner.succeed(
         `Category at index ${index} details:${pretty(category)}`,
-        { raw: { catid: index, category } },
+        { raw: { index, category } },
       );
     } catch (error) {
       handleError(error, cli, cmd);
@@ -88,7 +96,9 @@ count
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
       spinner.start(info.counting('category'));
       const countBN = await hub.countCategory(chain.contracts);
       spinner.succeed(`iExec hub has a total of ${countBN} category`, {

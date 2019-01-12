@@ -4,7 +4,6 @@ const SignerProvider = require('ethjs-custom-signer');
 const ethers = require('ethers');
 const createIExecContracts = require('iexec-contracts-js-client');
 const createIExecClient = require('iexec-server-js-client');
-const keystore = require('./keystore');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
 
@@ -60,7 +59,7 @@ const createChains = (
   }
 };
 
-const loadChains = async () => {
+const loadChains = async (keystore) => {
   try {
     const chainsConf = await loadChainConf();
     const chains = createChains(chainsConf, keystore);
@@ -72,9 +71,9 @@ const loadChains = async () => {
   }
 };
 
-const loadChain = async (chainName, spinner = Spinner()) => {
+const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
   try {
-    const chains = await loadChains();
+    const chains = await loadChains(keystore);
     if (chainName) {
       if (!(chainName in chains)) {
         throw Error(`missing "${chainName}" chain in "chains.json"`);

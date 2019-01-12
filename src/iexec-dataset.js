@@ -5,6 +5,8 @@ const multiaddr = require('multiaddr');
 const {
   help,
   addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -19,17 +21,23 @@ const {
   saveDeployedObj,
   loadDeployedObj,
 } = require('./fs');
-const { load } = require('./keystore');
+const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
+const { NULL_ADDRESS, isEthAddress } = require('./utils');
 
 const objName = 'dataset';
 
 const init = cli.command('init');
 addGlobalOptions(init);
+addWalletLoadOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
   const spinner = Spinner(cmd);
   try {
-    const { address } = await load();
+    const walletOptions = await computeWalletLoadOptions(cmd);
+    const keystore = Keystore(
+      Object.assign({}, walletOptions, { isSigner: false }),
+    );
+    const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
       overwrite: { owner: address },
     });
@@ -46,14 +54,17 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
 
 const deploy = cli.command('deploy');
 addGlobalOptions(deploy);
+addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, spinner),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
       const datasetMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr)
@@ -77,21 +88,29 @@ deploy
 
 const show = cli.command('show [addressOrIndex]');
 addGlobalOptions(show);
+addWalletLoadOptions(show);
 show
   .option(...option.chain())
   .option(...option.user())
   .description(desc.showObj(objName))
   .action(async (cliAddressOrIndex, cmd) => {
     const spinner = Spinner(cmd);
+    const walletOptions = await computeWalletLoadOptions(cmd);
+    const keystore = Keystore(
+      Object.assign({}, walletOptions, { isSigner: false }),
+    );
     try {
-      const [chain, { address }, deployedObj] = await Promise.all([
-        loadChain(cmd.chain, spinner),
-        load(),
+      const [chain, [address], deployedObj] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner }),
+        keystore.accounts(),
         loadDeployedObj(objName),
       ]);
 
-      const userAddress = cmd.user || address;
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+
+      const isAddress = isEthAddress(addressOrIndex, { strict: false });
+      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
@@ -111,6 +130,7 @@ show
 
 const count = cli.command('count');
 addGlobalOptions(count);
+addWalletLoadOptions(count);
 count
   .option(...option.chain())
   .option(...option.user())
@@ -118,11 +138,18 @@ count
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const [chain, { address }] = await Promise.all([
-        loadChain(cmd.chain, spinner),
-        load(),
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(
+        Object.assign({}, walletOptions, { isSigner: false }),
+      );
+      const [chain, [address]] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner }),
+        keystore.accounts(),
       ]);
-      const userAddress = cmd.user || address;
+
+      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
+
       spinner.start(info.counting(objName));
       const objCountBN = await hub.countObj(objName)(
         chain.contracts,

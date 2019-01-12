@@ -10,6 +10,8 @@ const debug = Debug('iexec:utils');
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
 
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
 const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
@@ -295,7 +297,7 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
-  gatewayAuth,
   http,
   getSalt,
+  NULL_ADDRESS,
 };
