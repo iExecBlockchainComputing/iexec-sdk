@@ -142,6 +142,7 @@ const importPrivateKeyAndSave = async (privateKey, options) => {
 };
 
 const Keystore = ({ walletOptions, isSigner = true } = {}) => {
+  const cachedWallet = {};
   let password = (walletOptions && walletOptions.password) || false;
   // keystoreDir
   let fileDir;
@@ -185,6 +186,9 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
 
   // load wallet from FS
   const load = async ({ prefix = true } = {}) => {
+    if (prefix && cachedWallet && cachedWallet.prefixed) return cachedWallet.prefixed;
+    if (!prefix && cachedWallet && cachedWallet.noPrefixed) return cachedWallet.noPrefixed;
+
     const isValidKeystoreDir = (await fs.stat(fileDir)).isDirectory();
     if (!isValidKeystoreDir) throw Error('invalid keystoredir');
     const fileName = await getWalletFileName();
@@ -224,6 +228,10 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     const derivedUserWallet = walletFromPrivKey(pk, {
       prefix,
     });
+
+    if (prefix) cachedWallet.prefixed = derivedUserWallet;
+    else cachedWallet.noPrefixed = derivedUserWallet;
+
     return derivedUserWallet;
   };
 
