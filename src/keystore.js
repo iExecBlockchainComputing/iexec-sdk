@@ -163,7 +163,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     }
     if (walletOptions.walletAddress) {
       const files = await fs.readdir(fileDir);
-      const matchingFiles = files.filter((e) => {
+      const match = files.find((e) => {
         const address = e.split('--')[2];
         return (
           address
@@ -172,8 +172,8 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
             || address.toLowerCase() === walletOptions.walletAddress.toLowerCase())
         );
       });
-      if (matchingFiles[0]) {
-        return matchingFiles[0];
+      if (match) {
+        return match;
       }
       throw Error(
         `no wallet file matching address ${
