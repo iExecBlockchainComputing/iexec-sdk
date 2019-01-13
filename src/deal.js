@@ -7,7 +7,7 @@ const objName = 'deal';
 const show = async (contracts, dealid) => {
   try {
     if (!isBytes32(dealid, { strict: false })) throw Error('invalid dealid');
-    const clerkAddress = contracts.fetchClerkAddress();
+    const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({ at: clerkAddress });
     const deal = bnifyNestedEthersBn(
       cleanRPC(await clerkContract.viewDeal(dealid)),
