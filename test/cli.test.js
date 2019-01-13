@@ -439,9 +439,7 @@ test(
 test('iexec deal show', async () => {
   const { dealid } = await loadJSONFile('orderFill_stdout.json');
   return expect(
-    execAsync(
-      `${iexecPath} deal show ${dealid} --raw > 'dealShow_stdout.json' `,
-    ),
+    execAsync(`${iexecPath} deal show ${dealid}`),
   ).resolves.not.toBe(1);
 });
 
