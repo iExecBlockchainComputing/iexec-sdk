@@ -218,7 +218,7 @@ iexec task show <taskid> --download # NOT IMPLEMENTED YET
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 ```
 
-## sgx
+## tee
 
 ```bash
 # OPTIONS
@@ -230,9 +230,9 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --outputsFolderPath <path>
 # --secretManagementService <hostname/IP>
 # --remoteFileSystem <serviceName>
-iexec sgx init # init the SGX folders tree structure
-iexec sgx encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
-iexec sgx decrypt # decrypt work result
+iexec tee init # init the TEE folders tree structure
+iexec tee encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
+iexec tee decrypt # decrypt work result
 ```
 
 ## category

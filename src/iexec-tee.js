@@ -7,6 +7,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const {
   help,
+  addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -15,10 +18,11 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const { isEthAddress } = require('./utils');
+const { Keystore } = require('./keystore');
 
-const debug = Debug('iexec:iexec-sgx');
+const debug = Debug('iexec:iexec-tee');
 
-const sgxFolderName = 'sgx';
+const teeFolderName = 'tee';
 const keysFolderName = 'keys';
 const inputsFolderName = 'inputs';
 const encryptedOutputsFolderName = 'encryptedOutputs';
@@ -50,15 +54,15 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   proc.on('error', () => reject(errorMessage || 'process errored'));
 });
 
-const createSGXPaths = (cmd = {}) => {
+const createTEEPaths = (cmd = {}) => {
   const keysPath = cmd.keysFolderPath
-    || path.join(process.cwd(), sgxFolderName, keysFolderName);
+    || path.join(process.cwd(), teeFolderName, keysFolderName);
   const inputsPath = cmd.inputsFolderPath
-    || path.join(process.cwd(), sgxFolderName, inputsFolderName);
+    || path.join(process.cwd(), teeFolderName, inputsFolderName);
   const encryptedOutputsPath = cmd.encryptedOutputsFolder
-    || path.join(process.cwd(), sgxFolderName, encryptedOutputsFolderName);
+    || path.join(process.cwd(), teeFolderName, encryptedOutputsFolderName);
   const decryptedOutputPath = cmd.outputsFolderPath
-    || path.join(process.cwd(), sgxFolderName, outputsFolderName);
+    || path.join(process.cwd(), teeFolderName, outputsFolderName);
   const paths = {
     keysPath,
     inputsPath,
@@ -69,34 +73,34 @@ const createSGXPaths = (cmd = {}) => {
   return paths;
 };
 
-cli
-  .command('init')
-  .description(desc.sgxInit())
-  .action(async () => {
-    try {
-      const spinner = Spinner();
-      spinner.start('creating SGX folder tree structure');
-      const {
-        keysPath,
-        inputsPath,
-        encryptedOutputsPath,
-        decryptedOutputPath,
-      } = createSGXPaths();
-      await Promise.all([
-        fs.ensureDir(keysPath),
-        fs.ensureDir(inputsPath),
-        fs.ensureDir(encryptedOutputsPath),
-        fs.ensureDir(decryptedOutputPath),
-      ]);
+const init = cli.command('init');
+addGlobalOptions(init);
+init.description(desc.teeInit()).action(async (cmd) => {
+  const spinner = Spinner(cmd);
+  try {
+    spinner.start('creating TEE folder tree structure');
+    const {
+      keysPath,
+      inputsPath,
+      encryptedOutputsPath,
+      decryptedOutputPath,
+    } = createTEEPaths();
+    await Promise.all([
+      fs.ensureDir(keysPath),
+      fs.ensureDir(inputsPath),
+      fs.ensureDir(encryptedOutputsPath),
+      fs.ensureDir(decryptedOutputPath),
+    ]);
 
-      spinner.succeed(info.sgxInit());
-    } catch (error) {
-      handleError(error, cli);
-    }
-  });
+    spinner.succeed(info.teeInit());
+  } catch (error) {
+    handleError(error, cli, cmd);
+  }
+});
 
-cli
-  .command('encryptedpush')
+const encryptedpush = cli.command('encryptedpush');
+addGlobalOptions(encryptedpush);
+encryptedpush
   .option(...option.chain())
   .option(...option.keysFolderPath())
   .option(...option.inputsFolderPath())
@@ -105,13 +109,15 @@ cli
   .option(...option.remoteFileSystem())
   .description(desc.encryptedpush())
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
       if (!cmd.application) throw Error('missing --application option');
 
-      const chain = await loadChain(cmd.chain);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
 
-      const { keysPath, inputsPath } = createSGXPaths(cmd);
+      const { keysPath, inputsPath } = createTEEPaths(cmd);
       spinner.start(`encrypting data from ${inputsPath} and uploading`);
 
       let appName = cmd.application;
@@ -154,12 +160,13 @@ cli
       ]);
       spinner.succeed('data encrypted and uploaded');
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command('decrypt')
+const decrypt = cli.command('decrypt');
+addGlobalOptions(decrypt);
+decrypt
   .option(...option.keysFolderPath())
   .option(...option.encryptedOutputsFolder())
   .option(...option.outputsFolderPath())
@@ -167,13 +174,13 @@ cli
   .action(async (cmd) => {
     try {
       debug('cmd', cmd);
-      const spinner = Spinner();
+      const spinner = Spinner(cmd);
 
       const {
         keysPath,
         encryptedOutputsPath,
         decryptedOutputPath,
-      } = createSGXPaths(cmd);
+      } = createTEEPaths(cmd);
 
       spinner.start('decrypting');
       await spawnAsync('docker', [
@@ -189,9 +196,11 @@ cli
         'iexechub/sgx-scone:cli',
         'decrypt',
       ]);
-      spinner.succeed(`data decrypted in folder ${decryptedOutputPath}`);
+      spinner.succeed(`data decrypted in folder ${decryptedOutputPath}`, {
+        raw: decryptedOutputPath,
+      });
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 

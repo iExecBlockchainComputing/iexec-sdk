@@ -32,7 +32,7 @@ const info = {
   tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
   valid: obj => `${obj} is valid`,
   notValid: obj => `${obj} is NOT valid`,
-  sgxInit: () => 'created SGX folders tree structure',
+  teeInit: () => 'created TEE folders tree structure',
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
@@ -78,7 +78,7 @@ const desc = {
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
-  sgxInit: () => 'init the SGX folders tree structure',
+  teeInit: () => 'init the TEE folders tree structure',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
   publish: objName => `publish a signed ${objName}`,
