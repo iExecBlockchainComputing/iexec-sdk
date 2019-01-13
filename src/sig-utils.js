@@ -299,25 +299,20 @@ const signStructHash = (key, structHash, sepratorHash) => {
 
 const signTypedDatav3 = async (privateKey, typedData) => {
   try {
-    debug('privateKey', privateKey);
     debug('typedData', typedData);
-
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
-
     const domainSeparator = hashStruct(
       'EIP712Domain',
       typedData.types.EIP712Domain,
       typedData.domain,
     );
     debug('domainSeparator', domainSeparator);
-
     const messageHash = hashStruct(
       typedData.primaryType,
       typedData.types[typedData.primaryType],
       typedData.message,
     );
     debug('messageHash', messageHash);
-
     const sign = signStructHash(privKeyBuffer, messageHash, domainSeparator);
     debug('sign', sign);
     return sign;
