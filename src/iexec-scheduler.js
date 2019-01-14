@@ -4,6 +4,9 @@ const Debug = require('debug');
 const cli = require('commander');
 const {
   help,
+  addGlobalOptions,
+  addWalletLoadOptions,
+  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -13,20 +16,25 @@ const {
 } = require('./cli-helper');
 const { loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains.js');
+const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-scheduler');
 const objName = 'scheduler';
 
-cli
-  .command('show')
+const show = cli.command('show');
+addGlobalOptions(show);
+addWalletLoadOptions(show);
+show
   .option(...option.chain())
   .option(...option.scheduler())
   .description(desc.showObj('version', objName))
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [{ iexec, scheduler }, { jwtoken }] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadAccountConf(),
       ]);
 
@@ -47,21 +55,27 @@ cli
       const details = {
         version,
       };
-      spinner.succeed(`scheduler ${scheduler} details:${pretty(details)}`);
+      spinner.succeed(`scheduler ${scheduler} details:${pretty(details)}`, {
+        raw: details,
+      });
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
-cli
-  .command('api')
+const apiCall = cli.command('api');
+addGlobalOptions(apiCall);
+addWalletLoadOptions(apiCall);
+apiCall
   .option(...option.chain())
   .description('direct call of scheduler API methods')
   .action(async (cmd) => {
-    const spinner = Spinner();
+    const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
       const [{ iexec, scheduler }, { jwtoken }] = await Promise.all([
-        loadChain(cmd.chain),
+        loadChain(cmd.chain, keystore, { spinner }),
         loadAccountConf(),
       ]);
 
@@ -77,9 +91,11 @@ cli
 
       const res = await iexec[fnName](...fnArgs);
 
-      spinner.succeed(`scheduler ${scheduler} details:${pretty(res)}`);
+      spinner.succeed(`scheduler ${scheduler} details:${pretty(res)}`, {
+        raw: res,
+      });
     } catch (error) {
-      handleError(error, cli);
+      handleError(error, cli, cmd);
     }
   });
 
