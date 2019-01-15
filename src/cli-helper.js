@@ -144,6 +144,22 @@ const option = {
     'show a workerpoolorder',
   ],
   showRequestOrder: () => ['--request [orderHash]', 'show a requestorder'],
+  fillAppOrder: () => [
+    '--app <orderHash>',
+    'specify the app order from the marketplace to fill',
+  ],
+  fillDatasetOrder: () => [
+    '--dataset <orderHash>',
+    'specify the dataset order from the marketplace to fill',
+  ],
+  fillWorkerpoolOrder: () => [
+    '--workerpool [orderHash>',
+    'specify the wokerpool order from the marketplace to fill',
+  ],
+  fillRequestOrder: () => [
+    '--request orderHash',
+    'specify the requestorder from the marketplace to fill',
+  ],
   auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],

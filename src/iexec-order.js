@@ -268,6 +268,10 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
+  .option(...option.fillAppOrder())
+  .option(...option.fillDatasetOrder())
+  .option(...option.fillWorkerpoolOrder())
+  .option(...option.fillRequestOrder())
   .description(desc.fill(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -280,10 +284,31 @@ fill
       ]);
       debug('signedOrders', signedOrders);
 
-      const appOrder = signedOrders[chain.id].apporder;
-      const datasetOrder = signedOrders[chain.id].datasetorder;
-      const workerpoolOrder = signedOrders[chain.id].workerpoolorder;
-      const requestOrderInput = signedOrders[chain.id].requestorder;
+      const getOrderByHash = async (orderName, orderHash) => {
+        if (isBytes32(orderHash, { strict: false })) {
+          spinner.info(
+            `fetching ${orderName} ${orderHash} from iexec marketplace`,
+          );
+          const orderRes = await order.showOrder(chain.id, orderName, {
+            orderHash,
+          });
+          return orderRes.order;
+        }
+        throw Error(`invalid ${orderName} hash`);
+      };
+
+      const appOrder = cmd.app
+        ? await getOrderByHash('apporder', cmd.app)
+        : signedOrders[chain.id].apporder;
+      const datasetOrder = cmd.dataset
+        ? await getOrderByHash('datasetorder', cmd.dataset)
+        : signedOrders[chain.id].datasetorder;
+      const workerpoolOrder = cmd.workerpool
+        ? await getOrderByHash('workerpoolorder', cmd.workerpool)
+        : signedOrders[chain.id].workerpoolorder;
+      const requestOrderInput = cmd.request
+        ? await getOrderByHash('requestorder', cmd.request)
+        : signedOrders[chain.id].requestorder;
 
       const useDataset = requestOrderInput
         ? requestOrderInput.dataset
