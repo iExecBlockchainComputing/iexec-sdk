@@ -285,7 +285,16 @@ const http = {
   authorizedPost: gatewayAuth,
 };
 
-const getSalt = () => ethers.utils.hexlify(ethers.utils.bigNumberify(ethers.utils.randomBytes(32)));
+const getSalt = () => {
+  const hex = ethers.utils
+    .bigNumberify(ethers.utils.randomBytes(32))
+    .toHexString()
+    .substring(2);
+  const salt = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    .substr(0, 66 - hex.length)
+    .concat(hex);
+  return salt;
+};
 
 module.exports = {
   getContractAddress,
