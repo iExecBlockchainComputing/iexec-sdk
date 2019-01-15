@@ -45,7 +45,9 @@ create
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
+        `Your wallet address is ${res.address}\nwallet saved in "${
+          res.fileName
+        }":\n${pretty(res.wallet)}`,
         { raw: res },
       );
       spinner.warn('You must backup your wallet file in a safe place!');
@@ -70,7 +72,9 @@ importPk
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `wallet saved in "${res.fileName}":\n${pretty(res.wallet)}`,
+        `Your wallet address is ${res.address}\nwallet saved in "${
+          res.fileName
+        }":\n${pretty(res.wallet)}`,
         { raw: res },
       );
       spinner.warn('You must backup your wallet file in a safe place!');
