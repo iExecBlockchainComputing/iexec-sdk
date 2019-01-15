@@ -649,7 +649,9 @@ show
         );
       }
 
-      const chain = await loadChain(cmd.chain, spinner);
+      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+        spinner,
+      });
 
       const showOrder = async (orderName, cmdInput) => {
         const findOption = {};
