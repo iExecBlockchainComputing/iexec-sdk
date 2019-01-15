@@ -204,6 +204,32 @@ const httpRequest = verb => async (endpoint, body = {}, api = API_URL) => {
   throw new Error('API call error');
 };
 
+const signTypedDatav3 = async (eth, typedData) => {
+  const signTDv3 = td => new Promise((resolve, reject) => {
+    eth.sendAsync(
+      {
+        method: 'eth_signTypedData_v3',
+        params: [null, td],
+      },
+      (err, result) => {
+        if (err) reject(err);
+        resolve(result.result);
+      },
+    );
+  });
+
+  const sign = await signTDv3(typedData);
+  debug('sign', sign);
+
+  const serializedSign = '0x'
+    .concat(sign.r.substr(2))
+    .concat(sign.s.substr(2))
+    .concat(sign.v.toString(16));
+
+  debug('serializedSign', serializedSign);
+  return serializedSign;
+};
+
 const gatewayAuth = async (
   chainID,
   address,
@@ -224,39 +250,20 @@ const gatewayAuth = async (
 
     debug('body', body);
 
-    const { data } = await httpRequest('POST')('challenge', {
+    const challengeRes = await httpRequest('POST')('challenge', {
       chainID,
     });
-    debug('data', data);
+    debug('challengeRes', challengeRes);
 
-    const typedData = JSON.parse(data);
+    const typedData = challengeRes.data;
     debug('typedData', typedData);
 
-    const signTypedDatav3 = td => new Promise((resolve, reject) => {
-      eth.sendAsync(
-        {
-          method: 'eth_signTypedData_v3',
-          params: [null, td],
-        },
-        (err, result) => {
-          if (err) reject(err);
-          resolve(result.result);
-        },
-      );
-    });
-
-    const sign = await signTypedDatav3(typedData);
-    debug('sign', sign);
-
-    const serializedSign = '0x'
-      .concat(sign.r.substr(2))
-      .concat(sign.s.substr(2))
-      .concat(sign.v.toString(16));
+    const serializedSign = await signTypedDatav3(eth, typedData);
 
     const authBody = Object.assign(
       {
         auth: {
-          data,
+          data: challengeRes.data,
           address,
           sig: serializedSign,
         },
