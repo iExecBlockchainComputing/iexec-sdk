@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { Spinner } = require('./cli-helper');
 const { ethersBnToBn, bnToEthersBn } = require('./utils');
 
 const debug = Debug('iexec:wallet');
@@ -32,14 +31,14 @@ const ethFaucets = [
     chainName: 'rinkeby',
     name: 'faucet.rinkeby.io',
     getETH: () => ({
-      message: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH',
+      error: 'Go to https://faucet.rinkeby.io/ to manually ask for ETH',
     }),
   },
   {
     chainName: 'kovan',
     name: 'gitter.im/kovan-testnet/faucet',
     getETH: () => ({
-      message:
+      error:
         'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH',
     }),
   },
@@ -71,24 +70,21 @@ const checkBalances = async (contracts, address) => {
 };
 
 const getETH = async (chainName, account) => {
-  const spinner = Spinner();
-  spinner.start(`requesting ETH from ${chainName} faucets...`);
-
   const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
-  const responses = await Promise.all(
+  const faucetsResponses = await Promise.all(
     filteredFaucets.map(faucet => faucet.getETH(account)),
   );
-  const responsesString = filteredFaucets.reduce(
-    (accu, curr, index) => accu.concat(
-      '- ',
-      curr.name,
-      ' : \n',
-      JSON.stringify(responses[index], null, '\t'),
-      '\n\n',
-    ),
-    '',
-  );
-  spinner.succeed(`Faucets responses:\n${responsesString}`);
+  const responses = filteredFaucets.reduce((accu, curr, index) => {
+    accu.push(
+      Object.assign(
+        {
+          name: curr.name,
+        },
+        { response: faucetsResponses[index] },
+      ),
+    );
+    return accu;
+  }, []);
   return responses;
 };
 
@@ -102,23 +98,20 @@ const rlcFaucets = [
 ];
 
 const getRLC = async (chainName, account) => {
-  const spinner = Spinner();
-
-  spinner.start(`requesting ${chainName} faucet for nRLC...`);
-  const responses = await Promise.all(
+  const faucetsResponses = await Promise.all(
     rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
   );
-  const responsesString = rlcFaucets.reduce(
-    (accu, curr, index) => accu.concat(
-      '- ',
-      curr.name,
-      ' : \n',
-      JSON.stringify(responses[index], null, '\t'),
-      '\n\n',
-    ),
-    '',
-  );
-  spinner.succeed(`Faucets responses:\n${responsesString}`);
+  const responses = rlcFaucets.reduce((accu, curr, index) => {
+    accu.push(
+      Object.assign(
+        {
+          name: curr.name,
+        },
+        { response: faucetsResponses[index] },
+      ),
+    );
+    return accu;
+  }, []);
   return responses;
 };
 

@@ -156,7 +156,22 @@ getEth
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
-      await wallet.getETH(chain.name, address);
+      spinner.start(`requesting ETH from ${chain.name} faucets...`);
+      const faucetsResponses = await wallet.getETH(chain.name, address);
+      const responsesString = faucetsResponses.reduce(
+        (accu, curr) => accu.concat(
+          '- ',
+          curr.name,
+          ' :',
+          curr.response.error
+            ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
+            : pretty(curr.response),
+        ),
+        '',
+      );
+      spinner.succeed(`Faucets responses:\n${responsesString}`, {
+        raw: { faucetsResponses },
+      });
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -177,7 +192,22 @@ getRlc
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
-      await wallet.getRLC(chain.name, address);
+      spinner.start(`requesting ${chain.name} faucet for nRLC...`);
+      const faucetsResponses = await wallet.getRLC(chain.name, address);
+      const responsesString = faucetsResponses.reduce(
+        (accu, curr) => accu.concat(
+          '- ',
+          curr.name,
+          ' :',
+          curr.response.error
+            ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
+            : pretty(curr.response),
+        ),
+        '',
+      );
+      spinner.succeed(`Faucets responses:\n${responsesString}`, {
+        raw: { faucetsResponses },
+      });
     } catch (error) {
       handleError(error, cli, cmd);
     }
