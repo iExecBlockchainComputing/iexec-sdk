@@ -66,9 +66,7 @@ const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
       } else {
         const names = Object.keys(chainsConf.chains);
         names.forEach((n) => {
-          debug('n', n);
           const chainConf = chainsConf.chains[n];
-          debug('chainConf', chainConf);
           if (chainConf.id && chainConf.id === chainName) {
             name = n;
             conf = chainConf;
