@@ -9,8 +9,9 @@ const { Spinner } = require('./cli-helper');
 
 const debug = Debug('iexec:chains');
 
-const createChains = (
-  chainsConf,
+const createChainFromConf = (
+  chainName,
+  chainConf,
   {
     signTransaction,
     accounts,
@@ -21,78 +22,76 @@ const createChains = (
   },
 ) => {
   try {
-    const chains = { names: Object.keys(chainsConf.chains) };
-    chains.names.forEach((name) => {
-      const chain = chainsConf.chains[name];
-      const signerProvider = new SignerProvider(chain.host, {
-        signTransaction,
-        accounts,
-        signTypedData,
-        signTypedDatav3,
-        signMessage,
-        signPersonalMessage,
-      });
-
-      chains[name] = Object.assign({}, chain);
-      chains[name].name = name;
-      chains[name].ethjs = new EthJS(signerProvider);
-      chains[name].ethSigner = new ethers.providers.Web3Provider(
-        signerProvider,
-      ).getSigner();
-      chains[name].EthJS = EthJS;
-      chains[name].iexec = createIExecClient({
-        server: chain.scheduler,
-        authURL: chainsConf.auth,
-      });
-      chains[name].contracts = createIExecContracts({
-        ethSigner: chains[name].ethSigner,
-        chainID: chains[name].id,
-        hubAddress: chains[name].hub,
-      });
-      // index by chainID
-      chains[chain.id] = chains[name];
+    const chain = Object.assign({}, chainConf);
+    const signerProvider = new SignerProvider(chainConf.host, {
+      signTransaction,
+      accounts,
+      signTypedData,
+      signTypedDatav3,
+      signMessage,
+      signPersonalMessage,
     });
-    return chains;
+    chain.name = chainName;
+    chain.ethjs = new EthJS(signerProvider);
+    chain.ethSigner = new ethers.providers.Web3Provider(
+      signerProvider,
+    ).getSigner();
+    chain.EthJS = EthJS;
+    chain.iexec = createIExecClient({
+      server: chain.scheduler,
+      authURL: chainConf.auth,
+    });
+    chain.contracts = createIExecContracts({
+      ethSigner: chain.ethSigner,
+      chainID: chain.id,
+      hubAddress: chain.hub,
+    });
+    return chain;
   } catch (error) {
-    debug('createChains()', error);
-    throw error;
-  }
-};
-
-const loadChains = async (keystore) => {
-  try {
-    const chainsConf = await loadChainConf();
-    const chains = createChains(chainsConf, keystore);
-    if (chainsConf.default) chains.default = chainsConf.default;
-    return chains;
-  } catch (error) {
-    debug('loadChains()', error);
+    debug('createChainFromConf()', error);
     throw error;
   }
 };
 
 const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
   try {
-    const chains = await loadChains(keystore);
+    const chainsConf = await loadChainConf();
+    debug('chainsConf', chainsConf);
+    let name;
+    let conf;
     if (chainName) {
-      if (!(chainName in chains)) {
-        throw Error(`missing "${chainName}" chain in "chains.json"`);
+      if (chainsConf.chains[chainName]) {
+        conf = chainsConf.chains[chainName];
+        name = chainName;
+      } else {
+        const names = Object.keys(chainsConf.chains);
+        names.forEach((n) => {
+          debug('n', n);
+          const chainConf = chainsConf.chains[n];
+          debug('chainConf', chainConf);
+          if (chainConf.id && chainConf.id === chainName) {
+            name = n;
+            conf = chainConf;
+          }
+        });
+        if (!name) throw Error(`missing "${chainName}" chain in "chains.json"`);
       }
-      spinner.info(`using chain [${chainName}]`);
-      return chains[chainName];
-    }
-    if (chains.default) {
-      if (!(chains.default in chains)) {
-        throw Error(`missing "${chains.default}" chain in "chains.json"`);
+    } else if (chainsConf.default) {
+      if (chainsConf.chains[chainsConf.default]) {
+        name = chainsConf.default;
+        conf = chainsConf.chains[chainsConf.default];
+      } else {
+        throw Error(`missing "${chainsConf.default}" chain in "chains.json"`);
       }
-      spinner.info(`using chain [${chains.default}]`);
-      return chains[chains.default];
+    } else if (chainsConf.chains && chainsConf.chains.kovan) {
+      name = 'kovan';
+      conf = chainsConf.chain.kovan;
     }
-    if ('kovan' in chains) {
-      spinner.info('using chain [kovan]');
-      return chains.kovan;
-    }
-    throw Error('missing chain parameter. Check your "chains.json" file');
+    if (!name) throw Error('missing chain parameter. Check your "chains.json" file');
+    debug('loading chain', name, conf);
+    const chain = createChainFromConf(name, conf, keystore);
+    spinner.info(`using chain [${name}]`);
+    return chain;
   } catch (error) {
     debug('loadChain()', error);
     throw error;
@@ -100,6 +99,5 @@ const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
 };
 
 module.exports = {
-  loadChains,
   loadChain,
 };
