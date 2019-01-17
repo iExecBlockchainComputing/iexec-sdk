@@ -286,37 +286,35 @@ const hashStruct = (primaryType, members, obj) => {
   return structHash;
 };
 
-const signStructHash = (key, structHash, sepratorHash) => {
-  const solSha3 = ethers.utils.solidityKeccak256(
-    ['bytes', 'bytes32', 'bytes32'],
-    ['0x1901', sepratorHash, structHash],
+const hashEIP712 = (typedData) => {
+  const domainSeparatorHash = hashStruct(
+    'EIP712Domain',
+    typedData.types.EIP712Domain,
+    typedData.domain,
   );
-  const sig = ecsign(Buffer.from(solSha3.substr(2), 'hex'), key);
-  const sign = {
-    r: addHexPrefix(sig.r.toString('hex')),
-    s: addHexPrefix(sig.s.toString('hex')),
-    v: sig.v,
-  };
-  return sign;
+  const messageHash = hashStruct(
+    typedData.primaryType,
+    typedData.types[typedData.primaryType],
+    typedData.message,
+  );
+  const hash = ethers.utils.solidityKeccak256(
+    ['bytes', 'bytes32', 'bytes32'],
+    ['0x1901', domainSeparatorHash, messageHash],
+  );
+  return hash;
 };
 
 const signTypedDatav3 = async (privateKey, typedData) => {
   try {
     debug('typedData', typedData);
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const domainSeparator = hashStruct(
-      'EIP712Domain',
-      typedData.types.EIP712Domain,
-      typedData.domain,
-    );
-    debug('domainSeparator', domainSeparator);
-    const messageHash = hashStruct(
-      typedData.primaryType,
-      typedData.types[typedData.primaryType],
-      typedData.message,
-    );
-    debug('messageHash', messageHash);
-    const sign = signStructHash(privKeyBuffer, messageHash, domainSeparator);
+    const solSha3 = hashEIP712(typedData);
+    const sig = ecsign(Buffer.from(solSha3.substr(2), 'hex'), privKeyBuffer);
+    const sign = {
+      r: addHexPrefix(sig.r.toString('hex')),
+      s: addHexPrefix(sig.s.toString('hex')),
+      v: sig.v,
+    };
     debug('sign', sign);
     return sign;
   } catch (error) {
@@ -329,4 +327,5 @@ module.exports = {
   signTypedData,
   signTypedDatav3,
   hashStruct,
+  hashEIP712,
 };

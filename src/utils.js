@@ -5,6 +5,7 @@ const fetch = require('cross-fetch');
 const qs = require('query-string');
 const BN = require('bn.js');
 const ethers = require('ethers');
+const { hashEIP712 } = require('./sig-utils');
 
 const debug = Debug('iexec:utils');
 
@@ -176,19 +177,28 @@ const makeQueryString = (verb, body) => {
   return '';
 };
 
-const httpRequest = verb => async (endpoint, body = {}, api = API_URL) => {
+const httpRequest = verb => async (
+  endpoint,
+  body = {},
+  optionalHeaders = {},
+  api = API_URL,
+) => {
   const baseURL = api;
   const queryString = makeQueryString(verb, body);
   const url = baseURL.concat(endpoint, queryString);
+  const headers = Object.assign(
+    {
+      Accept: 'application/json',
+      'content-type': 'application/json',
+    },
+    optionalHeaders,
+  );
   const response = await fetch(
     url,
     Object.assign(
       {
         method: verb,
-        headers: {
-          Accept: 'application/json',
-          'content-type': 'application/json',
-        },
+        headers,
       },
       makeBody(verb, body),
     ),
@@ -258,19 +268,18 @@ const gatewayAuth = async (
     const typedData = challengeRes.data;
     debug('typedData', typedData);
 
+    const messageHash = hashEIP712(typedData);
     const serializedSign = await signTypedDatav3(eth, typedData);
+    const separator = '_';
+    const authHeader = messageHash
+      .concat(separator)
+      .concat(serializedSign)
+      .concat(separator)
+      .concat(address);
 
-    const authBody = Object.assign(
-      {
-        auth: {
-          data: challengeRes.data,
-          address,
-          sig: serializedSign,
-        },
-      },
-      body,
-    );
-    const response = await httpRequest('POST')(endpoint, authBody);
+    const response = await httpRequest('POST')(endpoint, body, {
+      authorization: authHeader,
+    });
     debug('response', response);
     return response;
   } catch (error) {
