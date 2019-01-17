@@ -113,7 +113,7 @@ const saveWallet = async (userWallet, options) => {
     };
     const creationDate = `${now.getUTCFullYear()}-${pad(
       now.getUTCMonth() + 1,
-    )}-${pad(now.getUTCDay())}T${pad(now.getUTCHours())}-${pad(
+    )}-${pad(now.getUTCDate())}T${pad(now.getUTCHours())}-${pad(
       now.getUTCMinutes(),
     )}-${pad(now.getUTCSeconds())}.${(now.getUTCMilliseconds() / 1000)
       .toFixed(3)
