@@ -260,8 +260,9 @@ const gatewayAuth = async (
 
     debug('body', body);
 
-    const challengeRes = await httpRequest('POST')('challenge', {
+    const challengeRes = await httpRequest('GET')('challenge', {
       chainID,
+      address,
     });
     debug('challengeRes', challengeRes);
 
