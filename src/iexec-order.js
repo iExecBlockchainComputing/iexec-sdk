@@ -472,6 +472,7 @@ fill
 
 const publish = cli.command(command.publish());
 addGlobalOptions(publish);
+addWalletLoadOptions(publish);
 publish
   .option(...option.publishAppOrder())
   .option(...option.publishDatasetOrder())
@@ -491,9 +492,13 @@ publish
         );
       }
 
-      const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, Keystore(), { spinner }),
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+
+      const [chain, signedOrders, { address }] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
+        keystore.load(),
       ]);
 
       const publishOrder = async (orderName) => {
@@ -509,6 +514,8 @@ publish
         spinner.start(`publishing ${orderName}`);
         const orderHash = await order.publishOrder(
           chain.id,
+          address,
+          chain.ethSigner.provider._web3Provider,
           orderName,
           orderToPublish,
         );

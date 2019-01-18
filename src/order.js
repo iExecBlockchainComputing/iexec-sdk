@@ -249,13 +249,18 @@ const cancelDatasetOrder = (order, domain) => cancelOrder('datasetorder', order,
 const cancelWorkerpoolOrder = (order, domain) => cancelOrder('workerpoolorder', order, domain);
 const cancelRequestOrder = (order, domain) => cancelOrder('requestorder', order, domain);
 
-const publishOrder = async (chainID, orderName, orderToPublish) => {
+const publishOrder = async (
+  chainID,
+  address,
+  eth,
+  orderName,
+  orderToPublish,
+) => {
   try {
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
-    debug('endpoint', endpoint);
     const body = { chainID, order: orderToPublish };
-    debug('body', body);
-    const response = await http.post(endpoint, body);
+    const authorization = await getAuthorization(chainID, address, eth);
+    const response = await http.post(endpoint, body, { authorization });
     debug('response', response);
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
