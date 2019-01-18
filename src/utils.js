@@ -206,8 +206,8 @@ const httpRequest = verb => async (
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     const json = await response.json();
-    if (json.ok) return json;
     if (json.error) throw new Error(json.error);
+    if (response.status === 200 && json) return json;
   } else {
     throw new Error('the http response is not of JSON type');
   }
