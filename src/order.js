@@ -7,8 +7,9 @@ const {
   http,
   getSalt,
   checksummedAddress,
+  getAuthorization,
 } = require('./utils');
-const { hashStruct } = require('./sig-utils');
+const { hashStruct, deserializeSig } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
@@ -179,7 +180,7 @@ const checkRemainingVolume = async (
   return remain;
 };
 
-const signOrder = async (orderName, orderObj, domainObj, eth) => {
+const signOrder = async (orderName, orderObj, domainObj, eth, address) => {
   const salt = getSalt();
   const saltedOrderObj = Object.assign(orderObj, { salt });
 
@@ -209,7 +210,7 @@ const signOrder = async (orderName, orderObj, domainObj, eth) => {
     eth.sendAsync(
       {
         method: 'eth_signTypedData_v3',
-        params: [null, data],
+        params: [address, JSON.stringify(data)],
       },
       (err, result) => {
         if (err) reject(err);
@@ -218,17 +219,19 @@ const signOrder = async (orderName, orderObj, domainObj, eth) => {
     );
   });
 
-  const sign = await signTypedDatav3(typedData);
-  debug('sign', sign);
+  const sig = await signTypedDatav3(typedData);
+  debug('sig', sig);
+
+  const sign = deserializeSig(sig);
 
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   debug('signedOrder', signedOrder);
   return signedOrder;
 };
-const signAppOrder = (order, domain, eth) => signOrder('apporder', order, domain, eth);
-const signDatasetOrder = (order, domain, eth) => signOrder('datasetorder', order, domain, eth);
-const signWorkerpoolOrder = (order, domain, eth) => signOrder('workerpoolorder', order, domain, eth);
-const signRequestOrder = (order, domain, eth) => signOrder('requestorder', order, domain, eth);
+const signAppOrder = (order, domain, eth, address) => signOrder('apporder', order, domain, eth, address);
+const signDatasetOrder = (order, domain, eth, address) => signOrder('datasetorder', order, domain, eth, address);
+const signWorkerpoolOrder = (order, domain, eth, address) => signOrder('workerpoolorder', order, domain, eth, address);
+const signRequestOrder = (order, domain, eth, address) => signOrder('requestorder', order, domain, eth, address);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
@@ -270,13 +273,8 @@ const unpublishOrder = async (chainID, address, eth, orderName, orderHash) => {
     debug('endpoint', endpoint);
     const body = { chainID, orderHash };
     debug('body', body);
-    const response = await http.authorizedPost(
-      chainID,
-      address,
-      eth,
-      endpoint,
-      { body },
-    );
+    const authorization = await getAuthorization(chainID, address, eth);
+    const response = await http.post(endpoint, body, { authorization });
     debug('response', response);
     if (response.ok && response.unpublished) {
       return response.unpublished;

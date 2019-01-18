@@ -214,12 +214,12 @@ const httpRequest = verb => async (
   throw new Error('API call error');
 };
 
-const signTypedDatav3 = async (eth, typedData) => {
+const signTypedDatav3 = async (eth, address, typedData) => {
   const signTDv3 = td => new Promise((resolve, reject) => {
     eth.sendAsync(
       {
         method: 'eth_signTypedData_v3',
-        params: [null, td],
+        params: [address, JSON.stringify(td)],
       },
       (err, result) => {
         if (err) reject(err);
@@ -227,72 +227,50 @@ const signTypedDatav3 = async (eth, typedData) => {
       },
     );
   });
-
   const sign = await signTDv3(typedData);
-  debug('sign', sign);
-
-  const serializedSign = '0x'
-    .concat(sign.r.substr(2))
-    .concat(sign.s.substr(2))
-    .concat(sign.v.toString(16));
-
-  debug('serializedSign', serializedSign);
-  return serializedSign;
+  return sign;
 };
 
-const gatewayAuth = async (
+const getAuthorization = async (
   chainID,
   address,
-  eth,
-  endpoint,
-  { body = {} } = {},
+  ethProvider,
+  { apiUrl = API_URL, challengeEndpoint = 'challenge' } = {},
 ) => {
   try {
-    debug(
-      'gatewayAuth()',
-      'endpoint',
-      endpoint,
-      'address',
-      address,
-      'chainID',
-      chainID,
+    const challenge = await httpRequest('GET')(
+      challengeEndpoint,
+      {
+        chainID,
+        address,
+      },
+      {},
+      apiUrl,
     );
-
-    debug('body', body);
-
-    const challengeRes = await httpRequest('GET')('challenge', {
-      chainID,
-      address,
-    });
-    debug('challengeRes', challengeRes);
-
-    const typedData = challengeRes.data;
+    debug('challenge', challenge);
+    const typedData = challenge.data;
     debug('typedData', typedData);
-
-    const messageHash = hashEIP712(typedData);
-    const serializedSign = await signTypedDatav3(eth, typedData);
+    const sign = await signTypedDatav3(ethProvider, address, typedData);
+    debug('sign', sign);
+    const hash = hashEIP712(typedData);
+    debug('hash', hash);
     const separator = '_';
-    const authHeader = messageHash
+    const authorization = hash
       .concat(separator)
-      .concat(serializedSign)
+      .concat(sign)
       .concat(separator)
       .concat(address);
-
-    const response = await httpRequest('POST')(endpoint, body, {
-      authorization: authHeader,
-    });
-    debug('response', response);
-    return response;
+    debug('authorization', authorization);
+    return authorization;
   } catch (error) {
-    debug('gatewayAuth() error', error);
-    throw error;
+    debug('getAuthorization()', error);
+    throw Error('failed to get authorization');
   }
 };
 
 const http = {
   get: httpRequest('GET'),
   post: httpRequest('POST'),
-  authorizedPost: gatewayAuth,
 };
 
 const getSalt = () => {
@@ -323,6 +301,7 @@ module.exports = {
   secToDate,
   decodeJWTForPrint,
   decodeJWT,
+  getAuthorization,
   http,
   getSalt,
   NULL_ADDRESS,

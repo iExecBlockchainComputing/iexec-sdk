@@ -308,7 +308,7 @@ const signTypedDatav3 = async (privateKey, typedData) => {
   try {
     debug('typedData', typedData);
     const privKeyBuffer = Buffer.from(privateKey, 'hex');
-    const solSha3 = hashEIP712(typedData);
+    const solSha3 = hashEIP712(JSON.parse(typedData));
     const sig = ecsign(Buffer.from(solSha3.substr(2), 'hex'), privKeyBuffer);
     const sign = {
       r: addHexPrefix(sig.r.toString('hex')),
@@ -316,16 +316,30 @@ const signTypedDatav3 = async (privateKey, typedData) => {
       v: sig.v,
     };
     debug('sign', sign);
-    return sign;
+    const serializedSign = addHexPrefix(
+      sign.r
+        .substr(2)
+        .concat(sign.s.substr(2))
+        .concat(sign.v.toString(16)),
+    );
+    return serializedSign;
   } catch (error) {
     debug('signStruct()', error);
     throw error;
   }
 };
 
+const deserializeSig = (sig) => {
+  const r = addHexPrefix(sig.substring(2).substr(0, 64));
+  const s = addHexPrefix(sig.substring(2).substr(64, 64));
+  const v = parseInt(sig.substring(2).substr(128, 2), 16);
+  return { r, s, v };
+};
+
 module.exports = {
   signTypedData,
   signTypedDatav3,
+  deserializeSig,
   hashStruct,
   hashEIP712,
 };
