@@ -214,6 +214,46 @@ const httpRequest = verb => async (
   throw new Error('API call error');
 };
 
+const download = verb => async (
+  endpoint,
+  body = {},
+  optionalHeaders = {},
+  api = API_URL,
+) => {
+  const baseURL = api;
+  const queryString = makeQueryString(verb, body);
+  const url = baseURL.concat(endpoint, queryString);
+  const headers = Object.assign(
+    {
+      Accept: ['application/zip'],
+      'content-type': 'application/json',
+    },
+    optionalHeaders,
+  );
+  const response = await fetch(
+    url,
+    Object.assign(
+      {
+        method: verb,
+        headers,
+      },
+      makeBody(verb, body),
+    ),
+  );
+  if (!response.ok) {
+    throw Error(
+      `API call error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
+  }
+  const contentType = response.headers.get('content-type');
+  return {
+    content: response.body,
+    contentType,
+  };
+};
+
 const signTypedDatav3 = async (eth, address, typedData) => {
   const signTDv3 = td => new Promise((resolve, reject) => {
     eth.sendAsync(
@@ -241,6 +281,7 @@ const getAuthorization = async (
     const challenge = await httpRequest('GET')(
       challengeEndpoint,
       {
+        chainId: chainID,
         chainID,
         address,
       },
@@ -248,7 +289,7 @@ const getAuthorization = async (
       apiUrl,
     );
     debug('challenge', challenge);
-    const typedData = challenge.data;
+    const typedData = challenge.data || challenge;
     debug('typedData', typedData);
     const sign = await signTypedDatav3(ethProvider, address, typedData);
     debug('sign', sign);
@@ -303,6 +344,7 @@ module.exports = {
   decodeJWT,
   getAuthorization,
   http,
+  download,
   getSalt,
   NULL_ADDRESS,
 };
