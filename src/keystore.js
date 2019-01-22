@@ -158,20 +158,31 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
   }
 
   const getWalletFileName = async () => {
+    const descSortWallet = (a, b) => {
+      const aDate = a.split('--')[1];
+      const bDate = b.split('--')[1];
+      if (aDate < bDate) return 1;
+      if (aDate > bDate) return -1;
+      return 0;
+    };
+
     if (walletOptions.walletFileName) {
       return walletOptions.walletFileName;
     }
     if (walletOptions.walletAddress) {
       const files = await fs.readdir(fileDir);
-      const match = files.find((e) => {
-        const address = e.split('--')[2];
-        return (
-          address
-          && ('0x'.concat(address).toLowerCase()
-            === walletOptions.walletAddress.toLowerCase()
-            || address.toLowerCase() === walletOptions.walletAddress.toLowerCase())
-        );
-      });
+      const match = files
+        .filter((e) => {
+          const address = e.split('--')[2];
+          return (
+            address
+            && ('0x'.concat(address).toLowerCase()
+              === walletOptions.walletAddress.toLowerCase()
+              || address.toLowerCase()
+                === walletOptions.walletAddress.toLowerCase())
+          );
+        })
+        .sort(descSortWallet)[0];
       if (match) {
         return match;
       }
@@ -180,6 +191,13 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
           walletOptions.walletAddress
         } found in ${fileDir}`,
       );
+    }
+    if (isSigner) {
+      const files = await fs.readdir(fileDir);
+      const sortedWallet = files
+        .filter(e => e.split('--')[2])
+        .sort(descSortWallet);
+      return sortedWallet[0] || null;
     }
     return null;
   };
@@ -216,7 +234,11 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
       try {
         const loadingOptions = Object.assign({}, { fileName }, { fileDir });
         const encryptedWallet = await loadEncryptedWalletConf(loadingOptions);
-        if (!password) password = await prompt.password('Wallet password');
+        if (!password) {
+          password = await prompt.password(
+            `Using wallet ${fileName}\nPlease enter your password to unlock your wallet`,
+          );
+        }
         const wallet = await decrypt(encryptedWallet, password);
         pk = wallet.privateKey;
       } catch (error) {
