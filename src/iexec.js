@@ -88,7 +88,7 @@ async function main() {
         walletOptions.walletOptions.walletAddress = walletRes.address;
         const keystore = Keystore(walletOptions);
         const [chain, keys] = await Promise.all([
-          loadChain('ropsten', keystore, { spinner }),
+          loadChain('kovan', keystore, { spinner }),
           keystore.load({ lowercase: true }),
         ]);
 
