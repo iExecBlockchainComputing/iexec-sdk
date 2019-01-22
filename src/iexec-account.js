@@ -24,41 +24,6 @@ const {
 const debug = Debug('iexec:iexec-account');
 const objName = 'account';
 
-const login = cli.command('login');
-addGlobalOptions(login);
-addWalletLoadOptions(login);
-login
-  .option(...option.chain())
-  .option(...option.force())
-  .description(desc.login())
-  .action(async (cmd) => {
-    const spinner = Spinner(cmd);
-    try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load({ lowercase: true }),
-        loadChain(cmd.chain, keystore, { spinner }),
-      ]);
-      const force = cmd.force || cmd.raw || false;
-      debug('force', force);
-      spinner.start(info.logging());
-      const jwtoken = await account.auth(address, chain.iexec, chain.ethjs);
-      spinner.stop();
-
-      const fileName = await saveAccountConf({ jwtoken }, { force });
-
-      const jwtForPrint = decodeJWTForPrint(jwtoken);
-      spinner.succeed(
-        `You are logged into iExec. Login token saved into "${fileName}":${pretty(
-          jwtForPrint,
-        )}`,
-        { raw: { jwt: jwtoken, info: jwtForPrint } },
-      );
-    } catch (error) {
-      handleError(error, cli, cmd);
-    }
-  });
 
 const deposit = cli.command(command.deposit());
 addGlobalOptions(deposit);
@@ -128,22 +93,8 @@ show
       }
       if (!userWallet && !address) throw Error('Missing address or wallet');
 
-      const [chain, { jwtoken }] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
-        loadAccountConf(),
-      ]);
       const userAddress = address || userWallet.address;
 
-      const jwtForPrint = decodeJWTForPrint(jwtoken);
-      if (
-        userWallet
-        && userWallet.address.toLowerCase() !== jwtForPrint.address.toLowerCase()
-      ) {
-        spinner.warn(
-          info.tokenAndWalletDiffer(userWallet.address, jwtForPrint.address),
-        );
-      }
-      spinner.info(`Account token:${pretty(jwtForPrint)}`);
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);

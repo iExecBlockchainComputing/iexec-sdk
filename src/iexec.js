@@ -85,31 +85,6 @@ async function main() {
         );
         spinner.warn('You must backup your wallet file in a safe place!');
 
-        walletOptions.walletOptions.walletAddress = walletRes.address;
-        const keystore = Keystore(walletOptions);
-        const [chain, keys] = await Promise.all([
-          loadChain('kovan', keystore, { spinner }),
-          keystore.load({ lowercase: true }),
-        ]);
-
-        spinner.start(info.logging());
-        const jwtoken = await account.auth(
-          keys.address,
-          chain.iexec,
-          chain.ethjs,
-        );
-        spinner.stop();
-
-        const accountfileName = await saveAccountConf(
-          { jwtoken },
-          { force: true },
-        );
-        const jwtForPrint = decodeJWTForPrint(jwtoken);
-        spinner.info(
-          `You are logged into iExec. Login token saved into "${accountfileName}":${pretty(
-            jwtForPrint,
-          )}`,
-        );
 
         const raw = Object.assign(
           {},

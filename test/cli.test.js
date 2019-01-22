@@ -121,15 +121,6 @@ test('iexec info', () => expect(execAsync(`${iexecPath} info`)).resolves.not.toB
 
 // ACCOUNT
 test(
-  'iexec account login',
-  () => expect(
-    execAsync(
-      `${iexecPath} account login --force --password test --wallet-address ${ADDRESS}`,
-    ),
-  ).resolves.not.toBe(1),
-  10000,
-);
-test(
   'iexec account show (+ wallet)',
   () => expect(
     execAsync(
