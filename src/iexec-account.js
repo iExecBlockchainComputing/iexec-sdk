@@ -93,6 +93,7 @@ show
       }
       if (!userWallet && !address) throw Error('Missing address or wallet');
 
+      const chain = await loadChain(cmd.chain, keystore, { spinner });
       const userAddress = address || userWallet.address;
 
 
