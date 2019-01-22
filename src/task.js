@@ -1,10 +1,16 @@
 const Debug = require('debug');
-const { http, checkEvent, isBytes32 } = require('./utils');
+const deal = require('./deal');
+const {
+  checkEvent,
+  isBytes32,
+  bnifyNestedEthersBn,
+  cleanRPC,
+} = require('./utils');
 
 const debug = Debug('iexec:task');
 const objName = 'task';
 
-const statusMap = {
+const taskStatusMap = {
   0: 'UNSET',
   1: 'ACTIVE',
   2: 'REVEALING',
@@ -18,12 +24,17 @@ const show = async (contracts, taskid) => {
   try {
     if (!isBytes32(taskid, { strict: false })) throw Error('invalid taskid');
     const { chainID } = contracts;
-    const body = { chainID, find: { taskid } };
-    const response = await http.post('tasks', body);
-    let task;
-    if (response.tasks && response.tasks[0]) [task] = response.tasks;
-    else throw new Error(`no task found for taskid ${taskid} on chain ${chainID}`);
-    return task;
+    const hubContract = contracts.getHubContract();
+    const task = bnifyNestedEthersBn(
+      cleanRPC(await hubContract.viewTask(taskid)),
+    );
+    if (
+      task.dealid
+      === '0x0000000000000000000000000000000000000000000000000000000000000000'
+    ) throw Error(`no task found for taskid ${taskid} on chain ${chainID}`);
+    return Object.assign({}, task, {
+      statusName: taskStatusMap[task.status],
+    });
   } catch (error) {
     debug('show()', error);
     throw error;
@@ -40,7 +51,8 @@ const waitForTaskStatusChange = async (
     if (!isBytes32(taskid, { strict: false })) throw Error('invalid taskid');
     const task = await show(contracts, taskid);
     const taskStatus = task.status;
-    const taskStatusName = statusMap[taskStatus];
+    debug('taskStatus', taskStatus);
+    const taskStatusName = taskStatusMap[taskStatus];
     if (taskStatus !== prevStatus) {
       return { status: taskStatus, statusName: taskStatusName };
     }
@@ -58,17 +70,22 @@ const claim = async (contracts, taskid, userAddress) => {
     const task = await show(contracts, taskid);
     const taskStatus = task.status;
 
-    if (['COMPLETED', 'FAILLED'].includes(statusMap[taskStatus.toString()])) {
+    if (
+      ['COMPLETED', 'FAILLED'].includes(taskStatusMap[taskStatus.toString()])
+    ) {
       throw Error(
-        `cannot claim a ${objName} having status: ${
-          statusMap[taskStatus.toString()]
+        `cannot claim a ${objName} having status ${
+          taskStatusMap[taskStatus.toString()]
         }`,
       );
     }
-    if (task.requester.toLowerCase() !== userAddress.toLowerCase()) {
+    const tasksDeal = await deal.show(contracts, task.dealid);
+    debug('tasksDeal', tasksDeal);
+
+    if (tasksDeal.requester.toLowerCase() !== userAddress.toLowerCase()) {
       throw Error(
         `cannot claim a ${objName} requested by someone else: ${
-          task.requester
+          tasksDeal.requester
         }`,
       );
     }
@@ -99,7 +116,7 @@ const claim = async (contracts, taskid, userAddress) => {
 };
 
 module.exports = {
-  statusMap,
+  taskStatusMap,
   show,
   waitForTaskStatusChange,
   claim,

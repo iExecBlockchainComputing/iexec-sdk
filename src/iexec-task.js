@@ -18,8 +18,14 @@ const {
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
-const { getAuthorization, download } = require('./utils');
+const {
+  getAuthorization,
+  download,
+  stringifyNestedBn,
+  NULL_ADDRESS,
+} = require('./utils');
 const task = require('./task');
+const deal = require('./deal');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -55,7 +61,7 @@ show
             initialStatus,
           );
           spinner.info(`task status ${statusName}`);
-          if (['3', '4'].includes(status)) {
+          if (['FAILLED', 'COMPLETED'].includes(task.taskStatusMap[status])) {
             return { status, statusName };
           }
           return waitCompletedOrClaimed(status);
@@ -70,45 +76,60 @@ show
       const consensusTimeout = parseInt(taskResult.finalDeadline, 10);
       const consensusTimeoutDate = new Date(consensusTimeout * 1000);
       const now = Math.floor(Date.now() / 1000);
-      if (['0', '1', '2'].includes(taskResult.status) && now > consensusTimeout) claimable = true;
+      if (
+        ['UNSET', 'ACTIVE', 'REVEALING'].includes(
+          task.taskStatusMap[taskResult.status],
+        )
+        && now > consensusTimeout
+      ) claimable = true;
 
       let resultPath;
       if (cmd.download) {
-        if (taskResult.status === '3') {
+        if (task.taskStatusMap[taskResult.status] === 'COMPLETED') {
           const { address } = await keystore.load();
-          // const taskid = '0x222d54fdb2433f77c1eae5c4bc806351d9f958b6906f603c29e73eb4e9b2c941';
-          const resultRepoBaseURL = 'http://52.53.142.148:18290/results/';
-
+          const tasksDeal = await deal.show(chain.contracts, taskResult.dealid);
+          const beneficiary = tasksDeal.beneficiary === NULL_ADDRESS
+            ? tasksDeal.requester
+            : tasksDeal.beneficiary;
+          if (address.toLowerCase() !== beneficiary.toLowerCase()) {
+            throw Error(
+              `only beneficiary ${beneficiary} can download the result`,
+            );
+          }
+          const resultRepoBaseURL = taskResult.results.split(`${taskid}`)[0];
+          debug('resultRepoBaseURL', resultRepoBaseURL);
           const authorization = await getAuthorization(
             chain.id,
             address,
             chain.ethSigner.provider._web3Provider,
             { apiUrl: resultRepoBaseURL },
           );
-          debug('authorization', authorization);
-
-          const { content, contentType } = await download('GET')(
+          const { content } = await download('GET')(
             taskid,
             { chainId: chain.id },
             { authorization },
             resultRepoBaseURL,
           );
-          resultPath = path.join(process.cwd(), `${taskid}.zip`);
+          const resultFileNane = cmd.download !== true ? cmd.download : taskid;
+          resultPath = path.join(process.cwd(), `${resultFileNane}.zip`);
           const stream = fs.createWriteStream(resultPath);
           await content.pipe(stream);
         } else {
           spinner.info(
-            `Task is not completed, ${option.download[0]} will be ignored`,
+            `Task status is not COMPLETED, option ${
+              option.download()[0]
+            } will be ignored`,
           );
         }
       }
 
+      const cleanTask = stringifyNestedBn(taskResult);
       const raw = Object.assign(
-        { task: taskResult },
+        { task: cleanTask },
         { claimable },
         { resultPath },
       );
-      spinner.succeed(`Task ${taskid} details: ${pretty(taskResult)}`, {
+      spinner.succeed(`Task ${taskid} details: ${pretty(cleanTask)}`, {
         raw,
       });
       if (resultPath) {
