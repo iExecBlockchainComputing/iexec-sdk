@@ -178,7 +178,15 @@ const option = {
     'download a work result data to local filesystem, if completed',
   ],
   category: () => ['--category <id>', 'specify the work category'],
-  workerpool: () => ['--workerpool [address]', 'filter by workerpool address'],
+  workerpool: () => ['--workerpool <address>', 'filter by workerpool address'],
+  appOrderbook: () => [
+    '--app <address>',
+    'show the best orders for specified app',
+  ],
+  datasetOrderbook: () => [
+    '--dataset <address>',
+    'show the best orders for specified dataset',
+  ],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet',
