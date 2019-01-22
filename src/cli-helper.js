@@ -177,7 +177,7 @@ const option = {
     '--download [fileName]',
     'download a work result data to local filesystem, if completed',
   ],
-  category: () => ['--category [ID]', 'specify the work category'],
+  category: () => ['--category <id>', 'specify the work category'],
   workerpool: () => ['--workerpool [address]', 'filter by workerpool address'],
   password: () => [
     '--password <password>',
