@@ -16,7 +16,6 @@ The iExec SDK is a CLI and a JS library that allows developers to interact with 
 - The RLC faucet: https://faucet.iex.ec
 - iExec main documentation: https://docs.iex.ec
 - The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
-- The iExec [JS client lib](https://github.com/iExecBlockchainComputing/iexec-server-js-client) to interact with iExec server (without the SDK)
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
 
 ## Install
@@ -106,14 +105,14 @@ iexec dataset deploy --wallet-address <address> # deploy dataset on Ethereum
 iexec dataset show --wallet-address <address> # show details of deployed dataset
 ```
 
-### Place a resource sell order on the Marketplace
+### Place a resource limit sell order on the Marketplace
 
 #### Dapp developper
 
 ```bash
 iexec order init --app # init apporder fields in iexec.json
 iexec order sign --app # sign initialized apporder
-iexec order publish --app # publish signed apporder on the marketplace
+iexec order publish --app # publish your signed apporder on the marketplace and get an orderHash
 ```
 
 #### Workerpool
@@ -121,7 +120,7 @@ iexec order publish --app # publish signed apporder on the marketplace
 ```bash
 iexec order init --workerpool # init workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign initialized workerpoolorder
-iexec order publish --workerpool # publish signed workerpoolorder on the marketplace
+iexec order publish --workerpool # publish your signed workerpoolorder on the marketplace and get an orderHash
 ```
 
 #### Dataset provider
@@ -129,17 +128,17 @@ iexec order publish --workerpool # publish signed workerpoolorder on the marketp
 ```bash
 iexec order init --dataset # init datasetorder fields in iexec.json
 iexec order sign --dataset # sign initialized datasetorder
-iexec order publish --dataset # publish signed datasetorder on the marketplace
+iexec order publish --dataset #publish your signed datasetorder on the marketplace and get an orderHash
 ```
 
-### Place a buy requestorder on the Marketplace
+### Place a limit buy requestorder on the Marketplace
 
 #### Requester
 
 ```bash
 iexec order init --request # init requestorder fields in iexec.json
-iexec order sign --app # sign initialized apporder
-iexec order publish --app # publish signed apporder on the marketplace
+iexec order sign --request # sign initialized apporder
+iexec order publish --request # publish signed apporder on the marketplace
 ```
 
 ### View the orders published on the Marketplace
@@ -155,7 +154,7 @@ iexec orderbook show --dataset <address> # show the best datasetorders published
 #### requester
 
 ```bash
-iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders
+iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealId
 ```
 
 ### Buy & run tasks filling orders OTC
@@ -163,7 +162,19 @@ iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash
 #### requester
 
 ```bash
-iexec order fill # fill all signed orders from your orders.json
+iexec order fill # fill all signed orders from your orders.json and get a dealId
+```
+
+### Follow the execution and download the result
+
+#### requester / beneficiary
+
+```bash
+iexec deal show <dealid> # show you deal details
+iexec deal show <dealid> --task <index> # qet the taskid of a task of the deal
+iexec task show <taskid> # show the status of a task
+iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
+iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
 ```
 
 # iExec SDK CLI API
