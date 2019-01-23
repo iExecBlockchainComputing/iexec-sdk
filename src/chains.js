@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
 const ethers = require('ethers');
 const createIExecContracts = require('iexec-contracts-js-client');
@@ -31,13 +30,12 @@ const createChainFromConf = (
       signPersonalMessage,
     });
     chain.name = chainName;
-    chain.ethjs = new EthJS(signerProvider);
-    chain.ethSigner = new ethers.providers.Web3Provider(
+    chain.signerProvider = signerProvider;
+    const ethSigner = new ethers.providers.Web3Provider(
       signerProvider,
     ).getSigner();
-    chain.EthJS = EthJS;
     chain.contracts = createIExecContracts({
-      ethSigner: chain.ethSigner,
+      ethSigner,
       chainID: chain.id,
       hubAddress: chain.hub,
     });

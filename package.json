@@ -29,7 +29,6 @@
     "debug": "4.1.0",
     "elliptic": "6.4.1",
     "ethers": "4.0.12",
-    "ethjs": "0.4.0",
     "ethjs-account": "0.1.4",
     "ethjs-custom-signer": "1.0.3",
     "ethjs-signer": "0.1.1",

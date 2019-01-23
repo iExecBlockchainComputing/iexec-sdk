@@ -101,7 +101,7 @@ show
           const authorization = await getAuthorization(
             chain.id,
             address,
-            chain.ethSigner.provider._web3Provider,
+            chain.signerProvider,
             { apiUrl: resultRepoBaseURL },
           );
           const { content } = await download('GET')(
