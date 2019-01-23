@@ -88,7 +88,6 @@ const chains = {
       host: 'http://localhost:8545',
       id: '17',
       hub: '0x60E25C038D70A15364DAc11A042DB1dD7A2cccBC',
-      scheduler: 'https://pool1api.iex.ec',
     },
     ropsten: {
       host: 'https://ropsten.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',

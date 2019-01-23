@@ -17,11 +17,9 @@ const {
   desc,
   option,
 } = require('./cli-helper');
-const { initIExecConf, initChainConf, saveAccountConf } = require('./fs');
+const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
-const account = require('./account');
 const { loadChain } = require('./chains');
-const { decodeJWTForPrint } = require('./utils');
 const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
@@ -85,7 +83,6 @@ async function main() {
         );
         spinner.warn('You must backup your wallet file in a safe place!');
 
-
         const raw = Object.assign(
           {},
           walletRes && { walletAddress: walletRes.address },
@@ -104,8 +101,6 @@ async function main() {
   cli.command('wallet', 'manage local ethereum wallet');
 
   cli.command('account', 'manage iExec account');
-
-  cli.command('scheduler', 'interact with an iExec scheduler');
 
   cli.command('app', 'manage iExec apps');
 

@@ -160,7 +160,6 @@ const option = {
     '--request orderHash',
     'specify the requestorder from the marketplace to fill',
   ],
-  auth: () => ['--auth <auth>', 'auth server name', 'https://auth.iex.ec'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
   forceCreate: () => [
@@ -207,7 +206,6 @@ const option = {
     '--wallet-file <walletFileName>',
     'specify the name of the wallet file to use',
   ],
-  scheduler: () => ['--scheduler <host>', 'scheduler host uri'],
   application: () => ['--application <name>', 'dockerhub app name'],
   secretManagementService: () => [
     '--secretManagementService <hostname>',

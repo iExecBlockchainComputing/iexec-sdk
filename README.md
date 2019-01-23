@@ -344,13 +344,6 @@ iexec category show <index> # show category details by index
 iexec category count # count total number of category
 ```
 
-## scheduler
-
-```bash
-iexec scheduler show # show scheduler details
-iexec scheduler api # direct call of scheduler API methods
-```
-
 ## iexec.json
 
 The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|dataset|category|workerpool], or when signing an order.
@@ -568,7 +561,6 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 - [iexec.wallet.getRLC](#walletgetrlc)
 - [iexec.wallet.sendETH](#walletsendeth)
 - [iexec.wallet.sendRLC](#walletsendrlc)
-- [iexec.account.auth](#accountauth)
 - [iexec.account.deposit](#accountdeposit)
 - [iexec.account.withdraw](#accountwithdraw)
 - [iexec.hub.createObj](#hubcreateobj)
@@ -667,24 +659,6 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 ```js
 // wallet.sendRLC
-```
-
-### account.auth
-
-**Parameters**
-
-- `amount` **String** the amount of nano RLC to send to
-- `scheduler` **Object** an [iexec scheduler](https://github.com/iExecBlockchainComputing/iexec-server-js-client) object
-- `ethjs` **Object** [Ethjs](https://github.com/ethjs/ethjs) client
-
-**Return** (Promise)
-
-- `jwtoken` **String** the iExec jwt token
-
-**Example**
-
-```js
-// account.auth
 ```
 
 ### account.deposit

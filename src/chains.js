@@ -3,7 +3,6 @@ const EthJS = require('ethjs');
 const SignerProvider = require('ethjs-custom-signer');
 const ethers = require('ethers');
 const createIExecContracts = require('iexec-contracts-js-client');
-const createIExecClient = require('iexec-server-js-client');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
 
@@ -37,10 +36,6 @@ const createChainFromConf = (
       signerProvider,
     ).getSigner();
     chain.EthJS = EthJS;
-    chain.iexec = createIExecClient({
-      server: chain.scheduler,
-      authURL: chainConf.auth,
-    });
     chain.contracts = createIExecContracts({
       ethSigner: chain.ethSigner,
       chainID: chain.id,

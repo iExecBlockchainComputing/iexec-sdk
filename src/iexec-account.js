@@ -4,9 +4,8 @@ const Debug = require('debug');
 const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
-const { saveAccountConf, loadAccountConf } = require('./fs');
 const { loadChain } = require('./chains');
-const { decodeJWTForPrint, stringifyNestedBn } = require('./utils');
+const { stringifyNestedBn } = require('./utils');
 const {
   help,
   addGlobalOptions,
@@ -23,7 +22,6 @@ const {
 
 const debug = Debug('iexec:iexec-account');
 const objName = 'account';
-
 
 const deposit = cli.command(command.deposit());
 addGlobalOptions(deposit);
@@ -95,7 +93,6 @@ show
 
       const chain = await loadChain(cmd.chain, keystore, { spinner });
       const userAddress = address || userWallet.address;
-
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);

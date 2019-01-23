@@ -3,24 +3,6 @@ const { checkEvent, ethersBnToBn } = require('./utils');
 
 const debug = Debug('iexec:account');
 
-
-const auth = async (address, iexec, eth) => {
-  const { message } = await iexec.getTypedMessage();
-  debug('message', message);
-  const msgJSON = JSON.stringify(message);
-
-  const signature = await eth.signTypedData(message, address);
-  debug('signature', signature);
-
-  const { jwtoken } = await iexec.getJWTBySignature(
-    msgJSON,
-    address.toLowerCase(),
-    signature,
-  );
-  debug('jwtoken', jwtoken);
-  return jwtoken;
-};
-
 const checkBalance = async (contracts, address) => {
   const { stake, locked } = await contracts.checkBalance(address);
   const balance = {
@@ -70,7 +52,6 @@ const withdraw = async (contracts, amount) => {
 };
 
 module.exports = {
-  auth,
   checkBalance,
   deposit,
   withdraw,

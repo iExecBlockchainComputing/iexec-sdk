@@ -1,6 +1,5 @@
 const Debug = require('debug');
 const ethUtil = require('ethjs-util');
-const jws = require('jws');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const BN = require('bn.js');
@@ -149,18 +148,6 @@ const secToDate = (secs) => {
   t.setSeconds(secs);
   return t;
 };
-
-const decodeJWTForPrint = (jwtoken) => {
-  const { payload } = jws.decode(jwtoken);
-  const tokenDetails = {
-    address: payload.blockchainaddr,
-    issuer: payload.iss,
-    'issued date': secToDate(payload.iat),
-  };
-  return tokenDetails;
-};
-
-const decodeJWT = jws.decode;
 
 const API_URL = 'https://gateway.iex.ec/';
 // const API_URL = 'http://localhost:3000/';
@@ -340,8 +327,6 @@ module.exports = {
   stringifyNestedBn,
   toUpperFirst,
   secToDate,
-  decodeJWTForPrint,
-  decodeJWT,
   getAuthorization,
   http,
   download,
