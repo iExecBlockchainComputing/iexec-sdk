@@ -1,4 +1,5 @@
 const Debug = require('debug');
+const ethers = require('ethers');
 const { isBytes32, cleanRPC, bnifyNestedEthersBn } = require('./utils');
 
 const debug = Debug('iexec:deal');
@@ -28,7 +29,16 @@ const claim = async (contracts, dealid, userAddress) => {
   }
 };
 
+const computeTaskId = (dealid, taskIdx) => {
+  const encodedTypes = ['bytes32', 'uint256'];
+  const values = [dealid, taskIdx];
+  const encoded = ethers.utils.defaultAbiCoder.encode(encodedTypes, values);
+  const taskid = ethers.utils.keccak256(encoded);
+  return taskid;
+};
+
 module.exports = {
   show,
   claim,
+  computeTaskId,
 };

@@ -165,13 +165,13 @@ iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash
 iexec order fill # fill all signed orders from your orders.json and get a dealId
 ```
 
-### Follow the execution and download the result
+### View the Deal, follow the Tasks execution and download a result
 
 #### requester / beneficiary
 
 ```bash
 iexec deal show <dealid> # show you deal details
-iexec deal show <dealid> --task <index> # qet the taskid of a task of the deal
+iexec deal show <dealid> --task 0 # qet the taskid of the task at index 0 of the deal
 iexec task show <taskid> # show the status of a task
 iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
@@ -313,7 +313,8 @@ iexec orderbook show --dataset <address> # show the best datasetorders published
 # OPTIONS
 # ---chain <chainName>
 iexec deal show <dealid> # show a deal identified by dealid
-iexec deal claim <dealid> # NOT IMPLEMENTED YED
+iexec deal show <dealid> --tasks <index...> # show the tasks of the deal at specified index (usage --tasks 0,1,2,3)
+iexec deal claim <dealid> # NOT IMPLEMENTED YET
 ```
 
 ## task
