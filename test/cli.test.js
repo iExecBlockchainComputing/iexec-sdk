@@ -41,7 +41,7 @@ test('iexec init', async () => {
 
 // CHAIN.JSON
 test('edit chain.json', () => expect(
-  execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}",' chain.json`)
+  execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}"' chain.json`)
     .then(
       execAsync(`sed -i '/"default"/c"default": "${chainName}",' chain.json`),
     )
