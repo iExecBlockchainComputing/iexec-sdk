@@ -72,28 +72,98 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet getETH # ask faucet for ETH
-iexec wallet getRLC # ask iExec faucet for RLC
-iexec account deposit 200 # deposit nRLC on your iExec account, so you can buy orders
-iexec wallet show
-iexec account show
+iexec wallet getETH --wallet-address <address> # ask faucet for ETH, this may require manual action
+iexec wallet getRLC --wallet-address <address> # ask iExec faucet for RLC
+iexec account deposit 200 --wallet-address <address> # deposit nRLC on your iExec account, so you can buy orders
+iexec wallet show --wallet-address <address>
+iexec account show --wallet-address <address>
 ```
 
 ### Deploy an app
 
 ```bash
-iexec app count # check if you have already deployed apps
-iexec app init # reset app fields in iexec.json
-iexec app deploy # deploy app on Ethereum
-iexec app show # show details of deployed app
+iexec app count --wallet-address <address> # check if you have already deployed apps
+iexec app init --wallet-address <address> # reset app fields in iexec.json
+iexec app deploy --wallet-address <address> # deploy app on Ethereum
+iexec app show --wallet-address <address> # show details of deployed app
 ```
 
-### Buy & Run task using Marketplace
+### Deploy a workerpool
 
 ```bash
-iexec order init --app --dataset --workerpool --request # init orders fields in iexec.json
-iexec order sign --app --dataset --workerpool --request # sign initialized orders
-iexec order fill # fill all signed orders
+iexec workerpool count --wallet-address <address> # check if you have already deployed workerpools
+iexec workerpool init --wallet-address <address> # reset workerpool fields in iexec.json
+iexec workerpool deploy --wallet-address <address> # deploy workerpool on Ethereum
+iexec workerpool show --wallet-address <address> # show details of deployed workerpool
+```
+
+### Deploy a dataset
+
+```bash
+iexec dataset count --wallet-address <address> # check if you have already deployed datasets
+iexec dataset init --wallet-address <address> # reset dataset fields in iexec.json
+iexec dataset deploy --wallet-address <address> # deploy dataset on Ethereum
+iexec dataset show --wallet-address <address> # show details of deployed dataset
+```
+
+### Place a resource sell order on the Marketplace
+
+#### Dapp developper
+
+```bash
+iexec order init --app # init apporder fields in iexec.json
+iexec order sign --app # sign initialized apporder
+iexec order publish --app # publish signed apporder on the marketplace
+```
+
+#### Workerpool
+
+```bash
+iexec order init --workerpool # init workerpoolorder fields in iexec.json
+iexec order sign --workerpool # sign initialized workerpoolorder
+iexec order publish --workerpool # publish signed workerpoolorder on the marketplace
+```
+
+#### Dataset provider
+
+```bash
+iexec order init --dataset # init datasetorder fields in iexec.json
+iexec order sign --dataset # sign initialized datasetorder
+iexec order publish --dataset # publish signed datasetorder on the marketplace
+```
+
+### Place a buy requestorder on the Marketplace
+
+#### Requester
+
+```bash
+iexec order init --request # init requestorder fields in iexec.json
+iexec order sign --app # sign initialized apporder
+iexec order publish --app # publish signed apporder on the marketplace
+```
+
+### View the orders published on the Marketplace
+
+```bash
+iexec orderbook show --category <id> # show the best workerpoolorders and requestorders published on the Marketplace for the specified category
+iexec orderbook show --app <address> # show the best apporders published on the Marketplace for the specified app
+iexec orderbook show --dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
+```
+
+### Buy & run tasks filling orders published on the marketplace
+
+#### requester
+
+```bash
+iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders
+```
+
+### Buy & run tasks filling orders OTC
+
+#### requester
+
+```bash
+iexec order fill # fill all signed orders from your orders.json
 ```
 
 # iExec SDK CLI API
@@ -106,6 +176,21 @@ iexec --help
 iexec app --help
 iexec orderbook --help
 iexec info --chain kovan
+```
+
+## Global options
+
+```bash
+--raw # display the command result as a json
+```
+
+### Wallet options
+
+```bash
+--keystoredir <'global'|'local'|customPath> # specify the location of the keystoredir
+--wallet-address <address> # specify which wallet to use in the keystore
+--wallet-file <fileName> # specify which wallet to use in the keystore
+--password <password> # specify the password for unlocking the wallet (not recommended)
 ```
 
 ## init
@@ -122,16 +207,16 @@ iexec init # create all files necessary to get started
 # --to <address>
 # --force
 # --password <password>
-iexec wallet create
-iexec wallet getETH
-iexec wallet getRLC
+iexec wallet create # create a new encrypted wallet
+iexec wallet create --unecrypted # create unecrypted wallet.json (not recommended)
+iexec wallet import <privateKey> # create an encrypted wallet from a privateKey
+iexec wallet getETH # ask ETH from faucets
+iexec wallet getRLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow to display wallet private key
-iexec wallet sendETH <amount> --to <eth_address>
-iexec wallet sendRLC <amount> --to <eth_address>
-iexec wallet sweep --to <eth_address> # drain all ETH and RLC, sending them back to iExec faucet by default
-iexec wallet encrypt --password <password> # save encrypted-wallet.json from wallet.json
-iexec wallet decrypt --password <password> # save wallet.json from encrypted-wallet.json
+iexec wallet sendETH <amount> --to <address> # send ETH to the specified eth address
+iexec wallet sendRLC <amount> --to <address>  # send RLC to the specified eth address
+iexec wallet sweep --to <address> # drain all ETH and RLC, sending them to the specified eth address
 ```
 
 ## account
@@ -140,10 +225,9 @@ iexec wallet decrypt --password <password> # save wallet.json from encrypted-wal
 # OPTIONS
 # --chain <chainName>
 # --force
-iexec account login
 iexec account show [address] # optional address to show other people's account
-iexec account deposit <amount>
-iexec account withdraw <amount>
+iexec account deposit <amount> # deposit the specified amount of RLC from your wallet to your account
+iexec account withdraw <amount> # withdraw the specified amount of RLC from your account to your wallet
 ```
 
 ## app
@@ -155,6 +239,7 @@ iexec account withdraw <amount>
 iexec app init # init new app
 iexec app deploy # deploy new app
 iexec app show [address|index] # show app details
+iexec app count # count your total number of app
 iexec app count --user <userAddress> # count user total number of app
 ```
 
@@ -167,6 +252,7 @@ iexec app count --user <userAddress> # count user total number of app
 iexec dataset init # init new app
 iexec dataset deploy # deploy new dataset
 iexec dataset show [address|index] # show dataset details
+iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
 ```
 
@@ -179,6 +265,7 @@ iexec dataset count --user <userAddress> # count user total number of dataset
 iexec workerpool init # init new workerpool
 iexec workerpool deploy # deploy new workerpool
 iexec workerpool show [address|index] # show workerpool details
+iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool
 ```
 
@@ -193,18 +280,29 @@ iexec order init --app --dataset --workerpool --request # specify the kind of or
 iexec order sign # sign all initialized orders
 iexec order sign --app --dataset --workerpool --request # sign the specific initialized orders
 iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec marketplace
-iexec order place # NOT IMPLEMENTED
 iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec marketplace
 iexec order fill # fill a set of signed orders (app + dataset + workerpool + request) and return a dealID
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
+iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from the marketplace (order is still valid)
+```
+
+## orderbook
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec orderbook show --category <id> # show the best workerpoolorders and requestorders published on the Marketplace for the specified category
+iexec orderbook show --app <address> # show the best apporders published on the Marketplace for the specified app
+iexec orderbook show --dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
 ```
 
 ## deal
 
 ```bash
 # OPTIONS
-# NOT reimplemented
-# WIP
+# ---chain <chainName>
+iexec deal show <dealid> # show a deal identified by dealid
+iexec deal claim <dealid> # NOT IMPLEMENTED YED
 ```
 
 ## task
@@ -214,7 +312,7 @@ iexec order cancel --app --dataset --workerpool --request # cancel a specific si
 # --chain <chainName>
 iexec task show <taskid> # show task identified by taskid
 iexec task show <taskid> --watch # wait for task to be COMPLETED or CLAIMED
-iexec task show <taskid> --download # NOT IMPLEMENTED YET
+iexec task show <taskid> --download [fileName] # download the result of a COMPLETED task
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 ```
 
@@ -243,7 +341,7 @@ iexec tee decrypt # decrypt work result
 iexec category init # init new category
 iexec category create # create new category
 iexec category show <index> # show category details by index
-iexec category count # count hub total number of category
+iexec category count # count total number of category
 ```
 
 ## scheduler
@@ -255,7 +353,7 @@ iexec scheduler api # direct call of scheduler API methods
 
 ## iexec.json
 
-The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|datasetcategory|workerPool], or when submitting a work.
+The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|dataset|category|workerpool], or when signing an order.
 
 ```json
 {
@@ -293,7 +391,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "app": "0x0000000000000000000000000000000000000000",
       "appprice": "0",
       "volume": "1",
-      "tag": "0",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "datasetrestrict": "0x0000000000000000000000000000000000000000",
       "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
       "requesterrestrict": "0x0000000000000000000000000000000000000000"
@@ -302,7 +400,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "dataset": "0x0000000000000000000000000000000000000000",
       "datasetprice": "0",
       "volume": "1",
-      "tag": "0",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "apprestrict": "0x0000000000000000000000000000000000000000",
       "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
       "requesterrestrict": "0x0000000000000000000000000000000000000000"
@@ -313,7 +411,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "volume": "1",
       "category": "1",
       "trust": "100",
-      "tag": "0",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "apprestrict": "0x0000000000000000000000000000000000000000",
       "datasetrestrict": "0x0000000000000000000000000000000000000000",
       "requesterrestrict": "0x0000000000000000000000000000000000000000"
@@ -328,7 +426,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "volume": "1",
       "category": "1",
       "trust": "100",
-      "tag": "0",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "beneficiary": "0x0000000000000000000000000000000000000000",
       "callback": "0x0000000000000000000000000000000000000000",
       "params": "{ cmdline: '--help' }"
@@ -369,6 +467,84 @@ The `chains.json` file, located in every iExec project, describes the parameters
       "host": "https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ",
       "id": "1",
       "server": "https://mainxw.iex.ec:443"
+    }
+  }
+}
+```
+
+The `orders.json` file, located in iExec project, localy stores your signed orders. This file is used when you publish an order on the marketplace and when you fill orders without specified orders from the marketplace.
+
+```json
+{
+  "42": {
+    "apporder": {
+      "app": "0x0000000000000000000000000000000000000000",
+      "appprice": "0",
+      "volume": "1",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "datasetrestrict": "0x0000000000000000000000000000000000000000",
+      "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000",
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "sign": {
+        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "v": 0
+      }
+    },
+    "datasetorder": {
+      "dataset": "0x0000000000000000000000000000000000000000",
+      "datasetprice": "0",
+      "volume": "1",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "apprestrict": "0x0000000000000000000000000000000000000000",
+      "workerpoolrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000",
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "sign": {
+        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "v": 0
+      }
+    },
+    "workerpoolorder": {
+      "workerpool": "0x0000000000000000000000000000000000000000",
+      "workerpoolprice": "0",
+      "volume": "1",
+      "category": "1",
+      "trust": "100",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "apprestrict": "0x0000000000000000000000000000000000000000",
+      "datasetrestrict": "0x0000000000000000000000000000000000000000",
+      "requesterrestrict": "0x0000000000000000000000000000000000000000",
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "sign": {
+        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "v": 0
+      }
+    },
+    "requestorder": {
+      "app": "0x0000000000000000000000000000000000000000",
+      "appmaxprice": "0",
+      "dataset": "0x0000000000000000000000000000000000000000",
+      "datasetmaxprice": "0",
+      "workerpool": "0x0000000000000000000000000000000000000000",
+      "workerpoolmaxprice": "0",
+      "volume": "1",
+      "category": "1",
+      "trust": "100",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "beneficiary": "0x0000000000000000000000000000000000000000",
+      "callback": "0x0000000000000000000000000000000000000000",
+      "params": "{ cmdline: '--help' }",
+      "requester": "0x0000000000000000000000000000000000000000",
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "sign": {
+        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "v": 0
+      }
     }
   }
 }
