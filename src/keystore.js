@@ -192,6 +192,10 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
         } found in ${fileDir}`,
       );
     }
+    const existsUnencrypted = await fs.existsSync(
+      path.join(process.cwd(), 'wallet.json'),
+    );
+    if (existsUnencrypted) return null;
     if (isSigner) {
       const files = await fs.readdir(fileDir);
       const sortedWallet = files
