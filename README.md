@@ -52,129 +52,158 @@ Now run `iexec --version` to check all is working.
 
 # Tutorials
 
-## Video
-
-- SDK Video series link: https://goo.gl/1AfnSH
-- Init project video: https://www.youtube.com/watch?v=afBIv-84C9U
-- Deploy app video: https://www.youtube.com/watch?v=EltDUaYU8lQ
-- Buy market order and trigger a work video: https://www.youtube.com/watch?v=x7Sy8PcGcMg
-
-## Katacoda
-
-Katacoda is an in-browser terminal that allows you to remotely follow tutorials without the need to install the SDK on your machine: https://www.katacoda.com/sulliwane/scenarios/sdk-v2-tutorial
-
-## Text
-
 ### Init project
 
 required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet getETH --wallet-address <address> # ask faucet for ETH, this may require manual action
-iexec wallet getRLC --wallet-address <address> # ask iExec faucet for RLC
-iexec account deposit 200 --wallet-address <address> # deposit nRLC on your iExec account, so you can buy orders
-iexec wallet show --wallet-address <address>
-iexec account show --wallet-address <address>
+iexec wallet getETH # ask faucet for ETH, this may require manual action
+iexec wallet getRLC # ask iExec faucet for RLC
+iexec wallet show
 ```
 
-### Deploy an app
+### SDK CLI for Dapp developpers
+
+First go through [Init project](#init-project)
+
+#### Deploy an app
 
 ```bash
-iexec app count --wallet-address <address> # check if you have already deployed apps
-iexec app init --wallet-address <address> # reset app fields in iexec.json
-iexec app deploy --wallet-address <address> # deploy app on Ethereum
-iexec app show --wallet-address <address> # show details of deployed app
+iexec app count # check if you have already deployed apps
+iexec app init # reset app fields in iexec.json
+iexec app deploy # deploy app on Ethereum and get an address
+iexec app show # show details of deployed app
 ```
 
-### Deploy a workerpool
+#### Sell your app on the Marketplace
 
 ```bash
-iexec workerpool count --wallet-address <address> # check if you have already deployed workerpools
-iexec workerpool init --wallet-address <address> # reset workerpool fields in iexec.json
-iexec workerpool deploy --wallet-address <address> # deploy workerpool on Ethereum
-iexec workerpool show --wallet-address <address> # show details of deployed workerpool
+iexec orderbook show --app <address> # check if you have valid sell orders for your app on the marketplace
+iexec order init --app # reset apporder fields in iexec.json
+iexec order sign --app # sign your apporder
+iexec order publish --app # publish your apporder on the marketplace and get an orderHash
+iexec order show --app [orderHash] # show your order on the Marketplace
+iexec order cancel --app <orderHash> # cancel your order
 ```
 
-### Deploy a dataset
+### SDK CLI for Dataset providers
+
+First go through [Init project](#init-project)
+
+#### Deploy a dataset
 
 ```bash
-iexec dataset count --wallet-address <address> # check if you have already deployed datasets
-iexec dataset init --wallet-address <address> # reset dataset fields in iexec.json
-iexec dataset deploy --wallet-address <address> # deploy dataset on Ethereum
-iexec dataset show --wallet-address <address> # show details of deployed dataset
+iexec dataset count # check if you have already deployed datasets
+iexec dataset init # reset dataset fields in iexec.json
+iexec dataset deploy # deploy dataset on Ethereum
+iexec dataset show # show details of deployed dataset
 ```
 
-### Place a resource limit sell order on the Marketplace
-
-#### Dapp developper
+#### Sell your dataset on the Marketplace
 
 ```bash
-iexec order init --app # init apporder fields in iexec.json
-iexec order sign --app # sign initialized apporder
-iexec order publish --app # publish your signed apporder on the marketplace and get an orderHash
+iexec orderbook show --dataset <address> # check if you have valid sell orders for your dataset on the marketplace
+iexec order init --dataset # reset datasetorder fields in iexec.json
+iexec order sign --dataset # sign your datasetorder
+iexec order publish --dataset #publish your datasetorder on the marketplace and get an orderHash
+iexec order show --dataset [orderHash] # show your order on the Marketplace
+iexec order cancel --dataset <orderHash> # cancel your order
 ```
 
-#### Workerpool
+### SDK CLI for Workerpools
+
+First go through [Init project](#init-project)
+
+#### Deploy a workerpool
 
 ```bash
-iexec order init --workerpool # init workerpoolorder fields in iexec.json
-iexec order sign --workerpool # sign initialized workerpoolorder
-iexec order publish --workerpool # publish your signed workerpoolorder on the marketplace and get an orderHash
+iexec workerpool count # check if you have already deployed workerpools
+iexec workerpool init # reset workerpool fields in iexec.json
+iexec workerpool deploy # deploy workerpool on Ethereum
+iexec workerpool show # show details of deployed workerpool
 ```
 
-#### Dataset provider
+#### Sell your computing power at limit price on the Marketplace
 
 ```bash
-iexec order init --dataset # init datasetorder fields in iexec.json
-iexec order sign --dataset # sign initialized datasetorder
-iexec order publish --dataset #publish your signed datasetorder on the marketplace and get an orderHash
+iexec orderbook show --workerpool <address> # check if you have valid sell orders for your workerpool on the marketplace
+iexec order init --workerpool # reset workerpoolorder fields in iexec.json
+iexec order sign --workerpool # sign your workerpoolorder
+iexec order publish --workerpool # publish your workerpoolorder on the marketplace and get an orderHash
+iexec order show --workerpool [orderHash] # show your order on the Marketplace
+iexec order cancel --workerpool <orderHash> # cancel your order
 ```
 
-### Place a limit buy requestorder on the Marketplace
-
-#### Requester
+#### Sell your computing power at market price on the Marketplace
 
 ```bash
-iexec order init --request # init requestorder fields in iexec.json
-iexec order sign --request # sign initialized apporder
-iexec order publish --request # publish signed apporder on the marketplace
+iexec orderbook show --category <id> # find a requestorder ask you want to fill in your category
+iexec orderbook show --app <address> #  find a compatible apporder
+iexec orderbook show --dataset <address> #  find a compatible datasetorder
+iexec order init --workerpool # reset workerpoolorder fields in iexec.json
+iexec order sign --workerpool # sign your workerpoolorder
+iexec order fill --request [orderHash] --app [orderHash] --dataset [orderHash] # send the orders and get a dealid
+iexec deal show <dealid> # show the detail of the deal you concludes
 ```
 
-### View the orders published on the Marketplace
+### SDK CLI for Requesters
+
+First go through [Init project](#init-project)
+
+#### Top up your iExec account to buy compution
 
 ```bash
-iexec orderbook show --category <id> # show the best workerpoolorders and requestorders published on the Marketplace for the specified category
-iexec orderbook show --app <address> # show the best apporders published on the Marketplace for the specified app
-iexec orderbook show --dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
+iexec account show # show your iExec account
+iexec account deposit 200 # deposit RLC from your wallet to your account
+iexec account show # make sure you have enough staked RCL to buy computation
 ```
 
-### Buy & run tasks filling orders published on the marketplace
-
-#### requester
+#### Buy computation at market price on the Marketplace
 
 ```bash
-iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealId
+iexec orderbook show --workerpool [address] # find the best workerpoolorder on the marketplace
+iexec orderbook show --app <address> # find the best apporder on the marketplace
+iexec orderbook show --dataset <address> # find the best datasetorder on the marketplace
+iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealid
 ```
 
-### Buy & run tasks filling orders OTC
-
-#### requester
+#### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec order fill # fill all signed orders from your orders.json and get a dealId
+iexec orderbook show --requester <address> # check if you have valid orders in the marketplace
+iexec order init --request # reset requestorder fields in iexec.json
+iexec order sign --request # sign your requestorder
+iexec order publish --request # publish your requestorder on the marketplace and get an orderHash
+iexec order show --app <orderHash> --deals # show your order on the marketplace and check the deals
 ```
 
-### View the Deal, follow the Tasks execution and download a result
-
-#### requester / beneficiary
+#### Watch your Deals, your Tasks and download the results
 
 ```bash
-iexec deal show <dealid> # show you deal details
-iexec deal show <dealid> --task 0 # qet the taskid of the task at index 0 of the deal
-iexec task show <taskid> # show the status of a task
+iexec deal show <dealid> # show your deal details
+iexec deal show <dealid> --tasks 0 # qet the taskid of the task at index 0 of the deal
+iexec task show <taskid> # show the status of your task
 iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
+```
+
+### SDK CLI for workers
+
+First go through [Init project](#init-project)
+
+#### Top up your iExec account to buy compution
+
+```bash
+iexec account deposit 200 # deposit RLC from your wallet to your account
+iexec account show # make sure you have enough stake to join a workerpool
+```
+
+#### Withdraw your working reward
+
+```bash
+iexec account show # view your available stake
+iexec account withdraw 1000 # withdraw RLC from your account to your wallet
 ```
 
 # iExec SDK CLI API
@@ -292,9 +321,10 @@ iexec order sign # sign all initialized orders
 iexec order sign --app --dataset --workerpool --request # sign the specific initialized orders
 iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec marketplace
 iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec marketplace
+iexec order show --request [orderHash] --deals # show the deals produced by an order
 iexec order fill # fill a set of signed orders (app + dataset + workerpool + request) and return a dealID
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
-iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from the marketplace (order is still valid)
+iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from the marketplace (unpublished orders are still valid the PoCo, to invalidate them use cancel)
 ```
 
 ## orderbook
