@@ -127,7 +127,7 @@ iexec workerpool show # show details of deployed workerpool
 #### Sell your computing power at limit price on the Marketplace
 
 ```bash
-iexec orderbook show --workerpool <address> # check if you have valid sell orders for your workerpool on the marketplace
+iexec orderbook show --workerpool <address> --category <id> # check if you have valid sell orders for your workerpool on the marketplace
 iexec order init --workerpool # reset workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign your workerpoolorder
 iexec order publish --workerpool # publish your workerpoolorder on the marketplace and get an orderHash
@@ -162,7 +162,7 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec orderbook show --workerpool [address] # find the best workerpoolorder on the marketplace
+iexec orderbook show --category <id> # find the best workerpoolorder for your category on the marketplace
 iexec orderbook show --app <address> # find the best apporder on the marketplace
 iexec orderbook show --dataset <address> # find the best datasetorder on the marketplace
 iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealid
@@ -171,7 +171,7 @@ iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash
 #### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec orderbook show --requester <address> # check if you have valid orders in the marketplace
+iexec orderbook show --requester <address> --category <id> # check if you already have valid orders on the marketplace
 iexec order init --request # reset requestorder fields in iexec.json
 iexec order sign --request # sign your requestorder
 iexec order publish --request # publish your requestorder on the marketplace and get an orderHash
@@ -333,6 +333,8 @@ iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orde
 # OPTIONS
 # --chain <chainName>
 iexec orderbook show --category <id> # show the best workerpoolorders and requestorders published on the Marketplace for the specified category
+iexec orderbook show --category <id> --requester <address> # filters the result on requester
+iexec orderbook show --category <id> --workerpool <address> # filters the result on workerpool
 iexec orderbook show --app <address> # show the best apporders published on the Marketplace for the specified app
 iexec orderbook show --dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
 ```
@@ -826,8 +828,8 @@ If your program is not written in javascript, your last option to use the SDK wo
 
 Finally, you could choose to parse the SDK stdout/stderr to access more information. Use the global option --raw to get json formated output. ex:
 
-- `iexec orderbook show --raw &> out.txt`
-- `iexec orderbook show --raw |& grep .`
+- `iexec wallet show --raw &> out.txt`
+- `iexec wallet show --raw |& grep .`
 
 Warning:
 

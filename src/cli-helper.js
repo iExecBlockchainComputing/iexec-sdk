@@ -178,7 +178,14 @@ const option = {
     'download a work result data to local filesystem, if completed',
   ],
   category: () => ['--category <id>', 'specify the work category'],
-  workerpool: () => ['--workerpool <address>', 'filter by workerpool address'],
+  workerpoolOrderbook: () => [
+    '--workerpool <address>',
+    'filter by workerpool address',
+  ],
+  requesterOrderbook: () => [
+    '--requester <address>',
+    'filter by requester address',
+  ],
   appOrderbook: () => [
     '--app <address>',
     'show the best orders for specified app',

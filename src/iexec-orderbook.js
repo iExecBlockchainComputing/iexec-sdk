@@ -27,14 +27,17 @@ show
   .option(...option.category())
   .option(...option.appOrderbook())
   .option(...option.datasetOrderbook())
-  .option(...option.workerpool())
+  .option(...option.workerpoolOrderbook())
+  .option(...option.requesterOrderbook())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
       if (!cmd.category && !cmd.app && !cmd.dataset) {
         throw new Error(
-          `one of the following options is required (${option.category()[0]}|${
+          `one of the following options is required (${option.category()[0]} ${
+            option.workerpoolOrderbook()[0]
+          }|${option.category()[0]} ${option.requesterOrderbook()[0]}|${
             option.appOrderbook()[0]
           }|${option.datasetOrderbook()[0]})`,
         );
@@ -52,11 +55,11 @@ show
         { chainID: chain.id },
         { category: cmd.category },
         { workerpool: cmd.workerpool },
+        { requester: cmd.requester },
         { app: cmd.app },
         { dataset: cmd.dataset },
       );
       const response = await http.get('orderbook', body);
-      debug('response', response);
       const workerpoolOrders = response.orderbook.workerpoolOrders
         ? response.orderbook.workerpoolOrders.map(e => ({
           orderHash: e.orderHash,
@@ -71,6 +74,8 @@ show
         ? response.orderbook.requestOrders.map(e => ({
           orderHash: e.orderHash,
           requester: e.order.requester,
+          app: e.order.app,
+          dataset: e.order.dataset,
           beneficiary: e.order.beneficiary,
           category: e.order.category,
           price: e.order.workerpoolmaxprice,
@@ -122,7 +127,6 @@ show
           successMessage += `dataset orders details:${pretty(datasetOrders)}\n`;
         }
       } else successMessage = 'Empty order book';
-      debug('successMessage', successMessage);
       spinner.succeed(successMessage, {
         raw: {
           workerpoolOrders: response.orderbook.workerpoolOrders,
