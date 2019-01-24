@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const {
+  isBytes32,
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
@@ -56,6 +57,7 @@ const objDesc = {
     cancelMethode: 'cancelAppOrder',
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: 'apporders',
+    dealField: 'appHash',
   },
   datasetorder: {
     primaryType: 'DatasetOrder',
@@ -74,6 +76,7 @@ const objDesc = {
     cancelMethode: 'cancelDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: 'datasetorders',
+    dealField: 'datasetHash',
   },
   workerpoolorder: {
     primaryType: 'WorkerpoolOrder',
@@ -94,6 +97,7 @@ const objDesc = {
     cancelMethode: 'cancelWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: 'workerpoolorders',
+    dealField: 'workerpoolHash',
   },
   requestorder: {
     primaryType: 'RequestOrder',
@@ -117,6 +121,7 @@ const objDesc = {
     cancelMethode: 'cancelRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: 'requestorders',
+    dealField: 'requestHash',
   },
   sign: {
     structMembers: [
@@ -291,29 +296,51 @@ const unpublishOrder = async (chainID, address, eth, orderName, orderHash) => {
   }
 };
 
-const showOrder = async (chainID, orderName, { orderHash } = {}) => {
+const fetchPublishedOrderByHash = async (chainID, orderName, orderHash) => {
   try {
-    const endpoint = objDesc[orderName].apiEndpoint;
-    debug('endpoint', endpoint);
+    isBytes32(orderHash);
+    const endpoint = objDesc[orderName] && objDesc[orderName].apiEndpoint;
+    if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
     const body = {
       chainID,
       sort: {
         publicationTimestamp: -1,
       },
       limit: 1,
+      find: { orderHash },
     };
-    if (orderHash) body.find = { orderHash };
-    debug('body', body);
     const response = await http.post(endpoint, body);
-    debug('response', response);
     if (response.ok && response.orders) {
-      const order = response.orders[0];
-      if (order) return order;
-      throw new Error('Order not published');
+      return response.orders[0] || null;
     }
-    throw new Error('An error occured while getting order');
+    throw Error('An error occured while getting order');
   } catch (error) {
-    debug('publishOrder()', error);
+    debug('getPublishedOrderByHash()', error);
+    throw error;
+  }
+};
+
+const fetchDealsByOrderHash = async (chainID, orderName, orderHash) => {
+  try {
+    isBytes32(orderHash);
+    const hashFiedName = objDesc[orderName] && objDesc[orderName].dealField;
+    if (!hashFiedName) throw Error(`Unsuported orderName ${orderName}`);
+    const endpoint = 'deals';
+    const body = {
+      chainID,
+      sort: {
+        publicationTimestamp: -1,
+      },
+      limit: 1,
+      find: { [hashFiedName]: orderHash },
+    };
+    const response = await http.post(endpoint, body);
+    if (response.ok && response.deals) {
+      return { count: response.count, deals: response.deals };
+    }
+    throw Error('An error occured while getting deals');
+  } catch (error) {
+    debug('showDeals()', error);
     throw error;
   }
 };
@@ -373,7 +400,8 @@ module.exports = {
   checkRemainingVolume,
   publishOrder,
   unpublishOrder,
-  showOrder,
+  fetchPublishedOrderByHash,
+  fetchDealsByOrderHash,
   signAppOrder,
   signDatasetOrder,
   signWorkerpoolOrder,

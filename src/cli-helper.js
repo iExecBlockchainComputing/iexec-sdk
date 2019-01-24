@@ -144,6 +144,7 @@ const option = {
     'show a workerpoolorder',
   ],
   showRequestOrder: () => ['--request [orderHash]', 'show a requestorder'],
+  showOrderDeals: () => ['--deals', 'show the deals produced by the order'],
   fillAppOrder: () => [
     '--app <orderHash>',
     'specify the app order from the marketplace to fill',

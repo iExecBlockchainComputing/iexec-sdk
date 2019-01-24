@@ -54,7 +54,6 @@ init
         || cmd.workerpool
         || cmd.request
       );
-      debug('initAll', initAll);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(
@@ -114,7 +113,6 @@ sign
         || cmd.workerpool
         || cmd.request
       );
-      debug('signAll', signAll);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -286,7 +284,6 @@ fill
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
       ]);
-      debug('signedOrders', signedOrders);
 
       const getOrderByHash = async (orderName, orderHash) => {
         if (isBytes32(orderHash, { strict: false })) {
@@ -482,9 +479,7 @@ publish
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
-    debug('cmd', cmd);
-    debug('cmd.parent', cmd.parent);
-    const spinner = Spinner(cmd.parent);
+    const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
         throw new Error(
@@ -674,6 +669,7 @@ show
   .option(...option.showDatasetOrder())
   .option(...option.showWorkerpoolOrder())
   .option(...option.showRequestOrder())
+  .option(...option.showOrderDeals())
   .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
@@ -690,26 +686,55 @@ show
       });
 
       const showOrder = async (orderName, cmdInput) => {
-        const findOption = {};
-        if (isBytes32(cmdInput, { strict: false })) {
-          findOption.orderHash = cmdInput;
-        } else {
+        let orderHash;
+        if (cmdInput === true) {
           spinner.info(
-            `no order hash specified, showing last ${orderName} published`,
+            `No order hash specified, showing ${orderName} from "orders.json"`,
           );
+          const signedOrders = (await loadSignedOrders())[chain.id];
+          const signedOrder = signedOrders && signedOrders[orderName];
+          if (!signedOrder) {
+            throw Error(
+              `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
+            );
+          }
+          orderHash = order.getOrderHash(orderName, signedOrder);
+        } else {
+          orderHash = cmdInput;
         }
+        isBytes32(orderHash);
         spinner.start(info.showing(orderName));
-        const orderToShow = await order.showOrder(
+        const orderToShow = await order.fetchPublishedOrderByHash(
           chain.id,
           orderName,
-          findOption,
+          orderHash,
         );
-        spinner.succeed(
-          `${orderName} with orderHash ${
-            orderToShow.orderHash
-          } details:${pretty(orderToShow)}`,
-          { raw: { order: orderToShow } },
+        let deals;
+        if (cmd.deals) {
+          deals = await order.fetchDealsByOrderHash(
+            chain.id,
+            orderName,
+            orderHash,
+          );
+        }
+        const orderString = orderToShow
+          ? `${orderName} with orderHash ${orderHash} details:${pretty(
+            orderToShow,
+          )}`
+          : `${orderName} with orderHash ${orderHash} is not published`;
+        const dealsString = deals && deals.count
+          ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
+            deals.deals,
+          )}`
+          : '\nDeals count: 0';
+        const raw = Object.assign(
+          { orderHash },
+          { publishedOrder: orderToShow },
+          deals && { deals: { count: deals.count, lastDeals: deals.deals } },
         );
+        spinner.succeed(`${orderString}${dealsString}`, {
+          raw,
+        });
       };
 
       if (cmd.app) await showOrder('apporder', cmd.app);

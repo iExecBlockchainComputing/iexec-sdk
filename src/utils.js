@@ -92,15 +92,15 @@ const isEthAddress = (address, { strict = false } = {}) => {
 
 const isBytes32 = (str, { strict = true } = {}) => {
   if (typeof str !== 'string') {
-    if (strict) throw new Error('type missmatch');
+    if (strict) throw new Error(`isBytes32 type missmatch, value: ${str}`);
     return false;
   }
   if (str.length !== 66) {
-    if (strict) throw new Error('incorrect length');
+    if (strict) throw new Error(`isBytes32 incorrect length, value: ${str}`);
     return false;
   }
   if (str.substr(0, 2) !== '0x') {
-    if (strict) throw new Error('incorrect hex format');
+    if (strict) throw new Error(`isBytes32 incorrect hex format, value: ${str}`);
     return false;
   }
   return true;
