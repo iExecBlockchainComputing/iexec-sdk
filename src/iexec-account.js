@@ -80,7 +80,7 @@ show
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(
-        Object.assign({}, walletOptions, { isSigner: false }),
+        Object.assign({}, walletOptions, address && { isSigner: false }),
       );
 
       let userWallet;
