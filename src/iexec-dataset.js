@@ -72,6 +72,7 @@ deploy
       const datasetToDeploy = Object.assign({}, iexecConf[objName], {
         multiaddr: datasetMultiaddrBuffer,
       });
+      await keystore.load();
       spinner.start(info.deploying(objName));
       const address = await hub.createObj(objName)(
         chain.contracts,

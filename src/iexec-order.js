@@ -450,6 +450,7 @@ fill
         await prompt.limitedStake(totalCost, stake, payableVolume);
       }
       // all checks passed send matchOrder
+      await keystore.load();
       spinner.start(info.filling(objName));
       const { dealid, volume } = await order.matchOrders(
         appOrder,

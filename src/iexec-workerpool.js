@@ -67,7 +67,7 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
-
+      await keystore.load();
       spinner.start(info.deploying(objName));
       const address = await hub.createObj(objName)(
         chain.contracts,

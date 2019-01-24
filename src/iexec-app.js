@@ -76,7 +76,7 @@ deploy
         multiaddr: appMultiaddrBuffer,
         mrenclave: appMREnclaveBuffer,
       });
-
+      await keystore.load();
       spinner.start(info.deploying(objName));
       const address = await hub.createObj(objName)(
         chain.contracts,

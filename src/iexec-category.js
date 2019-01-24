@@ -52,6 +52,7 @@ create
         loadIExecConf(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
+      await keystore.load();
       spinner.start(info.creating('category'));
       const catidBN = await hub.createCategory(
         chain.contracts,
