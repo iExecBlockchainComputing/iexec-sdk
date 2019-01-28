@@ -13,7 +13,7 @@ const main = {
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-app',
-  multiaddr: '/dns4/hub.docker.com/tcp/443',
+  multiaddr: 'hello-world',
   mrenclave: '',
 };
 

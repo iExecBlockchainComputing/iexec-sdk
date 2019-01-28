@@ -67,8 +67,15 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
-      const datasetMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr)
-        .buffer;
+      let datasetMultiaddrBuffer;
+      try {
+        datasetMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
+      } catch (error) {
+        datasetMultiaddrBuffer = Buffer.from(
+          iexecConf[objName].multiaddr,
+          'utf8',
+        );
+      }
       const datasetToDeploy = Object.assign({}, iexecConf[objName], {
         multiaddr: datasetMultiaddrBuffer,
       });

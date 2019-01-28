@@ -67,7 +67,12 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
-      const appMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
+      let appMultiaddrBuffer;
+      try {
+        appMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
+      } catch (error) {
+        appMultiaddrBuffer = Buffer.from(iexecConf[objName].multiaddr, 'utf8');
+      }
       const appMREnclaveBuffer = Buffer.from(
         iexecConf[objName].mrenclave,
         'utf8',
