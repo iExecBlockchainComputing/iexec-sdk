@@ -1,6 +1,5 @@
 const Debug = require('debug');
 const SignerProvider = require('ethjs-custom-signer');
-const ethers = require('ethers');
 const createIExecContracts = require('iexec-contracts-js-client');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');

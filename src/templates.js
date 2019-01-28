@@ -13,7 +13,10 @@ const main = {
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-app',
+  type: 'DOCKER',
   multiaddr: 'hello-world',
+  checksum:
+    '0x2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535',
   mrenclave: '',
 };
 
@@ -21,6 +24,8 @@ const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
   multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+  checksum:
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
 const workerpool = {
