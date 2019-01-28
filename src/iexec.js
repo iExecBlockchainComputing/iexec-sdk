@@ -106,17 +106,17 @@ async function main() {
 
   cli.command('dataset', 'manage iExec datasets');
 
-  cli.command('category', 'manage iExec categories');
-
   cli.command('workerpool', 'manage iExec workerpools');
 
-  cli.command('orderbook', 'show marketplace orderbook');
+  cli.command('category', 'manage iExec categories');
 
   cli.command('order', 'manage iExec marketplace orders');
 
-  cli.command('task', 'manage iExec tasks');
+  cli.command('orderbook', 'show marketplace orderbook');
 
   cli.command('deal', 'manage iExec deals');
+
+  cli.command('task', 'manage iExec tasks');
 
   cli.command('tee', 'interact with Trusted Execution Environment');
 
