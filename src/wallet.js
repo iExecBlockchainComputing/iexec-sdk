@@ -46,7 +46,7 @@ const ethFaucets = [
 
 const checkBalances = async (contracts, address) => {
   const rlcAddress = await contracts.fetchRLCAddress();
-  const getETH = () => contracts.ethSigner.provider.getBalance(address).catch((error) => {
+  const getETH = () => contracts.eth.getBalance(address).catch((error) => {
     debug(error);
     return 0;
   });

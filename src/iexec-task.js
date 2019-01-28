@@ -101,7 +101,7 @@ show
           const authorization = await getAuthorization(
             chain.id,
             address,
-            chain.signerProvider,
+            chain.contracts.ethProvider,
             { apiUrl: resultRepoBaseURL },
           );
           const { content } = await download('GET')(

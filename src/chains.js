@@ -21,7 +21,7 @@ const createChainFromConf = (
 ) => {
   try {
     const chain = Object.assign({}, chainConf);
-    const signerProvider = new SignerProvider(chainConf.host, {
+    const ethProvider = new SignerProvider(chainConf.host, {
       signTransaction,
       accounts,
       signTypedData,
@@ -30,12 +30,8 @@ const createChainFromConf = (
       signPersonalMessage,
     });
     chain.name = chainName;
-    chain.signerProvider = signerProvider;
-    const ethSigner = new ethers.providers.Web3Provider(
-      signerProvider,
-    ).getSigner();
     chain.contracts = createIExecContracts({
-      ethSigner,
+      ethProvider,
       chainId: chain.id,
       hubAddress: chain.hub,
     });
