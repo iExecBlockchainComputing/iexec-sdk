@@ -255,7 +255,7 @@ const cancelWorkerpoolOrder = (order, domain) => cancelOrder('workerpoolorder', 
 const cancelRequestOrder = (order, domain) => cancelOrder('requestorder', order, domain);
 
 const publishOrder = async (
-  chainID,
+  chainId,
   address,
   eth,
   orderName,
@@ -263,8 +263,8 @@ const publishOrder = async (
 ) => {
   try {
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
-    const body = { chainID, order: orderToPublish };
-    const authorization = await getAuthorization(chainID, address, eth);
+    const body = { chainId, order: orderToPublish };
+    const authorization = await getAuthorization(chainId, address, eth);
     const response = await http.post(endpoint, body, { authorization });
     debug('response', response);
     if (response.ok && response.saved && response.saved.orderHash) {
@@ -277,13 +277,13 @@ const publishOrder = async (
   }
 };
 
-const unpublishOrder = async (chainID, address, eth, orderName, orderHash) => {
+const unpublishOrder = async (chainId, address, eth, orderName, orderHash) => {
   try {
     const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
     debug('endpoint', endpoint);
-    const body = { chainID, orderHash };
+    const body = { chainId, orderHash };
     debug('body', body);
-    const authorization = await getAuthorization(chainID, address, eth);
+    const authorization = await getAuthorization(chainId, address, eth);
     const response = await http.post(endpoint, body, { authorization });
     debug('response', response);
     if (response.ok && response.unpublished) {
@@ -296,13 +296,13 @@ const unpublishOrder = async (chainID, address, eth, orderName, orderHash) => {
   }
 };
 
-const fetchPublishedOrderByHash = async (chainID, orderName, orderHash) => {
+const fetchPublishedOrderByHash = async (chainId, orderName, orderHash) => {
   try {
     isBytes32(orderHash);
     const endpoint = objDesc[orderName] && objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
     const body = {
-      chainID,
+      chainId,
       sort: {
         publicationTimestamp: -1,
       },
@@ -320,14 +320,14 @@ const fetchPublishedOrderByHash = async (chainID, orderName, orderHash) => {
   }
 };
 
-const fetchDealsByOrderHash = async (chainID, orderName, orderHash) => {
+const fetchDealsByOrderHash = async (chainId, orderName, orderHash) => {
   try {
     isBytes32(orderHash);
     const hashFiedName = objDesc[orderName] && objDesc[orderName].dealField;
     if (!hashFiedName) throw Error(`Unsuported orderName ${orderName}`);
     const endpoint = 'deals';
     const body = {
-      chainID,
+      chainId,
       sort: {
         publicationTimestamp: -1,
       },

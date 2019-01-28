@@ -36,7 +36,7 @@ const createChainFromConf = (
     ).getSigner();
     chain.contracts = createIExecContracts({
       ethSigner,
-      chainID: chain.id,
+      chainId: chain.id,
       hubAddress: chain.hub,
     });
     return chain;

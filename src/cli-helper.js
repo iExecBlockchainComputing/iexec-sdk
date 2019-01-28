@@ -312,8 +312,8 @@ const prompt = {
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
   overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
-  transfer: (currency, amount, chainName, to, chainID) => question(
-    `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainID: ${chainID}]`,
+  transfer: (currency, amount, chainName, to, chainId) => question(
+    `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
   fillOrder: (amount, orderID) => question(
     `Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`,

@@ -23,7 +23,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 const show = async (contracts, taskid) => {
   try {
     if (!isBytes32(taskid, { strict: false })) throw Error('invalid taskid');
-    const { chainID } = contracts;
+    const { chainId } = contracts;
     const hubContract = contracts.getHubContract();
     const task = bnifyNestedEthersBn(
       cleanRPC(await hubContract.viewTask(taskid)),
@@ -31,7 +31,7 @@ const show = async (contracts, taskid) => {
     if (
       task.dealid
       === '0x0000000000000000000000000000000000000000000000000000000000000000'
-    ) throw Error(`no task found for taskid ${taskid} on chain ${chainID}`);
+    ) throw Error(`no task found for taskid ${taskid} on chain ${chainId}`);
     return Object.assign({}, task, {
       statusName: taskStatusMap[task.status],
     });

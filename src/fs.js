@@ -187,13 +187,13 @@ const initOrderObj = async (orderName, overwrite) => {
   }
 };
 
-const saveDeployedObj = async (objName, chainID, address) => {
+const saveDeployedObj = async (objName, chainId, address) => {
   try {
     const deployedConf = await loadDeployedConf({ retry: () => ({}) });
     debug('deployedConf', deployedConf);
 
     if (typeof deployedConf[objName] !== 'object') deployedConf[objName] = {};
-    deployedConf[objName][chainID] = address;
+    deployedConf[objName][chainId] = address;
 
     await saveDeployedConf(deployedConf, { force: true });
   } catch (error) {
@@ -202,12 +202,12 @@ const saveDeployedObj = async (objName, chainID, address) => {
   }
 };
 
-const saveSignedOrder = async (orderName, chainID, signedOrder) => {
+const saveSignedOrder = async (orderName, chainId, signedOrder) => {
   try {
     const signedOrders = await loadSignedOrders({ retry: () => ({}) });
 
-    if (typeof signedOrders[chainID] !== 'object') signedOrders[chainID] = {};
-    signedOrders[chainID][orderName] = signedOrder;
+    if (typeof signedOrders[chainId] !== 'object') signedOrders[chainId] = {};
+    signedOrders[chainId][orderName] = signedOrder;
 
     const fileName = await saveSignedOrders(signedOrders, { force: true });
     return { saved: orderName, fileName };

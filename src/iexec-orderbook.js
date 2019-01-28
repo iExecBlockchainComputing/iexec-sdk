@@ -52,7 +52,7 @@ show
 
       spinner.start(info.showing(objName));
       const body = Object.assign(
-        { chainID: chain.id },
+        { chainId: chain.id },
         { category: cmd.category },
         { workerpool: cmd.workerpool },
         { requester: cmd.requester },

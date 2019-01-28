@@ -53,7 +53,7 @@ const minBn = (bnArray) => {
   return min;
 };
 
-const getContractAddress = (desc, chainID, { strict = true } = {}) => {
+const getContractAddress = (desc, chainId, { strict = true } = {}) => {
   try {
     if (!('networks' in desc)) {
       if (strict) {
@@ -61,21 +61,21 @@ const getContractAddress = (desc, chainID, { strict = true } = {}) => {
       }
       return undefined;
     }
-    if (!(chainID in desc.networks)) {
+    if (!(chainId in desc.networks)) {
       if (strict) {
-        throw Error(`missing "${chainID}" key in contract JSON description`);
+        throw Error(`missing "${chainId}" key in contract JSON description`);
       }
       return undefined;
     }
-    if (!('address' in desc.networks[chainID])) {
+    if (!('address' in desc.networks[chainId])) {
       if (strict) {
         throw Error(
-          `missing address key in contract JSON description for chainID: ${chainID}`,
+          `missing address key in contract JSON description for chainId: ${chainId}`,
         );
       }
       return undefined;
     }
-    return desc.networks[chainID].address;
+    return desc.networks[chainId].address;
   } catch (error) {
     debug('getContractAddress()', error);
     throw error;
@@ -259,7 +259,7 @@ const signTypedDatav3 = async (eth, address, typedData) => {
 };
 
 const getAuthorization = async (
-  chainID,
+  chainId,
   address,
   ethProvider,
   { apiUrl = API_URL, challengeEndpoint = 'challenge' } = {},
@@ -268,8 +268,7 @@ const getAuthorization = async (
     const challenge = await httpRequest('GET')(
       challengeEndpoint,
       {
-        chainId: chainID,
-        chainID,
+        chainId,
         address,
       },
       {},

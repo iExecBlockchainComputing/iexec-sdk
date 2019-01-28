@@ -124,7 +124,7 @@ sign
 
       const clerkAddress = await chain.contracts.fetchClerkAddress();
       const domainObj = order.getEIP712Domain(
-        chain.contracts.chainID,
+        chain.contracts.chainId,
         clerkAddress,
       );
 
