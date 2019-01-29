@@ -170,7 +170,15 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
       return walletOptions.walletFileName;
     }
     if (walletOptions.walletAddress) {
-      const files = await fs.readdir(fileDir);
+      let files;
+      try {
+        files = await fs.readdir(fileDir);
+      } catch (error) {
+        debug(error);
+        throw Error(
+          `Missing keystore directory ${fileDir}, did you forget to run 'iexec wallet create' ?`,
+        );
+      }
       const match = files
         .filter((e) => {
           const address = e.split('--')[2];
@@ -197,7 +205,15 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     );
     if (existsUnencrypted) return null;
     if (isSigner) {
-      const files = await fs.readdir(fileDir);
+      let files;
+      try {
+        files = await fs.readdir(fileDir);
+      } catch (error) {
+        debug(error);
+        throw Error(
+          `Missing keystore directory ${fileDir}, did you forget to run 'iexec wallet create' ?`,
+        );
+      }
       const sortedWallet = files
         .filter(e => e.split('--')[2])
         .sort(descSortWallet);
@@ -211,8 +227,6 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     if (prefix && cachedWallet && cachedWallet.prefixed) return cachedWallet.prefixed;
     if (!prefix && cachedWallet && cachedWallet.noPrefixed) return cachedWallet.noPrefixed;
 
-    const isValidKeystoreDir = (await fs.stat(fileDir)).isDirectory();
-    if (!isValidKeystoreDir) throw Error('invalid keystoredir');
     const fileName = await getWalletFileName();
     // try local unencrypted
     let pk;
