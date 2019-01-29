@@ -12,11 +12,11 @@ const main = {
 
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'my-app',
+  name: 'hello-world',
   type: 'DOCKER',
-  multiaddr: 'hello-world',
+  multiaddr: 'registry.hub.docker.com/hello-world:linux',
   checksum:
-    '0x2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535',
+    '0x90bef26b4e016c47ef0814cc02db77e56ca7aef0dca5b079b48326a2a7326ca5',
   mrenclave: '',
 };
 
