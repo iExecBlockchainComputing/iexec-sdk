@@ -457,7 +457,7 @@ test(
   'iexec order cancel --request (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} order cancel --request --force  --password test --wallet-address ${ADDRESS}`,
+      `${iexecPath} order cancel --request --force --password test --wallet-address ${ADDRESS}`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -525,6 +525,27 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
+// sendETH
+test(
+  'iexec wallet sendETH',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet sendETH 1 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+
+// sendRLC
+test(
+  'iexec wallet sendRLC',
+  () => expect(
+    execAsync(
+      `${iexecPath} wallet sendRLC 1000 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // unecrypted wallet
 test(
@@ -539,6 +560,14 @@ test(
   'iexec wallet show (unencrypted wallet.json)',
   () => expect(execAsync(`${iexecPath} wallet show`)).resolves.not.toBe(1),
   10000,
+);
+
+test(
+  'iexec wallet sweep (unencrypted wallet.json)',
+  () => expect(
+    execAsync(`${iexecPath} wallet sweep --to ${ADDRESS} --force`),
+  ).resolves.not.toBe(1),
+  15000,
 );
 
 test('remove unencrypted wallet.json', () => expect(execAsync('rm wallet.json')).resolves.not.toBe(1));
