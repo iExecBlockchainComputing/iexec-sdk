@@ -14,6 +14,22 @@ const { hashStruct, deserializeSig } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
+const APP_ORDER = 'apporder';
+const DATASET_ORDER = 'datasetorder';
+const WORKERPOOL_ORDER = 'workerpoolorder';
+const REQUEST_ORDER = 'requestorder';
+
+const ORDERS_TYPES = [
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+];
+
+const checkOrderName = (orderName) => {
+  if (!ORDERS_TYPES.includes(orderName)) throw Error(`Invalid orderName value ${orderName}`);
+};
+
 const NULL_DATASETORDER = {
   dataset: '0x0000000000000000000000000000000000000000',
   datasetprice: '0',
@@ -40,7 +56,7 @@ const objDesc = {
       { name: 'verifyingContract', type: 'address' },
     ],
   },
-  apporder: {
+  [APP_ORDER]: {
     primaryType: 'AppOrder',
     structMembers: [
       { name: 'app', type: 'address' },
@@ -59,7 +75,7 @@ const objDesc = {
     apiEndpoint: 'apporders',
     dealField: 'appHash',
   },
-  datasetorder: {
+  [DATASET_ORDER]: {
     primaryType: 'DatasetOrder',
     structMembers: [
       { name: 'dataset', type: 'address' },
@@ -78,7 +94,7 @@ const objDesc = {
     apiEndpoint: 'datasetorders',
     dealField: 'datasetHash',
   },
-  workerpoolorder: {
+  [WORKERPOOL_ORDER]: {
     primaryType: 'WorkerpoolOrder',
     structMembers: [
       { name: 'workerpool', type: 'address' },
@@ -99,7 +115,7 @@ const objDesc = {
     apiEndpoint: 'workerpoolorders',
     dealField: 'workerpoolHash',
   },
-  requestorder: {
+  [REQUEST_ORDER]: {
     primaryType: 'RequestOrder',
     structMembers: [
       { name: 'app', type: 'address' },
@@ -132,13 +148,6 @@ const objDesc = {
   },
 };
 
-const getEIP712Domain = (chainId, verifyingContract) => ({
-  name: 'iExecODB',
-  version: '3.0-alpha',
-  chainId,
-  verifyingContract,
-});
-
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
   const struct = objDesc[objName].structMembers.reduce(reducer, []);
@@ -152,37 +161,65 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const getContractOwner = async (orderName, orderObj, contracts) => {
-  const contractAddress = orderObj[objDesc[orderName].contractPropName];
-  const contract = contracts.getContract(objDesc[orderName].contractName)({
-    at: contractAddress,
-  });
-  const owner = checksummedAddress(await contract.m_owner());
-  return owner;
+const getEIP712Domain = (chainId, verifyingContract) => ({
+  name: 'iExecODB',
+  version: '3.0-alpha',
+  chainId,
+  verifyingContract,
+});
+
+const getContractOwner = async (contracts, orderName, orderObj) => {
+  try {
+    checkOrderName(orderName);
+    const contractAddress = orderObj[objDesc[orderName].contractPropName];
+    const contract = contracts.getContract(objDesc[orderName].contractName)({
+      at: contractAddress,
+    });
+    const owner = checksummedAddress(await contract.m_owner());
+    return owner;
+  } catch (error) {
+    debug('getContractOwner()', error);
+    throw error;
+  }
 };
 
-const getOrderHash = (orderName, order) => hashStruct(
-  objDesc[orderName].primaryType,
-  objDesc[orderName].structMembers,
-  order,
-);
+const getOrderHash = (orderName, order) => {
+  try {
+    checkOrderName(orderName);
+    return hashStruct(
+      objDesc[orderName].primaryType,
+      objDesc[orderName].structMembers,
+      order,
+    );
+  } catch (error) {
+    debug('getOrderHash()', error);
+    throw error;
+  }
+};
 
 const checkRemainingVolume = async (
+  contracts,
   orderName,
   order,
-  contracts,
   { strict = true } = {},
 ) => {
-  const initial = new BN(order.volume);
-  const orderHash = getOrderHash(orderName, order);
-  const clerkAddress = await contracts.fetchClerkAddress();
-  const clerkContract = contracts.getClerkContract({
-    at: clerkAddress,
-  });
-  const consumed = ethersBnToBn(await clerkContract.viewConsumed(orderHash));
-  const remain = initial.sub(consumed);
-  if (remain.lte(new BN(0)) && strict) throw new Error(`${orderName} is fully consumed`);
-  return remain;
+  try {
+    checkOrderName(orderName);
+    const initial = new BN(order.volume);
+    const orderHash = getOrderHash(orderName, order);
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkContract = contracts.getClerkContract({
+      at: clerkAddress,
+    });
+    const cons = await clerkContract.viewConsumed(orderHash);
+    const consumed = ethersBnToBn(cons);
+    const remain = initial.sub(consumed);
+    if (remain.lte(new BN(0)) && strict) throw new Error(`${orderName} is fully consumed`);
+    return remain;
+  } catch (error) {
+    debug('checkRemainingVolume()', error);
+    throw error;
+  }
 };
 
 const signOrder = async (
@@ -192,13 +229,14 @@ const signOrder = async (
   domainObj,
   address,
 ) => {
-  const signerAddress = orderName === 'requestorder'
+  checkOrderName(orderName);
+  const signerAddress = orderName === REQUEST_ORDER
     ? orderObj.requester
-    : await getContractOwner(orderName, orderObj, contracts);
+    : await getContractOwner(contracts, orderName, orderObj);
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw Error(
       `Invalid order signer, must be the ${
-        orderName === 'requestorder' ? 'requester' : 'resource owner'
+        orderName === REQUEST_ORDER ? 'requester' : 'resource owner'
       }`,
     );
   }
@@ -245,39 +283,36 @@ const signOrder = async (
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   return signedOrder;
 };
-const signAppOrder = (contracts, order, domain, address) => signOrder(contracts, 'apporder', order, domain, address);
-const signDatasetOrder = (contracts, order, domain, address) => signOrder(contracts, 'datasetorder', order, domain, address);
-const signWorkerpoolOrder = (contracts, order, domain, address) => signOrder(contracts, 'workerpoolorder', order, domain, address);
-const signRequestOrder = (contracts, order, domain, address) => signOrder(contracts, 'requestorder', order, domain, address);
 
-const cancelOrder = async (orderName, orderObj, contracts) => {
-  const args = signedOrderToStruct(orderName, orderObj);
-  const clerkAddress = await contracts.fetchClerkAddress();
-  const clerkContact = contracts.getClerkContract({ at: clerkAddress });
-  const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
-  const txReceipt = await tx.wait();
-  const logs = contracts.decodeClerkLogs(txReceipt.logs);
-  if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
-  return true;
-};
-const cancelAppOrder = (order, domain) => cancelOrder('apporder', order, domain);
-const cancelDatasetOrder = (order, domain) => cancelOrder('datasetorder', order, domain);
-const cancelWorkerpoolOrder = (order, domain) => cancelOrder('workerpoolorder', order, domain);
-const cancelRequestOrder = (order, domain) => cancelOrder('requestorder', order, domain);
-
-const publishOrder = async (
-  chainId,
-  address,
-  eth,
-  orderName,
-  orderToPublish,
-) => {
+const cancelOrder = async (contracts, orderName, orderObj) => {
   try {
+    checkOrderName(orderName);
+    const args = signedOrderToStruct(orderName, orderObj);
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
+    const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
+    const txReceipt = await tx.wait();
+    const logs = contracts.decodeClerkLogs(txReceipt.logs);
+    if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+    return true;
+  } catch (error) {
+    debug('cancelOrder()', error);
+    throw error;
+  }
+};
+
+const publishOrder = async (contracts, orderName, signedOrder, address) => {
+  try {
+    checkOrderName(orderName);
+    const { chainId } = signedOrder.domain;
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
-    const body = { chainId, order: orderToPublish };
-    const authorization = await getAuthorization(chainId, address, eth);
+    const body = { chainId, order: signedOrder };
+    const authorization = await getAuthorization(
+      chainId,
+      address,
+      contracts.ethProvider,
+    );
     const response = await http.post(endpoint, body, { authorization });
-    debug('response', response);
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
     }
@@ -288,11 +323,22 @@ const publishOrder = async (
   }
 };
 
-const unpublishOrder = async (chainId, address, eth, orderName, orderHash) => {
+const unpublishOrder = async (
+  contracts,
+  orderName,
+  chainId,
+  orderHash,
+  address,
+) => {
   try {
+    checkOrderName(orderName);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
     const body = { chainId, orderHash };
-    const authorization = await getAuthorization(chainId, address, eth);
+    const authorization = await getAuthorization(
+      chainId,
+      address,
+      contracts.ethProvider,
+    );
     const response = await http.post(endpoint, body, { authorization });
     if (response.ok && response.unpublished) {
       return response.unpublished;
@@ -304,10 +350,11 @@ const unpublishOrder = async (chainId, address, eth, orderName, orderHash) => {
   }
 };
 
-const fetchPublishedOrderByHash = async (chainId, orderName, orderHash) => {
+const fetchPublishedOrderByHash = async (orderName, chainId, orderHash) => {
   try {
+    checkOrderName(orderName);
     isBytes32(orderHash);
-    const endpoint = objDesc[orderName] && objDesc[orderName].apiEndpoint;
+    const endpoint = objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
     const body = {
       chainId,
@@ -323,16 +370,16 @@ const fetchPublishedOrderByHash = async (chainId, orderName, orderHash) => {
     }
     throw Error('An error occured while getting order');
   } catch (error) {
-    debug('getPublishedOrderByHash()', error);
+    debug('fetchPublishedOrderByHash()', error);
     throw error;
   }
 };
 
-const fetchDealsByOrderHash = async (chainId, orderName, orderHash) => {
+const fetchDealsByOrderHash = async (orderName, chainId, orderHash) => {
   try {
+    checkOrderName(orderName);
     isBytes32(orderHash);
-    const hashFiedName = objDesc[orderName] && objDesc[orderName].dealField;
-    if (!hashFiedName) throw Error(`Unsuported orderName ${orderName}`);
+    const hashFiedName = objDesc[orderName].dealField;
     const endpoint = 'deals';
     const body = {
       chainId,
@@ -348,32 +395,26 @@ const fetchDealsByOrderHash = async (chainId, orderName, orderHash) => {
     }
     throw Error('An error occured while getting deals');
   } catch (error) {
-    debug('showDeals()', error);
+    debug('fetchDealsByOrderHash()', error);
     throw error;
   }
 };
 
 const matchOrders = async (
+  contracts,
   appOrder,
   datasetOrder = NULL_DATASETORDER,
   workerpoolOrder,
   requestOrder,
-  contracts,
 ) => {
   try {
-    const appOrderStruct = signedOrderToStruct('apporder', appOrder);
-    const datasetOrderStruct = signedOrderToStruct(
-      'datasetorder',
-      datasetOrder,
-    );
+    const appOrderStruct = signedOrderToStruct(APP_ORDER, appOrder);
+    const datasetOrderStruct = signedOrderToStruct(DATASET_ORDER, datasetOrder);
     const workerpoolOrderStruct = signedOrderToStruct(
-      'workerpoolorder',
+      WORKERPOOL_ORDER,
       workerpoolOrder,
     );
-    const requestOrderStruct = signedOrderToStruct(
-      'requestorder',
-      requestOrder,
-    );
+    const requestOrderStruct = signedOrderToStruct(REQUEST_ORDER, requestOrder);
 
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({ at: clerkAddress });
@@ -399,19 +440,16 @@ module.exports = {
   getEIP712Domain,
   getOrderHash,
   getContractOwner,
-  cancelOrder,
-  cancelAppOrder,
-  cancelDatasetOrder,
-  cancelWorkerpoolOrder,
-  cancelRequestOrder,
   checkRemainingVolume,
+  signOrder,
+  cancelOrder,
   publishOrder,
   unpublishOrder,
+  matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,
-  signAppOrder,
-  signDatasetOrder,
-  signWorkerpoolOrder,
-  signRequestOrder,
-  matchOrders,
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
 };
