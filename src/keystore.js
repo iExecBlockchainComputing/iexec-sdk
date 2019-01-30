@@ -195,7 +195,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
         return match;
       }
       throw Error(
-        `no wallet file matching address ${
+        `No wallet file matching address ${
           walletOptions.walletAddress
         } found in ${fileDir}`,
       );
@@ -239,7 +239,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
         const { privateKey } = await loadWalletConf(loadingOptions);
         pk = privateKey;
       } catch (error) {
-        debug('try load unecrypted', error);
+        debug('try load unencrypted', error);
         throw Error(
           `Missing option ${option.walletAddress()[0]} or ${
             option.walletFileName()[0]
@@ -260,7 +260,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
         const wallet = await decrypt(encryptedWallet, password);
         pk = wallet.privateKey;
       } catch (error) {
-        debug('try load unecrypted', error);
+        debug('try load encrypted', error);
         throw error;
       }
     }
