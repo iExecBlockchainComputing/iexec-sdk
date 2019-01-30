@@ -1,7 +1,8 @@
 const Debug = require('debug');
+const ethers = require('ethers');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { ethersBnToBn, bnToEthersBn } = require('./utils');
+const { ethersBnToBn, bnToEthersBn, throwIfMissing } = require('./utils');
 
 const debug = Debug('iexec:wallet');
 
@@ -44,48 +45,65 @@ const ethFaucets = [
   },
 ];
 
-const checkBalances = async (contracts, address) => {
-  const rlcAddress = await contracts.fetchRLCAddress();
-  const getETH = () => contracts.eth.getBalance(address).catch((error) => {
-    debug(error);
-    return 0;
-  });
-  const getRLC = () => contracts
-    .getRLCContract({
-      at: rlcAddress,
-    })
-    .balanceOf(address)
-    .catch((error) => {
+const checkBalances = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const rlcAddress = await contracts.fetchRLCAddress();
+    const getETH = () => contracts.eth.getBalance(address).catch((error) => {
       debug(error);
       return 0;
     });
+    const getRLC = () => contracts
+      .getRLCContract({
+        at: rlcAddress,
+      })
+      .balanceOf(address)
+      .catch((error) => {
+        debug(error);
+        return 0;
+      });
 
-  const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
-  const balances = {
-    wei: ethersBnToBn(weiBalance),
-    nRLC: ethersBnToBn(rlcBalance),
-  };
-  debug('balances', balances);
-  return balances;
+    const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
+    const balances = {
+      wei: ethersBnToBn(weiBalance),
+      nRLC: ethersBnToBn(rlcBalance),
+    };
+    debug('balances', balances);
+    return balances;
+  } catch (error) {
+    debug('checkBalances()', error);
+    throw error;
+  }
 };
 
-const getETH = async (chainName, account) => {
-  const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
-  const faucetsResponses = await Promise.all(
-    filteredFaucets.map(faucet => faucet.getETH(account)),
-  );
-  const responses = filteredFaucets.reduce((accu, curr, index) => {
-    accu.push(
-      Object.assign(
-        {
-          name: curr.name,
-        },
-        { response: faucetsResponses[index] },
-      ),
+const getETH = async (
+  chainName = throwIfMissing(),
+  account = throwIfMissing(),
+) => {
+  try {
+    const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
+    if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
+    const faucetsResponses = await Promise.all(
+      filteredFaucets.map(faucet => faucet.getETH(account)),
     );
-    return accu;
-  }, []);
-  return responses;
+    const responses = filteredFaucets.reduce((accu, curr, index) => {
+      accu.push(
+        Object.assign(
+          {
+            name: curr.name,
+          },
+          { response: faucetsResponses[index] },
+        ),
+      );
+      return accu;
+    }, []);
+    return responses;
+  } catch (error) {
+    debug('getETH()', error);
+    throw error;
+  }
 };
 
 const rlcFaucets = [
@@ -97,68 +115,93 @@ const rlcFaucets = [
   },
 ];
 
-const getRLC = async (chainName, account) => {
-  const faucetsResponses = await Promise.all(
-    rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
-  );
-  const responses = rlcFaucets.reduce((accu, curr, index) => {
-    accu.push(
-      Object.assign(
-        {
-          name: curr.name,
-        },
-        { response: faucetsResponses[index] },
-      ),
+const getRLC = async (
+  chainName = throwIfMissing(),
+  account = throwIfMissing(),
+) => {
+  try {
+    const faucetsResponses = await Promise.all(
+      rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
     );
-    return accu;
-  }, []);
-  return responses;
-};
-
-const sendETH = async (contracts, value, from, to) => {
-  const tx = await contracts.ethSigner.sendTransaction({
-    data: '0x',
-    to,
-    value,
-  });
-
-  const txReceipt = await tx.wait();
-  debug('txReceipt:', txReceipt);
-
-  return txReceipt;
-};
-
-const sendRLC = async (contracts, amount, to) => {
-  const rlcAddress = await contracts.fetchRLCAddress();
-  debug('rlcAddress', rlcAddress);
-
-  const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-
-  const tx = await rlcContract.transfer(to, amount);
-  const txReceipt = await tx.wait();
-  debug('txReceipt', txReceipt);
-
-  return txReceipt;
-};
-
-const sweep = async (contracts, address, to) => {
-  const balances = await checkBalances(contracts, address);
-
-  if (balances.nRLC.gt(new BN(0))) {
-    await sendRLC(contracts, bnToEthersBn(balances.nRLC), to);
+    const responses = rlcFaucets.reduce((accu, curr, index) => {
+      accu.push(
+        Object.assign(
+          {
+            name: curr.name,
+          },
+          { response: faucetsResponses[index] },
+        ),
+      );
+      return accu;
+    }, []);
+    return responses;
+  } catch (error) {
+    debug('getRLC()', error);
+    throw error;
   }
+};
 
-  const txFee = new BN('10000000000000000');
-  debug('txFee.toString()', txFee.toString());
-  debug('balances.wei.toString()', balances.wei.toString());
-  debug('balances.wei.gt(txFee)', balances.wei.gt(txFee));
-
-  const sweepETH = balances.wei.sub(txFee);
-  debug('sweepETH.toString()', sweepETH.toString());
-  if (balances.wei.gt(new BN(txFee))) {
-    await sendETH(contracts, bnToEthersBn(sweepETH), address, to);
+const sendETH = async (
+  contracts = throwIfMissing(),
+  value = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
+  try {
+    const ethSigner = new ethers.providers.Web3Provider(
+      contracts.ethProvider,
+    ).getSigner();
+    const tx = await ethSigner.sendTransaction({
+      data: '0x',
+      to,
+      value,
+    });
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('sendETH()', error);
+    throw error;
   }
-  return true;
+};
+
+const sendRLC = async (
+  contracts = throwIfMissing(),
+  amount = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
+  try {
+    const rlcAddress = await contracts.fetchRLCAddress();
+    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
+    const tx = await rlcContract.transfer(to, amount);
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('sendRLC()', error);
+    throw error;
+  }
+};
+
+const sweep = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
+  try {
+    const balances = await checkBalances(contracts, address);
+    let sendRLCTxHash;
+    if (balances.nRLC.gt(new BN(0))) {
+      sendRLCTxHash = await sendRLC(contracts, bnToEthersBn(balances.nRLC), to);
+    }
+    const txFee = new BN('10000000000000000');
+    let sendETHTxHash;
+    const sweepETH = balances.wei.sub(txFee);
+    if (balances.wei.gt(new BN(txFee))) {
+      sendETHTxHash = await sendETH(contracts, bnToEthersBn(sweepETH), to);
+    }
+    return Object.assign({}, { sendRLCTxHash }, { sendETHTxHash });
+  } catch (error) {
+    debug('sweep()', error);
+    throw error;
+  }
 };
 
 module.exports = {

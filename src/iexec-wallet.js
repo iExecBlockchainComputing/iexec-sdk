@@ -239,7 +239,7 @@ sendETH
         cmd.to
       }`;
       spinner.start(`sending ${message}...`);
-      await wallet.sendETH(chain.contracts, weiAmount, address, cmd.to);
+      await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: { amount, from: address, to: cmd.to },
       });
@@ -293,6 +293,7 @@ addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
   .option(...option.to())
+  .option(...option.force())
   .description(desc.sweep())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
