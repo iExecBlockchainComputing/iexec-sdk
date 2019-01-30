@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const ethers = require('ethers');
 const cli = require('commander');
 const unit = require('ethjs-unit');
@@ -27,7 +26,6 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 
-const debug = Debug('iexec:iexec-wallet');
 const objName = 'wallet';
 
 const create = cli.command('create');
@@ -233,7 +231,7 @@ sendETH
       const weiAmount = ethers.utils.parseEther(amount).toHexString();
       if (!cmd.to) throw Error('missing --to option');
 
-      if (!cmd.force && !cmd.raw) {
+      if (!cmd.force) {
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
 
@@ -270,7 +268,7 @@ sendRLC
 
       if (!cmd.to) throw Error('missing --to option');
 
-      if (!cmd.force && !cmd.raw) {
+      if (!cmd.force) {
         await prompt.transferRLC(amount, chain.name, cmd.to, chain.id);
       }
 
@@ -306,7 +304,7 @@ sweep
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
       if (!cmd.to) throw Error('missing --to option');
-      if (!cmd.force && !cmd.raw) {
+      if (!cmd.force) {
         await prompt.sweep(chain.name, cmd.to, chain.id);
       }
       spinner.start('sweeping wallet...');
