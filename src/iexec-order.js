@@ -145,9 +145,9 @@ sign
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
         const signedOrder = await order.signAppOrder(
+          chain.contracts,
           orderObj,
           domainObj,
-          chain.contracts.ethProvider,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -179,9 +179,9 @@ sign
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
 
         const signedOrder = await order.signDatasetOrder(
+          chain.contracts,
           orderObj,
           domainObj,
-          chain.contracts.ethProvider,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -213,9 +213,9 @@ sign
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
 
         const signedOrder = await order.signWorkerpoolOrder(
+          chain.contracts,
           orderObj,
           domainObj,
-          chain.contracts.ethProvider,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -239,9 +239,9 @@ sign
           strict: true,
         });
         const signedOrder = await order.signRequestOrder(
+          chain.contracts,
           orderObj,
           domainObj,
-          chain.contracts.ethProvider,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -364,7 +364,12 @@ fill
           );
         }
         const domain = order.getEIP712Domain(chain.id, clerkAddress);
-        const signed = order.signRequestOrder(unsignedOrder, domain);
+        const signed = order.signRequestOrder(
+          chain.contracts,
+          unsignedOrder,
+          domain,
+          address,
+        );
         return signed;
       };
 

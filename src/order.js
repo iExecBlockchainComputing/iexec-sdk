@@ -185,7 +185,24 @@ const checkRemainingVolume = async (
   return remain;
 };
 
-const signOrder = async (orderName, orderObj, domainObj, eth, address) => {
+const signOrder = async (
+  contracts,
+  orderName,
+  orderObj,
+  domainObj,
+  address,
+) => {
+  const signerAddress = orderName === 'requestorder'
+    ? orderObj.requester
+    : await getContractOwner(orderName, orderObj, contracts);
+  if (signerAddress.toLowerCase() !== address.toLowerCase()) {
+    throw Error(
+      `Invalid order signer, must be the ${
+        orderName === 'requestorder' ? 'requester' : 'resource owner'
+      }`,
+    );
+  }
+
   const salt = getSalt();
   const saltedOrderObj = Object.assign(orderObj, { salt });
 
@@ -212,7 +229,7 @@ const signOrder = async (orderName, orderObj, domainObj, eth, address) => {
   };
 
   const signTypedDatav3 = data => new Promise((resolve, reject) => {
-    eth.sendAsync(
+    contracts.ethProvider.sendAsync(
       {
         method: 'eth_signTypedData_v3',
         params: [address, JSON.stringify(data)],
@@ -223,20 +240,15 @@ const signOrder = async (orderName, orderObj, domainObj, eth, address) => {
       },
     );
   });
-
   const sig = await signTypedDatav3(typedData);
-  debug('sig', sig);
-
   const sign = deserializeSig(sig);
-
   const signedOrder = Object.assign(saltedOrderObj, { sign });
-  debug('signedOrder', signedOrder);
   return signedOrder;
 };
-const signAppOrder = (order, domain, eth, address) => signOrder('apporder', order, domain, eth, address);
-const signDatasetOrder = (order, domain, eth, address) => signOrder('datasetorder', order, domain, eth, address);
-const signWorkerpoolOrder = (order, domain, eth, address) => signOrder('workerpoolorder', order, domain, eth, address);
-const signRequestOrder = (order, domain, eth, address) => signOrder('requestorder', order, domain, eth, address);
+const signAppOrder = (contracts, order, domain, address) => signOrder(contracts, 'apporder', order, domain, address);
+const signDatasetOrder = (contracts, order, domain, address) => signOrder(contracts, 'datasetorder', order, domain, address);
+const signWorkerpoolOrder = (contracts, order, domain, address) => signOrder(contracts, 'workerpoolorder', order, domain, address);
+const signRequestOrder = (contracts, order, domain, address) => signOrder(contracts, 'requestorder', order, domain, address);
 
 const cancelOrder = async (orderName, orderObj, contracts) => {
   const args = signedOrderToStruct(orderName, orderObj);
@@ -245,7 +257,6 @@ const cancelOrder = async (orderName, orderObj, contracts) => {
   const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
   const txReceipt = await tx.wait();
   const logs = contracts.decodeClerkLogs(txReceipt.logs);
-  debug('logs', logs);
   if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
   return true;
 };
@@ -280,12 +291,9 @@ const publishOrder = async (
 const unpublishOrder = async (chainId, address, eth, orderName, orderHash) => {
   try {
     const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
-    debug('endpoint', endpoint);
     const body = { chainId, orderHash };
-    debug('body', body);
     const authorization = await getAuthorization(chainId, address, eth);
     const response = await http.post(endpoint, body, { authorization });
-    debug('response', response);
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
@@ -377,7 +385,6 @@ const matchOrders = async (
     );
     const txReceipt = await tx.wait();
     const logs = contracts.decodeClerkLogs(txReceipt.logs);
-    debug('logs', logs);
     const matchEvent = 'OrdersMatched';
     if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(matchEvent, logs);
