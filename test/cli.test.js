@@ -426,6 +426,43 @@ test(
   15000,
 );
 
+test(
+  'iexec order cancel --app (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order cancel --app --force --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+test(
+  'iexec order cancel --dataset (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order cancel --dataset --force --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+test(
+  'iexec order cancel --workerpool (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order cancel --workerpool --force --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+test(
+  'iexec order cancel --request (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order cancel --request --force  --password test --wallet-address ${ADDRESS}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+
 // DEAL
 test('iexec deal show', async () => {
   const { dealid } = await loadJSONFile('orderFill_stdout.json');
