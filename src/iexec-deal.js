@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
 const {
   help,
@@ -19,7 +18,6 @@ const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const deal = require('./deal');
 
-const debug = Debug('iexec:iexec-deal');
 const objName = 'deal';
 
 const show = cli.command('show <dealid>');
