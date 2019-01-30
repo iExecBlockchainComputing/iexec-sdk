@@ -79,7 +79,7 @@ iexec app show # show details of deployed app
 #### Sell your app on the Marketplace
 
 ```bash
-iexec orderbook show --app <address> # check if you have valid sell orders for your app on the marketplace
+iexec orderbook app <address> # check if you have valid sell orders for your app on the marketplace
 iexec order init --app # reset apporder fields in iexec.json
 iexec order sign --app # sign your apporder
 iexec order publish --app # publish your apporder on the marketplace and get an orderHash
@@ -103,7 +103,7 @@ iexec dataset show # show details of deployed dataset
 #### Sell your dataset on the Marketplace
 
 ```bash
-iexec orderbook show --dataset <address> # check if you have valid sell orders for your dataset on the marketplace
+iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the marketplace
 iexec order init --dataset # reset datasetorder fields in iexec.json
 iexec order sign --dataset # sign your datasetorder
 iexec order publish --dataset #publish your datasetorder on the marketplace and get an orderHash
@@ -127,7 +127,7 @@ iexec workerpool show # show details of deployed workerpool
 #### Sell your computing power at limit price on the Marketplace
 
 ```bash
-iexec orderbook show --workerpool <address> --category <id> # check if you have valid sell orders for your workerpool on the marketplace
+iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the marketplace
 iexec order init --workerpool # reset workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign your workerpoolorder
 iexec order publish --workerpool # publish your workerpoolorder on the marketplace and get an orderHash
@@ -138,9 +138,9 @@ iexec order cancel --workerpool <orderHash> # cancel your order
 #### Sell your computing power at market price on the Marketplace
 
 ```bash
-iexec orderbook show --category <id> # find a requestorder ask you want to fill in your category
-iexec orderbook show --app <address> #  find a compatible apporder
-iexec orderbook show --dataset <address> #  find a compatible datasetorder
+iexec orderbook requester --category <id> # find a requestorder ask you want to fill in your category
+iexec orderbook app <address> #  find a compatible apporder
+iexec orderbook dataset <address> #  find a compatible datasetorder
 iexec order init --workerpool # reset workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign your workerpoolorder
 iexec order fill --request [orderHash] --app [orderHash] --dataset [orderHash] # send the orders and get a dealid
@@ -162,16 +162,16 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec orderbook show --category <id> # find the best workerpoolorder for your category on the marketplace
-iexec orderbook show --app <address> # find the best apporder on the marketplace
-iexec orderbook show --dataset <address> # find the best datasetorder on the marketplace
+iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the marketplace
+iexec orderbook app <address> # find the best apporder on the marketplace
+iexec orderbook dataset <address> # find the best datasetorder on the marketplace
 iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealid
 ```
 
 #### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec orderbook show --requester <address> --category <id> # check if you already have valid orders on the marketplace
+iexec orderbook requester [address] --category <id> # check if you already have valid orders on the marketplace
 iexec order init --request # reset requestorder fields in iexec.json
 iexec order sign --request # sign your requestorder
 iexec order publish --request # publish your requestorder on the marketplace and get an orderHash
@@ -332,11 +332,12 @@ iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orde
 ```bash
 # OPTIONS
 # --chain <chainName>
-iexec orderbook show --category <id> # show the best workerpoolorders and requestorders published on the Marketplace for the specified category
-iexec orderbook show --category <id> --requester <address> # filters the result on requester
-iexec orderbook show --category <id> --workerpool <address> # filters the result on workerpool
-iexec orderbook show --app <address> # show the best apporders published on the Marketplace for the specified app
-iexec orderbook show --dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
+iexec orderbook requester --category <id> # show the best requestorders published on the Marketplace for the specified category
+iexec orderbook requester [address] --category <id> # filters the result on requester
+iexec orderbook workerpool --category <id> # show the best workerpools published on the Marketplace for the specified category
+iexec orderbook workerpool [address] --category <id> # filters the result on workerpool
+iexec orderbook app <address> # show the best apporders published on the Marketplace for the specified app
+iexec orderbook dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
 ```
 
 ## deal
