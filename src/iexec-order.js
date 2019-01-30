@@ -359,7 +359,7 @@ fill
           requester: address,
           volume: volume.toString(),
         });
-        if (!cmd.force && !cmd.raw) {
+        if (!cmd.force) {
           await prompt.signGeneratedOrder(
             order.REQUEST_ORDER,
             pretty(unsignedOrder),
@@ -419,7 +419,7 @@ fill
         workerpoolVolume,
         requestVolume,
       ]);
-      if (requestVolume.gt(maxVolume) && !cmd.force && !cmd.raw) await prompt.limitedVolume(maxVolume, requestVolume);
+      if (requestVolume.gt(maxVolume) && !cmd.force) await prompt.limitedVolume(maxVolume, requestVolume);
       // price check
       const workerpoolPrice = new BN(workerpoolOrder.workerpoolprice);
       const workerpoolMaxPrice = new BN(requestOrder.workerpoolmaxprice);
@@ -451,7 +451,7 @@ fill
         );
       }
       const totalCost = costPerWork.mul(maxVolume);
-      if (stake.lt(totalCost) && !cmd.force && !cmd.raw) {
+      if (stake.lt(totalCost) && !cmd.force) {
         const payableVolume = costPerWork.isZero()
           ? new BN(0)
           : stake.div(costPerWork);
@@ -514,7 +514,7 @@ publish
             } in "orders.json"`,
           );
         }
-        if (!cmd.force && !cmd.raw) await prompt.publishOrder(orderName, pretty(orderToPublish));
+        if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
         spinner.start(`publishing ${orderName}`);
         const orderHash = await order.publishOrder(
           chain.contracts,
@@ -586,7 +586,7 @@ unpublish
             orderName,
             orderToUnpublish,
           );
-          if (!cmd.force && !cmd.raw) {
+          if (!cmd.force) {
             await prompt.unpublishFromJsonFile(
               orderName,
               pretty(orderToUnpublish),
@@ -654,7 +654,7 @@ cancel
             } in "orders.json"`,
           );
         }
-        if (!cmd.force && !cmd.raw) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+        if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
         spinner.start(`canceling ${orderName}`);
         await order.cancelOrder(chain.contracts, orderName, orderToCancel);
         spinner.succeed(`${orderName} successfully canceled`);
