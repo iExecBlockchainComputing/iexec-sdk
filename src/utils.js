@@ -84,10 +84,11 @@ const getContractAddress = (desc, chainId, { strict = true } = {}) => {
 
 const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString = ethUtil.isHexString(address);
-  if (!isHexString && strict) {
+  const isAddress = isHexString && address.length === 42;
+  if (!isAddress && strict) {
     throw Error(`address ${address} is not a valid Ethereum address`);
   }
-  return isHexString;
+  return isAddress;
 };
 
 const isBytes32 = (str, { strict = true } = {}) => {
