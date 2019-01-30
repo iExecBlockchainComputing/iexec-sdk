@@ -312,6 +312,10 @@ const getSalt = () => {
   return salt;
 };
 
+const throwIfMissing = () => {
+  throw Error('Missing parameter');
+};
+
 module.exports = {
   getContractAddress,
   isEthAddress,
@@ -332,4 +336,5 @@ module.exports = {
   download,
   getSalt,
   NULL_ADDRESS,
+  throwIfMissing,
 };

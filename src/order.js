@@ -10,6 +10,7 @@ const {
   checksummedAddress,
   getAuthorization,
 } = require('./utils');
+const { throwIfMissing } = require('./utils');
 const { hashStruct, deserializeSig } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
@@ -161,16 +162,24 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const getEIP712Domain = (chainId, verifyingContract) => ({
+const getEIP712Domain = (
+  chainId = throwIfMissing(),
+  verifyingContract = throwIfMissing(),
+) => ({
   name: 'iExecODB',
   version: '3.0-alpha',
   chainId,
   verifyingContract,
 });
 
-const getContractOwner = async (contracts, orderName, orderObj) => {
+const getContractOwner = async (
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  orderObj = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
+    if (orderName === REQUEST_ORDER) throw Error('Invalid orderName');
     const contractAddress = orderObj[objDesc[orderName].contractPropName];
     const contract = contracts.getContract(objDesc[orderName].contractName)({
       at: contractAddress,
@@ -183,7 +192,10 @@ const getContractOwner = async (contracts, orderName, orderObj) => {
   }
 };
 
-const getOrderHash = (orderName, order) => {
+const getOrderHash = (
+  orderName = throwIfMissing(),
+  order = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
     return hashStruct(
@@ -198,9 +210,9 @@ const getOrderHash = (orderName, order) => {
 };
 
 const checkRemainingVolume = async (
-  contracts,
-  orderName,
-  order,
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  order = throwIfMissing(),
   { strict = true } = {},
 ) => {
   try {
@@ -223,11 +235,11 @@ const checkRemainingVolume = async (
 };
 
 const signOrder = async (
-  contracts,
-  orderName,
-  orderObj,
-  domainObj,
-  address,
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  orderObj = throwIfMissing(),
+  domainObj = throwIfMissing(),
+  address = throwIfMissing(),
 ) => {
   checkOrderName(orderName);
   const signerAddress = orderName === REQUEST_ORDER
@@ -284,7 +296,11 @@ const signOrder = async (
   return signedOrder;
 };
 
-const cancelOrder = async (contracts, orderName, orderObj) => {
+const cancelOrder = async (
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  orderObj = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
     const args = signedOrderToStruct(orderName, orderObj);
@@ -301,7 +317,12 @@ const cancelOrder = async (contracts, orderName, orderObj) => {
   }
 };
 
-const publishOrder = async (contracts, orderName, signedOrder, address) => {
+const publishOrder = async (
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  signedOrder = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
     const { chainId } = signedOrder.domain;
@@ -324,11 +345,11 @@ const publishOrder = async (contracts, orderName, signedOrder, address) => {
 };
 
 const unpublishOrder = async (
-  contracts,
-  orderName,
-  chainId,
-  orderHash,
-  address,
+  contracts = throwIfMissing(),
+  orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
+  orderHash = throwIfMissing(),
+  address = throwIfMissing(),
 ) => {
   try {
     checkOrderName(orderName);
@@ -350,7 +371,11 @@ const unpublishOrder = async (
   }
 };
 
-const fetchPublishedOrderByHash = async (orderName, chainId, orderHash) => {
+const fetchPublishedOrderByHash = async (
+  orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
+  orderHash = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
     isBytes32(orderHash);
@@ -375,7 +400,11 @@ const fetchPublishedOrderByHash = async (orderName, chainId, orderHash) => {
   }
 };
 
-const fetchDealsByOrderHash = async (orderName, chainId, orderHash) => {
+const fetchDealsByOrderHash = async (
+  orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
+  orderHash = throwIfMissing(),
+) => {
   try {
     checkOrderName(orderName);
     isBytes32(orderHash);
@@ -401,11 +430,11 @@ const fetchDealsByOrderHash = async (orderName, chainId, orderHash) => {
 };
 
 const matchOrders = async (
-  contracts,
-  appOrder,
+  contracts = throwIfMissing(),
+  appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder,
-  requestOrder,
+  workerpoolOrder = throwIfMissing(),
+  requestOrder = throwIfMissing(),
 ) => {
   try {
     const appOrderStruct = signedOrderToStruct(APP_ORDER, appOrder);
