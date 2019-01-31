@@ -519,6 +519,7 @@ publish
         const orderHash = await order.publishOrder(
           chain.contracts,
           orderName,
+          chain.id,
           orderToPublish,
           address,
         );

@@ -320,12 +320,12 @@ const cancelOrder = async (
 const publishOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
   signedOrder = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
   try {
     checkOrderName(orderName);
-    const { chainId } = signedOrder.domain;
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
     const body = { chainId, order: signedOrder };
     const authorization = await getAuthorization(
