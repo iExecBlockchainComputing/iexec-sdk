@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
@@ -20,7 +19,6 @@ const {
   pretty,
 } = require('./cli-helper');
 
-const debug = Debug('iexec:iexec-account');
 const objName = 'account';
 
 const deposit = cli.command(command.deposit());
@@ -35,7 +33,7 @@ deposit
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(cmd.chain, keystore, { spinner });
-      debug('amount', amount);
+      await keystore.load();
       spinner.start(info.depositing());
       const depositedeAmount = await account.deposit(chain.contracts, amount);
       spinner.succeed(info.deposited(depositedeAmount), {
@@ -58,7 +56,7 @@ withdraw
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(cmd.chain, keystore, { spinner });
-      debug('amount', amount);
+      await keystore.load();
       spinner.start(info.withdrawing());
       const withdrawedAmount = await account.withdraw(chain.contracts, amount);
       spinner.succeed(info.withdrawed(amount), {
@@ -83,16 +81,20 @@ show
         Object.assign({}, walletOptions, address && { isSigner: false }),
       );
 
-      let userWallet;
-      try {
-        userWallet = await keystore.load();
-      } catch (error) {
-        if (error.message === 'invalid password') throw error;
+      let userAddress;
+      if (!address) {
+        try {
+          const userWallet = await keystore.load();
+          userAddress = userWallet.address;
+        } catch (error) {
+          if (error.message === 'invalid password') throw error;
+        }
+      } else {
+        userAddress = address;
       }
-      if (!userWallet && !address) throw Error('Missing address or wallet');
+      if (!userAddress) throw Error('Missing address or wallet');
 
       const chain = await loadChain(cmd.chain, keystore, { spinner });
-      const userAddress = address || userWallet.address;
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);
