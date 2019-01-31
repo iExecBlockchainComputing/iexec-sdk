@@ -2,7 +2,12 @@ const Debug = require('debug');
 const ethers = require('ethers');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { ethersBnToBn, bnToEthersBn, throwIfMissing } = require('./utils');
+const {
+  isEthAddress,
+  ethersBnToBn,
+  bnToEthersBn,
+  throwIfMissing,
+} = require('./utils');
 
 const debug = Debug('iexec:wallet');
 
@@ -50,6 +55,7 @@ const checkBalances = async (
   address = throwIfMissing(),
 ) => {
   try {
+    isEthAddress(address, { strict: true });
     const rlcAddress = await contracts.fetchRLCAddress();
     const getETH = () => contracts.eth.getBalance(address).catch((error) => {
       debug(error);
@@ -83,6 +89,7 @@ const getETH = async (
   account = throwIfMissing(),
 ) => {
   try {
+    isEthAddress(account, { strict: true });
     const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
     if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
     const faucetsResponses = await Promise.all(
@@ -120,6 +127,7 @@ const getRLC = async (
   account = throwIfMissing(),
 ) => {
   try {
+    isEthAddress(account, { strict: true });
     const faucetsResponses = await Promise.all(
       rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
     );
@@ -147,6 +155,7 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
+    isEthAddress(to, { strict: true });
     const ethSigner = new ethers.providers.Web3Provider(
       contracts.ethProvider,
     ).getSigner();
@@ -168,6 +177,7 @@ const sendRLC = async (
   amount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
+  isEthAddress(to, { strict: true });
   try {
     const rlcAddress = await contracts.fetchRLCAddress();
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
@@ -186,6 +196,7 @@ const sweep = async (
   to = throwIfMissing(),
 ) => {
   try {
+    isEthAddress(to, { strict: true });
     const balances = await checkBalances(contracts, address);
     let sendRLCTxHash;
     if (balances.nRLC.gt(new BN(0))) {
