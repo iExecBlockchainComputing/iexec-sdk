@@ -5,80 +5,130 @@ const {
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
+  throwIfMissing,
 } = require('./utils');
 
 const debug = Debug('iexec:hub');
 
-const createObj = objName => async (contracts, obj, options) => {
-  const logs = await contracts.createObj(objName)(obj, options);
-  const address = checksummedAddress(logs[0][objName]);
-  return address;
-};
-
-const showObj = objName => async (
-  contracts,
-  objAdressOrIndex,
-  userAddress,
+const createObj = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  obj = throwIfMissing(),
   options,
 ) => {
-  let objAddress;
-  if (
-    !ethUtil.isHexString(objAdressOrIndex)
-    && Number.isInteger(Number(objAdressOrIndex))
-  ) {
-    // INDEX case: need hit subHub to get obj address from index
-    objAddress = await contracts.getUserObjAddressByIndex(objName)(
-      userAddress,
-      objAdressOrIndex,
-      options,
-    );
-  } else if (isEthAddress(objAdressOrIndex)) {
-    objAddress = objAdressOrIndex;
-  } else {
-    throw Error(
-      'argument is neither an integer index nor a valid ethereum address',
-    );
+  try {
+    const logs = await contracts.createObj(objName)(obj, options);
+    const address = checksummedAddress(logs[0][objName]);
+    return address;
+  } catch (error) {
+    debug('createObj()', error);
+    throw error;
   }
-
-  const obj = bnifyNestedEthersBn(
-    await contracts.getObjProps(objName)(objAddress),
-  );
-  return { obj, objAddress };
 };
 
-const countObj = objName => async (contracts, userAddress, options) => {
-  const objCountBN = ethersBnToBn(
-    await contracts.getUserObjCount(objName)(userAddress, options),
-  );
-  debug('objCountBN', objCountBN);
-  return objCountBN;
+const showObj = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  objAdressOrIndex = throwIfMissing(),
+  userAddress = throwIfMissing(),
+  options,
+) => {
+  try {
+    let objAddress;
+    if (
+      !ethUtil.isHexString(objAdressOrIndex)
+      && Number.isInteger(Number(objAdressOrIndex))
+    ) {
+      // INDEX case: need hit subHub to get obj address from index
+      objAddress = await contracts.getUserObjAddressByIndex(objName)(
+        userAddress,
+        objAdressOrIndex,
+        options,
+      );
+    } else if (isEthAddress(objAdressOrIndex)) {
+      objAddress = objAdressOrIndex;
+    } else {
+      throw Error(
+        'Argument is neither an integer index nor a valid ethereum address',
+      );
+    }
+
+    const obj = bnifyNestedEthersBn(
+      await contracts.getObjProps(objName)(objAddress),
+    );
+    return { obj, objAddress };
+  } catch (error) {
+    debug('showObj()', error);
+    throw error;
+  }
 };
 
-const createCategory = async (contracts, obj, options) => {
-  const logs = await contracts.createCategory(obj, options);
-  debug('logs', logs);
-  return logs[0].catid;
+const countObj = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+  options,
+) => {
+  try {
+    const objCountBN = ethersBnToBn(
+      await contracts.getUserObjCount(objName)(userAddress, options),
+    );
+    return objCountBN;
+  } catch (error) {
+    debug('countObj()', error);
+    throw error;
+  }
 };
 
-const showCategory = async (contracts, index, options) => {
-  const category = bnifyNestedEthersBn(
-    await contracts.getCategoryByIndex(index, options),
-  );
-  return category;
+const createCategory = async (
+  contracts = throwIfMissing(),
+  obj = throwIfMissing(),
+  options,
+) => {
+  try {
+    const logs = await contracts.createCategory(obj, options);
+    return logs[0].catid;
+  } catch (error) {
+    debug('createCategory()', error);
+    throw error;
+  }
 };
 
-const countCategory = async (contracts, options) => {
-  const countBN = ethersBnToBn(
-    await contracts.getHubContract(options).countCategory(),
-  );
-  return countBN;
+const showCategory = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  options,
+) => {
+  try {
+    const category = bnifyNestedEthersBn(
+      await contracts.getCategoryByIndex(index, options),
+    );
+    return category;
+  } catch (error) {
+    debug('showCategory()', error);
+    throw error;
+  }
 };
 
-const getTimeoutRatio = async (contracts, options) => {
-  const timeoutRatio = ethersBnToBn(
-    await contracts.getHubContract(options).FINAL_DEADLINE_RATIO(),
-  );
-  return timeoutRatio;
+const countCategory = async (contracts = throwIfMissing(), options) => {
+  try {
+    const countBN = ethersBnToBn(
+      await contracts.getHubContract(options).countCategory(),
+    );
+    return countBN;
+  } catch (error) {
+    debug('countCategory()', error);
+    throw error;
+  }
+};
+
+const getTimeoutRatio = async (contracts = throwIfMissing(), options) => {
+  try {
+    const timeoutRatio = ethersBnToBn(
+      await contracts.getHubContract(options).FINAL_DEADLINE_RATIO(),
+    );
+    return timeoutRatio;
+  } catch (error) {
+    debug('getTimeoutRatio()', error);
+    throw error;
+  }
 };
 
 module.exports = {
