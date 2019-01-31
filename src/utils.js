@@ -86,22 +86,18 @@ const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString = ethUtil.isHexString(address);
   const isAddress = isHexString && address.length === 42;
   if (!isAddress && strict) {
-    throw Error(`address ${address} is not a valid Ethereum address`);
+    throw Error(`Address ${address} is not a valid Ethereum address`);
   }
   return isAddress;
 };
 
 const isBytes32 = (str, { strict = true } = {}) => {
-  if (typeof str !== 'string') {
-    if (strict) throw new Error(`isBytes32 type missmatch, value: ${str}`);
-    return false;
-  }
-  if (str.length !== 66) {
-    if (strict) throw new Error(`isBytes32 incorrect length, value: ${str}`);
-    return false;
-  }
-  if (str.substr(0, 2) !== '0x') {
-    if (strict) throw new Error(`isBytes32 incorrect hex format, value: ${str}`);
+  if (
+    typeof str !== 'string'
+    || str.length !== 66
+    || str.substr(0, 2) !== '0x'
+  ) {
+    if (strict) throw new Error(`${str} is not a val Bytes32 HexString`);
     return false;
   }
   return true;
@@ -138,7 +134,7 @@ const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
       eventFound = event;
     }
   });
-  if (!eventFound && strict) throw new Error(`unknown event ${eventName}`);
+  if (!eventFound && strict) throw new Error(`Unknown event ${eventName}`);
   return eventFound;
 };
 
@@ -197,7 +193,7 @@ const httpRequest = verb => async (
     if (json.error) throw new Error(json.error);
     if (response.status === 200 && json) return json;
   } else {
-    throw new Error('the http response is not of JSON type');
+    throw new Error('The http response is not of JSON type');
   }
   throw new Error('API call error');
 };
@@ -292,7 +288,7 @@ const getAuthorization = async (
     return authorization;
   } catch (error) {
     debug('getAuthorization()', error);
-    throw Error('failed to get authorization');
+    throw Error('Failed to get authorization');
   }
 };
 
