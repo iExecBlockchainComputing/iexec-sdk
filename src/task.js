@@ -32,9 +32,18 @@ const show = async (contracts, taskid) => {
       task.dealid
       === '0x0000000000000000000000000000000000000000000000000000000000000000'
     ) throw Error(`no task found for taskid ${taskid} on chain ${chainId}`);
-    return Object.assign({}, task, {
-      statusName: taskStatusMap[task.status],
-    });
+    return Object.assign(
+      {},
+      task,
+      {
+        statusName: taskStatusMap[task.status],
+      },
+      {
+        results:
+          task.results
+          && Buffer.from(task.results.substr(2), 'hex').toString('utf8'),
+      },
+    );
   } catch (error) {
     debug('show()', error);
     throw error;
