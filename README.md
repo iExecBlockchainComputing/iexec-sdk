@@ -425,7 +425,7 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 **Parameters**
 
 - `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `amouont` **String** the amount of nano RLC to send to
+- `amount` **String** the amount of ETH to send to
 - `from` **String** the address the is sending ETH
 - `to` **String** the address that is receiving the amount of ETH
 
