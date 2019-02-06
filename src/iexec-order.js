@@ -120,12 +120,6 @@ sign
         keystore.load(),
       ]);
 
-      const clerkAddress = await chain.contracts.fetchClerkAddress();
-      const domainObj = order.getEIP712Domain(
-        chain.contracts.chainId,
-        clerkAddress,
-      );
-
       const signAppOrder = async () => {
         spinner.start('signing apporder');
         const orderObj = iexecConf.order.apporder;
@@ -146,7 +140,6 @@ sign
           chain.contracts,
           order.APP_ORDER,
           orderObj,
-          domainObj,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -181,7 +174,6 @@ sign
           chain.contracts,
           order.DATASET_ORDER,
           orderObj,
-          domainObj,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -218,7 +210,6 @@ sign
           chain.contracts,
           order.WORKERPOOL_ORDER,
           orderObj,
-          domainObj,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -245,7 +236,6 @@ sign
           chain.contracts,
           order.REQUEST_ORDER,
           orderObj,
-          domainObj,
           address,
         );
         const { saved, fileName } = await saveSignedOrder(
@@ -342,10 +332,7 @@ fill
         workerpoolOrder,
       );
       const computeRequestOrder = async () => {
-        const [{ address }, clerkAddress] = await Promise.all([
-          keystore.load(),
-          chain.contracts.fetchClerkAddress(),
-        ]);
+        const { address } = await keystore.load();
         const volume = minBn([appVolume, datasetVolume, workerpoolVolume]);
         const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
           app: appOrder.app,
@@ -365,12 +352,10 @@ fill
             pretty(unsignedOrder),
           );
         }
-        const domain = order.getEIP712Domain(chain.id, clerkAddress);
         const signed = order.signOrder(
           chain.contracts,
           order.REQUEST_ORDER,
           unsignedOrder,
-          domain,
           address,
         );
         return signed;

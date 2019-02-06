@@ -162,10 +162,7 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const getEIP712Domain = (
-  chainId = throwIfMissing(),
-  verifyingContract = throwIfMissing(),
-) => ({
+const getEIP712Domain = (chainId, verifyingContract) => ({
   name: 'iExecODB',
   version: '3.0-alpha',
   chainId,
@@ -238,7 +235,6 @@ const signOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   orderObj = throwIfMissing(),
-  domainObj = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
   checkOrderName(orderName);
@@ -253,8 +249,8 @@ const signOrder = async (
     );
   }
 
-  const salt = getSalt();
-  const saltedOrderObj = Object.assign(orderObj, { salt });
+  const clerkAddress = await contracts.fetchClerkAddress();
+  const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
 
   const domain = [
     { name: 'name', type: 'string' },
@@ -262,6 +258,9 @@ const signOrder = async (
     { name: 'chainId', type: 'uint256' },
     { name: 'verifyingContract', type: 'address' },
   ];
+
+  const salt = getSalt();
+  const saltedOrderObj = Object.assign(orderObj, { salt });
 
   const order = objDesc[orderName].structMembers;
 
@@ -466,7 +465,6 @@ const matchOrders = async (
 };
 
 module.exports = {
-  getEIP712Domain,
   getOrderHash,
   getContractOwner,
   checkRemainingVolume,
