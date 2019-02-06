@@ -68,27 +68,27 @@ show
     }
   });
 
-const claim = cli.command('claim <dealid>');
-addGlobalOptions(claim);
-addWalletLoadOptions(claim);
-claim
-  .option(...option.chain())
-  .description(desc.claimObj(objName))
-  .action(async (dealid, cmd) => {
-    const spinner = Spinner(cmd);
-    try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
-      const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
-        keystore.account(),
-      ]);
-      spinner.start(info.claiming(objName));
-      const txHash = await deal.claim(chain.contracts, dealid, address);
-      spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
-    } catch (error) {
-      handleError(error, cli, cmd);
-    }
-  });
+// const claim = cli.command('claim <dealid>');
+// addGlobalOptions(claim);
+// addWalletLoadOptions(claim);
+// claim
+//   .option(...option.chain())
+//   .description(desc.claimObj(objName))
+//   .action(async (dealid, cmd) => {
+//     const spinner = Spinner(cmd);
+//     try {
+//       const walletOptions = await computeWalletLoadOptions(cmd);
+//       const keystore = Keystore(walletOptions);
+//       const [chain, [address]] = await Promise.all([
+//         loadChain(cmd.chain, keystore, { spinner }),
+//         keystore.account(),
+//       ]);
+//       spinner.start(info.claiming(objName));
+//       const txHash = await deal.claim(chain.contracts, dealid, address);
+//       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
+//     } catch (error) {
+//       handleError(error, cli, cmd);
+//     }
+//   });
 
 help(cli);
