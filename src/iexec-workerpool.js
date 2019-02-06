@@ -111,12 +111,12 @@ show
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       spinner.start(info.showing(objName));
-      const { obj, objAddress } = await hub.showObj(objName)(
+      const { workerpool, objAddress } = await hub.showWorkerpool(
         chain.contracts,
         addressOrIndex,
         userAddress,
       );
-      const cleanObj = stringifyNestedBn(obj);
+      const cleanObj = stringifyNestedBn(workerpool);
       spinner.succeed(`${objName} ${objAddress} details:${pretty(cleanObj)}`, {
         raw: { address: objAddress, workerpool: cleanObj },
       });

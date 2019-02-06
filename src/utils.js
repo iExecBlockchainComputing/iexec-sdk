@@ -4,6 +4,7 @@ const fetch = require('cross-fetch');
 const qs = require('query-string');
 const BN = require('bn.js');
 const ethers = require('ethers');
+const multiaddr = require('multiaddr');
 const { hashEIP712 } = require('./sig-utils');
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
@@ -44,6 +45,28 @@ const stringifyNestedBn = (obj) => {
 };
 
 const checksummedAddress = address => ethers.utils.getAddress(address);
+
+const multiaddrHexToHuman = (hexString) => {
+  let res;
+  const buffer = Buffer.from(hexString.substr(2), 'hex');
+  try {
+    res = multiaddr(buffer).toString('utf8');
+  } catch (error) {
+    res = buffer.toString();
+  }
+  return res;
+};
+
+const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
+  let multiaddrBuffer;
+  try {
+    multiaddrBuffer = multiaddr(str).buffer;
+  } catch (error) {
+    if (strict) throw error;
+    multiaddrBuffer = Buffer.from(str, 'utf8');
+  }
+  return multiaddrBuffer;
+};
 
 const minBn = (bnArray) => {
   let min = new BN(bnArray[0]);
@@ -335,6 +358,8 @@ module.exports = {
   ethersBnToBn,
   bnifyNestedEthersBn,
   stringifyNestedBn,
+  multiaddrHexToHuman,
+  humanToMultiaddrBuffer,
   toUpperFirst,
   secToDate,
   getAuthorization,

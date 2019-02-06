@@ -6,6 +6,7 @@ const {
   checksummedAddress,
   bnifyNestedEthersBn,
   throwIfMissing,
+  multiaddrHexToHuman,
 } = require('./utils');
 
 const debug = Debug('iexec:hub');
@@ -59,6 +60,63 @@ const showObj = (objName = throwIfMissing()) => async (
     debug('showObj()', error);
     throw error;
   }
+};
+
+const cleanObj = (obj) => {
+  const reducer = (acc, curr) => Object.assign(acc, { [curr[0].split('m_')[1]]: curr[1] });
+  return Object.entries(obj).reduce(reducer, {});
+};
+
+const showApp = async (
+  contracts = throwIfMissing(),
+  objAdressOrIndex = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('app')(
+    contracts,
+    objAdressOrIndex,
+    userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_appMultiaddr && {
+      appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
+    },
+  );
+  return { objAddress, app: clean };
+};
+
+const showDataset = async (
+  contracts = throwIfMissing(),
+  objAdressOrIndex = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('dataset')(
+    contracts,
+    objAdressOrIndex,
+    userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_datasetMultiaddr && {
+      datasetMultiaddr: multiaddrHexToHuman(obj.m_datasetMultiaddr),
+    },
+  );
+  return { objAddress, dataset: clean };
+};
+
+const showWorkerpool = async (
+  contracts = throwIfMissing(),
+  objAdressOrIndex = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('workerpool')(
+    contracts,
+    objAdressOrIndex,
+    userAddress,
+  );
+  const clean = cleanObj(obj);
+  return { objAddress, workerpool: clean };
 };
 
 const countObj = (objName = throwIfMissing()) => async (
@@ -134,6 +192,9 @@ const getTimeoutRatio = async (contracts = throwIfMissing(), options) => {
 module.exports = {
   createObj,
   showObj,
+  showApp,
+  showDataset,
+  showWorkerpool,
   countObj,
   createCategory,
   showCategory,

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const multiaddr = require('multiaddr');
 const {
   help,
   addGlobalOptions,
@@ -23,7 +22,11 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const { NULL_ADDRESS, isEthAddress } = require('./utils');
+const {
+  NULL_ADDRESS,
+  isEthAddress,
+  humanToMultiaddrBuffer,
+} = require('./utils');
 
 const objName = 'app';
 
@@ -67,12 +70,10 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
-      let appMultiaddrBuffer;
-      try {
-        appMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
-      } catch (error) {
-        appMultiaddrBuffer = Buffer.from(iexecConf[objName].multiaddr, 'utf8');
-      }
+      const appMultiaddrBuffer = humanToMultiaddrBuffer(
+        iexecConf[objName].multiaddr,
+        { strict: false },
+      );
       const appMREnclaveBuffer = Buffer.from(
         iexecConf[objName].mrenclave,
         'utf8',
@@ -125,13 +126,13 @@ show
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       spinner.start(info.showing(objName));
-      const { obj, objAddress } = await hub.showObj(objName)(
+      const { app, objAddress } = await hub.showApp(
         chain.contracts,
         addressOrIndex,
         userAddress,
       );
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(obj)}`, {
-        raw: { address: objAddress, app: obj },
+      spinner.succeed(`${objName} ${objAddress} details:${pretty(app)}`, {
+        raw: { address: objAddress, app },
       });
     } catch (error) {
       handleError(error, cli, cmd);

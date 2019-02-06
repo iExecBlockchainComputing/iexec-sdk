@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const multiaddr = require('multiaddr');
 const {
   help,
   addGlobalOptions,
@@ -23,7 +22,11 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const { NULL_ADDRESS, isEthAddress } = require('./utils');
+const {
+  NULL_ADDRESS,
+  isEthAddress,
+  humanToMultiaddrBuffer,
+} = require('./utils');
 
 const objName = 'dataset';
 
@@ -67,15 +70,10 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
-      let datasetMultiaddrBuffer;
-      try {
-        datasetMultiaddrBuffer = multiaddr(iexecConf[objName].multiaddr).buffer;
-      } catch (error) {
-        datasetMultiaddrBuffer = Buffer.from(
-          iexecConf[objName].multiaddr,
-          'utf8',
-        );
-      }
+      const datasetMultiaddrBuffer = humanToMultiaddrBuffer(
+        iexecConf[objName].multiaddr,
+        { strict: false },
+      );
       const datasetToDeploy = Object.assign({}, iexecConf[objName], {
         multiaddr: datasetMultiaddrBuffer,
       });
@@ -123,13 +121,13 @@ show
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       spinner.start(info.showing(objName));
-      const { obj, objAddress } = await hub.showObj(objName)(
+      const { dataset, objAddress } = await hub.showDataset(
         chain.contracts,
         addressOrIndex,
         userAddress,
       );
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(obj)}`, {
-        raw: { address: objAddress, dataset: obj },
+      spinner.succeed(`${objName} ${objAddress} details:${pretty(dataset)}`, {
+        raw: { address: objAddress, dataset },
       });
     } catch (error) {
       handleError(error, cli, cmd);
