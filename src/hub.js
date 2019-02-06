@@ -29,20 +29,19 @@ const createObj = (objName = throwIfMissing()) => async (
 const showObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
   objAdressOrIndex = throwIfMissing(),
-  userAddress = throwIfMissing(),
-  options,
+  userAddress,
 ) => {
   try {
     let objAddress;
     if (
-      !ethUtil.isHexString(objAdressOrIndex)
+      !isEthAddress(objAdressOrIndex, { strict: false })
       && Number.isInteger(Number(objAdressOrIndex))
     ) {
+      if (!isEthAddress(userAddress)) throw Error('Missing userAddress');
       // INDEX case: need hit subHub to get obj address from index
       objAddress = await contracts.getUserObjAddressByIndex(objName)(
         userAddress,
         objAdressOrIndex,
-        options,
       );
     } else if (isEthAddress(objAdressOrIndex)) {
       objAddress = objAdressOrIndex;
@@ -70,7 +69,7 @@ const cleanObj = (obj) => {
 const showApp = async (
   contracts = throwIfMissing(),
   objAdressOrIndex = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress,
 ) => {
   const { obj, objAddress } = await showObj('app')(
     contracts,
@@ -89,7 +88,7 @@ const showApp = async (
 const showDataset = async (
   contracts = throwIfMissing(),
   objAdressOrIndex = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress,
 ) => {
   const { obj, objAddress } = await showObj('dataset')(
     contracts,
@@ -108,7 +107,7 @@ const showDataset = async (
 const showWorkerpool = async (
   contracts = throwIfMissing(),
   objAdressOrIndex = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress,
 ) => {
   const { obj, objAddress } = await showObj('workerpool')(
     contracts,
@@ -122,11 +121,10 @@ const showWorkerpool = async (
 const countObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
   userAddress = throwIfMissing(),
-  options,
 ) => {
   try {
     const objCountBN = ethersBnToBn(
-      await contracts.getUserObjCount(objName)(userAddress, options),
+      await contracts.getUserObjCount(objName)(userAddress),
     );
     return objCountBN;
   } catch (error) {
@@ -138,10 +136,9 @@ const countObj = (objName = throwIfMissing()) => async (
 const createCategory = async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
-  options,
 ) => {
   try {
-    const logs = await contracts.createCategory(obj, options);
+    const logs = await contracts.createCategory(obj);
     return logs[0].catid;
   } catch (error) {
     debug('createCategory()', error);
@@ -152,11 +149,10 @@ const createCategory = async (
 const showCategory = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
-  options,
 ) => {
   try {
     const category = bnifyNestedEthersBn(
-      await contracts.getCategoryByIndex(index, options),
+      await contracts.getCategoryByIndex(index),
     );
     return category;
   } catch (error) {
@@ -165,10 +161,10 @@ const showCategory = async (
   }
 };
 
-const countCategory = async (contracts = throwIfMissing(), options) => {
+const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
-      await contracts.getHubContract(options).countCategory(),
+      await contracts.getHubContract().countCategory(),
     );
     return countBN;
   } catch (error) {
@@ -177,10 +173,10 @@ const countCategory = async (contracts = throwIfMissing(), options) => {
   }
 };
 
-const getTimeoutRatio = async (contracts = throwIfMissing(), options) => {
+const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await contracts.getHubContract(options).FINAL_DEADLINE_RATIO(),
+      await contracts.getHubContract().FINAL_DEADLINE_RATIO(),
     );
     return timeoutRatio;
   } catch (error) {
