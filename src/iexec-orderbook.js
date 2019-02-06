@@ -12,8 +12,9 @@ const {
   info,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
-const { http, isEthAddress } = require('./utils');
+const { isEthAddress } = require('./utils');
 const { Keystore } = require('./keystore');
+const orderbook = require('./orderbook');
 
 const objName = 'orderbook';
 
@@ -31,10 +32,9 @@ orderbookApp
       if (address) isEthAddress(address, { strict: true });
 
       spinner.start(info.showing(objName));
-      const body = Object.assign({ chainId: chain.id }, { app: address });
-      const response = await http.get('orderbook/app', body);
-      const appOrders = response.appOrderbook
-        ? response.appOrderbook.map(e => ({
+      const response = await orderbook.fetchAppOrderbook(chain.id, address);
+      const appOrders = response.appOrders
+        ? response.appOrders.map(e => ({
           orderHash: e.orderHash,
           app: e.order.app,
           price: e.order.appprice,
@@ -45,11 +45,11 @@ orderbookApp
 
       const successMessage = appOrders.length > 0
         ? `Orderbook\napp orders details:${pretty(appOrders)}\n`
-        : 'Empty order book';
+        : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
         raw: {
-          appOrders: response.appOrderbook,
+          appOrders: response.appOrders,
         },
       });
       spinner.info('trade in the browser at https://market.iex.ec');
@@ -72,10 +72,9 @@ orderbookDataset
       if (address) isEthAddress(address, { strict: true });
 
       spinner.start(info.showing(objName));
-      const body = Object.assign({ chainId: chain.id }, { dataset: address });
-      const response = await http.get('orderbook/dataset', body);
-      const datasetOrders = response.datasetOrderbook
-        ? response.datasetOrderbook.map(e => ({
+      const response = await orderbook.fetchDatasetOrderbook(chain.id, address);
+      const datasetOrders = response.datasetOrders
+        ? response.datasetOrders.map(e => ({
           orderHash: e.orderHash,
           dataset: e.order.dataset,
           price: e.order.datasetprice,
@@ -86,11 +85,11 @@ orderbookDataset
 
       const successMessage = datasetOrders.length > 0
         ? `Orderbook\ndataset orders details:${pretty(datasetOrders)}\n`
-        : 'Empty order book';
+        : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
         raw: {
-          datasetOrders: response.datasetOrderbook,
+          datasetOrders: response.datasetOrders,
         },
       });
       spinner.info('trade in the browser at https://market.iex.ec');
@@ -99,9 +98,9 @@ orderbookDataset
     }
   });
 
-const orderbookWorkerpool = cli.command('workerpool [address]');
-addGlobalOptions(orderbookWorkerpool);
-orderbookWorkerpool
+const worderbookWorkerpool = cli.command('workerpool [address]');
+addGlobalOptions(worderbookWorkerpool);
+worderbookWorkerpool
   .option(...option.chain())
   .option(...option.category())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
@@ -115,14 +114,13 @@ orderbookWorkerpool
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
 
       spinner.start(info.showing(objName));
-      const body = Object.assign(
-        { chainId: chain.id },
-        { category: cmd.category },
-        address && { workerpool: address },
+      const response = await orderbook.fetchWorkerpoolOrderbook(
+        chain.id,
+        cmd.category,
+        { address },
       );
-      const response = await http.get('orderbook/workerpool', body);
-      const workerpoolOrders = response.workerpoolOrderbook
-        ? response.workerpoolOrderbook.map(e => ({
+      const workerpoolOrders = response.workerpoolOrders
+        ? response.workerpoolOrders.map(e => ({
           orderHash: e.orderHash,
           workerpool: e.order.workerpool,
           category: e.order.category,
@@ -135,11 +133,11 @@ orderbookWorkerpool
 
       const successMessage = workerpoolOrders.length > 0
         ? `Orderbook\nworkerpool orders details:${pretty(workerpoolOrders)}\n`
-        : 'Empty order book';
+        : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
         raw: {
-          workerpoolOrders: response.workerpoolOrderbook,
+          workerpoolOrders: response.workerpoolOrders,
         },
       });
       spinner.info('trade in the browser at https://market.iex.ec');
@@ -164,14 +162,13 @@ orderbookRequester
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
 
       spinner.start(info.showing(objName));
-      const body = Object.assign(
-        { chainId: chain.id },
-        { category: cmd.category },
-        address && { requester: address },
+      const response = await orderbook.fetchRequestOrderbook(
+        chain.id,
+        cmd.category,
+        { requesterAddress: address },
       );
-      const response = await http.get('orderbook/request', body);
-      const requestOrders = response.requestOrderbook
-        ? response.requestOrderbook.map(e => ({
+      const requestOrders = response.requestOrders
+        ? response.requestOrders.map(e => ({
           orderHash: e.orderHash,
           requester: e.order.requester,
           app: e.order.app,
@@ -187,11 +184,11 @@ orderbookRequester
 
       const successMessage = requestOrders.length > 0
         ? `Orderbook\nrequest orders details:${pretty(requestOrders)}\n`
-        : 'Empty order book';
+        : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
         raw: {
-          requestOrders: response.requestOrderbook,
+          requestOrders: response.requestOrders,
         },
       });
       spinner.info('trade in the browser at https://market.iex.ec');

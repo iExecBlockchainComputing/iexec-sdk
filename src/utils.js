@@ -6,9 +6,10 @@ const BN = require('bn.js');
 const ethers = require('ethers');
 const { hashEIP712 } = require('./sig-utils');
 
+/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
+
 const debug = Debug('iexec:utils');
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -97,7 +98,15 @@ const isBytes32 = (str, { strict = true } = {}) => {
     || str.length !== 66
     || str.substr(0, 2) !== '0x'
   ) {
-    if (strict) throw new Error(`${str} is not a val Bytes32 HexString`);
+    if (strict) throw new Error(`${str} is not a valid Bytes32 HexString`);
+    return false;
+  }
+  return true;
+};
+
+const isString = (str, { strict = true } = {}) => {
+  if (typeof str !== 'string') {
+    if (strict) throw new Error(`${str} is not a string`);
     return false;
   }
   return true;
@@ -314,6 +323,7 @@ const throwIfMissing = () => {
 
 module.exports = {
   getContractAddress,
+  isString,
   isEthAddress,
   checksummedAddress,
   isBytes32,
