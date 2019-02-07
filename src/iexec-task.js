@@ -18,14 +18,8 @@ const {
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
-const {
-  getAuthorization,
-  download,
-  stringifyNestedBn,
-  NULL_ADDRESS,
-} = require('./utils');
+const { stringifyNestedBn } = require('./utils');
 const task = require('./task');
-const deal = require('./deal');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -60,8 +54,8 @@ show
             taskid,
             initialStatus,
           );
-          spinner.info(`task status ${statusName}`);
-          if (['FAILLED', 'COMPLETED'].includes(task.taskStatusMap[status])) {
+          spinner.info(`Task status ${statusName}`);
+          if (['FAILLED', 'COMPLETED'].includes(task.TASK_STATUS_MAP[status])) {
             return { status, statusName };
           }
           return waitCompletedOrClaimed(status);
@@ -78,42 +72,24 @@ show
       const now = Math.floor(Date.now() / 1000);
       if (
         ['UNSET', 'ACTIVE', 'REVEALING'].includes(
-          task.taskStatusMap[taskResult.status],
+          task.TASK_STATUS_MAP[taskResult.status],
         )
         && now > consensusTimeout
       ) claimable = true;
 
       let resultPath;
       if (cmd.download) {
-        if (task.taskStatusMap[taskResult.status] === 'COMPLETED') {
+        if (task.TASK_STATUS_MAP[taskResult.status] === 'COMPLETED') {
           const { address } = await keystore.load();
-          const tasksDeal = await deal.show(chain.contracts, taskResult.dealid);
-          const beneficiary = tasksDeal.beneficiary === NULL_ADDRESS
-            ? tasksDeal.requester
-            : tasksDeal.beneficiary;
-          if (address.toLowerCase() !== beneficiary.toLowerCase()) {
-            throw Error(
-              `only beneficiary ${beneficiary} can download the result`,
-            );
-          }
-          const resultRepoBaseURL = taskResult.results.split(`${taskid}`)[0];
-          debug('resultRepoBaseURL', resultRepoBaseURL);
-          const authorization = await getAuthorization(
-            chain.id,
-            address,
-            chain.contracts.ethProvider,
-            { apiUrl: resultRepoBaseURL },
-          );
-          const { content } = await download('GET')(
+          const { body } = await task.fetchResults(
+            chain.contracts,
             taskid,
-            { chainId: chain.id },
-            { authorization },
-            resultRepoBaseURL,
+            address,
           );
           const resultFileNane = cmd.download !== true ? cmd.download : taskid;
           resultPath = path.join(process.cwd(), `${resultFileNane}.zip`);
           const stream = fs.createWriteStream(resultPath);
-          await content.pipe(stream);
+          await body.pipe(stream);
         } else {
           spinner.info(
             `Task status is not COMPLETED, option ${
@@ -133,11 +109,11 @@ show
         raw,
       });
       if (resultPath) {
-        spinner.info(`results downloaded in ${resultPath}`);
+        spinner.info(`Results downloaded in ${resultPath}`);
       }
       if (claimable) {
         spinner.info(
-          `consensus timeout date ${consensusTimeoutDate} exceeded but consensus not reached. You can claim the work to get a full refund using "iexec task claim"`,
+          `Consensus timeout date ${consensusTimeoutDate} exceeded but consensus not reached. You can claim the work to get a full refund using "iexec task claim"`,
         );
       }
     } catch (error) {

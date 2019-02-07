@@ -13,6 +13,7 @@ const debug = Debug('iexec:utils');
 
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
@@ -263,11 +264,7 @@ const download = verb => async (
       }`,
     );
   }
-  const contentType = response.headers.get('content-type');
-  return {
-    content: response.body,
-    contentType,
-  };
+  return response;
 };
 
 const signTypedDatav3 = async (eth, address, typedData) => {
@@ -367,5 +364,6 @@ module.exports = {
   download,
   getSalt,
   NULL_ADDRESS,
+  NULL_BYTES32,
   throwIfMissing,
 };
