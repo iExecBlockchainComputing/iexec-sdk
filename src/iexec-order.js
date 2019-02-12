@@ -284,9 +284,11 @@ fill
           spinner.info(
             `fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
-          const orderRes = await order.showOrder(chain.id, orderName, {
+          const orderRes = await order.fetchPublishedOrderByHash(
+            orderName,
+            chain.id,
             orderHash,
-          });
+          );
           return orderRes.order;
         }
         throw Error(`invalid ${orderName} hash`);

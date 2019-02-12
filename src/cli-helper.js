@@ -154,11 +154,11 @@ const option = {
     'specify the dataset order from the marketplace to fill',
   ],
   fillWorkerpoolOrder: () => [
-    '--workerpool [orderHash>',
+    '--workerpool <orderHash>',
     'specify the wokerpool order from the marketplace to fill',
   ],
   fillRequestOrder: () => [
-    '--request orderHash',
+    '--request <orderHash>',
     'specify the requestorder from the marketplace to fill',
   ],
   to: () => ['--to <address>', 'receiver address'],
