@@ -727,7 +727,7 @@ show
           { publishedOrder: orderToShow },
           deals && { deals: { count: deals.count, lastDeals: deals.deals } },
         );
-        spinner.succeed(`${orderString}${dealsString}`, {
+        spinner.succeed(`${orderString}${cmd.deals ? dealsString : ''}`, {
           raw,
         });
       };
