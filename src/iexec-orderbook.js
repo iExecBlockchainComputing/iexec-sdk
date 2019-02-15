@@ -98,9 +98,9 @@ orderbookDataset
     }
   });
 
-const worderbookWorkerpool = cli.command('workerpool [address]');
-addGlobalOptions(worderbookWorkerpool);
-worderbookWorkerpool
+const orderbookWorkerpool = cli.command('workerpool [address]');
+addGlobalOptions(orderbookWorkerpool);
+orderbookWorkerpool
   .option(...option.chain())
   .option(...option.category())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
