@@ -394,6 +394,15 @@ fill
           'workerpool address mismatch between requestorder and workerpoolorder',
         );
       }
+      // trust check
+      const requestTrust = new BN(requestOrder.trust);
+      const workerpoolTrust = new BN(workerpoolOrder.trust);
+      if (workerpoolTrust.lt(requestTrust)) {
+        throw new Error(
+          `workerpoolOrder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
+        );
+      }
+
       // volumes check
       const requestVolume = await order.checkRemainingVolume(
         chain.contracts,
