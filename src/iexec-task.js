@@ -39,10 +39,15 @@ show
       const keystore = Keystore(
         Object.assign(walletOptions, !cmd.download && { isSigner: false }),
       );
-
       const chain = await loadChain(cmd.chain, keystore, {
         spinner,
       });
+      let userAddress;
+      if (cmd.download) {
+        const { address } = await keystore.load();
+        userAddress = address;
+      }
+
       debug('cmd.watch', cmd.watch);
       debug('cmd.download', cmd.download);
 
@@ -80,11 +85,10 @@ show
       let resultPath;
       if (cmd.download) {
         if (task.TASK_STATUS_MAP[taskResult.status] === 'COMPLETED') {
-          const { address } = await keystore.load();
           const { body } = await task.fetchResults(
             chain.contracts,
             taskid,
-            address,
+            userAddress,
           );
           const resultFileNane = cmd.download !== true ? cmd.download : taskid;
           resultPath = path.join(process.cwd(), `${resultFileNane}.zip`);
