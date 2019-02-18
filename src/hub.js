@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const ethUtil = require('ethjs-util');
 const {
   isEthAddress,
   ethersBnToBn,

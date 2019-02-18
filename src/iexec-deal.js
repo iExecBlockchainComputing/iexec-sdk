@@ -41,7 +41,7 @@ show
       if (cmd.tasks) {
         const tasksIndex = cmd.tasks.split(',');
         const botFirst = parseInt(dealResult.botFirst, 10);
-        const botSize = parseInt(dealResult.botFirst, 10);
+        const botSize = parseInt(dealResult.botSize, 10);
         tasks = tasksIndex.map((i) => {
           const index = parseInt(i, 10);
           if (Number.isNaN(index) || index < 0) throw Error(`Invalid index ${i} in ${option.dealTasks()[0]}`);
