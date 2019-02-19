@@ -282,16 +282,21 @@ fill
       const getOrderByHash = async (orderName, orderHash) => {
         if (isBytes32(orderHash, { strict: false })) {
           spinner.info(
-            `fetching ${orderName} ${orderHash} from iexec marketplace`,
+            `Fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
           const orderRes = await order.fetchPublishedOrderByHash(
             orderName,
             chain.id,
             orderHash,
           );
+          if (!orderRes) {
+            throw Error(
+              `${orderName} ${orderHash} is not published on iexec marketplace`,
+            );
+          }
           return orderRes.order;
         }
-        throw Error(`invalid ${orderName} hash`);
+        throw Error(`Invalid ${orderName} hash`);
       };
       const appOrder = cmd.app
         ? await getOrderByHash(order.APP_ORDER, cmd.app)
@@ -373,7 +378,7 @@ fill
       // address matching check
       if (requestOrder.app.toLowerCase() !== appOrder.app.toLowerCase()) {
         throw new Error(
-          'app address mismatch between requestorder and apporder',
+          'App address mismatch between requestorder and apporder',
         );
       }
       if (
@@ -382,7 +387,7 @@ fill
           !== datasetOrder.dataset.toLowerCase()
       ) {
         throw new Error(
-          'dataset address mismatch between requestorder and datasetorder',
+          'Dataset address mismatch between requestorder and datasetorder',
         );
       }
       if (
@@ -391,7 +396,7 @@ fill
           !== workerpoolOrder.workerpool.toLowerCase()
       ) {
         throw new Error(
-          'workerpool address mismatch between requestorder and workerpoolorder',
+          'Workerpool address mismatch between requestorder and workerpoolorder',
         );
       }
       // trust check
@@ -399,7 +404,7 @@ fill
       const workerpoolTrust = new BN(workerpoolOrder.trust);
       if (workerpoolTrust.lt(requestTrust)) {
         throw new Error(
-          `workerpoolOrder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
+          `WorkerpoolOrder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
         );
       }
 
@@ -440,10 +445,9 @@ fill
         chain.contracts,
         requestOrder.requester,
       );
-      debug('stake', stake);
       if (stake.lt(costPerWork)) {
         throw new Error(
-          `cost per work is ${costPerWork} nRLC and you have ${stake} nRLC staked on your account. You should run "iexec account deposit <amount>" to top up your account`,
+          `Cost per task is ${costPerWork} nRLC and requester have ${stake} nRLC staked. Orders can't be matched. If you are the requester, you should run "iexec account deposit <amount>" to top up your account`,
         );
       }
       const totalCost = costPerWork.mul(maxVolume);
@@ -452,6 +456,24 @@ fill
           ? new BN(0)
           : stake.div(costPerWork);
         await prompt.limitedStake(totalCost, stake, payableVolume);
+      }
+      // workerpool owner stake check
+      const workerpoolOwner = await order.getContractOwner(
+        chain.contracts,
+        order.WORKERPOOL_ORDER,
+        workerpoolOrder,
+      );
+      const schedulerBalance = await account.checkBalance(
+        chain.contracts,
+        workerpoolOwner,
+      );
+      const schedulerStakeBN = schedulerBalance.stake;
+      if (schedulerStakeBN.mul(new BN(3)).lt(workerpoolPrice)) {
+        throw Error(
+          `Workerpool required stake is ${workerpoolPrice.mul(
+            new BN(3),
+          )} nRLC and workerpool owner has ${stake} nRLC staked. Orders can't be matched. If you are the workerpool owner, you should run "iexec account deposit <amount>" to top up your account`,
+        );
       }
       // all checks passed send matchOrder
       await keystore.load();
