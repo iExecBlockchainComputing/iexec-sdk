@@ -151,7 +151,7 @@ const loadDeployedConf = options => loadJSONAndRetry(
 const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, options);
 
 const initIExecConf = async (options) => {
-  const iexecConf = Object.assign(templates.main, { app: templates.app });
+  const iexecConf = Object.assign(templates.main);
   const fileName = await saveIExecConf(iexecConf, options);
   return { saved: iexecConf, fileName };
 };
@@ -163,6 +163,7 @@ const initChainConf = async (options) => {
 
 const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   try {
+    if (objName === 'app') await initObj('buyConf');
     const iexecConf = await loadIExecConf();
     iexecConf[objName] = obj || templates.overwriteObject(templates[objName], overwrite);
     const fileName = await saveIExecConf(iexecConf, { force: true });

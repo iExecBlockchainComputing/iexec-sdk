@@ -389,6 +389,12 @@ iexec category show <index> # show category details by index
 iexec category count # count total number of category
 ```
 
+## registry
+
+```bash
+iexec registry validate <'app'|'dataset'|'workerpool'> # validate an object before submiting it to the iExec registry and be listed in the iExec stores
+```
+
 ## iexec.json
 
 The `iexec.json` file, located in every iExec project, describes the parameters used when creating a [app|dataset|category|workerpool], or when signing an order.
@@ -396,33 +402,27 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 ```json
 {
   "app": {
-    "owner": "0x0000000000000000000000000000000000000000",
-    "name": "my-app",
-    "params": {
-      "type": "DOCKER",
-      "envvars": "XWDOCKERIMAGE=hello-world"
-    },
-    "hash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    "owner": "0xF048eF3d7E3B33A465E0599E641BB29421f7Df92",
+    "name": "VanityGen",
+    "type": "DOCKER",
+    "multiaddr": "registry.hub.docker.com/iexechub/vanitygen:1.0.0",
+    "checksum": "0x762a451c05e0d8097b35d6376e748798b5dc6a13290439cf67d5202f7c6f695f",
+    "mrenclave": ""
   },
   "dataset": {
-    "owner": "0x0000000000000000000000000000000000000000",
+    "owner": "0xF048eF3d7E3B33A465E0599E641BB29421f7Df92",
     "name": "my-dataset",
-    "params": {
-      "arg1": "value1"
-    },
-    "hash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    "multiaddr": "/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ",
+    "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "workerpool": {
+    "owner": "0xF048eF3d7E3B33A465E0599E641BB29421f7Df92",
+    "description": "my workerpool"
   },
   "category": {
     "name": "CAT1",
     "description": "my category N°1",
     "workClockTimeRef": 100
-  },
-  "workerpool": {
-    "owner": "0x0000000000000000000000000000000000000000",
-    "description": "my-workerpool",
-    "subscriptionLockStakePolicy": "100",
-    "subscriptionMinimumStakePolicy": "100",
-    "subscriptionMinimumScorePolicy": "100"
   },
   "order": {
     "apporder": {

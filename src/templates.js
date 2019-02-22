@@ -1,6 +1,6 @@
 const main = {
   description:
-    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe to your users what your application does',
+    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
   license: 'MIT',
   author: '?',
   social: {
@@ -20,6 +20,12 @@ const app = {
   mrenclave: '',
 };
 
+const buyConf = {
+  params: '{ "0": "" }',
+  tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  trust: 0,
+};
+
 const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
@@ -36,8 +42,8 @@ const workerpool = {
 const order = {
   apporder: {
     app: '0x0000000000000000000000000000000000000000',
-    appprice: '0',
-    volume: '1',
+    appprice: 0,
+    volume: 1000000,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     datasetrestrict: '0x0000000000000000000000000000000000000000',
     workerpoolrestrict: '0x0000000000000000000000000000000000000000',
@@ -45,8 +51,8 @@ const order = {
   },
   datasetorder: {
     dataset: '0x0000000000000000000000000000000000000000',
-    datasetprice: '0',
-    volume: '1',
+    datasetprice: 0,
+    volume: 1000000,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
     workerpoolrestrict: '0x0000000000000000000000000000000000000000',
@@ -54,10 +60,10 @@ const order = {
   },
   workerpoolorder: {
     workerpool: '0x0000000000000000000000000000000000000000',
-    workerpoolprice: '0',
-    volume: '1',
-    category: '1',
-    trust: '0',
+    workerpoolprice: 0,
+    volume: 1,
+    category: 1,
+    trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
     datasetrestrict: '0x0000000000000000000000000000000000000000',
@@ -65,14 +71,14 @@ const order = {
   },
   requestorder: {
     app: '0x0000000000000000000000000000000000000000',
-    appmaxprice: '0',
+    appmaxprice: 0,
     dataset: '0x0000000000000000000000000000000000000000',
-    datasetmaxprice: '0',
+    datasetmaxprice: 0,
     workerpool: '0x0000000000000000000000000000000000000000',
-    workerpoolmaxprice: '0',
-    volume: '1',
-    category: '1',
-    trust: '0',
+    workerpoolmaxprice: 0,
+    volume: 1,
+    category: 1,
+    trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     beneficiary: '0x0000000000000000000000000000000000000000',
     callback: '0x0000000000000000000000000000000000000000',
@@ -122,6 +128,7 @@ module.exports = {
   dataset,
   workerpool,
   category,
+  buyConf,
   chains,
   overwriteObject,
   createOrder,

@@ -72,6 +72,7 @@ async function main() {
           );
         }
 
+        spinner.info('Creating your wallet file');
         const walletOptions = await computeWalletCreateOptions(cmd);
         const walletRes = await createAndSave(
           Object.assign({}, { force }, walletOptions),
@@ -120,7 +121,7 @@ async function main() {
 
   cli.command('tee', 'interact with Trusted Execution Environment');
 
-  // cli.command('registry', 'interact with iExec registry');
+  cli.command('registry', 'interact with iExec registry');
 
   const infoCmd = cli.command('info');
   addGlobalOptions(infoCmd);
