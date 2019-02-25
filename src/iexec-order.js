@@ -66,6 +66,7 @@ init
         if (resourceName === 'request') {
           const [address] = await keystore.accounts();
           overwrite.requester = address;
+          overwrite.beneficiary = address;
         } else {
           const deployedObj = await loadDeployedObj(resourceName);
           if (deployedObj && deployedObj[chain.id]) {
