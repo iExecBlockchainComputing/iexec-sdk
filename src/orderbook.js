@@ -62,6 +62,7 @@ const fetchWorkerpoolOrderbook = async (
     if (response.ok) {
       return {
         count: response.count,
+        openVolume: response.openVolume,
         workerpoolOrders: response.workerpoolOrderbook,
       };
     }

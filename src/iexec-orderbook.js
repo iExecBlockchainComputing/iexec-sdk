@@ -137,6 +137,7 @@ orderbookWorkerpool
 
       spinner.succeed(successMessage, {
         raw: {
+          openVolume: response.openVolume,
           workerpoolOrders: response.workerpoolOrders,
         },
       });
