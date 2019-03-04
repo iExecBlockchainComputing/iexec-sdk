@@ -48,6 +48,7 @@ async function main() {
   addWalletCreateOptions(init);
   init
     .option(...option.force())
+    .option(...option.skipWallet())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
       const spinner = Spinner(cmd);
@@ -72,17 +73,22 @@ async function main() {
           );
         }
 
-        spinner.info('Creating your wallet file');
-        const walletOptions = await computeWalletCreateOptions(cmd);
-        const walletRes = await createAndSave(
-          Object.assign({}, { force }, walletOptions),
-        );
-        spinner.info(
-          `Your wallet address is ${walletRes.address} wallet file saved in "${
-            walletRes.fileName
-          }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
-        );
-        spinner.warn('You must backup your wallet file in a safe place!');
+        let walletRes;
+        if (!cmd.skipWallet) {
+          spinner.info('Creating your wallet file');
+          const walletOptions = await computeWalletCreateOptions(cmd);
+          walletRes = await createAndSave(
+            Object.assign({}, { force }, walletOptions),
+          );
+          spinner.info(
+            `Your wallet address is ${
+              walletRes.address
+            } wallet file saved in "${
+              walletRes.fileName
+            }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
+          );
+          spinner.warn('You must backup your wallet file in a safe place!');
+        }
 
         const raw = Object.assign(
           {},

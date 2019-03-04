@@ -237,6 +237,7 @@ iexec info --chain kovan
 
 ```bash
 iexec init # create all files necessary to get started
+iexec init --skip-wallet # skip the wallet creation step
 ```
 
 ## wallet
