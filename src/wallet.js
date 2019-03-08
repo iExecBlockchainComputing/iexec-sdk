@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const ethers = require('ethers');
+const { Web3Provider } = require('ethers').providers;
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
 const {
@@ -156,9 +156,7 @@ const sendETH = async (
 ) => {
   try {
     isEthAddress(to, { strict: true });
-    const ethSigner = new ethers.providers.Web3Provider(
-      contracts.ethProvider,
-    ).getSigner();
+    const ethSigner = new Web3Provider(contracts.ethProvider).getSigner();
     const tx = await ethSigner.sendTransaction({
       data: '0x',
       to,
