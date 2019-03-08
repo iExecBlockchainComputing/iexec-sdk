@@ -189,7 +189,7 @@ const getContractOwner = async (
   }
 };
 
-const getOrderHash = (
+const computeOrderHash = (
   orderName = throwIfMissing(),
   order = throwIfMissing(),
 ) => {
@@ -201,7 +201,7 @@ const getOrderHash = (
       order,
     );
   } catch (error) {
-    debug('getOrderHash()', error);
+    debug('computeOrderHash()', error);
     throw error;
   }
 };
@@ -215,7 +215,7 @@ const checkRemainingVolume = async (
   try {
     checkOrderName(orderName);
     const initial = new BN(order.volume);
-    const orderHash = getOrderHash(orderName, order);
+    const orderHash = computeOrderHash(orderName, order);
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
@@ -465,7 +465,7 @@ const matchOrders = async (
 };
 
 module.exports = {
-  getOrderHash,
+  computeOrderHash,
   getContractOwner,
   checkRemainingVolume,
   signOrder,

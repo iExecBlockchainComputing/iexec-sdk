@@ -602,7 +602,7 @@ unpublish
               } in "orders.json"`,
             );
           }
-          orderHashToUnpublish = order.getOrderHash(
+          orderHashToUnpublish = order.computeOrderHash(
             orderName,
             orderToUnpublish,
           );
@@ -725,7 +725,7 @@ show
               `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
             );
           }
-          orderHash = order.getOrderHash(orderName, signedOrder);
+          orderHash = order.computeOrderHash(orderName, signedOrder);
         } else {
           orderHash = cmdInput;
         }
