@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const ethers = require('ethers');
+const { defaultAbiCoder, keccak256 } = require('ethers').utils;
 const {
   isBytes32,
   isEthAddress,
@@ -95,8 +95,8 @@ const computeTaskId = (
     isBytes32(dealid, { strict: true });
     const encodedTypes = ['bytes32', 'uint256'];
     const values = [dealid, taskIdx];
-    const encoded = ethers.utils.defaultAbiCoder.encode(encodedTypes, values);
-    const taskid = ethers.utils.keccak256(encoded);
+    const encoded = defaultAbiCoder.encode(encodedTypes, values);
+    const taskid = keccak256(encoded);
     return taskid;
   } catch (error) {
     debug('computeTaskId()', error);
