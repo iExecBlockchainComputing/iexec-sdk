@@ -3,7 +3,7 @@ const ethUtil = require('ethjs-util');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const BN = require('bn.js');
-const ethers = require('ethers');
+const { getAddress, bigNumberify, randomBytes } = require('ethers').utils;
 const multiaddr = require('multiaddr');
 const { hashEIP712 } = require('./sig-utils');
 
@@ -16,7 +16,7 @@ const NULL_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
-const bnToEthersBn = bn => ethers.utils.bigNumberify(bn.toString());
+const bnToEthersBn = bn => bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
 const bnifyNestedEthersBn = (obj) => {
@@ -44,7 +44,7 @@ const stringifyNestedBn = (obj) => {
   return objOut;
 };
 
-const checksummedAddress = address => ethers.utils.getAddress(address);
+const checksummedAddress = address => getAddress(address);
 
 const multiaddrHexToHuman = (hexString) => {
   let res;
@@ -325,8 +325,7 @@ const http = {
 };
 
 const getSalt = () => {
-  const hex = ethers.utils
-    .bigNumberify(ethers.utils.randomBytes(32))
+  const hex = bigNumberify(randomBytes(32))
     .toHexString()
     .substring(2);
   const salt = '0x0000000000000000000000000000000000000000000000000000000000000000'
