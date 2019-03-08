@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const ethUtil = require('ethjs-util');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const BN = require('bn.js');
@@ -107,7 +106,7 @@ const getContractAddress = (desc, chainId, { strict = true } = {}) => {
 };
 
 const isEthAddress = (address, { strict = false } = {}) => {
-  const isHexString = ethUtil.isHexString(address);
+  const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
   const isAddress = isHexString && address.length === 42;
   if (!isAddress && strict) {
     throw Error(`Address ${address} is not a valid Ethereum address`);

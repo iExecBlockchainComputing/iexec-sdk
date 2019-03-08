@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const ethjsUtil = require('ethjs-util');
+const { intToHex, isHexPrefixed, stripHexPrefix } = require('ethjs-util');
 const EC = require('elliptic').ec;
 const BN = require('bn.js');
 const {
@@ -16,7 +16,7 @@ const addHexPrefix = (str) => {
   if (typeof str !== 'string') {
     return str;
   }
-  return ethjsUtil.isHexPrefixed(str) ? str : `0x${str}`;
+  return isHexPrefixed(str) ? str : `0x${str}`;
 };
 
 const typedSignatureHash = (typedData) => {
@@ -89,7 +89,7 @@ const concatSig = (v, r, s) => {
   const vSig = bufferToInt(v);
   const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64);
-  const vStr = ethjsUtil.stripHexPrefix(ethjsUtil.intToHex(vSig));
+  const vStr = stripHexPrefix(intToHex(vSig));
   return addHexPrefix(rStr.concat(sStr, vStr)).toString('hex');
 };
 

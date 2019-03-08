@@ -3,7 +3,7 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs-extra');
 const uuidv4 = require('uuid/v4');
-const ethjsUtil = require('ethjs-util');
+const { stripHexPrefix } = require('ethjs-util');
 const ethjsSigner = require('ethjs-signer');
 const { generate, privateToAccount } = require('ethjs-account');
 const EC = require('elliptic').ec;
@@ -48,7 +48,7 @@ const walletFromPrivKey = (
   const walletKeys = Object.keys(userWallet);
   if (!prefix) {
     walletKeys.forEach((e) => {
-      userWallet[e] = ethjsUtil.stripHexPrefix(userWallet[e]);
+      userWallet[e] = stripHexPrefix(userWallet[e]);
     });
   }
   if (lowercase) {
@@ -309,7 +309,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     try {
       debug('signMessage', message);
       // const { privateKey } = await load();
-      // const messageBuffer = Buffer.from(ethjsUtil.stripHexPrefix(message), 'hex');
+      // const messageBuffer = Buffer.from(stripHexPrefix(message), 'hex');
       // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
       // const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
       // return signedMessage;
