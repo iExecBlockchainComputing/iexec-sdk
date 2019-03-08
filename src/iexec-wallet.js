@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const ethers = require('ethers');
+const { parseEther } = require('ethers').utils;
 const cli = require('commander');
 const unit = require('ethjs-unit');
 const wallet = require('./wallet');
@@ -228,7 +228,7 @@ sendETH
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
-      const weiAmount = ethers.utils.parseEther(amount).toHexString();
+      const weiAmount = parseEther(amount).toHexString();
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
