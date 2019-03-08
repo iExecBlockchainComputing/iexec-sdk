@@ -322,23 +322,29 @@ fill
       if (!datasetOrder && useDataset) throw new Error('Missing datasetorder');
       if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
 
-      const appVolume = await order.checkRemainingVolume(
+      const appVolume = await order.getRemainingVolume(
         chain.contracts,
         order.APP_ORDER,
         appOrder,
       );
+      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+
       const datasetVolume = useDataset && datasetOrder
-        ? await order.checkRemainingVolume(
+        ? await order.getRemainingVolume(
           chain.contracts,
           order.DATASET_ORDER,
           datasetOrder,
         )
         : new BN(2).pow(new BN(256)).sub(new BN(1));
-      const workerpoolVolume = await order.checkRemainingVolume(
+      if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
+
+      const workerpoolVolume = await order.getRemainingVolume(
         chain.contracts,
         order.WORKERPOOL_ORDER,
         workerpoolOrder,
       );
+      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+
       const computeRequestOrder = async () => {
         const { address } = await keystore.load();
         const volume = minBn([appVolume, datasetVolume, workerpoolVolume]);
@@ -410,11 +416,13 @@ fill
       }
 
       // volumes check
-      const requestVolume = await order.checkRemainingVolume(
+      const requestVolume = await order.getRemainingVolume(
         chain.contracts,
         order.REQUEST_ORDER,
         requestOrder,
       );
+      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+
       const maxVolume = minBn([
         appVolume,
         datasetVolume,

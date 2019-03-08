@@ -206,11 +206,10 @@ const computeOrderHash = (
   }
 };
 
-const checkRemainingVolume = async (
+const getRemainingVolume = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),
-  { strict = true } = {},
 ) => {
   try {
     checkOrderName(orderName);
@@ -223,10 +222,9 @@ const checkRemainingVolume = async (
     const cons = await clerkContract.viewConsumed(orderHash);
     const consumed = ethersBnToBn(cons);
     const remain = initial.sub(consumed);
-    if (remain.lte(new BN(0)) && strict) throw new Error(`${orderName} is fully consumed`);
     return remain;
   } catch (error) {
-    debug('checkRemainingVolume()', error);
+    debug('getRemainingVolume()', error);
     throw error;
   }
 };
@@ -467,7 +465,7 @@ const matchOrders = async (
 module.exports = {
   computeOrderHash,
   getContractOwner,
-  checkRemainingVolume,
+  getRemainingVolume,
   signOrder,
   cancelOrder,
   publishOrder,
