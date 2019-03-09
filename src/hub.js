@@ -6,6 +6,7 @@ const {
   bnifyNestedEthersBn,
   throwIfMissing,
   multiaddrHexToHuman,
+  getEventFromLogs,
 } = require('./utils');
 
 const debug = Debug('iexec:hub');
@@ -16,8 +17,8 @@ const createObj = (objName = throwIfMissing()) => async (
   options,
 ) => {
   try {
-    const logs = await contracts.createObj(objName)(obj, options);
-    const address = checksummedAddress(logs[0][objName]);
+    const txReceipt = await contracts.createObj(objName)(obj, options);
+    const address = checksummedAddress(txReceipt.events[0].args[objName]);
     return address;
   } catch (error) {
     debug('createObj()', error);
@@ -137,8 +138,11 @@ const createCategory = async (
   obj = throwIfMissing(),
 ) => {
   try {
-    const logs = await contracts.createCategory(obj);
-    return logs[0].catid;
+    const txReceipt = await contracts.createCategory(obj);
+    const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
+      strict: true,
+    }).args;
+    return catid;
   } catch (error) {
     debug('createCategory()', error);
     throw error;

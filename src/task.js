@@ -161,8 +161,7 @@ const claim = async (
     const claimTx = await hubContract.claim(taskid);
 
     const claimTxReceipt = await claimTx.wait();
-    const claimEvents = contracts.decodeHubLogs(claimTxReceipt.logs);
-    if (!checkEvent('TaskClaimed', claimEvents)) throw Error('TaskClaimed not confirmed');
+    if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;
   } catch (error) {

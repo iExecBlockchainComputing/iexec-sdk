@@ -305,8 +305,7 @@ const cancelOrder = async (
     const clerkContact = contracts.getClerkContract({ at: clerkAddress });
     const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
     const txReceipt = await tx.wait();
-    const logs = contracts.decodeClerkLogs(txReceipt.logs);
-    if (!checkEvent(objDesc[orderName].cancelEvent, logs)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+    if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return true;
   } catch (error) {
     debug('cancelOrder()', error);
@@ -451,11 +450,13 @@ const matchOrders = async (
       requestOrderStruct,
     );
     const txReceipt = await tx.wait();
-    const logs = contracts.decodeClerkLogs(txReceipt.logs);
     const matchEvent = 'OrdersMatched';
-    if (!checkEvent(matchEvent, logs)) throw Error(`${matchEvent} not confirmed`);
-    const { dealid, volume } = getEventFromLogs(matchEvent, logs);
-    return { dealid, volume };
+    if (!checkEvent(matchEvent, txReceipt.events)) throw Error(`${matchEvent} not confirmed`);
+    const { dealid, volume } = getEventFromLogs(
+      matchEvent,
+      txReceipt.events,
+    ).args;
+    return { dealid, volume: ethersBnToBn(volume) };
   } catch (error) {
     debug('matchOrders() error', error);
     throw error;

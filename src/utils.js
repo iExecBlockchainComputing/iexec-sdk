@@ -151,8 +151,7 @@ const cleanRPC = (rpcObj) => {
 const checkEvent = (eventName, events) => {
   let confirm = false;
   events.forEach((event) => {
-    debug('event', event._eventName);
-    if (event._eventName === eventName) confirm = true;
+    if (event.event === eventName) confirm = true;
   });
   return confirm;
 };
@@ -160,8 +159,7 @@ const checkEvent = (eventName, events) => {
 const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
   let eventFound = {};
   events.forEach((event) => {
-    debug('event', event._eventName);
-    if (event._eventName === eventName) {
+    if (event.event === eventName) {
       eventFound = event;
     }
   });

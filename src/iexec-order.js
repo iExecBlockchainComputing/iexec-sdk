@@ -495,7 +495,7 @@ fill
         requestOrder,
       );
       spinner.succeed(
-        `${volume} work successfully purchased with dealid ${dealid}`,
+        `${volume} task successfully purchased with dealid ${dealid}`,
         { raw: { dealid, volume } },
       );
     } catch (error) {

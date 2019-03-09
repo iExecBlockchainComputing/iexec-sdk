@@ -39,16 +39,14 @@ const deposit = async (
       })
       .approve(clerkAddress, amount);
     const allowTxReceipt = await allowTx.wait();
-    const allowEvents = contracts.decodeRLCLogs(allowTxReceipt.logs);
-    if (!checkEvent('Approval', allowEvents)) throw Error('Approval not confirmed');
+    if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
 
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
     const tx = await clerkContract.deposit(amount);
     const txReceipt = await tx.wait();
-    const events = contracts.decodeClerkLogs(txReceipt.logs);
-    if (!checkEvent('Deposit', events)) throw Error('Deposit not confirmed');
+    if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
     return amount;
   } catch (error) {
     debug('deposit()', error);
@@ -67,8 +65,7 @@ const withdraw = async (
     });
     const tx = await clerkContract.withdraw(amount);
     const txReceipt = await tx.wait();
-    const events = contracts.decodeClerkLogs(txReceipt.logs);
-    if (!checkEvent('Withdraw', events)) throw Error('Withdraw not confirmed');
+    if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
     return amount;
   } catch (error) {
     debug('withdraw()', error);
