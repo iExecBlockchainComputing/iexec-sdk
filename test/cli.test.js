@@ -34,7 +34,8 @@ const saveRaw = () => {
   return `--raw > out/${testNum}_out 2>&1`;
 };
 
-test('mkdir test/out', async () => expect(execAsync('mkdir test/out').catch(e => console.log(e.message))));
+execAsync('rm -r test/out').catch(e => console.log(e.message));
+execAsync('mkdir test/out').catch(e => console.log(e.message));
 
 test('iexec init', async () => {
   const block4 = await ethRPC.getBlock(4);
@@ -72,7 +73,7 @@ test(
   'iexec wallet import',
   () => expect(
     execAsync(
-      `${iexecPath} wallet import ${PRIVATE_KEY} --password test --force --raw > walletImport_stdout.json`,
+      `${iexecPath} wallet import ${PRIVATE_KEY} --password test --force --raw > out/walletImport_stdout.json`,
     ),
   ).resolves.not.toBe(1),
   10000,
@@ -89,7 +90,7 @@ test(
 );
 
 test('iexec wallet show (+ wallet from file name)', async () => {
-  const { fileName } = await loadJSONFile('walletImport_stdout.json');
+  const { fileName } = await loadJSONFile('out/walletImport_stdout.json');
   const walletFile = fileName.split('/')[fileName.split('/').length - 1];
   return expect(
     execAsync(
@@ -180,7 +181,7 @@ test(
   'iexec app deploy (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} app deploy --password test --wallet-address ${ADDRESS} --raw > appDeploy_stdout.json`,
+      `${iexecPath} app deploy --password test --wallet-address ${ADDRESS} --raw > out/appDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -235,7 +236,7 @@ test(
   'iexec dataset deploy (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} dataset deploy --password test --wallet-address ${ADDRESS} --raw > datasetDeploy_stdout.json`,
+      `${iexecPath} dataset deploy --password test --wallet-address ${ADDRESS} --raw > out/datasetDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -284,7 +285,7 @@ test(
   'iexec workerpool deploy (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} workerpool deploy --password test --wallet-address ${ADDRESS} --raw > workerpoolDeploy_stdout.json`,
+      `${iexecPath} workerpool deploy --password test --wallet-address ${ADDRESS} --raw > out/workerpoolDeploy_stdout.json`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -370,7 +371,7 @@ test(
 
 // edit order
 test('edit requestOrder app iexec.json => use deployed app', async () => {
-  const { address } = await loadJSONFile('appDeploy_stdout.json');
+  const { address } = await loadJSONFile('out/appDeploy_stdout.json');
   return expect(
     execAsync(
       `sed -i 's/"app": "0x0000000000000000000000000000000000000000",/"app": "${address}",/' iexec.json`,
@@ -378,7 +379,7 @@ test('edit requestOrder app iexec.json => use deployed app', async () => {
   ).resolves.not.toBe(1);
 });
 test('edit requestOrder dataset iexec.json => use deployed dataset', async () => {
-  const { address } = await loadJSONFile('datasetDeploy_stdout.json');
+  const { address } = await loadJSONFile('out/datasetDeploy_stdout.json');
   return expect(
     execAsync(
       `sed -i 's/"dataset": "0x0000000000000000000000000000000000000000",/"dataset": "${address}",/' iexec.json`,
@@ -386,7 +387,7 @@ test('edit requestOrder dataset iexec.json => use deployed dataset', async () =>
   ).resolves.not.toBe(1);
 });
 test('edit requestOrder workerpool iexec.json => use deployed workerpool', async () => {
-  const { address } = await loadJSONFile('workerpoolDeploy_stdout.json');
+  const { address } = await loadJSONFile('out/workerpoolDeploy_stdout.json');
   return expect(
     execAsync(
       `sed -i 's/"workerpool": "0x0000000000000000000000000000000000000000",/"workerpool": "${address}",/' iexec.json`,
@@ -444,7 +445,7 @@ test(
   'iexec order fill (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} order fill --password test --wallet-address ${ADDRESS} --raw > 'orderFill_stdout.json'`,
+      `${iexecPath} order fill --password test --wallet-address ${ADDRESS} --raw > 'out/orderFill_stdout.json'`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -489,7 +490,7 @@ test(
 
 // DEAL
 test('iexec deal show', async () => {
-  const { dealid } = await loadJSONFile('orderFill_stdout.json');
+  const { dealid } = await loadJSONFile('out/orderFill_stdout.json');
   return expect(
     execAsync(`${iexecPath} deal show ${dealid}`),
   ).resolves.not.toBe(1);
