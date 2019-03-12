@@ -1,5 +1,6 @@
 const Debug = require('debug');
 const {
+  toUpperFirst,
   isEthAddress,
   ethersBnToBn,
   checksummedAddress,
@@ -18,7 +19,14 @@ const createObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const txReceipt = await contracts.createObj(objName)(obj, options);
-    const address = checksummedAddress(txReceipt.events[0].args[objName]);
+    const event = getEventFromLogs(
+      'Create'.concat(toUpperFirst(objName)),
+      txReceipt.events,
+      {
+        strict: true,
+      },
+    );
+    const address = checksummedAddress(event.args[objName]);
     return address;
   } catch (error) {
     debug('createObj()', error);

@@ -610,7 +610,8 @@ unpublish
               } in "orders.json"`,
             );
           }
-          orderHashToUnpublish = order.computeOrderHash(
+          orderHashToUnpublish = await order.computeOrderHash(
+            chain.contracts,
             orderName,
             orderToUnpublish,
           );
@@ -668,9 +669,10 @@ cancel
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
 
-      const [chain, signedOrders] = await Promise.all([
+      const [chain, signedOrders, { address }] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
+        keystore.load(),
       ]);
 
       const cancelOrder = async (orderName) => {
@@ -733,7 +735,11 @@ show
               `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
             );
           }
-          orderHash = order.computeOrderHash(orderName, signedOrder);
+          orderHash = await order.computeOrderHash(
+            chain.contracts,
+            orderName,
+            signedOrder,
+          );
         } else {
           orderHash = cmdInput;
         }

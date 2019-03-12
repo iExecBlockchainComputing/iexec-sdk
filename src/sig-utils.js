@@ -168,7 +168,6 @@ const signTypedDatav3 = async (privateKey, typedData) => {
       s: addHexPrefix(sig.s.toString('hex')),
       v: sig.v,
     };
-    debug('sign', sign);
     const serializedSign = addHexPrefix(
       sign.r
         .substr(2)
