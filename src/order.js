@@ -9,9 +9,11 @@ const {
   getSalt,
   checksummedAddress,
   getAuthorization,
+  NULL_ADDRESS,
+  NULL_BYTES32,
 } = require('./utils');
 const { throwIfMissing } = require('./utils');
-const { hashStruct, deserializeSig } = require('./sig-utils');
+const { hashEIP712 } = require('./sig-utils');
 
 const debug = Debug('iexec:order');
 
@@ -32,19 +34,15 @@ const checkOrderName = (orderName) => {
 };
 
 const NULL_DATASETORDER = {
-  dataset: '0x0000000000000000000000000000000000000000',
-  datasetprice: '0',
-  volume: '0',
-  tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-  apprestrict: '0x0000000000000000000000000000000000000000',
-  workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-  requesterrestrict: '0x0000000000000000000000000000000000000000',
-  salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-  sign: {
-    r: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    s: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    v: '0',
-  },
+  dataset: NULL_ADDRESS,
+  datasetprice: 0,
+  volume: 0,
+  tag: NULL_BYTES32,
+  apprestrict: NULL_ADDRESS,
+  workerpoolrestrict: NULL_ADDRESS,
+  requesterrestrict: NULL_ADDRESS,
+  salt: NULL_BYTES32,
+  sign: '0x',
 };
 
 const objDesc = {
@@ -140,13 +138,6 @@ const objDesc = {
     apiEndpoint: 'requestorders',
     dealField: 'requestHash',
   },
-  sign: {
-    structMembers: [
-      { name: 'v', type: 'uint8' },
-      { name: 'r', type: 'bytes32' },
-      { name: 's', type: 'bytes32' },
-    ],
-  },
 };
 
 const objToStructArray = (objName, obj) => {
@@ -157,8 +148,7 @@ const objToStructArray = (objName, obj) => {
 
 const signedOrderToStruct = (orderName, orderObj) => {
   const unsigned = objToStructArray(orderName, orderObj);
-  const sign = objToStructArray('sign', orderObj.sign);
-  const signed = unsigned.concat([sign]);
+  const signed = unsigned.concat([orderObj.sign]);
   return signed;
 };
 
@@ -181,7 +171,7 @@ const getContractOwner = async (
     const contract = contracts.getContract(objDesc[orderName].contractName)({
       at: contractAddress,
     });
-    const owner = checksummedAddress(await contract.m_owner());
+    const owner = checksummedAddress(await contract.owner());
     return owner;
   } catch (error) {
     debug('getContractOwner()', error);
@@ -189,17 +179,28 @@ const getContractOwner = async (
   }
 };
 
-const computeOrderHash = (
+const computeOrderHash = async (
+  contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),
 ) => {
   try {
     checkOrderName(orderName);
-    return hashStruct(
-      objDesc[orderName].primaryType,
-      objDesc[orderName].structMembers,
-      order,
-    );
+
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
+
+    const types = {};
+    types.EIP712Domain = objDesc.EIP712Domain.structMembers;
+    types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
+
+    const typedData = {
+      types,
+      domain: domainObj,
+      primaryType: objDesc[orderName].primaryType,
+      message: order,
+    };
+    return hashEIP712(typedData);
   } catch (error) {
     debug('computeOrderHash()', error);
     throw error;
@@ -214,7 +215,7 @@ const getRemainingVolume = async (
   try {
     checkOrderName(orderName);
     const initial = new BN(order.volume);
-    const orderHash = computeOrderHash(orderName, order);
+    const orderHash = await computeOrderHash(contracts, orderName, order);
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
@@ -250,20 +251,13 @@ const signOrder = async (
   const clerkAddress = await contracts.fetchClerkAddress();
   const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
 
-  const domain = [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    { name: 'chainId', type: 'uint256' },
-    { name: 'verifyingContract', type: 'address' },
-  ];
-
   const salt = getSalt();
   const saltedOrderObj = Object.assign(orderObj, { salt });
 
   const order = objDesc[orderName].structMembers;
 
   const types = {};
-  types.EIP712Domain = domain;
+  types.EIP712Domain = objDesc.EIP712Domain.structMembers;
   types[objDesc[orderName].primaryType] = order;
 
   const message = orderObj;
@@ -287,8 +281,7 @@ const signOrder = async (
       },
     );
   });
-  const sig = await signTypedDatav3(typedData);
-  const sign = deserializeSig(sig);
+  const sign = await signTypedDatav3(typedData);
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   return signedOrder;
 };
