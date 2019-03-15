@@ -305,14 +305,9 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     }
   };
 
-  const signMessage = async (message) => {
+  const signMessage = async (address, message) => {
     try {
       debug('signMessage', message);
-      // const { privateKey } = await load();
-      // const messageBuffer = Buffer.from(stripHexPrefix(message), 'hex');
-      // const msgSig = ethUtil.ecsign(messageBuffer, privateKey);
-      // const signedMessage = ethUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s));
-      // return signedMessage;
       throw Error('eth_sign not implemented');
     } catch (error) {
       debug('signMessage()', error);
@@ -320,23 +315,20 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     }
   };
 
-  const signPersonalMessage = async (msgHex) => {
+  const signPersonalMessage = async (address, message) => {
     try {
-      debug('msgHex', msgHex);
-      throw Error('personal_sign not implemented');
-      // const { privateKey } = await load({ prefix: false });
-      // const privKeyBuffer = Buffer.from(privateKey, 'hex');
-      // const signedPersonalMess = sigUtil.personalSign(privKeyBuffer, {
-      //   data: msgHex,
-      // });
-      // return signedPersonalMess;
+      debug('signPersonalMessage', message);
+      const { privateKey } = await load();
+      const wallet = new Wallet(privateKey);
+      const sign = wallet.signMessage(message);
+      return sign;
     } catch (error) {
       debug('signPersonalMessage()', error);
       throw error;
     }
   };
 
-  const signTypedData = async (typedData) => {
+  const signTypedData = async (address, typedData) => {
     try {
       const { privateKey } = await load({ prefix: false });
       const privKeyBuffer = Buffer.from(privateKey, 'hex');

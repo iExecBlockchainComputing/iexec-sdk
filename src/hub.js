@@ -70,7 +70,10 @@ const showObj = (objName = throwIfMissing()) => async (
 };
 
 const cleanObj = (obj) => {
-  const reducer = (acc, curr) => Object.assign(acc, { [curr[0].split('m_')[1]]: curr[1] });
+  const reducer = (acc, curr) => {
+    const name = curr[0].substr(0, 2) === 'm_' ? curr[0].split('m_')[1] : curr[0];
+    return Object.assign(acc, { [name]: curr[1] });
+  };
   return Object.entries(obj).reduce(reducer, {});
 };
 

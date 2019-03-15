@@ -83,6 +83,8 @@ const desc = {
   cancelOrder: objName => `cancel a signed ${objName}`,
   publish: objName => `publish a signed ${objName}`,
   unpublish: objName => `unpublish a signed ${objName}`,
+  pushSecret: () => 'push a secret to the secret management service',
+  checkSecret: () => 'check if a secret exists in the secret management service',
 };
 
 const option = {
@@ -243,6 +245,18 @@ const option = {
   encryptedOutputsFolder: () => [
     '--encryptedOutputsFolder <path>',
     'path of folder containing decrypted work result',
+  ],
+  pushBeneficiarySecret: () => [
+    '--beneficiary',
+    'push the secret of a beneficiary (default)',
+  ],
+  pushAppSecret: () => [
+    '--app <address>',
+    'push the secret of an encrypted app',
+  ],
+  pushDatasetSecret: () => [
+    '--dataset <address>',
+    'push the secret of an encrypted dataset',
   ],
 };
 
