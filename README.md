@@ -367,16 +367,11 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --application <appName | app0xAddress>
-# --keysFolderPath <path>
-# --inputsFolderPath <path>
-# --encryptedOutputsFolder <path>
-# --outputsFolderPath <path>
-# --secretManagementService <hostname/IP>
-# --remoteFileSystem <serviceName>
-iexec tee init # init the TEE folders tree structure
-iexec tee encryptedpush --application iexechub/sgx-scone:blender # encrypt work input data + upload it to file hosting service
-iexec tee decrypt # decrypt work result
+iexec tee push-secret [secret]
+iexec tee push-secret --secret-file [secretPath] # specify a file path for readind the secret
+iexec tee push-secret --beneficary # push the secret for the beneficiary (default)
+iexec tee push-secret --app <appAddress> # push the secret for the app
+iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
 ```
 
 ## category
