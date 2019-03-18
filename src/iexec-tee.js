@@ -237,7 +237,7 @@ pushSecret
           'Missing argument secret or option secret-path <secretPath>',
         );
       }
-      const secretToPush = secret || (await fs.readFile(cmd.secretPath, 'utf8'));
+      const secretToPush = secret || (await fs.readFile(cmd.secretPath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
