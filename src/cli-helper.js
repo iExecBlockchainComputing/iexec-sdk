@@ -258,6 +258,10 @@ const option = {
     '--dataset <address>',
     'push the secret of an encrypted dataset',
   ],
+  secretPath: () => [
+    '--secret-path <secretPath>',
+    'push the secret froma file',
+  ],
 };
 
 const addGlobalOptions = (cli) => {

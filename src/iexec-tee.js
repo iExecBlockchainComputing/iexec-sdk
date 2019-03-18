@@ -213,6 +213,7 @@ pushSecret
   .option(...option.pushBeneficiarySecret())
   .option(...option.pushAppSecret())
   .option(...option.pushDatasetSecret())
+  .option(...option.secretPath())
   .description(desc.pushSecret())
   .action(async (secret, cmd) => {
     const spinner = Spinner(cmd);
@@ -230,6 +231,14 @@ pushSecret
           } | ${option.pushDatasetSecret()[0]})`,
         );
       }
+
+      if (!secret && !cmd.secretPath) {
+        throw Error(
+          'Missing argument secret or option secret-path <secretPath>',
+        );
+      }
+      const secretToPush = secret || (await fs.readFile(cmd.secretPath, 'utf8'));
+      debug('secretToPush', secretToPush);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(Object.assign(walletOptions));
@@ -249,7 +258,7 @@ pushSecret
         sms,
         address,
         resourceAddress,
-        secret,
+        secretToPush,
       );
       if (res.hash) {
         spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
