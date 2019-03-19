@@ -97,6 +97,7 @@ const chains = {
   chains: {
     dev: {
       host: 'http://localhost:8545',
+      sms: 'http://localhost:5000',
       id: '17',
       hub: '0x60E25C038D70A15364DAc11A042DB1dD7A2cccBC',
     },
