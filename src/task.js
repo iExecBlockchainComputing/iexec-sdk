@@ -79,10 +79,47 @@ const waitForTaskStatusChange = async (
   }
 };
 
+const downloadFromIpfs = async (
+  ipfsAddress,
+  { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
+) => {
+  try {
+    debug(
+      'downloadFromIpfs()',
+      'ipfsGatewayURL',
+      ipfsGatewayURL,
+      'ipfsAddress',
+      ipfsAddress,
+    );
+    const res = await download('GET')(ipfsAddress, {}, {}, ipfsGatewayURL);
+    return res;
+  } catch (error) {
+    throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
+  }
+};
+
+const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
+  const resultRepoBaseURL = task.results.split(`${taskid}`)[0];
+  const authorization = await getAuthorization(
+    contracts.chainId,
+    userAddress,
+    contracts.ethProvider,
+    { apiUrl: resultRepoBaseURL },
+  );
+  const res = await download('GET')(
+    taskid,
+    { chainId: contracts.chainId },
+    { authorization },
+    resultRepoBaseURL,
+  );
+  return res;
+};
+
 const fetchResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   userAddress = throwIfMissing(),
+  { ipfsGatewayURL } = {},
 ) => {
   try {
     isEthAddress(userAddress, { strict: true });
@@ -92,22 +129,21 @@ const fetchResults = async (
     const beneficiary = tasksDeal.beneficiary === NULL_ADDRESS
       ? tasksDeal.requester
       : tasksDeal.beneficiary;
-    if (userAddress.toLowerCase() !== beneficiary.toLowerCase()) {
+    if (
+      userAddress.toLowerCase() !== beneficiary.toLowerCase()
+      && NULL_ADDRESS !== beneficiary.toLowerCase()
+    ) {
       throw Error(`Only beneficiary ${beneficiary} can download the result`);
     }
-    const resultRepoBaseURL = task.results.split(`${taskid}`)[0];
-    const authorization = await getAuthorization(
-      contracts.chainId,
-      userAddress,
-      contracts.ethProvider,
-      { apiUrl: resultRepoBaseURL },
-    );
-    const res = await download('GET')(
-      taskid,
-      { chainId: contracts.chainId },
-      { authorization },
-      resultRepoBaseURL,
-    );
+    const resultAddress = task.results;
+    let res;
+    if (resultAddress && resultAddress.substr(0, 6) === '/ipfs/') {
+      debug('download from ipfs', resultAddress);
+      res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
+    } else {
+      debug('download from result repo', resultAddress);
+      res = await downloadFromResultRepo(contracts, taskid, task, userAddress);
+    }
     return res;
   } catch (error) {
     debug('fetchResults()', error);
