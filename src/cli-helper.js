@@ -85,6 +85,7 @@ const desc = {
   unpublish: objName => `unpublish a signed ${objName}`,
   pushSecret: () => 'push a secret to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
+  encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
 };
 
 const option = {
@@ -221,31 +222,6 @@ const option = {
     '--wallet-file <walletFileName>',
     'specify the name of the wallet file to use',
   ],
-  application: () => ['--application <name>', 'dockerhub app name'],
-  secretManagementService: () => [
-    '--secretManagementService <hostname>',
-    'SCONE secret management service url or IP',
-  ],
-  remoteFileSystem: () => [
-    '--remoteFileSystem <name>',
-    'file hosting service name',
-  ],
-  keysFolderPath: () => [
-    '--keysFolderPath <path>',
-    'path of folder containing encrypt/decrypt keys',
-  ],
-  inputsFolderPath: () => [
-    '--inputsFolderPath <path>',
-    'path of folder containing encrypted input data',
-  ],
-  outputsFolderPath: () => [
-    '--outputsFolderPath <path>',
-    'path of folder containing encrypted work result',
-  ],
-  encryptedOutputsFolder: () => [
-    '--encryptedOutputsFolder <path>',
-    'path of folder containing decrypted work result',
-  ],
   pushBeneficiarySecret: () => [
     '--beneficiary',
     'push the secret of a beneficiary (default)',
@@ -331,6 +307,10 @@ const prompt = {
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
   overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
+  dirNotEmpty: (dir, options) => question(
+    `Directory ${dir} is not empty, continue and replace content?`,
+    options,
+  ),
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),

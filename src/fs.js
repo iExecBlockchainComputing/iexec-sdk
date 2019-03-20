@@ -225,6 +225,16 @@ const loadDeployedObj = async (objName) => {
   return deployedConf[objName];
 };
 
+const isEmptyDir = async (dirPath) => {
+  try {
+    const files = await fs.readdir(dirPath);
+    if (!files.length) return true;
+    return false;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   saveJSONToFile,
   saveAccountConf,
@@ -248,6 +258,7 @@ module.exports = {
   loadDeployedObj,
   initChainConf,
   initOrderObj,
+  isEmptyDir,
   IEXEC_FILE_NAME,
   CHAIN_FILE_NAME,
   ACCOUNT_FILE_NAME,

@@ -15,19 +15,25 @@ const {
   option,
   Spinner,
   info,
+  prompt,
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const tee = require('./tee.js');
-const { isEthAddress } = require('./utils');
+const { isEmptyDir } = require('./fs');
 const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
 
+const DOCKER_IMAGE = 'iexechub/xxxx';
+
 const teeFolderName = 'tee';
-const keysFolderName = 'keys';
-const inputsFolderName = 'inputs';
-const encryptedOutputsFolderName = 'encryptedOutputs';
-const outputsFolderName = 'outputs';
+const secretsFolderName = '.tee-secrets';
+const datasetSecretsFolderName = 'dataset';
+const beneficiarySecretsFolderName = 'beneficiary';
+const originalDatasetFolderName = 'original-dataset';
+const encryptedDatasetFolderName = 'encrypted-dataset';
+const encryptedResultsFolderName = 'encrypted-results';
+const decryptedResultsFolderName = 'decrypted-results';
 
 const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
@@ -56,19 +62,44 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
 });
 
 const createTEEPaths = (cmd = {}) => {
-  const keysPath = cmd.keysFolderPath
-    || path.join(process.cwd(), teeFolderName, keysFolderName);
-  const inputsPath = cmd.inputsFolderPath
-    || path.join(process.cwd(), teeFolderName, inputsFolderName);
-  const encryptedOutputsPath = cmd.encryptedOutputsFolder
-    || path.join(process.cwd(), teeFolderName, encryptedOutputsFolderName);
-  const decryptedOutputPath = cmd.outputsFolderPath
-    || path.join(process.cwd(), teeFolderName, outputsFolderName);
+  const datasetSecretsFolderPath = path.join(
+    process.cwd(),
+    secretsFolderName,
+    datasetSecretsFolderName,
+  );
+  const beneficiarySecretsFolderPath = path.join(
+    process.cwd(),
+    secretsFolderName,
+    beneficiarySecretsFolderName,
+  );
+  const originalDatasetFolderPath = path.join(
+    process.cwd(),
+    teeFolderName,
+    originalDatasetFolderName,
+  );
+  const encryptedDatasetFolderPath = path.join(
+    process.cwd(),
+    teeFolderName,
+    encryptedDatasetFolderName,
+  );
+  const encryptedResultsFolderPath = path.join(
+    process.cwd(),
+    teeFolderName,
+    encryptedResultsFolderName,
+  );
+  const decryptedResultsFolderPath = path.join(
+    process.cwd(),
+    teeFolderName,
+    decryptedResultsFolderName,
+  );
+
   const paths = {
-    keysPath,
-    inputsPath,
-    encryptedOutputsPath,
-    decryptedOutputPath,
+    datasetSecretsFolderPath,
+    beneficiarySecretsFolderPath,
+    originalDatasetFolderPath,
+    encryptedDatasetFolderPath,
+    encryptedResultsFolderPath,
+    decryptedResultsFolderPath,
   };
   debug('paths', paths);
   return paths;
@@ -81,125 +112,81 @@ init.description(desc.teeInit()).action(async (cmd) => {
   try {
     spinner.start('creating TEE folder tree structure');
     const {
-      keysPath,
-      inputsPath,
-      encryptedOutputsPath,
-      decryptedOutputPath,
+      datasetSecretsFolderPath,
+      beneficiarySecretsFolderPath,
+      originalDatasetFolderPath,
+      encryptedDatasetFolderPath,
+      encryptedResultsFolderPath,
+      decryptedResultsFolderPath,
     } = createTEEPaths();
     await Promise.all([
-      fs.ensureDir(keysPath),
-      fs.ensureDir(inputsPath),
-      fs.ensureDir(encryptedOutputsPath),
-      fs.ensureDir(decryptedOutputPath),
+      fs.ensureDir(datasetSecretsFolderPath),
+      fs.ensureDir(beneficiarySecretsFolderPath),
+      fs.ensureDir(originalDatasetFolderPath),
+      fs.ensureDir(encryptedDatasetFolderPath),
+      fs.ensureDir(encryptedResultsFolderPath),
+      fs.ensureDir(decryptedResultsFolderPath),
     ]);
-
     spinner.succeed(info.teeInit());
   } catch (error) {
     handleError(error, cli, cmd);
   }
 });
 
-const encryptedpush = cli.command('encryptedpush');
-addGlobalOptions(encryptedpush);
-encryptedpush
-  .option(...option.chain())
-  .option(...option.keysFolderPath())
-  .option(...option.inputsFolderPath())
-  .option(...option.application())
-  .option(...option.secretManagementService())
-  .option(...option.remoteFileSystem())
-  .description(desc.encryptedpush())
+const encryptDataset = cli.command('encrypt-dataset');
+addGlobalOptions(encryptDataset);
+encryptDataset
+  .option(...option.force())
+  .description(desc.encryptDataset())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      if (!cmd.application) throw Error('missing --application option');
-
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
-        spinner,
-      });
-
-      const { keysPath, inputsPath } = createTEEPaths(cmd);
-      spinner.start(`encrypting data from ${inputsPath} and uploading`);
-
-      let appName = cmd.application;
-      if (isEthAddress(cmd.application)) {
-        const appObj = await chain.contracts.getObjProps('app')(
-          cmd.application,
-        );
-        const appParams = JSON.parse(appObj.m_appParams);
-        debug('appParams', appParams);
-        const [fieldName, fieldValue] = appParams.envvars
-          .split(' ')
-          .find(e => e.includes('XWDOCKERIMAGE'))
-          .split('=');
-        debug('fieldName', fieldName);
-        debug('fieldValue', fieldValue);
-        appName = fieldValue;
-        debug('appName', appName);
-      }
-
-      const secretManagementService = [
-        '--secretManagementService',
-        cmd.secretManagementService,
-      ];
-      const remoteFileSystem = ['--remoteFileSystem', cmd.remoteFileSystem];
-
-      await spawnAsync('docker', [
-        'run',
-        '-t',
-        '--rm',
-        '-v',
-        `${keysPath}:/conf`,
-        '-v',
-        `${inputsPath}:/inputs`,
-        'iexechub/sgx-scone:cli',
-        'encryptedpush',
-        '--application',
-        appName,
-        ...(cmd.secretManagementService ? secretManagementService : []),
-        ...(cmd.remoteFileSystem ? remoteFileSystem : []),
-      ]);
-      spinner.succeed('data encrypted and uploaded');
-    } catch (error) {
-      handleError(error, cli, cmd);
-    }
-  });
-
-const decrypt = cli.command('decrypt');
-addGlobalOptions(decrypt);
-decrypt
-  .option(...option.keysFolderPath())
-  .option(...option.encryptedOutputsFolder())
-  .option(...option.outputsFolderPath())
-  .description(desc.decrypt())
-  .action(async (cmd) => {
-    try {
-      debug('cmd', cmd);
-      const spinner = Spinner(cmd);
-
       const {
-        keysPath,
-        encryptedOutputsPath,
-        decryptedOutputPath,
+        datasetSecretsFolderPath,
+        originalDatasetFolderPath,
+        encryptedDatasetFolderPath,
       } = createTEEPaths(cmd);
 
-      spinner.start('decrypting');
+      const isDatasetSecretsFolderEmpty = await isEmptyDir(
+        datasetSecretsFolderPath,
+      );
+      const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
+      if (isDatasetFolderEmpty) {
+        throw Error(
+          `input folder ${originalDatasetFolderPath} is empty, nothing to encrypt`,
+        );
+      }
+      if (!isDatasetSecretsFolderEmpty && !cmd.force) {
+        await prompt.dirNotEmpty(datasetSecretsFolderPath);
+      }
+
+      spinner.start(`encrypting dataset from ${originalDatasetFolderPath}`);
+
       await spawnAsync('docker', [
         'run',
         '-t',
         '--rm',
         '-v',
-        `${keysPath}:/conf`,
+        `${originalDatasetFolderPath}:/data`,
         '-v',
-        `${encryptedOutputsPath}:/encryptedOutputs`,
+        `${encryptedDatasetFolderPath}:/data_sgx_ready`,
         '-v',
-        `${decryptedOutputPath}:/decryptedOutputs`,
-        'iexechub/sgx-scone:cli',
-        'decrypt',
+        `${datasetSecretsFolderPath}:/conf/keytag`,
+        '--entrypoint',
+        'sh',
+        DOCKER_IMAGE,
+        'dataset_encrypt.sh',
       ]);
-      spinner.succeed(`data decrypted in folder ${decryptedOutputPath}`, {
-        raw: decryptedOutputPath,
-      });
+
+      spinner.succeed(
+        `dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file\ndecryption key in ${datasetSecretsFolderPath}, make sure to backup this file`,
+        {
+          raw: {
+            encryptedDatasetFolderPath,
+            secretPath: datasetSecretsFolderPath,
+          },
+        },
+      );
     } catch (error) {
       handleError(error, cli, cmd);
     }
