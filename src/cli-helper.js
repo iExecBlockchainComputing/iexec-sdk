@@ -238,7 +238,31 @@ const option = {
   ],
   secretPath: () => [
     '--secret-path <secretPath>',
-    'push the secret froma file',
+    'push the secret from a file',
+  ],
+  datasetKeystoredir: () => [
+    '--dataset-keystoredir <path>',
+    'specify dataset tee key directory',
+  ],
+  beneficiaryKeystoredir: () => [
+    '--beneficiary-keystoredir <path>',
+    'specify beneficiary tee keys directory',
+  ],
+  encryptedResultsDir: () => [
+    '--encrypted-results-dir <path>',
+    'specify the encryped results directory',
+  ],
+  decryptedResultsDir: () => [
+    '--decrypted-results-dir <path>',
+    'specify the decrypted results directory',
+  ],
+  encryptedDatasetDir: () => [
+    '--encrypted-dataset-dir <path>',
+    'specify the encrypted dataset directory',
+  ],
+  originalDatasetDir: () => [
+    '--original-dataset-dir <path>',
+    'specify the original dataset directory',
   ],
 };
 

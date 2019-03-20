@@ -62,36 +62,18 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
 });
 
 const createTEEPaths = (cmd = {}) => {
-  const datasetSecretsFolderPath = path.join(
-    process.cwd(),
-    secretsFolderName,
-    datasetSecretsFolderName,
-  );
-  const beneficiarySecretsFolderPath = path.join(
-    process.cwd(),
-    secretsFolderName,
-    beneficiarySecretsFolderName,
-  );
-  const originalDatasetFolderPath = path.join(
-    process.cwd(),
-    teeFolderName,
-    originalDatasetFolderName,
-  );
-  const encryptedDatasetFolderPath = path.join(
-    process.cwd(),
-    teeFolderName,
-    encryptedDatasetFolderName,
-  );
-  const encryptedResultsFolderPath = path.join(
-    process.cwd(),
-    teeFolderName,
-    encryptedResultsFolderName,
-  );
-  const decryptedResultsFolderPath = path.join(
-    process.cwd(),
-    teeFolderName,
-    decryptedResultsFolderName,
-  );
+  const datasetSecretsFolderPath = cmd.datasetKeystoredir
+    || path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
+  const beneficiarySecretsFolderPath = cmd.beneficiaryKeystoredir
+    || path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
+  const originalDatasetFolderPath = cmd.originalDatasetDir
+    || path.join(process.cwd(), teeFolderName, originalDatasetFolderName);
+  const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
+    || path.join(process.cwd(), teeFolderName, encryptedDatasetFolderName);
+  const encryptedResultsFolderPath = cmd.encryptedResultsDir
+    || path.join(process.cwd(), teeFolderName, encryptedResultsFolderName);
+  const decryptedResultsFolderPath = cmd.decryptedResultsDir
+    || path.join(process.cwd(), teeFolderName, decryptedResultsFolderName);
 
   const paths = {
     datasetSecretsFolderPath,
@@ -107,36 +89,47 @@ const createTEEPaths = (cmd = {}) => {
 
 const init = cli.command('init');
 addGlobalOptions(init);
-init.description(desc.teeInit()).action(async (cmd) => {
-  const spinner = Spinner(cmd);
-  try {
-    spinner.start('creating TEE folder tree structure');
-    const {
-      datasetSecretsFolderPath,
-      beneficiarySecretsFolderPath,
-      originalDatasetFolderPath,
-      encryptedDatasetFolderPath,
-      encryptedResultsFolderPath,
-      decryptedResultsFolderPath,
-    } = createTEEPaths();
-    await Promise.all([
-      fs.ensureDir(datasetSecretsFolderPath),
-      fs.ensureDir(beneficiarySecretsFolderPath),
-      fs.ensureDir(originalDatasetFolderPath),
-      fs.ensureDir(encryptedDatasetFolderPath),
-      fs.ensureDir(encryptedResultsFolderPath),
-      fs.ensureDir(decryptedResultsFolderPath),
-    ]);
-    spinner.succeed(info.teeInit());
-  } catch (error) {
-    handleError(error, cli, cmd);
-  }
-});
+init
+  .option(...option.datasetKeystoredir())
+  .option(...option.beneficiaryKeystoredir())
+  .option(...option.originalDatasetDir())
+  .option(...option.encryptedDatasetDir())
+  .option(...option.encryptedResultsDir())
+  .option(...option.decryptedResultsDir())
+  .description(desc.teeInit())
+  .action(async (cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      spinner.start('creating TEE folder tree structure');
+      const {
+        datasetSecretsFolderPath,
+        beneficiarySecretsFolderPath,
+        originalDatasetFolderPath,
+        encryptedDatasetFolderPath,
+        encryptedResultsFolderPath,
+        decryptedResultsFolderPath,
+      } = createTEEPaths();
+      await Promise.all([
+        fs.ensureDir(datasetSecretsFolderPath),
+        fs.ensureDir(beneficiarySecretsFolderPath),
+        fs.ensureDir(originalDatasetFolderPath),
+        fs.ensureDir(encryptedDatasetFolderPath),
+        fs.ensureDir(encryptedResultsFolderPath),
+        fs.ensureDir(decryptedResultsFolderPath),
+      ]);
+      spinner.succeed(info.teeInit());
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
 
 const encryptDataset = cli.command('encrypt-dataset');
 addGlobalOptions(encryptDataset);
 encryptDataset
   .option(...option.force())
+  .option(...option.datasetKeystoredir())
+  .option(...option.originalDatasetDir())
+  .option(...option.encryptedDatasetDir())
   .description(desc.encryptDataset())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -199,6 +192,7 @@ const generateKeys = cli.command('generate-beneficiary-keys');
 addGlobalOptions(generateKeys);
 generateKeys
   .option(...option.force())
+  .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -243,6 +237,9 @@ const decryptResults = cli.command('decrypt-results');
 addGlobalOptions(decryptResults);
 decryptResults
   .option(...option.force())
+  .option(...option.beneficiaryKeystoredir())
+  .option(...option.encryptedResultsDir())
+  .option(...option.decryptedResultsDir())
   .description(desc.decryptResults())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
