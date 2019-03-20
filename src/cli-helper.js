@@ -87,6 +87,7 @@ const desc = {
   checkSecret: () => 'check if a secret exists in the secret management service',
   encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
   generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
+  decryptResults: () => 'decrypt encrypted results from "encrypted-results" to "decrypted-results" with beneficary key',
 };
 
 const option = {

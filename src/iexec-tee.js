@@ -24,7 +24,7 @@ const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
 
-const DOCKER_IMAGE = 'iexechub/xxxx';
+const DOCKER_IMAGE = 'iexechub/xxxx@sha256:xxxx';
 
 const teeFolderName = 'tee';
 const secretsFolderName = '.tee-secrets';
@@ -156,7 +156,7 @@ encryptDataset
       ]);
       if (isDatasetFolderEmpty) {
         throw Error(
-          `input folder ${originalDatasetFolderPath} is empty, nothing to encrypt`,
+          `Input folder ${originalDatasetFolderPath} is empty, nothing to encrypt`,
         );
       }
       if (!isDatasetSecretsFolderEmpty && !cmd.force) {
@@ -231,6 +231,75 @@ generateKeys
         {
           raw: {
             secretPath: beneficiarySecretsFolderPath,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const decryptResults = cli.command('decrypt-results');
+addGlobalOptions(decryptResults);
+decryptResults
+  .option(...option.force())
+  .description(desc.decryptResults())
+  .action(async (cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const {
+        beneficiarySecretsFolderPath,
+        encryptedResultsFolderPath,
+        decryptedResultsFolderPath,
+      } = createTEEPaths(cmd);
+
+      const [
+        isBeneficiarySecretsFolderEmpty,
+        isEncryptedResultsFolderEmpty,
+        isDecryptedResultsFolderEmpty,
+      ] = await Promise.all([
+        isEmptyDir(beneficiarySecretsFolderPath),
+        isEmptyDir(encryptedResultsFolderPath),
+        isEmptyDir(decryptedResultsFolderPath),
+      ]);
+
+      if (isBeneficiarySecretsFolderEmpty) {
+        throw Error(
+          `Missing beneficiary key in ${beneficiarySecretsFolderPath}`,
+        );
+      }
+      if (isEncryptedResultsFolderEmpty) {
+        throw Error(
+          `Input folder ${encryptedResultsFolderPath} is empty, nothing to decrypt`,
+        );
+      }
+      if (!isDecryptedResultsFolderEmpty && !cmd.force) {
+        await prompt.dirNotEmpty(decryptedResultsFolderPath);
+      }
+
+      spinner.start('Decrypting results');
+
+      await spawnAsync('docker', [
+        'run',
+        '-t',
+        '--rm',
+        '-v',
+        `${beneficiarySecretsFolderPath}:/privatekey`,
+        '-v',
+        `${encryptedResultsFolderPath}:/encrypted_results`,
+        '-v',
+        `${decryptedResultsFolderPath}:/decrypted_results`,
+        '--entrypoint',
+        'sh',
+        DOCKER_IMAGE,
+        'decrypt_results.sh',
+      ]);
+
+      spinner.succeed(
+        `Results successfully decrypted in ${decryptedResultsFolderPath}`,
+        {
+          raw: {
+            resultsPath: decryptedResultsFolderPath,
           },
         },
       );
