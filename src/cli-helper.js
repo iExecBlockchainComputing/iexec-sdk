@@ -242,11 +242,11 @@ const option = {
   ],
   datasetKeystoredir: () => [
     '--dataset-keystoredir <path>',
-    'specify dataset tee key directory',
+    'specify dataset TEE key directory',
   ],
   beneficiaryKeystoredir: () => [
     '--beneficiary-keystoredir <path>',
-    'specify beneficiary tee keys directory',
+    'specify beneficiary TEE keys directory',
   ],
   encryptedResultsDir: () => [
     '--encrypted-results-dir <path>',
