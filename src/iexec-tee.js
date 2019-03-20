@@ -147,10 +147,13 @@ encryptDataset
         encryptedDatasetFolderPath,
       } = createTEEPaths(cmd);
 
-      const isDatasetSecretsFolderEmpty = await isEmptyDir(
-        datasetSecretsFolderPath,
-      );
-      const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
+      const [
+        isDatasetSecretsFolderEmpty,
+        isDatasetFolderEmpty,
+      ] = await Promise.all([
+        isEmptyDir(datasetSecretsFolderPath),
+        isEmptyDir(originalDatasetFolderPath),
+      ]);
       if (isDatasetFolderEmpty) {
         throw Error(
           `input folder ${originalDatasetFolderPath} is empty, nothing to encrypt`,
@@ -160,7 +163,7 @@ encryptDataset
         await prompt.dirNotEmpty(datasetSecretsFolderPath);
       }
 
-      spinner.start(`encrypting dataset from ${originalDatasetFolderPath}`);
+      spinner.start(`Encrypting dataset from ${originalDatasetFolderPath}`);
 
       await spawnAsync('docker', [
         'run',
@@ -179,11 +182,55 @@ encryptDataset
       ]);
 
       spinner.succeed(
-        `dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file\ndecryption key in ${datasetSecretsFolderPath}, make sure to backup this file`,
+        `Dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file\ndecryption key in ${datasetSecretsFolderPath}, make sure to backup this file`,
         {
           raw: {
             encryptedDatasetFolderPath,
             secretPath: datasetSecretsFolderPath,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const generateKeys = cli.command('generate-beneficiary-keys');
+addGlobalOptions(generateKeys);
+generateKeys
+  .option(...option.force())
+  .description(desc.generateKeys())
+  .action(async (cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const { beneficiarySecretsFolderPath } = createTEEPaths(cmd);
+
+      const isSecretsFolderEmpty = await isEmptyDir(
+        beneficiarySecretsFolderPath,
+      );
+      if (!isSecretsFolderEmpty && !cmd.force) {
+        await prompt.dirNotEmpty(beneficiarySecretsFolderPath);
+      }
+
+      spinner.start('Generating new beneficiary keys');
+
+      await spawnAsync('docker', [
+        'run',
+        '-t',
+        '--rm',
+        '-v',
+        `${beneficiarySecretsFolderPath}:/key`,
+        '--entrypoint',
+        'sh',
+        DOCKER_IMAGE,
+        'generate_key.sh',
+      ]);
+
+      spinner.succeed(
+        `Beneficiary keys pair generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to publish your public key for result encryption`,
+        {
+          raw: {
+            secretPath: beneficiarySecretsFolderPath,
           },
         },
       );

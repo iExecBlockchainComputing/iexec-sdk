@@ -86,6 +86,7 @@ const desc = {
   pushSecret: () => 'push a secret to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
   encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
+  generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
 };
 
 const option = {
