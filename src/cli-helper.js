@@ -264,6 +264,10 @@ const option = {
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
   ],
+  keyPassword: () => [
+    '--beneficiary-key-password <password>',
+    'password used to encrypt the beneficiary key',
+  ],
 };
 
 const addGlobalOptions = (cli) => {

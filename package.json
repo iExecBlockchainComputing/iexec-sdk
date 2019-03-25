@@ -42,6 +42,7 @@
     "is-docker": "1.1.0",
     "js-sha3": "0.8.0",
     "multiaddr": "6.0.6",
+    "openpgp": "4.4.10",
     "ora": "3.2.0",
     "prettyjson": "1.2.1",
     "query-string": "6.3.0",

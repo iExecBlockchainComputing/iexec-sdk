@@ -20,12 +20,11 @@ const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 const ORDERS_FILE_NAME = 'orders.json';
 
-const saveJSONToFile = async (
+const saveTextToFile = async (
   fileName,
-  obj,
+  text,
   { force = false, strict = true, fileDir } = {},
 ) => {
-  const json = JSON.stringify(obj, null, 2);
   try {
     let filePath;
     if (fileDir) {
@@ -35,11 +34,11 @@ const saveJSONToFile = async (
       filePath = fileName;
     }
     if (force) {
-      await fs.writeFile(filePath, json);
+      await fs.writeFile(filePath, text);
       return filePath;
     }
     const fd = await fs.open(filePath, 'wx');
-    await fs.write(fd, json, 0, 'utf8');
+    await fs.write(fd, text, 0, 'utf8');
     await fs.close(fd);
     return filePath;
   } catch (error) {
@@ -52,11 +51,30 @@ const saveJSONToFile = async (
         } else {
           filePath = fileName;
         }
-        await fs.writeFile(filePath, json);
+        await fs.writeFile(filePath, text);
         return filePath;
       }
       return '';
     }
+    debug('saveTextToFile()', error);
+    throw error;
+  }
+};
+
+const saveJSONToFile = async (
+  fileName,
+  obj,
+  { force = false, strict = true, fileDir } = {},
+) => {
+  try {
+    const json = JSON.stringify(obj, null, 2);
+    const filePath = await saveTextToFile(fileName, json, {
+      force,
+      strict,
+      fileDir,
+    });
+    return filePath;
+  } catch (error) {
     debug('saveJSONToFile()', error);
     throw error;
   }
@@ -236,6 +254,7 @@ const isEmptyDir = async (dirPath) => {
 };
 
 module.exports = {
+  saveTextToFile,
   saveJSONToFile,
   saveAccountConf,
   saveWalletConf,

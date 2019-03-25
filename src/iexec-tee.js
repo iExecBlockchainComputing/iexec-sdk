@@ -19,7 +19,7 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const tee = require('./tee.js');
-const { isEmptyDir } = require('./fs');
+const { isEmptyDir, saveTextToFile } = require('./fs');
 const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
@@ -190,38 +190,48 @@ encryptDataset
 
 const generateKeys = cli.command('generate-beneficiary-keys');
 addGlobalOptions(generateKeys);
+addWalletLoadOptions(generateKeys);
 generateKeys
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
+  .option(...option.keyPassword())
   .description(desc.generateKeys())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(
+        Object.assign(walletOptions, { isSigner: false }),
+      );
+      const [address] = await keystore.accounts();
+
       const { beneficiarySecretsFolderPath } = createTEEPaths(cmd);
 
-      const isSecretsFolderEmpty = await isEmptyDir(
-        beneficiarySecretsFolderPath,
-      );
-      if (!isSecretsFolderEmpty && !cmd.force) {
-        await prompt.dirNotEmpty(beneficiarySecretsFolderPath);
-      }
-
+      spinner.info(`Generate beneficiary keys for wallet address ${address}`);
+      const passphrase = cmd.beneficiaryKeyPassword
+        || (await prompt.confimedPassword(
+          'Please choose a password for beneficiary key encryption',
+        ));
       spinner.start('Generating new beneficiary keys');
 
-      await spawnAsync('docker', [
-        'run',
-        '-t',
-        '--rm',
-        '-v',
-        `${beneficiarySecretsFolderPath}:/key`,
-        '--entrypoint',
-        'sh',
-        DOCKER_IMAGE,
-        'generate_key.sh',
-      ]);
+      const { privateKey, publicKey } = await tee.generateBeneficiaryKeys(
+        address,
+        passphrase,
+      );
+      spinner.stop();
+      const priKeyFileName = `${address}_key`;
+      const pubKeyFileName = `${address}_key.pub`;
+      await saveTextToFile(priKeyFileName, privateKey, {
+        force: cmd.force,
+        fileDir: beneficiarySecretsFolderPath,
+      });
+      await saveTextToFile(pubKeyFileName, publicKey, {
+        force: cmd.force,
+        fileDir: beneficiarySecretsFolderPath,
+      });
 
       spinner.succeed(
-        `Beneficiary keys pair generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to publish your public key for result encryption`,
+        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to publish your public key for result encryption`,
         {
           raw: {
             secretPath: beneficiarySecretsFolderPath,
