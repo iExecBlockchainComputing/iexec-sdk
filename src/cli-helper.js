@@ -87,7 +87,7 @@ const desc = {
   checkSecret: () => 'check if a secret exists in the secret management service',
   encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
   generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
-  decryptResults: () => 'decrypt encrypted results from "encrypted-results" to "decrypted-results" with beneficary key',
+  decryptResults: () => 'decrypt encrypted results with beneficary key',
 };
 
 const option = {
@@ -248,13 +248,9 @@ const option = {
     '--beneficiary-keystoredir <path>',
     'specify beneficiary TEE keys directory',
   ],
-  encryptedResultsDir: () => [
-    '--encrypted-results-dir <path>',
-    'specify the encryped results directory',
-  ],
-  decryptedResultsDir: () => [
-    '--decrypted-results-dir <path>',
-    'specify the decrypted results directory',
+  beneficiaryKeyFile: () => [
+    '--beneficiary-key-file <fileName>',
+    'specify beneficiary TEE key file to use',
   ],
   encryptedDatasetDir: () => [
     '--encrypted-dataset-dir <path>',
@@ -263,10 +259,6 @@ const option = {
   originalDatasetDir: () => [
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
-  ],
-  keyPassword: () => [
-    '--beneficiary-key-password <password>',
-    'password used to encrypt the beneficiary key',
   ],
 };
 

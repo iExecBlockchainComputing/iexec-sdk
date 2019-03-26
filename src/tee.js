@@ -1,32 +1,7 @@
 const Debug = require('debug');
-const openpgp = require('openpgp');
 const { throwIfMissing, http } = require('./utils');
 
 const debug = Debug('iexec:tee');
-
-const generateBeneficiaryKeys = async (
-  walletAddress = throwIfMissing(),
-  passphrase = throwIfMissing(),
-) => {
-  try {
-    const options = {
-      userIds: [
-        {
-          name: walletAddress,
-        },
-      ],
-      numBits: 2048,
-      passphrase,
-    };
-    const { publicKeyArmored, privateKeyArmored } = await openpgp.generateKey(
-      options,
-    );
-    return { privateKey: privateKeyArmored, publicKey: publicKeyArmored };
-  } catch (error) {
-    debug('generateBeneficiaryKeys()', error);
-    throw error;
-  }
-};
 
 const secretEndpoit = address => `/secret/${address}`;
 
@@ -77,4 +52,7 @@ const checkSecret = async (
   }
 };
 
-module.exports = { generateBeneficiaryKeys, pushSecret, checkSecret };
+module.exports = {
+  pushSecret,
+  checkSecret,
+};

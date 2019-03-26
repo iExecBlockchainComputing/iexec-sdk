@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 const Debug = require('debug');
+const JSZip = require('jszip');
 const cli = require('commander');
 const fs = require('fs-extra');
 const path = require('path');
 const { spawn } = require('child_process');
+const { createDecipheriv, generateKeyPair, privateDecrypt } = require('crypto');
 const {
   help,
   addGlobalOptions,
@@ -32,8 +34,8 @@ const datasetSecretsFolderName = 'dataset';
 const beneficiarySecretsFolderName = 'beneficiary';
 const originalDatasetFolderName = 'original-dataset';
 const encryptedDatasetFolderName = 'encrypted-dataset';
-const encryptedResultsFolderName = 'encrypted-results';
-const decryptedResultsFolderName = 'decrypted-results';
+const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
+const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 
 const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
@@ -61,6 +63,30 @@ const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   proc.on('error', () => reject(errorMessage || 'process errored'));
 });
 
+const streamToBuffer = stream => new Promise((resolve, reject) => {
+  const buffers = [];
+  stream.on('error', reject);
+  stream.on('data', data => buffers.push(data));
+  stream.on('end', () => resolve(Buffer.concat(buffers)));
+});
+
+const extractFileFromZip = (jszip, file, destination) => new Promise((resolve, reject) => {
+  try {
+    jszip
+      .file(file)
+      .nodeStream()
+      .pipe(fs.createWriteStream(destination))
+      .on('finish', () => {
+        resolve();
+      });
+  } catch (error) {
+    reject(error);
+  }
+});
+
+const AES_ALGO = 'aes-128-cbc';
+const decipherAES = (secret, iv) => createDecipheriv(AES_ALGO, secret, iv);
+
 const createTEEPaths = (cmd = {}) => {
   const datasetSecretsFolderPath = cmd.datasetKeystoredir
     || path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
@@ -70,18 +96,12 @@ const createTEEPaths = (cmd = {}) => {
     || path.join(process.cwd(), teeFolderName, originalDatasetFolderName);
   const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
     || path.join(process.cwd(), teeFolderName, encryptedDatasetFolderName);
-  const encryptedResultsFolderPath = cmd.encryptedResultsDir
-    || path.join(process.cwd(), teeFolderName, encryptedResultsFolderName);
-  const decryptedResultsFolderPath = cmd.decryptedResultsDir
-    || path.join(process.cwd(), teeFolderName, decryptedResultsFolderName);
 
   const paths = {
     datasetSecretsFolderPath,
     beneficiarySecretsFolderPath,
     originalDatasetFolderPath,
     encryptedDatasetFolderPath,
-    encryptedResultsFolderPath,
-    decryptedResultsFolderPath,
   };
   debug('paths', paths);
   return paths;
@@ -94,8 +114,6 @@ init
   .option(...option.beneficiaryKeystoredir())
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
-  .option(...option.encryptedResultsDir())
-  .option(...option.decryptedResultsDir())
   .description(desc.teeInit())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -106,16 +124,12 @@ init
         beneficiarySecretsFolderPath,
         originalDatasetFolderPath,
         encryptedDatasetFolderPath,
-        encryptedResultsFolderPath,
-        decryptedResultsFolderPath,
       } = createTEEPaths();
       await Promise.all([
         fs.ensureDir(datasetSecretsFolderPath),
         fs.ensureDir(beneficiarySecretsFolderPath),
         fs.ensureDir(originalDatasetFolderPath),
         fs.ensureDir(encryptedDatasetFolderPath),
-        fs.ensureDir(encryptedResultsFolderPath),
-        fs.ensureDir(decryptedResultsFolderPath),
       ]);
       spinner.succeed(info.teeInit());
     } catch (error) {
@@ -175,7 +189,7 @@ encryptDataset
       ]);
 
       spinner.succeed(
-        `Dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file\ndecryption key in ${datasetSecretsFolderPath}, make sure to backup this file`,
+        `Dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file.\nDecryption key stored in ${datasetSecretsFolderPath}, make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
         {
           raw: {
             encryptedDatasetFolderPath,
@@ -194,7 +208,7 @@ addWalletLoadOptions(generateKeys);
 generateKeys
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
-  .option(...option.keyPassword())
+  // .option(...option.keyPassword())
   .description(desc.generateKeys())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -208,17 +222,33 @@ generateKeys
       const { beneficiarySecretsFolderPath } = createTEEPaths(cmd);
 
       spinner.info(`Generate beneficiary keys for wallet address ${address}`);
-      const passphrase = cmd.beneficiaryKeyPassword
-        || (await prompt.confimedPassword(
-          'Please choose a password for beneficiary key encryption',
-        ));
       spinner.start('Generating new beneficiary keys');
 
-      const { privateKey, publicKey } = await tee.generateBeneficiaryKeys(
-        address,
-        passphrase,
-      );
-      spinner.stop();
+      const { privateKey, publicKey } = await new Promise((resolve, reject) => {
+        generateKeyPair(
+          'rsa',
+          {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+              type: 'spki',
+              format: 'pem',
+            },
+            privateKeyEncoding: {
+              type: 'pkcs8',
+              format: 'pem',
+            },
+          },
+          (err, pub, pri) => {
+            if (err) reject(err);
+            else {
+              resolve({
+                privateKey: pri,
+                publicKey: pub,
+              });
+            }
+          },
+        );
+      });
       const priKeyFileName = `${address}_key`;
       const pubKeyFileName = `${address}_key.pub`;
       await saveTextToFile(priKeyFileName, privateKey, {
@@ -231,7 +261,7 @@ generateKeys
       });
 
       spinner.succeed(
-        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to publish your public key for result encryption`,
+        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to securely share your public key for result encryption`,
         {
           raw: {
             secretPath: beneficiarySecretsFolderPath,
@@ -243,73 +273,101 @@ generateKeys
     }
   });
 
-const decryptResults = cli.command('decrypt-results');
+const decryptResults = cli.command('decrypt-results [encryptedResultsPath]');
 addGlobalOptions(decryptResults);
 decryptResults
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
-  .option(...option.encryptedResultsDir())
-  .option(...option.decryptedResultsDir())
+  .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
-  .action(async (cmd) => {
+  .action(async (encryptedResultsPath, cmd) => {
     const spinner = Spinner(cmd);
     try {
-      const {
-        beneficiarySecretsFolderPath,
-        encryptedResultsFolderPath,
-        decryptedResultsFolderPath,
-      } = createTEEPaths(cmd);
+      const { beneficiarySecretsFolderPath } = createTEEPaths(cmd);
 
-      const [
-        isBeneficiarySecretsFolderEmpty,
-        isEncryptedResultsFolderEmpty,
-        isDecryptedResultsFolderEmpty,
-      ] = await Promise.all([
-        isEmptyDir(beneficiarySecretsFolderPath),
-        isEmptyDir(encryptedResultsFolderPath),
-        isEmptyDir(decryptedResultsFolderPath),
-      ]);
+      const inputFile = encryptedResultsPath
+        || path.join(process.cwd(), DEFAULT_ENCRYPTED_RESULTS_NAME);
+      const outputFile = cmd.decryptedResultsPath
+        || path.join(process.cwd(), DEFAULT_DECRYPTED_RESULTS_NAME);
 
-      if (isBeneficiarySecretsFolderEmpty) {
-        throw Error(
-          `Missing beneficiary key in ${beneficiarySecretsFolderPath}`,
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(
+        Object.assign(walletOptions, { isSigner: false }),
+      );
+
+      let beneficiaryKeyPath;
+      if (cmd.beneficiaryKeyFile) {
+        beneficiaryKeyPath = path.join(
+          beneficiarySecretsFolderPath,
+          cmd.beneficiaryKeyFile,
+        );
+      } else {
+        const [address] = await keystore.accounts();
+        spinner.info(`Using beneficiary key for wallet ${address}`);
+        beneficiaryKeyPath = path.join(
+          beneficiarySecretsFolderPath,
+          `${address}_key`,
         );
       }
-      if (isEncryptedResultsFolderEmpty) {
-        throw Error(
-          `Input folder ${encryptedResultsFolderPath} is empty, nothing to decrypt`,
-        );
+
+      const rootFolder = 'iexec_out';
+      const encKeyFile = 'encrypted_key';
+      const encResultsFile = 'result.zip.aes';
+
+      const zip = await new JSZip().loadAsync(fs.readFile(inputFile));
+
+      let encryptedResultsKeyArrayBuffer;
+      try {
+        encryptedResultsKeyArrayBuffer = await zip
+          .file(`${rootFolder}/${encKeyFile}`)
+          .async('arraybuffer');
+      } catch (error) {
+        throw Error(`Missing ${encKeyFile} file in ${inputFile}`);
       }
-      if (!isDecryptedResultsFolderEmpty && !cmd.force) {
-        await prompt.dirNotEmpty(decryptedResultsFolderPath);
+      const encryptedResultsKeyBuffer = Buffer.from(
+        encryptedResultsKeyArrayBuffer,
+        'ArrayBuffer',
+      );
+
+      let beneficiaryKey;
+      try {
+        beneficiaryKey = await fs.readFile(beneficiaryKeyPath, 'utf8');
+      } catch (error) {
+        debug(error);
+        throw Error(
+          `Failed to load beneficiary key from ${beneficiaryKeyPath}`,
+        );
       }
 
       spinner.start('Decrypting results');
-
-      await spawnAsync('docker', [
-        'run',
-        '-t',
-        '--rm',
-        '-v',
-        `${beneficiarySecretsFolderPath}:/privatekey`,
-        '-v',
-        `${encryptedResultsFolderPath}:/encrypted_results`,
-        '-v',
-        `${decryptedResultsFolderPath}:/decrypted_results`,
-        '--entrypoint',
-        'sh',
-        DOCKER_IMAGE,
-        'decrypt_results.sh',
-      ]);
-
-      spinner.succeed(
-        `Results successfully decrypted in ${decryptedResultsFolderPath}`,
-        {
-          raw: {
-            resultsPath: decryptedResultsFolderPath,
-          },
-        },
+      const resultsKey = privateDecrypt(
+        beneficiaryKey,
+        encryptedResultsKeyBuffer,
       );
+      debug('resultsKey', resultsKey);
+
+      const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
+      await extractFileFromZip(
+        zip,
+        `${rootFolder}/${encResultsFile}`,
+        tempResultsPath,
+      );
+      const ivStream = fs.createReadStream(tempResultsPath, { end: 15 });
+      const iv = await streamToBuffer(ivStream);
+      debug('iv', iv);
+      const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
+        start: 16,
+      });
+      await encryptedResultsStream
+        .pipe(decipherAES(resultsKey, iv))
+        .pipe(fs.createWriteStream(outputFile));
+      await fs.remove(tempResultsPath);
+
+      spinner.succeed(`Results successfully decrypted in ${outputFile}`, {
+        raw: {
+          resultsPath: outputFile,
+        },
+      });
     } catch (error) {
       handleError(error, cli, cmd);
     }
