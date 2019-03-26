@@ -14,9 +14,9 @@ const {
   saveEncryptedWalletConf,
   loadEncryptedWalletConf,
 } = require('./fs');
-const { prompt, option } = require('./cli-helper');
+const { prompt, option, computeWalletLoadOptions } = require('./cli-helper');
 const sigUtils = require('./sig-utils');
-const { checksummedAddress } = require('./utils');
+const { checksummedAddress, NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:keystore');
 const secp256k1 = new EC('secp256k1');
@@ -142,7 +142,10 @@ const importPrivateKeyAndSave = async (privateKey, options) => {
   return saveWallet(userWallet, options);
 };
 
-const Keystore = ({ walletOptions, isSigner = true } = {}) => {
+const Keystore = ({
+  walletOptions = computeWalletLoadOptions().walletOptions,
+  isSigner = true,
+} = {}) => {
   const cachedWallet = {};
   let password = (walletOptions && walletOptions.password) || false;
   // keystoreDir
@@ -300,7 +303,6 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
         walletAddress = checksummedAddress(address);
       } catch (error) {
         debug('try loadWalletAddress encrypted', error);
-        throw error;
       }
     }
     return walletAddress;
@@ -313,6 +315,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
       try {
         if (isSigner) walletAddress = (await load()).address;
         else walletAddress = await loadWalletAddress();
+        if (!walletAddress) walletAddress = NULL_ADDRESS;
       } catch (error) {
         debug('accounts() loading wallet', error);
         if (isSigner) throw error;

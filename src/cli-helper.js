@@ -522,16 +522,19 @@ const computeWalletCreateOptions = async (cmd) => {
 
 const computeWalletLoadOptions = (cmd) => {
   try {
-    const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
-    const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const path = cmd.keystoredir
+    const global = (cmd && cmd.keystoredir && cmd.keystoredir === 'global')
+      || !cmd
+      || !cmd.keystoredir;
+    const local = (cmd && cmd.keystoredir && cmd.keystoredir === 'local') || false;
+    const path = cmd
+      && cmd.keystoredir
       && cmd.keystoredir !== 'local'
       && cmd.keystoredir !== 'global'
       ? cmd.keystoredir
       : false;
-    const password = cmd.password || false;
-    const walletFileName = cmd.walletFile || false;
-    const walletAddress = cmd.walletAddress || false;
+    const password = (cmd && cmd.password) || false;
+    const walletFileName = (cmd && cmd.walletFile) || false;
+    const walletAddress = (cmd && cmd.walletAddress) || false;
     return {
       walletOptions: {
         global,
