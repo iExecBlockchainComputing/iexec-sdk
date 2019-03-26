@@ -16,6 +16,7 @@ const {
 } = require('./fs');
 const { prompt, option } = require('./cli-helper');
 const sigUtils = require('./sig-utils');
+const { checksummedAddress } = require('./utils');
 
 const debug = Debug('iexec:keystore');
 const secp256k1 = new EC('secp256k1');
@@ -157,24 +158,39 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     fileDir = process.cwd();
   }
 
-  const getWalletFileName = async () => {
-    const descSortWallet = (a, b) => {
-      const aDate = a.split('--')[1];
-      const bDate = b.split('--')[1];
-      if (aDate < bDate) return 1;
-      if (aDate > bDate) return -1;
-      return 0;
-    };
+  const descSortWallet = (a, b) => {
+    const aDate = a.split('--')[1];
+    const bDate = b.split('--')[1];
+    if (aDate < bDate) return 1;
+    if (aDate > bDate) return -1;
+    return 0;
+  };
 
-    if (walletOptions.walletFileName) {
+  const getMostRecentWalletFileName = async () => {
+    let files;
+    try {
+      files = await fs.readdir(fileDir);
+      debug('files', files);
+    } catch (error) {
+      debug('getMostRecentWalletFileName()', error);
+      throw error;
+    }
+    const sortedWallet = files
+      .filter(e => e.split('--')[2])
+      .sort(descSortWallet);
+    return sortedWallet[0] || null;
+  };
+
+  const getWalletFileName = async () => {
+    if (walletOptions && walletOptions.walletFileName) {
       return walletOptions.walletFileName;
     }
-    if (walletOptions.walletAddress) {
+    if (walletOptions && walletOptions.walletAddress) {
       let files;
       try {
         files = await fs.readdir(fileDir);
       } catch (error) {
-        debug(error);
+        debug('getWalletFileName()', error);
         throw Error(
           `Missing keystore directory ${fileDir}, did you forget to run 'iexec wallet create' ?`,
         );
@@ -204,22 +220,7 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
       path.join(process.cwd(), 'wallet.json'),
     );
     if (existsUnencrypted) return null;
-    if (isSigner) {
-      let files;
-      try {
-        files = await fs.readdir(fileDir);
-      } catch (error) {
-        debug(error);
-        throw Error(
-          `Missing keystore directory ${fileDir}, did you forget to run 'iexec wallet create' ?`,
-        );
-      }
-      const sortedWallet = files
-        .filter(e => e.split('--')[2])
-        .sort(descSortWallet);
-      return sortedWallet[0] || null;
-    }
-    return null;
+    return getMostRecentWalletFileName();
   };
 
   // load wallet from FS
@@ -275,17 +276,48 @@ const Keystore = ({ walletOptions, isSigner = true } = {}) => {
     return derivedUserWallet;
   };
 
+  const loadWalletAddress = async () => {
+    const fileName = await getWalletFileName();
+    let walletAddress;
+    // try local unencrypted
+    if (!fileName) {
+      try {
+        const loadingOptions = Object.assign(
+          {},
+          { fileName: WALLET_FILE_NAME },
+        );
+        const { address } = await loadWalletConf(loadingOptions);
+        walletAddress = checksummedAddress(address);
+      } catch (error) {
+        debug('try loadWalletAddress unencrypted', error);
+      }
+    }
+    // try encrypted
+    if (!walletAddress) {
+      try {
+        const loadingOptions = Object.assign({}, { fileName }, { fileDir });
+        const { address } = await loadEncryptedWalletConf(loadingOptions);
+        walletAddress = checksummedAddress(address);
+      } catch (error) {
+        debug('try loadWalletAddress encrypted', error);
+        throw error;
+      }
+    }
+    return walletAddress;
+  };
+
   const accounts = async () => {
     try {
       debug('accounts');
       let walletAddress;
       try {
-        walletAddress = (await load()).address;
+        if (isSigner) walletAddress = (await load()).address;
+        else walletAddress = await loadWalletAddress();
       } catch (error) {
         debug('accounts() loading wallet', error);
         if (isSigner) throw error;
-        walletAddress = '0x0000000000000000000000000000000000000000';
       }
+      debug(walletAddress);
       return [walletAddress];
     } catch (error) {
       debug('accounts()', error);
