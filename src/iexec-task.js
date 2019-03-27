@@ -85,10 +85,12 @@ show
       let resultPath;
       if (cmd.download) {
         if (task.TASK_STATUS_MAP[taskResult.status] === 'COMPLETED') {
+          spinner.start(info.downloading());
           const { body } = await task.fetchResults(
             chain.contracts,
             taskid,
             userAddress,
+            { ipfsGatewayURL: chain.ipfsGateway },
           );
           const resultFileName = cmd.download !== true ? cmd.download : taskid;
           resultPath = path.join(process.cwd(), `${resultFileName}.zip`);
@@ -113,7 +115,7 @@ show
         raw,
       });
       if (resultPath) {
-        spinner.info(`Results downloaded in ${resultPath}`);
+        spinner.info(info.downloaded(resultPath));
       }
       if (claimable) {
         spinner.info(

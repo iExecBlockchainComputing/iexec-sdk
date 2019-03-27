@@ -99,14 +99,16 @@ show
       let userWallet;
       let displayedWallet;
       try {
-        userWallet = await keystore.load();
-        displayedWallet = Object.assign(
-          {},
-          cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
-          { publicKey: userWallet.publicKey, address: userWallet.address },
-        );
-        // show user wallet
-        spinner.info(`Wallet file:${pretty(displayedWallet)}`);
+        if (!address) {
+          userWallet = await keystore.load();
+          displayedWallet = Object.assign(
+            {},
+            cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
+            { publicKey: userWallet.publicKey, address: userWallet.address },
+          );
+          // show user wallet
+          spinner.info(`Wallet file:${pretty(displayedWallet)}`);
+        }
       } catch (error) {
         if (error.message === 'invalid password') throw error;
       }

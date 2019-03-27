@@ -167,7 +167,6 @@ test(
 );
 
 // APP
-test('iexec app init (no wallet)', () => expect(execAsync(`${iexecPath} app init ${saveRaw()}`)).resolves.not.toBe(1));
 test(
   'iexec app init (+ wallet)',
   () => expect(
@@ -177,6 +176,7 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
+test('iexec app init (no wallet)', () => expect(execAsync(`${iexecPath} app init ${saveRaw()}`)).resolves.not.toBe(1));
 test(
   'iexec app deploy (+ wallet)',
   () => expect(
@@ -185,6 +185,13 @@ test(
     ),
   ).resolves.not.toBe(1),
   15000,
+);
+test(
+  'iexec app show 1 (no wallet)',
+  () => expect(execAsync(`${iexecPath} app show 1 ${saveRaw()}`)).resolves.not.toBe(
+    1,
+  ),
+  10000,
 );
 test(
   'iexec app show 1 (+ wallet)',
@@ -200,6 +207,13 @@ test(
   () => expect(
     execAsync(`${iexecPath} app show 1 --user ${ADDRESS} ${saveRaw()}`),
   ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec app count (no wallet)',
+  () => expect(execAsync(`${iexecPath} app count ${saveRaw()}`)).resolves.not.toBe(
+    1,
+  ),
   10000,
 );
 test(
@@ -220,9 +234,6 @@ test(
 );
 
 // DATASET
-test('iexec dataset init (no wallet)', () => expect(execAsync(`${iexecPath} dataset init ${saveRaw()}`)).resolves.not.toBe(
-  1,
-));
 test(
   'iexec dataset init (+ wallet)',
   () => expect(
@@ -232,6 +243,9 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
+test('iexec dataset init (no wallet)', () => expect(execAsync(`${iexecPath} dataset init ${saveRaw()}`)).resolves.not.toBe(
+  1,
+));
 test(
   'iexec dataset deploy (+ wallet)',
   () => expect(
@@ -240,6 +254,13 @@ test(
     ),
   ).resolves.not.toBe(1),
   15000,
+);
+test(
+  'iexec dataset show 1 (no wallet)',
+  () => expect(
+    execAsync(`${iexecPath} dataset show 1 ${saveRaw()}`),
+  ).resolves.not.toBe(1),
+  10000,
 );
 test(
   'iexec dataset show 1 (+ wallet)',
@@ -253,6 +274,13 @@ test(
 test('iexec dataset show 1 --user [address]', () => expect(
   execAsync(`${iexecPath} dataset show 1 --user ${ADDRESS} ${saveRaw()}`),
 ).resolves.not.toBe(1));
+test(
+  'iexec dataset count (no wallet)',
+  () => expect(
+    execAsync(`${iexecPath} dataset count ${saveRaw()}`),
+  ).resolves.not.toBe(1),
+  10000,
+);
 test(
   'iexec dataset count (+ wallet)',
   () => expect(
@@ -271,7 +299,6 @@ test(
 );
 
 // WORKERPOOL
-test('iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
 test(
   'iexec workerpool init (+ wallet)',
   () => expect(
@@ -281,6 +308,7 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
+test('iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
 test(
   'iexec workerpool deploy (+ wallet)',
   () => expect(
@@ -289,6 +317,13 @@ test(
     ),
   ).resolves.not.toBe(1),
   15000,
+);
+test(
+  'iexec workerpool show 1 (no wallet)',
+  () => expect(
+    execAsync(`${iexecPath} workerpool show 1 ${saveRaw()}`),
+  ).resolves.not.toBe(1),
+  10000,
 );
 test(
   'iexec workerpool show 1 (+ wallet)',
@@ -305,6 +340,13 @@ test(
     execAsync(
       `${iexecPath} workerpool show --password test --user ${ADDRESS} ${saveRaw()}`,
     ),
+  ).resolves.not.toBe(1),
+  10000,
+);
+test(
+  'iexec workerpool count (no wallet)',
+  () => expect(
+    execAsync(`${iexecPath} workerpool count ${saveRaw()}`),
   ).resolves.not.toBe(1),
   10000,
 );

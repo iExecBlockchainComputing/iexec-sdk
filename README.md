@@ -58,6 +58,29 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
+```
+
+**You may get this error:**
+
+```bash
+failed with Error: Hub address missing
+```
+
+Simply edit `chain.json` file to set the `hub` address:
+
+```json
+"kovan": {
+  "host": "http://localhost:8545/",
+  "id": "42",
+  "hub": "0x36D32A8b943D7a9BB797D250970C6961CEB4afFa"
+},
+```
+
+**Here are the last deployed hub address:**
+
+- kovan (PoCo v3.0.26): `"hub": "0x36D32A8b943D7a9BB797D250970C6961CEB4afFa"`
+
+```
 iexec wallet getETH # ask faucet for ETH, this may require manual action
 iexec wallet getRLC # ask iExec faucet for RLC
 iexec wallet show
