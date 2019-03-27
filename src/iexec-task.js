@@ -90,8 +90,8 @@ show
             taskid,
             userAddress,
           );
-          const resultFileNane = cmd.download !== true ? cmd.download : taskid;
-          resultPath = path.join(process.cwd(), `${resultFileNane}.zip`);
+          const resultFileName = cmd.download !== true ? cmd.download : taskid;
+          resultPath = path.join(process.cwd(), `${resultFileName}.zip`);
           const stream = fs.createWriteStream(resultPath);
           await body.pipe(stream);
         } else {
