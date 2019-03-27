@@ -496,6 +496,13 @@ test('iexec deal show', async () => {
   ).resolves.not.toBe(1);
 });
 
+// tee
+test('iexec tee decrypt-results', async () => expect(
+  execAsync(
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key ${saveRaw()}`,
+  ),
+).resolves.not.toBe(1));
+
 // // Uncomment when update schema-validator
 // test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
 // test.skip('iexec registry validate dataset', () => expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
