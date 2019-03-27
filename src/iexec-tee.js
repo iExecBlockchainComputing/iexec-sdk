@@ -3,6 +3,7 @@
 const Debug = require('debug');
 const JSZip = require('jszip');
 const cli = require('commander');
+const semver = require('semver');
 const fs = require('fs-extra');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -215,6 +216,14 @@ generateKeys
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      const nodeMinVersion = 'v10.12.0';
+      if (semver.gt(nodeMinVersion, process.version)) {
+        throw Error(
+          `Minimum node version to use this command is ${nodeMinVersion}, found ${
+            process.version
+          }`,
+        );
+      }
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),

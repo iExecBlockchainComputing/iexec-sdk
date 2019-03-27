@@ -46,6 +46,7 @@
     "ora": "3.2.0",
     "prettyjson": "1.2.1",
     "query-string": "6.4.0",
+    "semver": "6.0.0",
     "update-check-es5": "1.5.4",
     "uuid": "3.3.2"
   },

@@ -1,8 +1,11 @@
 const { exec } = require('child_process');
+const semver = require('semver');
 const Promise = require('bluebird');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
+
+console.log('Node version:', process.version);
 
 const { DRONE } = process.env;
 const execAsync = Promise.promisify(exec);
@@ -541,9 +544,17 @@ test('iexec deal show', async () => {
 // tee
 test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
 
-test('iexec tee generate-beneficiary-keys', async () => expect(
-  execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
-).resolves.not.toBe(1));
+if (semver.gt('v10.12.0', process.version)) {
+  test('iexec tee generate-beneficiary-keys', async () => expect(
+    execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
+  ).rejects.not.toBe(1));
+} else {
+  test('iexec tee generate-beneficiary-keys', async () => expect(
+    execAsync(
+      `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
+    ),
+  ).resolves.not.toBe(1));
+}
 
 test('iexec tee decrypt-results (wrong beneficiary key)', async () => expect(
   execAsync(
