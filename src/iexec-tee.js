@@ -191,7 +191,7 @@ encryptDataset
       ]);
 
       spinner.succeed(
-        `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in ${datasetSecretsFolderPath}, make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
+        `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in "${datasetSecretsFolderPath}", make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
         {
           raw: {
             encryptedDatasetFolderPath,
