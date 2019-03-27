@@ -249,6 +249,7 @@ generateKeys
           },
         );
       });
+      spinner.stop();
       const priKeyFileName = `${address}_key`;
       const pubKeyFileName = `${address}_key.pub`;
       await saveTextToFile(priKeyFileName, privateKey, {
