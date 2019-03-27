@@ -380,7 +380,10 @@ decryptResults
           `${rootFolder}/${encResultsFile}`,
           tempResultsPath,
         );
-        const ivStream = fs.createReadStream(tempResultsPath, { end: 15 });
+        const ivStream = fs.createReadStream(tempResultsPath, {
+          start: 0,
+          end: 15,
+        });
         const iv = await streamToBuffer(ivStream);
         debug('iv', iv);
         const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
