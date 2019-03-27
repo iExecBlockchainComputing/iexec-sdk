@@ -229,10 +229,6 @@ const option = {
     '--beneficiary',
     'push the secret of a beneficiary (default)',
   ],
-  pushAppSecret: () => [
-    '--app <address>',
-    'push the secret of an encrypted app',
-  ],
   pushDatasetSecret: () => [
     '--dataset <address>',
     'push the secret of an encrypted dataset',

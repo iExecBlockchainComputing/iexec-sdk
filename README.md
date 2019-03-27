@@ -400,7 +400,6 @@ iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt
 iexec tee push-secret [secret]
 iexec tee push-secret --secret-file [secretPath] # specify a file path for readind the secret
 iexec tee push-secret --beneficary # push the secret for the beneficiary (default)
-iexec tee push-secret --app <appAddress> # push the secret for the app
 iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
 iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
 ```

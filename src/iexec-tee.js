@@ -36,6 +36,8 @@ const originalDatasetFolderName = 'original-dataset';
 const encryptedDatasetFolderName = 'encrypted-dataset';
 const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
 const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
+const publicKeyName = address => `${address}_key.pub`;
+const privateKeyName = address => `${address}_key`;
 
 const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
@@ -179,9 +181,9 @@ encryptDataset
         '-v',
         `${originalDatasetFolderPath}:/data`,
         '-v',
-        `${encryptedDatasetFolderPath}:/data_sgx_ready`,
+        `${encryptedDatasetFolderPath}:/data_SGX_ready`,
         '-v',
-        `${datasetSecretsFolderPath}:/conf/keytag`,
+        `${datasetSecretsFolderPath}:/conf`,
         '--entrypoint',
         'sh',
         DOCKER_IMAGE,
@@ -249,8 +251,8 @@ generateKeys
         );
       });
       spinner.stop();
-      const priKeyFileName = `${address}_key`;
-      const pubKeyFileName = `${address}_key.pub`;
+      const priKeyFileName = privateKeyName(address);
+      const pubKeyFileName = publicKeyName(address);
       await saveTextToFile(priKeyFileName, privateKey, {
         force: cmd.force,
         fileDir: beneficiarySecretsFolderPath,
@@ -308,7 +310,7 @@ decryptResults
         spinner.info(`Using beneficiary key for wallet ${address}`);
         beneficiaryKeyPath = path.join(
           beneficiarySecretsFolderPath,
-          `${address}_key`,
+          privateKeyName(address),
         );
       }
 
@@ -397,40 +399,26 @@ decryptResults
     }
   });
 
-const pushSecret = cli.command('push-secret [secret]');
+const pushSecret = cli.command('push-secret');
 addGlobalOptions(pushSecret);
 addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.pushBeneficiarySecret())
-  .option(...option.pushAppSecret())
   .option(...option.pushDatasetSecret())
   .option(...option.secretPath())
   .description(desc.pushSecret())
-  .action(async (secret, cmd) => {
+  .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
-      debug('app', cmd.app);
       debug('dataset', cmd.dataset);
-      if (
-        (cmd.beneficary && cmd.app)
-        || (cmd.beneficary && cmd.dataset)
-        || (cmd.app && cmd.dataset)
-      ) {
+      if (cmd.beneficary && cmd.dataset) {
         throw Error(
           `Only one option is allowed (${option.pushBeneficiarySecret()[0]} | ${
-            option.pushAppSecret()[0]
-          } | ${option.pushDatasetSecret()[0]})`,
+            option.pushDatasetSecret()[0]
+          })`,
         );
       }
-
-      if (!secret && !cmd.secretPath) {
-        throw Error(
-          'Missing argument secret or option secret-path <secretPath>',
-        );
-      }
-      const secretToPush = secret || (await fs.readFile(cmd.secretPath, 'utf8')).trim();
-      debug('secretToPush', secretToPush);
 
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(Object.assign(walletOptions));
@@ -438,13 +426,42 @@ pushSecret
         spinner,
       });
 
+      const { contracts, sms } = chain;
+      if (!sms) throw Error(`Missing sms in "chains.json" for chain ${chain.id}`);
+
       const { address } = await keystore.load();
       debug('address', address);
-      const resourceAddress = cmd.app || cmd.dataset || address;
+
+      const resourceAddress = cmd.dataset || address;
       debug('resourceAddress', resourceAddress);
 
-      const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in chains.json for chain ${chain.id}`);
+      let secretFilePath;
+      if (cmd.secretPath) {
+        secretFilePath = cmd.secretPath;
+      } else {
+        let defaultSecretPath;
+        const {
+          datasetSecretsFolderPath,
+          beneficiarySecretsFolderPath,
+        } = createTEEPaths();
+        const secretFileName = 'keytag';
+        if (cmd.dataset) {
+          defaultSecretPath = path.join(
+            datasetSecretsFolderPath,
+            secretFileName,
+          );
+        } else {
+          defaultSecretPath = path.join(
+            beneficiarySecretsFolderPath,
+            publicKeyName(address),
+          );
+        }
+        secretFilePath = defaultSecretPath;
+      }
+
+      const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
+      debug('secretToPush', secretToPush);
+
       const res = await tee.pushSecret(
         contracts,
         sms,
