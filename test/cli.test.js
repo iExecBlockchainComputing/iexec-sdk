@@ -553,6 +553,12 @@ test('iexec tee decrypt-results (wrong beneficiary key)', async () => expect(
 
 test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
   execAsync(
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
+  ),
+).resolves.not.toBe(1));
+
+test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName>', async () => expect(
+  execAsync(
     `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
