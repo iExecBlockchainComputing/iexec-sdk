@@ -208,7 +208,6 @@ addWalletLoadOptions(generateKeys);
 generateKeys
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
-  // .option(...option.keyPassword())
   .description(desc.generateKeys())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -315,7 +314,15 @@ decryptResults
       const encKeyFile = 'encrypted_key';
       const encResultsFile = 'result.zip.aes';
 
-      const zip = await new JSZip().loadAsync(fs.readFile(inputFile));
+      let zip;
+      try {
+        zip = await new JSZip().loadAsync(fs.readFile(inputFile));
+      } catch (error) {
+        debug(error);
+        throw Error(
+          `Failed to load encrypted results zip file from ${inputFile}`,
+        );
+      }
 
       let encryptedResultsKeyArrayBuffer;
       try {
@@ -341,28 +348,40 @@ decryptResults
       }
 
       spinner.start('Decrypting results');
-      const resultsKey = privateDecrypt(
-        beneficiaryKey,
-        encryptedResultsKeyBuffer,
-      );
+      let resultsKey;
+      try {
+        resultsKey = privateDecrypt(beneficiaryKey, encryptedResultsKeyBuffer);
+      } catch (error) {
+        debug(error);
+        throw Error(`Failed to decrypt results key with ${beneficiaryKeyPath}`);
+      }
       debug('resultsKey', resultsKey);
 
-      const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
-      await extractFileFromZip(
-        zip,
-        `${rootFolder}/${encResultsFile}`,
-        tempResultsPath,
-      );
-      const ivStream = fs.createReadStream(tempResultsPath, { end: 15 });
-      const iv = await streamToBuffer(ivStream);
-      debug('iv', iv);
-      const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
-        start: 16,
-      });
-      await encryptedResultsStream
-        .pipe(decipherAES(resultsKey, iv))
-        .pipe(fs.createWriteStream(outputFile));
-      await fs.remove(tempResultsPath);
+      try {
+        const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
+        await extractFileFromZip(
+          zip,
+          `${rootFolder}/${encResultsFile}`,
+          tempResultsPath,
+        );
+        const ivStream = fs.createReadStream(tempResultsPath, { end: 15 });
+        const iv = await streamToBuffer(ivStream);
+        debug('iv', iv);
+        const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
+          start: 16,
+        });
+        await encryptedResultsStream
+          .pipe(decipherAES(resultsKey, iv))
+          .pipe(fs.createWriteStream(outputFile));
+        try {
+          await fs.remove(tempResultsPath);
+        } catch (e) {
+          debug(e);
+        }
+      } catch (error) {
+        debug(error);
+        throw Error('Failed to decrypt results with decrypted results key');
+      }
 
       spinner.succeed(`Results successfully decrypted in ${outputFile}`, {
         raw: {
