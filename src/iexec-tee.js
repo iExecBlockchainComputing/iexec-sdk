@@ -163,14 +163,14 @@ encryptDataset
       ]);
       if (isDatasetFolderEmpty) {
         throw Error(
-          `Input folder ${originalDatasetFolderPath} is empty, nothing to encrypt`,
+          `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
         );
       }
       if (!isDatasetSecretsFolderEmpty && !cmd.force) {
         await prompt.dirNotEmpty(datasetSecretsFolderPath);
       }
 
-      spinner.start(`Encrypting dataset from ${originalDatasetFolderPath}`);
+      spinner.start(`Encrypting dataset from "${originalDatasetFolderPath}"`);
 
       await spawnAsync('docker', [
         'run',
@@ -189,7 +189,7 @@ encryptDataset
       ]);
 
       spinner.succeed(
-        `Dataset encrypted in ${encryptedDatasetFolderPath}, you can publish the encrypted file.\nDecryption key stored in ${datasetSecretsFolderPath}, make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
+        `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in ${datasetSecretsFolderPath}, make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
         {
           raw: {
             encryptedDatasetFolderPath,
@@ -261,10 +261,12 @@ generateKeys
       });
 
       spinner.succeed(
-        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in ${beneficiarySecretsFolderPath}, make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to securely share your public key for result encryption`,
+        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in "${beneficiarySecretsFolderPath}", make sure to backup this key pair\nRun "iexec tee push-secret --beneficiary" to securely share your public key for result encryption`,
         {
           raw: {
             secretPath: beneficiarySecretsFolderPath,
+            privateKeyFile: priKeyFileName,
+            publicKeyFile: pubKeyFileName,
           },
         },
       );
@@ -320,7 +322,7 @@ decryptResults
       } catch (error) {
         debug(error);
         throw Error(
-          `Failed to load encrypted results zip file from ${inputFile}`,
+          `Failed to load encrypted results zip file from "${inputFile}"`,
         );
       }
 
@@ -330,7 +332,7 @@ decryptResults
           .file(`${rootFolder}/${encKeyFile}`)
           .async('arraybuffer');
       } catch (error) {
-        throw Error(`Missing ${encKeyFile} file in ${inputFile}`);
+        throw Error(`Missing ${encKeyFile} file in "${inputFile}"`);
       }
       const encryptedResultsKeyBuffer = Buffer.from(
         encryptedResultsKeyArrayBuffer,
@@ -343,7 +345,7 @@ decryptResults
       } catch (error) {
         debug(error);
         throw Error(
-          `Failed to load beneficiary key from ${beneficiaryKeyPath}`,
+          `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
         );
       }
 
@@ -353,7 +355,9 @@ decryptResults
         resultsKey = privateDecrypt(beneficiaryKey, encryptedResultsKeyBuffer);
       } catch (error) {
         debug(error);
-        throw Error(`Failed to decrypt results key with ${beneficiaryKeyPath}`);
+        throw Error(
+          `Failed to decrypt results key with "${beneficiaryKeyPath}"`,
+        );
       }
       debug('resultsKey', resultsKey);
 
