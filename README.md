@@ -395,7 +395,7 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --original-dataset-dir <path>
 # --encrypted-dataset-dir <path>
 iexec tee init # create the TEE folder tree structure
-iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset"
+iexec tee encrypt-dataset # NOT IMPLEMENTED # generate a key and encrypt the dataset from "original-dataset"
 iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
 iexec tee push-secret [secret]
 iexec tee push-secret --secret-file [secretPath] # specify a file path for readind the secret

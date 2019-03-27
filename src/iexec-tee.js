@@ -150,6 +150,7 @@ encryptDataset
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
+      throw Error('NOT IMPLEMENTED');
       const {
         datasetSecretsFolderPath,
         originalDatasetFolderPath,
