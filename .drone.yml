@@ -8,6 +8,7 @@ pipeline:
     image: node:${NODE_TAG}
     commands:
       - node -v
+      - npm -v
       - npm install
       - npm run build
       - npm -g install .
@@ -19,6 +20,7 @@ pipeline:
     image: node:${NODE_TAG}
     commands:
       - node -v
+      - npm -v
       - npm install
       - npm run build
       - npm -g install .
