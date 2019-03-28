@@ -10,6 +10,7 @@ pipeline:
       - node -v
       - npm -v
       - npm install
+      - ./node_modules/.bin/babel --version
       - npm run build
       - npm -g install .
       - npm test
@@ -22,6 +23,7 @@ pipeline:
       - node -v
       - npm -v
       - npm install
+      - ./node_modules/.bin/babel --version
       - npm run build
       - npm -g install .
       - npm test
