@@ -1,8 +1,11 @@
 const { exec } = require('child_process');
+const semver = require('semver');
 const Promise = require('bluebird');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
+
+console.log('Node version:', process.version);
 
 const { DRONE } = process.env;
 const execAsync = Promise.promisify(exec);
@@ -537,6 +540,39 @@ test('iexec deal show', async () => {
     execAsync(`${iexecPath} deal show ${dealid}`),
   ).resolves.not.toBe(1);
 });
+
+// tee
+test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
+
+if (semver.gt('v10.12.0', process.version)) {
+  test('iexec tee generate-beneficiary-keys', async () => expect(
+    execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
+  ).rejects.not.toBe(1));
+} else {
+  test('iexec tee generate-beneficiary-keys', async () => expect(
+    execAsync(
+      `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
+    ),
+  ).resolves.not.toBe(1));
+}
+
+test('iexec tee decrypt-results (wrong beneficiary key)', async () => expect(
+  execAsync(
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip ${saveRaw()}`,
+  ),
+).rejects.not.toBe(1));
+
+test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
+  execAsync(
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
+  ),
+).resolves.not.toBe(1));
+
+test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName>', async () => expect(
+  execAsync(
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key ${saveRaw()}`,
+  ),
+).resolves.not.toBe(1));
 
 // // Uncomment when update schema-validator
 // test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));

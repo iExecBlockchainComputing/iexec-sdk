@@ -2,7 +2,7 @@
 
 const cli = require('commander');
 const Debug = require('debug');
-require('babel-polyfill');
+require('@babel/polyfill');
 const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
 const {

@@ -52,4 +52,7 @@ const checkSecret = async (
   }
 };
 
-module.exports = { pushSecret, checkSecret };
+module.exports = {
+  pushSecret,
+  checkSecret,
+};

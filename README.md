@@ -390,11 +390,18 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 ```bash
 # OPTIONS
 # --chain <chainName>
+# --dataset-keystoredir <path>
+# --beneficiary-keystoredir <path>
+# --original-dataset-dir <path>
+# --encrypted-dataset-dir <path>
+iexec tee init # create the TEE folder tree structure
+iexec tee encrypt-dataset # NOT IMPLEMENTED # generate a key and encrypt the dataset from "original-dataset"
+iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
 iexec tee push-secret [secret]
 iexec tee push-secret --secret-file [secretPath] # specify a file path for readind the secret
 iexec tee push-secret --beneficary # push the secret for the beneficiary (default)
-iexec tee push-secret --app <appAddress> # push the secret for the app
 iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
+iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
 ```
 
 ## category

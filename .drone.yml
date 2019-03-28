@@ -6,9 +6,12 @@ matrix:
 pipeline:
   build:
     image: node:${NODE_TAG}
+    pull: true
     commands:
       - node -v
+      - npm -v
       - npm install
+      - ./node_modules/.bin/babel --version
       - npm run build
       - npm -g install .
       - npm test
@@ -17,9 +20,12 @@ pipeline:
 
   build_on_tag:
     image: node:${NODE_TAG}
+    pull: true
     commands:
       - node -v
+      - npm -v
       - npm install
+      - ./node_modules/.bin/babel --version
       - npm run build
       - npm -g install .
       - npm test
