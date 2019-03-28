@@ -50,9 +50,8 @@
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "babel-cli": "6.26.0",
+    "@babel/cli": "7.2.3",
     "@babel/preset-env": "7.4.2",
-    "babel-preset-jest": "24.3.0",
     "bluebird": "3.5.3",
     "eslint": "5.15.3",
     "eslint-config-airbnb-base": "13.1.0",
