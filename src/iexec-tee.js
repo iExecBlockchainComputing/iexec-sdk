@@ -504,11 +504,20 @@ checkSecret
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(Object.assign(walletOptions));
+      const keystore = Keystore(
+        Object.assign(walletOptions, { isSigner: false }),
+      );
       const chain = await loadChain(cmd.chain, keystore, {
         spinner,
       });
-      const keyAddress = address || (await keystore.load()).address;
+      let keyAddress;
+      if (address) {
+        keyAddress = address;
+      } else {
+        [keyAddress] = await keystore.accounts();
+        spinner.info(`Checking secret for wallet ${keyAddress}`);
+      }
+
       const { sms } = chain;
       if (!sms) throw Error(`Missing sms in chains.json for chain ${chain.id}`);
       const res = await tee.checkSecret(sms, keyAddress);

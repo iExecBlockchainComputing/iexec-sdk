@@ -32,7 +32,10 @@ const pushSecret = async (
       {},
       smsUrl,
     );
-    return res;
+    if (res.ok) {
+      return res.data;
+    }
+    throw Error(`SMS answered with error: ${res.errorMessage}`);
   } catch (error) {
     debug('pushSecret()', error);
     throw error;
@@ -45,7 +48,10 @@ const checkSecret = async (
 ) => {
   try {
     const res = await http.get(secretEndpoit(resourceAddress), {}, {}, smsUrl);
-    return res;
+    if (res.ok) {
+      return res.data;
+    }
+    throw Error(`SMS answered with error: ${res.errorMessage}`);
   } catch (error) {
     debug('checkSecret()', error);
     throw error;
