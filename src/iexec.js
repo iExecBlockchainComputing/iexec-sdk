@@ -20,6 +20,7 @@ const {
 const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
+const { checksummedAddress } = require('./utils');
 const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
@@ -143,7 +144,7 @@ async function main() {
           Keystore({ isSigner: false }),
           { spinner },
         );
-        const hubAddress = cmd.hub || chain.hub;
+        const hubAddress = checksummedAddress(cmd.hub || chain.hub);
 
         spinner.start(info.checking('iExec contracts info'));
 
