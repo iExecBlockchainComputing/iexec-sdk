@@ -6,6 +6,7 @@ matrix:
 pipeline:
   build:
     image: node:${NODE_TAG}
+    pull: always
     commands:
       - node -v
       - npm -v
@@ -19,6 +20,7 @@ pipeline:
 
   build_on_tag:
     image: node:${NODE_TAG}
+    pull: always
     commands:
       - node -v
       - npm -v
