@@ -102,19 +102,19 @@ const chains = {
       hub: '0x60E25C038D70A15364DAc11A042DB1dD7A2cccBC',
     },
     ropsten: {
-      host: 'https://ropsten.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
+      host: 'https://ropsten.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '3',
     },
     rinkeby: {
-      host: 'https://rinkeby.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
+      host: 'https://rinkeby.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '4',
     },
     kovan: {
-      host: 'https://kovan.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
+      host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '42',
     },
     mainnet: {
-      host: 'https://mainnet.infura.io/v3/b2fd33d1c9cc440ba84752c2a4cf949d',
+      host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '1',
     },
   },
