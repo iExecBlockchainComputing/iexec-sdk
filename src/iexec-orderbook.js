@@ -117,7 +117,7 @@ orderbookWorkerpool
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.id,
         cmd.category,
-        { address },
+        { workerpoolAddress: address },
       );
       const workerpoolOrders = response.workerpoolOrders
         ? response.workerpoolOrders.map(e => ({
