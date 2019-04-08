@@ -564,7 +564,7 @@ test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => ex
 
 test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/${saveRaw()}`,
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
