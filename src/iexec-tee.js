@@ -361,7 +361,7 @@ decryptResults
         );
       }
 
-      spinner.start('Decrypting results');
+      spinner.start('Decrypting results key');
       let resultsKey;
       try {
         resultsKey = privateDecrypt(beneficiaryKey, encryptedResultsKeyBuffer);
@@ -373,8 +373,18 @@ decryptResults
       }
       debug('resultsKey', resultsKey);
 
+      const cleanFile = async (filePath) => {
+        try {
+          await fs.remove(filePath);
+        } catch (e) {
+          debug('cleanFile', filePath, e);
+        }
+      };
+
+      spinner.stop();
+      spinner.start('Decrypting results');
+      const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
       try {
-        const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
         await extractFileFromZip(
           zip,
           `${rootFolder}/${encResultsFile}`,
@@ -386,19 +396,24 @@ decryptResults
         });
         const iv = await streamToBuffer(ivStream);
         debug('iv', iv);
-        const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
-          start: 16,
+
+        await new Promise((resolve, reject) => {
+          const out = fs.createWriteStream(outputFile);
+          out.on('close', () => resolve());
+          const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
+            start: 16,
+          });
+          encryptedResultsStream
+            .on('error', e => reject(new Error(`Read error: ${e}`)))
+            .pipe(decipherAES(resultsKey, iv))
+            .on('error', e => reject(new Error(`Decipher error: ${e}`)))
+            .pipe(out)
+            .on('error', e => reject(new Error(`Write error: ${e}`)));
         });
-        await encryptedResultsStream
-          .pipe(decipherAES(resultsKey, iv))
-          .pipe(fs.createWriteStream(outputFile));
-        try {
-          await fs.remove(tempResultsPath);
-        } catch (e) {
-          debug(e);
-        }
+        await cleanFile(tempResultsPath);
       } catch (error) {
         debug(error);
+        await Promise.all([cleanFile(tempResultsPath), cleanFile(outputFile)]);
         throw Error('Failed to decrypt results with decrypted results key');
       }
 
