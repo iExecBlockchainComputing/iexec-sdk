@@ -556,21 +556,21 @@ if (semver.gt('v10.12.0', process.version)) {
   ).resolves.not.toBe(1));
 }
 
-test('iexec tee decrypt-results (wrong beneficiary key)', async () => expect(
+test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip ${saveRaw()}`,
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
   ),
 ).rejects.not.toBe(1));
 
 test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
-test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName>', async () => expect(
+test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key ${saveRaw()}`,
+    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
