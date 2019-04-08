@@ -382,6 +382,8 @@ decryptResults
       };
 
       spinner.stop();
+      const outputExists = await fs.exists(outputFile);
+      if (outputExists && !cmd.force) await prompt.fileExists(outputFile);
       spinner.start('Decrypting results');
       const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
       try {

@@ -330,6 +330,7 @@ const prompt = {
     `Directory ${dir} is not empty, continue and replace content?`,
     options,
   ),
+  fileExists: (path, options) => question(`File ${path} already exists, continue and replace?`, options),
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
