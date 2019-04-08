@@ -592,7 +592,7 @@ test(
   'iexec wallet import --keystoredir [path]',
   () => expect(
     execAsync(
-      `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir temp/iexecSDKTest ${saveRaw()}`,
+      `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir ~/temp/iexecSDKTest ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1),
   10000,
@@ -602,7 +602,7 @@ test(
   'iexec wallet show --keystoredir [path] --wallet-address',
   () => expect(
     execAsync(
-      `${iexecPath} wallet show --password customPath --keystoredir temp/iexecSDKTest --wallet-address ${ADDRESS2} ${saveRaw()}`,
+      `${iexecPath} wallet show --password customPath --keystoredir ~/temp/iexecSDKTest --wallet-address ${ADDRESS2} ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1),
   10000,

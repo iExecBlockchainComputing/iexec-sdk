@@ -95,7 +95,7 @@ const saveWallet = async (userWallet, options) => {
       : osDefaultPathMap.fallback.keystoredir;
     fileDir = path.join(os.homedir(), keystoredir);
   } else if (options.walletOptions && options.walletOptions.path) {
-    fileDir = path.join(os.homedir(), options.walletOptions.path);
+    fileDir = path.join(options.walletOptions.path);
   }
 
   // encryted
@@ -156,7 +156,7 @@ const Keystore = ({
       : osDefaultPathMap.fallback.keystoredir;
     fileDir = path.join(os.homedir(), keystoredir);
   } else if (walletOptions && walletOptions.path) {
-    fileDir = path.join(os.homedir(), walletOptions.path);
+    fileDir = path.join(walletOptions.path);
   } else {
     fileDir = process.cwd();
   }
