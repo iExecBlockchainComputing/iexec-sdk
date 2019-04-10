@@ -179,9 +179,22 @@ const initChainConf = async (options) => {
   return { saved: templates.chains, fileName };
 };
 
+const initArray = async (arrayName, { array } = {}) => {
+  try {
+    const iexecConf = await loadIExecConf();
+    iexecConf[arrayName] = array || templates[arrayName];
+    const fileName = await saveIExecConf(iexecConf, { force: true });
+    return { saved: iexecConf[arrayName], fileName };
+  } catch (error) {
+    debug('initArray()', error);
+    throw error;
+  }
+};
+
 const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   try {
     if (objName === 'app') await initObj('buyConf');
+    if (objName === 'dataset') await initArray('dapps');
     const iexecConf = await loadIExecConf();
     iexecConf[objName] = obj || templates.overwriteObject(templates[objName], overwrite);
     const fileName = await saveIExecConf(iexecConf, { force: true });

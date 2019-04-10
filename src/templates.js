@@ -34,6 +34,16 @@ const dataset = {
     '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
+const compatibleDapp = {
+  name: 'Recomanded-dapp-for-MyDataset',
+  addresses: {
+    42: '0x0000000000000000000000000000000000000000',
+  },
+  buyConf,
+};
+
+const dapps = [compatibleDapp];
+
 const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
@@ -130,6 +140,7 @@ module.exports = {
   workerpool,
   category,
   buyConf,
+  dapps,
   chains,
   overwriteObject,
   createOrder,
