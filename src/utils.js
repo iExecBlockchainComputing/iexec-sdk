@@ -61,7 +61,7 @@ const decodeJWTForPrint = (jwtoken) => {
 
 const decodeJWT = jws.decode;
 
-const API_URL = 'https://gateway.iex.ec/';
+const API_URL = 'https://v2.gateway.iex.ec/';
 // const API_URL = 'http://localhost:3000/';
 
 const makeBody = (verb, body) => {
