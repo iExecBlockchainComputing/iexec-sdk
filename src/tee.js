@@ -4,6 +4,7 @@ const { throwIfMissing, http } = require('./utils');
 const debug = Debug('iexec:tee');
 
 const secretEndpoit = address => `/secret/${address}`;
+const secretPrefix = 'iexec_sms_secret:';
 
 const pushSecret = async (
   contracts = throwIfMissing(),
@@ -25,7 +26,7 @@ const pushSecret = async (
         },
       );
     });
-    const sign = await signMessage(secret);
+    const sign = await signMessage(secretPrefix.concat(secret));
     const res = await http.post(
       secretEndpoit(resourceAddress),
       { secret, sign },
