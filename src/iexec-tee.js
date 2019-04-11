@@ -140,71 +140,70 @@ init
     }
   });
 
-const encryptDataset = cli.command('encrypt-dataset');
-addGlobalOptions(encryptDataset);
-encryptDataset
-  .option(...option.force())
-  .option(...option.datasetKeystoredir())
-  .option(...option.originalDatasetDir())
-  .option(...option.encryptedDatasetDir())
-  .description(desc.encryptDataset())
-  .action(async (cmd) => {
-    const spinner = Spinner(cmd);
-    try {
-      throw Error('NOT IMPLEMENTED');
-      const {
-        datasetSecretsFolderPath,
-        originalDatasetFolderPath,
-        encryptedDatasetFolderPath,
-      } = createTEEPaths(cmd);
-
-      const [
-        isDatasetSecretsFolderEmpty,
-        isDatasetFolderEmpty,
-      ] = await Promise.all([
-        isEmptyDir(datasetSecretsFolderPath),
-        isEmptyDir(originalDatasetFolderPath),
-      ]);
-      if (isDatasetFolderEmpty) {
-        throw Error(
-          `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
-        );
-      }
-      if (!isDatasetSecretsFolderEmpty && !cmd.force) {
-        await prompt.dirNotEmpty(datasetSecretsFolderPath);
-      }
-
-      spinner.start(`Encrypting dataset from "${originalDatasetFolderPath}"`);
-
-      await spawnAsync('docker', [
-        'run',
-        '-t',
-        '--rm',
-        '-v',
-        `${originalDatasetFolderPath}:/data`,
-        '-v',
-        `${encryptedDatasetFolderPath}:/data_SGX_ready`,
-        '-v',
-        `${datasetSecretsFolderPath}:/conf`,
-        '--entrypoint',
-        'sh',
-        DOCKER_IMAGE,
-        'dataset_encrypt.sh',
-      ]);
-
-      spinner.succeed(
-        `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in "${datasetSecretsFolderPath}", make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
-        {
-          raw: {
-            encryptedDatasetFolderPath,
-            secretPath: datasetSecretsFolderPath,
-          },
-        },
-      );
-    } catch (error) {
-      handleError(error, cli, cmd);
-    }
-  });
+// const encryptDataset = cli.command('encrypt-dataset');
+// addGlobalOptions(encryptDataset);
+// encryptDataset
+//   .option(...option.force())
+//   .option(...option.datasetKeystoredir())
+//   .option(...option.originalDatasetDir())
+//   .option(...option.encryptedDatasetDir())
+//   .description(desc.encryptDataset())
+//   .action(async (cmd) => {
+//     const spinner = Spinner(cmd);
+//     try {
+//       const {
+//         datasetSecretsFolderPath,
+//         originalDatasetFolderPath,
+//         encryptedDatasetFolderPath,
+//       } = createTEEPaths(cmd);
+//
+//       const [
+//         isDatasetSecretsFolderEmpty,
+//         isDatasetFolderEmpty,
+//       ] = await Promise.all([
+//         isEmptyDir(datasetSecretsFolderPath),
+//         isEmptyDir(originalDatasetFolderPath),
+//       ]);
+//       if (isDatasetFolderEmpty) {
+//         throw Error(
+//           `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
+//         );
+//       }
+//       if (!isDatasetSecretsFolderEmpty && !cmd.force) {
+//         await prompt.dirNotEmpty(datasetSecretsFolderPath);
+//       }
+//
+//       spinner.start(`Encrypting dataset from "${originalDatasetFolderPath}"`);
+//
+//       await spawnAsync('docker', [
+//         'run',
+//         '-t',
+//         '--rm',
+//         '-v',
+//         `${originalDatasetFolderPath}:/data`,
+//         '-v',
+//         `${encryptedDatasetFolderPath}:/data_SGX_ready`,
+//         '-v',
+//         `${datasetSecretsFolderPath}:/conf`,
+//         '--entrypoint',
+//         'sh',
+//         DOCKER_IMAGE,
+//         'dataset_encrypt.sh',
+//       ]);
+//
+//       spinner.succeed(
+//         `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in "${datasetSecretsFolderPath}", make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
+//         {
+//           raw: {
+//             encryptedDatasetFolderPath,
+//             secretPath: datasetSecretsFolderPath,
+//           },
+//         },
+//       );
+//     } catch (error) {
+//       handleError(error, cli, cmd);
+//     }
+//   });
 
 const generateKeys = cli.command('generate-beneficiary-keys');
 addGlobalOptions(generateKeys);
