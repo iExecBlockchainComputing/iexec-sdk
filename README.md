@@ -72,13 +72,13 @@ Simply edit `chain.json` file to set the `hub` address:
 "kovan": {
   "host": "http://localhost:8545/",
   "id": "42",
-  "hub": "0x36D32A8b943D7a9BB797D250970C6961CEB4afFa"
+  "hub": "0x6140B1d51c11B217c2D23EA52dcC6918bD5F38e4"
 },
 ```
 
 **Here are the last deployed hub address:**
 
-- kovan (PoCo v3.0.26): `"hub": "0x36D32A8b943D7a9BB797D250970C6961CEB4afFa"`
+- kovan (PoCo v3.0.26): `"hub": "0x6140B1d51c11B217c2D23EA52dcC6918bD5F38e4"`
 
 ```
 iexec wallet getETH # ask faucet for ETH, this may require manual action
