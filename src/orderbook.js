@@ -10,7 +10,6 @@ const fetchAppOrderbook = async (
   appAddress = throwIfMissing(),
 ) => {
   try {
-    isString(chainId, { strict: true });
     isEthAddress(appAddress, { strict: true });
     const body = Object.assign({ chainId }, { app: appAddress });
     const response = await http.get('orderbook/app', body);
@@ -27,7 +26,6 @@ const fetchDatasetOrderbook = async (
   datasetAddress = throwIfMissing(),
 ) => {
   try {
-    isString(chainId, { strict: true });
     isEthAddress(datasetAddress, { strict: true });
     const body = Object.assign({ chainId }, { dataset: datasetAddress });
     const response = await http.get('orderbook/dataset', body);
@@ -50,7 +48,6 @@ const fetchWorkerpoolOrderbook = async (
   { workerpoolAddress } = {},
 ) => {
   try {
-    isString(chainId, { strict: true });
     isString(category, { strict: true });
     if (workerpoolAddress) isEthAddress(workerpoolAddress, { strict: true });
     const body = Object.assign(
@@ -79,7 +76,6 @@ const fetchRequestOrderbook = async (
   { requesterAddress } = {},
 ) => {
   try {
-    isString(chainId, { strict: true });
     isString(category, { strict: true });
     if (requesterAddress) isEthAddress(requesterAddress, { strict: true });
     const body = Object.assign(
