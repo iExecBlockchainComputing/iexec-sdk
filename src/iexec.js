@@ -144,7 +144,9 @@ async function main() {
           Keystore({ isSigner: false }),
           { spinner },
         );
-        const hubAddress = checksummedAddress(cmd.hub || chain.hub);
+        const hubAddress = checksummedAddress(
+          cmd.hub || chain.hub || (await chain.contracts.fetchHubAddress()),
+        );
 
         spinner.start(info.checking('iExec contracts info'));
 
