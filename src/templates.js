@@ -12,11 +12,11 @@ const main = {
 
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'hello-world',
+  name: 'VanityEth',
   type: 'DOCKER',
-  multiaddr: 'registry.hub.docker.com/hello-world:linux',
+  multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
   checksum:
-    '0x90bef26b4e016c47ef0814cc02db77e56ca7aef0dca5b079b48326a2a7326ca5',
+    '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
   mrenclave: '',
 };
 
@@ -72,7 +72,7 @@ const order = {
     workerpool: '0x0000000000000000000000000000000000000000',
     workerpoolprice: 0,
     volume: 1,
-    category: 1,
+    category: 0,
     trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
@@ -87,7 +87,7 @@ const order = {
     workerpool: '0x0000000000000000000000000000000000000000',
     workerpoolmaxprice: 0,
     volume: 1,
-    category: 1,
+    category: 0,
     trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     beneficiary: '0x0000000000000000000000000000000000000000',
@@ -97,7 +97,7 @@ const order = {
 };
 
 const category = {
-  name: 'CAT1',
+  name: 'XXL',
   description: 'new hub category',
   workClockTimeRef: '100',
 };
