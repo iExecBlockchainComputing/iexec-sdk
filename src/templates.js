@@ -72,7 +72,7 @@ const order = {
     workerpool: '0x0000000000000000000000000000000000000000',
     workerpoolprice: 0,
     volume: 1,
-    category: 1,
+    category: 0,
     trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
@@ -87,7 +87,7 @@ const order = {
     workerpool: '0x0000000000000000000000000000000000000000',
     workerpoolmaxprice: 0,
     volume: 1,
-    category: 1,
+    category: 0,
     trust: 0,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     beneficiary: '0x0000000000000000000000000000000000000000',
@@ -97,7 +97,7 @@ const order = {
 };
 
 const category = {
-  name: 'CAT1',
+  name: 'XXL',
   description: 'new hub category',
   workClockTimeRef: '100',
 };
