@@ -67,6 +67,11 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
+      if (!iexecConf[objName]) {
+        throw Error(
+          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+        );
+      }
       await keystore.load();
       spinner.start(info.deploying(objName));
       const address = await hub.createObj(objName)(

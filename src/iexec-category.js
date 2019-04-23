@@ -52,6 +52,11 @@ create
         loadIExecConf(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
+      if (!iexecConf[objName]) {
+        throw Error(
+          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+        );
+      }
       await keystore.load();
       spinner.start(info.creating('category'));
       const catidBN = await hub.createCategory(

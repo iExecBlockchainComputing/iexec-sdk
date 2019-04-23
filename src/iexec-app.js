@@ -70,6 +70,11 @@ deploy
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
       ]);
+      if (!iexecConf[objName]) {
+        throw Error(
+          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+        );
+      }
       const appMultiaddrBuffer = humanToMultiaddrBuffer(
         iexecConf[objName].multiaddr,
         { strict: false },
