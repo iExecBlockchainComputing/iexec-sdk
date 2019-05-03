@@ -60,7 +60,7 @@ show
             initialStatus,
           );
           spinner.info(`Task status ${statusName}`);
-          if (['FAILLED', 'COMPLETED'].includes(task.TASK_STATUS_MAP[status])) {
+          if (['FAILED', 'COMPLETED'].includes(task.TASK_STATUS_MAP[status])) {
             return { status, statusName };
           }
           return waitCompletedOrClaimed(status);

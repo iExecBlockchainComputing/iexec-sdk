@@ -21,7 +21,7 @@ const TASK_STATUS_MAP = {
   1: 'ACTIVE',
   2: 'REVEALING',
   3: 'COMPLETED',
-  4: 'FAILLED',
+  4: 'FAILED',
 };
 const FETCH_INTERVAL = 5000;
 const sleep = ms => new Promise(res => setTimeout(res, ms));
@@ -163,7 +163,7 @@ const claim = async (
     const taskStatus = task.status;
 
     if (
-      ['COMPLETED', 'FAILLED'].includes(TASK_STATUS_MAP[taskStatus.toString()])
+      ['COMPLETED', 'FAILED'].includes(TASK_STATUS_MAP[taskStatus.toString()])
     ) {
       throw Error(
         `Cannot claim a ${objName} having status ${
