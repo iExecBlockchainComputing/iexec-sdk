@@ -359,6 +359,7 @@ fill
           workerpoolmaxprice: workerpoolOrder.workerpoolprice,
           requester: address,
           volume: volume.toString(),
+          category: workerpoolOrder.category,
         });
         if (!cmd.force) {
           await prompt.signGeneratedOrder(
@@ -406,6 +407,15 @@ fill
           'Workerpool address mismatch between requestorder and workerpoolorder',
         );
       }
+      // category check
+      const requestCat = new BN(requestOrder.category);
+      const workerpoolCat = new BN(workerpoolOrder.category);
+      if (!workerpoolCat.eq(requestCat)) {
+        throw new Error(
+          'Category mismatch between requestorder and workerpoolorder',
+        );
+      }
+
       // trust check
       const requestTrust = new BN(requestOrder.trust);
       const workerpoolTrust = new BN(workerpoolOrder.trust);
