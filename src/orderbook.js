@@ -1,6 +1,10 @@
 const Debug = require('debug');
 const {
-  http, isString, isEthAddress, throwIfMissing,
+  http,
+  isString,
+  isEthAddress,
+  throwIfMissing,
+  ensureString,
 } = require('./utils');
 
 const debug = Debug('iexec:orderbook');
@@ -11,7 +15,10 @@ const fetchAppOrderbook = async (
 ) => {
   try {
     isEthAddress(appAddress, { strict: true });
-    const body = Object.assign({ chainId }, { app: appAddress });
+    const body = Object.assign(
+      { chainId: ensureString(chainId) },
+      { app: appAddress },
+    );
     const response = await http.get('orderbook/app', body);
     if (response.ok) return { count: response.count, appOrders: response.appOrderbook };
     throw Error('An error occured while getting orderbook');
@@ -27,7 +34,10 @@ const fetchDatasetOrderbook = async (
 ) => {
   try {
     isEthAddress(datasetAddress, { strict: true });
-    const body = Object.assign({ chainId }, { dataset: datasetAddress });
+    const body = Object.assign(
+      { chainId: ensureString(chainId) },
+      { dataset: datasetAddress },
+    );
     const response = await http.get('orderbook/dataset', body);
     if (response.ok) {
       return {
@@ -51,7 +61,7 @@ const fetchWorkerpoolOrderbook = async (
     isString(category, { strict: true });
     if (workerpoolAddress) isEthAddress(workerpoolAddress, { strict: true });
     const body = Object.assign(
-      { chainId },
+      { chainId: ensureString(chainId) },
       { category },
       workerpoolAddress && { workerpool: workerpoolAddress },
     );
@@ -79,7 +89,7 @@ const fetchRequestOrderbook = async (
     isString(category, { strict: true });
     if (requesterAddress) isEthAddress(requesterAddress, { strict: true });
     const body = Object.assign(
-      { chainId },
+      { chainId: ensureString(chainId) },
       { category },
       requesterAddress && { requester: requesterAddress },
     );

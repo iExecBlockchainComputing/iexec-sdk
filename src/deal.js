@@ -8,6 +8,7 @@ const {
   throwIfMissing,
   http,
   checksummedAddress,
+  ensureString,
 } = require('./utils');
 
 const debug = Debug('iexec:deal');
@@ -36,7 +37,7 @@ const fetchRequesterDeals = async (
       beforeTimestamp && { blockTimestamp: { $lt: beforeTimestamp } },
     );
     const body = {
-      chainId,
+      chainId: ensureString(chainId),
       sort: {
         blockTimestamp: -1,
       },

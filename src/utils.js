@@ -335,6 +335,8 @@ const throwIfMissing = () => {
   throw Error('Missing parameter');
 };
 
+const ensureString = val => String(val);
+
 module.exports = {
   getContractAddress,
   isString,
@@ -359,5 +361,6 @@ module.exports = {
   getSalt,
   NULL_ADDRESS,
   NULL_BYTES32,
+  ensureString,
   throwIfMissing,
 };

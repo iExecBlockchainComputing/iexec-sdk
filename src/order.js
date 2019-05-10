@@ -11,6 +11,7 @@ const {
   getAuthorization,
   NULL_ADDRESS,
   NULL_BYTES32,
+  ensureString,
 } = require('./utils');
 const { throwIfMissing } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
@@ -316,7 +317,7 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
-    const body = { chainId, order: signedOrder };
+    const body = { chainId: ensureString(chainId), order: signedOrder };
     const authorization = await getAuthorization(
       chainId,
       address,
@@ -343,7 +344,7 @@ const unpublishOrder = async (
   try {
     checkOrderName(orderName);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
-    const body = { chainId, orderHash };
+    const body = { chainId: ensureString(chainId), orderHash };
     const authorization = await getAuthorization(
       chainId,
       address,
@@ -371,7 +372,7 @@ const fetchPublishedOrderByHash = async (
     const endpoint = objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
     const body = {
-      chainId,
+      chainId: ensureString(chainId),
       sort: {
         publicationTimestamp: -1,
       },
@@ -400,7 +401,7 @@ const fetchDealsByOrderHash = async (
     const hashFiedName = objDesc[orderName].dealField;
     const endpoint = 'deals';
     const body = {
-      chainId,
+      chainId: ensureString(chainId),
       sort: {
         publicationTimestamp: -1,
       },
