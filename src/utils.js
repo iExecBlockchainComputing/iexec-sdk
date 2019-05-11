@@ -363,4 +363,5 @@ module.exports = {
   NULL_BYTES32,
   ensureString,
   throwIfMissing,
+  signTypedDatav3,
 };

@@ -12,6 +12,7 @@ const {
   NULL_ADDRESS,
   NULL_BYTES32,
   ensureString,
+  signTypedDatav3,
 } = require('./utils');
 const { throwIfMissing } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
@@ -270,19 +271,7 @@ const signOrder = async (
     message,
   };
 
-  const signTypedDatav3 = data => new Promise((resolve, reject) => {
-    contracts.ethProvider.sendAsync(
-      {
-        method: 'eth_signTypedData_v3',
-        params: [address, JSON.stringify(data)],
-      },
-      (err, result) => {
-        if (err) reject(err);
-        resolve(result.result);
-      },
-    );
-  });
-  const sign = await signTypedDatav3(typedData);
+  const sign = await signTypedDatav3(contracts.ethProvider, address, typedData);
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   return signedOrder;
 };
