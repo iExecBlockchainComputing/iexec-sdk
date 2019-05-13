@@ -60,20 +60,20 @@ const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
             conf = chainConf;
           }
         });
-        if (!name) throw Error(`missing "${chainName}" chain in "chains.json"`);
+        if (!name) throw Error(`missing "${chainName}" chain in "chain.json"`);
       }
     } else if (chainsConf.default) {
       if (chainsConf.chains[chainsConf.default]) {
         name = chainsConf.default;
         conf = chainsConf.chains[chainsConf.default];
       } else {
-        throw Error(`missing "${chainsConf.default}" chain in "chains.json"`);
+        throw Error(`missing "${chainsConf.default}" chain in "chain.json"`);
       }
     } else if (chainsConf.chains && chainsConf.chains.kovan) {
       name = 'kovan';
       conf = chainsConf.chain.kovan;
     }
-    if (!name) throw Error('missing chain parameter. Check your "chains.json" file');
+    if (!name) throw Error('missing chain parameter. Check your "chain.json" file');
     debug('loading chain', name, conf);
     const chain = createChainFromConf(name, conf, keystore);
     spinner.info(`using chain [${name}]`);

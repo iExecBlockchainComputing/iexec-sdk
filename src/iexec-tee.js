@@ -456,7 +456,7 @@ pushSecret
       });
 
       const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in "chains.json" for chain ${chain.id}`);
+      if (!sms) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
 
       const { address } = await keystore.load();
       debug('address', address);
@@ -535,7 +535,7 @@ checkSecret
       }
 
       const { sms } = chain;
-      if (!sms) throw Error(`Missing sms in chains.json for chain ${chain.id}`);
+      if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
       const res = await tee.checkSecret(sms, keyAddress);
       if (res.hash) {
         spinner.succeed(
