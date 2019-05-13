@@ -122,10 +122,12 @@ const chains = {
     kovan: {
       host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '42',
+      sms: 'https://sms-kovan.iex.ec',
     },
     mainnet: {
       host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '1',
+      sms: 'https://sms-mainnet.iex.ec',
     },
   },
 };
