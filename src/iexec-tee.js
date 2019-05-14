@@ -298,6 +298,7 @@ generateKeys
 
 const decryptResults = cli.command('decrypt-results [encryptedResultsPath]');
 addGlobalOptions(decryptResults);
+addWalletLoadOptions(decryptResults);
 decryptResults
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
