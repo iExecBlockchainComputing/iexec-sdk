@@ -126,14 +126,13 @@ const fetchResults = async (
     const task = await show(contracts, taskid);
     if (TASK_STATUS_MAP[task.status] !== 'COMPLETED') throw Error('Task is not completed');
     const tasksDeal = await deal.show(contracts, task.dealid);
-    const beneficiary = tasksDeal.beneficiary === NULL_ADDRESS
-      ? tasksDeal.requester
-      : tasksDeal.beneficiary;
     if (
-      userAddress.toLowerCase() !== beneficiary.toLowerCase()
-      && NULL_ADDRESS !== beneficiary.toLowerCase()
+      userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
+      && NULL_ADDRESS !== tasksDeal.beneficiary.toLowerCase()
     ) {
-      throw Error(`Only beneficiary ${beneficiary} can download the result`);
+      throw Error(
+        `Only beneficiary ${tasksDeal.beneficiary} can download the result`,
+      );
     }
     const resultAddress = task.results;
     let res;
