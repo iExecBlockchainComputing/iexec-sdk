@@ -27,7 +27,7 @@ const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
 
-const DOCKER_IMAGE = 'iexechub/xxxx@sha256:xxxx';
+// const DATASET_ENCRYPTOR_DOCKER_IMAGE = 'iexechub/dataset-encryptor@sha256:faeb25a4607815a783d230e62535f3eb988947a17a62bfe4f1f5c68d767f0ce1';
 
 const teeFolderName = 'tee';
 const secretsFolderName = '.tee-secrets';
@@ -172,23 +172,33 @@ init
 //       if (!isDatasetSecretsFolderEmpty && !cmd.force) {
 //         await prompt.dirNotEmpty(datasetSecretsFolderPath);
 //       }
+//       const datasetFiles = await fs.readdir(originalDatasetFolderPath);
 //
-//       spinner.start(`Encrypting dataset from "${originalDatasetFolderPath}"`);
+//       datasetFiles.forEach((datasetFileName) => {
+//         if (datasetFileName.indexOf(' ') !== -1) {
+//           throw Error(
+//             `Dataset file name should not contain space, found "${datasetFileName}"`,
+//           );
+//         }
+//       });
+//
+//       spinner.info(
+//         `Encrypting ${
+//           datasetFiles.length
+//         } dataset(s) from "${originalDatasetFolderPath}"`,
+//       );
 //
 //       await spawnAsync('docker', [
 //         'run',
-//         '-t',
 //         '--rm',
 //         '-v',
-//         `${originalDatasetFolderPath}:/data`,
+//         `${originalDatasetFolderPath}:/input`,
 //         '-v',
-//         `${encryptedDatasetFolderPath}:/data_SGX_ready`,
+//         `${encryptedDatasetFolderPath}:/output_enc`,
 //         '-v',
-//         `${datasetSecretsFolderPath}:/conf`,
-//         '--entrypoint',
-//         'sh',
-//         DOCKER_IMAGE,
-//         'dataset_encrypt.sh',
+//         `${datasetSecretsFolderPath}:/output_secret`,
+//         DATASET_ENCRYPTOR_DOCKER_IMAGE,
+//         ...datasetFiles,
 //       ]);
 //
 //       spinner.succeed(
