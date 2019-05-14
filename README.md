@@ -188,6 +188,16 @@ iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
 ```
 
+#### Use tee results encryption
+
+```bash
+iexec tee init # create the tee folder tree
+iexec tee generate-beneficiary-keys # generate private/public AES keypaire for result encryption
+iexec tee push-secret # share the public AES key with the secret management service, all your results will be encrypted with this key
+# Go through the normal buy process  and download the result of the computation #
+iexec tee decrypt-results [encryptedResultsFilePath] # decrypt the result with the private AES key
+```
+
 ### SDK CLI for workers
 
 First go through [Init project](#init-project)
@@ -374,8 +384,8 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 iexec tee init # create the TEE folder tree structure
 iexec tee encrypt-dataset # NOT IMPLEMENTED # generate a key and encrypt the dataset from "original-dataset"
 iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
-iexec tee push-secret [secret]
-iexec tee push-secret --secret-file [secretPath] # specify a file path for readind the secret
+iexec tee push-secret # push the secret for the beneficiary
+iexec tee push-secret --secret-file [secretPath] # specify a file path for reading the secret
 iexec tee push-secret --beneficary # push the secret for the beneficiary (default)
 iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
 iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
