@@ -90,7 +90,7 @@ const extractFileFromZip = (jszip, file, destination) => new Promise((resolve, r
   }
 });
 
-const AES_ALGO = 'aes-128-cbc';
+const AES_ALGO = 'aes-256-cbc';
 const decipherAES = (secret, iv) => createDecipheriv(AES_ALGO, secret, iv);
 
 const createTEEPaths = (cmd = {}) => {
@@ -269,7 +269,7 @@ generateKeys
         generateKeyPair(
           'rsa',
           {
-            modulusLength: 2048,
+            modulusLength: 4096,
             publicKeyEncoding: {
               type: 'spki',
               format: 'pem',
