@@ -516,29 +516,27 @@ The `chains.json` file, located in every iExec project, describes the parameters
   "default": "kovan",
   "chains": {
     "development": {
-      "host": "localhost",
+      "host": "http://localhost:8545",
       "id": "*",
-      "server": "https://localhost:443"
+      "sms": "http://localhost:5000"
     },
     "ropsten": {
-      "host": "https://ropsten.infura.io/berv5GTB5cSdOJPPnqOq",
-      "id": "3",
-      "server": "https://testxw.iex.ec:443"
+      "host": "https://ropsten.infura.io/v3/apiKey",
+      "id": "3"
     },
     "rinkeby": {
-      "host": "https://rinkeby.infura.io/berv5GTB5cSdOJPPnqOq",
-      "id": "4",
-      "server": "https://testxw.iex.ec:443"
+      "host": "https://rinkeby.infura.io/v3/apiKey",
+      "id": "4"
     },
     "kovan": {
-      "host": "https://kovan.infura.io/berv5GTB5cSdOJPPnqOq",
+      "host": "https://kovan.infura.io/v3/apiKey",
       "id": "42",
-      "server": "https://testxw.iex.ec:443"
+      "sms": "https://sms-kovan.iex.ec"
     },
     "mainnet": {
-      "host": "https://mainnet.infura.io/berv5GTB5cSdOJPPnqOq ",
+      "host": "https://mainnet.infura.io/v3/apiKey ",
       "id": "1",
-      "server": "https://mainxw.iex.ec:443"
+      "sms": "https://sms-mainnet.iex.ec"
     }
   }
 }
