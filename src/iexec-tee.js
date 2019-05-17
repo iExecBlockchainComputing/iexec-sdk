@@ -27,7 +27,7 @@ const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
 
-// const DATASET_ENCRYPTOR_DOCKER_IMAGE = 'iexechub/dataset-encryptor@sha256:faeb25a4607815a783d230e62535f3eb988947a17a62bfe4f1f5c68d767f0ce1';
+const DATASET_ENCRYPTOR_DOCKER_IMAGE = 'iexechub/dataset-encryptor@sha256:748eae337101d486281803ae8e8508acc9a7c72cfcc4f2d960f1c17ea730a42e';
 
 const teeFolderName = 'tee';
 const secretsFolderName = '.tee-secrets';
@@ -40,17 +40,20 @@ const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 const publicKeyName = address => `${address}_key.pub`;
 const privateKeyName = address => `${address}_key`;
 
-const spawnAsync = (bin, args) => new Promise((resolve, reject) => {
+const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
   let errorMessage = '';
   const proc = args ? spawn(bin, args) : spawn(bin);
 
-  proc.stdout.on('data', data => console.log(`${data}`));
+  proc.stdout.on('data', (data) => {
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    if (!options.quiet) options.spinner.info(inlineData);
+  });
   proc.stderr.on('data', (data) => {
-    errorMessage = errorMessage.concat('\n', data);
-    debug('errorMessage', errorMessage);
-    console.log(`${data}`);
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    if (!options.quiet) options.spinner.info(inlineData);
+    errorMessage = errorMessage.concat(inlineData, '\n');
   });
 
   proc.on('close', (code) => {
@@ -140,80 +143,98 @@ init
     }
   });
 
-// const encryptDataset = cli.command('encrypt-dataset');
-// addGlobalOptions(encryptDataset);
-// encryptDataset
-//   .option(...option.force())
-//   .option(...option.datasetKeystoredir())
-//   .option(...option.originalDatasetDir())
-//   .option(...option.encryptedDatasetDir())
-//   .description(desc.encryptDataset())
-//   .action(async (cmd) => {
-//     const spinner = Spinner(cmd);
-//     try {
-//       const {
-//         datasetSecretsFolderPath,
-//         originalDatasetFolderPath,
-//         encryptedDatasetFolderPath,
-//       } = createTEEPaths(cmd);
-//
-//       const [
-//         isDatasetSecretsFolderEmpty,
-//         isDatasetFolderEmpty,
-//       ] = await Promise.all([
-//         isEmptyDir(datasetSecretsFolderPath),
-//         isEmptyDir(originalDatasetFolderPath),
-//       ]);
-//       if (isDatasetFolderEmpty) {
-//         throw Error(
-//           `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
-//         );
-//       }
-//       if (!isDatasetSecretsFolderEmpty && !cmd.force) {
-//         await prompt.dirNotEmpty(datasetSecretsFolderPath);
-//       }
-//       const datasetFiles = await fs.readdir(originalDatasetFolderPath);
-//
-//       datasetFiles.forEach((datasetFileName) => {
-//         if (datasetFileName.indexOf(' ') !== -1) {
-//           throw Error(
-//             `Dataset file name should not contain space, found "${datasetFileName}"`,
-//           );
-//         }
-//       });
-//
-//       spinner.info(
-//         `Encrypting ${
-//           datasetFiles.length
-//         } dataset(s) from "${originalDatasetFolderPath}"`,
-//       );
-//
-//       await spawnAsync('docker', [
-//         'run',
-//         '--rm',
-//         '-v',
-//         `${originalDatasetFolderPath}:/input`,
-//         '-v',
-//         `${encryptedDatasetFolderPath}:/output_enc`,
-//         '-v',
-//         `${datasetSecretsFolderPath}:/output_secret`,
-//         DATASET_ENCRYPTOR_DOCKER_IMAGE,
-//         ...datasetFiles,
-//       ]);
-//
-//       spinner.succeed(
-//         `Dataset encrypted in "${encryptedDatasetFolderPath}", you can publish the encrypted file.\nDecryption key stored in "${datasetSecretsFolderPath}", make sure to backup this file.\nOnce your dataset is published run "iexec tee push-secret --dataset <datasetAddress>" to securely share the decryption key with workers.`,
-//         {
-//           raw: {
-//             encryptedDatasetFolderPath,
-//             secretPath: datasetSecretsFolderPath,
-//           },
-//         },
-//       );
-//     } catch (error) {
-//       handleError(error, cli, cmd);
-//     }
-//   });
+const encryptDataset = cli.command('encrypt-dataset');
+addGlobalOptions(encryptDataset);
+encryptDataset
+  .option(...option.force())
+  .option(...option.datasetKeystoredir())
+  .option(...option.originalDatasetDir())
+  .option(...option.encryptedDatasetDir())
+  .description(desc.encryptDataset())
+  .action(async (cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const {
+        datasetSecretsFolderPath,
+        originalDatasetFolderPath,
+        encryptedDatasetFolderPath,
+      } = createTEEPaths(cmd);
+
+      const [
+        isDatasetSecretsFolderEmpty,
+        isDatasetFolderEmpty,
+      ] = await Promise.all([
+        isEmptyDir(datasetSecretsFolderPath),
+        isEmptyDir(originalDatasetFolderPath),
+      ]);
+      if (isDatasetFolderEmpty) {
+        throw Error(
+          `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
+        );
+      }
+      if (!isDatasetSecretsFolderEmpty && !cmd.force) {
+        await prompt.dirNotEmpty(datasetSecretsFolderPath);
+      }
+      const datasetFiles = await fs.readdir(originalDatasetFolderPath);
+
+      try {
+        await spawnAsync('docker', ['--version'], { spinner, quiet: true });
+      } catch (error) {
+        debug('test docker --version', error);
+        throw Error('This command requires docker');
+      }
+      try {
+        await spawnAsync('docker', ['pull', DATASET_ENCRYPTOR_DOCKER_IMAGE], {
+          spinner,
+          quiet: true,
+        });
+      } catch (error) {
+        debug('docker pull', error);
+        throw Error(
+          `Failled to pull docker image ${DATASET_ENCRYPTOR_DOCKER_IMAGE}`,
+        );
+      }
+
+      datasetFiles.forEach((datasetFileName) => {
+        if (datasetFileName.indexOf(' ') !== -1) {
+          throw Error(
+            `Dataset file name should not contain space, found "${datasetFileName}"`,
+          );
+        }
+      });
+
+      spinner.info(
+        `Encrypting ${
+          datasetFiles.length
+        } dataset(s) from "${originalDatasetFolderPath}"`,
+      );
+
+      await spawnAsync('docker', [
+        'run',
+        '--rm',
+        '-v',
+        `${originalDatasetFolderPath}:/input`,
+        '-v',
+        `${encryptedDatasetFolderPath}:/output_enc`,
+        '-v',
+        `${datasetSecretsFolderPath}:/output_secret`,
+        DATASET_ENCRYPTOR_DOCKER_IMAGE,
+        ...datasetFiles,
+      ]);
+
+      spinner.succeed(
+        `Encrypted datasets stored in "${encryptedDatasetFolderPath}", you can publish the encrypted files.\nDatasets keys stored in "${datasetSecretsFolderPath}", make sure to backup them.\nOnce you deploy an encrypted dataset run "iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetKeyPath>" to securely share the dataset key with the workers.`,
+        {
+          raw: {
+            encryptedDatasetFolderPath,
+            secretPath: datasetSecretsFolderPath,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
 
 const generateKeys = cli.command('generate-beneficiary-keys');
 addGlobalOptions(generateKeys);
