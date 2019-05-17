@@ -91,7 +91,17 @@ iexec order cancel --app <orderHash> # cancel your order
 
 First go through [Init project](#init-project)
 
-#### Deploy a dataset
+#### Encrypt your dataset
+
+```bash
+iexec tee init # create ./tee/original-dataset, ./tee/encryptedDataset and ./.tee-secrets/dataset
+cp 'myAwsomeDataset.file' ./tee/original-dataset # copy your dataset file into the original-dataset folder
+iexec tee encrypt-dataset # generate a secret key for each file in original-dataset and encrypt it
+cat ./.tee-secret/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
+cat ./tee/encrypted-dataset/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
+```
+
+#### Deploy your dataset
 
 ```bash
 iexec dataset count # check if you have already deployed datasets
@@ -100,11 +110,20 @@ iexec dataset deploy # deploy dataset on Ethereum
 iexec dataset show # show details of deployed dataset
 ```
 
+### Securely share the dataset secret key (Encrypted datasets only)
+
+**Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
+
+```bash
+iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetSecretPath> # Push the secret in the Secreet Management Service (sms)
+```
+
 #### Sell your dataset on the Marketplace
 
 ```bash
 iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the marketplace
 iexec order init --dataset # reset datasetorder fields in iexec.json
+vim iexec.json # edit your selling policy, set restrictions, price ...
 iexec order sign --dataset # sign your datasetorder
 iexec order publish --dataset #publish your datasetorder on the marketplace and get an orderHash
 iexec order show --dataset [orderHash] # show your order on the Marketplace
@@ -382,7 +401,7 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --original-dataset-dir <path>
 # --encrypted-dataset-dir <path>
 iexec tee init # create the TEE folder tree structure
-iexec tee encrypt-dataset # NOT IMPLEMENTED # generate a key and encrypt the dataset from "original-dataset"
+iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset" docker is required for this command
 iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
 iexec tee push-secret # push the secret for the beneficiary
 iexec tee push-secret --secret-file [secretPath] # specify a file path for reading the secret
@@ -390,6 +409,8 @@ iexec tee push-secret --beneficary # push the secret for the beneficiary (defaul
 iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
 iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
 ```
+
+About `iexec tee encrypt-dataset`, the command will run an encryption script based on Openssl in a docker container. The source code is available in [github](https://github.com/iExecBlockchainComputing/PoCo-tools/tree/master/scripts/encryption/docker)
 
 ## category
 
