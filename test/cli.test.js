@@ -544,6 +544,12 @@ test('iexec deal show', async () => {
 // tee
 test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
 
+test('iexec tee encrypt-dataset', async () => expect(
+  execAsync(
+    `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
+  ),
+).resolves.not.toBe(1));
+
 if (semver.gt('v10.12.0', process.version)) {
   test('iexec tee generate-beneficiary-keys', async () => expect(
     execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
