@@ -608,230 +608,460 @@ The `orders.json` file, located in iExec project, localy stores your signed orde
 
 iExec SDK can be imported in your code as a library/module, and it's compatible with old JS engines:
 
-- \>= Node v6.4
+- \>= Node v8
 - \>= Firefox v22
 - \>= Chrome v28
 - \>= IE 9
 
-## Methods
+## Create a `contracts` object consumable by `iexec` SDK
 
-- [iexec.wallet.checkBalances](#walletcheckbalances)
-- [iexec.wallet.getETH](#walletgeteth)
-- [iexec.wallet.getRLC](#walletgetrlc)
-- [iexec.wallet.sendETH](#walletsendeth)
-- [iexec.wallet.sendRLC](#walletsendrlc)
-- [iexec.account.deposit](#accountdeposit)
-- [iexec.account.withdraw](#accountwithdraw)
-- [iexec.hub.createObj](#hubcreateobj)
-- [iexec.hub.showObj](#hubshowobj)
-- [iexec.hub.countObj](#hubcountobj)
+iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every methodes that interract with the blockchain.
 
-### wallet.checkBalances
+`contracts` is created with the module `iexec-contracts-js-client` and require an etherem signer provider.
 
-**Parameters**
+**Usage:**
+In your project, install `iexec-contracts-js-client`
 
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `address` **String** the address to check balances on
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `balances` **Object**
-  - `balances.wei` **BN** ether balance in wei
-  - `balances.nRLC` **BN** RLC balance in nano RLC
-
-**Example**
-
-```js
-// wallet.checkBalances
+```
+npm install iexec-contracts-js-client@next
 ```
 
-### wallet.getETH
-
-**Parameters**
-
-- `chainName` **String** name of the chain (ropsten|rinkeby|kovan)
-- `address` **String** the address to ask ETH for
-
-**Return** (Promise)
-
-- `responses` **Array of String** String response from each faucet api
-
-**Example**
+In your code
 
 ```js
-// wallet.getETH
+import createIExecContracts from 'iexec-contracts-js-client';
+
+const getContracts = ethProvider => {
+  return createIExecContracts({
+    ethProvider: ethProvider, // an eth signer provider like MetaMask
+    chainId: 42, // id of the chain (42 for kovan)
+  });
+};
 ```
 
-### wallet.getRLC
+**Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
-**Parameters**
+## Get a signer provider from MetaMask
 
-- `chainName` **String** name of the chain (ropsten|rinkeby|kovan)
-- `address` **String** the address to ask ETH for
-
-**Return** (Promise)
-
-- `responses` **Array of String** String response from each faucet api
-
-**Example**
+**Example:**
 
 ```js
-// wallet.getRLC
+const getEthProvider = async () => {
+  let ethProvider;
+  if (!window.ethereum)
+    // check existing
+    throw Error('Need to install MetaMask');
+  ethProvider = window.ethereum;
+  try {
+    await window.ethereum.enable(); // prompt the use to grant the dapp access to the blockchain
+  } catch (error) {
+    throw Error('User denied access', error);
+  }
+  return ethProvider;
+};
 ```
 
-### wallet.sendETH
+## Use iExec SDK lib
 
-**Parameters**
+Install `iexec` in your project
 
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `amouont` **String** the amount of nano RLC to send to
-- `from` **String** the address the is sending ETH
-- `to` **String** the address that is receiving the amount of ETH
-
-**Return** (Promise)
-
-- `txReceipt` **Object** the ethereum transaction receipt
-
-**Example**
-
-```js
-// wallet.sendETH
+```
+npm install iexec@next
 ```
 
-### wallet.sendRLC
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `amount` **String** the amount of nano RLC to send to
-- `to` **String** the address that will receive the amount of nRLC
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `txReceipt` **Object** the ethereum transaction receipt
-
-**Example**
+### Wallet operations
 
 ```js
-// wallet.sendRLC
+import sdk from 'iexec';
+
+// check wallet balances (nRLC & wei)
+const checkBalances = async (contracts, ethAddress) => {
+  const balance = await sdk.wallet.checkBalances(contracts, ethAddress);
+  console.log('Nano RLC:', balance.nRLC.toString());
+  console.log('Eth wei:', balance.wei.toString());
+};
+
+// send RLC
+const sendRLC = async (contracts, amount, toEthAddress) => {
+  const txHash = await sdk.wallet.sendRLC(contracts, amount, toEthAddress);
+  console.log('Transaction hash:', txHash);
+};
 ```
 
-### account.deposit
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `amount` **String** the amount of nano RLC to deposit in iExec account
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `txReceipt` **Object** the ethereum transaction receipt
-
-**Example**
+### Account operations
 
 ```js
-// account.deposit
+import sdk from 'iexec';
+
+// check iExec account balance (nRLC staked and locked)
+const checkAccountBalance = async (contracts, ethAddress) => {
+  const balance = await sdk.account.checkBalance(contracts, ethAddress);
+  console.log('Nano RLC staked:', balance.stake.toString());
+  console.log('Nano RLC locked:', balance.locked.toString());
+};
+
+// deposit RLC from the wallet to the iExec Account
+const deposit = async (contracts, amount) => {
+  const depositedAmount = await sdk.account.deposit(contracts, amount);
+  console.log('Deposited:', depositedAmount);
+};
+
+// withdraw RLC from the iExec Account to the wallet
+const withdraw = async (contracts, amount) => {
+  const withdrawedAmount = await sdk.account.withdraw(contracts, amount);
+  console.log('Withdrawed:', withdrawedAmount);
+};
 ```
 
-### account.withdraw
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `amount` **String** the amount of nano RLC to deposit in iExec account
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `txReceipt` **Object** the ethereum transaction receipt
-
-**Example**
+### Orderbook exploration
 
 ```js
-// wallet.withdraw
+import sdk from 'iexec';
+
+// explore the published workerpool orders
+const getWorkerpoolOrderbook = async (chainId, category, workerpoolAddress) => {
+  const res = await sdk.orderbook.fetchWorkerpoolOrderbook(
+    chainId, // 42 for kovan
+    category, // 1 for category 1
+    { workerpoolAddress }, // optional filter by workerpool address
+  );
+  console.log('Best workerpool orders:', res.workerpoolOrders);
+  console.log('Best order:', res.workerpoolOrders[0].order);
+};
+
+// explore the published request orders
+const getRequestOrderbook = async (chainId, category, requesterAddress) => {
+  const res = await sdk.orderbook.fetchRequestOrderbook(
+    chainId, // 42 for kovan
+    category, // 1 for category 1
+    { requesterAddress }, // optional filter by requester address
+  );
+  console.log('Best request orders:', res.requestOrders);
+  console.log('Best order:', res.requestOrders[0].order);
+};
+
+// explore the published app orders
+const getAppOrderbook = async (chainId, appAddress) => {
+  const res = await sdk.orderbook.fetchAppOrderbook(
+    chainId, // 42 for kovan
+    appAddress, // '0x...' the eth address of an iExec dapp
+  );
+  console.log(`Best orders for ${appAddress}:`, res.appOrders);
+  console.log('Best order:', res.appOrders[0].order);
+};
+
+// explore the published dataset orders
+const getDatasetOrderbook = async (chainId, datasetAddress) => {
+  const res = await sdk.orderbook.fetchDatasetOrderbook(
+    chainId, // 42 for kovan
+    datasetAddress, // '0x...' the eth address of an iExec dataset
+  );
+  console.log(`Best orders for ${datasetAddress}:`, res.datasetOrders);
+  console.log('Best order:', res.datasetOrders[0].order);
+};
 ```
 
-### hub.createObj
+### Order operations
 
-**Parameters**
-
-- `objName` **String** the object type name (app|workerPool|dataset)
-
-**Return** Below Function:
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `obj` **Object** the object to create
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `events` **Object** the decoded logs from the transaction receipt
-
-**Example**
+#### Create your app order (as dapp developper)
 
 ```js
-// hub.createObj
+import sdk from 'iexec';
+
+// prepare an app order to sign
+const initAppOrder = (
+  app, // app address
+  appprice, // selling price in nRLC
+  volume, // number of execution to sell
+  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
+  datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
+  workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
+  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
+) => {
+  app,
+    appprice,
+    volume,
+    tag,
+    datasetrestrict,
+    workerpoolrestrict,
+    requesterrestrict;
+};
+
+// sign an app order
+const signAppOrder = async (contracts, orderToSign, signerAddress) => {
+  const signedOrder = await sdk.order.signOrder(
+    contracts,
+    sdk.order.APP_ORDER,
+    orderToSign,
+    signerAddress,
+  );
+  console.log('Signed order:', signedOrder);
+};
 ```
 
-### hub.showObj
-
-**Parameters**
-
-- `objName` **String** the object type name (app|workerPool|dataset)
-
-**Return** Below Function:
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `objAdressOrIndex` **String** the object address or index
-- `userAddress` **String** the user address to query for
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `obj` **Object** All the properties of the object
-
-**Example**
+#### Create your dataset order (as dataset provider)
 
 ```js
-// hub.showObj
+import sdk from 'iexec';
+
+// prepare a dataset order to sign
+const initDatasetOrder = (
+  dataset, // dataset address
+  datasetprice, // selling price in nRLC
+  volume, // number of execution to sell
+  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
+  apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
+  workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
+  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
+) => {
+  dataset,
+    datasetprice,
+    volume,
+    tag,
+    apprestrict,
+    workerpoolrestrict,
+    requesterrestrict;
+};
+
+// sign a dataset order
+const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
+  const signedOrder = await sdk.order.signOrder(
+    contracts,
+    sdk.order.DATASET_ORDER,
+    orderToSign,
+    signerAddress,
+  );
+  console.log('Signed order:', signedOrder);
+};
 ```
 
-### hub.countObj
-
-**Parameters**
-
-- `objName` **String** the object type name (app|workerPool|dataset)
-
-**Return** Below Function:
-
-**Parameters**
-
-- `contracts` **Object** an [iexec contracts](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) object
-- `userAddress` **String** the user address to query for
-- `options` **Object** [optional] options
-  - `options.hub` **String** custom hub address
-
-**Return** (Promise)
-
-- `objCount` **BN** The total count of object
-
-**Example**
+#### Create your workerpool order (as workerpool owner)
 
 ```js
-// hub.countObj
+import sdk from 'iexec';
+
+// prepare a workerpool order to sign
+const initWorkerpoolOrder = (
+  workerpool, // workerpool address
+  workerpoolprice, // execution selling price in nRLC
+  volume, // number of execution to sell
+  category, // id of the category (0 to 4)
+  trust = 0, // level of trust offered (default no trust)
+  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded offered tags (default no tag)
+  apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
+  datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
+  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
+) => {
+  workerpool,
+    workerpoolprice,
+    volume,
+    category,
+    trust,
+    tag,
+    apprestrict,
+    datasetrestrict,
+    requesterrestrict;
+};
+
+// sign a workerpool order
+const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
+  const signedOrder = await sdk.order.signOrder(
+    contracts,
+    sdk.order.WORKERPOOL_ORDER,
+    orderToSign,
+    signerAddress,
+  );
+  console.log('Signed order:', signedOrder);
+};
+```
+
+#### Create your request order (as requester)
+
+```js
+import sdk from 'iexec';
+
+// prepare a request order to sign
+const initRequestOrder = (
+  app, // address of the app to run
+  appmaxprice, // max price in nRLC to pay to the app owner
+  dataset = sdk.utils.NULL_ADDRESS, // address of the dataset to use (default no dataset)
+  datasetprice, // max price in nRLC to pay to the dataset owner
+  workerpool = sdk.utils.NULL_ADDRESS, // address of the workerpool to use (default any workerpool)
+  workerpoolprice, // max price in nRLC to pay to the workerpool
+  requester, // address of the signer of the order (pay for the computation)
+  beneficiary, // address of the beneficiary of the order (can download the result of the computation)
+  volume, // number of execution to buy
+  params = { 0: '' }, // indexed execution command lines (one entry by execution)
+  callback = sdk.utils.NULL_ADDRESS, // address of the smart contract to send receiveResult as specified in ERC1154 (default none)
+  category, // id of the category (0 to 4)
+  trust = 0, // level of trust required (default no trust)
+  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
+) => {
+  app,
+    appmaxprice,
+    dataset,
+    datasetprice,
+    workerpool,
+    workerpoolprice,
+    requester,
+    beneficiary,
+    volume,
+    params,
+    callback,
+    category,
+    trust,
+    tag;
+};
+
+// sign a request order
+const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
+  const signedOrder = await sdk.order.signOrder(
+    contracts,
+    sdk.order.REQUEST_ORDER,
+    orderToSign,
+    signerAddress,
+  );
+  console.log('Signed order:', signedOrder);
+};
+```
+
+#### Order sharing
+
+```js
+import sdk from 'iexec';
+
+// publish an order on iExec marketplace
+const publishAppOrder = async (contracts, chainId, signedAppOrder, address) => {
+  const orderHash = await sdk.order.publishOrder(
+    contracts,
+    orderName, // sdk.order.APP_ORDER for publishing App order
+    chainId, // 42 for kovan
+    signedAppOrder,
+    address, // signer address
+  );
+  console.log('Published order orderHash:', orderHash);
+};
+
+// unpublish an order from iExec marketplace (unpublished orders still can be matched)
+const unpublishAppOrder = async (contracts, chainId, orderHash, address) => {
+  const unpublishedOrderHash = await sdk.order.unpublishOrder(
+    contracts,
+    orderName, // sdk.order.APP_ORDER for publishing App order
+    chainId, // 42 for kovan
+    orderHash, // hash of the order to unpublish
+    address, // signer address
+  );
+  console.log('Unublished order orderHash:', unpublishedOrderHash);
+};
+
+// cancel an order (canceled orders can't be matched)
+const cancelAppOrder = async (contracts, signedAppOrder) => {
+  const isCanceled = await sdk.order.unpublishOrder(
+    contracts,
+    orderName, // sdk.order.APP_ORDER for publishing App order
+    signedAppOrder, // order to cancel
+  );
+  console.log('Order is canceled:', isCanceled);
+};
+```
+
+#### Make a deal
+
+```js
+import sdk from 'iexec';
+
+// make a deal with compatible signed orders
+const makeADeal = async (
+  contracts,
+  signedAppOrder,
+  signedDataseOrder = sdk.order.NULL_DATASETORDER, // default no dataset
+  signedWorkerpoolOrder,
+  signedRequestOrder,
+) => {
+  const res = await sdk.order.matchOrder(
+    contracts,
+    signedAppOrder,
+    signedDataseOrder,
+    signedWorkerpoolOrder,
+    signedRequestOrder,
+  );
+  console.log('Deal concluded:', res.dealid);
+  console.log('Volume matched:', res.volume);
+};
+
+// show the deals produced by an order
+const showAppOrderDeals = async (contracts, chainId, signedOrder) => {
+  const orderHash = await sdk.order.computeOrderHash(
+    contracts,
+    orderName, // sdk.order.APP_ORDER to get an App order hash
+    signedOrder, // signed app order
+  );
+  const res = await sdk.order.fetchDealsByOrderHash(
+    orderName, // sdk.order.APP_ORDER to get an App order hash
+    chainId, // 42 for kovan
+    orderHash,
+  );
+  console.log('Deals concluded:', res.deals);
+  console.log('Total deals count:', res.count);
+};
+```
+
+### Deal operations
+
+```js
+import sdk from 'iexec';
+
+// show a deal
+const showDeal = async (contracts, dealid) => {
+  const deal = await sdk.deal.show(contracts, dealid);
+  console.log('Deal:', deal);
+};
+
+// get a taskid from a deal
+const getTaskId = (
+  dealid, // Bytes 32 hexstring, id of the deal
+  taskIdx = 0, // index of the task (default 0)
+) => {
+  const taskid = sdk.deal.computeTaskId(dealid, taskIdx);
+  console.log('Taskid :', taskid);
+};
+```
+
+### Task operations
+
+```js
+import sdk from 'iexec';
+
+// show a task
+const showTask = async (contracts, taskid) => {
+  const task = await sdk.task.show(
+    contracts,
+    taskid, // Bytes 32 hexstring, id of the task
+  );
+  console.log('Task:', task);
+};
+
+// claim a task not completed after the final deadline
+const claimTask = async (contracts, taskid, requesterAddress) => {
+  const txHash = await sdk.task.claim(
+    contracts,
+    taskid, // Bytes 32 hexstring, id of the task
+    requesterAddress, // address of the requester
+  );
+  console.log('Claim transaction :', txHash);
+};
+
+const dowloadResults = async (contractas, taskid, userAddress) => {
+  const res = await sdk.task.fetchResults(
+    contracts,
+    taskid, // Bytes 32 hexstring, id of the task
+    userAdress, // address of the beneficiary
+    {
+      ipfsGatewayURL: 'https://gateway.ipfs.io', // optional url of an IPFS gateway (should allow CORS for in browser use)
+    },
+  );
+  const resultBlob = await res.blob(); // get the result
+};
 ```
 
 # iExec SDK CLI fork/spawn
