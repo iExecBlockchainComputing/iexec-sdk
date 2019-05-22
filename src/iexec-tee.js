@@ -114,6 +114,15 @@ const generatePassword = () => new Promise((resolve, reject) => randomBytes(32, 
   else resolve(buff);
 }));
 
+const generateOpensslSafePassword = async () => {
+  const password = await generatePassword();
+  if (
+    password.indexOf(Buffer.from('0a', 'hex')) !== -1
+    || password.indexOf(Buffer.from('00', 'hex')) !== -1
+  ) return generateOpensslSafePassword();
+  return password;
+};
+
 const generateSalt = () => new Promise((resolve, reject) => randomBytes(8, (err, buff) => {
   if (err) reject(err);
   else resolve(buff);
@@ -203,7 +212,7 @@ encryptDataset
 
       const encryptDatasetFile = async (datasetFileName) => {
         spinner.info(`Encrypting ${datasetFileName}`);
-        const password = await generatePassword();
+        const password = await generateOpensslSafePassword();
         debug('password', password);
 
         await saveTextToFile(
