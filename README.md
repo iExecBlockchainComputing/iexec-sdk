@@ -401,7 +401,7 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --original-dataset-dir <path>
 # --encrypted-dataset-dir <path>
 iexec tee init # create the TEE folder tree structure
-iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset" docker is required for this command
+iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset"
 iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
 iexec tee push-secret # push the secret for the beneficiary
 iexec tee push-secret --secret-file [secretPath] # specify a file path for reading the secret
@@ -409,8 +409,6 @@ iexec tee push-secret --beneficary # push the secret for the beneficiary (defaul
 iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
 iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
 ```
-
-About `iexec tee encrypt-dataset`, the command will run an encryption script based on Openssl in a docker container. The source code is available in [github](https://github.com/iExecBlockchainComputing/PoCo-tools/tree/master/scripts/encryption/docker)
 
 ## category
 
