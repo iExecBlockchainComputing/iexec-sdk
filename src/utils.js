@@ -76,35 +76,6 @@ const minBn = (bnArray) => {
   return min;
 };
 
-const getContractAddress = (desc, chainId, { strict = true } = {}) => {
-  try {
-    if (!('networks' in desc)) {
-      if (strict) {
-        throw Error('missing networks key in contract JSON description');
-      }
-      return undefined;
-    }
-    if (!(chainId in desc.networks)) {
-      if (strict) {
-        throw Error(`missing "${chainId}" key in contract JSON description`);
-      }
-      return undefined;
-    }
-    if (!('address' in desc.networks[chainId])) {
-      if (strict) {
-        throw Error(
-          `missing address key in contract JSON description for chainId: ${chainId}`,
-        );
-      }
-      return undefined;
-    }
-    return desc.networks[chainId].address;
-  } catch (error) {
-    debug('getContractAddress()', error);
-    throw error;
-  }
-};
-
 const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
   const isAddress = isHexString && address.length === 42;
@@ -338,7 +309,6 @@ const throwIfMissing = () => {
 const ensureString = val => String(val);
 
 module.exports = {
-  getContractAddress,
   isString,
   isEthAddress,
   checksummedAddress,
