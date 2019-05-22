@@ -550,11 +550,13 @@ test('iexec tee encrypt-dataset', async () => expect(
   ),
 ).resolves.not.toBe(1));
 
-test('openssl decrypt dataset', async () => expect(
-  execAsync(
-    'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset',
-  ),
-).resolves.not.toBe(1));
+if (!DRONE) {
+  test('openssl decrypt dataset', async () => expect(
+    execAsync(
+      'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset',
+    ),
+  ).resolves.not.toBe(1));
+}
 
 if (semver.gt('v10.12.0', process.version)) {
   test('iexec tee generate-beneficiary-keys', async () => expect(
