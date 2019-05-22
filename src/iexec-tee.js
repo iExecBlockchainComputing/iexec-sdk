@@ -7,7 +7,14 @@ const semver = require('semver');
 const fs = require('fs-extra');
 const path = require('path');
 const { spawn } = require('child_process');
-const { createDecipheriv, generateKeyPair, privateDecrypt } = require('crypto');
+const {
+  createCipheriv,
+  createDecipheriv,
+  generateKeyPair,
+  privateDecrypt,
+  randomBytes,
+  pbkdf2,
+} = require('crypto');
 const {
   help,
   addGlobalOptions,
@@ -27,8 +34,6 @@ const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
 
-const DATASET_ENCRYPTOR_DOCKER_IMAGE = 'iexechub/dataset-encryptor@sha256:748eae337101d486281803ae8e8508acc9a7c72cfcc4f2d960f1c17ea730a42e';
-
 const teeFolderName = 'tee';
 const secretsFolderName = '.tee-secrets';
 const datasetSecretsFolderName = 'dataset';
@@ -40,34 +45,34 @@ const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 const publicKeyName = address => `${address}_key.pub`;
 const privateKeyName = address => `${address}_key`;
 
-const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
-  debug('spawnAsync bin', bin);
-  debug('spawnAsync args', args);
-  let errorMessage = '';
-  const proc = args ? spawn(bin, args) : spawn(bin);
-
-  proc.stdout.on('data', (data) => {
-    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-    if (!options.quiet) options.spinner.info(inlineData);
-  });
-  proc.stderr.on('data', (data) => {
-    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-    if (!options.quiet) options.spinner.info(inlineData);
-    errorMessage = errorMessage.concat(inlineData, '\n');
-  });
-
-  proc.on('close', (code) => {
-    if (code !== 0) reject(errorMessage || 'process errored');
-    resolve();
-  });
-
-  proc.on('exit', (code) => {
-    if (code !== 0) reject(errorMessage || 'process errored');
-    resolve();
-  });
-
-  proc.on('error', () => reject(errorMessage || 'process errored'));
-});
+// const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
+//   debug('spawnAsync bin', bin);
+//   debug('spawnAsync args', args);
+//   let errorMessage = '';
+//   const proc = args ? spawn(bin, args) : spawn(bin);
+//
+//   proc.stdout.on('data', (data) => {
+//     const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+//     if (!options.quiet) options.spinner.info(inlineData);
+//   });
+//   proc.stderr.on('data', (data) => {
+//     const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+//     if (!options.quiet) options.spinner.info(inlineData);
+//     errorMessage = errorMessage.concat(inlineData, '\n');
+//   });
+//
+//   proc.on('close', (code) => {
+//     if (code !== 0) reject(errorMessage || 'process errored');
+//     resolve();
+//   });
+//
+//   proc.on('exit', (code) => {
+//     if (code !== 0) reject(errorMessage || 'process errored');
+//     resolve();
+//   });
+//
+//   proc.on('error', () => reject(errorMessage || 'process errored'));
+// });
 
 const streamToBuffer = stream => new Promise((resolve, reject) => {
   const buffers = [];
@@ -90,8 +95,44 @@ const extractFileFromZip = (jszip, file, destination) => new Promise((resolve, r
   }
 });
 
-const AES_ALGO = 'aes-256-cbc';
-const decipherAES = (secret, iv) => createDecipheriv(AES_ALGO, secret, iv);
+const decipherAES = (secret, iv) => createDecipheriv('aes-256-cbc', secret, iv);
+
+const derivateKey = (password, salt) => new Promise((resolve, reject) => {
+  pbkdf2(password, salt, 10000, 48, 'sha256', (err, derivedKey) => {
+    if (err) reject(err);
+    else {
+      resolve({
+        key: derivedKey.slice(0, 32),
+        iv: derivedKey.slice(32, 48),
+      });
+    }
+  });
+});
+
+const generatePassword = () => new Promise((resolve, reject) => randomBytes(32, (err, buff) => {
+  if (err) reject(err);
+  else resolve(buff);
+}));
+
+const generateOpensslSafePassword = async () => {
+  const password = await generatePassword();
+  if (
+    password.indexOf(Buffer.from('0a', 'hex')) !== -1
+    || password.indexOf(Buffer.from('00', 'hex')) !== -1
+  ) return generateOpensslSafePassword();
+  return password;
+};
+
+const generateSalt = () => new Promise((resolve, reject) => randomBytes(8, (err, buff) => {
+  if (err) reject(err);
+  else resolve(buff);
+}));
+
+const encAes256cbcPbkdf2 = async (password, salt) => {
+  // based on Openssl 1.1.1 enc -aes-256-cbc -pbkdf2
+  const { key, iv } = await derivateKey(password, salt);
+  return createCipheriv('aes-256-cbc', key, iv);
+};
 
 const createTEEPaths = (cmd = {}) => {
   const datasetSecretsFolderPath = cmd.datasetKeystoredir
@@ -160,67 +201,71 @@ encryptDataset
         encryptedDatasetFolderPath,
       } = createTEEPaths(cmd);
 
-      const [
-        isDatasetSecretsFolderEmpty,
-        isDatasetFolderEmpty,
-      ] = await Promise.all([
-        isEmptyDir(datasetSecretsFolderPath),
-        isEmptyDir(originalDatasetFolderPath),
-      ]);
+      const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
       if (isDatasetFolderEmpty) {
         throw Error(
           `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
         );
       }
-      if (!isDatasetSecretsFolderEmpty && !cmd.force) {
-        await prompt.dirNotEmpty(datasetSecretsFolderPath);
-      }
+
       const datasetFiles = await fs.readdir(originalDatasetFolderPath);
 
-      try {
-        await spawnAsync('docker', ['--version'], { spinner, quiet: true });
-      } catch (error) {
-        debug('test docker --version', error);
-        throw Error('This command requires docker');
-      }
-      try {
-        await spawnAsync('docker', ['pull', DATASET_ENCRYPTOR_DOCKER_IMAGE], {
-          spinner,
-          quiet: true,
-        });
-      } catch (error) {
-        debug('docker pull', error);
-        throw Error(
-          `Failled to pull docker image ${DATASET_ENCRYPTOR_DOCKER_IMAGE}`,
+      const encryptDatasetFile = async (datasetFileName) => {
+        spinner.info(`Encrypting ${datasetFileName}`);
+        const password = await generateOpensslSafePassword();
+        debug('password', password);
+
+        await saveTextToFile(
+          `${datasetFileName}.secret`,
+          password.toString('base64').concat('\n'),
+          { fileDir: datasetSecretsFolderPath },
         );
-      }
+        spinner.info(
+          `Generated secret for ${datasetFileName} in ${path.join(
+            datasetSecretsFolderPath,
+            `${datasetFileName}.secret`,
+          )}`,
+        );
 
-      datasetFiles.forEach((datasetFileName) => {
-        if (datasetFileName.indexOf(' ') !== -1) {
-          throw Error(
-            `Dataset file name should not contain space, found "${datasetFileName}"`,
+        await new Promise(async (resolve, reject) => {
+          const out = fs.createWriteStream(
+            path.join(encryptedDatasetFolderPath, `${datasetFileName}.enc`),
           );
-        }
-      });
+          out.on('close', () => resolve());
 
-      spinner.info(
-        `Encrypting ${
-          datasetFiles.length
-        } dataset(s) from "${originalDatasetFolderPath}"`,
-      );
+          const salt = await generateSalt();
+          debug('salt', salt);
+          const saltText = Buffer.concat([Buffer.from('Salted__'), salt]);
 
-      await spawnAsync('docker', [
-        'run',
-        '--rm',
-        '-v',
-        `${originalDatasetFolderPath}:/input`,
-        '-v',
-        `${encryptedDatasetFolderPath}:/output_enc`,
-        '-v',
-        `${datasetSecretsFolderPath}:/output_secret`,
-        DATASET_ENCRYPTOR_DOCKER_IMAGE,
-        ...datasetFiles,
-      ]);
+          const datasetPath = path.join(
+            originalDatasetFolderPath,
+            `${datasetFileName}`,
+          );
+          const originalDatasetStream = fs.createReadStream(datasetPath);
+
+          out.write(saltText);
+          originalDatasetStream
+            .on('error', e => reject(new Error(`Read error: ${e}`)))
+            .pipe(await encAes256cbcPbkdf2(password, salt))
+            .on('error', e => reject(new Error(`Cipher error: ${e}`)))
+            .pipe(out)
+            .on('error', e => reject(new Error(`Write error: ${e}`)));
+        });
+        spinner.info(
+          `Generated encrypted file for ${datasetFileName} in ${path.join(
+            datasetSecretsFolderPath,
+            `${datasetFileName}.enc`,
+          )}`,
+        );
+      };
+
+      const recursiveEncryptDatasets = async (filesNames, index = 0) => {
+        if (index >= filesNames.length) return;
+        await encryptDatasetFile(filesNames[index]);
+        await recursiveEncryptDatasets(filesNames, index + 1);
+      };
+
+      await recursiveEncryptDatasets(datasetFiles);
 
       spinner.succeed(
         `Encrypted datasets stored in "${encryptedDatasetFolderPath}", you can publish the encrypted files.\nDatasets keys stored in "${datasetSecretsFolderPath}", make sure to backup them.\nOnce you deploy an encrypted dataset run "iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetKeyPath>" to securely share the dataset key with the workers.`,
