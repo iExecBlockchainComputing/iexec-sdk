@@ -20,6 +20,7 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - iExec main documentation: https://docs.iex.ec
 - The iExec [JS smart contracts client lib](https://github.com/iExecBlockchainComputing/iexec-contracts-js-client) to interact with iExec smart contracts (without the SDK)
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
+- [iExec data registry](https://github.com/iExecBlockchainComputing/iexec-data-registry), to apply for Data Store listing
 
 ## Install
 
@@ -204,7 +205,7 @@ iexec order show --app <orderHash> --deals # show your order on the marketplace 
 
 ```bash
 iexec deal show <dealid> # show your deal details
-iexec deal show <dealid> --tasks 0 # qet the taskid of the task at index 0 of the deal
+iexec deal show <dealid> --tasks 0 # get the taskid of the task at index 0 of the deal
 iexec task show <taskid> # show the status of your task
 iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
@@ -616,6 +617,11 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 - \>= Chrome v28
 - \>= IE 9
 
+## These dapps are built on the top of iexec SDK
+
+- [Price feed DOracle](https://price-feed-doracle.iex.ec/): a decentralized price oracle for your favorite cryptos.
+- [Not safe for work](https://nsfw.app.iex.ec/): find if a picture is safe for work using an AI trained model protected by iExec TEE.
+
 ## Create a `contracts` object consumable by `iexec` SDK
 
 iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every methodes that interract with the blockchain.
@@ -629,7 +635,7 @@ In your project, install `iexec-contracts-js-client`
 npm install iexec-contracts-js-client
 ```
 
-In your code
+In your code:
 
 ```js
 import createIExecContracts from 'iexec-contracts-js-client';
