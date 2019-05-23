@@ -9,7 +9,10 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 
 ## Resources
 
+- [CLI documentation](https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api)
+- [JS lib documentation](https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-library-api)
 - The iExec Dapp Store: https://dapps.iex.ec
+- The iExec Data Store: https://data.iex.ec
 - The iExec Marketplace: https://market.iex.ec
 - The iExec Explorer: https://explorer.iex.ec
 - The iExec Workerpool registry: https://pools.iex.ec
@@ -602,7 +605,7 @@ The `orders.json` file, located in iExec project, localy stores your signed orde
 }
 ```
 
-# iExec Library API
+# iExec SDK Library API
 
 [Work In Progress] Although we'll try to avoid any API change, the Lib API may still evolve a little bit based on beta-tester feedbacks.
 
@@ -617,13 +620,13 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 
 iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every methodes that interract with the blockchain.
 
-`contracts` is created with the module `iexec-contracts-js-client` and require an etherem signer provider.
+`contracts` is created with the module `iexec-contracts-js-client` and require an Ethereum signer provider.
 
 **Usage:**
 In your project, install `iexec-contracts-js-client`
 
 ```
-npm install iexec-contracts-js-client@next
+npm install iexec-contracts-js-client
 ```
 
 In your code
@@ -666,10 +669,12 @@ const getEthProvider = async () => {
 Install `iexec` in your project
 
 ```
-npm install iexec@next
+npm install iexec
 ```
 
 ### Wallet operations
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -689,6 +694,8 @@ const sendRLC = async (contracts, amount, toEthAddress) => {
 ```
 
 ### Account operations
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -714,6 +721,8 @@ const withdraw = async (contracts, amount) => {
 ```
 
 ### Orderbook exploration
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -765,6 +774,8 @@ const getDatasetOrderbook = async (chainId, datasetAddress) => {
 
 #### Create your app order (as dapp developper)
 
+**Example:**
+
 ```js
 import sdk from 'iexec';
 
@@ -801,6 +812,8 @@ const signAppOrder = async (contracts, orderToSign, signerAddress) => {
 
 #### Create your dataset order (as dataset provider)
 
+**Example:**
+
 ```js
 import sdk from 'iexec';
 
@@ -836,6 +849,8 @@ const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
 ```
 
 #### Create your workerpool order (as workerpool owner)
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -876,6 +891,8 @@ const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
 ```
 
 #### Create your request order (as requester)
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -927,6 +944,8 @@ const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
 
 #### Order sharing
 
+**Example:**
+
 ```js
 import sdk from 'iexec';
 
@@ -966,6 +985,8 @@ const cancelAppOrder = async (contracts, signedAppOrder) => {
 ```
 
 #### Make a deal
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
@@ -1008,6 +1029,8 @@ const showAppOrderDeals = async (contracts, chainId, signedOrder) => {
 
 ### Deal operations
 
+**Example:**
+
 ```js
 import sdk from 'iexec';
 
@@ -1028,6 +1051,8 @@ const getTaskId = (
 ```
 
 ### Task operations
+
+**Example:**
 
 ```js
 import sdk from 'iexec';
