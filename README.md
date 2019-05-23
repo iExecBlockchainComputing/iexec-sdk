@@ -608,9 +608,9 @@ The `orders.json` file, located in iExec project, localy stores your signed orde
 
 # iExec SDK Library API
 
-[Work In Progress] Although we'll try to avoid any API change, the Lib API may still evolve a little bit based on beta-tester feedbacks.
+**[Work In Progress]** Although we'll try to avoid any API change, the Lib API may still evolve a little bit based on beta-tester feedbacks.
 
-iExec SDK can be imported in your code as a library/module, and it's compatible with old JS engines:
+iExec SDK can be imported in your project as a library/module, and it's compatible with old JS engines:
 
 - \>= Node v8
 - \>= Firefox v22
@@ -622,18 +622,31 @@ iExec SDK can be imported in your code as a library/module, and it's compatible 
 - [Price feed DOracle](https://price-feed-doracle.iex.ec/): a decentralized price oracle for your favorite cryptos.
 - [Not safe for work](https://nsfw.app.iex.ec/): find if a picture is safe for work using an AI trained model protected by iExec TEE.
 
-## Create a `contracts` object consumable by `iexec` SDK
+## How to use ?
+
+1. [Install the dependencies in your JS project](#install-the-dependencies-in-your-js-project)
+2. [Create a contracts object consumable by iexec SDK](#create-a-contracts-object-consumable-by-iexec-sdk)
+3. [Access iexec most usefull methods](#access-iexec-most-usefull-methods)
+
+### Install the dependencies in your JS project
+
+Install iexec-contracts-js-client to access the iexec Smart Contracts
+
+```bash
+npm install iexec-contracts-js-client
+```
+
+Install iexec sdk
+
+```bash
+npm install iexec
+```
+
+### Create a `contracts` object consumable by `iexec` SDK
 
 iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every methodes that interract with the blockchain.
 
 `contracts` is created with the module `iexec-contracts-js-client` and require an Ethereum signer provider.
-
-**Usage:**
-In your project, install `iexec-contracts-js-client`
-
-```
-npm install iexec-contracts-js-client
-```
 
 In your code:
 
@@ -650,7 +663,7 @@ const getContracts = ethProvider => {
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
-## Get a signer provider from MetaMask
+In the browser, you can get a signer provider from [MetaMask plugin](https://metamask.io/)
 
 **Example:**
 
@@ -670,15 +683,18 @@ const getEthProvider = async () => {
 };
 ```
 
-## Use iExec SDK lib
+### Access iexec most usefull methods
 
-Install `iexec` in your project
+iexec modules:
 
-```
-npm install iexec
-```
+- [wallet](#wallet): manage your wallet, send RLC...
+- [account](#account): manage your account, deposit, withdraw...
+- [orderbook](#orderboook): explore the iexec Marketplace
+- [order](#order): manage any type of order, make deals to start offchain computation
+- [deal](#deal): find your deals
+- [task](#task): follow the computation, dowload results or claim failled exuecutions
 
-### Wallet operations
+### Wallet
 
 **Example:**
 
@@ -692,14 +708,14 @@ const checkBalances = async (contracts, ethAddress) => {
   console.log('Eth wei:', balance.wei.toString());
 };
 
-// send RLC
+// send RLC (! blockchain transaction !)
 const sendRLC = async (contracts, amount, toEthAddress) => {
   const txHash = await sdk.wallet.sendRLC(contracts, amount, toEthAddress);
   console.log('Transaction hash:', txHash);
 };
 ```
 
-### Account operations
+### Account
 
 **Example:**
 
@@ -713,20 +729,20 @@ const checkAccountBalance = async (contracts, ethAddress) => {
   console.log('Nano RLC locked:', balance.locked.toString());
 };
 
-// deposit RLC from the wallet to the iExec Account
+// deposit RLC from the wallet to the iExec Account (! blockchain transaction !)
 const deposit = async (contracts, amount) => {
   const depositedAmount = await sdk.account.deposit(contracts, amount);
   console.log('Deposited:', depositedAmount);
 };
 
-// withdraw RLC from the iExec Account to the wallet
+// withdraw RLC from the iExec Account to the wallet (! blockchain transaction !)
 const withdraw = async (contracts, amount) => {
   const withdrawedAmount = await sdk.account.withdraw(contracts, amount);
   console.log('Withdrawed:', withdrawedAmount);
 };
 ```
 
-### Orderbook exploration
+### Orderbook
 
 **Example:**
 
@@ -776,7 +792,7 @@ const getDatasetOrderbook = async (chainId, datasetAddress) => {
 };
 ```
 
-### Order operations
+### Order
 
 #### Create your app order (as dapp developper)
 
@@ -979,7 +995,7 @@ const unpublishAppOrder = async (contracts, chainId, orderHash, address) => {
   console.log('Unublished order orderHash:', unpublishedOrderHash);
 };
 
-// cancel an order (canceled orders can't be matched)
+// cancel an order (canceled orders can't be matched) (! blockchain transaction !)
 const cancelAppOrder = async (contracts, signedAppOrder) => {
   const isCanceled = await sdk.order.unpublishOrder(
     contracts,
@@ -997,7 +1013,7 @@ const cancelAppOrder = async (contracts, signedAppOrder) => {
 ```js
 import sdk from 'iexec';
 
-// make a deal with compatible signed orders
+// make a deal with compatible signed orders (! blockchain transaction !)
 const makeADeal = async (
   contracts,
   signedAppOrder,
@@ -1033,7 +1049,7 @@ const showAppOrderDeals = async (contracts, chainId, signedOrder) => {
 };
 ```
 
-### Deal operations
+### Deal
 
 **Example:**
 
@@ -1056,7 +1072,7 @@ const getTaskId = (
 };
 ```
 
-### Task operations
+### Task
 
 **Example:**
 
@@ -1072,7 +1088,7 @@ const showTask = async (contracts, taskid) => {
   console.log('Task:', task);
 };
 
-// claim a task not completed after the final deadline
+// claim a task not completed after the final deadline (! blockchain transaction !)
 const claimTask = async (contracts, taskid, requesterAddress) => {
   const txHash = await sdk.task.claim(
     contracts,
@@ -1091,7 +1107,7 @@ const dowloadResults = async (contractas, taskid, userAddress) => {
       ipfsGatewayURL: 'https://gateway.ipfs.io', // optional url of an IPFS gateway (should allow CORS for in browser use)
     },
   );
-  const resultBlob = await res.blob(); // get the result
+  const resultBlob = await res.blob(); // get the result in a blob for example
 };
 ```
 
