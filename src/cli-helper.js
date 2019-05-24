@@ -177,7 +177,7 @@ const option = {
   force: () => ['--force', 'force perform action without prompting user'],
   showPrivateKey: () => [
     '--show-private-key',
-    'allow to display walletprivate key',
+    'allow displaying walletprivate key',
   ],
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
@@ -493,7 +493,7 @@ const computeWalletCreateOptions = async (cmd) => {
     }
     if (cmd.unencrypted) {
       spinner.warn(
-        'using --unencrypted will generate unprotected unecrypted wallet, this is unsafe, make sure to know what you do',
+        'using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
       );
     }
 

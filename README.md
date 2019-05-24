@@ -282,12 +282,12 @@ iexec init --skip-wallet # skip the wallet creation step
 # --force
 # --password <password>
 iexec wallet create # create a new encrypted wallet
-iexec wallet create --unecrypted # create unecrypted wallet.json (not recommended)
+iexec wallet create --unencrypted # create unencrypted wallet.json (not recommended)
 iexec wallet import <privateKey> # create an encrypted wallet from a privateKey
 iexec wallet getETH # ask ETH from faucets
 iexec wallet getRLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
-iexec wallet show --show-private-key # allow to display wallet private key
+iexec wallet show --show-private-key # allow displaying wallet private key
 iexec wallet sendETH <amount> --to <address> # send ETH to the specified eth address
 iexec wallet sendRLC <amount> --to <address>  # send RLC to the specified eth address
 iexec wallet sweep --to <address> # drain all ETH and RLC, sending them to the specified eth address
@@ -428,7 +428,7 @@ iexec category count # count total number of category
 ## registry
 
 ```bash
-iexec registry validate <'app'|'dataset'|'workerpool'> # validate an object before submiting it to the iExec registry and be listed in the iExec stores
+iexec registry validate <'app'|'dataset'|'workerpool'> # validate an object before submitting it to the iExec registry and be listed in the iExec stores
 ```
 
 ## iexec.json
@@ -544,7 +544,7 @@ The `chains.json` file, located in every iExec project, describes the parameters
 }
 ```
 
-The `orders.json` file, located in iExec project, localy stores your signed orders. This file is used when you publish an order on the marketplace and when you fill orders without specified orders from the marketplace.
+The `orders.json` file, located in iExec project, locally stores your signed orders. This file is used when you publish an order on the marketplace and when you fill orders without specified orders from the marketplace.
 
 ```json
 {
@@ -608,7 +608,7 @@ The `orders.json` file, located in iExec project, localy stores your signed orde
 
 # iExec SDK Library API
 
-**[Work In Progress]** Although we'll try to avoid any API change, the Lib API may still evolve a little bit based on beta-tester feedbacks.
+**[Work In Progress]** Although we'll try to avoid any API change, the Lib API may still evolve based on beta-testers feedback.
 
 iExec SDK can be imported in your project as a library/module, and it's compatible with old JS engines:
 
@@ -626,7 +626,7 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 1. [Install the dependencies in your JS project](#install-the-dependencies-in-your-js-project)
 2. [Create a contracts object consumable by iexec SDK](#create-a-contracts-object-consumable-by-iexec-sdk)
-3. [Access iexec most usefull methods](#access-iexec-most-usefull-methods)
+3. [Access iexec most useful methods](#access-iexec-most-useful-methods)
 
 ### Install the dependencies in your JS project
 
@@ -644,7 +644,7 @@ npm install iexec
 
 ### Create a `contracts` object consumable by `iexec` SDK
 
-iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every methodes that interract with the blockchain.
+iExec SDK use a wrapper to access the iexec contracts on the blockchain, you need to pass this object to every method that interact with the blockchain.
 
 `contracts` is created with the module `iexec-contracts-js-client` and require an Ethereum signer provider.
 
@@ -683,7 +683,7 @@ const getEthProvider = async () => {
 };
 ```
 
-### Access iexec most usefull methods
+### Access iexec most useful methods
 
 iexec modules:
 
@@ -692,7 +692,7 @@ iexec modules:
 - [orderbook](#orderboook): explore the iexec Marketplace
 - [order](#order): manage any type of order, make deals to start offchain computation
 - [deal](#deal): find your deals
-- [task](#task): follow the computation, dowload results or claim failled exuecutions
+- [task](#task): follow the computation, download results or claim failled exuecutions
 
 ### Wallet
 
@@ -992,7 +992,7 @@ const unpublishAppOrder = async (contracts, chainId, orderHash, address) => {
     orderHash, // hash of the order to unpublish
     address, // signer address
   );
-  console.log('Unublished order orderHash:', unpublishedOrderHash);
+  console.log('Unpublished order orderHash:', unpublishedOrderHash);
 };
 
 // cancel an order (canceled orders can't be matched) (! blockchain transaction !)
@@ -1098,7 +1098,7 @@ const claimTask = async (contracts, taskid, requesterAddress) => {
   console.log('Claim transaction :', txHash);
 };
 
-const dowloadResults = async (contractas, taskid, userAddress) => {
+const downloadResults = async (contractas, taskid, userAddress) => {
   const res = await sdk.task.fetchResults(
     contracts,
     taskid, // Bytes 32 hexstring, id of the task
@@ -1113,12 +1113,12 @@ const dowloadResults = async (contractas, taskid, userAddress) => {
 
 # iExec SDK CLI fork/spawn
 
-If your program is not written in javascript, your last option to use the SDK would be to spawn it as a seperate process (sometimes called FORK operation). After each SDK run you should check the exit code returned by the SDK to know if the operation was sucessfull or not `echo $?`:
+If your program is not written in javascript, your last option to use the SDK would be to spawn it as a separate process (sometimes called FORK operation). After each SDK run you should check the exit code returned by the SDK to know if the operation was successful or not `echo $?`:
 
 - 0 = successful
 - 1 = error
 
-Finally, you could choose to parse the SDK stdout/stderr to access more information. Use the global option --raw to get json formated output. ex:
+Finally, you could choose to parse the SDK stdout/stderr to access more information. Use the global option --raw to get json formatted output. ex:
 
 - `iexec wallet show --raw &> out.txt`
 - `iexec wallet show --raw |& grep .`
