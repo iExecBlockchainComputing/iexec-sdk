@@ -109,9 +109,17 @@ const cleanRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
   const cleanObj = keys.reduce((accu, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
-      const value = typeof rpcObj[curr] === 'object'
-        ? cleanRPC(rpcObj[curr])
-        : rpcObj[curr];
+      let value;
+      if (
+        Array.isArray(rpcObj[curr])
+        && !rpcObj[curr].find(e => typeof e === 'object')
+      ) {
+        value = rpcObj[curr];
+      } else if (typeof rpcObj[curr] === 'object') {
+        value = cleanRPC(rpcObj[curr]);
+      } else {
+        value = rpcObj[curr];
+      }
       return Object.assign(accu, { [curr]: value });
     }
     return accu;
