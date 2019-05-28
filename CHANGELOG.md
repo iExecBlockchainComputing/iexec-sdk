@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix display task contributors
+
 ### Removed
 
 ## [3.0.31] - 2019-05-22
