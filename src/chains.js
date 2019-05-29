@@ -17,7 +17,7 @@ const createChainFromConf = (
     signMessage,
     signPersonalMessage,
   },
-  { txOptions } = {},
+  { txOptions = {} } = {},
 ) => {
   try {
     const chain = Object.assign({}, chainConf);
