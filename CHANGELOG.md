@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [3.0.32] - 2019-05-29
+
+### Added
+
 - option `--gas-price <wei>` allow to use custom gas price
 
 ### Changed
@@ -13,6 +21,8 @@ All notable changes to this project will be documented in this file.
 - fix display task contributors
 
 ### Removed
+
+- limit methods exported from `utils` module
 
 ## [3.0.31] - 2019-05-22
 
