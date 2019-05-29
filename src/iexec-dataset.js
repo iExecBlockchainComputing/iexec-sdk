@@ -6,6 +6,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   desc,
   option,
@@ -60,14 +61,16 @@ addGlobalOptions(deploy);
 addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {

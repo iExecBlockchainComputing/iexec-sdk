@@ -10,6 +10,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   option,
   desc,
@@ -26,13 +27,18 @@ addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .description(desc.deposit())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(cmd.chain, keystore, {
+        spinner,
+        txOptions,
+      });
       await keystore.load();
       spinner.start(info.depositing());
       const depositedeAmount = await account.deposit(chain.contracts, amount);
@@ -49,13 +55,18 @@ addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .description(desc.withdraw())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(cmd.chain, keystore, {
+        spinner,
+        txOptions,
+      });
       await keystore.load();
       spinner.start(info.withdrawing());
       const withdrawedAmount = await account.withdraw(chain.contracts, amount);

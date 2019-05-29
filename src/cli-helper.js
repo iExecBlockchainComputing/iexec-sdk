@@ -3,6 +3,7 @@ const colors = require('colors/safe');
 const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
+const BN = require('bn.js');
 
 const debug = Debug('help');
 
@@ -256,6 +257,10 @@ const option = {
   originalDatasetDir: () => [
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
+  ],
+  txGasPrice: () => [
+    '--gas-price <wei>',
+    'set custom gas price for transactions (in wei)',
   ],
 };
 
@@ -550,6 +555,18 @@ const computeWalletLoadOptions = (cmd) => {
   }
 };
 
+const computeTxOptions = (cmd) => {
+  let gasPrice;
+  if (cmd.gasPrice) {
+    if (!/^\d+$/i.test(cmd.gasPrice)) throw Error('Invalid gas price value');
+    const bnGasPrice = new BN(cmd.gasPrice);
+    if (bnGasPrice.isNeg() || bnGasPrice.isZero()) throw Error('Invalid gas price, must be positive');
+    gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
+  }
+  debug('gasPrice', gasPrice);
+  return Object.assign({}, { gasPrice });
+};
+
 const handleError = (error, cli, cmd) => {
   const spinner = Spinner(cmd);
   const lastArg = cli.args[cli.args.length - 1];
@@ -604,6 +621,7 @@ module.exports = {
   addWalletLoadOptions,
   computeWalletCreateOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   prompt,
   pretty,
   prettyRPC,

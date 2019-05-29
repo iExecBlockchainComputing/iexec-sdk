@@ -7,6 +7,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   desc,
   option,
@@ -265,6 +266,7 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
+  .option(...option.txGasPrice())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
   .option(...option.fillWorkerpoolOrder())
@@ -274,9 +276,10 @@ fill
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
       ]);
 
@@ -665,6 +668,7 @@ cancel
   .option(...option.cancelWorkerpoolOrder())
   .option(...option.cancelRequestOrder())
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
@@ -677,10 +681,10 @@ cancel
       }
 
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-
       const [chain, signedOrders, { address }] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
         keystore.load(),
       ]);

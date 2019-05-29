@@ -160,10 +160,19 @@ test(
   20000,
 );
 test(
-  'iexec account withdraw 1000 (+ wallet)',
+  'iexec account withdraw 500 (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} account withdraw 1000 --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
+      `${iexecPath} account withdraw 500 --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+test(
+  'iexec account withdraw 500 --gas-price 1000000000 (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} account withdraw 500 --gas-price 1000000000 --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1),
   15000,

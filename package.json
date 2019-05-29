@@ -30,7 +30,7 @@
     "elliptic": "6.4.1",
     "ethers": "4.0.28",
     "ethjs-account": "0.1.4",
-    "ethjs-custom-signer": "1.1.0",
+    "ethjs-custom-signer": "1.1.1",
     "ethjs-signer": "0.1.1",
     "ethjs-unit": "0.1.6",
     "ethjs-util": "0.1.6",
@@ -45,7 +45,7 @@
     "ora": "3.4.0",
     "prettyjson": "1.2.1",
     "query-string": "6.5.0",
-    "semver": "6.1.0",
+    "semver": "6.1.1",
     "update-check-es5": "1.5.4",
     "uuid": "3.3.2"
   },

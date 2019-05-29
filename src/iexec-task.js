@@ -9,6 +9,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   desc,
   option,
@@ -132,14 +133,16 @@ addGlobalOptions(claim);
 addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
+      const txOptions = computeTxOptions(cmd);
       const [chain, wallet] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
         keystore.load(),
       ]);
       spinner.start(info.claiming(objName));
