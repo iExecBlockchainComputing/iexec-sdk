@@ -27,7 +27,7 @@ addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .description(desc.deposit())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);
@@ -55,7 +55,7 @@ addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .description(desc.withdraw())
   .action(async (amount, cmd) => {
     const spinner = Spinner(cmd);

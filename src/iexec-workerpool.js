@@ -58,7 +58,7 @@ addGlobalOptions(deploy);
 addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);

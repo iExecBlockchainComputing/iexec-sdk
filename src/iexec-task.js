@@ -133,7 +133,7 @@ addGlobalOptions(claim);
 addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
     const spinner = Spinner(cmd);

@@ -266,7 +266,7 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
   .option(...option.fillWorkerpoolOrder())
@@ -668,7 +668,7 @@ cancel
   .option(...option.cancelWorkerpoolOrder())
   .option(...option.cancelRequestOrder())
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {

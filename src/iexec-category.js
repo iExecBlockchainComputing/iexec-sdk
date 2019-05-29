@@ -43,7 +43,7 @@ addGlobalOptions(create);
 addWalletLoadOptions(create);
 create
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);

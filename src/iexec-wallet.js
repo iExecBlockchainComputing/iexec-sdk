@@ -219,7 +219,7 @@ addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sendETH())
@@ -258,7 +258,7 @@ addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sendRLC())
@@ -299,7 +299,7 @@ addGlobalOptions(sweep);
 addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
-  .option(...option.gasPrice())
+  .option(...option.txGasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sweep())
