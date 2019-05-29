@@ -6,6 +6,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   help,
   desc,
@@ -42,15 +43,17 @@ addGlobalOptions(create);
 addWalletLoadOptions(create);
 create
   .option(...option.chain())
+  .option(...option.gasPrice())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       if (!iexecConf[objName]) {
         throw Error(

@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- option `--gas-price <wei>` allow to use custom gas price
+
 ### Changed
 
 - fix display task contributors

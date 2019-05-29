@@ -15,6 +15,7 @@ const {
   computeWalletCreateOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  computeTxOptions,
   handleError,
   help,
   Spinner,
@@ -218,6 +219,7 @@ addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
+  .option(...option.gasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sendETH())
@@ -225,10 +227,11 @@ sendETH
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       const weiAmount = parseEther(amount).toHexString();
       if (!cmd.to) throw Error('missing --to option');
@@ -255,6 +258,7 @@ addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
+  .option(...option.gasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sendRLC())
@@ -262,10 +266,11 @@ sendRLC
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
 
       if (!cmd.to) throw Error('missing --to option');
@@ -294,6 +299,7 @@ addGlobalOptions(sweep);
 addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
+  .option(...option.gasPrice())
   .option(...option.to())
   .option(...option.force())
   .description(desc.sweep())
@@ -301,10 +307,11 @@ sweep
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [{ address }, chain] = await Promise.all([
         keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       if (!cmd.to) throw Error('missing --to option');
       if (!cmd.force) {

@@ -17,17 +17,23 @@ const createChainFromConf = (
     signMessage,
     signPersonalMessage,
   },
+  { txOptions } = {},
 ) => {
   try {
     const chain = Object.assign({}, chainConf);
-    const ethProvider = new SignerProvider(chainConf.host, {
-      signTransaction,
-      accounts,
-      signTypedData,
-      signTypedDatav3,
-      signMessage,
-      signPersonalMessage,
-    });
+    const signerOptions = Object.assign(
+      {},
+      {
+        signTransaction,
+        accounts,
+        signTypedData,
+        signTypedDatav3,
+        signMessage,
+        signPersonalMessage,
+      },
+      { gasPrice: txOptions.gasPrice },
+    );
+    const ethProvider = new SignerProvider(chainConf.host, signerOptions);
     chain.name = chainName;
     chain.contracts = createIExecContracts({
       ethProvider,
@@ -41,7 +47,11 @@ const createChainFromConf = (
   }
 };
 
-const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
+const loadChain = async (
+  chainName,
+  keystore,
+  { spinner = Spinner(), txOptions } = {},
+) => {
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
@@ -75,7 +85,7 @@ const loadChain = async (chainName, keystore, { spinner = Spinner() } = {}) => {
     }
     if (!name) throw Error('missing chain parameter. Check your "chain.json" file');
     debug('loading chain', name, conf);
-    const chain = createChainFromConf(name, conf, keystore);
+    const chain = createChainFromConf(name, conf, keystore, { txOptions });
     spinner.info(`using chain [${name}]`);
     return chain;
   } catch (error) {

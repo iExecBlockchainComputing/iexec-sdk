@@ -266,6 +266,12 @@ iexec info --chain kovan
 --password <password> # specify the password for unlocking the wallet (not recommended)
 ```
 
+### Transactions options
+
+```bash
+--gas-price <wei> # use the specified value for next transactions gas price (default use eth_gasPrice result)
+```
+
 ## init
 
 ```bash
