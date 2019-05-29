@@ -5,7 +5,23 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
-const utils = require('./utils');
+const {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  getSalt,
+  checksummedAddress,
+  isEthAddress,
+  isBytes32,
+} = require('./utils');
+
+const utils = {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  getSalt,
+  isEthAddress,
+  isBytes32,
+  checksummedAddress,
+};
 
 const sdk = {
   wallet,

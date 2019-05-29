@@ -85,7 +85,7 @@ const isEthAddress = (address, { strict = false } = {}) => {
   return isAddress;
 };
 
-const isBytes32 = (str, { strict = true } = {}) => {
+const isBytes32 = (str, { strict = false } = {}) => {
   if (
     typeof str !== 'string'
     || str.length !== 66
