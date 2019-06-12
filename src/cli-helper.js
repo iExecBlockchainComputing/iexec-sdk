@@ -258,6 +258,10 @@ const option = {
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
   ],
+  datasetEncryptionAlgorithm: () => [
+    '--algorithm <algorithm>',
+    "specify the encryption algorithm to use <'aes-256-cbc'|'scone'>",
+  ],
   txGasPrice: () => [
     '--gas-price <wei>',
     'set custom gas price for transactions (in wei)',
