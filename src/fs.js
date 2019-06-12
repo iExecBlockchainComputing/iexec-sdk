@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
+const JSZip = require('jszip');
 const {
   validateChainsConf,
   validateWalletConf,
@@ -266,6 +267,55 @@ const isEmptyDir = async (dirPath) => {
   }
 };
 
+const zipDirectory = async (dirPath, { force = false } = {}) => {
+  const zipPath = `${dirPath}.zip`;
+  const zipName = path.parse(zipPath).base;
+  debug(`zip directory ${dirPath} in ${zipPath}`);
+  if ((await fs.exists(zipPath)) && !force) throw Error(`File ${zipPath} already exists`);
+  try {
+    const addFolder = async (zip, folderPath = '') => {
+      debug('zip adding folder', folderPath);
+      const folderContent = await fs.readdir(path.join(dirPath, folderPath));
+      const pathArray = folderContent.map(fileName => path.join(folderPath, fileName));
+      await Promise.all(
+        pathArray.map(async (relativePath) => {
+          const stats = await fs.lstat(path.join(dirPath, relativePath));
+          if (stats.isDirectory()) {
+            await addFolder(zip, relativePath);
+          } else if (stats.isFile()) {
+            debug('zip adding file', relativePath);
+            zip.file(
+              relativePath,
+              await fs.readFile(path.join(dirPath, relativePath)),
+            );
+          } else {
+            throw Error(`cannot zip ${pathArray}`);
+          }
+        }),
+      );
+    };
+    const zip = new JSZip();
+    await addFolder(zip);
+    debug('zip in memory');
+    await new Promise((resolve, reject) => {
+      zip
+        .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+        .pipe(fs.createWriteStream(zipPath))
+        .on('finish', () => {
+          resolve();
+        })
+        .on('error', (error) => {
+          reject(error);
+        });
+    });
+    debug(`zip ${zipPath} created`);
+    return { zipPath, zipName };
+  } catch (error) {
+    debug('zipDirectory()', error);
+    throw Error(`Failed to create ${zipPath} from ${dirPath}`);
+  }
+};
+
 module.exports = {
   saveTextToFile,
   saveJSONToFile,
@@ -291,6 +341,7 @@ module.exports = {
   initChainConf,
   initOrderObj,
   isEmptyDir,
+  zipDirectory,
   IEXEC_FILE_NAME,
   CHAIN_FILE_NAME,
   ACCOUNT_FILE_NAME,
