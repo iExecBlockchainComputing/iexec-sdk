@@ -99,8 +99,8 @@ First go through [Init project](#init-project)
 
 ```bash
 iexec tee init # create ./tee/original-dataset, ./tee/encryptedDataset and ./.tee-secrets/dataset
-cp 'myAwsomeDataset.file' ./tee/original-dataset # copy your dataset file into the original-dataset folder
-iexec tee encrypt-dataset # generate a secret key for each file in original-dataset and encrypt it
+cp 'myAwsomeDataset.file' ./tee/original-dataset # copy your dataset file or folder into the original-dataset folder
+iexec tee encrypt-dataset # generate a secret key for each file or folder in original-dataset and encrypt it
 cat ./.tee-secret/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
 cat ./tee/encrypted-dataset/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
@@ -412,6 +412,7 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --encrypted-dataset-dir <path>
 iexec tee init # create the TEE folder tree structure
 iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset"
+iexec tee encrypt-dataset --algorithm scone # generate a key and encrypt the dataset from "original-dataset" with Scone
 iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
 iexec tee push-secret # push the secret for the beneficiary
 iexec tee push-secret --secret-file [secretPath] # specify a file path for reading the secret
