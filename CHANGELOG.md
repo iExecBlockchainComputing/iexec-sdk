@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- CLI fix typo
+
 ### Removed
 
 ## [3.0.32] - 2019-05-29
