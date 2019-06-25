@@ -6,15 +6,21 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [3.0.33] - 2019-06-25
+
+### Added
+
 - `iexec tee encrypt-dataset --algorithm <'aes-256-cbc'|'scone'>` alow to choose encryption methode, default is aes-256-cbc.
   `--algorithm scone` alow an encrypted dataset to be processed into a SGX enclave by a Scone compatible dapp.
 
 ### Changed
 
-
 - `iexec tee encrypt-dataset` now supports dataset folders.
 - CLI fix typo
-
 
 ### Removed
 
