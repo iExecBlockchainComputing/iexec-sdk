@@ -34,7 +34,7 @@ const ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 let testNum = 0;
 const saveRaw = () => {
   testNum += 1;
-  return `--raw > out/${testNum}_out 2>&1`;
+  return `--raw ${DRONE ? '' : `> out/${testNum}_out 2>&1`}`;
 };
 
 execAsync('rm -r test/out').catch(e => console.log(e.message));
