@@ -577,15 +577,17 @@ test(
   15000,
 );
 
-test(
-  'iexec tee encrypt-dataset --algorithm scone',
-  async () => expect(
-    execAsync(
-      `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  15000,
-);
+if (!DRONE) {
+  test(
+    'iexec tee encrypt-dataset --algorithm scone',
+    async () => expect(
+      execAsync(
+        `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
+      ),
+    ).resolves.not.toBe(1),
+    15000,
+  );
+}
 
 if (semver.gt('v10.12.0', process.version)) {
   test('iexec tee generate-beneficiary-keys', async () => expect(
