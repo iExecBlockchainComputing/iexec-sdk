@@ -29,7 +29,7 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const tee = require('./tee.js');
-const { isEmptyDir, saveTextToFile } = require('./fs');
+const { isEmptyDir, saveTextToFile, zipDirectory } = require('./fs');
 const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-tee');
@@ -45,34 +45,40 @@ const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 const publicKeyName = address => `${address}_key.pub`;
 const privateKeyName = address => `${address}_key`;
 
-// const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
-//   debug('spawnAsync bin', bin);
-//   debug('spawnAsync args', args);
-//   let errorMessage = '';
-//   const proc = args ? spawn(bin, args) : spawn(bin);
-//
-//   proc.stdout.on('data', (data) => {
-//     const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-//     if (!options.quiet) options.spinner.info(inlineData);
-//   });
-//   proc.stderr.on('data', (data) => {
-//     const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-//     if (!options.quiet) options.spinner.info(inlineData);
-//     errorMessage = errorMessage.concat(inlineData, '\n');
-//   });
-//
-//   proc.on('close', (code) => {
-//     if (code !== 0) reject(errorMessage || 'process errored');
-//     resolve();
-//   });
-//
-//   proc.on('exit', (code) => {
-//     if (code !== 0) reject(errorMessage || 'process errored');
-//     resolve();
-//   });
-//
-//   proc.on('error', () => reject(errorMessage || 'process errored'));
-// });
+const SCONE_IMAGE = 'iexechub/tee_data_encrypter';
+
+const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
+  debug('spawnAsync bin', bin);
+  debug('spawnAsync args', args);
+  let errorMessage = '';
+  const proc = args ? spawn(bin, args) : spawn(bin);
+
+  proc.stdout.on('data', (data) => {
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    debug('spawnAsync stdout', inlineData);
+    if (!options.quiet) options.spinner.info(inlineData);
+  });
+  proc.stderr.on('data', (data) => {
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    debug('spawnAsync stderr', inlineData);
+    if (!options.quiet) options.spinner.info(inlineData);
+    errorMessage = errorMessage.concat(inlineData, '\n');
+  });
+  proc.on('close', (code) => {
+    debug('spawnAsync close', code);
+    if (code !== 0) reject(errorMessage || 'process errored');
+    resolve();
+  });
+  proc.on('exit', (code) => {
+    debug('spawnAsync exit', code);
+    if (code !== 0) reject(errorMessage || 'process errored');
+    resolve();
+  });
+  proc.on('error', () => {
+    debug('spawnAsync error');
+    reject(errorMessage || 'process errored');
+  });
+});
 
 const streamToBuffer = stream => new Promise((resolve, reject) => {
   const buffers = [];
@@ -135,14 +141,22 @@ const encAes256cbcPbkdf2 = async (password, salt) => {
 };
 
 const createTEEPaths = (cmd = {}) => {
+  const absolutePath = relativeOrAbsolutePath => (path.isAbsolute(relativeOrAbsolutePath)
+    ? relativeOrAbsolutePath
+    : path.join(process.cwd(), relativeOrAbsolutePath));
+
   const datasetSecretsFolderPath = cmd.datasetKeystoredir
-    || path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
+    ? absolutePath(cmd.datasetKeystoredir)
+    : path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
   const beneficiarySecretsFolderPath = cmd.beneficiaryKeystoredir
-    || path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
+    ? absolutePath(cmd.beneficiaryKeystoredir)
+    : path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
   const originalDatasetFolderPath = cmd.originalDatasetDir
-    || path.join(process.cwd(), teeFolderName, originalDatasetFolderName);
+    ? absolutePath(cmd.originalDatasetDir)
+    : path.join(process.cwd(), teeFolderName, originalDatasetFolderName);
   const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
-    || path.join(process.cwd(), teeFolderName, encryptedDatasetFolderName);
+    ? absolutePath(cmd.encryptedDatasetDir)
+    : path.join(process.cwd(), teeFolderName, encryptedDatasetFolderName);
 
   const paths = {
     datasetSecretsFolderPath,
@@ -191,6 +205,7 @@ encryptDataset
   .option(...option.datasetKeystoredir())
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
+  .option(...option.datasetEncryptionAlgorithm())
   .description(desc.encryptDataset())
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -207,65 +222,226 @@ encryptDataset
           `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
         );
       }
-
       const datasetFiles = await fs.readdir(originalDatasetFolderPath);
+      debug('datasetFiles', datasetFiles);
 
-      const encryptDatasetFile = async (datasetFileName) => {
-        spinner.info(`Encrypting ${datasetFileName}`);
-        const password = await generateOpensslSafePassword();
-        debug('password', password);
+      if (!cmd.algorithm || cmd.algorithm === 'aes-256-cbc') {
+        spinner.info('Using default encryption aes-256-cbc');
+        const encryptDatasetFile = async (datasetFileName) => {
+          spinner.info(`Encrypting ${datasetFileName}`);
+          const password = await generateOpensslSafePassword();
+          debug('password', password);
 
-        await saveTextToFile(
-          `${datasetFileName}.secret`,
-          password.toString('base64').concat('\n'),
-          { fileDir: datasetSecretsFolderPath },
-        );
-        spinner.info(
-          `Generated secret for ${datasetFileName} in ${path.join(
-            datasetSecretsFolderPath,
+          await saveTextToFile(
             `${datasetFileName}.secret`,
-          )}`,
-        );
-
-        await new Promise(async (resolve, reject) => {
-          const out = fs.createWriteStream(
-            path.join(encryptedDatasetFolderPath, `${datasetFileName}.enc`),
+            password.toString('base64').concat('\n'),
+            { fileDir: datasetSecretsFolderPath, force: cmd.force },
           );
-          out.on('close', () => resolve());
-
-          const salt = await generateSalt();
-          debug('salt', salt);
-          const saltText = Buffer.concat([Buffer.from('Salted__'), salt]);
-
-          const datasetPath = path.join(
-            originalDatasetFolderPath,
-            `${datasetFileName}`,
+          spinner.info(
+            `Generated secret for ${datasetFileName} in ${path.join(
+              datasetSecretsFolderPath,
+              `${datasetFileName}.secret`,
+            )}`,
           );
-          const originalDatasetStream = fs.createReadStream(datasetPath);
 
-          out.write(saltText);
-          originalDatasetStream
-            .on('error', e => reject(new Error(`Read error: ${e}`)))
-            .pipe(await encAes256cbcPbkdf2(password, salt))
-            .on('error', e => reject(new Error(`Cipher error: ${e}`)))
-            .pipe(out)
-            .on('error', e => reject(new Error(`Write error: ${e}`)));
-        });
-        spinner.info(
-          `Generated encrypted file for ${datasetFileName} in ${path.join(
-            datasetSecretsFolderPath,
-            `${datasetFileName}.enc`,
-          )}`,
+          await new Promise(async (resolve, reject) => {
+            const out = fs.createWriteStream(
+              path.join(encryptedDatasetFolderPath, `${datasetFileName}.enc`),
+            );
+            out.on('close', () => resolve());
+
+            const salt = await generateSalt();
+            debug('salt', salt);
+            const saltText = Buffer.concat([Buffer.from('Salted__'), salt]);
+
+            const datasetPath = path.join(
+              originalDatasetFolderPath,
+              `${datasetFileName}`,
+            );
+            const originalDatasetStream = fs.createReadStream(datasetPath);
+
+            out.write(saltText);
+            originalDatasetStream
+              .on('error', e => reject(new Error(`Read error: ${e}`)))
+              .pipe(await encAes256cbcPbkdf2(password, salt))
+              .on('error', e => reject(new Error(`Cipher error: ${e}`)))
+              .pipe(out)
+              .on('error', e => reject(new Error(`Write error: ${e}`)));
+          });
+          spinner.info(
+            `Generated encrypted file for ${datasetFileName} in ${path.join(
+              datasetSecretsFolderPath,
+              `${datasetFileName}.enc`,
+            )}`,
+          );
+        };
+
+        const recursiveEncryptDatasets = async (filesNames, index = 0) => {
+          if (index >= filesNames.length) return;
+          const stats = await fs.lstat(
+            path.join(originalDatasetFolderPath, filesNames[index]),
+          );
+          if (stats.isDirectory()) {
+            spinner.info(`Creating zip file from folder ${filesNames[index]}`);
+            const { zipName, zipPath } = await zipDirectory(
+              path.join(originalDatasetFolderPath, filesNames[index]),
+              { force: cmd.force },
+            );
+            await encryptDatasetFile(zipName);
+            await fs.unlink(zipPath);
+          } else if (stats.isFile()) {
+            await encryptDatasetFile(filesNames[index]);
+          } else {
+            throw Error('Datasets should be files or directories');
+          }
+          await recursiveEncryptDatasets(filesNames, index + 1);
+        };
+        await recursiveEncryptDatasets(datasetFiles);
+      } else if (cmd.algorithm === 'scone') {
+        spinner.info('Using SCONE');
+        try {
+          await spawnAsync('docker', ['--version'], { spinner, quiet: true });
+        } catch (error) {
+          debug('test docker --version', error);
+          throw Error('This command requires docker');
+        }
+        try {
+          await spawnAsync('docker', ['pull', SCONE_IMAGE], {
+            spinner,
+            quiet: true,
+          });
+        } catch (error) {
+          debug('docker pull', error);
+          throw Error(`Failled to pull docker image ${SCONE_IMAGE}`);
+        }
+
+        const encryptDatasetFolder = async (folder) => {
+          const cleanTemp = async () => {
+            try {
+              await spawnAsync('docker', [
+                'run',
+                '--rm',
+                '-v',
+                `${encryptedDatasetFolderPath}:/encrypted`,
+                '-v',
+                `${datasetSecretsFolderPath}:/conf`,
+                SCONE_IMAGE,
+                'rm',
+                '/conf/keytag',
+                '&&',
+                'rm',
+                '-rf',
+                `/encrypted/${folder}`,
+              ]);
+            } catch (error) {
+              debug('encryptDatasetFolder cleanTemp', error);
+            }
+          };
+          try {
+            spinner.info(`Encrypting ${folder} with SCONE`);
+            await spawnAsync(
+              'docker',
+              [
+                'run',
+                '--rm',
+                '-v',
+                `${originalDatasetFolderPath}/${folder}:/data`,
+                '-v',
+                `${encryptedDatasetFolderPath}/${folder}:/data_SGX_ready`,
+                '-v',
+                `${datasetSecretsFolderPath}:/conf`,
+                SCONE_IMAGE,
+                'sh',
+                'create_data_fspf.sh',
+              ],
+              { spinner, quiet: true },
+            );
+            const sconeSecretPath = path.join(
+              datasetSecretsFolderPath,
+              `${folder}.scone.secret`,
+            );
+
+            const secret = await fs.readFile(
+              path.join(datasetSecretsFolderPath, 'keytag'),
+            );
+            await saveTextToFile(`${folder}.scone.secret`, secret, {
+              fileDir: datasetSecretsFolderPath,
+              force: cmd.force,
+            });
+            spinner.info(
+              `Generated secret for ${folder} in ${sconeSecretPath}`,
+            );
+            await zipDirectory(path.join(encryptedDatasetFolderPath, folder), {
+              force: true,
+            });
+            spinner.info(
+              `Generated encrypted file for ${folder} in ${path.join(
+                datasetSecretsFolderPath,
+                `${folder}.zip`,
+              )}`,
+            );
+            await cleanTemp();
+          } catch (error) {
+            await cleanTemp();
+            throw error;
+          }
+        };
+
+        const recursiveEncryptDatasets = async (filesNames, index = 0) => {
+          if (index >= filesNames.length) return;
+          let folderName;
+          const stats = await fs.lstat(
+            path.join(originalDatasetFolderPath, filesNames[index]),
+          );
+          if (stats.isDirectory()) {
+            folderName = filesNames[index];
+            await encryptDatasetFolder(folderName);
+          } else if (stats.isFile()) {
+            const safeFolderName = 'dataset_'.concat(
+              filesNames[index].replace(/[^\w\s.-_]/gi, ''),
+            );
+            spinner.info(
+              `Wrapping single file ${
+                filesNames[index]
+              } into folder ${safeFolderName}`,
+            );
+            await fs.mkdir(
+              path.join(originalDatasetFolderPath, safeFolderName),
+            );
+            await fs.copy(
+              path.join(originalDatasetFolderPath, filesNames[index]),
+              path.join(
+                originalDatasetFolderPath,
+                safeFolderName,
+                filesNames[index],
+              ),
+            );
+            folderName = safeFolderName;
+            await encryptDatasetFolder(folderName);
+            spinner.info(`Removing folder ${safeFolderName}`);
+            await fs.unlink(
+              path.join(
+                originalDatasetFolderPath,
+                safeFolderName,
+                filesNames[index],
+              ),
+            );
+            await fs.rmdir(
+              path.join(originalDatasetFolderPath, safeFolderName),
+            );
+          } else {
+            throw Error('Datasets should be files or directories');
+          }
+          await recursiveEncryptDatasets(filesNames, index + 1);
+        };
+        await recursiveEncryptDatasets(datasetFiles);
+      } else {
+        throw Error(
+          `Unsuported option ${option.datasetEncryptionAlgorithm()[0]} ${
+            cmd.algorithm
+          }`,
         );
-      };
-
-      const recursiveEncryptDatasets = async (filesNames, index = 0) => {
-        if (index >= filesNames.length) return;
-        await encryptDatasetFile(filesNames[index]);
-        await recursiveEncryptDatasets(filesNames, index + 1);
-      };
-
-      await recursiveEncryptDatasets(datasetFiles);
+      }
 
       spinner.succeed(
         `Encrypted datasets stored in "${encryptedDatasetFolderPath}", you can publish the encrypted files.\nDatasets keys stored in "${datasetSecretsFolderPath}", make sure to backup them.\nOnce you deploy an encrypted dataset run "iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetKeyPath>" to securely share the dataset key with the workers.`,
