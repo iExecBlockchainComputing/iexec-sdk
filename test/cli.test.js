@@ -559,6 +559,7 @@ test('iexec tee encrypt-dataset', async () => expect(
   ),
 ).resolves.not.toBe(1));
 
+// require docker
 if (!DRONE) {
   test('openssl decrypt dataset', async () => expect(
     execAsync(
@@ -577,6 +578,7 @@ test(
   15000,
 );
 
+// require docker
 if (!DRONE) {
   test(
     'iexec tee encrypt-dataset --algorithm scone',
