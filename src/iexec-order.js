@@ -469,7 +469,7 @@ fill
       );
       if (stake.lt(costPerWork)) {
         throw new Error(
-          `Cost per task is ${costPerWork} nRLC and requester have ${stake} nRLC staked. Orders can't be matched. If you are the requester, you should run "iexec account deposit <amount>" to top up your account`,
+          `Cost per task is ${costPerWork} nRLC and requester has ${stake} nRLC available. Orders can't be matched. If you are the requester, you should run "iexec account deposit <amount>" to top up your account`,
         );
       }
       const totalCost = costPerWork.mul(maxVolume);
@@ -494,7 +494,7 @@ fill
         throw Error(
           `Workerpool required stake is ${workerpoolPrice.mul(
             new BN(3),
-          )} nRLC and workerpool owner has ${stake} nRLC staked. Orders can't be matched. If you are the workerpool owner, you should run "iexec account deposit <amount>" to top up your account`,
+          )} nRLC and workerpool owner has ${stake} nRLC available. Orders can't be matched. If you are the workerpool owner, you should run "iexec account deposit <amount>" to top up your account`,
         );
       }
       // all checks passed send matchOrder

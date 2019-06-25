@@ -817,15 +817,15 @@ const initAppOrder = (
   datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
   workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
   requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => {
+) => ({
   app,
-    appprice,
-    volume,
-    tag,
-    datasetrestrict,
-    workerpoolrestrict,
-    requesterrestrict;
-};
+  appprice,
+  volume,
+  tag,
+  datasetrestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
 
 // sign an app order
 const signAppOrder = async (contracts, orderToSign, signerAddress) => {
@@ -855,15 +855,15 @@ const initDatasetOrder = (
   apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
   workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
   requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => {
+) => ({
   dataset,
-    datasetprice,
-    volume,
-    tag,
-    apprestrict,
-    workerpoolrestrict,
-    requesterrestrict;
-};
+  datasetprice,
+  volume,
+  tag,
+  apprestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
 
 // sign a dataset order
 const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
@@ -895,17 +895,17 @@ const initWorkerpoolOrder = (
   apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
   datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
   requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => {
+) => ({
   workerpool,
-    workerpoolprice,
-    volume,
-    category,
-    trust,
-    tag,
-    apprestrict,
-    datasetrestrict,
-    requesterrestrict;
-};
+  workerpoolprice,
+  volume,
+  category,
+  trust,
+  tag,
+  apprestrict,
+  datasetrestrict,
+  requesterrestrict,
+});
 
 // sign a workerpool order
 const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
@@ -931,9 +931,9 @@ const initRequestOrder = (
   app, // address of the app to run
   appmaxprice, // max price in nRLC to pay to the app owner
   dataset = sdk.utils.NULL_ADDRESS, // address of the dataset to use (default no dataset)
-  datasetprice, // max price in nRLC to pay to the dataset owner
+  datasetmaxprice, // max price in nRLC to pay to the dataset owner
   workerpool = sdk.utils.NULL_ADDRESS, // address of the workerpool to use (default any workerpool)
-  workerpoolprice, // max price in nRLC to pay to the workerpool
+  workerpoolmaxprice, // max price in nRLC to pay to the workerpool
   requester, // address of the signer of the order (pay for the computation)
   beneficiary, // address of the beneficiary of the order (can download the result of the computation)
   volume, // number of execution to buy
@@ -942,22 +942,22 @@ const initRequestOrder = (
   category, // id of the category (0 to 4)
   trust = 0, // level of trust required (default no trust)
   tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
-) => {
+) => ({
   app,
-    appmaxprice,
-    dataset,
-    datasetprice,
-    workerpool,
-    workerpoolprice,
-    requester,
-    beneficiary,
-    volume,
-    params,
-    callback,
-    category,
-    trust,
-    tag;
-};
+  appmaxprice,
+  dataset,
+  datasetmaxprice,
+  workerpool,
+  workerpoolmaxprice,
+  requester,
+  beneficiary,
+  volume,
+  params,
+  callback,
+  category,
+  trust,
+  tag,
+});
 
 // sign a request order
 const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
@@ -1028,7 +1028,7 @@ const makeADeal = async (
   signedWorkerpoolOrder,
   signedRequestOrder,
 ) => {
-  const res = await sdk.order.matchOrder(
+  const res = await sdk.order.matchOrders(
     contracts,
     signedAppOrder,
     signedDataseOrder,

@@ -11,7 +11,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+
 - `iexec tee encrypt-dataset` now supports dataset folders.
+- CLI fix typo
+
 
 ### Removed
 
