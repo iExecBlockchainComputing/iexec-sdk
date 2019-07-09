@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- request orders are no longer initialized with formated params
+
 ### Removed
 
 ## [3.0.33] - 2019-06-25
