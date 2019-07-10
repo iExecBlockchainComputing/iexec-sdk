@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `iexec order fill --params <string>` alow to generate request order on the fly with specified params
+
 ### Changed
 
 - request orders are no longer initialized with formated params

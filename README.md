@@ -5,7 +5,7 @@
 [![Build Status](https://drone.iex.ec//api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
 
-The iExec SDK is a CLI and a JS library that allows easy interactions with iExec decentralized marketplace in order to run off-chain computations.
+The iExec SDK is a CLI and a JS library that allows easy interactions with iExec decentralized Marketplace in order to run off-chain computations.
 
 ## Resources
 
@@ -83,10 +83,10 @@ iexec app show # show details of deployed app
 #### Sell your app on the Marketplace
 
 ```bash
-iexec orderbook app <address> # check if you have valid sell orders for your app on the marketplace
+iexec orderbook app <address> # check if you have valid sell orders for your app on the Marketplace
 iexec order init --app # reset apporder fields in iexec.json
 iexec order sign --app # sign your apporder
-iexec order publish --app # publish your apporder on the marketplace and get an orderHash
+iexec order publish --app # publish your apporder on the Marketplace and get an orderHash
 iexec order show --app [orderHash] # show your order on the Marketplace
 iexec order cancel --app <orderHash> # cancel your order
 ```
@@ -125,11 +125,11 @@ iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetSecretPat
 #### Sell your dataset on the Marketplace
 
 ```bash
-iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the marketplace
+iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the Marketplace
 iexec order init --dataset # reset datasetorder fields in iexec.json
 vim iexec.json # edit your selling policy, set restrictions, price ...
 iexec order sign --dataset # sign your datasetorder
-iexec order publish --dataset #publish your datasetorder on the marketplace and get an orderHash
+iexec order publish --dataset #publish your datasetorder on the Marketplace and get an orderHash
 iexec order show --dataset [orderHash] # show your order on the Marketplace
 iexec order cancel --dataset <orderHash> # cancel your order
 ```
@@ -150,10 +150,10 @@ iexec workerpool show # show details of deployed workerpool
 #### Sell your computing power at limit price on the Marketplace
 
 ```bash
-iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the marketplace
+iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the Marketplace
 iexec order init --workerpool # reset workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign your workerpoolorder
-iexec order publish --workerpool # publish your workerpoolorder on the marketplace and get an orderHash
+iexec order publish --workerpool # publish your workerpoolorder on the Marketplace and get an orderHash
 iexec order show --workerpool [orderHash] # show your order on the Marketplace
 iexec order cancel --workerpool <orderHash> # cancel your order
 ```
@@ -166,7 +166,7 @@ iexec orderbook app <address> #  find a compatible apporder
 iexec orderbook dataset <address> #  find a compatible datasetorder
 iexec order init --workerpool # reset workerpoolorder fields in iexec.json
 iexec order sign --workerpool # sign your workerpoolorder
-iexec order fill --request [orderHash] --app [orderHash] --dataset [orderHash] # send the orders and get a dealid
+iexec order fill --request <orderHash> --app <orderHash> --dataset <orderHash> # send the orders and get a dealid
 iexec deal show <dealid> # show the detail of the deal you concludes
 ```
 
@@ -185,20 +185,31 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the marketplace
-iexec orderbook app <address> # find the best apporder on the marketplace
-iexec orderbook dataset <address> # find the best datasetorder on the marketplace
-iexec order fill --app [orderHash] --workerpool [orderHash] --dataset [orderHash] # fill all signed orders and get a dealid
+iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the Marketplace
+iexec orderbook app <address> # find the best apporder on the Marketplace
+iexec orderbook dataset <address> # find the best datasetorder on the Marketplace
+iexec order init --request # reset requestorder fields in iexec.json
+iexec order sign --request # sign your requestorder
+iexec order fill --app <orderHash> --workerpool <orderHash> --dataset <orderHash> # fill orders from the Marketplace with signed request order and get a dealid
+```
+
+Alternatively you can generate the request on the fly
+
+```bash
+iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the Marketplace
+iexec orderbook app <address> # find the best apporder on the Marketplace
+iexec orderbook dataset <address> # find the best datasetorder on the Marketplace
+iexec order fill --app <orderHash> --workerpool <orderHash> --dataset <orderHash> --params <params> # fill orders from the Marketplace with requested params and get a dealid
 ```
 
 #### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec orderbook requester [address] --category <id> # check if you already have valid orders on the marketplace
+iexec orderbook requester [address] --category <id> # check if you already have valid orders on the Marketplace
 iexec order init --request # reset requestorder fields in iexec.json
 iexec order sign --request # sign your requestorder
-iexec order publish --request # publish your requestorder on the marketplace and get an orderHash
-iexec order show --app <orderHash> --deals # show your order on the marketplace and check the deals
+iexec order publish --request # publish your requestorder on the Marketplace and get an orderHash
+iexec order show --app <orderHash> --deals # show your order on the Marketplace and check the deals
 ```
 
 #### Watch your Deals, your Tasks and download the results
@@ -359,12 +370,14 @@ iexec order init # init all kind of orders
 iexec order init --app --dataset --workerpool --request # specify the kind of order to init
 iexec order sign # sign all initialized orders
 iexec order sign --app --dataset --workerpool --request # sign the specific initialized orders
-iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec marketplace
-iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec marketplace
+iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec Marketplace
+iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec Marketplace
 iexec order show --request [orderHash] --deals # show the deals produced by an order
-iexec order fill # fill a set of signed orders (app + dataset + workerpool + request) and return a dealID
+iexec order fill # fill a set of local signed orders (app + dataset + workerpool + request) and return a dealID
+iexec order fill --app <orderHash> --dataset <orderHash> --workerpool <orderHash> --request <orderHash> # fill a set of signed orders from iExec Marketplace and return a dealID
+iexec order fill --params <params> # fill a set of signed orders generate a request order with specified params on the fly (existing apporder is ignored)
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
-iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from the marketplace (unpublished orders are still valid the PoCo, to invalidate them use cancel)
+iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from iExec Marketplace (unpublished orders are still valid in the PoCo, to invalidate them use cancel)
 ```
 
 ## orderbook
@@ -551,7 +564,7 @@ The `chains.json` file, located in every iExec project, describes the parameters
 }
 ```
 
-The `orders.json` file, located in iExec project, locally stores your signed orders. This file is used when you publish an order on the marketplace and when you fill orders without specified orders from the marketplace.
+The `orders.json` file, located in iExec project, locally stores your signed orders. This file is used when you publish an order on the Marketplace and when you fill orders without specified orders from the Marketplace.
 
 ```json
 {
@@ -978,7 +991,7 @@ const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
 ```js
 import sdk from 'iexec';
 
-// publish an order on iExec marketplace
+// publish an order on iExec Marketplace
 const publishAppOrder = async (contracts, chainId, signedAppOrder, address) => {
   const orderHash = await sdk.order.publishOrder(
     contracts,
@@ -990,7 +1003,7 @@ const publishAppOrder = async (contracts, chainId, signedAppOrder, address) => {
   console.log('Published order orderHash:', orderHash);
 };
 
-// unpublish an order from iExec marketplace (unpublished orders still can be matched)
+// unpublish an order from iExec Marketplace (unpublished orders still can be matched)
 const unpublishAppOrder = async (contracts, chainId, orderHash, address) => {
   const unpublishedOrderHash = await sdk.order.unpublishOrder(
     contracts,
