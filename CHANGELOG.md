@@ -6,27 +6,31 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- `iexec order fill --params <string>` alow to generate request order on the fly with specified params
+### Changed
+
+### Removed
+
+## [3.0.34] - 2019-07-10
+
+### Added
+
+- `iexec order fill --params <string>` allow to generate request order on the fly with specified params
 
 ### Changed
 
 - request orders are no longer initialized with formated params
 
-### Removed
-
 ## [3.0.33] - 2019-06-25
 
 ### Added
 
-- `iexec tee encrypt-dataset --algorithm <'aes-256-cbc'|'scone'>` alow to choose encryption methode, default is aes-256-cbc.
-  `--algorithm scone` alow an encrypted dataset to be processed into a SGX enclave by a Scone compatible dapp.
+- `iexec tee encrypt-dataset --algorithm <'aes-256-cbc'|'scone'>` allow to choose encryption methode, default is aes-256-cbc.
+  `--algorithm scone` allow an encrypted dataset to be processed into a SGX enclave by a Scone compatible dapp.
 
 ### Changed
 
 - `iexec tee encrypt-dataset` now supports dataset folders.
 - CLI fix typo
-
-### Removed
 
 ## [3.0.32] - 2019-05-29
 
