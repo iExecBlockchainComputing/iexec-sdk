@@ -271,6 +271,7 @@ fill
   .option(...option.fillDatasetOrder())
   .option(...option.fillWorkerpoolOrder())
   .option(...option.fillRequestOrder())
+  .option(...option.fillRequestParams())
   .description(desc.fill(objName))
   .action(async (cmd) => {
     const spinner = Spinner(cmd);
@@ -282,6 +283,9 @@ fill
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
       ]);
+
+      const inputParams = cmd.params;
+      const requestOnTheFly = inputParams !== undefined;
 
       const getOrderByHash = async (orderName, orderHash) => {
         if (isBytes32(orderHash, { strict: false })) {
@@ -311,9 +315,14 @@ fill
       const workerpoolOrder = cmd.workerpool
         ? await getOrderByHash(order.WORKERPOOL_ORDER, cmd.workerpool)
         : signedOrders[chain.id].workerpoolorder;
-      const requestOrderInput = cmd.request
-        ? await getOrderByHash(order.REQUEST_ORDER, cmd.request)
-        : signedOrders[chain.id].requestorder;
+      let requestOrderInput;
+      if (requestOnTheFly) {
+        requestOrderInput = undefined;
+      } else {
+        requestOrderInput = cmd.request
+          ? await getOrderByHash(order.REQUEST_ORDER, cmd.request)
+          : signedOrders[chain.id].requestorder;
+      }
 
       const useDataset = requestOrderInput
         ? requestOrderInput.dataset
@@ -350,7 +359,6 @@ fill
 
       const computeRequestOrder = async () => {
         const { address } = await keystore.load();
-        const volume = minBn([appVolume, datasetVolume, workerpoolVolume]);
         const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
           app: appOrder.app,
           appmaxprice: appOrder.appprice,
@@ -361,8 +369,8 @@ fill
           workerpool: workerpoolOrder.workerpool,
           workerpoolmaxprice: workerpoolOrder.workerpoolprice,
           requester: address,
-          volume: volume.toString(),
           category: workerpoolOrder.category,
+          params: inputParams || ' ',
         });
         if (!cmd.force) {
           await prompt.signGeneratedOrder(

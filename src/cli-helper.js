@@ -168,6 +168,10 @@ const option = {
     '--request <orderHash>',
     'specify the requestorder from the marketplace to fill',
   ],
+  fillRequestParams: () => [
+    '--params <string>',
+    'specify the params of the request (existing request order will be ignored)',
+  ],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],

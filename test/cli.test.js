@@ -38,6 +38,15 @@ const saveRaw = () => {
 };
 
 execAsync('rm -r test/out').catch(e => console.log(e.message));
+execAsync('rm -r test/tee').catch(e => console.log(e.message));
+execAsync('rm -r test/.tee-secrets').catch(e => console.log(e.message));
+execAsync('rm test/chain.json').catch(e => console.log(e.message));
+execAsync('rm test/iexec.json').catch(e => console.log(e.message));
+execAsync('rm test/deployed.json').catch(e => console.log(e.message));
+execAsync('rm test/orders.json').catch(e => console.log(e.message));
+execAsync('rm test/results.zip').catch(e => console.log(e.message));
+execAsync('rm test/wallet.json').catch(e => console.log(e.message));
+
 execAsync('mkdir test/out').catch(e => console.log(e.message));
 
 test('iexec init', async () => {
@@ -458,6 +467,27 @@ test(
   ).resolves.not.toBe(1),
   30000,
 );
+
+test(
+  'iexec order sign --request (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order sign --request --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+
+test(
+  'iexec order fill (+ wallet)',
+  () => expect(
+    execAsync(
+      `${iexecPath} order fill --password test --wallet-address ${ADDRESS} --raw > 'out/orderFill_stdout.json'`,
+    ),
+  ).resolves.not.toBe(1),
+  15000,
+);
+
 test(
   'iexec order sign --app (+ wallet)',
   () => expect(
@@ -485,21 +515,12 @@ test(
   ).resolves.not.toBe(1),
   15000,
 );
-test(
-  'iexec order sign --request (+ wallet)',
-  () => expect(
-    execAsync(
-      `${iexecPath} order sign --request --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  15000,
-);
 
 test(
-  'iexec order fill (+ wallet)',
+  'iexec order fill --params <params> --force (+ wallet)',
   () => expect(
     execAsync(
-      `${iexecPath} order fill --password test --wallet-address ${ADDRESS} --raw > 'out/orderFill_stdout.json'`,
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --force --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -725,5 +746,3 @@ test(
   ).resolves.not.toBe(1),
   15000,
 );
-
-test('remove unencrypted wallet.json', () => expect(execAsync('rm wallet.json')).resolves.not.toBe(1));
