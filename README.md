@@ -310,6 +310,13 @@ iexec wallet sendRLC <amount> --to <address>  # send RLC to the specified eth ad
 iexec wallet sweep --to <address> # drain all ETH and RLC, sending them to the specified eth address
 ```
 
+The wallet files are stored in the Ethereum keystore.
+The keystore location depends on your OS:
+
+- Linux : ~/.ethereum/keystore
+- Mac: ~/Library/Ethereum/keystore
+- Windows: ~/AppData/Roaming/Ethereum/keystore
+
 ## account
 
 ```bash
