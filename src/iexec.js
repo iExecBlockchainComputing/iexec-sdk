@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+require('core-js/stable');
+require('regenerator-runtime/runtime');
 const cli = require('commander');
 const Debug = require('debug');
-require('@babel/polyfill');
 const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
 const {
