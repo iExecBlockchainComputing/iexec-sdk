@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix numbers format in templates
+- update api url
+- dependencies update
+
 ### Removed
 
 ## [3.0.34] - 2019-07-10

@@ -910,7 +910,7 @@ const initWorkerpoolOrder = (
   workerpoolprice, // execution selling price in nRLC
   volume, // number of execution to sell
   category, // id of the category (0 to 4)
-  trust = 0, // level of trust offered (default no trust)
+  trust = '0', // level of trust offered (default no trust)
   tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded offered tags (default no tag)
   apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
   datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
@@ -960,7 +960,7 @@ const initRequestOrder = (
   params = { 0: '' }, // indexed execution command lines (one entry by execution)
   callback = sdk.utils.NULL_ADDRESS, // address of the smart contract to send receiveResult as specified in ERC1154 (default none)
   category, // id of the category (0 to 4)
-  trust = 0, // level of trust required (default no trust)
+  trust = '0', // level of trust required (default no trust)
   tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
 ) => ({
   app,
