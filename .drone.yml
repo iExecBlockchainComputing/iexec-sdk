@@ -32,26 +32,14 @@ pipeline:
     when:
       ref: [refs/tags/v*]
 
-  npm_v3:
+  npm_v4:
     image: plugins/npm
     secrets: [npm_password]
     username: sulliwane
     email: sulliwane@gmail.com
-    tag: latest
+    tag: alpha
     when:
-      ref: [refs/tags/v3*]
-      matrix:
-        NODE_TAG: 8
-
-  dockerhub_v3:
-    image: plugins/docker
-    repo: iexechub/iexec-sdk
-    secrets: [docker_username, docker_password]
-    tags:
-      - latest
-      - ${DRONE_TAG##v}
-    when:
-      ref: [refs/tags/v3*]
+      ref: [refs/tags/v4.0.0-alpha.*]
       matrix:
         NODE_TAG: 8
 
