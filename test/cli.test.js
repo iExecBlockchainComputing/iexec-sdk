@@ -642,19 +642,6 @@ test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-k
   ),
 ).resolves.not.toBe(1));
 
-// // Uncomment when update schema-validator
-// test.skip('iexec registry validate app', () => expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1));
-// test.skip('iexec registry validate dataset', () => expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
-//   1,
-// ));
-// test.skip('iexec registry validate workerpool', () => expect(
-//   execAsync(`${iexecPath} registry validate workerpool`),
-// ).resolves.not.toBe(1));
-
-// // Uncomment when reimplemented
-// test.skip('iexec order count', () => expect(execAsync(`${iexecPath} order count`)).resolves.not.toBe(1));
-//
-
 // keystoredir custom
 test(
   'iexec wallet import --keystoredir [path]',
@@ -746,3 +733,28 @@ test(
   ).resolves.not.toBe(1),
   15000,
 );
+
+// schema-validator
+test('iexec registry validate app (invalid iexec.json)', () => expect(execAsync(`${iexecPath} registry validate app`)).rejects.toThrow());
+test('iexec registry validate dataset (invalid iexec.json)', () => expect(
+  execAsync(`${iexecPath} registry validate dataset`),
+).rejects.toThrow());
+test('iexec registry validate workerpool (invalid iexec.json)', () => expect(
+  execAsync(`${iexecPath} registry validate workerpool`),
+).rejects.toThrow());
+test('iexec registry validate app', async () => {
+  await execAsync('cp ./inputs/validator/iexec-app.json iexec.json');
+  expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1);
+});
+test('iexec registry validate dataset', async () => {
+  await execAsync('cp ./inputs/validator/iexec-dataset.json iexec.json');
+  expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
+    1,
+  );
+});
+test('iexec registry validate workerpool', async () => {
+  await execAsync('cp ./inputs/validator/iexec-workerpool.json iexec.json');
+  expect(
+    execAsync(`${iexecPath} registry validate workerpool`),
+  ).resolves.not.toBe(1);
+});

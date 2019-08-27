@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 - fix numbers format in templates
 - update api url
+- `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
 - dependencies update
 
 ### Removed
