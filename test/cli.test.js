@@ -6,6 +6,7 @@ const path = require('path');
 
 console.log('Node version:', process.version);
 
+// CONFIG
 const { DRONE } = process.env;
 const execAsync = cmd => new Promise((res, rej) => {
   exec(cmd, (error, stdout, stderr) => {
@@ -23,6 +24,15 @@ const chainName = 'dev';
 let hubAddress;
 let nativeHubAddress;
 let networkId;
+
+const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
+const PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
+const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
+const PRIVATE_KEY3 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
+const ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
+
+// UTILS
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 
 const loadJSONFile = async (fileName) => {
@@ -38,34 +48,24 @@ const saveJSONToFile = async (json, fileName) => {
   await fs.writeFile(filePath, text);
 };
 
-// const PRIVATE_KEY = '0xeb7877df435d1edf3f2dc94bf6784f20592d5d3235ef86a44002f2f6e58efd09';
-// const ADDRESS = '0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB';
-const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
-const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
-const PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
-const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
-const PRIVATE_KEY3 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
-const ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
-
 let testNum = 0;
 const saveRaw = () => {
   testNum += 1;
   return `--raw ${DRONE ? '' : `> out/${testNum}_out 2>&1`}`;
 };
 
-execAsync('rm -r test/out').catch(e => console.log(e.message));
-execAsync('rm -r test/tee').catch(e => console.log(e.message));
-execAsync('rm -r test/.tee-secrets').catch(e => console.log(e.message));
-execAsync('rm test/chain.json').catch(e => console.log(e.message));
-execAsync('rm test/iexec.json').catch(e => console.log(e.message));
-execAsync('rm test/deployed.json').catch(e => console.log(e.message));
-execAsync('rm test/orders.json').catch(e => console.log(e.message));
-execAsync('rm test/results.zip').catch(e => console.log(e.message));
-execAsync('rm test/wallet.json').catch(e => console.log(e.message));
-
-execAsync('mkdir test/out').catch(e => console.log(e.message));
-
-test('iexec init', async () => {
+// TESTS
+test('setup', async () => {
+  await execAsync('rm -r test/out').catch(e => console.log(e.message));
+  await execAsync('rm -r test/tee').catch(e => console.log(e.message));
+  await execAsync('rm -r test/.tee-secrets').catch(e => console.log(e.message));
+  await execAsync('rm test/chain.json').catch(e => console.log(e.message));
+  await execAsync('rm test/iexec.json').catch(e => console.log(e.message));
+  await execAsync('rm test/deployed.json').catch(e => console.log(e.message));
+  await execAsync('rm test/orders.json').catch(e => console.log(e.message));
+  await execAsync('rm test/results.zip').catch(e => console.log(e.message));
+  await execAsync('rm test/wallet.json').catch(e => console.log(e.message));
+  await execAsync('mkdir test/out').catch(e => console.log(e.message));
   const { chainId } = await ethRPC.getNetwork();
   console.log('chainId', chainId);
   networkId = `${chainId}`;
@@ -76,12 +76,16 @@ test('iexec init', async () => {
   nativeHubAddress = (await ethRPC.getTransaction(block28.transactions[0]))
     .creates;
   console.log('nativeHubAddress', nativeHubAddress);
-
   process.chdir('test');
-  return expect(
+}, 15000);
+
+test(
+  '[common] iexec init',
+  async () => expect(
     execAsync(`${iexecPath} init --password test --force ${saveRaw()}`),
-  ).resolves.not.toBe(1);
-}, 10000);
+  ).resolves.not.toBe(1),
+  10000,
+);
 
 // CHAIN.JSON
 test('edit chain.json use mainchain', async () => {
@@ -94,7 +98,7 @@ test('edit chain.json use mainchain', async () => {
 });
 
 test(
-  'iexec wallet create',
+  '[common] iexec wallet create',
   () => expect(
     execAsync(
       `${iexecPath} wallet create --password test --force ${saveRaw()}`,
@@ -104,7 +108,7 @@ test(
 );
 
 test(
-  'iexec wallet import',
+  '[common] iexec wallet import',
   () => expect(
     execAsync(
       `${iexecPath} wallet import ${PRIVATE_KEY} --password test --force --raw > out/walletImport_stdout.json`,
@@ -162,7 +166,18 @@ test(
 );
 
 // INFO
-test('iexec info', () => expect(execAsync(`${iexecPath} info ${saveRaw()}`)).resolves.not.toBe(1));
+test('[mainchain] iexec info', async () => {
+  const raw = await execAsync(`${iexecPath} info --raw`);
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.hubAddress).toBe(hubAddress);
+  expect(res.pocoVersion).not.toBe(undefined);
+  expect(res.appRegistryAddress).not.toBe(undefined);
+  expect(res.datasetRegistryAddress).not.toBe(undefined);
+  expect(res.workerpoolRegistryAddress).not.toBe(undefined);
+  expect(res.rlcAddress).not.toBe(undefined);
+  expect(res.useNative).toBe(false);
+});
 
 // ACCOUNT
 test(
@@ -211,7 +226,7 @@ test(
 
 // APP
 test(
-  'iexec app init (+ wallet)',
+  '[common] iexec app init (+ wallet)',
   () => expect(
     execAsync(
       `${iexecPath} app init --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
@@ -219,7 +234,7 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec app init (no wallet)', () => expect(execAsync(`${iexecPath} app init ${saveRaw()}`)).resolves.not.toBe(1));
+test('[common] iexec app init (no wallet)', () => expect(execAsync(`${iexecPath} app init ${saveRaw()}`)).resolves.not.toBe(1));
 test(
   'iexec app deploy (+ wallet)',
   () => expect(
@@ -278,7 +293,7 @@ test(
 
 // DATASET
 test(
-  'iexec dataset init (+ wallet)',
+  '[common] iexec dataset init (+ wallet)',
   () => expect(
     execAsync(
       `${iexecPath} dataset init --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
@@ -286,7 +301,7 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec dataset init (no wallet)', () => expect(execAsync(`${iexecPath} dataset init ${saveRaw()}`)).resolves.not.toBe(
+test('[common] iexec dataset init (no wallet)', () => expect(execAsync(`${iexecPath} dataset init ${saveRaw()}`)).resolves.not.toBe(
   1,
 ));
 test(
@@ -343,7 +358,7 @@ test(
 
 // WORKERPOOL
 test(
-  'iexec workerpool init (+ wallet)',
+  '[common] iexec workerpool init (+ wallet)',
   () => expect(
     execAsync(
       `${iexecPath} workerpool init --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
@@ -351,7 +366,7 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
-test('iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
+test('[common] iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
 test(
   'iexec workerpool deploy (+ wallet)',
   () => expect(
@@ -411,7 +426,7 @@ test(
 );
 
 // CATEGORY
-test('iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
+test('[common] iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
 test(
   'iexec category create (+ wallet)',
   () => expect(
@@ -429,23 +444,23 @@ test('iexec category count', () => expect(
 ).resolves.not.toBe(1));
 
 // ORDER
-test('iexec order init', () => expect(execAsync(`${iexecPath} order init ${saveRaw()}`)).resolves.not.toBe(
+test('[common] iexec order init', () => expect(execAsync(`${iexecPath} order init ${saveRaw()}`)).resolves.not.toBe(
   1,
 ));
-test('iexec order init --app', () => expect(
+test('[common] iexec order init --app', () => expect(
   execAsync(`${iexecPath} order init --app ${saveRaw()}`),
 ).resolves.not.toBe(1));
-test('iexec order init --dataset', () => expect(
+test('[common] iexec order init --dataset', () => expect(
   execAsync(`${iexecPath} order init --dataset ${saveRaw()}`),
 ).resolves.not.toBe(1));
-test('iexec order init --workerpool', () => expect(
+test('[common] iexec order init --workerpool', () => expect(
   execAsync(`${iexecPath} order init --workerpool ${saveRaw()}`),
 ).resolves.not.toBe(1));
-test('iexec order init --request', () => expect(
+test('[common] iexec order init --request', () => expect(
   execAsync(`${iexecPath} order init --request ${saveRaw()}`),
 ).resolves.not.toBe(1));
 test(
-  'iexec order init --request (+ wallet)',
+  '[common] iexec order init --request (+ wallet)',
   () => expect(
     execAsync(
       `${iexecPath} order init --request --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
@@ -594,9 +609,9 @@ test('iexec deal show', async () => {
 });
 
 // tee
-test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
+test('[common] iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
 
-test('iexec tee encrypt-dataset', async () => expect(
+test('[common] iexec tee encrypt-dataset', async () => expect(
   execAsync(
     `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
   ),
@@ -604,7 +619,7 @@ test('iexec tee encrypt-dataset', async () => expect(
 
 // require docker
 if (!DRONE) {
-  test('openssl decrypt dataset', async () => expect(
+  test('[common] openssl decrypt dataset', async () => expect(
     execAsync(
       'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset.txt',
     ),
@@ -612,7 +627,7 @@ if (!DRONE) {
 }
 
 test(
-  'iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
+  '[common] iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
   async () => expect(
     execAsync(
       `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
@@ -624,7 +639,7 @@ test(
 // require docker
 if (!DRONE) {
   test(
-    'iexec tee encrypt-dataset --algorithm scone',
+    '[common] iexec tee encrypt-dataset --algorithm scone',
     async () => expect(
       execAsync(
         `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
@@ -635,30 +650,30 @@ if (!DRONE) {
 }
 
 if (semver.gt('v10.12.0', process.version)) {
-  test('iexec tee generate-beneficiary-keys', async () => expect(
+  test('[common] iexec tee generate-beneficiary-keys', async () => expect(
     execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
   ).rejects.not.toBe(1));
 } else {
-  test('iexec tee generate-beneficiary-keys', async () => expect(
+  test('[common] iexec tee generate-beneficiary-keys', async () => expect(
     execAsync(
       `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1));
 }
 
-test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
+test('[common] iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
   execAsync(
     `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
   ),
 ).rejects.not.toBe(1));
 
-test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
+test('[common] iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
   execAsync(
     `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
-test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
+test('[common] iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
   execAsync(
     `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
   ),
@@ -666,7 +681,7 @@ test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-k
 
 // keystoredir custom
 test(
-  'iexec wallet import --keystoredir [path]',
+  '[common] iexec wallet import --keystoredir [path]',
   () => expect(
     execAsync(
       `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir ~/temp/iexecSDKTest ${saveRaw()}`,
@@ -687,7 +702,7 @@ test(
 
 // keystoredir local
 test(
-  'iexec wallet import --keystoredir local',
+  '[common] iexec wallet import --keystoredir local',
   () => expect(
     execAsync(
       `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase' --keystoredir local ${saveRaw()}`,
@@ -734,7 +749,7 @@ test('iexec wallet sendRLC', async () => {
 
 // unecrypted wallet
 test(
-  'iexec wallet import --unencrypted',
+  '[common] iexec wallet import --unencrypted',
   () => expect(
     execAsync(
       `${iexecPath} wallet import ${PRIVATE_KEY2} --unencrypted ${saveRaw()}`,
@@ -772,6 +787,19 @@ test('[sidechain] edit chain.json use sidechain', async () => {
   await saveJSONToFile(chains, 'chain.json');
 });
 
+test('[sidechain] iexec info', async () => {
+  const raw = await execAsync(`${iexecPath} info --raw`);
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.hubAddress).toBe(nativeHubAddress);
+  expect(res.pocoVersion).not.toBe(undefined);
+  expect(res.appRegistryAddress).not.toBe(undefined);
+  expect(res.datasetRegistryAddress).not.toBe(undefined);
+  expect(res.workerpoolRegistryAddress).not.toBe(undefined);
+  expect(res.rlcAddress).toBe(undefined);
+  expect(res.useNative).toBe(true);
+});
+
 test('[sidechain] iexec wallet show (+ wallet from address)', async () => {
   const raw = await execAsync(
     `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
@@ -788,7 +816,7 @@ test('[sidechain] iexec wallet sendETH', async () => {
   ).catch(e => e.message);
   const res = JSON.parse(raw);
   expect(res.ok).toBe(false);
-});
+}, 10000);
 
 test('[sidechain] iexec wallet sendRLC', async () => {
   const raw = await execAsync(
@@ -800,7 +828,7 @@ test('[sidechain] iexec wallet sendRLC', async () => {
   expect(res.to).toBe(ADDRESS2);
   expect(res.amount).toBe('1000000000');
   expect(res.txHash).not.toBe(undefined);
-});
+}, 10000);
 
 test('[sidechain] iexec wallet sweep (unencrypted wallet.json)', async () => {
   await execAsync('mv wallet.back wallet.json');
@@ -831,29 +859,29 @@ test('[sidechain] iexec wallet sweep (empty unencrypted wallet.json)', async () 
 }, 15000);
 
 // schema-validator
-test('iexec registry validate app (invalid iexec.json)', () => expect(execAsync(`${iexecPath} registry validate app`)).rejects.toThrow());
+test('[common] iexec registry validate app (invalid iexec.json)', () => expect(execAsync(`${iexecPath} registry validate app`)).rejects.toThrow());
 
-test('iexec registry validate dataset (invalid iexec.json)', () => expect(
+test('[common] iexec registry validate dataset (invalid iexec.json)', () => expect(
   execAsync(`${iexecPath} registry validate dataset`),
 ).rejects.toThrow());
 
-test('iexec registry validate workerpool (invalid iexec.json)', () => expect(
+test('[common] iexec registry validate workerpool (invalid iexec.json)', () => expect(
   execAsync(`${iexecPath} registry validate workerpool`),
 ).rejects.toThrow());
 
-test('iexec registry validate app', async () => {
+test('[common] iexec registry validate app', async () => {
   await execAsync('cp ./inputs/validator/iexec-app.json iexec.json');
   expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1);
 });
 
-test('iexec registry validate dataset', async () => {
+test('[common] iexec registry validate dataset', async () => {
   await execAsync('cp ./inputs/validator/iexec-dataset.json iexec.json');
   expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
     1,
   );
 });
 
-test('iexec registry validate workerpool', async () => {
+test('[common] iexec registry validate workerpool', async () => {
   await execAsync('cp ./inputs/validator/iexec-workerpool.json iexec.json');
   expect(
     execAsync(`${iexecPath} registry validate workerpool`),

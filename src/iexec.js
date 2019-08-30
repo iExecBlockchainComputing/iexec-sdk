@@ -39,9 +39,7 @@ async function main() {
     const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
     const spin = Spinner();
     spin.info(
-      `iExec SDK update available ${packageJSON.version} →  ${
-        update.latest
-      }, Run "${upgradeCMD}" to update\n`,
+      `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update\n`,
     );
   }
 
@@ -151,16 +149,19 @@ async function main() {
 
         spinner.start(info.checking('iExec contracts info'));
 
+        const useNative = !!chain.contracts.isNative;
+
+        const rlcAddress = useNative
+          ? undefined
+          : await chain.contracts.fetchRLCAddress({
+            hub: hubAddress,
+          });
         const [
-          rlcAddress,
           clerkAddress,
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          chain.contracts.fetchRLCAddress({
-            hub: hubAddress,
-          }),
           chain.contracts.fetchClerkAddress({
             hub: hubAddress,
           }),
@@ -182,8 +183,10 @@ async function main() {
 
         const iexecAddresses = {
           'iExec PoCo version': pocoVersion,
+          ...((useNative && {
+            'native RLC': true,
+          }) || { 'RLC ERC20 address': rlcAddress }),
           'hub address': hubAddress || chain.contracts.hubAddress,
-          'RLC ERC20 address': rlcAddress,
           'clerk address': clerkAddress,
           'app registry address': appRegistryAddress,
           'dataset registry address': datasetRegistryAddress,
@@ -197,6 +200,7 @@ async function main() {
             appRegistryAddress,
             datasetRegistryAddress,
             workerpoolRegistryAddress,
+            useNative,
           },
         });
       } catch (error) {
