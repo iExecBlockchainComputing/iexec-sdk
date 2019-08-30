@@ -15,6 +15,7 @@ const ethereumHost = DRONE ? 'ethereum' : 'localhost';
 const ethereumURL = `http://${ethereumHost}:8545`;
 const chainName = 'dev';
 let hubAddress;
+let networkId;
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 
 const loadJSONFile = async (fileName) => {
@@ -24,8 +25,16 @@ const loadJSONFile = async (fileName) => {
   return file;
 };
 
-const PRIVATE_KEY = '0xeb7877df435d1edf3f2dc94bf6784f20592d5d3235ef86a44002f2f6e58efd09';
-const ADDRESS = '0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB';
+const saveJSONToFile = async (json, fileName) => {
+  const filePath = path.join(process.cwd(), fileName);
+  const text = JSON.stringify(json, null, 2);
+  await fs.writeFile(filePath, text);
+};
+
+// const PRIVATE_KEY = '0xeb7877df435d1edf3f2dc94bf6784f20592d5d3235ef86a44002f2f6e58efd09';
+// const ADDRESS = '0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB';
+const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 const PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 const PRIVATE_KEY3 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
@@ -50,6 +59,9 @@ execAsync('rm test/wallet.json').catch(e => console.log(e.message));
 execAsync('mkdir test/out').catch(e => console.log(e.message));
 
 test('iexec init', async () => {
+  const { chainId } = await ethRPC.getNetwork();
+  console.log('chainId', chainId);
+  networkId = `${chainId}`;
   const block4 = await ethRPC.getBlock(4);
   const { creates } = await ethRPC.getTransaction(block4.transactions[0]);
   console.log('hubAddress', creates);
@@ -61,15 +73,14 @@ test('iexec init', async () => {
 }, 10000);
 
 // CHAIN.JSON
-test('edit chain.json', () => expect(
-  execAsync(`sed -i '/"hub"/c"hub": "${hubAddress}"' chain.json`)
-    .then(
-      execAsync(`sed -i '/"default"/c"default": "${chainName}",' chain.json`),
-    )
-    .then(
-      execAsync(`sed -i '/"host"/c"host": "${ethereumURL}",' chain.json`),
-    ),
-).resolves.not.toBe(1));
+test('edit chain.json', async () => {
+  const chains = await loadJSONFile('chain.json');
+  chains.default = chainName;
+  chains.chains.dev.hub = hubAddress;
+  chains.chains.dev.host = ethereumURL;
+  chains.chains.dev.id = networkId;
+  await saveJSONToFile(chains, 'chain.json');
+});
 
 test(
   'iexec wallet create',

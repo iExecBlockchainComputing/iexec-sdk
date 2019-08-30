@@ -45,5 +45,5 @@ pipeline:
 
 services:
   ethereum:
-    image: iexechub/poco-chain
+    image: iexechub/poco-chaintest
     pull: true
