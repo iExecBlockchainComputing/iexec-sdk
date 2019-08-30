@@ -18,6 +18,18 @@ const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber')
 const bnToEthersBn = bn => bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
+const truncateBnWeiToBnNRlc = (bnWei) => {
+  const weiString = bnWei.toString();
+  const nRlcString = weiString.length > 9 ? weiString.slice(0, -9) : '0';
+  return new BN(nRlcString);
+};
+
+const bnNRlcToBnWei = (bnNRlc) => {
+  const nRlcString = bnNRlc.toString();
+  const weiString = nRlcString !== '0' ? nRlcString.concat('000000000') : '0';
+  return new BN(weiString);
+};
+
 const bnifyNestedEthersBn = (obj) => {
   const objOut = {};
   Object.entries(obj).forEach((e) => {
@@ -327,6 +339,7 @@ module.exports = {
   minBn,
   bnToEthersBn,
   ethersBnToBn,
+  ethersBigNumberify: bigNumberify,
   bnifyNestedEthersBn,
   stringifyNestedBn,
   multiaddrHexToHuman,
@@ -342,4 +355,6 @@ module.exports = {
   ensureString,
   throwIfMissing,
   signTypedDatav3,
+  truncateBnWeiToBnNRlc,
+  bnNRlcToBnWei,
 };

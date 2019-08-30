@@ -240,20 +240,23 @@ sendETH
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${chain.name} ETH from ${address} to ${
-        cmd.to
-      }`;
+      const message = `${amount} ${chain.name} ETH from ${address} to ${cmd.to}`;
       spinner.start(`sending ${message}...`);
-      await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
+      const txHash = await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
       spinner.succeed(`Sent ${message}\n`, {
-        raw: { amount, from: address, to: cmd.to },
+        raw: {
+          amount,
+          from: address,
+          to: cmd.to,
+          txHash,
+        },
       });
     } catch (error) {
       handleError(error, cli, cmd);
     }
   });
 
-const sendRLC = cli.command('sendRLC <amount>');
+const sendRLC = cli.command('sendRLC <nRlcAmount>');
 addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
@@ -262,7 +265,7 @@ sendRLC
   .option(...option.to())
   .option(...option.force())
   .description(desc.sendRLC())
-  .action(async (amount, cmd) => {
+  .action(async (nRlcAmount, cmd) => {
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -276,18 +279,21 @@ sendRLC
       if (!cmd.to) throw Error('missing --to option');
 
       if (!cmd.force) {
-        await prompt.transferRLC(amount, chain.name, cmd.to, chain.id);
+        await prompt.transferRLC(nRlcAmount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${chain.name} nRLC from ${address} to ${
-        cmd.to
-      }`;
+      const message = `${nRlcAmount} ${chain.name} nRLC from ${address} to ${cmd.to}`;
       spinner.start(`sending ${message}...`);
 
-      await wallet.sendRLC(chain.contracts, amount, cmd.to);
+      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, cmd.to);
 
       spinner.succeed(`Sent ${message}\n`, {
-        raw: { amount, from: address, to: cmd.to },
+        raw: {
+          amount: nRlcAmount,
+          from: address,
+          to: cmd.to,
+          txHash,
+        },
       });
     } catch (error) {
       handleError(error, cli, cmd);
@@ -315,13 +321,32 @@ sweep
       ]);
       if (!cmd.to) throw Error('missing --to option');
       if (!cmd.force) {
-        await prompt.sweep(chain.name, cmd.to, chain.id);
+        await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ETH and RLC')(
+          chain.name,
+          cmd.to,
+          chain.id,
+        );
       }
       spinner.start('sweeping wallet...');
-      await wallet.sweep(chain.contracts, address, cmd.to);
-      spinner.succeed(`Wallet swept from ${address} to ${cmd.to}\n`, {
-        raw: { from: address, to: cmd.to },
-      });
+      const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
+        chain.contracts,
+        address,
+        cmd.to,
+      );
+      spinner.succeed(
+        `Wallet swept from ${address} to ${cmd.to}\n${
+          errors ? `Errors: ${errors}` : ''
+        }`,
+        {
+          raw: {
+            from: address,
+            to: cmd.to,
+            sendNativeTxHash,
+            sendERC20TxHash,
+            errors,
+          },
+        },
+      );
     } catch (error) {
       handleError(error, cli, cmd);
     }

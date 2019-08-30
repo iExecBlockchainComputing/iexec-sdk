@@ -1,6 +1,5 @@
 const { exec } = require('child_process');
 const semver = require('semver');
-const Promise = require('bluebird');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
@@ -8,13 +7,21 @@ const path = require('path');
 console.log('Node version:', process.version);
 
 const { DRONE } = process.env;
-const execAsync = Promise.promisify(exec);
+const execAsync = cmd => new Promise((res, rej) => {
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      rej(Error(stderr));
+    }
+    res(stdout + stderr);
+  });
+});
 
 const iexecPath = DRONE ? 'iexec' : 'node ../src/iexec.js';
 const ethereumHost = DRONE ? 'ethereum' : 'localhost';
 const ethereumURL = `http://${ethereumHost}:8545`;
 const chainName = 'dev';
 let hubAddress;
+let nativeHubAddress;
 let networkId;
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 
@@ -63,9 +70,13 @@ test('iexec init', async () => {
   console.log('chainId', chainId);
   networkId = `${chainId}`;
   const block4 = await ethRPC.getBlock(4);
-  const { creates } = await ethRPC.getTransaction(block4.transactions[0]);
-  console.log('hubAddress', creates);
-  hubAddress = creates;
+  hubAddress = (await ethRPC.getTransaction(block4.transactions[0])).creates;
+  console.log('hubAddress', hubAddress);
+  const block28 = await ethRPC.getBlock(28);
+  nativeHubAddress = (await ethRPC.getTransaction(block28.transactions[0]))
+    .creates;
+  console.log('nativeHubAddress', nativeHubAddress);
+
   process.chdir('test');
   return expect(
     execAsync(`${iexecPath} init --password test --force ${saveRaw()}`),
@@ -73,7 +84,7 @@ test('iexec init', async () => {
 }, 10000);
 
 // CHAIN.JSON
-test('edit chain.json', async () => {
+test('edit chain.json use mainchain', async () => {
   const chains = await loadJSONFile('chain.json');
   chains.default = chainName;
   chains.chains.dev.hub = hubAddress;
@@ -694,27 +705,32 @@ test(
   ).resolves.not.toBe(1),
   10000,
 );
+
 // sendETH
-test(
-  'iexec wallet sendETH',
-  () => expect(
-    execAsync(
-      `${iexecPath} wallet sendETH 1 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  10000,
-);
+test('iexec wallet sendETH', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendETH 1 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS} --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS);
+  expect(res.to).toBe(ADDRESS2);
+  expect(res.amount).toBe('1');
+  expect(res.txHash).not.toBe(undefined);
+}, 10000);
 
 // sendRLC
-test(
-  'iexec wallet sendRLC',
-  () => expect(
-    execAsync(
-      `${iexecPath} wallet sendRLC 1000 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  10000,
-);
+test('iexec wallet sendRLC', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendRLC 1000000000 --to ${ADDRESS2} --force --password test --wallet-address ${ADDRESS} --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS);
+  expect(res.to).toBe(ADDRESS2);
+  expect(res.amount).toBe('1000000000');
+  expect(res.txHash).not.toBe(undefined);
+}, 10000);
 
 // unecrypted wallet
 test(
@@ -735,34 +751,108 @@ test(
   10000,
 );
 
-test(
-  'iexec wallet sweep (unencrypted wallet.json)',
-  () => expect(
-    execAsync(
-      `${iexecPath} wallet sweep --to ${ADDRESS} --force ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  15000,
-);
+test('iexec wallet sweep (unencrypted wallet.json)', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sweep --to ${ADDRESS} --force --raw`,
+  );
+  const res = JSON.parse(raw);
+  await execAsync('mv wallet.json wallet.back');
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS2);
+  expect(res.to).toBe(ADDRESS);
+  expect(res.sendERC20TxHash).not.toBe(undefined);
+  expect(res.sendNativeTxHash).not.toBe(undefined);
+  expect(res.errors).toBe(undefined);
+}, 15000);
+
+test('[sidechain] edit chain.json use sidechain', async () => {
+  const chains = await loadJSONFile('chain.json');
+  chains.chains.dev.hub = nativeHubAddress;
+  chains.chains.dev.native = true;
+  await saveJSONToFile(chains, 'chain.json');
+});
+
+test('[sidechain] iexec wallet show (+ wallet from address)', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.balance.ETH.substr(0, 2)).toBe(res.balance.nRLC.substr(0, 2));
+  expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
+});
+
+test('[sidechain] iexec wallet sendETH', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendETH 0.1 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
+  ).catch(e => e.message);
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(false);
+});
+
+test('[sidechain] iexec wallet sendRLC', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendRLC 1000000000 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS);
+  expect(res.to).toBe(ADDRESS2);
+  expect(res.amount).toBe('1000000000');
+  expect(res.txHash).not.toBe(undefined);
+});
+
+test('[sidechain] iexec wallet sweep (unencrypted wallet.json)', async () => {
+  await execAsync('mv wallet.back wallet.json');
+  const raw = await execAsync(
+    `${iexecPath} wallet sweep --to ${ADDRESS} --force --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS2);
+  expect(res.to).toBe(ADDRESS);
+  expect(res.sendERC20TxHash).toBe(undefined);
+  expect(res.sendNativeTxHash).not.toBe(undefined);
+  expect(res.errors).toBe(undefined);
+}, 15000);
+
+test('[sidechain] iexec wallet sweep (empty unencrypted wallet.json)', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sweep --to ${ADDRESS} --force --raw`,
+  );
+  await execAsync('rm wallet.json');
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS2);
+  expect(res.to).toBe(ADDRESS);
+  expect(res.sendERC20TxHash).toBe(undefined);
+  expect(res.sendNativeTxHash).toBe(undefined);
+  expect(res.errors.length).toBe(1);
+}, 15000);
 
 // schema-validator
 test('iexec registry validate app (invalid iexec.json)', () => expect(execAsync(`${iexecPath} registry validate app`)).rejects.toThrow());
+
 test('iexec registry validate dataset (invalid iexec.json)', () => expect(
   execAsync(`${iexecPath} registry validate dataset`),
 ).rejects.toThrow());
+
 test('iexec registry validate workerpool (invalid iexec.json)', () => expect(
   execAsync(`${iexecPath} registry validate workerpool`),
 ).rejects.toThrow());
+
 test('iexec registry validate app', async () => {
   await execAsync('cp ./inputs/validator/iexec-app.json iexec.json');
   expect(execAsync(`${iexecPath} registry validate app`)).resolves.not.toBe(1);
 });
+
 test('iexec registry validate dataset', async () => {
   await execAsync('cp ./inputs/validator/iexec-dataset.json iexec.json');
   expect(execAsync(`${iexecPath} registry validate dataset`)).resolves.not.toBe(
     1,
   );
 });
+
 test('iexec registry validate workerpool', async () => {
   await execAsync('cp ./inputs/validator/iexec-workerpool.json iexec.json');
   expect(

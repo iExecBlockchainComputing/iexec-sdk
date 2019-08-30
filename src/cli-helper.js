@@ -369,7 +369,7 @@ const prompt = {
 
 prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);
 prompt.transferRLC = (...args) => prompt.transfer('nRLC', ...args);
-prompt.sweep = (...args) => prompt.transfer('ETH and RLC', 'all wallet', ...args);
+prompt.sweep = currencies => (...args) => prompt.transfer(currencies, 'all wallet', ...args);
 
 const oraOptions = {
   color: 'yellow',

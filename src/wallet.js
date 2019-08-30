@@ -1,13 +1,18 @@
 const Debug = require('debug');
-const { Web3Provider } = require('ethers').providers;
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
+const { Contract } = require('ethers');
 const {
   isEthAddress,
   ethersBnToBn,
   bnToEthersBn,
+  ethersBigNumberify,
+  truncateBnWeiToBnNRlc,
+  bnNRlcToBnWei,
   throwIfMissing,
 } = require('./utils');
+const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
+const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
 
 const debug = Debug('iexec:wallet');
 
@@ -56,26 +61,36 @@ const checkBalances = async (
 ) => {
   try {
     isEthAddress(address, { strict: true });
-    const rlcAddress = await contracts.fetchRLCAddress();
+    const { isNative } = contracts;
     const getETH = () => contracts.eth.getBalance(address).catch((error) => {
       debug(error);
       return 0;
     });
-    const getRLC = () => contracts
-      .getRLCContract({
-        at: rlcAddress,
-      })
-      .balanceOf(address)
-      .catch((error) => {
-        debug(error);
-        return 0;
+    const balances = {};
+    if (isNative) {
+      const weiBalance = await getETH();
+      Object.assign(balances, {
+        wei: ethersBnToBn(weiBalance),
+        nRLC: truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance)),
       });
+    } else {
+      const rlcAddress = await contracts.fetchRLCAddress();
+      const getRLC = () => contracts
+        .getRLCContract({
+          at: rlcAddress,
+        })
+        .balanceOf(address)
+        .catch((error) => {
+          debug(error);
+          return 0;
+        });
 
-    const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
-    const balances = {
-      wei: ethersBnToBn(weiBalance),
-      nRLC: ethersBnToBn(rlcBalance),
-    };
+      const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
+      Object.assign(balances, {
+        wei: ethersBnToBn(weiBalance),
+        nRLC: ethersBnToBn(rlcBalance),
+      });
+    }
     debug('balances', balances);
     return balances;
   } catch (error) {
@@ -149,21 +164,48 @@ const getRLC = async (
   }
 };
 
+const sendNativeToken = async (contracts, value, to) => {
+  try {
+    isEthAddress(to, { strict: true });
+    const hexValue = ethersBigNumberify(value).toHexString();
+    const ethSigner = contracts.eth.getSigner();
+    const tx = await ethSigner.sendTransaction({
+      data: '0x',
+      to,
+      value: hexValue,
+    });
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('sendNativeToken()', error);
+    throw error;
+  }
+};
+
+const sendERC20 = async (contracts, nRlcAmount, to) => {
+  isEthAddress(to, { strict: true });
+  try {
+    const rlcAddress = await contracts.fetchRLCAddress();
+    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
+    const tx = await rlcContract.transfer(to, nRlcAmount);
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('sendERC20()', error);
+    throw error;
+  }
+};
+
 const sendETH = async (
   contracts = throwIfMissing(),
   value = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
   try {
+    if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     isEthAddress(to, { strict: true });
-    const ethSigner = new Web3Provider(contracts.ethProvider).getSigner();
-    const tx = await ethSigner.sendTransaction({
-      data: '0x',
-      to,
-      value,
-    });
-    await tx.wait();
-    return tx.hash;
+    const txHash = await sendNativeToken(contracts, value, to);
+    return txHash;
   } catch (error) {
     debug('sendETH()', error);
     throw error;
@@ -172,16 +214,20 @@ const sendETH = async (
 
 const sendRLC = async (
   contracts = throwIfMissing(),
-  amount = throwIfMissing(),
+  nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
   isEthAddress(to, { strict: true });
   try {
-    const rlcAddress = await contracts.fetchRLCAddress();
-    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await rlcContract.transfer(to, amount);
-    await tx.wait();
-    return tx.hash;
+    if (contracts.isNative) {
+      debug('send native token');
+      const weiValue = bnNRlcToBnWei(new BN(nRlcAmount)).toString();
+      const txHash = await sendNativeToken(contracts, weiValue, to);
+      return txHash;
+    }
+    debug('send ERC20 token');
+    const txHash = await sendERC20(contracts, nRlcAmount, to);
+    return txHash;
   } catch (error) {
     debug('sendRLC()', error);
     throw error;
@@ -195,18 +241,56 @@ const sweep = async (
 ) => {
   try {
     isEthAddress(to, { strict: true });
-    const balances = await checkBalances(contracts, address);
-    let sendRLCTxHash;
-    if (balances.nRLC.gt(new BN(0))) {
-      sendRLCTxHash = await sendRLC(contracts, bnToEthersBn(balances.nRLC), to);
+    const code = await contracts.eth.getCode(to);
+    if (code !== '0x') {
+      throw new Error('Cannot sweep to a contract');
     }
-    const txFee = new BN('10000000000000000');
-    let sendETHTxHash;
-    const sweepETH = balances.wei.sub(txFee);
+    let balances = await checkBalances(contracts, address);
+    const res = {};
+    const errors = [];
+    if (!contracts.isNative) {
+      if (balances.nRLC.gt(new BN(0))) {
+        try {
+          const sendERC20TxHash = await sendERC20(
+            contracts,
+            bnToEthersBn(balances.nRLC),
+            to,
+          );
+          Object.assign(res, { sendERC20TxHash });
+        } catch (error) {
+          debug(error);
+          errors.push(`Failed to transfert ERC20': ${error.message}`);
+          throw Error(
+            `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
+          );
+        }
+        balances = await checkBalances(contracts, address);
+      }
+    }
+    const gasPrice = new BN((await contracts.eth.getGasPrice()).toString());
+    const gasLimit = new BN(21000);
+    const txFee = gasPrice.mul(gasLimit);
+    const sweepNative = balances.wei.sub(txFee);
     if (balances.wei.gt(new BN(txFee))) {
-      sendETHTxHash = await sendETH(contracts, bnToEthersBn(sweepETH), to);
+      try {
+        const sendNativeTxHash = await sendNativeToken(
+          contracts,
+          bnToEthersBn(sweepNative),
+          to,
+        );
+        debug('sendNativeTxHash', sendNativeTxHash);
+        Object.assign(res, { sendNativeTxHash });
+      } catch (error) {
+        debug(error);
+        errors.push(`Failed to transfert native token': ${error.message}`);
+      }
+    } else {
+      const err = 'Tx fees are greather than wallet balance';
+      debug(err);
+      errors.push(`Failed to transfert native token': ${err}`);
     }
-    return Object.assign({}, { sendRLCTxHash }, { sendETHTxHash });
+    if (errors.length > 0) Object.assign(res, { errors });
+    return res;
   } catch (error) {
     debug('sweep()', error);
     throw error;
