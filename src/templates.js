@@ -109,8 +109,10 @@ const chains = {
     dev: {
       host: 'http://localhost:8545',
       sms: 'http://localhost:5000',
-      id: '17',
-      hub: '0x60E25C038D70A15364DAc11A042DB1dD7A2cccBC',
+      id: '1544020727674',
+      hub: '0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1',
+      // hub: '0x531C0Cf1EF13099C3d3D7D90D522C89A06880113',
+      // native: true,
     },
     ropsten: {
       host: 'https://ropsten.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
@@ -124,6 +126,25 @@ const chains = {
       host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '42',
       sms: 'https://sms-kovan.iex.ec',
+    },
+    goerli: {
+      host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
+      hub: '0x99d8717a84d1e97422d04d9a2a82694038470753',
+      id: '5',
+      bridge: {
+        contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
+        bridgedNetworkId: '133',
+      },
+    },
+    viviani: {
+      host: 'https://viviani.iex.ec',
+      id: '133',
+      hub: '0xD1c670F25E5D9eC66DC82feD45e38Dc3f3f0Cd65',
+      native: true,
+      bridge: {
+        contract: '0x63CBf84596d0Dc13fCE1d8FA4470dc208390998a',
+        bridgedNetworkId: '5',
+      },
     },
     mainnet: {
       host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',

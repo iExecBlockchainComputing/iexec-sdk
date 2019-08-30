@@ -33,12 +33,13 @@ const createChainFromConf = (
       },
       { gasPrice: txOptions.gasPrice },
     );
-    const ethProvider = new SignerProvider(chainConf.host, signerOptions);
+    const ethSignerProvider = new SignerProvider(chainConf.host, signerOptions);
     chain.name = chainName;
     chain.contracts = createIExecContracts({
-      ethProvider,
+      ethSignerProvider,
       chainId: chain.id,
       hubAddress: chain.hub,
+      isNative: !!chain.native,
     });
     return chain;
   } catch (error) {
