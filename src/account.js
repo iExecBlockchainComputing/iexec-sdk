@@ -1,9 +1,12 @@
 const Debug = require('debug');
+const BN = require('bn.js');
 const {
   isEthAddress,
   checkEvent,
   ethersBnToBn,
   throwIfMissing,
+  bnNRlcToBnWei,
+  bnToEthersBn,
 } = require('./utils');
 
 const debug = Debug('iexec:account');
@@ -31,23 +34,34 @@ const deposit = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    let txHash;
     const clerkAddress = await contracts.fetchClerkAddress();
-    const rlcAddress = await contracts.fetchRLCAddress();
-    const allowTx = await contracts
-      .getRLCContract({
-        at: rlcAddress,
-      })
-      .approve(clerkAddress, amount);
-    const allowTxReceipt = await allowTx.wait();
-    if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
-
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
-    const tx = await clerkContract.deposit(amount);
-    const txReceipt = await tx.wait();
-    if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
-    return amount;
+    if (!contracts.isNative) {
+      const rlcAddress = await contracts.fetchRLCAddress();
+      const allowTx = await contracts
+        .getRLCContract({
+          at: rlcAddress,
+        })
+        .approve(clerkAddress, amount);
+      const allowTxReceipt = await allowTx.wait();
+      if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
+      const tx = await clerkContract.deposit(amount);
+      const txReceipt = await tx.wait();
+      if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
+      txHash = tx.hash;
+    } else {
+      const weiAmount = bnToEthersBn(
+        bnNRlcToBnWei(new BN(amount)),
+      ).toHexString();
+      const tx = await clerkContract.deposit({ value: weiAmount });
+      const txReceipt = await tx.wait();
+      if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
+      txHash = tx.hash;
+    }
+    return { amount, txHash };
   } catch (error) {
     debug('deposit()', error);
     throw error;

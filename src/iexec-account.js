@@ -41,9 +41,9 @@ deposit
       });
       await keystore.load();
       spinner.start(info.depositing());
-      const depositedeAmount = await account.deposit(chain.contracts, amount);
-      spinner.succeed(info.deposited(depositedeAmount), {
-        raw: { amount: depositedeAmount },
+      const depositRes = await account.deposit(chain.contracts, amount);
+      spinner.succeed(info.deposited(depositRes.amount), {
+        raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
     } catch (error) {
       handleError(error, cli, cmd);
