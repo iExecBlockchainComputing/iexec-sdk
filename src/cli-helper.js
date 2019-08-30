@@ -90,6 +90,8 @@ const desc = {
   encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
   generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficary key',
+  bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
+  bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
 };
 
 const option = {

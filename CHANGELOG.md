@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- optional bridge configuration in `chain.json`
+- `iexec wallet to-sidechain <nRlcAmount>` sending RLC from a mainchain to the bridged sidechain.
+- `iexec wallet to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
+
 ### Changed
 
 - [BREAKING] `wallet.sweep()` promise now resolves as `{sendNativeTxHash, sendERC20TxHash, errors}` on mainchains or `{sendNativeTxHash, errors}` on sidechains, previously was `{sendETHTxHash, sendRLCTxHash}`.

@@ -297,7 +297,105 @@ const sweep = async (
   }
 };
 
+const bridgeToSidechain = async (
+  contracts = throwIfMissing(),
+  bridgeAddress = throwIfMissing(),
+  nRlcAmount = throwIfMissing(),
+  { sidechainContracts, sidechainBridgeAddress } = {},
+) => {
+  try {
+    isEthAddress(bridgeAddress, { strict: true });
+    if (contracts.isNative) throw Error('Current chain is a sidechain');
+
+    const homeBridgeContract = new Contract(
+      bridgeAddress,
+      homeBridgeErcToNativeDesc.abi,
+      contracts.eth,
+    );
+    const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
+      homeBridgeContract.minPerTx(),
+      homeBridgeContract.maxPerTx(),
+      homeBridgeContract.withinExecutionLimit(nRlcAmount),
+    ]);
+    if (new BN(nRlcAmount).lt(ethersBnToBn(minPerTx))) {
+      throw Error(
+        `Minimum amount allowed to bridge is ${minPerTx.toString()} nRLC`,
+      );
+    }
+    if (new BN(nRlcAmount).gt(ethersBnToBn(maxPerTx))) {
+      throw Error(
+        `Maximum amount allowed to bridge is ${maxPerTx.toString()} nRLC`,
+      );
+    }
+    if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
+
+    const sendTxHash = await sendRLC(contracts, nRlcAmount, bridgeAddress);
+    return { sendTxHash };
+  } catch (error) {
+    debug('bridgeToSidechain()', error);
+    throw error;
+  }
+};
+
+const bridgeToMainchain = async (
+  contracts = throwIfMissing(),
+  bridgeAddress = throwIfMissing(),
+  nRlcAmount = throwIfMissing(),
+  { mainchainContracts, mainchainBridgeAddress } = {},
+) => {
+  try {
+    isEthAddress(bridgeAddress, { strict: true });
+    if (!contracts.isNative) throw Error('Current chain is a mainchain');
+
+    const foreignBridgeContract = new Contract(
+      bridgeAddress,
+      foreignBridgeErcToNativeDesc.abi,
+      contracts.eth,
+    );
+    const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
+      foreignBridgeContract.minPerTx(),
+      foreignBridgeContract.maxPerTx(),
+      foreignBridgeContract.withinExecutionLimit(nRlcAmount),
+    ]);
+    debug('minPerTx', minPerTx.toString());
+    debug('maxPerTx', maxPerTx.toString());
+    debug('withinExecutionLimit', withinExecutionLimit);
+
+    const bnWeiValue = bnNRlcToBnWei(new BN(nRlcAmount));
+
+    if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
+      throw Error(
+        `Minimum amount allowed to bridge is ${truncateBnWeiToBnNRlc(
+          ethersBnToBn(minPerTx),
+        )} nRLC`,
+      );
+    }
+    if (bnWeiValue.gt(ethersBnToBn(maxPerTx))) {
+      throw Error(
+        `Maximum amount allowed to bridge is ${truncateBnWeiToBnNRlc(
+          ethersBnToBn(maxPerTx),
+        )} nRLC`,
+      );
+    }
+    if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
+
+    const weiValue = bnWeiValue.toString();
+
+    const sendTxHash = await sendNativeToken(
+      contracts,
+      weiValue,
+      bridgeAddress,
+    );
+    return { sendTxHash };
+  } catch (error) {
+    debug('bridgeToSidechain()', error);
+    throw error;
+  }
+};
+
 module.exports = {
+  bridgeToMainchain,
+  bridgeToSidechain,
   checkBalances,
   getETH,
   getRLC,

@@ -352,4 +352,128 @@ sweep
     }
   });
 
+const bridgeToSidechain = cli.command('to-sidechain <nRlcAmount>');
+addGlobalOptions(bridgeToSidechain);
+addWalletLoadOptions(bridgeToSidechain);
+bridgeToSidechain
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.bridgeToSidechain())
+  .action(async (nRlcAmount, cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      ]);
+      if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
+      const bridgeAddress = chain.bridge && chain.bridge.contract;
+      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      if (!bridgeAddress) {
+        throw Error(
+          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+        );
+      }
+      if (!bridgedNetworkId) {
+        throw Error(
+          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+        );
+      }
+      if (!cmd.force) {
+        await prompt.transferRLC(
+          nRlcAmount,
+          chain.name,
+          `bridge contract ${bridgeAddress} (please double check the address)`,
+          chain.id,
+        );
+      }
+      const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
+      spinner.start(`sending ${message}...`);
+      const { sendTxHash } = await wallet.bridgeToSidechain(
+        chain.contracts,
+        bridgeAddress,
+        nRlcAmount,
+      );
+      spinner.succeed(
+        `Sent ${message} (tx: ${sendTxHash})\nPlease wait for the agent to credit your wallet on chain ${bridgedNetworkId}`,
+        {
+          raw: {
+            amount: nRlcAmount,
+            from: address,
+            to: bridgeAddress,
+            sendTxHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const bridgeToMainchain = cli.command('to-mainchain <nRlcAmount>');
+addGlobalOptions(bridgeToMainchain);
+addWalletLoadOptions(bridgeToMainchain);
+bridgeToMainchain
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.bridgeToMainchain())
+  .action(async (nRlcAmount, cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [{ address }, chain] = await Promise.all([
+        keystore.load(),
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      ]);
+      if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
+      const bridgeAddress = chain.bridge && chain.bridge.contract;
+      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      if (!bridgeAddress) {
+        throw Error(
+          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+        );
+      }
+      if (!bridgedNetworkId) {
+        throw Error(
+          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+        );
+      }
+      if (!cmd.force) {
+        await prompt.transferRLC(
+          nRlcAmount,
+          chain.name,
+          `bridge contract ${bridgeAddress} (please double check the address)`,
+          chain.id,
+        );
+      }
+      const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
+      spinner.start(`sending ${message}...`);
+      const { sendTxHash } = await wallet.bridgeToMainchain(
+        chain.contracts,
+        bridgeAddress,
+        nRlcAmount,
+      );
+      spinner.succeed(
+        `Sent ${message} (tx: ${sendTxHash})\nPlease wait for the agent to credit your wallet on chain ${bridgedNetworkId}`,
+        {
+          raw: {
+            amount: nRlcAmount,
+            from: address,
+            to: bridgeAddress,
+            sendTxHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
 help(cli);
