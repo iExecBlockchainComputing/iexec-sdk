@@ -17,7 +17,6 @@ const {
   handleError,
   desc,
   Spinner,
-  info,
 } = require('./cli-helper');
 const {
   loadDeployedConf,
@@ -66,47 +65,37 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
 
     // validate iexec.json
     const iexecConf = await loadIExecConf();
+    const validated = [];
+    const failed = [];
     try {
       objectMap[object].validate(iexecConf);
-
-      spinner.succeed(info.valid(IEXEC_FILE_NAME));
+      validated.push(IEXEC_FILE_NAME);
     } catch (confError) {
-      spinner.fail(info.notValid(IEXEC_FILE_NAME));
-      throw confError;
+      failed.push(`\n ${IEXEC_FILE_NAME}: ${confError.message}`);
     }
 
     // validate logo file
+    const logoPath = path.join(process.cwd(), iexecConf.logo);
+    let logoFile;
     try {
-      const logoPath = path.join(process.cwd(), iexecConf.logo);
-      let logoFile;
-      try {
-        logoFile = await fs.readFile(logoPath);
-      } catch (logoError) {
-        if (logoError.code === 'ENOENT') {
-          throw new Error(`missing "${iexecConf.logo}" logo image file`);
-        }
-        throw logoError;
-      }
+      logoFile = await fs.readFile(logoPath);
       const logoSize = sizeOf(logoFile);
       debug('logoSize', logoSize);
       if (!(logoSize.width === LOGO_SIDE && logoSize.height === LOGO_SIDE)) {
         throw Error(
-          `${
-            iexecConf.logo
-          } dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${
-            logoSize.width
-          } by ${logoSize.height}`,
+          `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`,
         );
       }
-
       const logoExt = path.extname(iexecConf.logo).substr(1);
       if (!(logoSize.type === logoExt)) {
         throw Error(`extension mismatch: ${logoSize.type} =/= ${logoExt}`);
       }
-      spinner.succeed(info.valid(iexecConf.logo));
-    } catch (logoErr) {
-      spinner.fail(info.notValid(iexecConf.logo));
-      throw logoErr;
+      validated.push(iexecConf.logo);
+    } catch (logoError) {
+      const errorMessage = logoError.code === 'ENOENT'
+        ? `missing "${iexecConf.logo}" logo image file`
+        : logoError.message;
+      failed.push(`\n ${iexecConf.logo}: ${errorMessage}`);
     }
 
     // validate deployed.json
@@ -119,18 +108,20 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
           `missing ${objectName} field. You should run "iexec ${object} deploy"`,
         );
       }
-      spinner.succeed(info.valid(DEPLOYED_FILE_NAME));
+      validated.push(DEPLOYED_FILE_NAME);
     } catch (confError) {
-      spinner.fail(info.notValid(DEPLOYED_FILE_NAME));
-      throw confError;
+      failed.push(`\n ${DEPLOYED_FILE_NAME}: ${confError.message}`);
     }
-
-    console.log('\n');
-    spinner.succeed(
-      `${object} description is valid. You can now submit it to the ${object} registry: ${
-        objectMap[object].registry
-      }`,
-    );
+    if (failed.length === 0) {
+      spinner.succeed(
+        `${object} description is valid. You can now submit it to the ${object} registry: ${objectMap[object].registry}`,
+        {
+          raw: { validated },
+        },
+      );
+    } else {
+      throw Error(`Invalid files: ${failed}`);
+    }
   } catch (error) {
     handleError(error, cli, cmd);
   }

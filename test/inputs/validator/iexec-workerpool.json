@@ -1,7 +1,5 @@
 {
   "description": "My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users",
-  "license": "MIT",
-  "author": "?",
   "social": {
     "website": "?",
     "github": "?"
