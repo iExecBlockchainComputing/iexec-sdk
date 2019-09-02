@@ -266,7 +266,7 @@ test('[mainchain] iexec account withdraw 500 (+ wallet)', async () => {
   expect(initialAccountBalance.sub(bnAmount).eq(finalAccountBalance)).toBe(
     true,
   );
-}, 15000);
+}, 30000);
 test(
   'iexec account withdraw 500 --gas-price 1000000000 (+ wallet)',
   () => expect(
@@ -954,7 +954,7 @@ test('[sidechain] iexec account withdraw 500 (+ wallet)', async () => {
     true,
   );
   // expect(initialWalletBalance.lt(finalWalletBalance)).toBe(true);
-}, 15000);
+}, 30000);
 
 test('[sidechain] iexec wallet sweep (unencrypted wallet.json)', async () => {
   await execAsync('mv wallet.back wallet.json');
