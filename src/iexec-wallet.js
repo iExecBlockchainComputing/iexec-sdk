@@ -352,7 +352,7 @@ sweep
     }
   });
 
-const bridgeToSidechain = cli.command('to-sidechain <nRlcAmount>');
+const bridgeToSidechain = cli.command('bridge-to-sidechain <nRlcAmount>');
 addGlobalOptions(bridgeToSidechain);
 addWalletLoadOptions(bridgeToSidechain);
 bridgeToSidechain
@@ -414,7 +414,7 @@ bridgeToSidechain
     }
   });
 
-const bridgeToMainchain = cli.command('to-mainchain <nRlcAmount>');
+const bridgeToMainchain = cli.command('bridge-to-mainchain <nRlcAmount>');
 addGlobalOptions(bridgeToMainchain);
 addWalletLoadOptions(bridgeToMainchain);
 bridgeToMainchain

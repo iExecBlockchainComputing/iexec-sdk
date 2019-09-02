@@ -306,8 +306,10 @@ iexec wallet getRLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
 iexec wallet sendETH <amount> --to <address> # send ETH to the specified eth address
-iexec wallet sendRLC <amount> --to <address>  # send RLC to the specified eth address
+iexec wallet sendRLC <nRlcAmount> --to <address>  # send RLC to the specified eth address
 iexec wallet sweep --to <address> # drain all ETH and RLC, sending them to the specified eth address
+iexec wallet bridge-to-sidechain <nRlcAmount> # send RLC from a mainchain to the bridged sidechain.
+iexec wallet bridge-to-mainchain <nRlcAmount> # send RLC from a sidechain to the bridged mainchain.
 ```
 
 The wallet files are stored in the Ethereum keystore.
