@@ -69,9 +69,9 @@ withdraw
       });
       await keystore.load();
       spinner.start(info.withdrawing());
-      const withdrawedAmount = await account.withdraw(chain.contracts, amount);
+      const res = await account.withdraw(chain.contracts, amount);
       spinner.succeed(info.withdrawed(amount), {
-        raw: { amount: withdrawedAmount },
+        raw: { amount: res.amount, txHash: res.txHash },
       });
     } catch (error) {
       handleError(error, cli, cmd);

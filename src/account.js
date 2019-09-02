@@ -77,10 +77,21 @@ const withdraw = async (
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
+    // if (contracts.isNative) {
+    //   const withdrawGas = ethersBnToBn(
+    //     await clerkContract.estimate.withdraw(amount),
+    //   );
+    //   const gasPrice = new BN((await contracts.eth.getGasPrice()).toString());
+    //   const withdrawWeiCost = withdrawGas.mul(gasPrice);
+    //   const weiAmount = bnNRlcToBnWei(new BN(amount));
+    //   debug('withdrawCost', withdrawWeiCost.toString());
+    //   debug('weiAmount', weiAmount.toString());
+    //   if (withdrawWeiCost.gt(weiAmount)) throw Error('withdraw cost is higher than witdrawed amount');
+    // }
     const tx = await clerkContract.withdraw(amount);
     const txReceipt = await tx.wait();
     if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
-    return amount;
+    return { amount, txHash: tx.hash };
   } catch (error) {
     debug('withdraw()', error);
     throw error;

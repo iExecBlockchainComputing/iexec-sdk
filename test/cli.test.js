@@ -232,15 +232,41 @@ test('[mainchain] iexec account deposit 1000 (+ wallet)', async () => {
     true,
   );
 }, 30000);
-test(
-  'iexec account withdraw 500 (+ wallet)',
-  () => expect(
-    execAsync(
-      `${iexecPath} account withdraw 500 --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
-    ),
-  ).resolves.not.toBe(1),
-  15000,
-);
+test('[mainchain] iexec account withdraw 500 (+ wallet)', async () => {
+  const initialWalletBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+    ).balance.nRLC,
+  );
+  const initialAccountBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+    ).balance.stake,
+  );
+  const amount = '500';
+  const raw = await execAsync(
+    `${iexecPath} account withdraw ${amount} --password test --wallet-address ${ADDRESS} --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.amount).toBe(amount);
+  expect(res.txHash).not.toBe(undefined);
+  const bnAmount = new BN(amount);
+  const finalWalletBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+    ).balance.nRLC,
+  );
+  const finalAccountBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+    ).balance.stake,
+  );
+  expect(initialWalletBalance.add(bnAmount).eq(finalWalletBalance)).toBe(true);
+  expect(initialAccountBalance.sub(bnAmount).eq(finalAccountBalance)).toBe(
+    true,
+  );
+}, 15000);
 test(
   'iexec account withdraw 500 --gas-price 1000000000 (+ wallet)',
   () => expect(
@@ -827,6 +853,36 @@ test('[sidechain] iexec info', async () => {
   expect(res.useNative).toBe(true);
 });
 
+test('[sidechain] iexec wallet show (+ wallet from address)', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.balance.ETH.substr(0, 2)).toBe(res.balance.nRLC.substr(0, 2));
+  expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
+});
+
+test('[sidechain] iexec wallet sendETH', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendETH 0.1 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
+  ).catch(e => e.message);
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(false);
+}, 10000);
+
+test('[sidechain] iexec wallet sendRLC', async () => {
+  const raw = await execAsync(
+    `${iexecPath} wallet sendRLC 1000000000 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
+  );
+  const res = JSON.parse(raw);
+  expect(res.ok).toBe(true);
+  expect(res.from).toBe(ADDRESS);
+  expect(res.to).toBe(ADDRESS2);
+  expect(res.amount).toBe('1000000000');
+  expect(res.txHash).not.toBe(undefined);
+}, 10000);
+
 test('[sidechain] iexec account deposit 1000 (+ wallet)', async () => {
   const initialWalletBalance = new BN(
     JSON.parse(
@@ -863,35 +919,42 @@ test('[sidechain] iexec account deposit 1000 (+ wallet)', async () => {
   );
 }, 30000);
 
-test('[sidechain] iexec wallet show (+ wallet from address)', async () => {
+test('[sidechain] iexec account withdraw 500 (+ wallet)', async () => {
+  const initialWalletBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+    ).balance.nRLC,
+  );
+  const initialAccountBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+    ).balance.stake,
+  );
+  const amount = '500';
   const raw = await execAsync(
-    `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
+    `${iexecPath} account withdraw ${amount} --password test --wallet-address ${ADDRESS} --raw`,
   );
   const res = JSON.parse(raw);
   expect(res.ok).toBe(true);
-  expect(res.balance.ETH.substr(0, 2)).toBe(res.balance.nRLC.substr(0, 2));
-  expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
-});
-
-test('[sidechain] iexec wallet sendETH', async () => {
-  const raw = await execAsync(
-    `${iexecPath} wallet sendETH 0.1 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
-  ).catch(e => e.message);
-  const res = JSON.parse(raw);
-  expect(res.ok).toBe(false);
-}, 10000);
-
-test('[sidechain] iexec wallet sendRLC', async () => {
-  const raw = await execAsync(
-    `${iexecPath} wallet sendRLC 1000000000 --to ${ADDRESS2} --password test --wallet-address ${ADDRESS} --force --raw`,
-  );
-  const res = JSON.parse(raw);
-  expect(res.ok).toBe(true);
-  expect(res.from).toBe(ADDRESS);
-  expect(res.to).toBe(ADDRESS2);
-  expect(res.amount).toBe('1000000000');
+  expect(res.amount).toBe(amount);
   expect(res.txHash).not.toBe(undefined);
-}, 10000);
+  const bnAmount = new BN(amount);
+  const finalWalletBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+    ).balance.nRLC,
+  );
+  const finalAccountBalance = new BN(
+    JSON.parse(
+      await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+    ).balance.stake,
+  );
+  expect(initialWalletBalance.add(bnAmount).gte(finalWalletBalance)).toBe(true);
+  expect(initialAccountBalance.sub(bnAmount).eq(finalAccountBalance)).toBe(
+    true,
+  );
+  // expect(initialWalletBalance.lt(finalWalletBalance)).toBe(true);
+}, 15000);
 
 test('[sidechain] iexec wallet sweep (unencrypted wallet.json)', async () => {
   await execAsync('mv wallet.back wallet.json');
