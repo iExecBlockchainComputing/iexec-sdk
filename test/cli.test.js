@@ -27,6 +27,7 @@ let nativeHubAddress;
 let networkId;
 
 const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const PUBLIC_KEY = '0x63b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 const PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
@@ -98,11 +99,11 @@ describe('[Mainchain]', () => {
   });
 
   afterAll(async () => {
-    await execAsync('rm wallet.json').catch();
-    await execAsync('rm iexec.json').catch();
-    await execAsync('rm chain.json').catch();
-    await execAsync('rm deployed.json').catch();
-    await execAsync('rm orders.json').catch();
+    await execAsync('rm wallet.json').catch(() => {});
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+    await execAsync('rm deployed.json').catch(() => {});
+    await execAsync('rm orders.json').catch(() => {});
   });
 
   // INFO
@@ -630,11 +631,11 @@ describe('[Sidechain]', () => {
   });
 
   afterAll(async () => {
-    await execAsync('rm wallet.json').catch();
-    await execAsync('rm iexec.json').catch();
-    await execAsync('rm chain.json').catch();
-    await execAsync('rm deployed.json').catch();
-    await execAsync('rm deployed.json').catch();
+    await execAsync('rm wallet.json').catch(() => {});
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+    await execAsync('rm deployed.json').catch(() => {});
+    await execAsync('rm deployed.json').catch(() => {});
   });
 
   test('[sidechain] iexec info', async () => {
@@ -833,11 +834,11 @@ describe('[Sidechain]', () => {
 
 describe('[Common]', () => {
   afterAll(async () => {
-    await execAsync('rm wallet.json').catch();
-    await execAsync('rm iexec.json').catch();
-    await execAsync('rm chain.json').catch();
-    await execAsync('rm deployed.json').catch();
-    await execAsync('rm results.zip').catch();
+    await execAsync('rm wallet.json').catch(() => {});
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+    await execAsync('rm deployed.json').catch(() => {});
+    await execAsync('rm results.zip').catch(() => {});
   });
 
   // init
@@ -851,19 +852,24 @@ describe('[Common]', () => {
 
   describe('[wallet]', () => {
     let importedWalletName;
-    afterAll(async () => {
-      await execAsync('rm wallet.json').catch();
+    let localWalletFileName;
+
+    beforeAll(async () => {
+      await execAsync('rm wallet.json').catch(() => {});
+      await execAsync(`${iexecPath} init --skip-wallet --force`);
+      const chains = await loadJSONFile('chain.json');
+      chains.default = chainName;
+      chains.chains.dev.hub = hubAddress;
+      chains.chains.dev.host = ethereumURL;
+      chains.chains.dev.id = networkId;
+      await saveJSONToFile(chains, 'chain.json');
     });
 
-    test('iexec wallet create', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet create --password test --force --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
-      expect(res.fileName).not.toBe(undefined);
-    }, 10000);
+    afterAll(async () => {
+      await execAsync('rm -rf out/keystore').catch(() => {});
+      await execAsync('rm wallet.json').catch(() => {});
+      if (localWalletFileName) await execAsync(`rm ${localWalletFileName}`).catch(() => {});
+    });
 
     test('iexec wallet import', async () => {
       const raw = await execAsync(
@@ -880,113 +886,168 @@ describe('[Common]', () => {
       ];
     }, 10000);
 
-    test(
-      'iexec wallet show (+ wallet from address)',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet create', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet create --password test --force --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.fileName).not.toBe(undefined);
+    }, 10000);
 
-    test(
-      'iexec wallet show (+ wallet from file name)',
-      async () => expect(
-        execAsync(
-          `${iexecPath} wallet show --password test --wallet-file ${importedWalletName} ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show --wallet-addres <address>', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS);
+      expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
+      expect(res.wallet.privateKey).toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+    }, 10000);
 
-    test(
-      'iexec wallet show (wrong password)',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS} ${saveRaw()}`,
-        ),
-      ).rejects.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show --show-private-key --wallet-addres <address>', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --show-private-key --password test --wallet-address ${ADDRESS} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS);
+      expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
+      expect(res.wallet.privateKey).toBe(PRIVATE_KEY);
+      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+    }, 10000);
 
-    test(
-      'iexec wallet show (missing wallet file)',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet show --wallet-address ${ADDRESS2} ${saveRaw()}`,
-        ),
-      ).rejects.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show --wallet-file <fileName>', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --password test --wallet-file ${importedWalletName} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS);
+      expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
+      expect(res.wallet.privateKey).toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+    }, 10000);
+
+    test('iexec wallet show --wallet-address <address> (wrong password)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS} --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error).toBe('invalid password');
+      expect(res.wallet).toBe(undefined);
+      expect(res.balance).toBe(undefined);
+    }, 10000);
+
+    test('iexec wallet show --wallet-address <address> (missing wallet file)', async () => {
+      const raw = await execAsync(
+        `${iexecPath}  wallet show --wallet-address ${ADDRESS2} --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error).toBe('Missing address or wallet');
+      expect(res.wallet).toBe(undefined);
+      expect(res.balance).toBe(undefined);
+    }, 10000);
 
     // keystoredir custom
-    test(
-      'iexec wallet import --keystoredir [path]',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet import ${PRIVATE_KEY2} --password customPath --keystoredir ~/temp/iexecSDKTest ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet import --keystoredir [path]', async () => {
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
+      const raw = await execAsync(
+        `${iexecPath}  wallet import ${PRIVATE_KEY2} --password customPath --keystoredir ./out/keystore --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.address).toBe(ADDRESS2);
+      expect(res.fileName.indexOf('out/keystore/')).not.toBe(-1);
+    }, 10000);
 
-    test(
-      'iexec wallet show --keystoredir [path] --wallet-address',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet show --password customPath --keystoredir ~/temp/iexecSDKTest --wallet-address ${ADDRESS2} ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show --keystoredir [path]', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --password customPath --keystoredir ./out/keystore --wallet-address ${ADDRESS2} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS2);
+    }, 10000);
 
     // keystoredir local
-    test(
-      '[common] iexec wallet import --keystoredir local',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase' --keystoredir local ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet import --keystoredir local', async () => {
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
+      const raw = await execAsync(
+        `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase' --keystoredir local --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.address).toBe(ADDRESS3);
+      expect(res.fileName.indexOf('/')).toBe(-1);
+      localWalletFileName = res.fileName;
+    }, 10000);
 
-    test(
-      'iexec wallet show --keystoredir local --wallet-address',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${ADDRESS3} ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show --keystoredir [path]', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${ADDRESS3} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS3);
+    }, 10000);
 
-    test(
-      'iexec wallet import --unencrypted',
-      () => expect(
-        execAsync(
-          `${iexecPath} wallet import ${PRIVATE_KEY2} --unencrypted ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    // unencrypted
+    test('iexec wallet import --unencrypted', async () => {
+      await execAsync('rm wallet.json').catch(() => {});
+      const raw = await execAsync(
+        `${iexecPath} wallet import ${PRIVATE_KEY2} --unencrypted --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.privateKey).toBe(PRIVATE_KEY2);
+      expect(res.wallet.address).toBe(ADDRESS2);
+      expect(res.address).toBe(ADDRESS2);
+      expect(res.fileName.indexOf('/')).toBe(-1);
+    }, 10000);
 
-    test(
-      'iexec wallet show (unencrypted wallet.json)',
-      () => expect(
-        execAsync(`${iexecPath} wallet show ${saveRaw()}`),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show (unencrypted wallet.json)', async () => {
+      const raw = await execAsync(`${iexecPath} wallet show --raw`);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet.address).toBe(ADDRESS2);
+    }, 10000);
 
-    test(
-      'iexec wallet show [address]',
-      () => expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} ${saveRaw()}`),
-      ).resolves.not.toBe(1),
-      10000,
-    );
+    test('iexec wallet show [address]', async () => {
+      const raw = await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe('0');
+      expect(res.balance.nRLC).not.toBe('0');
+      expect(res.wallet).toBe(undefined);
+    }, 10000);
   });
 
   describe('[tee]', () => {
