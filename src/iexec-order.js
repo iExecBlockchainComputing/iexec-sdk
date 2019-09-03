@@ -564,7 +564,7 @@ fill
       );
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
-        { raw: { dealid, volume } },
+        { raw: { dealid, volume: volume.toString() } },
       );
     } catch (error) {
       handleError(error, cli, cmd);

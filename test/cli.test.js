@@ -95,6 +95,7 @@ describe('[Mainchain]', () => {
   let mainchainApp;
   let mainchainDataset;
   let mainchainWorkerpool;
+  let mainchainDealid;
 
   beforeAll(async () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -616,15 +617,14 @@ describe('[Mainchain]', () => {
     expect(res.requestorder).not.toBe(undefined);
   }, 30000);
 
-  test(
-    'iexec order fill (+ wallet)',
-    () => expect(
-      execAsync(
-        `${iexecPath} order fill --raw > 'out/orderFill_stdout.json'`,
-      ),
-    ).resolves.not.toBe(1),
-    15000,
-  );
+  test('[mainchain] iexec order fill', async () => {
+    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.volume).toBe('1');
+    expect(res.dealid).not.toBe(undefined);
+    mainchainDealid = res.dealid;
+  }, 10000);
 
   test('[mainchain] iexec order sign --app', async () => {
     const raw = await execAsync(`${iexecPath} order sign --app --raw`);
@@ -667,15 +667,15 @@ describe('[Mainchain]', () => {
     expect(res.requestorder).not.toBe(undefined);
   }, 10000);
 
-  test(
-    'iexec order fill --params <params> --force (+ wallet)',
-    () => expect(
-      execAsync(
-        `${iexecPath} order fill --params 'arg --option "multiple words"' --force ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1),
-    15000,
-  );
+  test('[mainchain] iexec order fill --params <params> --force', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.volume).toBe('1');
+    expect(res.dealid).not.toBe(undefined);
+  }, 10000);
 
   test(
     'iexec order cancel --app (+ wallet)',
@@ -709,12 +709,9 @@ describe('[Mainchain]', () => {
   );
 
   // DEAL
-  test('iexec deal show', async () => {
-    const { dealid } = await loadJSONFile('out/orderFill_stdout.json');
-    return expect(
-      execAsync(`${iexecPath} deal show ${dealid}`),
-    ).resolves.not.toBe(1);
-  });
+  test('iexec deal show', async () => expect(
+    execAsync(`${iexecPath} deal show ${mainchainDealid}`),
+  ).resolves.not.toBe(1));
 
   // sendETH
   test('iexec wallet sendETH', async () => {
@@ -761,6 +758,7 @@ describe('[Sidechain]', () => {
   let sidechainApp;
   let sidechainDataset;
   let sidechainWorkerpool;
+  let sidechainDealid;
 
   beforeAll(async () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -1010,6 +1008,15 @@ describe('[Sidechain]', () => {
     expect(res.workerpoolorder).not.toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
   }, 30000);
+
+  test('[sidechain] iexec order fill', async () => {
+    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.volume).toBe('1');
+    expect(res.dealid).not.toBe(undefined);
+    sidechainDealid = res.dealid;
+  }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
     await execAsync('cp inputs/wallet/wallet2.json wallet.json');
