@@ -734,6 +734,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order cancel --app --dataset --workerpool --request (missing orders)', async () => {
     await execAsync('mv orders.json orders.back');
+    await execAsync('cp ./inputs/orders/emptyOrders.json orders.json');
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
     ).catch(e => e.message);
