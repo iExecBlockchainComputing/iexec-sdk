@@ -56,6 +56,15 @@ const saveRaw = () => {
   return `--raw ${DRONE ? '' : `> out/${testNum}_out 2>&1`}`;
 };
 
+const editRequestorder = async (app, dataset, workerpool) => {
+  if (!app || !dataset || !workerpool) throw Error('missing precondition');
+  const iexecJson = await loadJSONFile('iexec.json');
+  iexecJson.order.requestorder.app = app;
+  iexecJson.order.requestorder.dataset = dataset;
+  iexecJson.order.requestorder.workerpool = workerpool;
+  await saveJSONToFile(iexecJson, 'iexec.json');
+};
+
 // TESTS
 beforeAll(async () => {
   await execAsync('rm -r test/out').catch(e => console.log(e.message));
@@ -596,30 +605,16 @@ describe('[Mainchain]', () => {
   });
 
   // edit order
-  test('edit requestOrder app iexec.json => use deployed resources', async () => {
-    if (!mainchainApp || !mainchainDataset || !mainchainWorkerpool) throw Error('missing precondition');
-    const iexecJson = await loadJSONFile('iexec.json');
-    iexecJson.order.requestorder.app = mainchainApp;
-    iexecJson.order.requestorder.dataset = mainchainDataset;
-    iexecJson.order.requestorder.workerpool = mainchainWorkerpool;
-    await saveJSONToFile(iexecJson, 'iexec.json');
-  });
-
-  test(
-    'iexec order sign (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order sign ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    30000,
-  );
-
-  test(
-    'iexec order sign --request (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order sign --request ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
+  test('[mainchain] iexec order sign', async () => {
+    await editRequestorder(mainchainApp, mainchainDataset, mainchainWorkerpool);
+    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+  }, 30000);
 
   test(
     'iexec order fill (+ wallet)',
@@ -631,27 +626,46 @@ describe('[Mainchain]', () => {
     15000,
   );
 
-  test(
-    'iexec order sign --app (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order sign --app ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test(
-    'iexec order sign --dataset (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order sign --dataset ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test(
-    'iexec order sign --workerpool (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order sign --workerpool ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
+  test('[mainchain] iexec order sign --app', async () => {
+    const raw = await execAsync(`${iexecPath} order sign --app --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order sign --dataset', async () => {
+    const raw = await execAsync(`${iexecPath} order sign --dataset --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order sign --workerpool', async () => {
+    const raw = await execAsync(`${iexecPath} order sign --workerpool --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order sign --request', async () => {
+    await editRequestorder(mainchainApp, mainchainDataset, mainchainWorkerpool);
+    const raw = await execAsync(`${iexecPath} order sign --request --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+  }, 10000);
 
   test(
     'iexec order fill --params <params> --force (+ wallet)',
@@ -985,6 +999,17 @@ describe('[Sidechain]', () => {
     expect(res.requestorder.requester).toBe(ADDRESS);
     expect(res.requestorder.beneficiary).toBe(ADDRESS);
   });
+
+  test('[sidechain] iexec order sign', async () => {
+    await editRequestorder(sidechainApp, sidechainDataset, sidechainWorkerpool);
+    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+  }, 30000);
 
   test('[sidechain] iexec wallet sweep', async () => {
     await execAsync('cp inputs/wallet/wallet2.json wallet.json');

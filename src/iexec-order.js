@@ -60,8 +60,8 @@ init
       );
       const chain = await loadChain(cmd.chain, keystore, { spinner });
 
-      const initialized = {};
-      const failedToInit = [];
+      const success = {};
+      const fails = [];
 
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
@@ -80,7 +80,7 @@ init
             }
           }
           const { saved, fileName } = await initOrderObj(orderName, overwrite);
-          Object.assign(initialized, { [orderName]: saved });
+          Object.assign(success, { [orderName]: saved });
           spinner.info(
             `Saved default ${orderName} in "${fileName}", you can edit it:${pretty(
               saved,
@@ -88,7 +88,7 @@ init
           );
         } catch (error) {
           spinner.info(`Failed to init ${orderName}: ${error}`);
-          failedToInit.push(` ${orderName}`);
+          fails.push(` ${orderName}`);
         }
       };
 
@@ -97,13 +97,15 @@ init
       if (cmd.workerpool || initAll) await initOrder('workerpool');
       if (cmd.request || initAll) await initOrder('request');
 
-      if (failedToInit.length === 0) {
+      if (fails.length === 0) {
         spinner.succeed(
           "Successfully initialized, you can edit in 'iexec.json'",
-          { raw: initialized },
+          {
+            raw: success,
+          },
         );
       } else {
-        throw Error(`Failed to init${failedToInit}`);
+        throw Error(`Failed to init:${fails}`);
       }
     } catch (error) {
       handleError(error, cli, cmd);
@@ -139,139 +141,167 @@ sign
         keystore.load(),
       ]);
 
+      const success = {};
+      const fails = [];
+
       const signAppOrder = async () => {
         spinner.start('signing apporder');
-        const orderObj = iexecConf.order.apporder;
-        if (!orderObj) {
-          throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
-        }
-        await chain.contracts.checkDeployedApp(orderObj.app, {
-          strict: true,
-        });
-        const owner = await order.getContractOwner(
-          chain.contracts,
-          order.APP_ORDER,
-          orderObj,
-        );
-        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
+        try {
+          const orderObj = iexecConf.order.apporder;
+          if (!orderObj) {
+            throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
+          }
+          await chain.contracts.checkDeployedApp(orderObj.app, {
+            strict: true,
+          });
+          const owner = await order.getContractOwner(
+            chain.contracts,
+            order.APP_ORDER,
+            orderObj,
+          );
+          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
-        const signedOrder = await order.signOrder(
-          chain.contracts,
-          order.APP_ORDER,
-          orderObj,
-          address,
-        );
-        const { saved, fileName } = await saveSignedOrder(
-          order.APP_ORDER,
-          chain.id,
-          signedOrder,
-        );
-        spinner.succeed(
-          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
-          { raw: { order: signedOrder } },
-        );
+          const signedOrder = await order.signOrder(
+            chain.contracts,
+            order.APP_ORDER,
+            orderObj,
+            address,
+          );
+          const { saved, fileName } = await saveSignedOrder(
+            order.APP_ORDER,
+            chain.id,
+            signedOrder,
+          );
+          spinner.info(
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          );
+          Object.assign(success, { apporder: signedOrder });
+        } catch (error) {
+          fails.push(` apporder: ${error.message}`);
+        }
       };
 
       const signDatasetOrder = async () => {
         spinner.start('signing datasetorder');
-        const orderObj = iexecConf.order.datasetorder;
-        if (!orderObj) {
-          throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
+        try {
+          const orderObj = iexecConf.order.datasetorder;
+          if (!orderObj) {
+            throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
+          }
+          await chain.contracts.checkDeployedDataset(orderObj.dataset, {
+            strict: true,
+          });
+
+          const owner = await order.getContractOwner(
+            chain.contracts,
+            order.DATASET_ORDER,
+            orderObj,
+          );
+          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
+
+          const signedOrder = await order.signOrder(
+            chain.contracts,
+            order.DATASET_ORDER,
+            orderObj,
+            address,
+          );
+          const { saved, fileName } = await saveSignedOrder(
+            order.DATASET_ORDER,
+            chain.id,
+            signedOrder,
+          );
+          spinner.info(
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          );
+
+          Object.assign(success, { datasetorder: signedOrder });
+        } catch (error) {
+          fails.push(` datasetorder: ${error.message}`);
         }
-        await chain.contracts.checkDeployedDataset(orderObj.dataset, {
-          strict: true,
-        });
-
-        const owner = await order.getContractOwner(
-          chain.contracts,
-          order.DATASET_ORDER,
-          orderObj,
-        );
-        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
-
-        const signedOrder = await order.signOrder(
-          chain.contracts,
-          order.DATASET_ORDER,
-          orderObj,
-          address,
-        );
-        const { saved, fileName } = await saveSignedOrder(
-          order.DATASET_ORDER,
-          chain.id,
-          signedOrder,
-        );
-        spinner.succeed(
-          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
-          { raw: { order: signedOrder } },
-        );
       };
 
       const signWorkerpoolOrder = async () => {
         spinner.start('signing workerpoolorder');
-        const orderObj = iexecConf.order.workerpoolorder;
-        if (!orderObj) {
-          throw new Error(
-            info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
+        try {
+          const orderObj = iexecConf.order.workerpoolorder;
+          if (!orderObj) {
+            throw new Error(
+              info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
+            );
+          }
+          await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
+            strict: true,
+          });
+
+          const owner = await order.getContractOwner(
+            chain.contracts,
+            order.WORKERPOOL_ORDER,
+            orderObj,
           );
+          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
+
+          const signedOrder = await order.signOrder(
+            chain.contracts,
+            order.WORKERPOOL_ORDER,
+            orderObj,
+            address,
+          );
+          const { saved, fileName } = await saveSignedOrder(
+            order.WORKERPOOL_ORDER,
+            chain.id,
+            signedOrder,
+          );
+          spinner.info(
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          );
+          Object.assign(success, { workerpoolorder: signedOrder });
+        } catch (error) {
+          fails.push(` workerpoolorder: ${error.message}`);
         }
-        await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
-          strict: true,
-        });
-
-        const owner = await order.getContractOwner(
-          chain.contracts,
-          order.WORKERPOOL_ORDER,
-          orderObj,
-        );
-        if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
-
-        const signedOrder = await order.signOrder(
-          chain.contracts,
-          order.WORKERPOOL_ORDER,
-          orderObj,
-          address,
-        );
-        const { saved, fileName } = await saveSignedOrder(
-          order.WORKERPOOL_ORDER,
-          chain.id,
-          signedOrder,
-        );
-        spinner.succeed(
-          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
-          { raw: { order: signedOrder } },
-        );
       };
 
       const signRequestOrder = async () => {
         spinner.start('signing requestorder');
-        const orderObj = iexecConf.order.requestorder;
-        if (!orderObj) {
-          throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
+        try {
+          const orderObj = iexecConf.order.requestorder;
+          if (!orderObj) {
+            throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
+          }
+          await chain.contracts.checkDeployedApp(orderObj.app, {
+            strict: true,
+          });
+          const signedOrder = await order.signOrder(
+            chain.contracts,
+            order.REQUEST_ORDER,
+            orderObj,
+            address,
+          );
+          const { saved, fileName } = await saveSignedOrder(
+            order.REQUEST_ORDER,
+            chain.id,
+            signedOrder,
+          );
+          spinner.info(
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+          );
+          Object.assign(success, { requestorder: saved });
+        } catch (error) {
+          fails.push(` requestorder: ${error.message}`);
         }
-        await chain.contracts.checkDeployedApp(orderObj.app, {
-          strict: true,
-        });
-        const signedOrder = await order.signOrder(
-          chain.contracts,
-          order.REQUEST_ORDER,
-          orderObj,
-          address,
-        );
-        const { saved, fileName } = await saveSignedOrder(
-          order.REQUEST_ORDER,
-          chain.id,
-          signedOrder,
-        );
-        spinner.succeed(
-          info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
-          { raw: { order: signedOrder } },
-        );
       };
 
       if (cmd.app || signAll) await signAppOrder();
       if (cmd.dataset || signAll) await signDatasetOrder();
       if (cmd.workerpool || signAll) await signWorkerpoolOrder();
       if (cmd.request || signAll) await signRequestOrder();
+
+      if (fails.length === 0) {
+        spinner.succeed("Successfully signed and stored in 'orders.json'", {
+          raw: success,
+        });
+      } else {
+        throw Error(`Failed to sign:${fails}`);
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }
