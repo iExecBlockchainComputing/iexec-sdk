@@ -748,12 +748,24 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   // DEAL
-  test('iexec deal show', async () => expect(
-    execAsync(`${iexecPath} deal show ${mainchainDealid}`),
-  ).resolves.not.toBe(1));
+  test('[mainchain] iexec deal show', async () => {
+    const raw = await execAsync(
+      `${iexecPath} deal show ${mainchainDealid} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deal).not.toBe(undefined);
+    expect(res.deal.app.pointer).toBe(mainchainApp);
+    expect(res.deal.dataset.pointer).toBe(mainchainDataset);
+    expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(res.deal.requester).toBe(ADDRESS);
+    expect(res.deal.beneficiary).toBe(ADDRESS);
+    expect(res.deal.botFirst).toBe('0');
+    expect(res.deal.botSize).toBe('1');
+  }, 10000);
 
   // sendETH
-  test('iexec wallet sendETH', async () => {
+  test('[mainchain] iexec wallet sendETH', async () => {
     const raw = await execAsync(
       `${iexecPath} wallet sendETH 1 --to ${ADDRESS2} --force --raw`,
     );
@@ -766,7 +778,7 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   // sendRLC
-  test('iexec wallet sendRLC', async () => {
+  test('[mainchain] iexec wallet sendRLC', async () => {
     const raw = await execAsync(
       `${iexecPath} wallet sendRLC 1000000000 --to ${ADDRESS2} --force --raw`,
     );
@@ -1072,6 +1084,22 @@ describe('[Sidechain]', () => {
     expect(res.requestorder).not.toBe(undefined);
     expect(res.requestorder.cancelTx).not.toBe(undefined);
     expect(res.fail).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec deal show', async () => {
+    const raw = await execAsync(
+      `${iexecPath} deal show ${sidechainDealid} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deal).not.toBe(undefined);
+    expect(res.deal.app.pointer).toBe(sidechainApp);
+    expect(res.deal.dataset.pointer).toBe(sidechainDataset);
+    expect(res.deal.workerpool.pointer).toBe(sidechainWorkerpool);
+    expect(res.deal.requester).toBe(ADDRESS);
+    expect(res.deal.beneficiary).toBe(ADDRESS);
+    expect(res.deal.botFirst).toBe('0');
+    expect(res.deal.botSize).toBe('1');
   }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
