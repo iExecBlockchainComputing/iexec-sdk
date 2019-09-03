@@ -234,6 +234,16 @@ describe('[Mainchain]', () => {
   );
 
   // APP
+  test('[common] iexec app init (no wallet)', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(`${iexecPath} app init --raw`);
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).not.toBe(ADDRESS);
+  });
+
   test('[common] iexec app init (+ wallet)', async () => {
     const raw = await execAsync(`${iexecPath} app init --raw`);
     const res = JSON.parse(raw);
@@ -242,14 +252,7 @@ describe('[Mainchain]', () => {
     expect(res.app.owner).toBe(ADDRESS);
   });
 
-  test('[common] iexec app init (no wallet)', async () => {
-    const raw = await execAsync(`${iexecPath} app init --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.app).not.toBe(undefined);
-  });
-
-  test('[mainchain] iexec app deploy (+ wallet)', async () => {
+  test('[mainchain] iexec app deploy', async () => {
     const raw = await execAsync(`${iexecPath} app deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -257,189 +260,281 @@ describe('[Mainchain]', () => {
     mainchainApp = res.address;
   }, 15000);
 
-  test(
-    'iexec app show 1 (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} app show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} app show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainApp);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
 
-  test(
-    'iexec app show 1 (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} app show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app show 1 (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} app show 1 --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
 
-  test(
-    'iexec app show 1 --user [address]',
-    () => expect(
-      execAsync(`${iexecPath} app show 1 --user ${ADDRESS} ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app show [appAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(`${iexecPath} app show ${mainchainApp} --raw`);
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainApp);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
 
-  test(
-    'iexec app count (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} app count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app show 1 --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} app show 1 --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
 
-  test(
-    'iexec app count (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} app count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} app count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
 
-  test(
-    'iexec app count --user [address]',
-    () => expect(
-      execAsync(`${iexecPath} app count --user ${ADDRESS} ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[mainchain] iexec app count --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} app count --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
 
   // DATASET
-  test(
-    '[common] iexec dataset init (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} dataset init ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test('[common] iexec dataset init (no wallet)', () => expect(
-    execAsync(`${iexecPath} dataset init ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test('[mainchain] iexec dataset deploy (+ wallet)', async () => {
+  test('[common] iexec dataset init (no wallet)', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(`${iexecPath} dataset init --raw`);
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).not.toBe(ADDRESS);
+  });
+
+  test('[common] iexec dataset init (+ wallet)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset init --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  });
+
+  test('[mainchain] iexec dataset deploy', async () => {
     const raw = await execAsync(`${iexecPath} dataset deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
     mainchainDataset = res.address;
+    console.log('mainchainDataset', mainchainDataset);
   }, 15000);
-  test(
-    'iexec dataset show 1 (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} dataset show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec dataset show 1 (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} dataset show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test('iexec dataset show 1 --user [address]', () => expect(
-    execAsync(`${iexecPath} dataset show 1 --user ${ADDRESS} ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test(
-    'iexec dataset count (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} dataset count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec dataset count (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} dataset count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec dataset count --user [address]',
-    () => expect(
-      execAsync(`${iexecPath} dataset count --user ${ADDRESS} ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+
+  test('[mainchain] iexec dataset show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainDataset);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec dataset show 1 (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset show 1 --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec dataset show [datasetAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(
+      `${iexecPath} dataset show ${mainchainDataset} --raw`,
+    );
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainDataset);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec dataset show 1 --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} dataset show 1 --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec dataset count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
+
+  test('[mainchain] iexec dataset count --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} dataset count --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
 
   // WORKERPOOL
-  test(
-    '[common] iexec workerpool init (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} workerpool init ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test('[common] iexec workerpool init (no wallet)', () => expect(execAsync(`${iexecPath} workerpool init`)).resolves.not.toBe(1));
-  test('[mainchain] iexec workerpool deploy (+ wallet)', async () => {
+  test('[common] iexec workerpool init (no wallet)', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(`${iexecPath} workerpool init --raw`);
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).not.toBe(ADDRESS);
+  });
+
+  test('[common] iexec workerpool init (+ wallet)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool init --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  });
+
+  test('[mainchain] iexec workerpool deploy', async () => {
     const raw = await execAsync(`${iexecPath} workerpool deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
     mainchainWorkerpool = res.address;
   }, 15000);
-  test(
-    'iexec workerpool show 1 (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} workerpool show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec workerpool show 1 (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} workerpool show 1 ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec workerpool show 1 --user [address]',
-    () => expect(
-      execAsync(
-        `${iexecPath} workerpool show --password test --user ${ADDRESS} ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec workerpool count (no wallet)',
-    () => expect(
-      execAsync(`${iexecPath} workerpool count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec workerpool count (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} workerpool count ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
-  test(
-    'iexec workerpool count --user',
-    () => expect(
-      execAsync(
-        `${iexecPath} workerpool count --user ${ADDRESS} ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+
+  test('[mainchain] iexec workerpool show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainWorkerpool);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec workerpool show 1 (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool show 1 --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec workerpool show [workerpoolAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(
+      `${iexecPath} workerpool show ${mainchainWorkerpool} --raw`,
+    );
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainWorkerpool);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec workerpool show 1 --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} workerpool show 1 --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).not.toBe(undefined);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[mainchain] iexec workerpool count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
+
+  test('[mainchain] iexec workerpool count --user [address]', async () => {
+    await execAsync('mv wallet.json wallet.back');
+    const raw = await execAsync(
+      `${iexecPath} workerpool count --user ${ADDRESS} --raw`,
+    );
+    await execAsync('mv wallet.back wallet.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
 
   // CATEGORY
-  test('[common] iexec category init', () => expect(execAsync(`${iexecPath} category init`)).resolves.not.toBe(1));
-  test(
-    'iexec category create (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} category create ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test('iexec category show 1', () => expect(
-    execAsync(`${iexecPath} category show 1 ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test('iexec category count', () => expect(
-    execAsync(`${iexecPath} category count ${saveRaw()}`),
-  ).resolves.not.toBe(1));
+  test('[common] iexec category init', async () => {
+    const raw = await execAsync(`${iexecPath} category init --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.category).not.toBe(undefined);
+  });
+
+  test('[common] iexec category create', async () => {
+    const raw = await execAsync(`${iexecPath} category create --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.catid).not.toBe(undefined);
+  });
+
+  test('[common] iexec category show 0', async () => {
+    const raw = await execAsync(`${iexecPath} category show 0 --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.index).toBe('0');
+    expect(res.category).not.toBe(undefined);
+  });
+
+  test('[common] iexec category count', async () => {
+    const raw = await execAsync(`${iexecPath} category count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  });
 
   // ORDER
   test('[common] iexec order init', () => expect(execAsync(`${iexecPath} order init ${saveRaw()}`)).resolves.not.toBe(
