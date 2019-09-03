@@ -867,6 +867,17 @@ describe('[Sidechain]', () => {
     sidechainApp = res.address;
   }, 15000);
 
+  test('[sidechain] iexec app show [appAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(`${iexecPath} app show ${sidechainApp} --raw`);
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainApp);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
+
   test('[common] iexec dataset init', async () => {
     const raw = await execAsync(`${iexecPath} dataset init --raw`);
     const res = JSON.parse(raw);
@@ -883,6 +894,19 @@ describe('[Sidechain]', () => {
     sidechainDataset = res.address;
   }, 15000);
 
+  test('[sidechain] iexec dataset show [datasetAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(
+      `${iexecPath} dataset show ${sidechainDataset} --raw`,
+    );
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainDataset);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
   test('[common] iexec workerpool init', async () => {
     const raw = await execAsync(`${iexecPath} workerpool init --raw`);
     const res = JSON.parse(raw);
@@ -898,6 +922,19 @@ describe('[Sidechain]', () => {
     expect(res.address).not.toBe(undefined);
     sidechainWorkerpool = res.address;
   }, 15000);
+
+  test('[sidechain] iexec workerpool show [workerpoolAddress]', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(
+      `${iexecPath} workerpool show ${sidechainWorkerpool} --raw`,
+    );
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainWorkerpool);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
     await execAsync('cp inputs/wallet/wallet2.json wallet.json');
@@ -938,7 +975,7 @@ describe('[Common]', () => {
 
   // init
   test(
-    '[common] iexec init',
+    'iexec init',
     async () => expect(
       execAsync(`${iexecPath} init --password test --force ${saveRaw()}`),
     ).resolves.not.toBe(1),
@@ -1146,11 +1183,11 @@ describe('[Common]', () => {
   });
 
   describe('[tee]', () => {
-    test('[common] iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(
+    test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(
       1,
     ));
 
-    test('[common] iexec tee encrypt-dataset', async () => expect(
+    test('iexec tee encrypt-dataset', async () => expect(
       execAsync(
         `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
       ),
@@ -1158,7 +1195,7 @@ describe('[Common]', () => {
 
     if (!DRONE) {
       // this test requires docker
-      test('[common] openssl decrypt dataset', async () => expect(
+      test('openssl decrypt dataset', async () => expect(
         execAsync(
           'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset.txt',
         ),
@@ -1166,7 +1203,7 @@ describe('[Common]', () => {
     }
 
     test(
-      '[common] iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
+      'iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
       async () => expect(
         execAsync(
           `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
@@ -1178,7 +1215,7 @@ describe('[Common]', () => {
     if (!DRONE) {
       // this test requires docker
       test(
-        '[common] iexec tee encrypt-dataset --algorithm scone',
+        'iexec tee encrypt-dataset --algorithm scone',
         async () => expect(
           execAsync(
             `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
@@ -1189,30 +1226,30 @@ describe('[Common]', () => {
     }
 
     if (semver.gt('v10.12.0', process.version)) {
-      test('[common] iexec tee generate-beneficiary-keys', async () => expect(
+      test('iexec tee generate-beneficiary-keys', async () => expect(
         execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
       ).rejects.not.toBe(1));
     } else {
-      test('[common] iexec tee generate-beneficiary-keys', async () => expect(
+      test('iexec tee generate-beneficiary-keys', async () => expect(
         execAsync(
           `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
         ),
       ).resolves.not.toBe(1));
     }
 
-    test('[common] iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
+    test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
       execAsync(
         `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
       ),
     ).rejects.not.toBe(1));
 
-    test('[common] iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
+    test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
       execAsync(
         `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --wallet-address ${ADDRESS} --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
       ),
     ).resolves.not.toBe(1));
 
-    test('[common] iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
+    test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
       execAsync(
         `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
       ),
@@ -1220,7 +1257,7 @@ describe('[Common]', () => {
   });
 
   describe('[registry]', () => {
-    test('[common] iexec registry validate app (invalid iexec.json)', async () => {
+    test('iexec registry validate app (invalid iexec.json)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate app --raw`,
       ).catch(e => e.message);
@@ -1228,7 +1265,7 @@ describe('[Common]', () => {
       expect(res.ok).toBe(false);
     });
 
-    test('[common] iexec registry validate dataset (invalid iexec.json)', async () => {
+    test('iexec registry validate dataset (invalid iexec.json)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate dataset --raw`,
       ).catch(e => e.message);
@@ -1236,7 +1273,7 @@ describe('[Common]', () => {
       expect(res.ok).toBe(false);
     });
 
-    test('[common] iexec registry validate workerpool (invalid iexec.json)', async () => {
+    test('iexec registry validate workerpool (invalid iexec.json)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate workerpool --raw`,
       ).catch(e => e.message);
@@ -1244,7 +1281,7 @@ describe('[Common]', () => {
       expect(res.ok).toBe(false);
     });
 
-    test('[common] iexec registry validate app', async () => {
+    test('iexec registry validate app', async () => {
       await execAsync('cp ./inputs/validator/iexec-app.json iexec.json');
       await execAsync('cp ./inputs/validator/deployed-app.json deployed.json');
       const raw = await execAsync(`${iexecPath} registry validate app --raw`);
@@ -1253,7 +1290,7 @@ describe('[Common]', () => {
       expect(res.validated.length).toBe(3);
     });
 
-    test('[common] iexec registry validate dataset', async () => {
+    test('iexec registry validate dataset', async () => {
       await execAsync('cp ./inputs/validator/iexec-dataset.json iexec.json');
       await execAsync(
         'cp ./inputs/validator/deployed-dataset.json deployed.json',
@@ -1266,7 +1303,7 @@ describe('[Common]', () => {
       expect(res.validated.length).toBe(3);
     });
 
-    test('[common] iexec registry validate workerpool', async () => {
+    test('iexec registry validate workerpool', async () => {
       await execAsync('cp ./inputs/validator/iexec-workerpool.json iexec.json');
       await execAsync(
         'cp ./inputs/validator/deployed-workerpool.json deployed.json',
