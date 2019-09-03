@@ -289,7 +289,7 @@ const cancelOrder = async (
     const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
     const txReceipt = await tx.wait();
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
-    return true;
+    return { order: orderObj, txHash: tx.hash };
   } catch (error) {
     debug('cancelOrder()', error);
     throw error;

@@ -734,6 +734,9 @@ cancel
         );
       }
 
+      const success = {};
+      const failed = [];
+
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -744,22 +747,41 @@ cancel
       ]);
 
       const cancelOrder = async (orderName) => {
-        const orderToCancel = signedOrders[chain.id][orderName];
-        if (!orderToCancel) {
-          throw new Error(
-            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+        try {
+          const orderToCancel = signedOrders[chain.id][orderName];
+          if (!orderToCancel) {
+            throw new Error(
+              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+            );
+          }
+          if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+          spinner.start(`canceling ${orderName}`);
+          const { txHash } = await order.cancelOrder(
+            chain.contracts,
+            orderName,
+            orderToCancel,
           );
+          spinner.info(`${orderName} successfully canceled (${txHash})`);
+          Object.assign(success, { [orderName]: { cancelTx: txHash } });
+        } catch (error) {
+          failed.push(`${orderName}: ${error.message}`);
         }
-        if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
-        spinner.start(`canceling ${orderName}`);
-        await order.cancelOrder(chain.contracts, orderName, orderToCancel);
-        spinner.succeed(`${orderName} successfully canceled`);
       };
 
       if (cmd.app) await cancelOrder(order.APP_ORDER);
       if (cmd.dataset) await cancelOrder(order.DATASET_ORDER);
       if (cmd.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
       if (cmd.request) await cancelOrder(order.REQUEST_ORDER);
+
+      if (failed.length === 0) {
+        spinner.succeed('Successfully canceled', {
+          raw: success,
+        });
+      } else {
+        spinner.fail(`Failed to cancel: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }

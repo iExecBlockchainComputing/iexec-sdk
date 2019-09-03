@@ -91,7 +91,6 @@ beforeAll(async () => {
 }, 15000);
 
 describe('[Mainchain]', () => {
-  // CHAIN.JSON
   let mainchainApp;
   let mainchainDataset;
   let mainchainWorkerpool;
@@ -677,36 +676,76 @@ describe('[Mainchain]', () => {
     expect(res.dealid).not.toBe(undefined);
   }, 10000);
 
-  test(
-    'iexec order cancel --app (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order cancel --app --force ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test(
-    'iexec order cancel --dataset (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order cancel --dataset --force ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test(
-    'iexec order cancel --workerpool (+ wallet)',
-    () => expect(
-      execAsync(
-        `${iexecPath} order cancel --workerpool --force ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1),
-    15000,
-  );
-  test(
-    'iexec order cancel --request (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order cancel --request --force ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    15000,
-  );
+  test('[mainchain] iexec order cancel --app', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order cancel --app --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.apporder.cancelTx).not.toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.fail).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order cancel --dataset', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order cancel --dataset --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.datasetorder.cancelTx).not.toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.fail).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order cancel --workerpool', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order cancel --workerpool --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.workerpoolorder.cancelTx).not.toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.fail).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order cancel --request', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order cancel --request --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+    expect(res.requestorder.cancelTx).not.toBe(undefined);
+    expect(res.fail).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order cancel --app --dataset --workerpool --request (missing orders)', async () => {
+    await execAsync('mv orders.json orders.back');
+    const raw = await execAsync(
+      `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
+    ).catch(e => e.message);
+    await execAsync('mv orders.back orders.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.fail.length).toBe(4);
+  }, 10000);
 
   // DEAL
   test('iexec deal show', async () => expect(
@@ -1016,6 +1055,23 @@ describe('[Sidechain]', () => {
     expect(res.volume).toBe('1');
     expect(res.dealid).not.toBe(undefined);
     sidechainDealid = res.dealid;
+  }, 10000);
+
+  test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
+    const raw = await execAsync(
+      `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
+    ).catch(e => e);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.apporder.cancelTx).not.toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.datasetorder.cancelTx).not.toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.workerpoolorder.cancelTx).not.toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+    expect(res.requestorder.cancelTx).not.toBe(undefined);
+    expect(res.fail).toBe(undefined);
   }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
