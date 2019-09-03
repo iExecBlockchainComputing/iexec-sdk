@@ -59,7 +59,6 @@ init
         Object.assign(walletOptions, { isSigner: false }),
       );
       const chain = await loadChain(cmd.chain, keystore, { spinner });
-
       const success = {};
       const failed = [];
 
@@ -133,7 +132,6 @@ sign
         || cmd.workerpool
         || cmd.request
       );
-
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf, { address }] = await Promise.all([
@@ -141,7 +139,6 @@ sign
         loadIExecConf(),
         keystore.load(),
       ]);
-
       const success = {};
       const failed = [];
 
@@ -593,42 +590,56 @@ publish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-
       const [chain, signedOrders, { address }] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
+      const success = {};
+      const failed = [];
 
       const publishOrder = async (orderName) => {
-        const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
-        if (!orderToPublish) {
-          throw new Error(
-            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+        try {
+          const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
+          if (!orderToPublish) {
+            throw new Error(
+              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+            );
+          }
+          if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+          spinner.start(`publishing ${orderName}`);
+          const orderHash = await order.publishOrder(
+            chain.contracts,
+            orderName,
+            chain.id,
+            orderToPublish,
+            address,
           );
+          spinner.info(
+            `${orderName} successfully published with orderHash ${orderHash}`,
+          );
+          Object.assign(success, { [orderName]: { orderHash } });
+        } catch (error) {
+          failed.push(`${orderName}: ${error.message}`);
         }
-        if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
-        spinner.start(`publishing ${orderName}`);
-        const orderHash = await order.publishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderToPublish,
-          address,
-        );
-        spinner.succeed(
-          `${orderName} successfully published with orderHash ${orderHash}`,
-          { raw: { orderHash } },
-        );
       };
 
       if (cmd.app) await publishOrder(order.APP_ORDER);
       if (cmd.dataset) await publishOrder(order.DATASET_ORDER);
       if (cmd.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
       if (cmd.request) await publishOrder(order.REQUEST_ORDER);
+
+      if (failed.length === 0) {
+        spinner.succeed('Successfully published', {
+          raw: success,
+        });
+      } else {
+        spinner.fail(`Failed to publish: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -653,61 +664,75 @@ unpublish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-
       const [chain, signedOrders, { address }] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
+      const success = {};
+      const failed = [];
 
       const unpublishOrder = async (orderName, orderHash) => {
-        let orderHashToUnpublish;
-        if (isBytes32(orderHash, { strict: false })) {
-          orderHashToUnpublish = orderHash;
-        } else {
-          spinner.info(
-            `No orderHash specified for unpublish ${orderName}, using orders.json`,
-          );
-          const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
-          if (!orderToUnpublish) {
-            throw new Error(
-              `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
+        try {
+          let orderHashToUnpublish;
+          if (isBytes32(orderHash, { strict: false })) {
+            orderHashToUnpublish = orderHash;
+          } else {
+            spinner.info(
+              `No orderHash specified for unpublish ${orderName}, using orders.json`,
             );
+            const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
+            if (!orderToUnpublish) {
+              throw new Error(
+                `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
+              );
+            }
+            orderHashToUnpublish = await order.computeOrderHash(
+              chain.contracts,
+              orderName,
+              orderToUnpublish,
+            );
+            if (!cmd.force) {
+              await prompt.unpublishFromJsonFile(
+                orderName,
+                pretty(orderToUnpublish),
+              );
+            }
           }
-          orderHashToUnpublish = await order.computeOrderHash(
+
+          spinner.start(`unpublishing ${orderName}`);
+          const unpublished = await order.unpublishOrder(
             chain.contracts,
             orderName,
-            orderToUnpublish,
+            chain.id,
+            orderHashToUnpublish,
+            address,
           );
-          if (!cmd.force) {
-            await prompt.unpublishFromJsonFile(
-              orderName,
-              pretty(orderToUnpublish),
-            );
-          }
+          spinner.info(
+            `${orderName} with orderHash ${unpublished} successfully unpublished`,
+          );
+          Object.assign(success, { [orderName]: { orderHash: unpublished } });
+        } catch (error) {
+          failed.push(`${orderName}: ${error.message}`);
         }
-
-        spinner.start(`unpublishing ${orderName}`);
-        const unpublished = await order.unpublishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderHashToUnpublish,
-          address,
-        );
-        spinner.succeed(
-          `${orderName} with orderHash ${unpublished} successfully unpublished`,
-          { raw: { orderHash: unpublished } },
-        );
       };
 
       if (cmd.app) await unpublishOrder(order.APP_ORDER, cmd.app);
       if (cmd.dataset) await unpublishOrder(order.DATASET_ORDER, cmd.dataset);
       if (cmd.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
       if (cmd.request) await unpublishOrder(order.REQUEST_ORDER, cmd.request);
+
+      if (failed.length === 0) {
+        spinner.succeed('Successfully unpublished', {
+          raw: success,
+        });
+      } else {
+        spinner.fail(`Failed to unpublish: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -733,10 +758,6 @@ cancel
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-
-      const success = {};
-      const failed = [];
-
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -745,6 +766,8 @@ cancel
         loadSignedOrders(),
         keystore.load(),
       ]);
+      const success = {};
+      const failed = [];
 
       const cancelOrder = async (orderName) => {
         try {
@@ -805,71 +828,84 @@ show
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
         spinner,
       });
+      const success = {};
+      const failed = [];
 
       const showOrder = async (orderName, cmdInput) => {
-        let orderHash;
-        if (cmdInput === true) {
-          spinner.info(
-            `No order hash specified, showing ${orderName} from "orders.json"`,
-          );
-          const signedOrders = (await loadSignedOrders())[chain.id];
-          const signedOrder = signedOrders && signedOrders[orderName];
-          if (!signedOrder) {
-            throw Error(
-              `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
+        try {
+          let orderHash;
+          if (cmdInput === true) {
+            spinner.info(
+              `No order hash specified, showing ${orderName} from "orders.json"`,
             );
+            const signedOrders = (await loadSignedOrders())[chain.id];
+            const signedOrder = signedOrders && signedOrders[orderName];
+            if (!signedOrder) {
+              throw Error(
+                `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
+              );
+            }
+            orderHash = await order.computeOrderHash(
+              chain.contracts,
+              orderName,
+              signedOrder,
+            );
+          } else {
+            orderHash = cmdInput;
           }
-          orderHash = await order.computeOrderHash(
-            chain.contracts,
-            orderName,
-            signedOrder,
-          );
-        } else {
-          orderHash = cmdInput;
-        }
-        isBytes32(orderHash);
-        spinner.start(info.showing(orderName));
-        const orderToShow = await order.fetchPublishedOrderByHash(
-          orderName,
-          chain.id,
-          orderHash,
-        );
-        let deals;
-        if (cmd.deals) {
-          deals = await order.fetchDealsByOrderHash(
+          isBytes32(orderHash);
+          spinner.start(info.showing(orderName));
+          const orderToShow = await order.fetchPublishedOrderByHash(
             orderName,
             chain.id,
             orderHash,
           );
+          let deals;
+          if (cmd.deals) {
+            deals = await order.fetchDealsByOrderHash(
+              orderName,
+              chain.id,
+              orderHash,
+            );
+          }
+          const orderString = orderToShow
+            ? `${orderName} with orderHash ${orderHash} details:${pretty(
+              orderToShow,
+            )}`
+            : `${orderName} with orderHash ${orderHash} is not published`;
+          const dealsString = deals && deals.count
+            ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
+              deals.deals,
+            )}`
+            : '\nDeals count: 0';
+          const raw = Object.assign(
+            { orderHash },
+            { publishedOrder: orderToShow },
+            deals && { deals: { count: deals.count, lastDeals: deals.deals } },
+          );
+          spinner.succeed(`${orderString}${cmd.deals ? dealsString : ''}`);
+          Object.assign(success, { [orderName]: { cancelTx: raw } });
+        } catch (error) {
+          failed.push(`${orderName}: ${error.message}`);
         }
-        const orderString = orderToShow
-          ? `${orderName} with orderHash ${orderHash} details:${pretty(
-            orderToShow,
-          )}`
-          : `${orderName} with orderHash ${orderHash} is not published`;
-        const dealsString = deals && deals.count
-          ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
-            deals.deals,
-          )}`
-          : '\nDeals count: 0';
-        const raw = Object.assign(
-          { orderHash },
-          { publishedOrder: orderToShow },
-          deals && { deals: { count: deals.count, lastDeals: deals.deals } },
-        );
-        spinner.succeed(`${orderString}${cmd.deals ? dealsString : ''}`, {
-          raw,
-        });
       };
 
       if (cmd.app) await showOrder(order.APP_ORDER, cmd.app);
       if (cmd.dataset) await showOrder(order.DATASET_ORDER, cmd.dataset);
       if (cmd.workerpool) await showOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
       if (cmd.request) await showOrder(order.REQUEST_ORDER, cmd.request);
+      if (failed.length === 0) {
+        spinner.succeed('Successfully found', {
+          raw: success,
+        });
+      } else {
+        spinner.fail(`Failed to show: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }
