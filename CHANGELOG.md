@@ -15,6 +15,15 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `wallet.sweep()` promise now resolves as `{sendNativeTxHash, sendERC20TxHash, errors}` on mainchains or `{sendNativeTxHash, errors}` on sidechains, previously was `{sendETHTxHash, sendRLCTxHash}`.
 - [BREAKING] `account.deposit()` promise now resolves as `{amount, txHash}`, previously was `amount`.
 - [BREAKING] `account.withdraw()` promise now resolves as `{amount, txHash}`, previously was `amount`.
+- [BREAKING] `order.cancel()` promise now resolves as `{order, txHash}`, previously was `true`.
+- [BREAKING] `iexec registry validate <object> --raw` output is now a single json `{ok, validated: [...fileNames], fail: [...errors]}`.
+- [BREAKING] `iexec order init --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order sign --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order cancel --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order publish --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order show --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order unpublis --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order fill --raw` volume in output is now formated as decimal string, previously was hexadecimal string.
 
 ### Removed
 
