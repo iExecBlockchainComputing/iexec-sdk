@@ -61,7 +61,7 @@ init
       const chain = await loadChain(cmd.chain, keystore, { spinner });
 
       const success = {};
-      const fails = [];
+      const failed = [];
 
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
@@ -87,8 +87,7 @@ init
             )}`,
           );
         } catch (error) {
-          spinner.info(`Failed to init ${orderName}: ${error}`);
-          fails.push(` ${orderName}`);
+          failed.push(`${orderName}: ${error.message}`);
         }
       };
 
@@ -97,7 +96,7 @@ init
       if (cmd.workerpool || initAll) await initOrder('workerpool');
       if (cmd.request || initAll) await initOrder('request');
 
-      if (fails.length === 0) {
+      if (failed.length === 0) {
         spinner.succeed(
           "Successfully initialized, you can edit in 'iexec.json'",
           {
@@ -105,7 +104,9 @@ init
           },
         );
       } else {
-        throw Error(`Failed to init:${fails}`);
+        spinner.fail(`Failed to init: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
       }
     } catch (error) {
       handleError(error, cli, cmd);
@@ -142,7 +143,7 @@ sign
       ]);
 
       const success = {};
-      const fails = [];
+      const failed = [];
 
       const signAppOrder = async () => {
         spinner.start('signing apporder');
@@ -177,7 +178,7 @@ sign
           );
           Object.assign(success, { apporder: signedOrder });
         } catch (error) {
-          fails.push(` apporder: ${error.message}`);
+          failed.push(`apporder: ${error.message}`);
         }
       };
 
@@ -216,7 +217,7 @@ sign
 
           Object.assign(success, { datasetorder: signedOrder });
         } catch (error) {
-          fails.push(` datasetorder: ${error.message}`);
+          failed.push(`datasetorder: ${error.message}`);
         }
       };
 
@@ -256,7 +257,7 @@ sign
           );
           Object.assign(success, { workerpoolorder: signedOrder });
         } catch (error) {
-          fails.push(` workerpoolorder: ${error.message}`);
+          failed.push(`workerpoolorder: ${error.message}`);
         }
       };
 
@@ -286,7 +287,7 @@ sign
           );
           Object.assign(success, { requestorder: saved });
         } catch (error) {
-          fails.push(` requestorder: ${error.message}`);
+          failed.push(`requestorder: ${error.message}`);
         }
       };
 
@@ -295,12 +296,14 @@ sign
       if (cmd.workerpool || signAll) await signWorkerpoolOrder();
       if (cmd.request || signAll) await signRequestOrder();
 
-      if (fails.length === 0) {
+      if (failed.length === 0) {
         spinner.succeed("Successfully signed and stored in 'orders.json'", {
           raw: success,
         });
       } else {
-        throw Error(`Failed to sign:${fails}`);
+        spinner.fail(`Failed to sign: ${pretty(failed)}`, {
+          raw: Object.assign({}, success, { fail: failed }),
+        });
       }
     } catch (error) {
       handleError(error, cli, cmd);

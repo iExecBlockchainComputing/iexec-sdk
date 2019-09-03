@@ -9,15 +9,6 @@ console.log('Node version:', process.version);
 
 // CONFIG
 const { DRONE } = process.env;
-const execAsync = cmd => new Promise((res, rej) => {
-  exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      rej(Error(stderr));
-    }
-    res(stdout + stderr);
-  });
-});
-
 const iexecPath = DRONE ? 'iexec' : 'node ../src/iexec.js';
 const ethereumHost = DRONE ? 'ethereum' : 'localhost';
 const ethereumURL = `http://${ethereumHost}:8545`;
@@ -35,6 +26,15 @@ const PRIVATE_KEY3 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2dd
 const ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 
 // UTILS
+const execAsync = cmd => new Promise((res, rej) => {
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      rej(Error(stderr));
+    }
+    res(stdout + stderr);
+  });
+});
+
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 
 const loadJSONFile = async (fileName) => {
@@ -1339,37 +1339,51 @@ describe('[Common]', () => {
   });
 
   describe('[registry]', () => {
-    test('iexec registry validate app (invalid iexec.json)', async () => {
+    beforeAll(async () => {
+      await execAsync(`${iexecPath} init --skip-wallet --force`);
+      await execAsync('rm deployed.json').catch(() => {});
+      await execAsync('rm logo.png').catch(() => {});
+    });
+
+    test('iexec registry validate app (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate app --raw`,
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
+      expect(res.fail.length).toBe(3);
+      expect(res.validated.length).toBe(0);
     });
 
-    test('iexec registry validate dataset (invalid iexec.json)', async () => {
+    test('iexec registry validate dataset (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate dataset --raw`,
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
+      expect(res.fail.length).toBe(3);
+      expect(res.validated.length).toBe(0);
     });
 
-    test('iexec registry validate workerpool (invalid iexec.json)', async () => {
+    test('iexec registry validate workerpool (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate workerpool --raw`,
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
+      expect(res.fail.length).toBe(3);
+      expect(res.validated.length).toBe(0);
     });
 
     test('iexec registry validate app', async () => {
       await execAsync('cp ./inputs/validator/iexec-app.json iexec.json');
       await execAsync('cp ./inputs/validator/deployed-app.json deployed.json');
+      await execAsync('cp ./inputs/validator/logo.png logo.png');
       const raw = await execAsync(`${iexecPath} registry validate app --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
+      expect(res.fail).toBe(undefined);
     });
 
     test('iexec registry validate dataset', async () => {
@@ -1377,12 +1391,14 @@ describe('[Common]', () => {
       await execAsync(
         'cp ./inputs/validator/deployed-dataset.json deployed.json',
       );
+      await execAsync('cp ./inputs/validator/logo.png logo.png');
       const raw = await execAsync(
         `${iexecPath} registry validate dataset --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
+      expect(res.fail).toBe(undefined);
     });
 
     test('iexec registry validate workerpool', async () => {
@@ -1390,12 +1406,14 @@ describe('[Common]', () => {
       await execAsync(
         'cp ./inputs/validator/deployed-workerpool.json deployed.json',
       );
+      await execAsync('cp ./inputs/validator/logo.png logo.png');
       const raw = await execAsync(
         `${iexecPath} registry validate workerpool --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
+      expect(res.fail).toBe(undefined);
     });
   });
 });

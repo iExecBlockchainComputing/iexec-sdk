@@ -17,6 +17,7 @@ const {
   handleError,
   desc,
   Spinner,
+  pretty,
 } = require('./cli-helper');
 const {
   loadDeployedConf,
@@ -71,7 +72,7 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
       objectMap[object].validate(iexecConf);
       validated.push(IEXEC_FILE_NAME);
     } catch (confError) {
-      failed.push(`\n ${IEXEC_FILE_NAME}: ${confError.message}`);
+      failed.push(`${IEXEC_FILE_NAME}: ${confError.message}`);
     }
 
     // validate logo file
@@ -95,7 +96,7 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
       const errorMessage = logoError.code === 'ENOENT'
         ? `missing "${iexecConf.logo}" logo image file`
         : logoError.message;
-      failed.push(`\n ${iexecConf.logo}: ${errorMessage}`);
+      failed.push(`${iexecConf.logo}: ${errorMessage}`);
     }
 
     // validate deployed.json
@@ -110,7 +111,7 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
       }
       validated.push(DEPLOYED_FILE_NAME);
     } catch (confError) {
-      failed.push(`\n ${DEPLOYED_FILE_NAME}: ${confError.message}`);
+      failed.push(`${DEPLOYED_FILE_NAME}: ${confError.message}`);
     }
     if (failed.length === 0) {
       spinner.succeed(
@@ -120,7 +121,9 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
         },
       );
     } else {
-      throw Error(`Invalid files: ${failed}`);
+      spinner.fail(`Invalid files: ${pretty(failed)}`, {
+        raw: Object.assign({}, { validated }, { fail: failed }),
+      });
     }
   } catch (error) {
     handleError(error, cli, cmd);
