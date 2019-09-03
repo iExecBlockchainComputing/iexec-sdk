@@ -60,34 +60,51 @@ init
       );
       const chain = await loadChain(cmd.chain, keystore, { spinner });
 
+      const initialized = {};
+      const failedToInit = [];
+
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
-        spinner.start(`creating ${orderName}`);
-        const overwrite = {};
-        if (resourceName === 'request') {
-          const [address] = await keystore.accounts();
-          overwrite.requester = address;
-          overwrite.beneficiary = address;
-        } else {
-          const deployedObj = await loadDeployedObj(resourceName);
-          if (deployedObj && deployedObj[chain.id]) {
-            const address = deployedObj[chain.id];
-            overwrite[resourceName] = address;
+        try {
+          spinner.start(`creating ${orderName}`);
+          const overwrite = {};
+          if (resourceName === 'request') {
+            const [address] = await keystore.accounts();
+            overwrite.requester = address;
+            overwrite.beneficiary = address;
+          } else {
+            const deployedObj = await loadDeployedObj(resourceName);
+            if (deployedObj && deployedObj[chain.id]) {
+              const address = deployedObj[chain.id];
+              overwrite[resourceName] = address;
+            }
           }
+          const { saved, fileName } = await initOrderObj(orderName, overwrite);
+          Object.assign(initialized, { [orderName]: saved });
+          spinner.info(
+            `Saved default ${orderName} in "${fileName}", you can edit it:${pretty(
+              saved,
+            )}`,
+          );
+        } catch (error) {
+          spinner.info(`Failed to init ${orderName}: ${error}`);
+          failedToInit.push(` ${orderName}`);
         }
-        const { saved, fileName } = await initOrderObj(orderName, overwrite);
-        spinner.succeed(
-          `Saved default ${orderName} in "${fileName}", you can edit it:${pretty(
-            saved,
-          )}`,
-          { raw: { order: saved } },
-        );
       };
 
       if (cmd.app || initAll) await initOrder('app');
       if (cmd.dataset || initAll) await initOrder('dataset');
       if (cmd.workerpool || initAll) await initOrder('workerpool');
       if (cmd.request || initAll) await initOrder('request');
+
+      if (failedToInit.length === 0) {
+        spinner.succeed(
+          "Successfully initialized, you can edit in 'iexec.json'",
+          { raw: initialized },
+        );
+      } else {
+        throw Error(`Failed to init${failedToInit}`);
+      }
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -557,9 +574,7 @@ publish
         const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
         if (!orderToPublish) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
@@ -626,9 +641,7 @@ unpublish
           const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToUnpublish) {
             throw new Error(
-              `No orderHash specified and no signed ${orderName} found for chain ${
-                chain.id
-              } in "orders.json"`,
+              `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
             );
           }
           orderHashToUnpublish = await order.computeOrderHash(
@@ -701,9 +714,7 @@ cancel
         const orderToCancel = signedOrders[chain.id][orderName];
         if (!orderToCancel) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));

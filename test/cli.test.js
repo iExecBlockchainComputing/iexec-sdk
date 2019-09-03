@@ -347,7 +347,6 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
     mainchainDataset = res.address;
-    console.log('mainchainDataset', mainchainDataset);
   }, 15000);
 
   test('[mainchain] iexec dataset show (from deployed.json)', async () => {
@@ -537,28 +536,64 @@ describe('[Mainchain]', () => {
   });
 
   // ORDER
-  test('[common] iexec order init', () => expect(execAsync(`${iexecPath} order init ${saveRaw()}`)).resolves.not.toBe(
-    1,
-  ));
-  test('[common] iexec order init --app', () => expect(
-    execAsync(`${iexecPath} order init --app ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test('[common] iexec order init --dataset', () => expect(
-    execAsync(`${iexecPath} order init --dataset ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test('[common] iexec order init --workerpool', () => expect(
-    execAsync(`${iexecPath} order init --workerpool ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test('[common] iexec order init --request', () => expect(
-    execAsync(`${iexecPath} order init --request ${saveRaw()}`),
-  ).resolves.not.toBe(1));
-  test(
-    '[common] iexec order init --request (+ wallet)',
-    () => expect(
-      execAsync(`${iexecPath} order init --request ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('[common] iexec order init (no deployed.json)', async () => {
+    await execAsync('mv deployed.json deployed.back');
+    const raw = await execAsync(`${iexecPath} order init --raw`);
+    await execAsync('mv deployed.back deployed.json');
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+    expect(res.requestorder.requester).toBe(ADDRESS);
+    expect(res.requestorder.beneficiary).toBe(ADDRESS);
+  });
+
+  test('[common] iexec order init --app ', async () => {
+    const raw = await execAsync(`${iexecPath} order init --app --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.apporder.app).toBe(mainchainApp);
+  });
+
+  test('[common] iexec order init --dataset ', async () => {
+    const raw = await execAsync(`${iexecPath} order init --dataset --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.datasetorder.dataset).toBe(mainchainDataset);
+  });
+
+  test('[common] iexec order init --workerpool', async () => {
+    const raw = await execAsync(`${iexecPath} order init --workerpool --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).toBe(undefined);
+    expect(res.workerpoolorder.workerpool).toBe(mainchainWorkerpool);
+  });
+
+  test('[common] iexec order init --request', async () => {
+    const raw = await execAsync(`${iexecPath} order init --request --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).toBe(undefined);
+    expect(res.datasetorder).toBe(undefined);
+    expect(res.workerpoolorder).toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+    expect(res.requestorder.requester).toBe(ADDRESS);
+    expect(res.requestorder.beneficiary).toBe(ADDRESS);
+  });
 
   // edit order
   test('edit requestOrder app iexec.json => use deployed resources', async () => {
@@ -935,6 +970,21 @@ describe('[Sidechain]', () => {
     expect(res.workerpool).not.toBe(undefined);
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
+
+  test('[common] iexec order init (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} order init --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.apporder).not.toBe(undefined);
+    expect(res.datasetorder).not.toBe(undefined);
+    expect(res.workerpoolorder).not.toBe(undefined);
+    expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder.app).toBe(sidechainApp);
+    expect(res.datasetorder.dataset).toBe(sidechainDataset);
+    expect(res.workerpoolorder.workerpool).toBe(sidechainWorkerpool);
+    expect(res.requestorder.requester).toBe(ADDRESS);
+    expect(res.requestorder.beneficiary).toBe(ADDRESS);
+  });
 
   test('[sidechain] iexec wallet sweep', async () => {
     await execAsync('cp inputs/wallet/wallet2.json wallet.json');
