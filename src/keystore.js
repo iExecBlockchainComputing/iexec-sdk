@@ -214,9 +214,7 @@ const Keystore = ({
         return match;
       }
       throw Error(
-        `No wallet file matching address ${
-          walletOptions.walletAddress
-        } found in ${fileDir}`,
+        `No wallet file matching address ${walletOptions.walletAddress} found in ${fileDir}`,
       );
     }
     const existsUnencrypted = await fs.existsSync(
@@ -312,15 +310,21 @@ const Keystore = ({
     try {
       debug('accounts');
       let walletAddress;
-      try {
-        if (isSigner) walletAddress = (await load()).address;
-        else walletAddress = await loadWalletAddress();
-        if (!walletAddress) walletAddress = NULL_ADDRESS;
-      } catch (error) {
-        debug('accounts() loading wallet', error);
-        if (isSigner) throw error;
+      if (isSigner) {
+        try {
+          const wallet = await load();
+          walletAddress = wallet.address;
+        } catch (error) {
+          debug('account() load signer wallet', error);
+          throw error;
+        }
+      } else {
+        walletAddress = await loadWalletAddress().catch((e) => {
+          debug(`accounts() unable to find existing wallet: ${e.message}`);
+          return NULL_ADDRESS;
+        });
       }
-      debug(walletAddress);
+      debug('walletAddress', walletAddress);
       return [walletAddress];
     } catch (error) {
       debug('accounts()', error);
