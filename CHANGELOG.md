@@ -6,14 +6,21 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `deal.show()` added `tasks: [...taskids]` key to the resolved value
+
 ### Changed
 
 - fix numbers format in templates
 - update api url
 - `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
 - dependencies update
+- [Breaking] `iexec deal show` ends with error when the deal doesn't exists
+- [Breaking] `deal.show()` throw when the deal doesn't exists
+- [Breaking] `deal.computeTaskIdsArray()` is no longer exposedin the lib (`deal.show()` resolves now as `{..., tasks: [...taskids]}`)
 
 ### Removed
+
+- [Breaking] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
 
 ## [3.0.34] - 2019-07-10
 

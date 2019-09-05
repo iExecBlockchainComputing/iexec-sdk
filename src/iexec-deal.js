@@ -5,7 +5,6 @@ const {
   help,
   addGlobalOptions,
   addWalletLoadOptions,
-  computeWalletLoadOptions,
   handleError,
   desc,
   option,
@@ -24,7 +23,6 @@ const show = cli.command('show <dealid>');
 addGlobalOptions(show);
 addWalletLoadOptions(show);
 show
-  .option(...option.dealTasks())
   .option(...option.chain())
   .description(desc.showObj(objName))
   .action(async (dealid, cmd) => {
@@ -33,36 +31,12 @@ show
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
         spinner,
       });
-
       spinner.start(info.showing(objName));
       const dealResult = await deal.show(chain.contracts, dealid);
-
-      let tasks;
-      if (cmd.tasks) {
-        const tasksIndex = cmd.tasks.split(',');
-        const botFirst = parseInt(dealResult.botFirst, 10);
-        const botSize = parseInt(dealResult.botSize, 10);
-        tasks = tasksIndex.map((i) => {
-          const index = parseInt(i, 10);
-          if (Number.isNaN(index) || index < 0) throw Error(`Invalid index ${i} in ${option.dealTasks()[0]}`);
-          if (index >= botSize) {
-            throw Error(
-              `Invalid index ${index} greather than bag of tasks size (${botSize})`,
-            );
-          }
-          const idx = botFirst + index;
-          const taskid = deal.computeTaskId(dealid, idx);
-          return { idx, taskid };
-        });
-      }
       const cleanDeal = stringifyNestedBn(dealResult);
-      const tasksString = tasks ? `\nTasks: ${pretty(tasks)}` : '';
-      spinner.succeed(
-        `Deal ${dealid} details: ${pretty(cleanDeal)}${tasksString}`,
-        {
-          raw: { deal: cleanDeal, tasks },
-        },
-      );
+      spinner.succeed(`Deal ${dealid} details: ${pretty(cleanDeal)}`, {
+        raw: { deal: cleanDeal },
+      });
     } catch (error) {
       handleError(error, cli, cmd);
     }

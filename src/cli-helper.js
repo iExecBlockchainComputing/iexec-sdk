@@ -206,10 +206,6 @@ const option = {
     '--dataset <address>',
     'show the best orders for specified dataset',
   ],
-  dealTasks: () => [
-    '--tasks <index...>',
-    'show the tasks of the deal at specified index (usage --tasks 0,1,2,3)',
-  ],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet',

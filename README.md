@@ -215,8 +215,7 @@ iexec order show --app <orderHash> --deals # show your order on the Marketplace 
 #### Watch your Deals, your Tasks and download the results
 
 ```bash
-iexec deal show <dealid> # show your deal details
-iexec deal show <dealid> --tasks 0 # get the taskid of the task at index 0 of the deal
+iexec deal show <dealid> # show your deal details, get the taskids
 iexec task show <taskid> # show the status of your task
 iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
@@ -406,7 +405,6 @@ iexec orderbook dataset <address> # show the best datasetorders published on the
 # OPTIONS
 # ---chain <chainName>
 iexec deal show <dealid> # show a deal identified by dealid
-iexec deal show <dealid> --tasks <index...> # show the tasks of the deal at specified index (usage --tasks 0,1,2,3)
 iexec deal claim <dealid> # NOT IMPLEMENTED YET
 ```
 
