@@ -9,6 +9,7 @@ const {
   http,
   checksummedAddress,
   ensureString,
+  NULL_ADDRESS,
 } = require('./utils');
 
 const debug = Debug('iexec:deal');
@@ -57,37 +58,6 @@ const fetchRequesterDeals = async (
   }
 };
 
-const show = async (
-  contracts = throwIfMissing(),
-  dealid = throwIfMissing(),
-) => {
-  try {
-    isBytes32(dealid, { strict: true });
-    const clerkAddress = await contracts.fetchClerkAddress();
-    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
-    const deal = bnifyNestedEthersBn(
-      cleanRPC(await clerkContract.viewDeal(dealid)),
-    );
-    return deal;
-  } catch (error) {
-    debug('show()', error);
-    throw error;
-  }
-};
-
-// const claim = async (
-//   contracts = throwIfMissing(),
-//   dealid = throwIfMissing(),
-//   userAddress = throwIfMissing(),
-// ) => {
-//   try {
-//     throw new Error('Not implemented');
-//   } catch (error) {
-//     debug('claim()', error);
-//     throw error;
-//   }
-// };
-
 const computeTaskId = (
   dealid = throwIfMissing(),
   taskIdx = throwIfMissing(),
@@ -115,10 +85,50 @@ const computeTaskIdsArray = (
   return taskids;
 };
 
+const show = async (
+  contracts = throwIfMissing(),
+  dealid = throwIfMissing(),
+) => {
+  try {
+    isBytes32(dealid, { strict: true });
+    const { chainId } = contracts;
+    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const deal = bnifyNestedEthersBn(
+      cleanRPC(await clerkContract.viewDeal(dealid)),
+    );
+    const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
+    if (!dealExists) throw Error(`No deal found for dealid ${dealid} on chain ${chainId}`);
+    const tasks = computeTaskIdsArray(
+      dealid,
+      deal.botFirst.toString(),
+      deal.botSize.toString(),
+    );
+    const dealWithTasks = { ...deal, tasks };
+    return dealWithTasks;
+  } catch (error) {
+    debug('show()', error);
+    throw error;
+  }
+};
+
+// const claim = async (
+//   contracts = throwIfMissing(),
+//   dealid = throwIfMissing(),
+//   userAddress = throwIfMissing(),
+// ) => {
+//   try {
+//     throw new Error('Not implemented');
+//   } catch (error) {
+//     debug('claim()', error);
+//     throw error;
+//   }
+// };
+
 module.exports = {
   show,
   // claim,
   computeTaskId,
-  computeTaskIdsArray,
+  // computeTaskIdsArray,
   fetchRequesterDeals,
 };
