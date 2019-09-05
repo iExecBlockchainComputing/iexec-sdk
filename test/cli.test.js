@@ -744,7 +744,7 @@ describe('[Mainchain]', () => {
   test('[mainchain] iexec deal show', async () => {
     const raw = await execAsync(
       `${iexecPath} deal show ${mainchainDealid} --raw`,
-    ).catch(e => e.message);
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.deal).not.toBe(undefined);
@@ -755,6 +755,18 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
+    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks['0']).not.toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec deal show (no deal)', async () => {
+    const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
+    const raw = await execAsync(
+      `${iexecPath} deal show ${fakeDealId} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.deal).toBe(undefined);
   }, 10000);
 
   // sendETH
@@ -798,7 +810,7 @@ describe('[Mainchain]', () => {
   }, 15000);
 });
 
-describe('[Sidechain]', () => {
+describe.only('[Sidechain]', () => {
   let sidechainApp;
   let sidechainDataset;
   let sidechainWorkerpool;
@@ -1079,10 +1091,10 @@ describe('[Sidechain]', () => {
     expect(res.fail).toBe(undefined);
   }, 10000);
 
-  test('[mainchain] iexec deal show', async () => {
+  test('[sidechain] iexec deal show', async () => {
     const raw = await execAsync(
       `${iexecPath} deal show ${sidechainDealid} --raw`,
-    ).catch(e => e.message);
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.deal).not.toBe(undefined);
@@ -1093,6 +1105,18 @@ describe('[Sidechain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
+    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks['0']).not.toBe(undefined);
+  }, 10000);
+
+  test('[sidechain] iexec deal show (no deal)', async () => {
+    const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
+    const raw = await execAsync(
+      `${iexecPath} deal show ${fakeDealId} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.deal).toBe(undefined);
   }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
