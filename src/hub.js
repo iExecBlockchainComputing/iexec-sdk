@@ -34,31 +34,34 @@ const createObj = (objName = throwIfMissing()) => async (
   }
 };
 
+const deployApp = (contracts, app) => createObj('app')(contracts, app);
+const deployDataset = (contracts, dataset) => createObj('dataset')(contracts, dataset);
+const deployWorkerpool = (contracts, workerpool) => createObj('workerpool')(contracts, workerpool);
+
 const showObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
+  objAddressOrIndex = throwIfMissing(),
   userAddress,
 ) => {
   try {
     let objAddress;
     if (
-      !isEthAddress(objAdressOrIndex, { strict: false })
-      && Number.isInteger(Number(objAdressOrIndex))
+      !isEthAddress(objAddressOrIndex, { strict: false })
+      && Number.isInteger(Number(objAddressOrIndex))
     ) {
       if (!isEthAddress(userAddress)) throw Error('Missing userAddress');
       // INDEX case: need hit subHub to get obj address from index
       objAddress = await contracts.getUserObjAddressByIndex(objName)(
         userAddress,
-        objAdressOrIndex,
+        objAddressOrIndex,
       );
-    } else if (isEthAddress(objAdressOrIndex)) {
-      objAddress = objAdressOrIndex;
+    } else if (isEthAddress(objAddressOrIndex)) {
+      objAddress = objAddressOrIndex;
     } else {
       throw Error(
         'Argument is neither an integer index nor a valid ethereum address',
       );
     }
-
     const obj = bnifyNestedEthersBn(
       await contracts.getObjProps(objName)(objAddress),
     );
@@ -79,12 +82,31 @@ const cleanObj = (obj) => {
 
 const showApp = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('app')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
+    userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_appMultiaddr && {
+      appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
+    },
+  );
+  return { objAddress, app: clean };
+};
+
+const showUserApp = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('app')(
+    contracts,
+    index,
     userAddress,
   );
   const clean = Object.assign(
@@ -98,12 +120,31 @@ const showApp = async (
 
 const showDataset = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('dataset')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
+    userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_datasetMultiaddr && {
+      datasetMultiaddr: multiaddrHexToHuman(obj.m_datasetMultiaddr),
+    },
+  );
+  return { objAddress, dataset: clean };
+};
+
+const showUserDataset = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('dataset')(
+    contracts,
+    index,
     userAddress,
   );
   const clean = Object.assign(
@@ -117,12 +158,26 @@ const showDataset = async (
 
 const showWorkerpool = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('workerpool')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
+    userAddress,
+  );
+  const clean = cleanObj(obj);
+  return { objAddress, workerpool: clean };
+};
+
+const showUserWorkerpool = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('workerpool')(
+    contracts,
+    index,
     userAddress,
   );
   const clean = cleanObj(obj);
@@ -143,6 +198,19 @@ const countObj = (objName = throwIfMissing()) => async (
     throw error;
   }
 };
+
+const countUserApps = async (
+  contracts = throwIfMissing(),
+  userAdress = throwIfMissing(),
+) => countObj('app')(contracts, userAdress);
+const countUserDatasets = async (
+  contracts = throwIfMissing(),
+  userAdress = throwIfMissing(),
+) => countObj('dataset')(contracts, userAdress);
+const countUserWorkerpools = async (
+  contracts = throwIfMissing(),
+  userAdress = throwIfMissing(),
+) => countObj('workerpool')(contracts, userAdress);
 
 const createCategory = async (
   contracts = throwIfMissing(),
@@ -200,12 +268,21 @@ const getTimeoutRatio = async (contracts = throwIfMissing()) => {
 };
 
 module.exports = {
-  createObj,
-  showObj,
+  createObj, // deprecated
+  deployApp,
+  deployDataset,
+  deployWorkerpool,
+  showObj, // deprecated
   showApp,
   showDataset,
   showWorkerpool,
-  countObj,
+  showUserApp,
+  showUserDataset,
+  showUserWorkerpool,
+  countObj, // deprecated
+  countUserApps,
+  countUserDatasets,
+  countUserWorkerpools,
   createCategory,
   showCategory,
   countCategory,
