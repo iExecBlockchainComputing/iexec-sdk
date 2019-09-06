@@ -82,14 +82,9 @@ const cleanObj = (obj) => {
 
 const showApp = async (
   contracts = throwIfMissing(),
-  objAddressOrIndex = throwIfMissing(), // index is deprecated
-  userAddress, // deprecated
+  appAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('app')(
-    contracts,
-    objAddressOrIndex,
-    userAddress,
-  );
+  const { obj, objAddress } = await showObj('app')(contracts, appAddress);
   const clean = Object.assign(
     cleanObj(obj),
     obj.m_appMultiaddr && {
@@ -120,13 +115,11 @@ const showUserApp = async (
 
 const showDataset = async (
   contracts = throwIfMissing(),
-  objAddressOrIndex = throwIfMissing(), // index is deprecated
-  userAddress, // deprecated
+  datasetAddress = throwIfMissing(),
 ) => {
   const { obj, objAddress } = await showObj('dataset')(
     contracts,
-    objAddressOrIndex,
-    userAddress,
+    datasetAddress,
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -158,13 +151,11 @@ const showUserDataset = async (
 
 const showWorkerpool = async (
   contracts = throwIfMissing(),
-  objAddressOrIndex = throwIfMissing(), // index is deprecated
-  userAddress, // deprecated
+  workerpoolAddress = throwIfMissing(),
 ) => {
   const { obj, objAddress } = await showObj('workerpool')(
     contracts,
-    objAddressOrIndex,
-    userAddress,
+    workerpoolAddress,
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -268,18 +259,15 @@ const getTimeoutRatio = async (contracts = throwIfMissing()) => {
 };
 
 module.exports = {
-  createObj, // deprecated
   deployApp,
   deployDataset,
   deployWorkerpool,
-  showObj, // deprecated
   showApp,
   showDataset,
   showWorkerpool,
   showUserApp,
   showUserDataset,
   showUserWorkerpool,
-  countObj, // deprecated
   countUserApps,
   countUserDatasets,
   countUserWorkerpools,

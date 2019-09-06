@@ -31,6 +31,9 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] removed `order.cancelOrder()` replaced by dedicated methods
 - [BREAKING] removed `order.publishOrder()` replaced by dedicated methods
 - [BREAKING] removed `order.unpublishOrder()` replaced by dedicated methods
+- [BREAKING] removed `hub.createObj()` replaced by dedicated deploy methods
+- [BREAKING] removed `hub.showObj()` replaced by dedicated methods
+- [BREAKING] removed `hub.countObj()` replaced by dedicated deploy methods
 
 ## [3.1.0 Unreleased]
 
