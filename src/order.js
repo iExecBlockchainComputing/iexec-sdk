@@ -684,22 +684,18 @@ module.exports = {
   signDatasetorder,
   signWorkerpoolorder,
   signRequestorder,
-  signOrder, // deprecated
   cancelApporder,
   cancelDatasetorder,
   cancelWorkerpoolorder,
   cancelRequestorder,
-  cancelOrder, // deprecated
   publishApporder,
   publishDatasetorder,
   publishWorkerpoolorder,
   publishRequestorder,
-  publishOrder, // deprecated
   unpublishApporder,
   unpublishDatasetorder,
   unpublishWorkerpoolorder,
   unpublishRequestorder,
-  unpublishOrder, // deprecated
   matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,

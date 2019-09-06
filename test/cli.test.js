@@ -810,7 +810,7 @@ describe('[Mainchain]', () => {
   }, 15000);
 });
 
-describe.only('[Sidechain]', () => {
+describe('[Sidechain]', () => {
   let sidechainApp;
   let sidechainDataset;
   let sidechainWorkerpool;

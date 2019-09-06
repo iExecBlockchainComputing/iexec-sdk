@@ -27,6 +27,11 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
+- [BREAKING] removed `order.signOrder()` replaced by dedicated methods
+- [BREAKING] removed `order.cancelOrder()` replaced by dedicated methods
+- [BREAKING] removed `order.publishOrder()` replaced by dedicated methods
+- [BREAKING] removed `order.unpublishOrder()` replaced by dedicated methods
+
 ## [3.1.0 Unreleased]
 
 ### Added
