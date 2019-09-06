@@ -271,7 +271,9 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   test('[mainchain] iexec app show 1 (current user)', async () => {
+    await execAsync('mv deployed.json deployed.back');
     const raw = await execAsync(`${iexecPath} app show 1 --raw`);
+    await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
@@ -360,7 +362,9 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   test('[mainchain] iexec dataset show 1 (current user)', async () => {
+    await execAsync('mv deployed.json deployed.back');
     const raw = await execAsync(`${iexecPath} dataset show 1 --raw`);
+    await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
@@ -451,7 +455,9 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   test('[mainchain] iexec workerpool show 1 (current user)', async () => {
+    await execAsync('mv deployed.json deployed.back');
     const raw = await execAsync(`${iexecPath} workerpool show 1 --raw`);
+    await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).not.toBe(undefined);
