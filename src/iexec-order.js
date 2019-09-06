@@ -138,9 +138,8 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signApporder(
           chain.contracts,
-          order.APP_ORDER,
           orderObj,
           address,
         );
@@ -172,9 +171,8 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
 
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signDatasetorder(
           chain.contracts,
-          order.DATASET_ORDER,
           orderObj,
           address,
         );
@@ -208,9 +206,8 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
 
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signWorkerpoolorder(
           chain.contracts,
-          order.WORKERPOOL_ORDER,
           orderObj,
           address,
         );
@@ -234,9 +231,8 @@ sign
         await chain.contracts.checkDeployedApp(orderObj.app, {
           strict: true,
         });
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signRequestorder(
           chain.contracts,
-          order.REQUEST_ORDER,
           orderObj,
           address,
         );
@@ -378,9 +374,8 @@ fill
             pretty(unsignedOrder),
           );
         }
-        const signed = order.signOrder(
+        const signed = order.signRequestorder(
           chain.contracts,
-          order.REQUEST_ORDER,
           unsignedOrder,
           address,
         );
@@ -557,9 +552,7 @@ publish
         const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
         if (!orderToPublish) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
@@ -626,9 +619,7 @@ unpublish
           const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToUnpublish) {
             throw new Error(
-              `No orderHash specified and no signed ${orderName} found for chain ${
-                chain.id
-              } in "orders.json"`,
+              `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
             );
           }
           orderHashToUnpublish = await order.computeOrderHash(
@@ -701,9 +692,7 @@ cancel
         const orderToCancel = signedOrders[chain.id][orderName];
         if (!orderToCancel) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
