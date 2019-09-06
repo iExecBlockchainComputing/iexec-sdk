@@ -519,14 +519,14 @@ describe('[Mainchain]', () => {
     expect(res.category).not.toBe(undefined);
   });
 
-  test('[common] iexec category create', async () => {
+  test('[mainchain] iexec category create', async () => {
     const raw = await execAsync(`${iexecPath} category create --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.catid).not.toBe(undefined);
   });
 
-  test('[common] iexec category show 0', async () => {
+  test('[mainchain] iexec category show 0', async () => {
     const raw = await execAsync(`${iexecPath} category show 0 --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -534,7 +534,7 @@ describe('[Mainchain]', () => {
     expect(res.category).not.toBe(undefined);
   });
 
-  test('[common] iexec category count', async () => {
+  test('[mainchain] iexec category count', async () => {
     const raw = await execAsync(`${iexecPath} category count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -987,6 +987,23 @@ describe('[Sidechain]', () => {
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
+  test('[sidechain] iexec app show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} app show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainApp);
+    expect(res.app).not.toBe(undefined);
+    expect(res.app.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[sidechain] iexec app count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} app count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
+
   test('[common] iexec dataset init', async () => {
     const raw = await execAsync(`${iexecPath} dataset init --raw`);
     const res = JSON.parse(raw);
@@ -1014,6 +1031,23 @@ describe('[Sidechain]', () => {
     expect(res.address).toBe(sidechainDataset);
     expect(res.dataset).not.toBe(undefined);
     expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[sidechain] iexec dataset show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainDataset);
+    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[sidechain] iexec dataset count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} dataset count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
   }, 10000);
 
   test('[common] iexec workerpool init', async () => {
@@ -1044,6 +1078,54 @@ describe('[Sidechain]', () => {
     expect(res.workerpool).not.toBe(undefined);
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
+
+  test('[sidechain] iexec workerpool show (from deployed.json)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool show --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(sidechainWorkerpool);
+    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool.owner).toBe(ADDRESS);
+  }, 10000);
+
+  test('[sidechain] iexec workerpool count (current user)', async () => {
+    const raw = await execAsync(`${iexecPath} workerpool count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  }, 10000);
+
+  // CATEGORY
+  test('[common] iexec category init', async () => {
+    const raw = await execAsync(`${iexecPath} category init --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.category).not.toBe(undefined);
+  });
+
+  test('[sidechain] iexec category create', async () => {
+    const raw = await execAsync(`${iexecPath} category create --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.catid).not.toBe(undefined);
+  });
+
+  test('[sidechain] iexec category show 0', async () => {
+    const raw = await execAsync(`${iexecPath} category show 0 --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.index).toBe('0');
+    expect(res.category).not.toBe(undefined);
+  });
+
+  test('[sidechain] iexec category count', async () => {
+    const raw = await execAsync(`${iexecPath} category count --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.count).not.toBe(undefined);
+    expect(res.count).not.toBe('0');
+  });
 
   test('[common] iexec order init (from deployed.json)', async () => {
     const raw = await execAsync(`${iexecPath} order init --raw`);
