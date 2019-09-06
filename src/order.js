@@ -276,6 +276,30 @@ const signOrder = async (
   return signedOrder;
 };
 
+const signApporder = async (
+  contracts = throwIfMissing(),
+  apporder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => signOrder(contracts, APP_ORDER, apporder, signerAddress);
+
+const signDatasetorder = async (
+  contracts = throwIfMissing(),
+  datasetorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => signOrder(contracts, DATASET_ORDER, datasetorder, signerAddress);
+
+const signWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  workerpoolorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => signOrder(contracts, WORKERPOOL_ORDER, workerpoolorder, signerAddress);
+
+const signRequestorder = async (
+  contracts = throwIfMissing(),
+  requestorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => signOrder(contracts, REQUEST_ORDER, requestorder, signerAddress);
+
 const cancelOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
@@ -295,6 +319,26 @@ const cancelOrder = async (
     throw error;
   }
 };
+
+const cancelApporder = async (
+  contracts = throwIfMissing(),
+  apporder = throwIfMissing(),
+) => cancelOrder(contracts, APP_ORDER, apporder);
+
+const cancelDatasetorder = async (
+  contracts = throwIfMissing(),
+  datasetorder = throwIfMissing(),
+) => cancelOrder(contracts, DATASET_ORDER, datasetorder);
+
+const cancelWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  workerpoolorder = throwIfMissing(),
+) => cancelOrder(contracts, WORKERPOOL_ORDER, workerpoolorder);
+
+const cancelRequestorder = async (
+  contracts = throwIfMissing(),
+  requestorder = throwIfMissing(),
+) => cancelOrder(contracts, REQUEST_ORDER, requestorder);
 
 const publishOrder = async (
   contracts = throwIfMissing(),
@@ -323,6 +367,52 @@ const publishOrder = async (
   }
 };
 
+const publishApporder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedApporder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(contracts, APP_ORDER, chainId, signedApporder, signerAddress);
+
+const publishDatasetorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedDatasetorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  DATASET_ORDER,
+  chainId,
+  signedDatasetorder,
+  signerAddress,
+);
+
+const publishWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedWorkerpoolorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  chainId,
+  signedWorkerpoolorder,
+  signerAddress,
+);
+
+const publishRequestorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedRequestorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  REQUEST_ORDER,
+  chainId,
+  signedRequestorder,
+  signerAddress,
+);
+
 const unpublishOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
@@ -349,6 +439,52 @@ const unpublishOrder = async (
     throw error;
   }
 };
+
+const unpublishApporder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  apporderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(contracts, APP_ORDER, chainId, apporderHash, signerAddress);
+
+const unpublishDatasetorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  datasetorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  DATASET_ORDER,
+  chainId,
+  datasetorderHash,
+  signerAddress,
+);
+
+const unpublishWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  workerpoolorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  chainId,
+  workerpoolorderHash,
+  signerAddress,
+);
+
+const unpublishRequestorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  requestorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  REQUEST_ORDER,
+  chainId,
+  requestorderHash,
+  signerAddress,
+);
 
 const fetchPublishedOrderByHash = async (
   orderName = throwIfMissing(),
@@ -446,14 +582,124 @@ const matchOrders = async (
   }
 };
 
+const createApporder = ({
+  app = throwIfMissing(),
+  appprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  tag = NULL_BYTES32,
+  datasetrestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  app,
+  appprice,
+  volume,
+  tag,
+  datasetrestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
+
+const createDatasetorder = ({
+  dataset = throwIfMissing(),
+  datasetprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  dataset,
+  datasetprice,
+  volume,
+  tag,
+  apprestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
+
+const createWorkerpoolorder = ({
+  workerpool = throwIfMissing(),
+  workerpoolprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  category = throwIfMissing(),
+  trust = '0',
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  datasetrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  workerpool,
+  workerpoolprice,
+  volume,
+  category,
+  trust,
+  tag,
+  apprestrict,
+  datasetrestrict,
+  requesterrestrict,
+});
+
+const createRequestorder = ({
+  app = throwIfMissing(),
+  appmaxprice = throwIfMissing(),
+  workerpoolmaxprice = throwIfMissing(),
+  requester = throwIfMissing(),
+  volume = throwIfMissing(),
+  category = throwIfMissing(),
+  workerpool = NULL_ADDRESS,
+  dataset = NULL_ADDRESS,
+  datasetmaxprice = '0',
+  beneficiary,
+  params = '',
+  callback = NULL_ADDRESS,
+  trust = '0',
+  tag = NULL_BYTES32,
+} = {}) => ({
+  app,
+  appmaxprice,
+  dataset,
+  datasetmaxprice,
+  workerpool,
+  workerpoolmaxprice,
+  requester,
+  beneficiary: beneficiary || requester,
+  volume,
+  params,
+  callback,
+  category,
+  trust,
+  tag,
+});
+
 module.exports = {
   computeOrderHash,
   getContractOwner,
   getRemainingVolume,
-  signOrder,
-  cancelOrder,
-  publishOrder,
-  unpublishOrder,
+  createApporder,
+  createDatasetorder,
+  createWorkerpoolorder,
+  createRequestorder,
+  signApporder,
+  signDatasetorder,
+  signWorkerpoolorder,
+  signRequestorder,
+  signOrder, // deprecated
+  cancelApporder,
+  cancelDatasetorder,
+  cancelWorkerpoolorder,
+  cancelRequestorder,
+  cancelOrder, // deprecated
+  publishApporder,
+  publishDatasetorder,
+  publishWorkerpoolorder,
+  publishRequestorder,
+  publishOrder, // deprecated
+  unpublishApporder,
+  unpublishDatasetorder,
+  unpublishWorkerpoolorder,
+  unpublishRequestorder,
+  unpublishOrder, // deprecated
   matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,

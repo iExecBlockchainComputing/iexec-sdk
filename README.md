@@ -829,22 +829,14 @@ const getDatasetOrderbook = async (chainId, datasetAddress) => {
 import sdk from 'iexec';
 
 // prepare an app order to sign
-const initAppOrder = (
-  app, // app address
-  appprice, // selling price in nRLC
-  volume, // number of execution to sell
-  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
-  datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
-  workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
-  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => ({
-  app,
-  appprice,
-  volume,
-  tag,
-  datasetrestrict,
-  workerpoolrestrict,
-  requesterrestrict,
+const orderToSign = sdk.order.createApporder({
+  app, // [mandatory] app address
+  appprice, // [mandatory] selling price in nRLC
+  volume, // [mandatory] number of execution to sell
+  tag, // [optional] bytes 32 hexstring encoded required tags (default no tag)
+  datasetrestrict, // [optional] whitelisted dataset (default all)
+  workerpoolrestrict, // [optional] whitelisted workerpool (default all)
+  requesterrestrict, // [optional] whitelisted requester (default all)
 });
 
 // sign an app order
@@ -867,23 +859,15 @@ const signAppOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a dataset order to sign
-const initDatasetOrder = (
-  dataset, // dataset address
-  datasetprice, // selling price in nRLC
-  volume, // number of execution to sell
-  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
-  apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
-  workerpoolrestrict = sdk.utils.NULL_ADDRESS, // whitelisted workerpool (default all)
-  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => ({
-  dataset,
-  datasetprice,
-  volume,
-  tag,
-  apprestrict,
-  workerpoolrestrict,
-  requesterrestrict,
-});
+const orderToSign = sdk.order.createDatasetorder(
+  dataset, // [mandatory] dataset address
+  datasetprice, // [mandatory] selling price in nRLC
+  volume, // [mandatory] number of execution to sell
+  tag, // [optional] bytes 32 hexstring encoded required tags (default no tag)
+  apprestrict, // [optional] whitelisted app (default all)
+  workerpoolrestrict, // [optional] whitelisted workerpool (default all)
+  requesterrestrict, // [optional] whitelisted requester (default all)
+);
 
 // sign a dataset order
 const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
@@ -905,27 +889,17 @@ const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a workerpool order to sign
-const initWorkerpoolOrder = (
-  workerpool, // workerpool address
-  workerpoolprice, // execution selling price in nRLC
-  volume, // number of execution to sell
-  category, // id of the category (0 to 4)
-  trust = '0', // level of trust offered (default no trust)
-  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded offered tags (default no tag)
-  apprestrict = sdk.utils.NULL_ADDRESS, // whitelisted app (default all)
-  datasetrestrict = sdk.utils.NULL_ADDRESS, // whitelisted dataset (default all)
-  requesterrestrict = sdk.utils.NULL_ADDRESS, // whitelisted requester (default all)
-) => ({
-  workerpool,
-  workerpoolprice,
-  volume,
-  category,
-  trust,
-  tag,
-  apprestrict,
-  datasetrestrict,
-  requesterrestrict,
-});
+const orderToSign = sdk.order.createWorkerpoolorder(
+  workerpool, // [mandatory] workerpool address
+  workerpoolprice, // [mandatory] execution selling price in nRLC
+  volume, // [mandatory] number of execution to sell
+  category, // [mandatory] id of the category (0 to 4)
+  trust, // [optional] level of trust offered (default no trust)
+  tag, // [optional] bytes 32 hexstring encoded offered tags (default no tag)
+  apprestrict, // [optional] whitelisted app (default all)
+  datasetrestrict, // [optional] whitelisted dataset (default all)
+  requesterrestrict, // [optional] whitelisted requester (default all)
+);
 
 // sign a workerpool order
 const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
@@ -947,37 +921,22 @@ const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a request order to sign
-const initRequestOrder = (
-  app, // address of the app to run
-  appmaxprice, // max price in nRLC to pay to the app owner
-  dataset = sdk.utils.NULL_ADDRESS, // address of the dataset to use (default no dataset)
-  datasetmaxprice, // max price in nRLC to pay to the dataset owner
-  workerpool = sdk.utils.NULL_ADDRESS, // address of the workerpool to use (default any workerpool)
-  workerpoolmaxprice, // max price in nRLC to pay to the workerpool
-  requester, // address of the signer of the order (pay for the computation)
-  beneficiary, // address of the beneficiary of the order (can download the result of the computation)
-  volume, // number of execution to buy
-  params = { 0: '' }, // indexed execution command lines (one entry by execution)
-  callback = sdk.utils.NULL_ADDRESS, // address of the smart contract to send receiveResult as specified in ERC1154 (default none)
-  category, // id of the category (0 to 4)
-  trust = '0', // level of trust required (default no trust)
-  tag = sdk.utils.NULL_BYTES32, // bytes 32 hexstring encoded required tags (default no tag)
-) => ({
-  app,
-  appmaxprice,
-  dataset,
-  datasetmaxprice,
-  workerpool,
-  workerpoolmaxprice,
-  requester,
-  beneficiary,
-  volume,
-  params,
-  callback,
-  category,
-  trust,
-  tag,
-});
+const orderToSign = sdk.order.createRequestorder(
+  app, // [mandatory] address of the app to run
+  appmaxprice, // [mandatory] max price in nRLC to pay to the app owner
+  workerpoolmaxprice, // [mandatory] max price in nRLC to pay to the workerpool
+  requester, // [mandatory] address of the signer of the order (pay for the computation)
+  volume, // [mandatory] number of execution to buy
+  category, // [mandatory] id of the category (0 to 4)
+  workerpool, //  [optional] address of the workerpool to use (default any workerpool)
+  dataset, // [optional] address of the dataset to use (default no dataset)
+  datasetmaxprice, // [optional] max price in nRLC to pay to the dataset owner (default '0')
+  beneficiary, // [optional] address of the beneficiary of the order (can download the result of the computation, default same as requester)
+  params, // [optional] application params
+  callback, // [optional] address of the smart contract to send receiveResult as specified in ERC1154 (default none)
+  trust, // [optional] level of trust required (default no trust)
+  tag, // [optional] bytes 32 hexstring encoded required tags (default no tag)
+);
 
 // sign a request order
 const signRequestOrder = async (contracts, orderToSign, signerAddress) => {

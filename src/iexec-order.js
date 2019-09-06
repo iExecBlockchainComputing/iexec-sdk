@@ -159,9 +159,8 @@ sign
           );
           if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
-          const signedOrder = await order.signOrder(
+          const signedOrder = await order.signApporder(
             chain.contracts,
-            order.APP_ORDER,
             orderObj,
             address,
           );
@@ -197,9 +196,8 @@ sign
           );
           if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
 
-          const signedOrder = await order.signOrder(
+          const signedOrder = await order.signDatasetorder(
             chain.contracts,
-            order.DATASET_ORDER,
             orderObj,
             address,
           );
@@ -238,9 +236,8 @@ sign
           );
           if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
 
-          const signedOrder = await order.signOrder(
+          const signedOrder = await order.signWorkerpoolorder(
             chain.contracts,
-            order.WORKERPOOL_ORDER,
             orderObj,
             address,
           );
@@ -268,9 +265,8 @@ sign
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
-          const signedOrder = await order.signOrder(
+          const signedOrder = await order.signRequestorder(
             chain.contracts,
-            order.REQUEST_ORDER,
             orderObj,
             address,
           );
@@ -425,9 +421,8 @@ fill
             pretty(unsignedOrder),
           );
         }
-        const signed = order.signOrder(
+        const signed = order.signRequestorder(
           chain.contracts,
-          order.REQUEST_ORDER,
           unsignedOrder,
           address,
         );
@@ -610,13 +605,44 @@ publish
           }
           if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
           spinner.start(`publishing ${orderName}`);
-          const orderHash = await order.publishOrder(
-            chain.contracts,
-            orderName,
-            chain.id,
-            orderToPublish,
-            address,
-          );
+
+          let orderHash;
+          switch (orderName) {
+            case order.APP_ORDER:
+              orderHash = await order.publishApporder(
+                chain.contracts,
+                chain.id,
+                orderToPublish,
+                address,
+              );
+              break;
+            case order.DATASET_ORDER:
+              orderHash = await order.publishDatasetorder(
+                chain.contracts,
+                chain.id,
+                orderToPublish,
+                address,
+              );
+              break;
+            case order.WORKERPOOL_ORDER:
+              orderHash = await order.publishWorkerpoolorder(
+                chain.contracts,
+                chain.id,
+                orderToPublish,
+                address,
+              );
+              break;
+            case order.REQUEST_ORDER:
+              orderHash = await order.publishRequestorder(
+                chain.contracts,
+                chain.id,
+                orderToPublish,
+                address,
+              );
+              break;
+            default:
+          }
+
           spinner.info(
             `${orderName} successfully published with orderHash ${orderHash}`,
           );
@@ -703,13 +729,42 @@ unpublish
           }
 
           spinner.start(`unpublishing ${orderName}`);
-          const unpublished = await order.unpublishOrder(
-            chain.contracts,
-            orderName,
-            chain.id,
-            orderHashToUnpublish,
-            address,
-          );
+          let unpublished;
+          switch (orderName) {
+            case order.APP_ORDER:
+              unpublished = await order.unpublishApporder(
+                chain.contracts,
+                chain.id,
+                orderHashToUnpublish,
+                address,
+              );
+              break;
+            case order.DATASET_ORDER:
+              unpublished = await order.unpublishDatasetorder(
+                chain.contracts,
+                chain.id,
+                orderHashToUnpublish,
+                address,
+              );
+              break;
+            case order.WORKERPOOL_ORDER:
+              unpublished = await order.unpublishWorkerpoolorder(
+                chain.contracts,
+                chain.id,
+                orderHashToUnpublish,
+                address,
+              );
+              break;
+            case order.REQUEST_ORDER:
+              unpublished = await order.unpublishRequestorder(
+                chain.contracts,
+                chain.id,
+                orderHashToUnpublish,
+                address,
+              );
+              break;
+            default:
+          }
           spinner.info(
             `${orderName} with orderHash ${unpublished} successfully unpublished`,
           );
@@ -779,13 +834,37 @@ cancel
           }
           if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
           spinner.start(`canceling ${orderName}`);
-          const { txHash } = await order.cancelOrder(
-            chain.contracts,
-            orderName,
-            orderToCancel,
-          );
-          spinner.info(`${orderName} successfully canceled (${txHash})`);
-          Object.assign(success, { [orderName]: { cancelTx: txHash } });
+          let cancelTx;
+          switch (orderName) {
+            case order.APP_ORDER:
+              cancelTx = (await order.cancelApporder(
+                chain.contracts,
+                orderToCancel,
+              )).txHash;
+              break;
+            case order.DATASET_ORDER:
+              cancelTx = (await order.cancelDatasetorder(
+                chain.contracts,
+                orderToCancel,
+              )).txHash;
+              break;
+            case order.WORKERPOOL_ORDER:
+              cancelTx = (await order.cancelWorkerpoolorder(
+                chain.contracts,
+                orderToCancel,
+              )).txHash;
+              break;
+            case order.REQUEST_ORDER:
+              cancelTx = (await order.cancelRequestorder(
+                chain.contracts,
+                orderToCancel,
+              )).txHash;
+              break;
+            default:
+          }
+
+          spinner.info(`${orderName} successfully canceled (${cancelTx})`);
+          Object.assign(success, { [orderName]: { cancelTx } });
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
         }
