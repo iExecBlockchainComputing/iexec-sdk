@@ -446,10 +446,104 @@ const matchOrders = async (
   }
 };
 
+const createApporder = ({
+  app = throwIfMissing(),
+  appprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  tag = NULL_BYTES32,
+  datasetrestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  app,
+  appprice,
+  volume,
+  tag,
+  datasetrestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
+
+const createDatasetorder = ({
+  dataset = throwIfMissing(),
+  datasetprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  dataset,
+  datasetprice,
+  volume,
+  tag,
+  apprestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+});
+
+const createWorkerpoolorder = ({
+  workerpool = throwIfMissing(),
+  workerpoolprice = throwIfMissing(),
+  volume = throwIfMissing(),
+  category = throwIfMissing(),
+  trust = '0',
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  datasetrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  workerpool,
+  workerpoolprice,
+  volume,
+  category,
+  trust,
+  tag,
+  apprestrict,
+  datasetrestrict,
+  requesterrestrict,
+});
+
+const createRequestorder = ({
+  app = throwIfMissing(),
+  appmaxprice = throwIfMissing(),
+  workerpoolmaxprice = throwIfMissing(),
+  requester = throwIfMissing(),
+  volume = throwIfMissing(),
+  category = throwIfMissing(),
+  workerpool = NULL_ADDRESS,
+  dataset = NULL_ADDRESS,
+  datasetmaxprice = '0',
+  beneficiary,
+  params = '',
+  callback = NULL_ADDRESS,
+  trust = '0',
+  tag = NULL_BYTES32,
+} = {}) => ({
+  app,
+  appmaxprice,
+  dataset,
+  datasetmaxprice,
+  workerpool,
+  workerpoolmaxprice,
+  requester,
+  beneficiary: beneficiary || requester,
+  volume,
+  params,
+  callback,
+  category,
+  trust,
+  tag,
+});
+
 module.exports = {
   computeOrderHash,
   getContractOwner,
   getRemainingVolume,
+  createApporder,
+  createDatasetorder,
+  createWorkerpoolorder,
+  createRequestorder,
   signOrder,
   cancelOrder,
   publishOrder,
