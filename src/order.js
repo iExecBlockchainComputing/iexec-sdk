@@ -367,6 +367,52 @@ const publishOrder = async (
   }
 };
 
+const publishApporder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedApporder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(contracts, APP_ORDER, chainId, signedApporder, signerAddress);
+
+const publishDatasetorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedDatasetorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  DATASET_ORDER,
+  chainId,
+  signedDatasetorder,
+  signerAddress,
+);
+
+const publishWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedWorkerpoolorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  chainId,
+  signedWorkerpoolorder,
+  signerAddress,
+);
+
+const publishRequestorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  signedRequestorder = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => publishOrder(
+  contracts,
+  REQUEST_ORDER,
+  chainId,
+  signedRequestorder,
+  signerAddress,
+);
+
 const unpublishOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
@@ -393,6 +439,52 @@ const unpublishOrder = async (
     throw error;
   }
 };
+
+const unpublishApporder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  apporderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(contracts, APP_ORDER, chainId, apporderHash, signerAddress);
+
+const unpublishDatasetorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  datasetorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  DATASET_ORDER,
+  chainId,
+  datasetorderHash,
+  signerAddress,
+);
+
+const unpublishWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  workerpoolorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  chainId,
+  workerpoolorderHash,
+  signerAddress,
+);
+
+const unpublishRequestorder = async (
+  contracts = throwIfMissing(),
+  chainId = throwIfMissing(),
+  requestorderHash = throwIfMissing(),
+  signerAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  REQUEST_ORDER,
+  chainId,
+  requestorderHash,
+  signerAddress,
+);
 
 const fetchPublishedOrderByHash = async (
   orderName = throwIfMissing(),
@@ -598,8 +690,16 @@ module.exports = {
   cancelWorkerpoolorder,
   cancelRequestorder,
   cancelOrder, // deprecated
-  publishOrder,
-  unpublishOrder,
+  publishApporder,
+  publishDatasetorder,
+  publishWorkerpoolorder,
+  publishRequestorder,
+  publishOrder, // deprecated
+  unpublishApporder,
+  unpublishDatasetorder,
+  unpublishWorkerpoolorder,
+  unpublishRequestorder,
+  unpublishOrder, // deprecated
   matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,

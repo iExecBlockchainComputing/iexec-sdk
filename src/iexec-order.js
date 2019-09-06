@@ -557,13 +557,44 @@ publish
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
         spinner.start(`publishing ${orderName}`);
-        const orderHash = await order.publishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderToPublish,
-          address,
-        );
+
+        let orderHash;
+        switch (orderName) {
+          case order.APP_ORDER:
+            orderHash = await order.publishApporder(
+              chain.contracts,
+              chain.id,
+              orderToPublish,
+              address,
+            );
+            break;
+          case order.DATASET_ORDER:
+            orderHash = await order.publishDatasetorder(
+              chain.contracts,
+              chain.id,
+              orderToPublish,
+              address,
+            );
+            break;
+          case order.WORKERPOOL_ORDER:
+            orderHash = await order.publishWorkerpoolorder(
+              chain.contracts,
+              chain.id,
+              orderToPublish,
+              address,
+            );
+            break;
+          case order.REQUEST_ORDER:
+            orderHash = await order.publishRequestorder(
+              chain.contracts,
+              chain.id,
+              orderToPublish,
+              address,
+            );
+            break;
+          default:
+        }
+
         spinner.succeed(
           `${orderName} successfully published with orderHash ${orderHash}`,
           { raw: { orderHash } },
@@ -636,13 +667,43 @@ unpublish
         }
 
         spinner.start(`unpublishing ${orderName}`);
-        const unpublished = await order.unpublishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderHashToUnpublish,
-          address,
-        );
+
+        let unpublished;
+        switch (orderName) {
+          case order.APP_ORDER:
+            unpublished = await order.unpublishApporder(
+              chain.contracts,
+              chain.id,
+              orderHashToUnpublish,
+              address,
+            );
+            break;
+          case order.DATASET_ORDER:
+            unpublished = await order.unpublishDatasetorder(
+              chain.contracts,
+              chain.id,
+              orderHashToUnpublish,
+              address,
+            );
+            break;
+          case order.WORKERPOOL_ORDER:
+            unpublished = await order.unpublishWorkerpoolorder(
+              chain.contracts,
+              chain.id,
+              orderHashToUnpublish,
+              address,
+            );
+            break;
+          case order.REQUEST_ORDER:
+            unpublished = await order.unpublishRequestorder(
+              chain.contracts,
+              chain.id,
+              orderHashToUnpublish,
+              address,
+            );
+            break;
+          default:
+        }
         spinner.succeed(
           `${orderName} with orderHash ${unpublished} successfully unpublished`,
           { raw: { orderHash: unpublished } },
