@@ -320,6 +320,26 @@ const cancelOrder = async (
   }
 };
 
+const cancelApporder = async (
+  contracts = throwIfMissing(),
+  apporder = throwIfMissing(),
+) => cancelOrder(contracts, APP_ORDER, apporder);
+
+const cancelDatasetorder = async (
+  contracts = throwIfMissing(),
+  datasetorder = throwIfMissing(),
+) => cancelOrder(contracts, DATASET_ORDER, datasetorder);
+
+const cancelWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  workerpoolorder = throwIfMissing(),
+) => cancelOrder(contracts, WORKERPOOL_ORDER, workerpoolorder);
+
+const cancelRequestorder = async (
+  contracts = throwIfMissing(),
+  requestorder = throwIfMissing(),
+) => cancelOrder(contracts, REQUEST_ORDER, requestorder);
+
 const publishOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
@@ -573,7 +593,11 @@ module.exports = {
   signWorkerpoolorder,
   signRequestorder,
   signOrder, // deprecated
-  cancelOrder,
+  cancelApporder,
+  cancelDatasetorder,
+  cancelWorkerpoolorder,
+  cancelRequestorder,
+  cancelOrder, // deprecated
   publishOrder,
   unpublishOrder,
   matchOrders,

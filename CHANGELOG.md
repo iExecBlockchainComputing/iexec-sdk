@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [Breaking] `deal.show()` throw when the deal doesn't exists
 - [Breaking] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
 - [Breaking] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
+- [Breaking] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
 
 ### Removed
 

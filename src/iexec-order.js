@@ -697,7 +697,22 @@ cancel
         }
         if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
         spinner.start(`canceling ${orderName}`);
-        await order.cancelOrder(chain.contracts, orderName, orderToCancel);
+
+        switch (orderName) {
+          case order.APP_ORDER:
+            await order.cancelApporder(chain.contracts, orderToCancel);
+            break;
+          case order.DATASET_ORDER:
+            await order.cancelDatasetorder(chain.contracts, orderToCancel);
+            break;
+          case order.WORKERPOOL_ORDER:
+            await order.cancelWorkerpoolorder(chain.contracts, orderToCancel);
+            break;
+          case order.REQUEST_ORDER:
+            await order.cancelRequestorder(chain.contracts, orderToCancel);
+            break;
+          default:
+        }
         spinner.succeed(`${orderName} successfully canceled`);
       };
 
