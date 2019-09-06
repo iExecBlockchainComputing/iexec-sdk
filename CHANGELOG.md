@@ -14,17 +14,23 @@ All notable changes to this project will be documented in this file.
 - update api url
 - `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
 - dependencies update
-- [Breaking] `iexec deal show` ends with error when the deal doesn't exists
-- [Breaking] `deal.show()` throw when the deal doesn't exists
-- [Breaking] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
-- [Breaking] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
-- [Breaking] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
-- [Breaking] `order.publishOrder()` is replaced by dedicated methods `order.publishApporder()`, `order.publishDatasetorder()`, `order.publishWorkerpoolorder()`, `order.publishRequestorder()`
-- [Breaking] `order.unpublishOrder()` is replaced by dedicated methods `order.unpublishApporder()`, `order.unpublishDatasetorder()`, `order.unpublishWorkerpoolorder()`, `order.unpublishRequestorder()`
+- [BREAKING] `iexec deal show` ends with error when the deal doesn't exists
+- [BREAKING] `deal.show()` throw when the deal doesn't exists
+- [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
+- [DEPRECATED] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
+- [DEPRECATED] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
+- [DEPRECATED] `order.publishOrder()` is replaced by dedicated methods `order.publishApporder()`, `order.publishDatasetorder()`, `order.publishWorkerpoolorder()`, `order.publishRequestorder()`
+- [DEPRECATED] `order.unpublishOrder()` is replaced by dedicated methods `order.unpublishApporder()`, `order.unpublishDatasetorder()`, `order.unpublishWorkerpoolorder()`, `order.unpublishRequestorder()`
+- [DEPRECATED] `hub.createObj()` is replaced by dedicated methods `hub.deployApp()`, `hub.deployDataset()`, `hub.deployWorkerpool()`
+- [DEPRECATED] `hub.countObj()` is replaced by dedicated methods `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
+- [DEPRECATED] `hub.showObj()` is replaced by dedicated methods `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
+- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserApp(contracts, index, userAddress)` or `hub.showApp(contracts, appAddress)`
+- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserDataset(contracts, index, userAddress)` or `hub.showDataset(contracts, datasetAddress)`
+- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
 
 ### Removed
 
-- [Breaking] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
+- [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
 
 ## [3.0.34] - 2019-07-10
 

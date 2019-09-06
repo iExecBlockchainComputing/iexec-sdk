@@ -87,10 +87,7 @@ deploy
       });
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const address = await hub.createObj(objName)(
-        chain.contracts,
-        datasetToDeploy,
-      );
+      const address = await hub.deployDataset(chain.contracts, datasetToDeploy);
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address },
       });
@@ -129,11 +126,18 @@ show
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       spinner.start(info.showing(objName));
-      const { dataset, objAddress } = await hub.showDataset(
-        chain.contracts,
-        addressOrIndex,
-        userAddress,
-      );
+
+      let res;
+      if (isAddress) {
+        res = await hub.showDataset(chain.contracts, addressOrIndex);
+      } else {
+        res = await hub.showUserDataset(
+          chain.contracts,
+          addressOrIndex,
+          userAddress,
+        );
+      }
+      const { dataset, objAddress } = res;
       spinner.succeed(`${objName} ${objAddress} details:${pretty(dataset)}`, {
         raw: { address: objAddress, dataset },
       });
@@ -165,7 +169,7 @@ count
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
-      const objCountBN = await hub.countObj(objName)(
+      const objCountBN = await hub.countUserDatasets(
         chain.contracts,
         userAddress,
       );
