@@ -16,6 +16,21 @@ const {
 } = require('./utils');
 const { throwIfMissing } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
+const {
+  addressSchema,
+  apporderSchema,
+  datasetorderSchema,
+  workerpoolorderSchema,
+  requestorderSchema,
+  signedApporderSchema,
+  signedDatasetorderSchema,
+  signedWorkerpoolorderSchema,
+  signedRequestorderSchema,
+  paramsSchema,
+  chainIdSchema,
+  bytes32Schema,
+  uint256Schema,
+} = require('./validator');
 
 const debug = Debug('iexec:order');
 
@@ -188,10 +203,24 @@ const computeOrderHash = async (
 ) => {
   try {
     checkOrderName(orderName);
-
+    let vOrder;
+    switch (orderName) {
+      case APP_ORDER:
+        vOrder = await signedApporderSchema().validate(order);
+        break;
+      case DATASET_ORDER:
+        vOrder = await signedDatasetorderSchema().validate(order);
+        break;
+      case WORKERPOOL_ORDER:
+        vOrder = await signedWorkerpoolorderSchema().validate(order);
+        break;
+      case REQUEST_ORDER:
+        vOrder = await signedRequestorderSchema().validate(order);
+        break;
+      default:
+    }
     const clerkAddress = await contracts.fetchClerkAddress();
     const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
-
     const types = {};
     types.EIP712Domain = objDesc.EIP712Domain.structMembers;
     types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
@@ -200,7 +229,7 @@ const computeOrderHash = async (
       types,
       domain: domainObj,
       primaryType: objDesc[orderName].primaryType,
-      message: order,
+      message: vOrder,
     };
     return hashEIP712(typedData);
   } catch (error) {
@@ -280,25 +309,45 @@ const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => signOrder(contracts, APP_ORDER, apporder, signerAddress);
+) => signOrder(
+  contracts,
+  APP_ORDER,
+  await apporderSchema().validate(apporder),
+  await addressSchema().validate(signerAddress),
+);
 
 const signDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => signOrder(contracts, DATASET_ORDER, datasetorder, signerAddress);
+) => signOrder(
+  contracts,
+  DATASET_ORDER,
+  await datasetorderSchema().validate(datasetorder),
+  await addressSchema().validate(signerAddress),
+);
 
 const signWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => signOrder(contracts, WORKERPOOL_ORDER, workerpoolorder, signerAddress);
+) => signOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  await workerpoolorderSchema().validate(workerpoolorder),
+  await addressSchema().validate(signerAddress),
+);
 
 const signRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => signOrder(contracts, REQUEST_ORDER, requestorder, signerAddress);
+) => signOrder(
+  contracts,
+  REQUEST_ORDER,
+  await requestorderSchema().validate(requestorder),
+  await addressSchema().validate(signerAddress),
+);
 
 const cancelOrder = async (
   contracts = throwIfMissing(),
@@ -323,22 +372,38 @@ const cancelOrder = async (
 const cancelApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => cancelOrder(contracts, APP_ORDER, apporder);
+) => cancelOrder(
+  contracts,
+  APP_ORDER,
+  await signedApporderSchema().validate(apporder),
+);
 
 const cancelDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
-) => cancelOrder(contracts, DATASET_ORDER, datasetorder);
+) => cancelOrder(
+  contracts,
+  DATASET_ORDER,
+  await signedDatasetorderSchema().validate(datasetorder),
+);
 
 const cancelWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
-) => cancelOrder(contracts, WORKERPOOL_ORDER, workerpoolorder);
+) => cancelOrder(
+  contracts,
+  WORKERPOOL_ORDER,
+  await signedWorkerpoolorderSchema().validate(workerpoolorder),
+);
 
 const cancelRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
-) => cancelOrder(contracts, REQUEST_ORDER, requestorder);
+) => cancelOrder(
+  contracts,
+  REQUEST_ORDER,
+  await signedRequestorderSchema().validate(requestorder),
+);
 
 const publishOrder = async (
   contracts = throwIfMissing(),
@@ -372,7 +437,13 @@ const publishApporder = async (
   chainId = throwIfMissing(),
   signedApporder = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => publishOrder(contracts, APP_ORDER, chainId, signedApporder, signerAddress);
+) => publishOrder(
+  contracts,
+  APP_ORDER,
+  await chainIdSchema().validate(chainId),
+  await signedApporderSchema().validate(signedApporder),
+  await addressSchema().validate(signerAddress),
+);
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
@@ -382,9 +453,9 @@ const publishDatasetorder = async (
 ) => publishOrder(
   contracts,
   DATASET_ORDER,
-  chainId,
-  signedDatasetorder,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await signedDatasetorderSchema().validate(signedDatasetorder),
+  await addressSchema().validate(signerAddress),
 );
 
 const publishWorkerpoolorder = async (
@@ -395,9 +466,9 @@ const publishWorkerpoolorder = async (
 ) => publishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  chainId,
-  signedWorkerpoolorder,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
+  await addressSchema().validate(signerAddress),
 );
 
 const publishRequestorder = async (
@@ -408,9 +479,9 @@ const publishRequestorder = async (
 ) => publishOrder(
   contracts,
   REQUEST_ORDER,
-  chainId,
-  signedRequestorder,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await signedRequestorderSchema().validate(signedRequestorder),
+  await addressSchema().validate(signerAddress),
 );
 
 const unpublishOrder = async (
@@ -445,7 +516,13 @@ const unpublishApporder = async (
   chainId = throwIfMissing(),
   apporderHash = throwIfMissing(),
   signerAddress = throwIfMissing(),
-) => unpublishOrder(contracts, APP_ORDER, chainId, apporderHash, signerAddress);
+) => unpublishOrder(
+  contracts,
+  APP_ORDER,
+  await chainIdSchema().validate(chainId),
+  await bytes32Schema().validate(apporderHash),
+  await addressSchema().validate(signerAddress),
+);
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
@@ -455,9 +532,9 @@ const unpublishDatasetorder = async (
 ) => unpublishOrder(
   contracts,
   DATASET_ORDER,
-  chainId,
-  datasetorderHash,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await bytes32Schema().validate(datasetorderHash),
+  await addressSchema().validate(signerAddress),
 );
 
 const unpublishWorkerpoolorder = async (
@@ -468,9 +545,9 @@ const unpublishWorkerpoolorder = async (
 ) => unpublishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  chainId,
-  workerpoolorderHash,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await bytes32Schema().validate(workerpoolorderHash),
+  await addressSchema().validate(signerAddress),
 );
 
 const unpublishRequestorder = async (
@@ -481,9 +558,9 @@ const unpublishRequestorder = async (
 ) => unpublishOrder(
   contracts,
   REQUEST_ORDER,
-  chainId,
-  requestorderHash,
-  signerAddress,
+  await chainIdSchema().validate(chainId),
+  await bytes32Schema().validate(requestorderHash),
+  await addressSchema().validate(signerAddress),
 );
 
 const fetchPublishedOrderByHash = async (
@@ -493,16 +570,17 @@ const fetchPublishedOrderByHash = async (
 ) => {
   try {
     checkOrderName(orderName);
-    isBytes32(orderHash);
+    const vChainId = await chainIdSchema().validate(chainId);
+    const vOrderHash = await bytes32Schema().validate(orderHash);
     const endpoint = objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
     const body = {
-      chainId: ensureString(chainId),
+      chainId: vChainId,
       sort: {
         publicationTimestamp: -1,
       },
       limit: 1,
-      find: { orderHash },
+      find: { vOrderHash },
     };
     const response = await http.post(endpoint, body);
     if (response.ok && response.orders) {
@@ -522,16 +600,17 @@ const fetchDealsByOrderHash = async (
 ) => {
   try {
     checkOrderName(orderName);
-    isBytes32(orderHash);
+    const vChainId = await chainIdSchema().validate(chainId);
+    const vOrderHash = await bytes32Schema().validate(orderHash);
     const hashFiedName = objDesc[orderName].dealField;
     const endpoint = 'deals';
     const body = {
-      chainId: ensureString(chainId),
+      chainId: vChainId,
       sort: {
         publicationTimestamp: -1,
       },
       limit: 1,
-      find: { [hashFiedName]: orderHash },
+      find: { [hashFiedName]: vOrderHash },
     };
     const response = await http.post(endpoint, body);
     if (response.ok && response.deals) {
@@ -552,13 +631,31 @@ const matchOrders = async (
   requestOrder = throwIfMissing(),
 ) => {
   try {
-    const appOrderStruct = signedOrderToStruct(APP_ORDER, appOrder);
-    const datasetOrderStruct = signedOrderToStruct(DATASET_ORDER, datasetOrder);
+    const [
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+    ] = await Promise.all([
+      signedApporderSchema().validate(appOrder),
+      signedDatasetorderSchema().validate(datasetOrder),
+      signedWorkerpoolorderSchema().validate(workerpoolOrder),
+      signedRequestorderSchema().validate(requestOrder),
+    ]);
+
+    const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
+    const datasetOrderStruct = signedOrderToStruct(
+      DATASET_ORDER,
+      vDatasetOrder,
+    );
     const workerpoolOrderStruct = signedOrderToStruct(
       WORKERPOOL_ORDER,
-      workerpoolOrder,
+      vWorkerpoolOrder,
     );
-    const requestOrderStruct = signedOrderToStruct(REQUEST_ORDER, requestOrder);
+    const requestOrderStruct = signedOrderToStruct(
+      REQUEST_ORDER,
+      vRequestOrder,
+    );
 
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({ at: clerkAddress });
@@ -582,7 +679,7 @@ const matchOrders = async (
   }
 };
 
-const createApporder = ({
+const createApporder = async ({
   app = throwIfMissing(),
   appprice = throwIfMissing(),
   volume = throwIfMissing(),
@@ -591,16 +688,16 @@ const createApporder = ({
   workerpoolrestrict = NULL_ADDRESS,
   requesterrestrict = NULL_ADDRESS,
 } = {}) => ({
-  app,
-  appprice,
-  volume,
-  tag,
-  datasetrestrict,
-  workerpoolrestrict,
-  requesterrestrict,
+  app: await addressSchema().validate(app),
+  appprice: await uint256Schema().validate(appprice),
+  volume: await uint256Schema().validate(volume),
+  tag: await bytes32Schema().validate(tag),
+  datasetrestrict: await addressSchema().validate(datasetrestrict),
+  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
-const createDatasetorder = ({
+const createDatasetorder = async ({
   dataset = throwIfMissing(),
   datasetprice = throwIfMissing(),
   volume = throwIfMissing(),
@@ -609,16 +706,16 @@ const createDatasetorder = ({
   workerpoolrestrict = NULL_ADDRESS,
   requesterrestrict = NULL_ADDRESS,
 } = {}) => ({
-  dataset,
-  datasetprice,
-  volume,
-  tag,
-  apprestrict,
-  workerpoolrestrict,
-  requesterrestrict,
+  dataset: await addressSchema().validate(dataset),
+  datasetprice: await uint256Schema().validate(datasetprice),
+  volume: await uint256Schema().validate(volume),
+  tag: await bytes32Schema().validate(tag),
+  apprestrict: await addressSchema().validate(apprestrict),
+  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
-const createWorkerpoolorder = ({
+const createWorkerpoolorder = async ({
   workerpool = throwIfMissing(),
   workerpoolprice = throwIfMissing(),
   volume = throwIfMissing(),
@@ -629,18 +726,18 @@ const createWorkerpoolorder = ({
   datasetrestrict = NULL_ADDRESS,
   requesterrestrict = NULL_ADDRESS,
 } = {}) => ({
-  workerpool,
-  workerpoolprice,
-  volume,
-  category,
-  trust,
-  tag,
-  apprestrict,
-  datasetrestrict,
-  requesterrestrict,
+  workerpool: await addressSchema().validate(workerpool),
+  workerpoolprice: await uint256Schema().validate(workerpoolprice),
+  volume: await uint256Schema().validate(volume),
+  category: await bytes32Schema().validate(category),
+  trust: await bytes32Schema().validate(trust),
+  tag: await bytes32Schema().validate(tag),
+  apprestrict: await addressSchema().validate(apprestrict),
+  datasetrestrict: await addressSchema().validate(datasetrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
-const createRequestorder = ({
+const createRequestorder = async ({
   app = throwIfMissing(),
   appmaxprice = throwIfMissing(),
   workerpoolmaxprice = throwIfMissing(),
@@ -656,20 +753,20 @@ const createRequestorder = ({
   trust = '0',
   tag = NULL_BYTES32,
 } = {}) => ({
-  app,
-  appmaxprice,
-  dataset,
-  datasetmaxprice,
-  workerpool,
-  workerpoolmaxprice,
-  requester,
-  beneficiary: beneficiary || requester,
-  volume,
-  params,
-  callback,
-  category,
-  trust,
-  tag,
+  app: await addressSchema().validate(app),
+  appmaxprice: await uint256Schema().validate(appmaxprice),
+  dataset: await addressSchema().validate(dataset),
+  datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
+  workerpool: await addressSchema().validate(workerpool),
+  workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
+  requester: await addressSchema().validate(requester),
+  beneficiary: await addressSchema().validate(beneficiary || requester),
+  volume: await uint256Schema().validate(volume),
+  params: await paramsSchema().validate(params),
+  callback: await addressSchema().validate(callback),
+  category: await uint256Schema().validate(category),
+  trust: await uint256Schema().validate(trust),
+  tag: await bytes32Schema().validate(tag),
 });
 
 module.exports = {
