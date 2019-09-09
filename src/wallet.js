@@ -2,12 +2,12 @@ const Debug = require('debug');
 const { Web3Provider } = require('ethers').providers;
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
+const { ethersBnToBn, bnToEthersBn, throwIfMissing } = require('./utils');
 const {
-  isEthAddress,
-  ethersBnToBn,
-  bnToEthersBn,
-  throwIfMissing,
-} = require('./utils');
+  uint256Schema,
+  addressSchema,
+  hexnumberSchema,
+} = require('./validator');
 
 const debug = Debug('iexec:wallet');
 
@@ -55,9 +55,9 @@ const checkBalances = async (
   address = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(address, { strict: true });
+    const vAddress = await addressSchema().validate(address);
     const rlcAddress = await contracts.fetchRLCAddress();
-    const getETH = () => contracts.eth.getBalance(address).catch((error) => {
+    const getETH = () => contracts.eth.getBalance(vAddress).catch((error) => {
       debug(error);
       return 0;
     });
@@ -65,7 +65,7 @@ const checkBalances = async (
       .getRLCContract({
         at: rlcAddress,
       })
-      .balanceOf(address)
+      .balanceOf(vAddress)
       .catch((error) => {
         debug(error);
         return 0;
@@ -89,11 +89,11 @@ const getETH = async (
   account = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(account, { strict: true });
+    const vAddress = await addressSchema().validate(account);
     const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
     if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
     const faucetsResponses = await Promise.all(
-      filteredFaucets.map(faucet => faucet.getETH(account)),
+      filteredFaucets.map(faucet => faucet.getETH(vAddress)),
     );
     const responses = filteredFaucets.reduce((accu, curr, index) => {
       accu.push(
@@ -127,9 +127,9 @@ const getRLC = async (
   account = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(account, { strict: true });
+    const vAddress = await addressSchema().validate(account);
     const faucetsResponses = await Promise.all(
-      rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
+      rlcFaucets.map(faucet => faucet.getRLC(chainName, vAddress)),
     );
     const responses = rlcFaucets.reduce((accu, curr, index) => {
       accu.push(
@@ -155,12 +155,13 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(to, { strict: true });
+    const vAddress = await addressSchema().validate(to);
+    const vValue = await hexnumberSchema().validate(value);
     const ethSigner = new Web3Provider(contracts.ethProvider).getSigner();
     const tx = await ethSigner.sendTransaction({
       data: '0x',
-      to,
-      value,
+      to: vAddress,
+      value: vValue,
     });
     await tx.wait();
     return tx.hash;
@@ -175,11 +176,12 @@ const sendRLC = async (
   amount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
-  isEthAddress(to, { strict: true });
   try {
+    const vAddress = await addressSchema().validate(to);
+    const vAmount = await uint256Schema().validate(amount);
     const rlcAddress = await contracts.fetchRLCAddress();
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await rlcContract.transfer(to, amount);
+    const tx = await rlcContract.transfer(vAddress, vAmount);
     await tx.wait();
     return tx.hash;
   } catch (error) {
@@ -194,17 +196,26 @@ const sweep = async (
   to = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(to, { strict: true });
-    const balances = await checkBalances(contracts, address);
+    const vAddress = await addressSchema().validate(address);
+    const vAddressTo = await addressSchema().validate(to);
+    const balances = await checkBalances(contracts, vAddress);
     let sendRLCTxHash;
     if (balances.nRLC.gt(new BN(0))) {
-      sendRLCTxHash = await sendRLC(contracts, bnToEthersBn(balances.nRLC), to);
+      sendRLCTxHash = await sendRLC(
+        contracts,
+        bnToEthersBn(balances.nRLC),
+        vAddressTo,
+      );
     }
     const txFee = new BN('10000000000000000');
     let sendETHTxHash;
     const sweepETH = balances.wei.sub(txFee);
     if (balances.wei.gt(new BN(txFee))) {
-      sendETHTxHash = await sendETH(contracts, bnToEthersBn(sweepETH), to);
+      sendETHTxHash = await sendETH(
+        contracts,
+        bnToEthersBn(sweepETH),
+        vAddressTo,
+      );
     }
     return Object.assign({}, { sendRLCTxHash }, { sendETHTxHash });
   } catch (error) {

@@ -10,6 +10,10 @@ const stringNumberSchema = () => string()
   })
   .matches(/^[0-9]*$/, '${path} must be a number');
 
+const hexnumberSchema = () => string()
+  .lowercase()
+  .matches(/^(0x)([0-9a-f]{2})*/, '${path} must be a hex number');
+
 const uint256Schema = () => stringNumberSchema();
 
 const chainIdSchema = () => stringNumberSchema();
@@ -33,15 +37,9 @@ const addressSchema = () => string()
 
 const bytes32Schema = () => string()
   .lowercase()
-  .matches(
-    /^(0x)([0-9A-Fa-f]{2}){32}/,
-    '${path} must be a bytes32 hexstring',
-  );
+  .matches(/^(0x)([0-9a-f]{2}){32}/, '${path} must be a bytes32 hexstring');
 
-const orderSignSchema = () => string().matches(
-  /^(0x)([0-9A-Fa-f]{2})*/,
-  '${path} must be a valid signature',
-);
+const orderSignSchema = () => string().matches(/^(0x)([0-9a-f]{2})*/, '${path} must be a valid signature');
 
 const signed = () => ({
   salt: bytes32Schema().required(),
@@ -142,4 +140,5 @@ module.exports = {
   signedRequestorderSchema,
   paramsSchema,
   chainIdSchema,
+  hexnumberSchema,
 };

@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const {
-  isBytes32,
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
