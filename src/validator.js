@@ -135,6 +135,7 @@ const signedRequestorderSchema = () => requestorderSchema().shape(
 );
 
 module.exports = {
+  stringSchema: string,
   uint256Schema,
   addressSchema,
   bytes32Schema,

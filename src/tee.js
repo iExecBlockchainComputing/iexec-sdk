@@ -1,5 +1,6 @@
 const Debug = require('debug');
 const { throwIfMissing, http } = require('./utils');
+const { addressSchema, stringSchema } = require('./validator');
 
 const debug = Debug('iexec:tee');
 
@@ -14,11 +15,15 @@ const pushSecret = async (
   secret = throwIfMissing(),
 ) => {
   try {
+    const vResourceAddress = await addressSchema().validate(resourceAddress);
+    const vSignerAddress = await addressSchema().validate(signerAddress);
+    await stringSchema().validate(secret, { strict: true });
+
     const signMessage = data => new Promise((resolve, reject) => {
       contracts.ethProvider.sendAsync(
         {
           method: 'personal_sign',
-          params: [signerAddress, data],
+          params: [vSignerAddress, data],
         },
         (err, result) => {
           if (err) reject(err);
@@ -28,7 +33,7 @@ const pushSecret = async (
     });
     const sign = await signMessage(secretPrefix.concat(secret));
     const res = await http.post(
-      secretEndpoit(resourceAddress),
+      secretEndpoit(vResourceAddress),
       { secret, sign },
       {},
       smsUrl,
@@ -48,7 +53,8 @@ const checkSecret = async (
   resourceAddress = throwIfMissing(),
 ) => {
   try {
-    const res = await http.get(secretEndpoit(resourceAddress), {}, {}, smsUrl);
+    const vResourceAddress = await addressSchema().validate(resourceAddress);
+    const res = await http.get(secretEndpoit(vResourceAddress), {}, {}, smsUrl);
     if (res.ok) {
       return res.data;
     }
