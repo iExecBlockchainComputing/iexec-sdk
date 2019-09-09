@@ -213,7 +213,7 @@ const sweep = async (
     if (balances.wei.gt(new BN(txFee))) {
       sendETHTxHash = await sendETH(
         contracts,
-        bnToEthersBn(sweepETH),
+        bnToEthersBn(sweepETH).toHexString(),
         vAddressTo,
       );
     }
