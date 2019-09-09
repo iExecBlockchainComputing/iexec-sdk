@@ -1,4 +1,4 @@
-const { string, object } = require('yup');
+const { string, number, object } = require('yup');
 const { getAddress } = require('ethers').utils;
 
 /* eslint no-template-curly-in-string: "off" */
@@ -9,6 +9,14 @@ const stringNumberSchema = () => string()
     return trimed.length > 0 ? trimed : '0';
   })
   .matches(/^[0-9]*$/, '${path} must be a number');
+
+const positiveIntSchema = () => number()
+  .integer()
+  .min(0);
+
+const positiveStrictIntSchema = () => number()
+  .integer()
+  .min(1);
 
 const hexnumberSchema = () => string()
   .lowercase()
@@ -141,4 +149,6 @@ module.exports = {
   paramsSchema,
   chainIdSchema,
   hexnumberSchema,
+  positiveIntSchema,
+  positiveStrictIntSchema,
 };
