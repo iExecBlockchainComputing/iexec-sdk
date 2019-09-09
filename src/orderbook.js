@@ -1,11 +1,6 @@
 const Debug = require('debug');
-const {
-  http,
-  isString,
-  isEthAddress,
-  throwIfMissing,
-  ensureString,
-} = require('./utils');
+const { http, isEthAddress, throwIfMissing } = require('./utils');
+const { addressSchema, chainIdSchema, uint256Schema } = require('./validator');
 
 const debug = Debug('iexec:orderbook');
 
@@ -14,10 +9,9 @@ const fetchAppOrderbook = async (
   appAddress = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(appAddress, { strict: true });
     const body = Object.assign(
-      { chainId: ensureString(chainId) },
-      { app: appAddress },
+      { chainId: await chainIdSchema().validate(chainId) },
+      { app: await addressSchema().validate(appAddress) },
     );
     const response = await http.get('orderbook/app', body);
     if (response.ok) return { count: response.count, appOrders: response.appOrderbook };
@@ -35,8 +29,8 @@ const fetchDatasetOrderbook = async (
   try {
     isEthAddress(datasetAddress, { strict: true });
     const body = Object.assign(
-      { chainId: ensureString(chainId) },
-      { dataset: datasetAddress },
+      { chainId: await chainIdSchema().validate(chainId) },
+      { dataset: await addressSchema().validate(datasetAddress) },
     );
     const response = await http.get('orderbook/dataset', body);
     if (response.ok) {
@@ -58,12 +52,12 @@ const fetchWorkerpoolOrderbook = async (
   { workerpoolAddress } = {},
 ) => {
   try {
-    isString(category, { strict: true });
-    if (workerpoolAddress) isEthAddress(workerpoolAddress, { strict: true });
     const body = Object.assign(
-      { chainId: ensureString(chainId) },
-      { category },
-      workerpoolAddress && { workerpool: workerpoolAddress },
+      { chainId: await chainIdSchema().validate(chainId) },
+      { category: await uint256Schema().validate(category) },
+      workerpoolAddress && {
+        workerpool: await addressSchema().validate(workerpoolAddress),
+      },
     );
     const response = await http.get('orderbook/workerpool', body);
     if (response.ok) {
@@ -86,12 +80,12 @@ const fetchRequestOrderbook = async (
   { requesterAddress } = {},
 ) => {
   try {
-    isString(category, { strict: true });
-    if (requesterAddress) isEthAddress(requesterAddress, { strict: true });
     const body = Object.assign(
-      { chainId: ensureString(chainId) },
-      { category },
-      requesterAddress && { requester: requesterAddress },
+      { chainId: await chainIdSchema().validate(chainId) },
+      { category: await uint256Schema().validate(category) },
+      requesterAddress && {
+        requester: await addressSchema().validate(requesterAddress),
+      },
     );
     const response = await http.get('orderbook/request', body);
     if (response.ok) {

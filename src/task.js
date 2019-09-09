@@ -2,8 +2,6 @@ const Debug = require('debug');
 const deal = require('./deal');
 const {
   checkEvent,
-  isBytes32,
-  isEthAddress,
   bnifyNestedEthersBn,
   cleanRPC,
   throwIfMissing,
@@ -12,14 +10,7 @@ const {
   NULL_ADDRESS,
   NULL_BYTES32,
 } = require('./utils');
-const {
-  chainIdSchema,
-  addressSchema,
-  bytes32Schema,
-  uint256Schema,
-  positiveIntSchema,
-  positiveStrictIntSchema,
-} = require('./validator');
+const { addressSchema, bytes32Schema, uint256Schema } = require('./validator');
 
 const debug = Debug('iexec:task');
 const objName = 'task';
