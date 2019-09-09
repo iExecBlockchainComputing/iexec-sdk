@@ -12,6 +12,14 @@ const {
   NULL_ADDRESS,
   NULL_BYTES32,
 } = require('./utils');
+const {
+  chainIdSchema,
+  addressSchema,
+  bytes32Schema,
+  uint256Schema,
+  positiveIntSchema,
+  positiveStrictIntSchema,
+} = require('./validator');
 
 const debug = Debug('iexec:task');
 const objName = 'task';
@@ -31,13 +39,13 @@ const show = async (
   taskid = throwIfMissing(),
 ) => {
   try {
-    if (!isBytes32(taskid, { strict: false })) throw Error('Invalid taskid');
+    const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
     const hubContract = contracts.getHubContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await hubContract.viewTask(taskid)),
+      cleanRPC(await hubContract.viewTask(vTaskId)),
     );
-    if (task.dealid === NULL_BYTES32) throw Error(`No task found for taskid ${taskid} on chain ${chainId}`);
+    if (task.dealid === NULL_BYTES32) throw Error(`No task found for taskid ${vTaskId} on chain ${chainId}`);
     return Object.assign(
       {},
       task,
@@ -63,16 +71,17 @@ const waitForTaskStatusChange = async (
   counter = 0,
 ) => {
   try {
-    isBytes32(taskid, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const vPrevStatus = await uint256Schema().validate(prevStatus);
+    const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
     debug('taskStatus', taskStatus);
     const taskStatusName = TASK_STATUS_MAP[taskStatus];
-    if (taskStatus !== prevStatus) {
+    if (taskStatus.toString() !== vPrevStatus) {
       return { status: taskStatus, statusName: taskStatusName };
     }
     await sleep(FETCH_INTERVAL);
-    return waitForTaskStatusChange(contracts, taskid, taskStatus, counter + 1);
+    return waitForTaskStatusChange(contracts, vTaskId, taskStatus, counter + 1);
   } catch (error) {
     debug('waitForTaskStatusChange()', error);
     throw error;
@@ -122,12 +131,13 @@ const fetchResults = async (
   { ipfsGatewayURL } = {},
 ) => {
   try {
-    isEthAddress(userAddress, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const vUserAddress = await addressSchema().validate(userAddress);
+    const task = await show(contracts, vTaskId);
     if (TASK_STATUS_MAP[task.status] !== 'COMPLETED') throw Error('Task is not completed');
     const tasksDeal = await deal.show(contracts, task.dealid);
     if (
-      userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
+      vUserAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
       && NULL_ADDRESS !== tasksDeal.beneficiary.toLowerCase()
     ) {
       throw Error(
@@ -141,7 +151,12 @@ const fetchResults = async (
       res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
     } else {
       debug('download from result repo', resultAddress);
-      res = await downloadFromResultRepo(contracts, taskid, task, userAddress);
+      res = await downloadFromResultRepo(
+        contracts,
+        vTaskId,
+        task,
+        vUserAddress,
+      );
     }
     return res;
   } catch (error) {
@@ -156,9 +171,9 @@ const claim = async (
   userAddress = throwIfMissing(),
 ) => {
   try {
-    isBytes32(taskid, { strict: true });
-    isEthAddress(userAddress, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const vUserAddress = await addressSchema().validate(userAddress);
+    const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
 
     if (
@@ -173,11 +188,9 @@ const claim = async (
     const tasksDeal = await deal.show(contracts, task.dealid);
     debug('tasksDeal', tasksDeal);
 
-    if (tasksDeal.requester.toLowerCase() !== userAddress.toLowerCase()) {
+    if (tasksDeal.requester.toLowerCase() !== vUserAddress.toLowerCase()) {
       throw Error(
-        `Cannot claim a ${objName} requested by someone else: ${
-          tasksDeal.requester
-        }`,
+        `Cannot claim a ${objName} requested by someone else: ${tasksDeal.requester}`,
       );
     }
 
