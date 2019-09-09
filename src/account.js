@@ -1,10 +1,6 @@
 const Debug = require('debug');
-const {
-  isEthAddress,
-  checkEvent,
-  ethersBnToBn,
-  throwIfMissing,
-} = require('./utils');
+const { checkEvent, ethersBnToBn, throwIfMissing } = require('./utils');
+const { uint256Schema, addressSchema } = require('./validator');
 
 const debug = Debug('iexec:account');
 
@@ -13,8 +9,9 @@ const checkBalance = async (
   address = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(address, { strict: true });
-    const { stake, locked } = await contracts.checkBalance(address);
+    const { stake, locked } = await contracts.checkBalance(
+      await addressSchema().validate(address),
+    );
     const balance = {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
@@ -31,23 +28,24 @@ const deposit = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    const vAmount = await uint256Schema().validate(amount);
     const clerkAddress = await contracts.fetchClerkAddress();
     const rlcAddress = await contracts.fetchRLCAddress();
     const allowTx = await contracts
       .getRLCContract({
         at: rlcAddress,
       })
-      .approve(clerkAddress, amount);
+      .approve(clerkAddress, vAmount);
     const allowTxReceipt = await allowTx.wait();
     if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
 
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
-    const tx = await clerkContract.deposit(amount);
+    const tx = await clerkContract.deposit(vAmount);
     const txReceipt = await tx.wait();
     if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
-    return amount;
+    return vAmount;
   } catch (error) {
     debug('deposit()', error);
     throw error;
@@ -59,14 +57,15 @@ const withdraw = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    const vAmount = await uint256Schema().validate(amount);
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
-    const tx = await clerkContract.withdraw(amount);
+    const tx = await clerkContract.withdraw(vAmount);
     const txReceipt = await tx.wait();
     if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
-    return amount;
+    return vAmount;
   } catch (error) {
     debug('withdraw()', error);
     throw error;
