@@ -233,9 +233,8 @@ sendETH
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
-      const weiAmount = parseEther(amount).toHexString();
+      const weiAmount = parseEther(amount).toString();
       if (!cmd.to) throw Error('missing --to option');
-
       if (!cmd.force) {
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }

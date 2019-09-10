@@ -3,16 +3,16 @@ const fetch = require('cross-fetch');
 const BN = require('bn.js');
 const { Contract } = require('ethers');
 const {
-  isEthAddress,
   ethersBnToBn,
   bnToEthersBn,
   ethersBigNumberify,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
-  throwIfMissing,
 } = require('./utils');
 const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
+
+const { addressSchema, uint256Schema, throwIfMissing } = require('./validator');
 
 const debug = Debug('iexec:wallet');
 
@@ -60,9 +60,9 @@ const checkBalances = async (
   address = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(address, { strict: true });
+    const vAddress = await addressSchema().validate(address);
     const { isNative } = contracts;
-    const getETH = () => contracts.eth.getBalance(address).catch((error) => {
+    const getETH = () => contracts.eth.getBalance(vAddress).catch((error) => {
       debug(error);
       return 0;
     });
@@ -79,7 +79,7 @@ const checkBalances = async (
         .getRLCContract({
           at: rlcAddress,
         })
-        .balanceOf(address)
+        .balanceOf(vAddress)
         .catch((error) => {
           debug(error);
           return 0;
@@ -104,11 +104,11 @@ const getETH = async (
   account = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(account, { strict: true });
+    const vAddress = await addressSchema().validate(account);
     const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
     if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
     const faucetsResponses = await Promise.all(
-      filteredFaucets.map(faucet => faucet.getETH(account)),
+      filteredFaucets.map(faucet => faucet.getETH(vAddress)),
     );
     const responses = filteredFaucets.reduce((accu, curr, index) => {
       accu.push(
@@ -142,9 +142,9 @@ const getRLC = async (
   account = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(account, { strict: true });
+    const vAddress = await addressSchema().validate(account);
     const faucetsResponses = await Promise.all(
-      rlcFaucets.map(faucet => faucet.getRLC(chainName, account)),
+      rlcFaucets.map(faucet => faucet.getRLC(chainName, vAddress)),
     );
     const responses = rlcFaucets.reduce((accu, curr, index) => {
       accu.push(
@@ -164,14 +164,19 @@ const getRLC = async (
   }
 };
 
-const sendNativeToken = async (contracts, value, to) => {
+const sendNativeToken = async (
+  contracts = throwIfMissing(),
+  value = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
   try {
-    isEthAddress(to, { strict: true });
-    const hexValue = ethersBigNumberify(value).toHexString();
+    const vAddress = await addressSchema().validate(to);
+    const vValue = await uint256Schema().validate(value);
+    const hexValue = ethersBigNumberify(vValue).toHexString();
     const ethSigner = contracts.eth.getSigner();
     const tx = await ethSigner.sendTransaction({
       data: '0x',
-      to,
+      to: vAddress,
       value: hexValue,
     });
     await tx.wait();
@@ -182,12 +187,17 @@ const sendNativeToken = async (contracts, value, to) => {
   }
 };
 
-const sendERC20 = async (contracts, nRlcAmount, to) => {
-  isEthAddress(to, { strict: true });
+const sendERC20 = async (
+  contracts = throwIfMissing(),
+  nRlcAmount = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
+  const vAddress = await addressSchema().validate(to);
+  const vAmount = await uint256Schema().validate(nRlcAmount);
   try {
     const rlcAddress = await contracts.fetchRLCAddress();
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await rlcContract.transfer(to, nRlcAmount);
+    const tx = await rlcContract.transfer(vAddress, vAmount);
     await tx.wait();
     return tx.hash;
   } catch (error) {
@@ -202,9 +212,10 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
+    const vAddress = await addressSchema().validate(to);
+    const vValue = await uint256Schema().validate(value);
     if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
-    isEthAddress(to, { strict: true });
-    const txHash = await sendNativeToken(contracts, value, to);
+    const txHash = await sendNativeToken(contracts, vValue, vAddress);
     return txHash;
   } catch (error) {
     debug('sendETH()', error);
@@ -217,16 +228,17 @@ const sendRLC = async (
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
-  isEthAddress(to, { strict: true });
   try {
+    const vAddress = await addressSchema().validate(to);
+    const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) {
       debug('send native token');
-      const weiValue = bnNRlcToBnWei(new BN(nRlcAmount)).toString();
-      const txHash = await sendNativeToken(contracts, weiValue, to);
+      const weiValue = bnNRlcToBnWei(new BN(vAmount)).toString();
+      const txHash = await sendNativeToken(contracts, weiValue, vAddress);
       return txHash;
     }
     debug('send ERC20 token');
-    const txHash = await sendERC20(contracts, nRlcAmount, to);
+    const txHash = await sendERC20(contracts, vAmount, vAddress);
     return txHash;
   } catch (error) {
     debug('sendRLC()', error);
@@ -240,12 +252,13 @@ const sweep = async (
   to = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(to, { strict: true });
-    const code = await contracts.eth.getCode(to);
+    const vAddress = await addressSchema().validate(address);
+    const vAddressTo = await addressSchema().validate(to);
+    const code = await contracts.eth.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
     }
-    let balances = await checkBalances(contracts, address);
+    let balances = await checkBalances(contracts, vAddress);
     const res = {};
     const errors = [];
     if (!contracts.isNative) {
@@ -254,7 +267,7 @@ const sweep = async (
           const sendERC20TxHash = await sendERC20(
             contracts,
             bnToEthersBn(balances.nRLC),
-            to,
+            vAddressTo,
           );
           Object.assign(res, { sendERC20TxHash });
         } catch (error) {
@@ -276,7 +289,7 @@ const sweep = async (
         const sendNativeTxHash = await sendNativeToken(
           contracts,
           bnToEthersBn(sweepNative),
-          to,
+          vAddressTo,
         );
         debug('sendNativeTxHash', sendNativeTxHash);
         Object.assign(res, { sendNativeTxHash });
@@ -301,35 +314,35 @@ const bridgeToSidechain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { sidechainContracts, sidechainBridgeAddress } = {},
 ) => {
   try {
-    isEthAddress(bridgeAddress, { strict: true });
+    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
 
     const homeBridgeContract = new Contract(
-      bridgeAddress,
+      vBridgeAddress,
       homeBridgeErcToNativeDesc.abi,
       contracts.eth,
     );
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
       homeBridgeContract.minPerTx(),
       homeBridgeContract.maxPerTx(),
-      homeBridgeContract.withinExecutionLimit(nRlcAmount),
+      homeBridgeContract.withinExecutionLimit(vAmount),
     ]);
-    if (new BN(nRlcAmount).lt(ethersBnToBn(minPerTx))) {
+    if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
       throw Error(
         `Minimum amount allowed to bridge is ${minPerTx.toString()} nRLC`,
       );
     }
-    if (new BN(nRlcAmount).gt(ethersBnToBn(maxPerTx))) {
+    if (new BN(vAmount).gt(ethersBnToBn(maxPerTx))) {
       throw Error(
         `Maximum amount allowed to bridge is ${maxPerTx.toString()} nRLC`,
       );
     }
     if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
 
-    const sendTxHash = await sendRLC(contracts, nRlcAmount, bridgeAddress);
+    const sendTxHash = await sendRLC(contracts, vAmount, vBridgeAddress);
     return { sendTxHash };
   } catch (error) {
     debug('bridgeToSidechain()', error);
@@ -341,27 +354,29 @@ const bridgeToMainchain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { mainchainContracts, mainchainBridgeAddress } = {},
 ) => {
   try {
-    isEthAddress(bridgeAddress, { strict: true });
+    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vAmount = await uint256Schema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
 
     const foreignBridgeContract = new Contract(
-      bridgeAddress,
+      vBridgeAddress,
       foreignBridgeErcToNativeDesc.abi,
       contracts.eth,
     );
+
+    const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
+    const weiValue = bnWeiValue.toString();
+
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
       foreignBridgeContract.minPerTx(),
       foreignBridgeContract.maxPerTx(),
-      foreignBridgeContract.withinExecutionLimit(nRlcAmount),
+      foreignBridgeContract.withinExecutionLimit(vAmount),
     ]);
     debug('minPerTx', minPerTx.toString());
     debug('maxPerTx', maxPerTx.toString());
     debug('withinExecutionLimit', withinExecutionLimit);
-
-    const bnWeiValue = bnNRlcToBnWei(new BN(nRlcAmount));
 
     if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
       throw Error(
@@ -379,12 +394,10 @@ const bridgeToMainchain = async (
     }
     if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
 
-    const weiValue = bnWeiValue.toString();
-
     const sendTxHash = await sendNativeToken(
       contracts,
       weiValue,
-      bridgeAddress,
+      vBridgeAddress,
     );
     return { sendTxHash };
   } catch (error) {

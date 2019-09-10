@@ -23,11 +23,7 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const {
-  NULL_ADDRESS,
-  isEthAddress,
-  humanToMultiaddrBuffer,
-} = require('./utils');
+const { NULL_ADDRESS, isEthAddress } = require('./utils');
 
 const objName = 'dataset';
 
@@ -78,16 +74,12 @@ deploy
           `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
         );
       }
-      const datasetMultiaddrBuffer = humanToMultiaddrBuffer(
-        iexecConf[objName].multiaddr,
-        { strict: false },
-      );
-      const datasetToDeploy = Object.assign({}, iexecConf[objName], {
-        multiaddr: datasetMultiaddrBuffer,
-      });
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const address = await hub.deployDataset(chain.contracts, datasetToDeploy);
+      const address = await hub.deployDataset(
+        chain.contracts,
+        iexecConf[objName],
+      );
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address },
       });

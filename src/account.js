@@ -1,13 +1,12 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const {
-  isEthAddress,
   checkEvent,
   ethersBnToBn,
-  throwIfMissing,
   bnNRlcToBnWei,
   bnToEthersBn,
 } = require('./utils');
+const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
 
 const debug = Debug('iexec:account');
 
@@ -16,8 +15,9 @@ const checkBalance = async (
   address = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(address, { strict: true });
-    const { stake, locked } = await contracts.checkBalance(address);
+    const { stake, locked } = await contracts.checkBalance(
+      await addressSchema().validate(address),
+    );
     const balance = {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
@@ -34,6 +34,7 @@ const deposit = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    const vAmount = await uint256Schema().validate(amount);
     let txHash;
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({
@@ -45,23 +46,23 @@ const deposit = async (
         .getRLCContract({
           at: rlcAddress,
         })
-        .approve(clerkAddress, amount);
+        .approve(clerkAddress, vAmount);
       const allowTxReceipt = await allowTx.wait();
       if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
-      const tx = await clerkContract.deposit(amount);
+      const tx = await clerkContract.deposit(vAmount);
       const txReceipt = await tx.wait();
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToEthersBn(
-        bnNRlcToBnWei(new BN(amount)),
+        bnNRlcToBnWei(new BN(vAmount)),
       ).toHexString();
       const tx = await clerkContract.deposit({ value: weiAmount });
       const txReceipt = await tx.wait();
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
-    return { amount, txHash };
+    return { amount: vAmount, txHash };
   } catch (error) {
     debug('deposit()', error);
     throw error;
@@ -73,6 +74,7 @@ const withdraw = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    const vAmount = await uint256Schema().validate(amount);
     const clerkAddress = await contracts.fetchClerkAddress();
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
@@ -88,10 +90,10 @@ const withdraw = async (
     //   debug('weiAmount', weiAmount.toString());
     //   if (withdrawWeiCost.gt(weiAmount)) throw Error('withdraw cost is higher than witdrawed amount');
     // }
-    const tx = await clerkContract.withdraw(amount);
+    const tx = await clerkContract.withdraw(vAmount);
     const txReceipt = await tx.wait();
     if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
-    return { amount, txHash: tx.hash };
+    return { amount: vAmount, txHash: tx.hash };
   } catch (error) {
     debug('withdraw()', error);
     throw error;
