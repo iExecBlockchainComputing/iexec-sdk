@@ -1,5 +1,6 @@
 const Debug = require('debug');
 const fetch = require('cross-fetch');
+const { Buffer } = require('buffer');
 const qs = require('query-string');
 const BN = require('bn.js');
 const { getAddress, bigNumberify, randomBytes } = require('ethers').utils;
@@ -45,6 +46,8 @@ const stringifyNestedBn = (obj) => {
 
 const checksummedAddress = address => getAddress(address);
 
+const utf8ToBuffer = str => Buffer.from(str, 'utf8');
+
 const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = Buffer.from(hexString.substr(2), 'hex');
@@ -62,7 +65,7 @@ const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
     multiaddrBuffer = multiaddr(str).buffer;
   } catch (error) {
     if (strict) throw error;
-    multiaddrBuffer = Buffer.from(str, 'utf8');
+    multiaddrBuffer = utf8ToBuffer(str);
   }
   return multiaddrBuffer;
 };
@@ -331,6 +334,7 @@ module.exports = {
   stringifyNestedBn,
   multiaddrHexToHuman,
   humanToMultiaddrBuffer,
+  utf8ToBuffer,
   toUpperFirst,
   secToDate,
   getAuthorization,

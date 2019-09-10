@@ -9,16 +9,23 @@ const {
   multiaddrHexToHuman,
   getEventFromLogs,
 } = require('./utils');
+const {
+  addressSchema,
+  uint256Schema,
+  categorySchema,
+  appSchema,
+  datasetSchema,
+  workerpoolSchema,
+} = require('./validator');
 
 const debug = Debug('iexec:hub');
 
 const createObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
-  options,
 ) => {
   try {
-    const txReceipt = await contracts.createObj(objName)(obj, options);
+    const txReceipt = await contracts.createObj(objName)(obj);
     const event = getEventFromLogs(
       'Create'.concat(toUpperFirst(objName)),
       txReceipt.events,
@@ -34,9 +41,12 @@ const createObj = (objName = throwIfMissing()) => async (
   }
 };
 
-const deployApp = (contracts, app) => createObj('app')(contracts, app);
-const deployDataset = (contracts, dataset) => createObj('dataset')(contracts, dataset);
-const deployWorkerpool = (contracts, workerpool) => createObj('workerpool')(contracts, workerpool);
+const deployApp = async (contracts, app) => createObj('app')(contracts, await appSchema().validate(app));
+const deployDataset = async (contracts, dataset) => createObj('dataset')(contracts, await datasetSchema().validate(dataset));
+const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool')(
+  contracts,
+  await workerpoolSchema().validate(workerpool),
+);
 
 const showObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
@@ -106,8 +116,8 @@ const showUserApp = async (
 ) => {
   const { obj, objAddress } = await showObj('app')(
     contracts,
-    index,
-    userAddress,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -144,8 +154,8 @@ const showUserDataset = async (
 ) => {
   const { obj, objAddress } = await showObj('dataset')(
     contracts,
-    index,
-    userAddress,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -177,8 +187,8 @@ const showUserWorkerpool = async (
 ) => {
   const { obj, objAddress } = await showObj('workerpool')(
     contracts,
-    index,
-    userAddress,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -201,23 +211,28 @@ const countObj = (objName = throwIfMissing()) => async (
 
 const countUserApps = async (
   contracts = throwIfMissing(),
-  userAdress = throwIfMissing(),
-) => countObj('app')(contracts, userAdress);
+  userAddress = throwIfMissing(),
+) => countObj('app')(contracts, await addressSchema().validate(userAddress));
 const countUserDatasets = async (
   contracts = throwIfMissing(),
-  userAdress = throwIfMissing(),
-) => countObj('dataset')(contracts, userAdress);
+  userAddress = throwIfMissing(),
+) => countObj('dataset')(contracts, await addressSchema().validate(userAddress));
 const countUserWorkerpools = async (
   contracts = throwIfMissing(),
-  userAdress = throwIfMissing(),
-) => countObj('workerpool')(contracts, userAdress);
+  userAddress = throwIfMissing(),
+) => countObj('workerpool')(
+  contracts,
+  await addressSchema().validate(userAddress),
+);
 
 const createCategory = async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
 ) => {
   try {
-    const txReceipt = await contracts.createCategory(obj);
+    const txReceipt = await contracts.createCategory(
+      await categorySchema().validate(obj),
+    );
     const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
       strict: true,
     }).args;
@@ -234,7 +249,7 @@ const showCategory = async (
 ) => {
   try {
     const category = bnifyNestedEthersBn(
-      await contracts.getCategoryByIndex(index),
+      await contracts.getCategoryByIndex(await uint256Schema().validate(index)),
     );
     return category;
   } catch (error) {

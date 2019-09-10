@@ -1,5 +1,8 @@
-const { string, number, object } = require('yup');
+const {
+  string, number, object, mixed, ValidationError,
+} = require('yup');
 const { getAddress } = require('ethers').utils;
+const { humanToMultiaddrBuffer, utf8ToBuffer } = require('./utils');
 
 /* eslint no-template-curly-in-string: "off" */
 
@@ -134,7 +137,54 @@ const signedRequestorderSchema = () => requestorderSchema().shape(
   '${path} is not a valid signed requestorder',
 );
 
+const multiaddressSchema = () => mixed().transform((value) => {
+  if (value instanceof Uint8Array) return value;
+  if (typeof value === 'string') {
+    return humanToMultiaddrBuffer(value, { strict: false });
+  }
+  throw new ValidationError('invalid multiaddr');
+});
+
+const mrenclaveSchema = () => mixed().transform((value) => {
+  if (value instanceof Uint8Array) return value;
+  return utf8ToBuffer(value);
+});
+
+const appSchema = () => object({
+  owner: addressSchema().required(),
+  name: string().required(),
+  type: string()
+    .matches(/^(DOCKER){1}$/, '${path} is not a valid type')
+    .required(),
+  multiaddr: multiaddressSchema().required(),
+  checksum: bytes32Schema().required(),
+  mrenclave: mrenclaveSchema().required(),
+});
+
+const datasetSchema = () => object({
+  owner: addressSchema().required(),
+  name: string().required(),
+  multiaddr: multiaddressSchema().required(),
+  checksum: bytes32Schema().required(),
+});
+
+const workerpoolSchema = () => object({
+  owner: addressSchema().required(),
+  description: string().required(),
+});
+
+const categorySchema = () => object({
+  name: string().required(),
+  description: string().required(),
+  workClockTimeRef: uint256Schema().required(),
+});
+
+const throwIfMissing = () => {
+  throw new ValidationError('missing parameter');
+};
+
 module.exports = {
+  throwIfMissing,
   stringSchema: string,
   uint256Schema,
   addressSchema,
@@ -152,4 +202,8 @@ module.exports = {
   hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  appSchema,
+  datasetSchema,
+  categorySchema,
+  workerpoolSchema,
 };
