@@ -1,6 +1,11 @@
 const Debug = require('debug');
-const { http, isEthAddress, throwIfMissing } = require('./utils');
-const { addressSchema, chainIdSchema, uint256Schema } = require('./validator');
+const { http } = require('./utils');
+const {
+  addressSchema,
+  chainIdSchema,
+  uint256Schema,
+  throwIfMissing,
+} = require('./validator');
 
 const debug = Debug('iexec:orderbook');
 
@@ -27,7 +32,6 @@ const fetchDatasetOrderbook = async (
   datasetAddress = throwIfMissing(),
 ) => {
   try {
-    isEthAddress(datasetAddress, { strict: true });
     const body = Object.assign(
       { chainId: await chainIdSchema().validate(chainId) },
       { dataset: await addressSchema().validate(datasetAddress) },

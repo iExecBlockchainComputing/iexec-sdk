@@ -5,7 +5,6 @@ const {
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
-  throwIfMissing,
   multiaddrHexToHuman,
   getEventFromLogs,
 } = require('./utils');
@@ -16,6 +15,7 @@ const {
   appSchema,
   datasetSchema,
   workerpoolSchema,
+  throwIfMissing,
 } = require('./validator');
 
 const debug = Debug('iexec:hub');

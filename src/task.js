@@ -4,13 +4,17 @@ const {
   checkEvent,
   bnifyNestedEthersBn,
   cleanRPC,
-  throwIfMissing,
   getAuthorization,
   download,
   NULL_ADDRESS,
   NULL_BYTES32,
 } = require('./utils');
-const { addressSchema, bytes32Schema, uint256Schema } = require('./validator');
+const {
+  addressSchema,
+  bytes32Schema,
+  uint256Schema,
+  throwIfMissing,
+} = require('./validator');
 
 const debug = Debug('iexec:task');
 const objName = 'task';

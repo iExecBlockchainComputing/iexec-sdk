@@ -1,6 +1,6 @@
 const Debug = require('debug');
-const { checkEvent, ethersBnToBn, throwIfMissing } = require('./utils');
-const { uint256Schema, addressSchema } = require('./validator');
+const { checkEvent, ethersBnToBn } = require('./utils');
+const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
 
 const debug = Debug('iexec:account');
 

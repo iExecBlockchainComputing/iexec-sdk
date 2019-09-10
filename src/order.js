@@ -13,7 +13,6 @@ const {
   ensureString,
   signTypedDatav3,
 } = require('./utils');
-const { throwIfMissing } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
 const {
   addressSchema,
@@ -29,6 +28,7 @@ const {
   chainIdSchema,
   bytes32Schema,
   uint256Schema,
+  throwIfMissing,
 } = require('./validator');
 
 const debug = Debug('iexec:order');

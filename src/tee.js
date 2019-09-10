@@ -1,6 +1,6 @@
 const Debug = require('debug');
-const { throwIfMissing, http } = require('./utils');
-const { addressSchema, stringSchema } = require('./validator');
+const { http } = require('./utils');
+const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
 
 const debug = Debug('iexec:tee');
 

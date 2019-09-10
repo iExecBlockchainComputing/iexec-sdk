@@ -3,7 +3,6 @@ const { defaultAbiCoder, keccak256 } = require('ethers').utils;
 const {
   cleanRPC,
   bnifyNestedEthersBn,
-  throwIfMissing,
   http,
   NULL_ADDRESS,
 } = require('./utils');
@@ -14,6 +13,7 @@ const {
   uint256Schema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  throwIfMissing,
 } = require('./validator');
 
 const debug = Debug('iexec:deal');

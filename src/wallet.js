@@ -2,11 +2,12 @@ const Debug = require('debug');
 const { Web3Provider } = require('ethers').providers;
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { ethersBnToBn, bnToEthersBn, throwIfMissing } = require('./utils');
+const { ethersBnToBn, bnToEthersBn } = require('./utils');
 const {
   uint256Schema,
   addressSchema,
   hexnumberSchema,
+  throwIfMissing,
 } = require('./validator');
 
 const debug = Debug('iexec:wallet');

@@ -206,4 +206,5 @@ module.exports = {
   datasetSchema,
   categorySchema,
   workerpoolSchema,
+  ValidationError,
 };
