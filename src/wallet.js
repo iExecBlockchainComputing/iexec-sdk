@@ -11,8 +11,8 @@ const {
 } = require('./utils');
 const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
-
 const { addressSchema, uint256Schema, throwIfMissing } = require('./validator');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:wallet');
 
@@ -174,12 +174,14 @@ const sendNativeToken = async (
     const vValue = await uint256Schema().validate(value);
     const hexValue = ethersBigNumberify(vValue).toHexString();
     const ethSigner = contracts.eth.getSigner();
-    const tx = await ethSigner.sendTransaction({
-      data: '0x',
-      to: vAddress,
-      value: hexValue,
-    });
-    await tx.wait();
+    const tx = await wrapSend(
+      ethSigner.sendTransaction({
+        data: '0x',
+        to: vAddress,
+        value: hexValue,
+      }),
+    );
+    await wrapWait(tx.wait());
     return tx.hash;
   } catch (error) {
     debug('sendNativeToken()', error);
@@ -195,10 +197,10 @@ const sendERC20 = async (
   const vAddress = await addressSchema().validate(to);
   const vAmount = await uint256Schema().validate(nRlcAmount);
   try {
-    const rlcAddress = await contracts.fetchRLCAddress();
+    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await rlcContract.transfer(vAddress, vAmount);
-    await tx.wait();
+    const tx = await wrapSend(rlcContract.transfer(vAddress, vAmount));
+    await wrapWait(tx.wait());
     return tx.hash;
   } catch (error) {
     debug('sendERC20()', error);
@@ -326,9 +328,9 @@ const bridgeToSidechain = async (
       contracts.eth,
     );
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
-      homeBridgeContract.minPerTx(),
-      homeBridgeContract.maxPerTx(),
-      homeBridgeContract.withinExecutionLimit(vAmount),
+      wrapCall(homeBridgeContract.minPerTx()),
+      wrapCall(homeBridgeContract.maxPerTx()),
+      wrapCall(homeBridgeContract.withinExecutionLimit(vAmount)),
     ]);
     if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
       throw Error(
@@ -370,9 +372,9 @@ const bridgeToMainchain = async (
     const weiValue = bnWeiValue.toString();
 
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
-      foreignBridgeContract.minPerTx(),
-      foreignBridgeContract.maxPerTx(),
-      foreignBridgeContract.withinExecutionLimit(vAmount),
+      wrapCall(foreignBridgeContract.minPerTx()),
+      wrapCall(foreignBridgeContract.maxPerTx()),
+      wrapCall(foreignBridgeContract.withinExecutionLimit(vAmount)),
     ]);
     debug('minPerTx', minPerTx.toString());
     debug('maxPerTx', maxPerTx.toString());

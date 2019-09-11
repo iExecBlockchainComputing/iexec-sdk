@@ -15,6 +15,7 @@ const {
   positiveStrictIntSchema,
   throwIfMissing,
 } = require('./validator');
+const { wrapCall } = require('./errorWrappers');
 
 const debug = Debug('iexec:deal');
 
@@ -107,10 +108,10 @@ const show = async (
   try {
     const vDealid = await bytes32Schema().validate(dealid);
     const { chainId } = contracts;
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({ at: clerkAddress });
     const deal = bnifyNestedEthersBn(
-      cleanRPC(await clerkContract.viewDeal(vDealid)),
+      cleanRPC(await wrapCall(clerkContract.viewDeal(vDealid))),
     );
     const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
     if (!dealExists) throw Error(`No deal found for dealid ${dealid} on chain ${chainId}`);

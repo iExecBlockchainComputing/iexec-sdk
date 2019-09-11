@@ -17,6 +17,7 @@ const {
   workerpoolSchema,
   throwIfMissing,
 } = require('./validator');
+const { wrapCall, wrapSend } = require('./errorWrappers');
 
 const debug = Debug('iexec:hub');
 
@@ -25,7 +26,7 @@ const createObj = (objName = throwIfMissing()) => async (
   obj = throwIfMissing(),
 ) => {
   try {
-    const txReceipt = await contracts.createObj(objName)(obj);
+    const txReceipt = await wrapSend(contracts.createObj(objName)(obj));
     const event = getEventFromLogs(
       'Create'.concat(toUpperFirst(objName)),
       txReceipt.events,
@@ -61,9 +62,11 @@ const showObj = (objName = throwIfMissing()) => async (
     ) {
       if (!isEthAddress(userAddress)) throw Error('Missing userAddress');
       // INDEX case: need hit subHub to get obj address from index
-      objAddress = await contracts.getUserObjAddressByIndex(objName)(
-        userAddress,
-        objAddressOrIndex,
+      objAddress = await wrapCall(
+        contracts.getUserObjAddressByIndex(objName)(
+          userAddress,
+          objAddressOrIndex,
+        ),
       );
     } else if (isEthAddress(objAddressOrIndex)) {
       objAddress = objAddressOrIndex;
@@ -73,7 +76,7 @@ const showObj = (objName = throwIfMissing()) => async (
       );
     }
     const obj = bnifyNestedEthersBn(
-      await contracts.getObjProps(objName)(objAddress),
+      await wrapCall(contracts.getObjProps(objName)(objAddress)),
     );
     return { obj, objAddress };
   } catch (error) {
@@ -194,7 +197,7 @@ const countObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const objCountBN = ethersBnToBn(
-      await contracts.getUserObjCount(objName)(userAddress),
+      await wrapCall(contracts.getUserObjCount(objName)(userAddress)),
     );
     return objCountBN;
   } catch (error) {
@@ -224,8 +227,8 @@ const createCategory = async (
   obj = throwIfMissing(),
 ) => {
   try {
-    const txReceipt = await contracts.createCategory(
-      await categorySchema().validate(obj),
+    const txReceipt = await wrapSend(
+      contracts.createCategory(await categorySchema().validate(obj)),
     );
     const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
       strict: true,
@@ -243,7 +246,9 @@ const showCategory = async (
 ) => {
   try {
     const category = bnifyNestedEthersBn(
-      await contracts.getCategoryByIndex(await uint256Schema().validate(index)),
+      await wrapCall(
+        contracts.getCategoryByIndex(await uint256Schema().validate(index)),
+      ),
     );
     return category;
   } catch (error) {
@@ -255,7 +260,7 @@ const showCategory = async (
 const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
-      await contracts.getHubContract().countCategory(),
+      await wrapCall(contracts.getHubContract().countCategory()),
     );
     return countBN;
   } catch (error) {
@@ -267,7 +272,7 @@ const countCategory = async (contracts = throwIfMissing()) => {
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await contracts.getHubContract().FINAL_DEADLINE_RATIO(),
+      await wrapCall(contracts.getHubContract().FINAL_DEADLINE_RATIO()),
     );
     return timeoutRatio;
   } catch (error) {

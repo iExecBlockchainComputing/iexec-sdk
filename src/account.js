@@ -7,6 +7,7 @@ const {
   bnToEthersBn,
 } = require('./utils');
 const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:account');
 
@@ -15,9 +16,8 @@ const checkBalance = async (
   address = throwIfMissing(),
 ) => {
   try {
-    const { stake, locked } = await contracts.checkBalance(
-      await addressSchema().validate(address),
-    );
+    const vAddress = await addressSchema().validate(address);
+    const { stake, locked } = await wrapCall(contracts.checkBalance(vAddress));
     const balance = {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
@@ -36,29 +36,31 @@ const deposit = async (
   try {
     const vAmount = await uint256Schema().validate(amount);
     let txHash;
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
     if (!contracts.isNative) {
-      const rlcAddress = await contracts.fetchRLCAddress();
-      const allowTx = await contracts
-        .getRLCContract({
-          at: rlcAddress,
-        })
-        .approve(clerkAddress, vAmount);
-      const allowTxReceipt = await allowTx.wait();
+      const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
+      const allowTx = await wrapSend(
+        contracts
+          .getRLCContract({
+            at: rlcAddress,
+          })
+          .approve(clerkAddress, vAmount),
+      );
+      const allowTxReceipt = await wrapWait(allowTx.wait());
       if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
-      const tx = await clerkContract.deposit(vAmount);
-      const txReceipt = await tx.wait();
+      const tx = await wrapSend(clerkContract.deposit(vAmount));
+      const txReceipt = await wrapWait(tx.wait());
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToEthersBn(
         bnNRlcToBnWei(new BN(vAmount)),
       ).toHexString();
-      const tx = await clerkContract.deposit({ value: weiAmount });
-      const txReceipt = await tx.wait();
+      const tx = await wrapSend(clerkContract.deposit({ value: weiAmount }));
+      const txReceipt = await wrapWait(tx.wait());
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
@@ -75,7 +77,7 @@ const withdraw = async (
 ) => {
   try {
     const vAmount = await uint256Schema().validate(amount);
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
@@ -90,8 +92,8 @@ const withdraw = async (
     //   debug('weiAmount', weiAmount.toString());
     //   if (withdrawWeiCost.gt(weiAmount)) throw Error('withdraw cost is higher than witdrawed amount');
     // }
-    const tx = await clerkContract.withdraw(vAmount);
-    const txReceipt = await tx.wait();
+    const tx = await wrapSend(clerkContract.withdraw(vAmount));
+    const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {
