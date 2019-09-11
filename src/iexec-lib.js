@@ -5,6 +5,7 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
+const errors = require('./errors');
 const {
   NULL_ADDRESS,
   NULL_BYTES32,
@@ -32,6 +33,7 @@ const sdk = {
   task,
   hub,
   utils,
+  errors,
 };
 
 module.exports = sdk;
