@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `deal.show()` added key `tasks: { [idx]: [taskid] }` to the resolved value
+- dynamic cast and validation of inputs, invalid inputs throw `ValidationError`.
+- introduced TypedErrors `ValidationError`, `Web3ProviderError`, `Web3ProviderCallError`, `Web3ProviderSendError`, `Web3ProviderSignMessageError`.
 
 ### Changed
 

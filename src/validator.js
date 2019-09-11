@@ -1,8 +1,9 @@
 const {
-  string, number, object, mixed, ValidationError,
+  string, number, object, mixed,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
 const { humanToMultiaddrBuffer, utf8ToBuffer } = require('./utils');
+const { ValidationError } = require('./errors');
 
 /* eslint no-template-curly-in-string: "off" */
 

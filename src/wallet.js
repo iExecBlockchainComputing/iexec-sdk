@@ -9,6 +9,7 @@ const {
   hexnumberSchema,
   throwIfMissing,
 } = require('./validator');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:wallet');
 
@@ -57,7 +58,7 @@ const checkBalances = async (
 ) => {
   try {
     const vAddress = await addressSchema().validate(address);
-    const rlcAddress = await contracts.fetchRLCAddress();
+    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const getETH = () => contracts.eth.getBalance(vAddress).catch((error) => {
       debug(error);
       return 0;
@@ -72,7 +73,10 @@ const checkBalances = async (
         return 0;
       });
 
-    const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
+    const [weiBalance, rlcBalance] = await Promise.all([
+      wrapCall(getETH()),
+      wrapCall(getRLC()),
+    ]);
     const balances = {
       wei: ethersBnToBn(weiBalance),
       nRLC: ethersBnToBn(rlcBalance),
@@ -159,12 +163,14 @@ const sendETH = async (
     const vAddress = await addressSchema().validate(to);
     const vValue = await hexnumberSchema().validate(value);
     const ethSigner = new Web3Provider(contracts.ethProvider).getSigner();
-    const tx = await ethSigner.sendTransaction({
-      data: '0x',
-      to: vAddress,
-      value: vValue,
-    });
-    await tx.wait();
+    const tx = await wrapSend(
+      ethSigner.sendTransaction({
+        data: '0x',
+        to: vAddress,
+        value: vValue,
+      }),
+    );
+    await wrapWait(tx.wait());
     return tx.hash;
   } catch (error) {
     debug('sendETH()', error);
@@ -180,10 +186,10 @@ const sendRLC = async (
   try {
     const vAddress = await addressSchema().validate(to);
     const vAmount = await uint256Schema().validate(amount);
-    const rlcAddress = await contracts.fetchRLCAddress();
+    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await rlcContract.transfer(vAddress, vAmount);
-    await tx.wait();
+    const tx = await wrapSend(rlcContract.transfer(vAddress, vAmount));
+    await wrapWait(tx.wait());
     return tx.hash;
   } catch (error) {
     debug('sendRLC()', error);

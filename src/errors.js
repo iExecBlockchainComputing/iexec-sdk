@@ -1,4 +1,4 @@
-const { ValidationError } = require('./validator');
+const { ValidationError } = require('yup');
 
 const getPropsToCopy = (error) => {
   const {

@@ -28,7 +28,7 @@ const wrapSend = async (promise) => {
   }
 };
 
-const wrapSignTypedDataV3 = async (promise) => {
+const wrapSign = async (promise) => {
   try {
     return await promise;
   } catch (err) {
@@ -39,9 +39,14 @@ const wrapSignTypedDataV3 = async (promise) => {
   }
 };
 
+const wrapSignTypedDataV3 = wrapSign;
+
+const wrapPersonalSign = wrapSign;
+
 module.exports = {
   wrapCall,
   wrapSend,
   wrapWait,
+  wrapPersonalSign,
   wrapSignTypedDataV3,
 };

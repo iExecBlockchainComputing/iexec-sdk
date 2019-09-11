@@ -29,7 +29,10 @@ const {
   bytes32Schema,
   uint256Schema,
   throwIfMissing,
+  ValidationError,
 } = require('./validator');
+
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:order');
 
@@ -46,7 +49,7 @@ const ORDERS_TYPES = [
 ];
 
 const checkOrderName = (orderName) => {
-  if (!ORDERS_TYPES.includes(orderName)) throw Error(`Invalid orderName value ${orderName}`);
+  if (!ORDERS_TYPES.includes(orderName)) throw new ValidationError(`Invalid orderName value ${orderName}`);
 };
 
 const NULL_DATASETORDER = {
@@ -182,12 +185,12 @@ const getContractOwner = async (
 ) => {
   try {
     checkOrderName(orderName);
-    if (orderName === REQUEST_ORDER) throw Error('Invalid orderName');
+    if (orderName === REQUEST_ORDER) throw new ValidationError('Invalid orderName');
     const contractAddress = orderObj[objDesc[orderName].contractPropName];
     const contract = contracts.getContract(objDesc[orderName].contractName)({
       at: contractAddress,
     });
-    const owner = checksummedAddress(await contract.owner());
+    const owner = checksummedAddress(await wrapCall(contract.owner()));
     return owner;
   } catch (error) {
     debug('getContractOwner()', error);
@@ -218,7 +221,7 @@ const computeOrderHash = async (
         break;
       default:
     }
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
     const types = {};
     types.EIP712Domain = objDesc.EIP712Domain.structMembers;
@@ -246,11 +249,11 @@ const getRemainingVolume = async (
     checkOrderName(orderName);
     const initial = new BN(order.volume);
     const orderHash = await computeOrderHash(contracts, orderName, order);
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
-    const cons = await clerkContract.viewConsumed(orderHash);
+    const cons = await wrapCall(clerkContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
     const remain = initial.sub(consumed);
     return remain;
@@ -278,7 +281,7 @@ const signOrder = async (
     );
   }
 
-  const clerkAddress = await contracts.fetchClerkAddress();
+  const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
   const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
 
   const salt = getSalt();
@@ -356,10 +359,12 @@ const cancelOrder = async (
   try {
     checkOrderName(orderName);
     const args = signedOrderToStruct(orderName, orderObj);
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContact = contracts.getClerkContract({ at: clerkAddress });
-    const tx = await clerkContact[objDesc[orderName].cancelMethode](args);
-    const txReceipt = await tx.wait();
+    const tx = await wrapSend(
+      clerkContact[objDesc[orderName].cancelMethode](args),
+    );
+    const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return true;
   } catch (error) {
@@ -424,7 +429,7 @@ const publishOrder = async (
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
     }
-    throw new Error('An error occured while publishing order');
+    throw Error('An error occured while publishing order');
   } catch (error) {
     debug('publishOrder()', error);
     throw error;
@@ -656,15 +661,17 @@ const matchOrders = async (
       vRequestOrder,
     );
 
-    const clerkAddress = await contracts.fetchClerkAddress();
+    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({ at: clerkAddress });
-    const tx = await clerkContract.matchOrders(
-      appOrderStruct,
-      datasetOrderStruct,
-      workerpoolOrderStruct,
-      requestOrderStruct,
+    const tx = await wrapSend(
+      clerkContract.matchOrders(
+        appOrderStruct,
+        datasetOrderStruct,
+        workerpoolOrderStruct,
+        requestOrderStruct,
+      ),
     );
-    const txReceipt = await tx.wait();
+    const txReceipt = await wrapWait(tx.wait());
     const matchEvent = 'OrdersMatched';
     if (!checkEvent(matchEvent, txReceipt.events)) throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(

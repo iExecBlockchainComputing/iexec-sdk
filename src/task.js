@@ -15,6 +15,7 @@ const {
   uint256Schema,
   throwIfMissing,
 } = require('./validator');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:task');
 const objName = 'task';
@@ -38,7 +39,7 @@ const show = async (
     const { chainId } = contracts;
     const hubContract = contracts.getHubContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await hubContract.viewTask(vTaskId)),
+      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
     );
     if (task.dealid === NULL_BYTES32) throw Error(`No task found for taskid ${vTaskId} on chain ${chainId}`);
     return Object.assign(
@@ -201,9 +202,9 @@ const claim = async (
     }
 
     const hubContract = contracts.getHubContract();
-    const claimTx = await hubContract.claim(taskid);
+    const claimTx = await wrapSend(hubContract.claim(taskid));
 
-    const claimTxReceipt = await claimTx.wait();
+    const claimTxReceipt = await wrapWait(claimTx.wait());
     if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;

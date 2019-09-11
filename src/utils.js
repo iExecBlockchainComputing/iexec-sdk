@@ -6,6 +6,7 @@ const BN = require('bn.js');
 const { getAddress, bigNumberify, randomBytes } = require('ethers').utils;
 const multiaddr = require('multiaddr');
 const { hashEIP712 } = require('./sig-utils');
+const { wrapSignTypedDataV3 } = require('./errorWrappers');
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
 
@@ -257,7 +258,7 @@ const signTypedDatav3 = async (eth, address, typedData) => {
       },
     );
   });
-  const sign = await signTDv3(typedData);
+  const sign = await wrapSignTypedDataV3(signTDv3(typedData));
   return sign;
 };
 

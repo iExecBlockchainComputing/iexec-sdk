@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const { http } = require('./utils');
 const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
+const { wrapPersonalSign } = require('./errorWrappers');
 
 const debug = Debug('iexec:tee');
 
@@ -19,7 +20,7 @@ const pushSecret = async (
     const vSignerAddress = await addressSchema().validate(signerAddress);
     await stringSchema().validate(secret, { strict: true });
 
-    const signMessage = data => new Promise((resolve, reject) => {
+    const personnalSign = data => new Promise((resolve, reject) => {
       contracts.ethProvider.sendAsync(
         {
           method: 'personal_sign',
@@ -31,7 +32,9 @@ const pushSecret = async (
         },
       );
     });
-    const sign = await signMessage(secretPrefix.concat(secret));
+    const sign = await wrapPersonalSign(
+      personnalSign(secretPrefix.concat(secret)),
+    );
     const res = await http.post(
       secretEndpoit(vResourceAddress),
       { secret, sign },
