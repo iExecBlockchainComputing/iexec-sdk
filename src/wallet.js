@@ -52,6 +52,11 @@ const ethFaucets = [
   },
 ];
 
+const getAddress = async (contracts = throwIfMissing()) => {
+  const address = await wrapCall(contracts.eth.getSigner().getAddress());
+  return checksummedAddress(address);
+};
+
 const checkBalances = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
@@ -199,12 +204,12 @@ const sendRLC = async (
 
 const sweep = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address,
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(address);
     const vAddressTo = await addressSchema().validate(to);
+    const vAddress = await getAddress(contracts);
     const balances = await checkBalances(contracts, vAddress);
     let sendRLCTxHash;
     if (balances.nRLC.gt(new BN(0))) {
@@ -229,11 +234,6 @@ const sweep = async (
     debug('sweep()', error);
     throw error;
   }
-};
-
-const getAddress = async (contracts) => {
-  const address = await wrapCall(contracts.eth.getSigner().getAddress());
-  return checksummedAddress(address);
 };
 
 module.exports = {
