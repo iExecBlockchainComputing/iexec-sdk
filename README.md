@@ -827,7 +827,7 @@ const getDatasetOrderbook = async (chainId, datasetAddress) => {
 import sdk from 'iexec';
 
 // prepare an app order to sign
-const orderToSign = sdk.order.createApporder({
+const orderToSign = await sdk.order.createApporder({
   app, // [mandatory] app address
   appprice, // [mandatory] selling price in nRLC
   volume, // [mandatory] number of execution to sell
@@ -838,13 +838,8 @@ const orderToSign = sdk.order.createApporder({
 });
 
 // sign an app order
-const signAppOrder = async (contracts, orderToSign, signerAddress) => {
-  const signedOrder = await sdk.order.signOrder(
-    contracts,
-    sdk.order.APP_ORDER,
-    orderToSign,
-    signerAddress,
-  );
+const signAppOrder = async (contracts, orderToSign) => {
+  const signedOrder = await sdk.order.signApporder(contracts, orderToSign);
   console.log('Signed order:', signedOrder);
 };
 ```
@@ -857,7 +852,7 @@ const signAppOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a dataset order to sign
-const orderToSign = sdk.order.createDatasetorder(
+const orderToSign = await sdk.order.createDatasetorder(
   dataset, // [mandatory] dataset address
   datasetprice, // [mandatory] selling price in nRLC
   volume, // [mandatory] number of execution to sell
@@ -868,13 +863,8 @@ const orderToSign = sdk.order.createDatasetorder(
 );
 
 // sign a dataset order
-const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
-  const signedOrder = await sdk.order.signOrder(
-    contracts,
-    sdk.order.DATASET_ORDER,
-    orderToSign,
-    signerAddress,
-  );
+const signDatasetOrder = async (contracts, orderToSign) => {
+  const signedOrder = await sdk.order.signDatasetorder(contracts, orderToSign);
   console.log('Signed order:', signedOrder);
 };
 ```
@@ -887,7 +877,7 @@ const signDatasetOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a workerpool order to sign
-const orderToSign = sdk.order.createWorkerpoolorder(
+const orderToSign = await sdk.order.createWorkerpoolorder(
   workerpool, // [mandatory] workerpool address
   workerpoolprice, // [mandatory] execution selling price in nRLC
   volume, // [mandatory] number of execution to sell
@@ -900,13 +890,8 @@ const orderToSign = sdk.order.createWorkerpoolorder(
 );
 
 // sign a workerpool order
-const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
-  const signedOrder = await sdk.order.signOrder(
-    contracts,
-    sdk.order.WORKERPOOL_ORDER,
-    orderToSign,
-    signerAddress,
-  );
+const signWorkerpoolOrder = async (contracts, orderToSign) => {
+  const signedOrder = await sdk.order.signOrder(contracts, orderToSign);
   console.log('Signed order:', signedOrder);
 };
 ```
@@ -919,7 +904,7 @@ const signWorkerpoolOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // prepare a request order to sign
-const orderToSign = sdk.order.createRequestorder(
+const orderToSign = await sdk.order.createRequestorder(
   app, // [mandatory] address of the app to run
   appmaxprice, // [mandatory] max price in nRLC to pay to the app owner
   workerpoolmaxprice, // [mandatory] max price in nRLC to pay to the workerpool
@@ -937,13 +922,8 @@ const orderToSign = sdk.order.createRequestorder(
 );
 
 // sign a request order
-const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
-  const signedOrder = await sdk.order.signOrder(
-    contracts,
-    sdk.order.REQUEST_ORDER,
-    orderToSign,
-    signerAddress,
-  );
+const signRequestOrder = async (contracts, orderToSign) => {
+  const signedOrder = await sdk.order.signOrder(contracts, orderToSign);
   console.log('Signed order:', signedOrder);
 };
 ```
@@ -956,25 +936,23 @@ const signRequestOrder = async (contracts, orderToSign, signerAddress) => {
 import sdk from 'iexec';
 
 // publish an order on iExec Marketplace
-const publishAppOrder = async (contracts, chainId, signedAppOrder, address) => {
+const publishAppOrder = async (contracts, chainId, signedAppOrder) => {
   const orderHash = await sdk.order.publishOrder(
     contracts,
     orderName, // sdk.order.APP_ORDER for publishing App order
     chainId, // 42 for kovan
     signedAppOrder,
-    address, // signer address
   );
   console.log('Published order orderHash:', orderHash);
 };
 
 // unpublish an order from iExec Marketplace (unpublished orders still can be matched)
-const unpublishAppOrder = async (contracts, chainId, orderHash, address) => {
+const unpublishAppOrder = async (contracts, chainId, orderHash) => {
   const unpublishedOrderHash = await sdk.order.unpublishOrder(
     contracts,
     orderName, // sdk.order.APP_ORDER for publishing App order
     chainId, // 42 for kovan
     orderHash, // hash of the order to unpublish
-    address, // signer address
   );
   console.log('Unpublished order orderHash:', unpublishedOrderHash);
 };
@@ -1045,15 +1023,6 @@ const showDeal = async (contracts, dealid) => {
   const deal = await sdk.deal.show(contracts, dealid);
   console.log('Deal:', deal);
 };
-
-// get a taskid from a deal
-const getTaskId = (
-  dealid, // Bytes 32 hexstring, id of the deal
-  taskIdx = 0, // index of the task (default 0)
-) => {
-  const taskid = sdk.deal.computeTaskId(dealid, taskIdx);
-  console.log('Taskid :', taskid);
-};
 ```
 
 ### Task
@@ -1073,20 +1042,18 @@ const showTask = async (contracts, taskid) => {
 };
 
 // claim a task not completed after the final deadline (! blockchain transaction !)
-const claimTask = async (contracts, taskid, requesterAddress) => {
+const claimTask = async (contracts, taskid) => {
   const txHash = await sdk.task.claim(
     contracts,
     taskid, // Bytes 32 hexstring, id of the task
-    requesterAddress, // address of the requester
   );
   console.log('Claim transaction :', txHash);
 };
 
-const downloadResults = async (contractas, taskid, userAddress) => {
+const downloadResults = async (contractas, taskid) => {
   const res = await sdk.task.fetchResults(
     contracts,
     taskid, // Bytes 32 hexstring, id of the task
-    userAdress, // address of the beneficiary
     {
       ipfsGatewayURL: 'https://gateway.ipfs.io', // optional url of an IPFS gateway (should allow CORS for in browser use)
     },

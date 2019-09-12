@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `wallet.getAddress()` gives the current wallet address
 - `deal.show()` added key `tasks: { [idx]: [taskid] }` to the resolved value
 - dynamic cast and validation of inputs, invalid inputs throw `ValidationError`.
 - introduced TypedErrors `ValidationError`, `Web3ProviderError`, `Web3ProviderCallError`, `Web3ProviderSendError`, `Web3ProviderSignMessageError`.
@@ -30,6 +31,8 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserApp(contracts, index, userAddress)` or `hub.showApp(contracts, appAddress)`
 - [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserDataset(contracts, index, userAddress)` or `hub.showDataset(contracts, datasetAddress)`
 - [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
+- [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
+- [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
 
 ### Removed
 
