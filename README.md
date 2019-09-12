@@ -936,22 +936,15 @@ const signRequestOrder = async (contracts, orderToSign) => {
 import sdk from 'iexec';
 
 // publish an order on iExec Marketplace
-const publishAppOrder = async (contracts, chainId, signedAppOrder) => {
-  const orderHash = await sdk.order.publishOrder(
-    contracts,
-    orderName, // sdk.order.APP_ORDER for publishing App order
-    chainId, // 42 for kovan
-    signedAppOrder,
-  );
+const publishAppOrder = async (contracts, signedAppOrder) => {
+  const orderHash = await sdk.order.publishApporder(contracts, signedAppOrder);
   console.log('Published order orderHash:', orderHash);
 };
 
 // unpublish an order from iExec Marketplace (unpublished orders still can be matched)
-const unpublishAppOrder = async (contracts, chainId, orderHash) => {
-  const unpublishedOrderHash = await sdk.order.unpublishOrder(
+const unpublishAppOrder = async (contracts, orderHash) => {
+  const unpublishedOrderHash = await sdk.order.unpublishApporder(
     contracts,
-    orderName, // sdk.order.APP_ORDER for publishing App order
-    chainId, // 42 for kovan
     orderHash, // hash of the order to unpublish
   );
   console.log('Unpublished order orderHash:', unpublishedOrderHash);
@@ -959,9 +952,8 @@ const unpublishAppOrder = async (contracts, chainId, orderHash) => {
 
 // cancel an order (canceled orders can't be matched) (! blockchain transaction !)
 const cancelAppOrder = async (contracts, signedAppOrder) => {
-  const isCanceled = await sdk.order.unpublishOrder(
+  const isCanceled = await sdk.order.cancelApporder(
     contracts,
-    orderName, // sdk.order.APP_ORDER for publishing App order
     signedAppOrder, // order to cancel
   );
   console.log('Order is canceled:', isCanceled);

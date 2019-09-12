@@ -427,45 +427,41 @@ const publishOrder = async (
 
 const publishApporder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedApporder = throwIfMissing(),
 ) => publishOrder(
   contracts,
   APP_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedApporderSchema().validate(signedApporder),
 );
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
   DATASET_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedDatasetorderSchema().validate(signedDatasetorder),
 );
 
 const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
 );
 
 const publishRequestorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
   REQUEST_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedRequestorderSchema().validate(signedRequestorder),
 );
 
@@ -498,45 +494,41 @@ const unpublishOrder = async (
 
 const unpublishApporder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   apporderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   APP_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(apporderHash),
 );
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   DATASET_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(datasetorderHash),
 );
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(workerpoolorderHash),
 );
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   requestorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   REQUEST_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(requestorderHash),
 );
 
