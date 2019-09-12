@@ -9,12 +9,8 @@ const {
   NULL_ADDRESS,
   NULL_BYTES32,
 } = require('./utils');
-const {
-  addressSchema,
-  bytes32Schema,
-  uint256Schema,
-  throwIfMissing,
-} = require('./validator');
+const { getAddress } = require('./wallet');
+const { bytes32Schema, uint256Schema, throwIfMissing } = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:task');
@@ -123,17 +119,18 @@ const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
 const fetchResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  userAddress = throwIfMissing(),
-  { ipfsGatewayURL } = {},
+  options = {},
+  options1 = {},
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const vUserAddress = await addressSchema().validate(userAddress);
+    const ipfsGatewayURL = options.ipfsGatewayURL || options1.ipfsGatewayURL;
+    const userAddress = await getAddress(contracts);
     const task = await show(contracts, vTaskId);
     if (TASK_STATUS_MAP[task.status] !== 'COMPLETED') throw Error('Task is not completed');
     const tasksDeal = await deal.show(contracts, task.dealid);
     if (
-      vUserAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
+      userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
       && NULL_ADDRESS !== tasksDeal.beneficiary.toLowerCase()
     ) {
       throw Error(
@@ -147,12 +144,7 @@ const fetchResults = async (
       res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
     } else {
       debug('download from result repo', resultAddress);
-      res = await downloadFromResultRepo(
-        contracts,
-        vTaskId,
-        task,
-        vUserAddress,
-      );
+      res = await downloadFromResultRepo(contracts, vTaskId, task, userAddress);
     }
     return res;
   } catch (error) {
@@ -164,11 +156,10 @@ const fetchResults = async (
 const claim = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  userAddress = throwIfMissing(),
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const vUserAddress = await addressSchema().validate(userAddress);
+    const userAddress = await getAddress(contracts);
     const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
 
@@ -184,7 +175,7 @@ const claim = async (
     const tasksDeal = await deal.show(contracts, task.dealid);
     debug('tasksDeal', tasksDeal);
 
-    if (tasksDeal.requester.toLowerCase() !== vUserAddress.toLowerCase()) {
+    if (tasksDeal.requester.toLowerCase() !== userAddress.toLowerCase()) {
       throw Error(
         `Cannot claim a ${objName} requested by someone else: ${tasksDeal.requester}`,
       );

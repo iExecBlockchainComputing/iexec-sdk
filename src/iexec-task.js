@@ -141,12 +141,12 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = computeTxOptions(cmd);
-      const [chain, wallet] = await Promise.all([
+      const [chain] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
         keystore.load(),
       ]);
       spinner.start(info.claiming(objName));
-      const txHash = await task.claim(chain.contracts, taskid, wallet.address);
+      const txHash = await task.claim(chain.contracts, taskid);
       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);

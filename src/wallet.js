@@ -2,7 +2,7 @@ const Debug = require('debug');
 const { Web3Provider } = require('ethers').providers;
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { ethersBnToBn, bnToEthersBn } = require('./utils');
+const { ethersBnToBn, bnToEthersBn, checksummedAddress } = require('./utils');
 const {
   uint256Schema,
   addressSchema,
@@ -233,7 +233,7 @@ const sweep = async (
 
 const getAddress = async (contracts) => {
   const address = await wrapCall(contracts.eth.getSigner().getAddress());
-  return address;
+  return checksummedAddress(address);
 };
 
 module.exports = {

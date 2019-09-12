@@ -138,11 +138,7 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
-        const signedOrder = await order.signApporder(
-          chain.contracts,
-          orderObj,
-          address,
-        );
+        const signedOrder = await order.signApporder(chain.contracts, orderObj);
         const { saved, fileName } = await saveSignedOrder(
           order.APP_ORDER,
           chain.id,
@@ -174,7 +170,6 @@ sign
         const signedOrder = await order.signDatasetorder(
           chain.contracts,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.DATASET_ORDER,
@@ -209,7 +204,6 @@ sign
         const signedOrder = await order.signWorkerpoolorder(
           chain.contracts,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.WORKERPOOL_ORDER,
@@ -234,7 +228,6 @@ sign
         const signedOrder = await order.signRequestorder(
           chain.contracts,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.REQUEST_ORDER,
@@ -374,10 +367,9 @@ fill
             pretty(unsignedOrder),
           );
         }
-        const signed = order.signRequestorder(
+        const signed = await order.signRequestorder(
           chain.contracts,
           unsignedOrder,
-          address,
         );
         return signed;
       };
@@ -542,7 +534,7 @@ publish
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
 
-      const [chain, signedOrders, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
@@ -565,7 +557,6 @@ publish
               chain.contracts,
               chain.id,
               orderToPublish,
-              address,
             );
             break;
           case order.DATASET_ORDER:
@@ -573,7 +564,6 @@ publish
               chain.contracts,
               chain.id,
               orderToPublish,
-              address,
             );
             break;
           case order.WORKERPOOL_ORDER:
@@ -581,7 +571,6 @@ publish
               chain.contracts,
               chain.id,
               orderToPublish,
-              address,
             );
             break;
           case order.REQUEST_ORDER:
@@ -589,7 +578,6 @@ publish
               chain.contracts,
               chain.id,
               orderToPublish,
-              address,
             );
             break;
           default:
@@ -743,7 +731,7 @@ cancel
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [chain, signedOrders, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
         keystore.load(),
