@@ -231,7 +231,13 @@ const sweep = async (
   }
 };
 
+const getAddress = async (contracts) => {
+  const address = await wrapCall(contracts.eth.getSigner().getAddress());
+  return address;
+};
+
 module.exports = {
+  getAddress,
   checkBalances,
   getETH,
   getRLC,
