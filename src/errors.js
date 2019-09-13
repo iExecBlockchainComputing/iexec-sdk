@@ -45,7 +45,18 @@ class Web3ProviderSignMessageError extends Web3ProviderError {
   }
 }
 
+class ObjectNotFoundError extends Error {
+  constructor(objName, objId, chainId) {
+    super(`No ${objName} found for id ${objId} on chain ${chainId}`);
+    this.name = this.constructor.name;
+    this.objName = objName;
+    this.chainId = chainId;
+    this.objectId = objId;
+  }
+}
+
 module.exports = {
+  ObjectNotFoundError,
   ValidationError,
   Web3ProviderError,
   Web3ProviderCallError,

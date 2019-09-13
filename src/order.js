@@ -32,6 +32,7 @@ const {
   throwIfMissing,
   ValidationError,
 } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
 
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
@@ -553,8 +554,10 @@ const fetchPublishedOrderByHash = async (
     };
     const response = await http.post(endpoint, body);
     if (response.ok && response.orders) {
-      return response.orders[0] || null;
+      if (response.orders[0]) return response.orders[0];
+      throw new ObjectNotFoundError(orderName, orderHash, chainId);
     }
+
     throw Error('An error occured while getting order');
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);

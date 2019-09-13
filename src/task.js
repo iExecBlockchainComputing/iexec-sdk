@@ -11,6 +11,7 @@ const {
 } = require('./utils');
 const { getAddress } = require('./wallet');
 const { bytes32Schema, uint256Schema, throwIfMissing } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:task');
@@ -37,7 +38,9 @@ const show = async (
     const task = bnifyNestedEthersBn(
       cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
     );
-    if (task.dealid === NULL_BYTES32) throw Error(`No task found for taskid ${vTaskId} on chain ${chainId}`);
+    if (task.dealid === NULL_BYTES32) {
+      throw new ObjectNotFoundError('task', vTaskId, chainId);
+    }
     return Object.assign(
       {},
       task,

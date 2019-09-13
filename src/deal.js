@@ -15,6 +15,7 @@ const {
   positiveStrictIntSchema,
   throwIfMissing,
 } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
 
 const debug = Debug('iexec:deal');
@@ -114,7 +115,9 @@ const show = async (
       cleanRPC(await wrapCall(clerkContract.viewDeal(vDealid))),
     );
     const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
-    if (!dealExists) throw Error(`No deal found for dealid ${dealid} on chain ${chainId}`);
+    if (!dealExists) {
+      throw new ObjectNotFoundError('deal', dealid, chainId);
+    }
     const tasks = await computeTaskIdsArray(
       dealid,
       deal.botFirst.toString(),
