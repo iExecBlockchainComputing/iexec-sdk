@@ -1,5 +1,6 @@
 const Debug = require('debug');
 const { http } = require('./utils');
+const { getAddress } = require('./wallet');
 const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
 const { wrapPersonalSign } = require('./errorWrappers');
 
@@ -11,13 +12,12 @@ const secretPrefix = 'iexec_sms_secret:';
 const pushSecret = async (
   contracts = throwIfMissing(),
   smsUrl = throwIfMissing(),
-  signerAddress = throwIfMissing(),
   resourceAddress = throwIfMissing(),
   secret = throwIfMissing(),
 ) => {
   try {
     const vResourceAddress = await addressSchema().validate(resourceAddress);
-    const vSignerAddress = await addressSchema().validate(signerAddress);
+    const vSignerAddress = await getAddress(contracts);
     await stringSchema().validate(secret, { strict: true });
 
     const personnalSign = data => new Promise((resolve, reject) => {

@@ -401,9 +401,7 @@ encryptDataset
               filesNames[index].replace(/[^\w\s.-_]/gi, ''),
             );
             spinner.info(
-              `Wrapping single file ${
-                filesNames[index]
-              } into folder ${safeFolderName}`,
+              `Wrapping single file ${filesNames[index]} into folder ${safeFolderName}`,
             );
             await fs.mkdir(
               path.join(originalDatasetFolderPath, safeFolderName),
@@ -470,9 +468,7 @@ generateKeys
       const nodeMinVersion = 'v10.12.0';
       if (semver.gt(nodeMinVersion, process.version)) {
         throw Error(
-          `Minimum node version to use this command is ${nodeMinVersion}, found ${
-            process.version
-          }`,
+          `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
         );
       }
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -747,7 +743,6 @@ pushSecret
       const res = await tee.pushSecret(
         contracts,
         sms,
-        address,
         resourceAddress,
         secretToPush,
       );
