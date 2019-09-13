@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - fix numbers format in templates
+- fix everyone can claim a task
 - update api url
 - `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
 - dependencies update

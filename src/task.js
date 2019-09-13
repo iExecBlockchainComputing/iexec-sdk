@@ -159,7 +159,6 @@ const claim = async (
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const userAddress = await getAddress(contracts);
     const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
 
@@ -174,12 +173,6 @@ const claim = async (
     }
     const tasksDeal = await deal.show(contracts, task.dealid);
     debug('tasksDeal', tasksDeal);
-
-    if (tasksDeal.requester.toLowerCase() !== userAddress.toLowerCase()) {
-      throw Error(
-        `Cannot claim a ${objName} requested by someone else: ${tasksDeal.requester}`,
-      );
-    }
 
     const now = Math.floor(Date.now() / 1000);
     const consensusTimeout = parseInt(task.finalDeadline, 10);
