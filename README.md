@@ -652,6 +652,8 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 1. [Install the dependency in your JS project](#install-the-dependenciy-in-your-js-project)
 2. [Instanciate the iExec SDK](#instanciate-the-iexec-sdk)
 3. [Use iexec sdk](#use-iexec-sdk)
+4. [Types](#types)
+5. [Errors](#errors)
 
 ### Install the dependency in your JS project
 
@@ -1363,6 +1365,262 @@ const res = await iexec.task.fetchResults(
 );
 console.log('task status is', res.statusName);
 ```
+
+### Types
+
+#### BN
+
+`BN` is instance of `bn.js` (see [bn.js](https://www.npmjs.com/package/bn.js)).
+`BN` constructor can be imported from iexec:
+
+```js
+import { utils } from 'iexec';
+const { BN } = utils;
+```
+
+#### Address
+
+`Address` is a "0x" prefixed checksummed ethereum address. Any valid ethereum address can be used as argument of methods requiring `Address` (ENS is not supported).
+
+#### Bytes32
+
+`Bytes32` is a "0x" prefixed hexadecimal string representation of 32 bytes.
+
+#### TxHash
+
+`TxHash` is an ethereum transaction hash.
+
+#### Uint256
+
+`Uint256` is a decimal string representation of a 256 bit unsigned integer.
+Accepted:
+
+- Number
+- String
+- BN
+
+#### Multiaddress
+
+`Multiaddress` is resource address representation [multiaddr](https://github.com/multiformats/js-multiaddr).
+Accepted:
+
+- url as string
+- multiaddr string representation
+- multiaddr().buffer
+
+#### Apporder
+
+`Apporder` is an object representation of an apporder not signed.
+
+```js
+{
+  app: Address,
+  appprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  datasetrestrict: Address,
+  workerpoolrestrict: Address,
+  requesterrestrict: Address
+}
+```
+
+#### SignedApporder
+
+`SignedApporder` is an object representation of a signed apporder.
+
+```js
+{
+  app: Address,
+  appprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  datasetrestrict: Address,
+  workerpoolrestrict: Address,
+  requesterrestrict: Address,
+  salt: Bytes32,
+  sign: HexString
+}
+```
+
+#### Datasetorder
+
+`Datasetorder` is an object representation of a datasetorder not signed.
+
+```js
+{
+  dataset: Address,
+  datasetprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  apprestrict: Address,
+  workerpoolrestrict: Address,
+  requesterrestrict: Address,
+}
+```
+
+#### SignedDatasetorder
+
+`SignedApporder` is an object representation of a signed datasetorder.
+
+```js
+{
+  dataset: Address,
+  datasetprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  apprestrict: Address,
+  workerpoolrestrict: Address,
+  requesterrestrict: Address,
+  salt: Bytes32,
+  sign: HexString
+}
+```
+
+#### Workerpoolorder
+
+`Workerpoolorder` is an object representation of a workerpoolorder not signed.
+
+```js
+{
+  workerpool: Address,
+  workerpoolprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  category: Uint256,
+  trust: Uint256,
+  apprestrict: Address,
+  datasetrestrict: Address,
+  requesterrestrict: Address,
+}
+```
+
+#### SignedWorkerpoolorder
+
+`SignedWorkerpoolorder` is an object representation of a signed workerpoolorder.
+
+```js
+{
+  workerpool: Address,
+  workerpoolprice: Uint256,
+  volume: Uint256,
+  tag: Bytes32,
+  category: Uint256,
+  trust: Uint256,
+  apprestrict: Address,
+  datasetrestrict: Address,
+  requesterrestrict: Address,
+  salt: Bytes32,
+  sign: HexString
+}
+```
+
+#### Requestorder
+
+`Requestorder` is an object representation of a requestorder not signed.
+
+```js
+{
+  app: Address,
+  appmaxprice: uint256S,
+  dataset: Address,
+  datasetmaxprice: uint256,
+  workerpool: Address,
+  workerpoolprice: Uint256,
+  requester: Address,
+  volume: Uint256,
+  tag: Bytes32,
+  category: Uint256,
+  trust: Uint256,
+  beneficary: Address,
+  callback: Address,
+  params: String,
+}
+```
+
+#### SignedRequestorder
+
+`SignedRequestorder` is an object representation of a signed requestorder.
+
+```js
+{
+  app: Address,
+  appmaxprice: uint256S,
+  dataset: Address,
+  datasetmaxprice: uint256,
+  workerpool: Address,
+  workerpoolprice: Uint256,
+  requester: Address,
+  volume: Uint256,
+  tag: Bytes32,
+  category: Uint256,
+  trust: Uint256,
+  beneficary: Address,
+  callback: Address,
+  params: String,
+  salt: Bytes32,
+  sign: HexString
+}
+```
+
+### Errors
+
+iexec sdk use typed errors, errors constructors are accessible through import.
+
+```js
+import { errors } from 'iexec';
+const {
+  ObjectNotFoundError,
+  ValidationError,
+  Web3ProviderError,
+  Web3ProviderCallError,
+  Web3ProviderSendError,
+  Web3ProviderSignMessageError,
+} = errors;
+```
+
+#### ObjectNotFoundError
+
+`ObjectNotFoundError` is thrown when trying to access an unexisting resource.
+Specific properties:
+
+- `error.objName`: type of object trying to access
+- `error.chainId`: chain id of the blockchain where the object is supposed to be
+- `error.objectId` : id used to find the object
+
+#### ValidationError
+`ValidationError` is thrown when a method is called with missing or unexpected parameters.
+
+#### Web3ProviderError
+
+`Web3ProviderError` encapsulate a web3 provider exception.
+Specific properties:
+
+- `error.originalError`: the original exception from the web3Provider.
+
+#### Web3ProviderCallError
+
+`Web3ProviderCallError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 call.
+Reasons:
+
+- network failure
+- unexpected args
+
+#### Web3ProviderCallError
+
+`Web3ProviderSendError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 send transaction.
+Reasons:
+
+- user denied tx signature
+- not enough gas
+- transaction revert
+
+#### Web3ProviderSignMessageError
+
+`Web3ProviderSignMessageError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 message signature.
+Reasons:
+
+- user denied message signature
+- method not supported by the web3 provider
 
 # iExec SDK CLI fork/spawn
 
