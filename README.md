@@ -1370,7 +1370,8 @@ console.log('task status is', res.statusName);
 
 #### BN
 
-`BN` is instance of `bn.js` (see [bn.js](https://www.npmjs.com/package/bn.js)).
+`BN` is instance of `bn.js` it allows big numbers manipulation in js (see [bn.js](https://www.npmjs.com/package/bn.js)).
+
 `BN` constructor can be imported from iexec:
 
 ```js
@@ -1393,6 +1394,7 @@ const { BN } = utils;
 #### Uint256
 
 `Uint256` is a decimal string representation of a 256 bit unsigned integer.
+
 Accepted:
 
 - Number
@@ -1402,6 +1404,7 @@ Accepted:
 #### Multiaddress
 
 `Multiaddress` is resource address representation [multiaddr](https://github.com/multiformats/js-multiaddr).
+
 Accepted:
 
 - url as string
@@ -1581,6 +1584,7 @@ const {
 #### ObjectNotFoundError
 
 `ObjectNotFoundError` is thrown when trying to access an unexisting resource.
+
 Specific properties:
 
 - `error.objName`: type of object trying to access
@@ -1588,11 +1592,13 @@ Specific properties:
 - `error.objectId` : id used to find the object
 
 #### ValidationError
+
 `ValidationError` is thrown when a method is called with missing or unexpected parameters.
 
 #### Web3ProviderError
 
 `Web3ProviderError` encapsulate a web3 provider exception.
+
 Specific properties:
 
 - `error.originalError`: the original exception from the web3Provider.
@@ -1600,6 +1606,7 @@ Specific properties:
 #### Web3ProviderCallError
 
 `Web3ProviderCallError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 call.
+
 Reasons:
 
 - network failure
@@ -1608,6 +1615,7 @@ Reasons:
 #### Web3ProviderCallError
 
 `Web3ProviderSendError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 send transaction.
+
 Reasons:
 
 - user denied tx signature
@@ -1617,6 +1625,7 @@ Reasons:
 #### Web3ProviderSignMessageError
 
 `Web3ProviderSignMessageError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 message signature.
+
 Reasons:
 
 - user denied message signature
