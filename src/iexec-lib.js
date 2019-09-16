@@ -8,6 +8,7 @@ const deal = require('./deal');
 const task = require('./task');
 const errors = require('./errors');
 const {
+  BN,
   NULL_ADDRESS,
   NULL_BYTES32,
   getSalt,
@@ -17,6 +18,7 @@ const {
 } = require('./utils');
 
 const utils = {
+  BN,
   NULL_ADDRESS,
   NULL_BYTES32,
   getSalt,
