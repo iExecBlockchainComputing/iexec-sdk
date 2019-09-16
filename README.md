@@ -649,11 +649,11 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## How to use ?
 
-1. [Install the dependencies in your JS project](#install-the-dependencies-in-your-js-project)
+1. [Install the dependency in your JS project](#install-the-dependenciy-in-your-js-project)
 2. [Instanciate the iExec SDK](#instanciate-the-iexec-sdk)
-3. [Access iexec most useful methods](#access-iexec-most-useful-methods)
+3. [Use iexec sdk](#use-iexec-sdk)
 
-### Install the dependencies in your JS project
+### Install the dependency in your JS project
 
 Install iexec sdk
 
@@ -676,7 +676,8 @@ const iexec = new IExec({
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (mainnet) and '42' (kovan testnet))
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (mainnet) and '42' (kovan testnet)).
+
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
 In the browser, you can get a signer provider from [MetaMask plugin](https://metamask.io/)
@@ -702,18 +703,16 @@ const getIExec = async () => {
 };
 ```
 
-### Access iexec most useful methods
+### Use iexec sdk
 
-- [wallet](#wallet): manage your wallet, send RLC...
-- [account](#account): manage your account, deposit, withdraw...
-- [orderbook](#orderboook): explore the iexec Marketplace
-- [order](#order): manage any type of order, make deals to start offchain computation
-- [deal](#deal): find your deals
-- [task](#task): follow the computation, download results or claim failled exuecutions
+- [wallet](#iexec.wallet): manage your wallet, send RLC...
+- [account](#iexec.account): manage your account, deposit, withdraw...
+- [orderbook](#iexec.orderboook): explore the iexec Marketplace
+- [order](#iexec.order): manage any type of order, make deals to start offchain computation
+- [deal](#iexec.deal): find your deals
+- [task](#iexec.task): follow the computation, download results or claim failled exuecutions
 
-**Important:** The iExec SDK methods allways return Promises.
-
-### wallet
+### iexec.wallet
 
 #### getAddress
 
@@ -780,7 +779,7 @@ iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendRLCTxHash: TxHa
 await sdk.wallet.sweep(toEthAddress);
 ```
 
-### account
+### iexec.account
 
 #### checkBalance
 
@@ -801,6 +800,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **BN** >
 
 > deposit some nRLC (1 nRLC = 1\*10^-9 RLC) from user wallet to user account
+>
 > The deposit include 2 transaction (1st to approve the iexec clerk SC, 2nd for deposit)
 
 **Example:**
@@ -823,7 +823,7 @@ const withdrawedAmount = await iexec.account.withdraw('1000000000');
 console.log('Withdrawed:', withdrawedAmount);
 ```
 
-### Orderbook
+### iexec.orderbook
 
 #### fetchAppOrderbook
 
@@ -862,6 +862,7 @@ console.log('total orders:', res.count);
 iexec.**orderbook.fetchAppOrderbook ( category: Uint256 \[, { workerpoolAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
 
 > find the cheapest orders for computing resource in specified category.
+>
 > _Optional_: filter on specific workerpoolAddress
 
 **Example:**
@@ -877,6 +878,7 @@ console.log('total orders:', res.count);
 iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
 
 > find the best paying request orders for computing resource in specified category.
+>
 > _Optional_: filter on specific requesterAddress
 
 **Example:**
@@ -953,7 +955,7 @@ console.log('status:', res.status);
 console.log('remaining:', res.remaining);
 ```
 
-### order
+### iexec.order
 
 #### createApporder
 
@@ -1247,7 +1249,7 @@ const res = await iexec.order.matchOrders(
 console.log('deal:', res.dealid);
 ```
 
-### deal
+### iexec.deal
 
 #### show
 
@@ -1285,6 +1287,7 @@ console.log('taskid:', taskid);
 iexec.**deal.fetchRequesterDeals ( requesterAddress: Address, \[ { appAddress: Address, datasetAddress: Address, workerpoolAddress: Address } \] )** => Promise < **{ count, deals: \[ ...Deals \]}** >
 
 > show the last deals of the specified requester.
+>
 > _Optional_: filter by appAddress, datasetAddress, workerpoolAddress.
 
 **Example:**
@@ -1297,7 +1300,7 @@ console.log('deals count:', res.count);
 console.log('last deal:', res.deals[0]);
 ```
 
-### task
+### iexec.task
 
 #### show
 
@@ -1333,6 +1336,7 @@ await iexec.task.claim(
 iexec.**task.claim ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
 
 > download the specified task result.
+>
 > _Optional_: overwrite the ipfs gateway to use for results stored on ipfs.
 
 **Example:**
