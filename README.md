@@ -9,8 +9,8 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 
 ## Resources
 
-- [CLI documentation](https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api)
-- [JS lib documentation](https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-library-api)
+- [CLI documentation](#iexec-sdk-cli-api)
+- [JS lib documentation](#iexec-sdk-library-api)
 - The iExec Dapp Store: https://dapps.iex.ec
 - The iExec Data Store: https://data.iex.ec
 - The iExec Marketplace: https://market.iex.ec
@@ -720,7 +720,8 @@ const getIExec = async () => {
 iexec.**wallet.getAddress ( )** => Promise < **Address** >
 
 > get the user selected address
-> **Example:**
+
+**Example:**
 
 ```js
 const userAddress = await iexec.wallet.getAddress();
@@ -732,7 +733,8 @@ console.log('User address:', userAddress);
 iexec.**wallet.checkBalances ( address: Address )** => Promise < **{ nRLC: BN, wei: BN }** >
 
 > check the wallet balance of specified address
-> **Example:**
+
+**Example:**
 
 ```js
 const balance = await iexec.wallet.checkBalances(ethAddress);
@@ -745,7 +747,8 @@ console.log('Eth wei:', balance.wei.toString());
 iexec.**wallet.sendRLC ( nRlcAmount: Uint256, address: Address )** => Promise < **TxHash** >
 
 > send some nRLC (1 nRLC = 1\*10^-9 RLC) to the specified address
-> **Example:**
+
+**Example:**
 
 ```js
 const txHash = await iexec.wallet.sendRLC(nRlcAmount, toEthAddress);
@@ -757,7 +760,8 @@ console.log('Transaction hash:', txHash);
 iexec.**wallet.sendETH ( weiAmount, address: Address )** => Promise < **TxHash** >
 
 > send some wei to the specified address
-> **Example:**
+
+**Example:**
 
 ```js
 const txHash = await iexec.wallet.sendETH(weiAmount, toEthAddress);
@@ -769,7 +773,8 @@ console.log('Transaction hash:', txHash);
 iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendRLCTxHash: TxHash, sendETHTxHash: TxHash }**
 
 > send all the RLC and the native token to the specified address
-> **Example:**
+
+**Example:**
 
 ```js
 await sdk.wallet.sweep(toEthAddress);
@@ -782,7 +787,8 @@ await sdk.wallet.sweep(toEthAddress);
 iexec.**account.checkBalance ( address: Address )** => Promise < **{ stake: BN, locked: BN }** >
 
 > check the account balance of specified address (stake is availlable nRLC, locked is escowed nRLC)
-> **Example:**
+
+**Example:**
 
 ```js
 const balance = await iexec.account.checkBalance(ethAddress);
@@ -796,7 +802,8 @@ iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **BN** >
 
 > deposit some nRLC (1 nRLC = 1\*10^-9 RLC) from user wallet to user account
 > The deposit include 2 transaction (1st to approve the iexec clerk SC, 2nd for deposit)
-> **Example:**
+
+**Example:**
 
 ```js
 const depositedAmount = await iexec.account.deposit('1000000000');
@@ -808,7 +815,8 @@ console.log('Deposited:', depositedAmount);
 iexec.**account.withdraw ( nRlcAmount: Uint256 )** => Promise < **BN** >
 
 > withdraw some nRLC (1 nRLC = 1\*10^-9 RLC) from user account to user wallet
-> **Example:**
+
+**Example:**
 
 ```js
 const withdrawedAmount = await iexec.account.withdraw('1000000000');
@@ -822,7 +830,8 @@ console.log('Withdrawed:', withdrawedAmount);
 iexec.**orderbook.fetchAppOrderbook ( address: Address )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified app
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchAppOrderbook(
@@ -837,7 +846,8 @@ console.log('total orders:', res.count);
 iexec.**orderbook.fetchDatasetOrderbook ( address: Address )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified dataset
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchDatasetOrderbook(
@@ -851,9 +861,10 @@ console.log('total orders:', res.count);
 
 iexec.**orderbook.fetchAppOrderbook ( category: Uint256 \[, { workerpoolAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
 
-> find the cheapest orders for computing resource in specified category
+> find the cheapest orders for computing resource in specified category.
 > _Optional_: filter on specific workerpoolAddress
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchWorkerpoolOrderbook('1');
@@ -865,9 +876,10 @@ console.log('total orders:', res.count);
 
 iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
 
-> find the best paying request orders for computing resource in specified category
+> find the best paying request orders for computing resource in specified category.
 > _Optional_: filter on specific requesterAddress
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchRequestOrderbook('1');
@@ -880,7 +892,8 @@ console.log('total orders:', res.count);
 iexec.**orderbook.fetchApporder ( orderHash: Bytes32 )** => Promise < **{ order: SignedApporder, status, remaining }** >
 
 > find a published apporder by orderHash
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchApporder(
@@ -896,7 +909,8 @@ console.log('remaining:', res.remaining);
 iexec.**orderbook.fetchDatasetorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedDatasetorder, status, remaining }** >
 
 > find a published datasetorder by orderHash
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchDatasetorder(
@@ -912,7 +926,8 @@ console.log('remaining:', res.remaining);
 iexec.**orderbook.fetchWorkerpoolorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedWorkerpoolorder, status, remaining }** >
 
 > find a published workerpoolorder by orderHash
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchWorkerpoolorder(
@@ -928,7 +943,8 @@ console.log('remaining:', res.remaining);
 iexec.**orderbook.fetchRequestorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedRequestorder, status, remaining }** >
 
 > find a published requestorder by orderHash
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.orderbook.fetchRequestorder(orderHash);
@@ -944,7 +960,8 @@ console.log('remaining:', res.remaining);
 iexec.**order.createApporder ( { app: Address, appprice: Uint256, volume: Uint256 \[, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
 > create an apporder with specified params
-> **Example:**
+
+**Example:**
 
 ```js
 const apporderToSign = await iexec.order.createApporder({
@@ -959,7 +976,8 @@ const apporderToSign = await iexec.order.createApporder({
 iexec.**order.signApporder ( apporderToSign: Apporder )** => Promise < **SignedApporder** >
 
 > sign an apporder to produce a SignedApporder valid for the PoCo.
-> **Example:**
+
+**Example:**
 
 ```js
 const signedApporder = await iexec.order.signApporder(apporderToSign);
@@ -970,7 +988,8 @@ const signedApporder = await iexec.order.signApporder(apporderToSign);
 iexec.**order.createDatasetorder ( { dataset: Address, datasetprice: Uint256, volume: Uint256 \[, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
 > create a datasetorder with specified params
-> **Example:**
+
+**Example:**
 
 ```js
 const datasetorderToSign = await iexec.order.createDatasetorder({
@@ -985,7 +1004,8 @@ const datasetorderToSign = await iexec.order.createDatasetorder({
 iexec.**order.signDatasetorder ( datasetorderToSign: Datasetorder )** => Promise < **SignedDatasetorder** >
 
 > sign a datasetorder to produce a SignedDatasetorder valid for the PoCo.
-> **Example:**
+
+**Example:**
 
 ```js
 const signedDatasetorder = await iexec.order.signDatasetorder(
@@ -998,7 +1018,8 @@ const signedDatasetorder = await iexec.order.signDatasetorder(
 iexec.**order.createWorkerpoolorder ( { workerpool: Address, workerpoolprice: Uint256, category: Uint256, volume: Uint256 \[, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
 > create a workerpoolorder with specified params
-> **Example:**
+
+**Example:**
 
 ```js
 const workerpoolorderToSign = await iexec.order.createWorkerpoolorder({
@@ -1014,7 +1035,8 @@ const workerpoolorderToSign = await iexec.order.createWorkerpoolorder({
 iexec.**order.signWorkerpoolorder ( workerpoolorderToSign: Workerpoolorder )** => Promise < **SignedWorkerpoolorder** >
 
 > sign a workerpoolorder to produce a SignedWorkerpoolorder valid for the PoCo.
-> **Example:**
+
+**Example:**
 
 ```js
 const signedWorkerpoolorder = await iexec.order.signWorkerpoolorder(
@@ -1027,7 +1049,8 @@ const signedWorkerpoolorder = await iexec.order.signWorkerpoolorder(
 iexec.**order.createRequestorder ( { app: Address, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, category: Uint256, volume: Uint256 \[, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
-> **Example:**
+
+**Example:**
 
 ```js
 const requestorderToSign = await iexec.order.createRequestorder({
@@ -1046,7 +1069,8 @@ const requestorderToSign = await iexec.order.createRequestorder({
 iexec.**order.signRequestorder ( requestorderToSign: Requestorder )** => Promise < **SignedRequestorder** >
 
 > sign a requestorder to produce a SignedRequestorder valid for the PoCo.
-> **Example:**
+
+**Example:**
 
 ```js
 const SignedRequestorder = await iexec.order.signRequestorder(
@@ -1059,7 +1083,8 @@ const SignedRequestorder = await iexec.order.signRequestorder(
 iexec.**order.publishApporder ( order: SignedApporder )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedApporder on the offchain marketplace, the order will be available for other users
-> **Example:**
+
+**Example:**
 
 ```js
 const orderHash = await iexec.order.publishApporder(signedApporder);
@@ -1071,7 +1096,8 @@ console.log('order published with orderHash:', orderHash);
 iexec.**order.unpublishApporder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
 > unpublish a SignedApporder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
-> **Example:**
+
+**Example:**
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
@@ -1082,7 +1108,8 @@ const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
 iexec.**order.cancelApporder ( order: SignedApporder )** => Promise < **Boolean** >
 
 > cancel a SignedApporder on the blockchain.
-> **Example:**
+
+**Example:**
 
 ```js
 await iexec.order.cancelApporder(signedApporder);
@@ -1093,7 +1120,8 @@ await iexec.order.cancelApporder(signedApporder);
 iexec.**order.publishDatasetorder ( order: SignedDatasetorder )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedDatasetorder on the offchain marketplace, the order will be available for other users
-> **Example:**
+
+**Example:**
 
 ```js
 const orderHash = await iexec.order.publishDatasetorder(signedDatasetorder);
@@ -1105,7 +1133,8 @@ console.log('order published with orderHash:', orderHash);
 iexec.**order.unpublishDatasetorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
 > unpublish a SignedDatasetorder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
-> **Example:**
+
+**Example:**
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
@@ -1116,7 +1145,8 @@ const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
 iexec.**order.cancelDatasetorder ( order: SignedDatasetorder )** => Promise < **Boolean** >
 
 > cancel a SignedDatasetorder on the blockchain.
-> **Example:**
+
+**Example:**
 
 ```js
 await iexec.order.cancelDatasetorder(signedDatasetorder);
@@ -1127,7 +1157,8 @@ await iexec.order.cancelDatasetorder(signedDatasetorder);
 iexec.**order.publishWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedWorkerpoolorder on the offchain marketplace, the order will be available for other users
-> **Example:**
+
+**Example:**
 
 ```js
 const orderHash = await iexec.order.publishWorkerpoolorder(
@@ -1141,7 +1172,8 @@ console.log('order published with orderHash:', orderHash);
 iexec.**order.unpublisWorkerpoolorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
 > unpublish a SignedWorkerpoolorder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
-> **Example:**
+
+**Example:**
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
@@ -1154,7 +1186,8 @@ const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
 iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **Boolean** >
 
 > cancel a SignedWorkerpoolorder on the blockchain.
-> **Example:**
+
+**Example:**
 
 ```js
 await iexec.order.cancelWorkerpoolorder(signedWorkerpoolorder);
@@ -1165,7 +1198,8 @@ await iexec.order.cancelWorkerpoolorder(signedWorkerpoolorder);
 iexec.**order.publishRequestorder ( order: SignedRequestorder )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedRequestorder on the offchain marketplace, the order will be available for other users
-> **Example:**
+
+**Example:**
 
 ```js
 const orderHash = await iexec.order.publishRequestorder(signedRequestorder);
@@ -1177,7 +1211,8 @@ console.log('order published with orderHash:', orderHash);
 iexec.**order.unpublishRequestorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
 > unpublish a SignedRequestorder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
-> **Example:**
+
+**Example:**
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
@@ -1188,7 +1223,8 @@ const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
 iexec.**order.cancelRequestorder ( order: SignedRequestorder )** => Promise < **Boolean** >
 
 > cancel a SignedRequestorder on the blockchain.
-> **Example:**
+
+**Example:**
 
 ```js
 await iexec.order.cancelRequestorder(signedRequestorder);
@@ -1199,7 +1235,8 @@ await iexec.order.cancelRequestorder(signedRequestorder);
 iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} )** => Promise < **{ dealid, volume }** >
 
 > make a deal on-chain with compatible orders and trigger off-chain computation.
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.order.matchOrders(
@@ -1217,7 +1254,8 @@ console.log('deal:', res.dealid);
 iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price }, dataset : { pointer: Address, owner: Address, price }, workerpool : { pointer: Address, owner: Address, price }, trust, category, tag, requester, beneficiary, callback, params, startTime, botFirst, botSize, workerStake, schedulerRewardRatio, tasks: \[...taskid\] }** >
 
 > show the details of a deal.
-> **Example:**
+
+**Example:**
 
 ```js
 const deal = await iexec.deal.show(
@@ -1231,7 +1269,8 @@ console.log('deal:', deal);
 iexec.**deal.computeTaskId ( dealid: Bytes32, taskIdx: Uint256 )** => Promise < **taskid: Bytes32** >
 
 > compute the taskid of the task with index taskIdx of specified deal.
-> **Example:**
+
+**Example:**
 
 ```js
 const taskid = await iexec.deal.computeTaskId(
@@ -1245,8 +1284,10 @@ console.log('taskid:', taskid);
 
 iexec.**deal.fetchRequesterDeals ( requesterAddress: Address, \[ { appAddress: Address, datasetAddress: Address, workerpoolAddress: Address } \] )** => Promise < **{ count, deals: \[ ...Deals \]}** >
 
-> show the last deals of the specified requester. Optional filter by appAddress, datasetAddress, workerpoolAddress.
-> **Example:**
+> show the last deals of the specified requester.
+> _Optional_: filter by appAddress, datasetAddress, workerpoolAddress.
+
+**Example:**
 
 ```js
 const res = await iexec.deal.fetchRequesterDeals(
@@ -1263,7 +1304,8 @@ console.log('last deal:', res.deals[0]);
 iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status, dealid, idx, resultDigest, results, statusName }** >
 
 > show the details of a task.
-> **Example:**
+
+**Example:**
 
 ```js
 const task = await iexec.task.show(
@@ -1277,7 +1319,8 @@ console.log('task:', task);
 iexec.**task.claim ( taskid: Bytes32 )** => Promise < **TxHash** >
 
 > claim a task not completed after the final deadline (refund RLC for the requester and the workers).
-> **Example:**
+
+**Example:**
 
 ```js
 await iexec.task.claim(
@@ -1289,8 +1332,10 @@ await iexec.task.claim(
 
 iexec.**task.claim ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
 
-> download the specified task result. Optional overwrite the ipfs gateway to use for results stored on ipfs.
-> **Example:**
+> download the specified task result.
+> _Optional_: overwrite the ipfs gateway to use for results stored on ipfs.
+
+**Example:**
 
 ```js
 const res = await iexec.task.fetchResults(
@@ -1304,7 +1349,8 @@ const binary = await res.blob();
 iexec.**task.waitForTaskStatusChange ( taskid: Bytes32, initialStatus: Uint256 )** => Promise < **{ status: Uint256, statusName: String }** >
 
 > wait until the status of specified task change.
-> **Example:**
+
+**Example:**
 
 ```js
 const res = await iexec.task.fetchResults(
