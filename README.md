@@ -705,12 +705,12 @@ const getIExec = async () => {
 
 ### Use iexec sdk
 
-- [wallet](#iexec.wallet): manage your wallet, send RLC...
-- [account](#iexec.account): manage your account, deposit, withdraw...
-- [orderbook](#iexec.orderboook): explore the iexec Marketplace
-- [order](#iexec.order): manage any type of order, make deals to start offchain computation
-- [deal](#iexec.deal): find your deals
-- [task](#iexec.task): follow the computation, download results or claim failled exuecutions
+- [wallet](#iexecwallet): manage your wallet, send RLC...
+- [account](#iexecaccount): manage your account, deposit, withdraw...
+- [orderbook](#iexecorderboook): explore the iexec Marketplace
+- [order](#iexecorder): manage any type of order, make deals to start offchain computation
+- [deal](#iexecdeal): find your deals
+- [task](#iexectask): follow the computation, download results or claim failled exuecutions
 
 ### iexec.wallet
 
