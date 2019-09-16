@@ -8,6 +8,7 @@ const {
   ethersBigNumberify,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
+  checksummedAddress,
 } = require('./utils');
 const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
@@ -54,6 +55,11 @@ const ethFaucets = [
     }),
   },
 ];
+
+const getAddress = async (contracts = throwIfMissing()) => {
+  const address = await wrapCall(contracts.eth.getSigner().getAddress());
+  return checksummedAddress(address);
+};
 
 const checkBalances = async (
   contracts = throwIfMissing(),
@@ -248,19 +254,15 @@ const sendRLC = async (
   }
 };
 
-const sweep = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-  to = throwIfMissing(),
-) => {
+const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
-    const vAddress = await addressSchema().validate(address);
     const vAddressTo = await addressSchema().validate(to);
+    const userAddress = await getAddress(contracts);
     const code = await contracts.eth.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
     }
-    let balances = await checkBalances(contracts, vAddress);
+    let balances = await checkBalances(contracts, userAddress);
     const res = {};
     const errors = [];
     if (!contracts.isNative) {
@@ -279,7 +281,7 @@ const sweep = async (
             `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
           );
         }
-        balances = await checkBalances(contracts, address);
+        balances = await checkBalances(contracts, userAddress);
       }
     }
     const gasPrice = new BN((await contracts.eth.getGasPrice()).toString());
@@ -411,6 +413,7 @@ const bridgeToMainchain = async (
 module.exports = {
   bridgeToMainchain,
   bridgeToSidechain,
+  getAddress,
   checkBalances,
   getETH,
   getRLC,

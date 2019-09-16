@@ -329,7 +329,6 @@ sweep
       spinner.start('sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
         chain.contracts,
-        address,
         cmd.to,
       );
       spinner.succeed(

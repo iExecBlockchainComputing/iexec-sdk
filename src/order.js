@@ -14,6 +14,7 @@ const {
   signTypedDatav3,
 } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
+const { getAddress } = require('./wallet');
 const {
   addressSchema,
   apporderSchema,
@@ -31,6 +32,7 @@ const {
   throwIfMissing,
   ValidationError,
 } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
 
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
@@ -267,12 +269,12 @@ const signOrder = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   orderObj = throwIfMissing(),
-  address = throwIfMissing(),
 ) => {
   checkOrderName(orderName);
   const signerAddress = orderName === REQUEST_ORDER
     ? orderObj.requester
     : await getContractOwner(contracts, orderName, orderObj);
+  const address = await getAddress(contracts);
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw Error(
       `Invalid order signer, must be the ${
@@ -310,45 +312,33 @@ const signOrder = async (
 const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
-) => signOrder(
-  contracts,
-  APP_ORDER,
-  await apporderSchema().validate(apporder),
-  await addressSchema().validate(signerAddress),
-);
+) => signOrder(contracts, APP_ORDER, await apporderSchema().validate(apporder));
 
 const signDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => signOrder(
   contracts,
   DATASET_ORDER,
   await datasetorderSchema().validate(datasetorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const signWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => signOrder(
   contracts,
   WORKERPOOL_ORDER,
   await workerpoolorderSchema().validate(workerpoolorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const signRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => signOrder(
   contracts,
   REQUEST_ORDER,
   await requestorderSchema().validate(requestorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const cancelOrder = async (
@@ -414,10 +404,10 @@ const publishOrder = async (
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   signedOrder = throwIfMissing(),
-  address = throwIfMissing(),
 ) => {
   try {
     checkOrderName(orderName);
+    const address = await getAddress(contracts);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
     const body = { chainId: ensureString(chainId), order: signedOrder };
     const authorization = await getAuthorization(
@@ -438,54 +428,42 @@ const publishOrder = async (
 
 const publishApporder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedApporder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => publishOrder(
   contracts,
   APP_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedApporderSchema().validate(signedApporder),
-  await addressSchema().validate(signerAddress),
 );
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => publishOrder(
   contracts,
   DATASET_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedDatasetorderSchema().validate(signedDatasetorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => publishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const publishRequestorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => publishOrder(
   contracts,
   REQUEST_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await signedRequestorderSchema().validate(signedRequestorder),
-  await addressSchema().validate(signerAddress),
 );
 
 const unpublishOrder = async (
@@ -493,12 +471,12 @@ const unpublishOrder = async (
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
-  address = throwIfMissing(),
 ) => {
   try {
     checkOrderName(orderName);
+    const address = await getAddress(contracts);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
-    const body = { chainId: ensureString(chainId), orderHash };
+    const body = { chainId, orderHash };
     const authorization = await getAuthorization(
       chainId,
       address,
@@ -517,54 +495,42 @@ const unpublishOrder = async (
 
 const unpublishApporder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   apporderHash = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   APP_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(apporderHash),
-  await addressSchema().validate(signerAddress),
 );
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   DATASET_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(datasetorderHash),
-  await addressSchema().validate(signerAddress),
 );
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(workerpoolorderHash),
-  await addressSchema().validate(signerAddress),
 );
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
-  chainId = throwIfMissing(),
   requestorderHash = throwIfMissing(),
-  signerAddress = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
   REQUEST_ORDER,
-  await chainIdSchema().validate(chainId),
+  await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(requestorderHash),
-  await addressSchema().validate(signerAddress),
 );
 
 const fetchPublishedOrderByHash = async (
@@ -588,8 +554,10 @@ const fetchPublishedOrderByHash = async (
     };
     const response = await http.post(endpoint, body);
     if (response.ok && response.orders) {
-      return response.orders[0] || null;
+      if (response.orders[0]) return response.orders[0];
+      throw new ObjectNotFoundError(orderName, orderHash, chainId);
     }
+
     throw Error('An error occured while getting order');
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);

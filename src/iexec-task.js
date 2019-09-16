@@ -43,10 +43,8 @@ show
       const chain = await loadChain(cmd.chain, keystore, {
         spinner,
       });
-      let userAddress;
       if (cmd.download) {
-        const { address } = await keystore.load();
-        userAddress = address;
+        await keystore.load();
       }
 
       debug('cmd.watch', cmd.watch);
@@ -87,12 +85,9 @@ show
       if (cmd.download) {
         if (task.TASK_STATUS_MAP[taskResult.status] === 'COMPLETED') {
           spinner.start(info.downloading());
-          const { body } = await task.fetchResults(
-            chain.contracts,
-            taskid,
-            userAddress,
-            { ipfsGatewayURL: chain.ipfsGateway },
-          );
+          const { body } = await task.fetchResults(chain.contracts, taskid, {
+            ipfsGatewayURL: chain.ipfsGateway,
+          });
           const resultFileName = cmd.download !== true ? cmd.download : taskid;
           resultPath = path.join(process.cwd(), `${resultFileName}.zip`);
           const stream = fs.createWriteStream(resultPath);
@@ -141,12 +136,12 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = computeTxOptions(cmd);
-      const [chain, wallet] = await Promise.all([
+      const [chain] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
         keystore.load(),
       ]);
       spinner.start(info.claiming(objName));
-      const txHash = await task.claim(chain.contracts, taskid, wallet.address);
+      const txHash = await task.claim(chain.contracts, taskid);
       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);

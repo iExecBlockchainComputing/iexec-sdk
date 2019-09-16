@@ -333,6 +333,7 @@ const throwIfMissing = () => {
 const ensureString = val => String(val);
 
 module.exports = {
+  BN,
   isString,
   isEthAddress,
   checksummedAddress,
