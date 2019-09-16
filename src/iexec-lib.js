@@ -175,13 +175,6 @@ const sdk = {
   IExec,
   errors,
   utils,
-  wallet, // deprecated
-  account, // deprecated
-  order, // deprecated
-  orderbook, // deprecated
-  deal, // deprecated
-  task, // deprecated
-  hub, // deprecated
 };
 
 module.exports = sdk;
