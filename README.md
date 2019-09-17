@@ -712,7 +712,10 @@ const getIExec = async () => {
 - [orderbook](#iexecorderboook): explore the iexec Marketplace
 - [order](#iexecorder): manage any type of order, make deals to start offchain computation
 - [deal](#iexecdeal): find your deals
-- [task](#iexectask): follow the computation, download results or claim failled exuecutions
+- [task](#iexectask): follow the computation, download results or claim failled executions
+- [app](#iexecapp): deploy a new app, show an existing one
+- [dataset](#iexecdataset): deploy a new dataset, show an existing one
+- [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
 
 ### iexec.wallet
 
@@ -1366,6 +1369,113 @@ const res = await iexec.task.fetchResults(
 console.log('task status is', res.statusName);
 ```
 
+### iexec.app
+
+#### show
+
+iexec.**app.show ( appAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
+
+> show the details of an app.
+
+**Example:**
+
+```js
+const { app } = await iexec.app.show(
+  '0x917D71168fF60A10afD684d8D815b4A78097225D',
+);
+console.log('app:', app);
+```
+
+#### deploy
+
+iexec.**app.deploy ( app: App )** => Promise < **Address** >
+
+> deploy an app on the blockchain.
+
+**Example:**
+
+```js
+const address = await iexec.app.deploy({
+  owner: await iexec.wallet.getAddress(),
+  name: 'My app',
+  type: 'DOCKER',
+  multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+  checksum:
+    '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+  mrenclave: '',
+});
+console.log('deployed at', address);
+```
+
+### iexec.dataset
+
+#### show
+
+iexec.**dataset.show ( datasetAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
+
+> show the details of a dataset.
+
+**Example:**
+
+```js
+const { dataset } = await iexec.dataset.show(
+  '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
+);
+console.log('dataset:', dataset);
+```
+
+#### deploy
+
+iexec.**dataset.deploy ( dataset: Dataset )** => Promise < **Address** >
+
+> deploy a dataset on the blockchain.
+
+**Example:**
+
+```js
+const address = await iexec.dataset.deploy({
+  owner: await iexec.wallet.getAddress(),
+  name: 'My dataset',
+  multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+  checksum:
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
+});
+console.log('deployed at', address);
+```
+
+### iexec.workerpool
+
+#### show
+
+iexec.**workerpool.show ( workerpoolAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
+
+> show the details of a workerpool.
+
+**Example:**
+
+```js
+const { workerpool } = await iexec.workerpool.show(
+  '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
+);
+console.log('workerpool:', workerpool);
+```
+
+#### deploy
+
+iexec.**workerpool.deploy ( workerpool: Workerpool )** => Promise < **Address** >
+
+> deploy a workerpool on the blockchain.
+
+**Example:**
+
+```js
+const address = await iexec.workerpool.deploy({
+  owner: await iexec.wallet.getAddress(),
+  description: 'My workerpool',
+});
+console.log('deployed at', address);
+```
+
 ### Types
 
 #### BN
@@ -1411,6 +1521,21 @@ Accepted:
 - multiaddr string representation
 - multiaddr().buffer
 
+#### App
+
+`App` is an object representation of an app.
+
+```js
+{
+  owner: Address,
+  name: String,
+  type: String, // only "DOCKER" is supported
+  multiaddr: Multiaddress,
+  checksum: Bytes32,
+  mrenclave: String,
+}
+```
+
 #### Apporder
 
 `Apporder` is an object representation of an apporder not signed.
@@ -1424,6 +1549,42 @@ Accepted:
   datasetrestrict: Address,
   workerpoolrestrict: Address,
   requesterrestrict: Address
+}
+```
+
+#### Dataset
+
+`Dataset` is an object representation of a dataset.
+
+```js
+{
+  owner: Address,
+  name: String,
+  multiaddr: Multiaddress,
+  checksum: Bytes32
+}
+```
+
+#### Workerpool
+
+`Workerpool` is an object representation of a workerpool.
+
+```js
+{
+  owner: Address,
+  description: String
+}
+```
+
+#### Category
+
+`Category` is an object representation of a category.
+
+```js
+{
+  name: String,
+  description: String,
+  workClockTimeRef: Uint253
 }
 ```
 
