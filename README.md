@@ -1750,7 +1750,7 @@ Specific properties:
 - `error.chainId`: chain id of the blockchain where the object is supposed to be
 - `error.objectId` : id used to find the object
 
-#### ValidationError
+#### ValidationError
 
 `ValidationError` is thrown when a method is called with missing or unexpected parameters.
 
