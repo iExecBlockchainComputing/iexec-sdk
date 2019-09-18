@@ -38,8 +38,8 @@ const saveRaw = () => {
 };
 
 execAsync('rm -r test/out').catch(e => console.log(e.message));
-execAsync('rm -r test/tee').catch(e => console.log(e.message));
-execAsync('rm -r test/.tee-secrets').catch(e => console.log(e.message));
+execAsync('rm -r test/datasets').catch(e => console.log(e.message));
+execAsync('rm -r test/.secrets').catch(e => console.log(e.message));
 execAsync('rm test/chain.json').catch(e => console.log(e.message));
 execAsync('rm test/iexec.json').catch(e => console.log(e.message));
 execAsync('rm test/deployed.json').catch(e => console.log(e.message));
@@ -571,12 +571,10 @@ test('iexec deal show', async () => {
   ).resolves.not.toBe(1);
 });
 
-// tee
-test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(1));
-
-test('iexec tee encrypt-dataset', async () => expect(
+// dataset encryption
+test('iexec dataset encrypt', async () => expect(
   execAsync(
-    `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
+    `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
@@ -584,16 +582,16 @@ test('iexec tee encrypt-dataset', async () => expect(
 if (!DRONE) {
   test('openssl decrypt dataset', async () => expect(
     execAsync(
-      'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset.txt',
+      'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.secrets/datasets:/secrets -v $PWD/datasets/encrypted:/encrypted openssldecrypt dataset.txt',
     ),
   ).resolves.not.toBe(1));
 }
 
 test(
-  'iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
+  'iexec dataset encrypt --force --algorithm aes-256-cbc',
   async () => expect(
     execAsync(
-      `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
+      `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
     ),
   ).resolves.not.toBe(1),
   15000,
@@ -602,43 +600,42 @@ test(
 // require docker
 if (!DRONE) {
   test(
-    'iexec tee encrypt-dataset --algorithm scone',
+    'iexec dataset encrypt --algorithm scone',
     async () => expect(
       execAsync(
-        `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
+        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
       ),
     ).resolves.not.toBe(1),
     15000,
   );
 }
 
+// result encryption
 if (semver.gt('v10.12.0', process.version)) {
-  test('iexec tee generate-beneficiary-keys', async () => expect(
-    execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
+  test('iexec result generate-keys', async () => expect(
+    execAsync(`${iexecPath} result generate-keys ${saveRaw()}`),
   ).rejects.not.toBe(1));
 } else {
-  test('iexec tee generate-beneficiary-keys', async () => expect(
-    execAsync(
-      `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
-    ),
+  test('iexec result generate-keys', async () => expect(
+    execAsync(`${iexecPath} result generate-keys --force ${saveRaw()}`),
   ).resolves.not.toBe(1));
 }
 
-test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
+test('iexec result decrypt --force (wrong beneficiary key)', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
+    `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
   ),
 ).rejects.not.toBe(1));
 
-test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
+test('iexec result decrypt --beneficiary-keystoredir <path>', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
+    `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 
-test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
+test('iexec result decrypt --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
   execAsync(
-    `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
+    `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
   ),
 ).resolves.not.toBe(1));
 

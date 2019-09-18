@@ -6,10 +6,12 @@ const cli = require('commander');
 const Debug = require('debug');
 const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
+const { ensureDir } = require('fs-extra');
 const {
   addGlobalOptions,
   addWalletCreateOptions,
   computeWalletCreateOptions,
+  createEncFolderPaths,
   handleError,
   help,
   Spinner,
@@ -39,9 +41,7 @@ async function main() {
     const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
     const spin = Spinner();
     spin.info(
-      `iExec SDK update available ${packageJSON.version} →  ${
-        update.latest
-      }, Run "${upgradeCMD}" to update\n`,
+      `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update\n`,
     );
   }
 
@@ -51,6 +51,10 @@ async function main() {
   init
     .option(...option.force())
     .option(...option.skipWallet())
+    .option(...option.datasetKeystoredir())
+    .option(...option.beneficiaryKeystoredir())
+    .option(...option.originalDatasetDir())
+    .option(...option.encryptedDatasetDir())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
       const spinner = Spinner(cmd);
@@ -74,6 +78,19 @@ async function main() {
             )}`,
           );
         }
+
+        const {
+          datasetSecretsFolderPath,
+          beneficiarySecretsFolderPath,
+          originalDatasetFolderPath,
+          encryptedDatasetFolderPath,
+        } = createEncFolderPaths();
+        await Promise.all([
+          ensureDir(datasetSecretsFolderPath),
+          ensureDir(beneficiarySecretsFolderPath),
+          ensureDir(originalDatasetFolderPath),
+          ensureDir(encryptedDatasetFolderPath),
+        ]);
 
         let walletRes;
         if (!cmd.skipWallet) {
@@ -128,6 +145,8 @@ async function main() {
   cli.command('task', 'manage iExec tasks');
 
   cli.command('tee', 'interact with Trusted Execution Environment');
+
+  cli.command('result', 'manage results encryption');
 
   cli.command('registry', 'interact with iExec registry');
 

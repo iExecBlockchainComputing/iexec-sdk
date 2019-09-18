@@ -95,14 +95,13 @@ iexec order cancel --app <orderHash> # cancel your order
 
 First go through [Init project](#init-project)
 
-#### Encrypt your dataset
+#### Encrypt your dataset (optional)
 
 ```bash
-iexec tee init # create ./tee/original-dataset, ./tee/encryptedDataset and ./.tee-secrets/dataset
-cp 'myAwsomeDataset.file' ./tee/original-dataset # copy your dataset file or folder into the original-dataset folder
-iexec tee encrypt-dataset # generate a secret key for each file or folder in original-dataset and encrypt it
-cat ./.tee-secret/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
-cat ./tee/encrypted-dataset/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
+cp 'myAwsomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
+iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it
+cat ./.secrets/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
+cat ./datasets/encrypted/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
 
 #### Deploy your dataset
@@ -119,7 +118,7 @@ iexec dataset show # show details of deployed dataset
 **Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
 
 ```bash
-iexec tee push-secret --dataset <datasetAddress> --secret-path <datasetSecretPath> # Push the secret in the Secreet Management Service (sms)
+iexec dataset push-secret # Push the secret in the Secret Management Service (sms)
 ```
 
 #### Sell your dataset on the Marketplace
@@ -221,14 +220,13 @@ iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
 ```
 
-#### Use tee results encryption
+#### Use results encryption
 
 ```bash
-iexec tee init # create the tee folder tree
-iexec tee generate-beneficiary-keys # generate private/public AES keypaire for result encryption
-iexec tee push-secret # share the public AES key with the secret management service, all your results will be encrypted with this key
+iexec result generate-keys # generate private/public AES keypair for result encryption
+iexec result push-secret # share the public AES key with the secret management service, all your results will be encrypted with this key
 # Go through the normal buy process  and download the result of the computation #
-iexec tee decrypt-results [encryptedResultsFilePath] # decrypt the result with the private AES key
+iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private AES key
 ```
 
 ### SDK CLI for workers
@@ -346,11 +344,15 @@ iexec app count --user <userAddress> # count user total number of app
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec dataset init # init new app
+iexec dataset init # init new dataset
 iexec dataset deploy # deploy new dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
+iexec dataset encrypt # generate a key and encrypt the dataset files from ./datasets/original/
+iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
+iexec dataset push-secret [datasetAddress] # push the secret for the dataset
+iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 ```
 
 ## workerpool
@@ -419,24 +421,16 @@ iexec task show <taskid> --download [fileName] # download the result of a COMPLE
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 ```
 
-## tee
+## result
 
 ```bash
 # OPTIONS
 # --chain <chainName>
-# --dataset-keystoredir <path>
-# --beneficiary-keystoredir <path>
-# --original-dataset-dir <path>
-# --encrypted-dataset-dir <path>
-iexec tee init # create the TEE folder tree structure
-iexec tee encrypt-dataset # generate a key and encrypt the dataset from "original-dataset"
-iexec tee encrypt-dataset --algorithm scone # generate a key and encrypt the dataset from "original-dataset" with Scone
-iexec tee generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
-iexec tee push-secret # push the secret for the beneficiary
-iexec tee push-secret --secret-file [secretPath] # specify a file path for reading the secret
-iexec tee push-secret --beneficary # push the secret for the beneficiary (default)
-iexec tee push-secret --dataset <datasetAddress> # push the secret for the dataset
-iexec tee decrypt-results [encryptedResultsPath] # decrypt encrypted results with beneficary key
+iexec result generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
+iexec result push-secret # push the encryption key for the beneficiary
+iexec result push-secret --secret-file [secretPath] # specify a file path for reading the secret
+iexec result decrypt [encryptedResultsPath] # decrypt encrypted results with beneficary key
+iexec result check-secret [userAddress] # check if a secret exists for the user
 ```
 
 ## category

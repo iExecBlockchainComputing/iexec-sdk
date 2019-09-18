@@ -4,6 +4,8 @@ const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
 const BN = require('bn.js');
+const path = require('path');
+const { spawn } = require('child_process');
 
 const debug = Debug('help');
 
@@ -27,7 +29,7 @@ const info = {
   withdrawing: () => 'making withdraw...',
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
   downloading: () => 'downloading task result',
-  downloaded: path => `downloaded task result to file ${path}`,
+  downloaded: filePath => `downloaded task result to file ${filePath}`,
   claimed: (amount, address) => `claimed ${amount} nRLC from work ${address}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
   checking: obj => `checking ${obj}...`,
@@ -86,8 +88,10 @@ const desc = {
   publish: objName => `publish a signed ${objName}`,
   unpublish: objName => `unpublish a signed ${objName}`,
   pushSecret: () => 'push a secret to the secret management service',
+  pushDatasetSecret: () => 'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
+  pushResultKey: () => 'push the public encryption key to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
-  encryptDataset: () => 'generate a key and encrypt the dataset from "original-dataset"',
+  encryptDataset: () => 'generate a key and encrypt the datasets files from "./datasets/original"',
   generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficary key',
 };
@@ -226,14 +230,6 @@ const option = {
     '--wallet-file <walletFileName>',
     'specify the name of the wallet file to use',
   ],
-  pushBeneficiarySecret: () => [
-    '--beneficiary',
-    'push the secret of a beneficiary (default)',
-  ],
-  pushDatasetSecret: () => [
-    '--dataset <address>',
-    'push the secret of an encrypted dataset',
-  ],
   secretPath: () => [
     '--secret-path <secretPath>',
     'push the secret from a file',
@@ -339,7 +335,7 @@ const prompt = {
     `Directory ${dir} is not empty, continue and replace content?`,
     options,
   ),
-  fileExists: (path, options) => question(`File ${path} already exists, continue and replace?`, options),
+  fileExists: (filePath, options) => question(`File ${filePath} already exists, continue and replace?`, options),
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
@@ -508,7 +504,7 @@ const computeWalletCreateOptions = async (cmd) => {
 
     const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
     const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const path = cmd.keystoredir
+    const keystorePath = cmd.keystoredir
       && cmd.keystoredir !== 'local'
       && cmd.keystoredir !== 'global'
       ? cmd.keystoredir
@@ -518,7 +514,7 @@ const computeWalletCreateOptions = async (cmd) => {
       walletOptions: {
         global,
         local,
-        path,
+        path: keystorePath,
         password: pw,
       },
     };
@@ -534,7 +530,7 @@ const computeWalletLoadOptions = (cmd) => {
       || !cmd
       || !cmd.keystoredir;
     const local = (cmd && cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const path = cmd
+    const keystorePath = cmd
       && cmd.keystoredir
       && cmd.keystoredir !== 'local'
       && cmd.keystoredir !== 'global'
@@ -547,7 +543,7 @@ const computeWalletLoadOptions = (cmd) => {
       walletOptions: {
         global,
         local,
-        path,
+        path: keystorePath,
         walletAddress,
         walletFileName,
         password,
@@ -557,6 +553,41 @@ const computeWalletLoadOptions = (cmd) => {
     debug('computeWalletLoadOptions()', error);
     throw error;
   }
+};
+
+const secretsFolderName = '.secrets';
+const datasetSecretsFolderName = 'datasets';
+const beneficiarySecretsFolderName = 'beneficiary';
+const datasetsFolderName = 'datasets';
+const originalDatasetFolderName = 'original';
+const encryptedDatasetFolderName = 'encrypted';
+
+const createEncFolderPaths = (cmd = {}) => {
+  const absolutePath = relativeOrAbsolutePath => (path.isAbsolute(relativeOrAbsolutePath)
+    ? relativeOrAbsolutePath
+    : path.join(process.cwd(), relativeOrAbsolutePath));
+
+  const datasetSecretsFolderPath = cmd.datasetKeystoredir
+    ? absolutePath(cmd.datasetKeystoredir)
+    : path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
+  const beneficiarySecretsFolderPath = cmd.beneficiaryKeystoredir
+    ? absolutePath(cmd.beneficiaryKeystoredir)
+    : path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
+  const originalDatasetFolderPath = cmd.originalDatasetDir
+    ? absolutePath(cmd.originalDatasetDir)
+    : path.join(process.cwd(), datasetsFolderName, originalDatasetFolderName);
+  const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
+    ? absolutePath(cmd.encryptedDatasetDir)
+    : path.join(process.cwd(), datasetsFolderName, encryptedDatasetFolderName);
+
+  const paths = {
+    datasetSecretsFolderPath,
+    beneficiarySecretsFolderPath,
+    originalDatasetFolderPath,
+    encryptedDatasetFolderPath,
+  };
+  debug('paths', paths);
+  return paths;
 };
 
 const computeTxOptions = (cmd) => {
@@ -612,6 +643,39 @@ const prettyRPC = (rpcObj) => {
   return pretty(prettyObj);
 };
 
+const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
+  debug('spawnAsync bin', bin);
+  debug('spawnAsync args', args);
+  let errorMessage = '';
+  const proc = args ? spawn(bin, args) : spawn(bin);
+
+  proc.stdout.on('data', (data) => {
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    debug('spawnAsync stdout', inlineData);
+    if (!options.quiet) options.spinner.info(inlineData);
+  });
+  proc.stderr.on('data', (data) => {
+    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
+    debug('spawnAsync stderr', inlineData);
+    if (!options.quiet) options.spinner.info(inlineData);
+    errorMessage = errorMessage.concat(inlineData, '\n');
+  });
+  proc.on('close', (code) => {
+    debug('spawnAsync close', code);
+    if (code !== 0) reject(errorMessage || 'process errored');
+    resolve();
+  });
+  proc.on('exit', (code) => {
+    debug('spawnAsync exit', code);
+    if (code !== 0) reject(errorMessage || 'process errored');
+    resolve();
+  });
+  proc.on('error', () => {
+    debug('spawnAsync error');
+    reject(errorMessage || 'process errored');
+  });
+});
+
 module.exports = {
   help,
   Spinner,
@@ -626,10 +690,12 @@ module.exports = {
   computeWalletCreateOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  createEncFolderPaths,
   prompt,
   pretty,
   prettyRPC,
   lbb,
   lba,
   lb,
+  spawnAsync,
 };
