@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - `wallet.getAddress()` gives the current wallet address
 - `deal.show()` added key `tasks: { [idx]: [taskid] }` to the resolved value
 - dynamic cast and validation of inputs, invalid inputs throw `ValidationError`.
-- introduced TypedErrors `ValidationError`, `Web3ProviderError`, `Web3ProviderCallError`, `Web3ProviderSendError`, `Web3ProviderSignMessageError`.
+- introduced TypedErrors `ValidationError`, `Web3ProviderError`, `Web3ProviderCallError`, `Web3ProviderSendError`, `Web3ProviderSignMessageError`, `ObjectNotFoundError`.
 
 ### Changed
 
@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `deal.show()` throw when the deal doesn't exists
 - [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
 - [BREAKING] `deal.computeTaskId()` returns a promise
+- [DEPRECATED] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` is deprecated, use `IExec` constructor.
 - [DEPRECATED] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
 - [DEPRECATED] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
 - [DEPRECATED] `order.publishOrder()` is replaced by dedicated methods `order.publishApporder()`, `order.publishDatasetorder()`, `order.publishWorkerpoolorder()`, `order.publishRequestorder()`
