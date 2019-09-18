@@ -550,12 +550,12 @@ const fetchPublishedOrderByHash = async (
         publicationTimestamp: -1,
       },
       limit: 1,
-      find: { vOrderHash },
+      find: { orderHash: vOrderHash },
     };
     const response = await http.post(endpoint, body);
     if (response.ok && response.orders) {
       if (response.orders[0]) return response.orders[0];
-      throw new ObjectNotFoundError(orderName, orderHash, chainId);
+      throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
     }
 
     throw Error('An error occured while getting order');
