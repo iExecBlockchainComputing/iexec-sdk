@@ -647,6 +647,10 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 - [Price feed DOracle](https://price-feed-doracle.iex.ec/): a decentralized price oracle for your favorite cryptos.
 - [Not safe for work](https://nsfw.app.iex.ec/): find if a picture is safe for work using an AI trained model protected by iExec TEE.
 
+## Test iexec in codesandbox
+
+[Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec310-zm93y?fontsize=14)
+
 ## How to use ?
 
 1. [Install the dependency in your JS project](#install-the-dependenciy-in-your-js-project)
