@@ -28,7 +28,9 @@ const pushSecret = async (
         },
         (err, result) => {
           if (err) reject(err);
-          resolve(result);
+          else if (result.error) reject(result.error);
+          else if (result.result) resolve(result.result);
+          else resolve(result); // should not happen
         },
       );
     });
