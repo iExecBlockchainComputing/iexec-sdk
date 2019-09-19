@@ -595,7 +595,7 @@ const computeTxOptions = (cmd) => {
   if (cmd.gasPrice) {
     if (!/^\d+$/i.test(cmd.gasPrice)) throw Error('Invalid gas price value');
     const bnGasPrice = new BN(cmd.gasPrice);
-    if (bnGasPrice.isNeg() || bnGasPrice.isZero()) throw Error('Invalid gas price, must be positive');
+    if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
   debug('gasPrice', gasPrice);
