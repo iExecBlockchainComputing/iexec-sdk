@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- [BREAKING] `iexec tee` subcommands moved
+- [BREAKING] `iexec tee` subcommands removed and replaced
   - `iexec tee init` is replaced by `iexec init`
   - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
   - `iexec tee generate-beneficiary-keys` is replaced by `iexec result generate-key`
@@ -47,6 +47,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 - [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
+- [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
 
 ## [3.0.34] - 2019-07-10
 
