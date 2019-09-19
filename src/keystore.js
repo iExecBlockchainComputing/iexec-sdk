@@ -315,12 +315,12 @@ const Keystore = ({
       try {
         if (isSigner) walletAddress = (await load()).address;
         else walletAddress = await loadWalletAddress();
-        if (!walletAddress) walletAddress = NULL_ADDRESS;
       } catch (error) {
         debug('accounts() loading wallet', error);
         if (isSigner) throw error;
       }
-      debug(walletAddress);
+      if (!walletAddress) walletAddress = NULL_ADDRESS;
+      debug('walletAddress', walletAddress);
       return [walletAddress];
     } catch (error) {
       debug('accounts()', error);
