@@ -32,6 +32,6 @@ test/iexec.json
 test/orders.json
 test/deployed.json
 test/results.zip
-test/tee/
-test/.tee-secrets
+test/datasets/
+test/.secrets/
 test/logo.png

@@ -68,8 +68,8 @@ const editRequestorder = async (app, dataset, workerpool) => {
 // TESTS
 beforeAll(async () => {
   await execAsync('rm -r test/out').catch(e => console.log(e.message));
-  await execAsync('rm -r test/tee').catch(e => console.log(e.message));
-  await execAsync('rm -r test/.tee-secrets').catch(e => console.log(e.message));
+  await execAsync('rm -r test/datasets').catch(e => console.log(e.message));
+  await execAsync('rm -r test/.secrets').catch(e => console.log(e.message));
   await execAsync('rm test/chain.json').catch(e => console.log(e.message));
   await execAsync('rm test/iexec.json').catch(e => console.log(e.message));
   await execAsync('rm test/deployed.json').catch(e => console.log(e.message));
@@ -1477,14 +1477,21 @@ describe('[Common]', () => {
     });
   });
 
-  describe('[tee]', () => {
-    test('iexec tee init', async () => expect(execAsync(`${iexecPath} tee init ${saveRaw()}`)).resolves.not.toBe(
-      1,
-    ));
+  describe('[dataset encryption]', () => {
+    beforeAll(async () => {
+      await execAsync(`${iexecPath} init --skip-wallet --force`);
+      const chains = await loadJSONFile('chain.json');
+      chains.default = chainName;
+      chains.chains.dev.hub = hubAddress;
+      chains.chains.dev.host = ethereumURL;
+      chains.chains.dev.id = networkId;
+      await saveJSONToFile(chains, 'chain.json');
+      await execAsync('cp inputs/wallet/wallet.json wallet.json');
+    });
 
-    test('iexec tee encrypt-dataset', async () => expect(
+    test('iexec dataset encrypt', async () => expect(
       execAsync(
-        `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
+        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
       ),
     ).resolves.not.toBe(1));
 
@@ -1492,16 +1499,16 @@ describe('[Common]', () => {
       // this test requires docker
       test('openssl decrypt dataset', async () => expect(
         execAsync(
-          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.tee-secrets/dataset:/secrets -v $PWD/tee/encrypted-dataset:/encrypted openssldecrypt dataset.txt',
+          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.secrets/datasets:/secrets -v $PWD/datasets/encrypted:/encrypted openssldecrypt dataset.txt',
         ),
       ).resolves.not.toBe(1));
     }
 
     test(
-      'iexec tee encrypt-dataset --force --algorithm aes-256-cbc',
+      'iexec dataset encrypt --force --algorithm aes-256-cbc',
       async () => expect(
         execAsync(
-          `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
+          `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
         ),
       ).resolves.not.toBe(1),
       15000,
@@ -1510,45 +1517,95 @@ describe('[Common]', () => {
     if (!DRONE) {
       // this test requires docker
       test(
-        'iexec tee encrypt-dataset --algorithm scone',
+        'iexec dataset encrypt --algorithm scone',
         async () => expect(
           execAsync(
-            `${iexecPath} tee encrypt-dataset --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
+            `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
           ),
         ).resolves.not.toBe(1),
         15000,
       );
     }
+  });
 
+  describe('[result]', () => {
+    beforeAll(async () => {
+      await execAsync(`${iexecPath} init --skip-wallet --force`);
+      const chains = await loadJSONFile('chain.json');
+      chains.default = chainName;
+      chains.chains.dev.hub = hubAddress;
+      chains.chains.dev.host = ethereumURL;
+      chains.chains.dev.id = networkId;
+      await saveJSONToFile(chains, 'chain.json');
+      await execAsync('cp inputs/wallet/wallet.json wallet.json');
+    });
     if (semver.gt('v10.12.0', process.version)) {
-      test('iexec tee generate-beneficiary-keys', async () => expect(
-        execAsync(`${iexecPath} tee generate-beneficiary-keys ${saveRaw()}`),
-      ).rejects.not.toBe(1));
+      test('iexec result generate-keys (node version < v10.12.0)', async () => {
+        const raw = await execAsync(
+          `${iexecPath} result generate-keys --force --raw`,
+        ).catch(e => e.message);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(false);
+        expect(res.secretPath).toBe(undefined);
+        expect(res.privateKeyFile).toBe(undefined);
+        expect(res.publicKeyFile).toBe(undefined);
+        expect(
+          res.error.indexOf(
+            'Minimum node version to use this command is v10.12.0, found v',
+          ),
+        ).not.toBe(-1);
+      });
     } else {
-      test('iexec tee generate-beneficiary-keys', async () => expect(
-        execAsync(
-          `${iexecPath} tee generate-beneficiary-keys --force ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1));
+      test('iexec result generate-keys', async () => {
+        const raw = await execAsync(
+          `${iexecPath} result generate-keys --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.secretPath).not.toBe(undefined);
+        expect(res.secretPath.indexOf('.secrets/beneficiary')).not.toBe(-1);
+        expect(res.privateKeyFile).toBe(
+          '0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+        );
+        expect(res.publicKeyFile).toBe(
+          '0x7bd4783FDCAD405A28052a0d1f11236A741da593_key.pub',
+        );
+      });
     }
 
-    test('iexec tee decrypt-results --force (wrong beneficiary key)', async () => expect(
-      execAsync(
-        `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --force ${saveRaw()}`,
-      ),
-    ).rejects.not.toBe(1));
+    test('iexec result decrypt --force (wrong beneficiary key)', async () => {
+      await execAsync(
+        'cp ./inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key ./.secrets/beneficiary/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+      );
+      const raw = await execAsync(
+        `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --force --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.resultsPath).toBe(undefined);
+      expect(res.error).not.toBe(undefined);
+      expect(res.error.indexOf('Failed to decrypt results key')).not.toBe(-1);
+    });
 
-    test('iexec tee decrypt-results --beneficiary-keystoredir <path>', async () => expect(
-      execAsync(
-        `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --wallet-address ${ADDRESS} --beneficiary-keystoredir inputs/beneficiaryKeys/ ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1));
+    test('iexec result decrypt --beneficiary-keystoredir <path>', async () => {
+      const raw = await execAsync(
+        `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --wallet-address ${ADDRESS} --beneficiary-keystoredir inputs/beneficiaryKeys/ --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.resultsPath).not.toBe(undefined);
+      expect(res.resultsPath.indexOf('results.zip')).not.toBe(-1);
+    });
 
-    test('iexec tee decrypt-results --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => expect(
-      execAsync(
-        `${iexecPath} tee decrypt-results inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key  --force ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1));
+    test('iexec result decrypt --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => {
+      const raw = await execAsync(
+        `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key --force --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.resultsPath).not.toBe(undefined);
+      expect(res.resultsPath.indexOf('results.zip')).not.toBe(-1);
+    });
   });
 
   describe('[registry]', () => {

@@ -47,11 +47,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- fix numbers format in templates
-- fix everyone can claim a task
-- update api url
-- `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
-- dependencies update
+- [BREAKING] `iexec tee` subcommands removed and replaced
+  - `iexec tee init` is replaced by `iexec init`
+  - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
+  - `iexec tee generate-beneficiary-keys` is replaced by `iexec result generate-key`
+  - `iexec tee decrypt-result` is replaced by `iexec result decrypt`
+  - `iexec tee push-secret` is replaced by `iexec dataset push-secret` and `iexec result push-secret`
+  - `iexec tee check-secret` is replaced by `iexec dataset check-secret` and `iexec result check-secret`
 - [BREAKING] `iexec deal show` ends with error when the deal doesn't exists
 - [BREAKING] `deal.show()` throw when the deal doesn't exists
 - [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
@@ -69,10 +71,16 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
 - [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
 - [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
+- fix numbers format in templates
+- fix everyone can claim a task
+- update api url
+- `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
+- dependencies update
 
 ### Removed
 
 - [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
+- [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
 
 ## [3.0.34] - 2019-07-10
 

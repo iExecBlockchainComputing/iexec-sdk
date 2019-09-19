@@ -4,9 +4,9 @@ const { getAddress } = require('./wallet');
 const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
 const { wrapPersonalSign } = require('./errorWrappers');
 
-const debug = Debug('iexec:tee');
+const debug = Debug('iexec:sms');
 
-const secretEndpoit = address => `/secret/${address}`;
+const secretEndpoint = address => `/secret/${address}`;
 const secretPrefix = 'iexec_sms_secret:';
 
 const pushSecret = async (
@@ -36,7 +36,7 @@ const pushSecret = async (
       personnalSign(secretPrefix.concat(secret)),
     );
     const res = await http.post(
-      secretEndpoit(vResourceAddress),
+      secretEndpoint(vResourceAddress),
       { secret, sign },
       {},
       smsUrl,
@@ -57,11 +57,16 @@ const checkSecret = async (
 ) => {
   try {
     const vResourceAddress = await addressSchema().validate(resourceAddress);
-    const res = await http.get(secretEndpoit(vResourceAddress), {}, {}, smsUrl);
+    const res = await http.get(
+      secretEndpoint(vResourceAddress),
+      {},
+      {},
+      smsUrl,
+    );
     if (res.ok) {
       return res.data;
     }
-    throw Error(`SMS answered with error: ${res.errorMessage}`);
+    return { error: res.errorMessage };
   } catch (error) {
     debug('checkSecret()', error);
     throw error;
