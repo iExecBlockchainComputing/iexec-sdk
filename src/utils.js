@@ -266,7 +266,9 @@ const signTypedDatav3 = async (eth, address, typedData) => {
       },
       (err, result) => {
         if (err) reject(err);
-        resolve(result.result);
+        else if (result.error) reject(result.error);
+        else if (result.result) resolve(result.result);
+        else resolve(result); // should not happen
       },
     );
   });
