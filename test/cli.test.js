@@ -50,11 +50,9 @@ const saveJSONToFile = async (json, fileName) => {
   await fs.writeFile(filePath, text);
 };
 
-let testNum = 0;
-const saveRaw = () => {
-  testNum += 1;
-  return `--raw ${DRONE ? '' : `> out/${testNum}_out 2>&1`}`;
-};
+const checkExists = async file => fs.pathExists(file);
+
+const filePath = fileName => path.join(process.cwd(), fileName);
 
 const editRequestorder = async (app, dataset, workerpool) => {
   if (!app || !dataset || !workerpool) throw Error('missing precondition');
@@ -1242,16 +1240,54 @@ describe('[Common]', () => {
     await execAsync('rm chain.json').catch(() => {});
     await execAsync('rm deployed.json').catch(() => {});
     await execAsync('rm results.zip').catch(() => {});
+    await execAsync('rm -rf datasets').catch(() => {});
+    await execAsync('rm -rf .secrets').catch(() => {});
   });
 
   // init
-  test(
-    'iexec init',
-    async () => expect(
-      execAsync(`${iexecPath} init --password test --force ${saveRaw()}`),
-    ).resolves.not.toBe(1),
-    10000,
-  );
+  test('iexec init', async () => {
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+    await execAsync('rm -rf datasets').catch(() => {});
+    await execAsync('rm -rf .secrets').catch(() => {});
+    const raw = await execAsync(
+      `${iexecPath} init --password test --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.walletAddress).not.toBe(undefined);
+    expect(res.walletFile).not.toBe(undefined);
+    expect(res.configFile).toBe('iexec.json');
+    expect(res.chainConfigFile).toBe('chain.json');
+    expect(await checkExists(filePath('iexec.json'))).toBe(true);
+    expect(await checkExists(filePath('chain.json'))).toBe(true);
+    expect(await checkExists(filePath('datasets/original/'))).toBe(true);
+    expect(await checkExists(filePath('datasets/encrypted/'))).toBe(true);
+    expect(await checkExists(filePath('.secrets/beneficiary/'))).toBe(true);
+    expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
+  }, 10000);
+
+  test('iexec init --skip-wallet', async () => {
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+    await execAsync('rm -rf datasets').catch(() => {});
+    await execAsync('rm -rf .secrets').catch(() => {});
+    const raw = await execAsync(
+      `${iexecPath} init --skip-wallet --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.walletAddress).toBe(undefined);
+    expect(res.walletFile).toBe(undefined);
+    expect(res.configFile).toBe('iexec.json');
+    expect(res.chainConfigFile).toBe('chain.json');
+    expect(await checkExists(filePath('iexec.json'))).toBe(true);
+    expect(await checkExists(filePath('chain.json'))).toBe(true);
+    expect(await checkExists(filePath('datasets/original/'))).toBe(true);
+    expect(await checkExists(filePath('datasets/encrypted/'))).toBe(true);
+    expect(await checkExists(filePath('.secrets/beneficiary/'))).toBe(true);
+    expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
+  }, 10000);
 
   describe('[wallet]', () => {
     let importedWalletName;
@@ -1430,6 +1466,7 @@ describe('[Common]', () => {
       expect(res.wallet.address).toBe(ADDRESS2);
       expect(res.address).toBe(ADDRESS2);
       expect(res.fileName.indexOf('/')).toBe(-1);
+      expect(await checkExists(filePath('wallet.json'))).toBe(true);
     }, 10000);
 
     test('iexec wallet show (unencrypted wallet.json)', async () => {
@@ -1489,11 +1526,38 @@ describe('[Common]', () => {
       await execAsync('cp inputs/wallet/wallet.json wallet.json');
     });
 
-    test('iexec dataset encrypt', async () => expect(
-      execAsync(
-        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
-      ),
-    ).resolves.not.toBe(1));
+    test('iexec dataset encrypt', async () => {
+      const raw = await execAsync(
+        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
+      expect(res.secretPath).not.toBe(undefined);
+      expect(
+        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
+      ).not.toBe(-1);
+      expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+      expect(
+        await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+      ).toBe(true);
+      expect(
+        await checkExists(
+          filePath('/.secrets/datasets/datasetFolder.zip.secret'),
+        ),
+      ).toBe(true);
+      expect(
+        await checkExists(
+          filePath('/datasets/encrypted/datasetFolder.zip.enc'),
+        ),
+      ).toBe(true);
+      expect(
+        await checkExists(filePath('/.secrets/datasets/dataset.txt.secret')),
+      ).toBe(true);
+      expect(
+        await checkExists(filePath('/datasets/encrypted/dataset.txt.enc')),
+      ).toBe(true);
+    });
 
     if (!DRONE) {
       // this test requires docker
@@ -1504,27 +1568,63 @@ describe('[Common]', () => {
       ).resolves.not.toBe(1));
     }
 
-    test(
-      'iexec dataset encrypt --force --algorithm aes-256-cbc',
-      async () => expect(
-        execAsync(
-          `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --force --algorithm aes-256-cbc ${saveRaw()}`,
-        ),
-      ).resolves.not.toBe(1),
-      15000,
-    );
+    test('iexec dataset encrypt --force --algorithm aes-256-cbc', async () => {
+      await execAsync(
+        'cp ./inputs/originalDataset/dataset.txt ./datasets/original/dataset.txt ',
+      );
+      const raw = await execAsync(
+        `${iexecPath} dataset encrypt --force --algorithm aes-256-cbc --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
+      expect(res.secretPath).not.toBe(undefined);
+      expect(
+        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
+      ).not.toBe(-1);
+      expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+      expect(
+        await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+      ).toBe(true);
+      expect(
+        await checkExists(filePath('/.secrets/datasets/dataset.txt.secret')),
+      ).toBe(true);
+      expect(
+        await checkExists(filePath('/datasets/encrypted/dataset.txt.enc')),
+      ).toBe(true);
+    });
 
     if (!DRONE) {
       // this test requires docker
-      test(
-        'iexec dataset encrypt --algorithm scone',
-        async () => expect(
-          execAsync(
-            `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone ${saveRaw()}`,
+      test('iexec dataset encrypt --algorithm scone', async () => {
+        const raw = await execAsync(
+          `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
+        expect(res.secretPath).not.toBe(undefined);
+        expect(
+          res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
+        ).not.toBe(-1);
+        expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+        expect(
+          await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+        ).toBe(true);
+        expect(
+          await checkExists(
+            filePath('/.secrets/datasets/datasetFolder.scone.secret'),
           ),
-        ).resolves.not.toBe(1),
-        15000,
-      );
+        ).toBe(true);
+        expect(
+          await checkExists(filePath('/datasets/encrypted/datasetFolder.zip')),
+        ).toBe(true);
+        expect(
+          await checkExists(
+            filePath('/datasets/encrypted/dataset_dataset.txt.zip'),
+          ),
+        ).toBe(true);
+      }, 15000);
     }
   });
 
