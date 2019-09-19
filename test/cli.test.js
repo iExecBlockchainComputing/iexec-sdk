@@ -1490,6 +1490,32 @@ describe('[Common]', () => {
     }, 10000);
   });
 
+  describe('[keystore]', () => {
+    test('no wallet in keystore, use default address on call', async () => {
+      await execAsync('rm wallet.json').catch(() => {});
+      const raw = await execAsync(
+        `${iexecPath} wallet show ${ADDRESS} --keystoredir ./null --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+    }, 10000);
+
+    test('no wallet in keystore, fail on send', async () => {
+      await execAsync('rm wallet.json').catch(() => {});
+      const raw = await execAsync(
+        `${iexecPath} account withdraw 0 ${ADDRESS} --keystoredir ./null --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error).toBe(
+        "ENOENT: no such file or directory, scandir 'null'",
+      );
+    }, 10000);
+  });
+
   describe('[tx option]', () => {
     beforeAll(async () => {
       await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -1511,6 +1537,25 @@ describe('[Common]', () => {
       const tx = await ethRPC.getTransaction(res.txHash);
       expect(tx).not.toBe(undefined);
       expect(tx.gasPrice.toString()).toBe('1000000001');
+    });
+    test('tx --gas-price 0', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account withdraw 0 --gas-price 0 --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).not.toBe(undefined);
+      const tx = await ethRPC.getTransaction(res.txHash);
+      expect(tx).not.toBe(undefined);
+      expect(tx.gasPrice.toString()).toBe('0');
+    });
+    test('tx --gas-price -1 (invalid gas-price)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account withdraw 0 --gas-price -1 --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.txHash).toBe(undefined);
     });
   });
 
