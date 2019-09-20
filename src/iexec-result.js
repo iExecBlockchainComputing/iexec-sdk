@@ -78,6 +78,7 @@ generateKeys
       const [address] = await keystore.accounts();
 
       const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+      await fs.ensureDir(beneficiarySecretsFolderPath);
 
       spinner.info(`Generate beneficiary keys for wallet address ${address}`);
       spinner.start('Generating new beneficiary keys');
@@ -146,6 +147,13 @@ decryptResults
     const spinner = Spinner(cmd);
     try {
       const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+      const exists = await fs.pathExists(beneficiarySecretsFolderPath);
+
+      if (!exists) {
+        throw Error(
+          "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+        );
+      }
 
       const inputFile = encryptedResultsPath
         || path.join(process.cwd(), DEFAULT_ENCRYPTED_RESULTS_NAME);

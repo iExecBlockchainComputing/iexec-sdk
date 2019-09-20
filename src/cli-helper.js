@@ -246,6 +246,10 @@ const option = {
     '--beneficiary-key-file <fileName>',
     'specify beneficiary TEE key file to use',
   ],
+  initDatasetFolders: () => [
+    '--encrypted',
+    'init datasets folder tree for dataset encryption',
+  ],
   encryptedDatasetDir: () => [
     '--encrypted-dataset-dir <path>',
     'specify the encrypted dataset directory',
