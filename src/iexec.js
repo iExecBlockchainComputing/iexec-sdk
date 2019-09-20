@@ -144,8 +144,6 @@ async function main() {
 
   cli.command('task', 'manage iExec tasks');
 
-  cli.command('tee', 'interact with Trusted Execution Environment');
-
   cli.command('result', 'manage results encryption');
 
   cli.command('registry', 'interact with iExec registry');
