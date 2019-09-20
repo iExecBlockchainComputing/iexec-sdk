@@ -1731,6 +1731,8 @@ describe('[Common]', () => {
     }
 
     test('iexec result decrypt --force (wrong beneficiary key)', async () => {
+      await execAsync('mkdir .secrets').catch(() => {});
+      await execAsync('mkdir .secrets/beneficiary').catch(() => {});
       await execAsync(
         'cp ./inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key ./.secrets/beneficiary/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
       );
