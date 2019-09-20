@@ -465,12 +465,12 @@ iexec registry validate <'app'|'dataset'|'workerpool'> # validate an object befo
 - [chain.json](#chainjson)
 - [orders.json](#ordersjson)
 - [deployed.json](#deployedjson)
-- [.secrets/](#/secrets/)
-  - [.secrets/datasets/](#/secrets/datasets/)
-  - [.secrets/beneficary/](#/secrets/beneficary/)
-- [datasets/](#/datasets/)
-  - [datasets/original/](#/datasets/original/)
-  - [datasets/encrypted/](#/datasets/encrypted/)
+- [.secrets/](#secrets)
+  - [.secrets/datasets/](#secretsdatasets)
+  - [.secrets/beneficary/](#secretsbeneficary)
+- [datasets/](#datasets)
+  - [datasets/original/](#datasetsoriginal)
+  - [datasets/encrypted/](#datasetsencrypted)
 
 ### iexec.json
 
@@ -692,7 +692,7 @@ This folder is created when running `iexec init` and is intended to store datase
 
 Paste your original dataset files in this folder and run `iexec dataset encrypt` to encrypt them.
 
-#### ./datasets/original/
+#### ./datasets/encrypted/
 
 Encrypted dataset files ends in this folder when you run `iexec dataset encrypt`.
 
