@@ -572,6 +572,10 @@ test('iexec deal show', async () => {
 });
 
 // dataset encryption
+test('iexec dataset init --encrypted', async () => expect(
+  execAsync(`${iexecPath} dataset init --encrypted ${saveRaw()}`),
+).resolves.not.toBe(1));
+
 test('iexec dataset encrypt', async () => expect(
   execAsync(
     `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset ${saveRaw()}`,
