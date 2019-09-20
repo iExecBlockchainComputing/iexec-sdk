@@ -93,6 +93,7 @@ const desc = {
 };
 
 const option = {
+  quiet: () => ['--quiet', 'stop prompting updates'],
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   hub: () => ['--hub <address>', desc.hubAddress()],

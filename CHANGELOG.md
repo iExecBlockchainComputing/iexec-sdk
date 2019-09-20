@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- global option `--quiet` stop prompting updates
+
 ### Changed
 
 - fix `iexec wallet create --raw` and `iexec wallet import --raw` JSON output on fail

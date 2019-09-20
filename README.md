@@ -265,6 +265,7 @@ iexec info --chain kovan
 ## Global options
 
 ```bash
+--quiet # stop prompting updates
 --raw # display the command result as a json
 ```
 

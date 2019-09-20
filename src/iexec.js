@@ -26,23 +26,24 @@ const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
+cli.option(...option.quiet());
 const debug = Debug('iexec');
 const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
 const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
 
 async function main() {
-  const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
-    debug,
-  );
-
-  if (update) {
-    const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
-    const spin = Spinner();
-    spin.info(
-      `iExec SDK update available ${packageJSON.version} →  ${
-        update.latest
-      }, Run "${upgradeCMD}" to update\n`,
+  const quietMode = cli.parse(process.argv).quiet;
+  if (!quietMode) {
+    const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
+      debug,
     );
+    if (update) {
+      const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
+      const spin = Spinner();
+      spin.info(
+        `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update\n`,
+      );
+    }
   }
 
   const init = cli.command('init');
