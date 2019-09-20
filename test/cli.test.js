@@ -1261,10 +1261,6 @@ describe('[Common]', () => {
     expect(res.chainConfigFile).toBe('chain.json');
     expect(await checkExists(filePath('iexec.json'))).toBe(true);
     expect(await checkExists(filePath('chain.json'))).toBe(true);
-    expect(await checkExists(filePath('datasets/original/'))).toBe(true);
-    expect(await checkExists(filePath('datasets/encrypted/'))).toBe(true);
-    expect(await checkExists(filePath('.secrets/beneficiary/'))).toBe(true);
-    expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
   }, 10000);
 
   test('iexec init --skip-wallet', async () => {
@@ -1283,10 +1279,6 @@ describe('[Common]', () => {
     expect(res.chainConfigFile).toBe('chain.json');
     expect(await checkExists(filePath('iexec.json'))).toBe(true);
     expect(await checkExists(filePath('chain.json'))).toBe(true);
-    expect(await checkExists(filePath('datasets/original/'))).toBe(true);
-    expect(await checkExists(filePath('datasets/encrypted/'))).toBe(true);
-    expect(await checkExists(filePath('.secrets/beneficiary/'))).toBe(true);
-    expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
   }, 10000);
 
   describe('[wallet]', () => {
@@ -1571,6 +1563,28 @@ describe('[Common]', () => {
       await execAsync('cp inputs/wallet/wallet.json wallet.json');
     });
 
+    test('iexec dataset init --encrypted', async () => {
+      const raw = await execAsync(
+        `${iexecPath} dataset init --encrypted --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
+      expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);
+      expect(await checkExists(filePath('datasets/encrypted/'))).toBe(true);
+    });
+
+    test('iexec dataset init --encrypted  --original-dataset-dir ./out/originals  --encrypted-dataset-dir ./out/encrypted --dataset-keystoredir ./out/dataset-secrets', async () => {
+      const raw = await execAsync(
+        `${iexecPath} dataset init --encrypted  --original-dataset-dir ./out/originals  --encrypted-dataset-dir ./out/encrypted --dataset-keystoredir ./out/dataset-secrets --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(await checkExists(filePath('out/dataset-secrets/'))).toBe(true);
+      expect(await checkExists(filePath('out/originals/'))).toBe(true);
+      expect(await checkExists(filePath('out/encrypted/'))).toBe(true);
+    });
+
     test('iexec dataset encrypt', async () => {
       const raw = await execAsync(
         `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --raw`,
@@ -1582,25 +1596,23 @@ describe('[Common]', () => {
       expect(
         res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
-      expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+      expect(res.secretPath.indexOf('.secrets/datasets')).not.toBe(-1);
       expect(
-        await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.secret')),
       ).toBe(true);
       expect(
         await checkExists(
-          filePath('/.secrets/datasets/datasetFolder.zip.secret'),
+          filePath('.secrets/datasets/datasetFolder.zip.secret'),
         ),
       ).toBe(true);
       expect(
-        await checkExists(
-          filePath('/datasets/encrypted/datasetFolder.zip.enc'),
-        ),
+        await checkExists(filePath('datasets/encrypted/datasetFolder.zip.enc')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('/.secrets/datasets/dataset.txt.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('/datasets/encrypted/dataset.txt.enc')),
+        await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
       ).toBe(true);
     });
 
@@ -1629,13 +1641,13 @@ describe('[Common]', () => {
       ).not.toBe(-1);
       expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
       expect(
-        await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.secret')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('/.secrets/datasets/dataset.txt.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('/datasets/encrypted/dataset.txt.enc')),
+        await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
       ).toBe(true);
     });
 
@@ -1654,19 +1666,19 @@ describe('[Common]', () => {
         ).not.toBe(-1);
         expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
         expect(
-          await checkExists(filePath('/.secrets/datasets/dataset.secret')),
+          await checkExists(filePath('.secrets/datasets/dataset.secret')),
         ).toBe(true);
         expect(
           await checkExists(
-            filePath('/.secrets/datasets/datasetFolder.scone.secret'),
+            filePath('.secrets/datasets/datasetFolder.scone.secret'),
           ),
         ).toBe(true);
         expect(
-          await checkExists(filePath('/datasets/encrypted/datasetFolder.zip')),
+          await checkExists(filePath('datasets/encrypted/datasetFolder.zip')),
         ).toBe(true);
         expect(
           await checkExists(
-            filePath('/datasets/encrypted/dataset_dataset.txt.zip'),
+            filePath('datasets/encrypted/dataset_dataset.txt.zip'),
           ),
         ).toBe(true);
       }, 15000);
