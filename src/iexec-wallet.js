@@ -51,7 +51,7 @@ create
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, spinner);
+      handleError(error, cli, cmd);
     }
   });
 
@@ -78,7 +78,7 @@ importPk
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, spinner);
+      handleError(error, cli, cmd);
     }
   });
 
@@ -240,9 +240,7 @@ sendETH
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${chain.name} ETH from ${address} to ${
-        cmd.to
-      }`;
+      const message = `${amount} ${chain.name} ETH from ${address} to ${cmd.to}`;
       spinner.start(`sending ${message}...`);
       await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
       spinner.succeed(`Sent ${message}\n`, {
@@ -279,9 +277,7 @@ sendRLC
         await prompt.transferRLC(amount, chain.name, cmd.to, chain.id);
       }
 
-      const message = `${amount} ${chain.name} nRLC from ${address} to ${
-        cmd.to
-      }`;
+      const message = `${amount} ${chain.name} nRLC from ${address} to ${cmd.to}`;
       spinner.start(`sending ${message}...`);
 
       await wallet.sendRLC(chain.contracts, amount, cmd.to);

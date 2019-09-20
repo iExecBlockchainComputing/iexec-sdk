@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix `iexec wallet create --raw` and `iexec wallet import --raw` JSON output on fail
 - fix numbers format in templates
 - update api url
 - `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
