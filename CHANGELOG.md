@@ -48,7 +48,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - [BREAKING] `iexec tee` subcommands removed and replaced
-  - `iexec tee init` is replaced by `iexec init`
+  - `iexec tee init` is replaced by `ìexec dataset init --encrypted`
   - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
   - `iexec tee generate-beneficiary-keys` is replaced by `iexec result generate-key`
   - `iexec tee decrypt-result` is replaced by `iexec result decrypt`

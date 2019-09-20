@@ -44,27 +44,47 @@ const defaultSecretName = 'dataset.secret';
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init.description(desc.initObj(objName)).action(async (cmd) => {
-  const spinner = Spinner(cmd);
-  try {
-    const walletOptions = await computeWalletLoadOptions(cmd);
-    const keystore = Keystore(
-      Object.assign({}, walletOptions, { isSigner: false }),
-    );
-    const [address] = await keystore.accounts();
-    const { saved, fileName } = await initObj(objName, {
-      overwrite: { owner: address },
-    });
-    spinner.succeed(
-      `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-        saved,
-      )}`,
-      { raw: { dataset: saved } },
-    );
-  } catch (error) {
-    handleError(error, cli, cmd);
-  }
-});
+
+init
+  .option(...option.initDatasetFolders())
+  .option(...option.datasetKeystoredir())
+  .option(...option.originalDatasetDir())
+  .option(...option.encryptedDatasetDir())
+  .description(desc.initObj(objName))
+  .action(async (cmd) => {
+    const spinner = Spinner(cmd);
+    try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(
+        Object.assign({}, walletOptions, { isSigner: false }),
+      );
+      const [address] = await keystore.accounts();
+      const { saved, fileName } = await initObj(objName, {
+        overwrite: { owner: address },
+      });
+      if (cmd.encrypted) {
+        const {
+          datasetSecretsFolderPath,
+          originalDatasetFolderPath,
+          encryptedDatasetFolderPath,
+        } = createEncFolderPaths(cmd);
+        await Promise.all([
+          fs.ensureDir(datasetSecretsFolderPath),
+          fs.ensureDir(originalDatasetFolderPath),
+          fs.ensureDir(encryptedDatasetFolderPath),
+        ]);
+        spinner.info('Created dataset folder tree for encryption');
+      }
+      spinner.succeed(
+        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+        { raw: { dataset: saved } },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
 
 const deploy = cli.command('deploy');
 addGlobalOptions(deploy);
@@ -245,6 +265,18 @@ encryptDataset
         originalDatasetFolderPath,
         encryptedDatasetFolderPath,
       } = createEncFolderPaths(cmd);
+
+      const [eDSF, eODF, eEDF] = await Promise.all([
+        fs.pathExists(datasetSecretsFolderPath),
+        fs.pathExists(originalDatasetFolderPath),
+        fs.pathExists(encryptedDatasetFolderPath),
+      ]);
+
+      if (!eDSF || !eODF || !eEDF) {
+        throw Error(
+          "Folders for dataset encryption are missing, did you forget to run 'iexec dataset init --encrypted'?",
+        );
+      }
 
       const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
       if (isDatasetFolderEmpty) {

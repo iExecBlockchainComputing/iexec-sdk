@@ -51,10 +51,6 @@ async function main() {
   init
     .option(...option.force())
     .option(...option.skipWallet())
-    .option(...option.datasetKeystoredir())
-    .option(...option.beneficiaryKeystoredir())
-    .option(...option.originalDatasetDir())
-    .option(...option.encryptedDatasetDir())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
       const spinner = Spinner(cmd);
@@ -78,19 +74,6 @@ async function main() {
             )}`,
           );
         }
-
-        const {
-          datasetSecretsFolderPath,
-          beneficiarySecretsFolderPath,
-          originalDatasetFolderPath,
-          encryptedDatasetFolderPath,
-        } = createEncFolderPaths();
-        await Promise.all([
-          ensureDir(datasetSecretsFolderPath),
-          ensureDir(beneficiarySecretsFolderPath),
-          ensureDir(originalDatasetFolderPath),
-          ensureDir(encryptedDatasetFolderPath),
-        ]);
 
         let walletRes;
         if (!cmd.skipWallet) {
@@ -143,8 +126,6 @@ async function main() {
   cli.command('deal', 'manage iExec deals');
 
   cli.command('task', 'manage iExec tasks');
-
-  cli.command('tee', 'interact with Trusted Execution Environment');
 
   cli.command('result', 'manage results encryption');
 
