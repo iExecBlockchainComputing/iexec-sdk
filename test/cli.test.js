@@ -1281,6 +1281,12 @@ describe('[Common]', () => {
     expect(await checkExists(filePath('chain.json'))).toBe(true);
   }, 10000);
 
+  test('check update (no --raw)', async () => {
+    await expect(
+      execAsync(`${iexecPath} init --skip-wallet --force`),
+    ).resolves.not.toBe(undefined);
+  }, 10000);
+
   describe('[wallet]', () => {
     let importedWalletName;
     let localWalletFileName;
