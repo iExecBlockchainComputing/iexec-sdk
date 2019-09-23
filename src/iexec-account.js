@@ -11,6 +11,7 @@ const {
   addWalletLoadOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  checkUpdate,
   handleError,
   option,
   desc,
@@ -30,6 +31,7 @@ deposit
   .option(...option.txGasPrice())
   .description(desc.deposit())
   .action(async (amount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -58,6 +60,7 @@ withdraw
   .option(...option.txGasPrice())
   .description(desc.withdraw())
   .action(async (amount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -85,6 +88,7 @@ show
   .option(...option.chain())
   .description(desc.showObj('iExec', objName))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);

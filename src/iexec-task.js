@@ -10,6 +10,7 @@ const {
   addWalletLoadOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -34,6 +35,7 @@ show
   .option(...option.download())
   .description(desc.showObj(objName))
   .action(async (taskid, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -136,6 +138,7 @@ claim
   .option(...option.txGasPrice())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);

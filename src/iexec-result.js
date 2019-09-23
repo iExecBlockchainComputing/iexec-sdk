@@ -6,13 +6,13 @@ const cli = require('commander');
 const semver = require('semver');
 const fs = require('fs-extra');
 const path = require('path');
-
 const { createDecipheriv, generateKeyPair, privateDecrypt } = require('crypto');
 const {
   help,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -63,6 +63,7 @@ generateKeys
   .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const nodeMinVersion = 'v10.12.0';
@@ -144,6 +145,7 @@ decryptResults
   .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
   .action(async (encryptedResultsPath, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
@@ -293,6 +295,7 @@ pushSecret
   .option(...option.secretPath())
   .description(desc.pushSecret())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -344,6 +347,7 @@ checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
