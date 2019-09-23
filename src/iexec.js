@@ -3,13 +3,11 @@
 require('core-js/stable');
 require('regenerator-runtime/runtime');
 const cli = require('commander');
-const Debug = require('debug');
-const checkForUpdate = require('update-check-es5');
-const isDocker = require('is-docker');
 const {
   addGlobalOptions,
   addWalletCreateOptions,
   computeWalletCreateOptions,
+  checkUpdate,
   handleError,
   help,
   Spinner,
@@ -26,26 +24,8 @@ const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
-cli.option(...option.quiet());
-const debug = Debug('iexec');
-const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
-const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
 
 async function main() {
-  const quietMode = cli.parse(process.argv).quiet;
-  if (!quietMode) {
-    const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
-      debug,
-    );
-    if (update) {
-      const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
-      const spin = Spinner();
-      spin.info(
-        `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update\n`,
-      );
-    }
-  }
-
   const init = cli.command('init');
   addGlobalOptions(init);
   addWalletCreateOptions(init);
@@ -54,6 +34,7 @@ async function main() {
     .option(...option.skipWallet())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
+      await checkUpdate(cmd);
       const spinner = Spinner(cmd);
       try {
         const force = cmd.force || cmd.raw;
@@ -139,6 +120,7 @@ async function main() {
     .option(...option.hub())
     .description(desc.info())
     .action(async (cmd) => {
+      await checkUpdate(cmd);
       const spinner = Spinner(cmd);
       try {
         const chain = await loadChain(

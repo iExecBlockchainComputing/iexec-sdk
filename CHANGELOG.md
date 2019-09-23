@@ -6,10 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- global option `--quiet` stop prompting updates
+- global option `--quiet` disable update notification
 
 ### Changed
 
+- global option `--raw` disable update notification
 - fix `iexec wallet create --raw` and `iexec wallet import --raw` JSON output on fail
 - fix numbers format in templates
 - update api url

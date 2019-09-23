@@ -20,6 +20,7 @@ const {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -177,6 +178,7 @@ init
   .option(...option.encryptedDatasetDir())
   .description(desc.teeInit())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       spinner.start('creating TEE folder tree structure');
@@ -208,6 +210,7 @@ encryptDataset
   .option(...option.datasetEncryptionAlgorithm())
   .description(desc.encryptDataset())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const {
@@ -465,6 +468,7 @@ generateKeys
   .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const nodeMinVersion = 'v10.12.0';
@@ -547,6 +551,7 @@ decryptResults
   .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
   .action(async (encryptedResultsPath, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const { beneficiarySecretsFolderPath } = createTEEPaths(cmd);
@@ -691,6 +696,7 @@ pushSecret
   .option(...option.secretPath())
   .description(desc.pushSecret())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       debug('dataset', cmd.dataset);
@@ -770,6 +776,7 @@ checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);

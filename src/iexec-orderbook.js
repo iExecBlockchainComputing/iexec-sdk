@@ -4,6 +4,7 @@ const cli = require('commander');
 const {
   help,
   addGlobalOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -24,6 +25,7 @@ orderbookApp
   .option(...option.chain())
   .description(desc.showObj('app orderbook', 'marketplace'))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
@@ -64,6 +66,7 @@ orderbookDataset
   .option(...option.chain())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
@@ -105,6 +108,7 @@ orderbookWorkerpool
   .option(...option.category())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
@@ -154,6 +158,7 @@ orderbookRequester
   .option(...option.category())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {

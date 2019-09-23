@@ -14,6 +14,7 @@ const {
 const {
   help,
   addGlobalOptions,
+  checkUpdate,
   handleError,
   desc,
   Spinner,
@@ -52,6 +53,7 @@ const objectMap = {
 const validate = cli.command('validate <object>');
 addGlobalOptions(validate);
 validate.description(desc.validateRessource()).action(async (object, cmd) => {
+  await checkUpdate(cmd);
   const spinner = Spinner(cmd);
   try {
     if (!objectNames.includes(object)) {

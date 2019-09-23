@@ -265,8 +265,8 @@ iexec info --chain kovan
 ## Global options
 
 ```bash
---quiet # stop prompting updates
---raw # display the command result as a json
+--quiet # disable update notification
+--raw # display the command result as a json (disable update notification)
 ```
 
 ### Wallet options

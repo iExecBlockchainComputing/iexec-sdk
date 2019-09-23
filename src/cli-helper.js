@@ -4,6 +4,9 @@ const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
 const BN = require('bn.js');
+const checkForUpdate = require('update-check-es5');
+const isDocker = require('is-docker');
+const packageJSON = require('../package.json');
 
 const debug = Debug('help');
 
@@ -275,6 +278,7 @@ const option = {
 
 const addGlobalOptions = (cli) => {
   cli.option(...option.raw());
+  cli.option(...option.quiet());
 };
 
 const addWalletCreateOptions = (cli) => {
@@ -439,7 +443,7 @@ const oraOptions = {
   },
 };
 
-const helpMessage = '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
+const helpMessage = '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
 const outputHelpMessage = () => console.log(helpMessage);
 const helpCB = (mess) => {
   const newMessage = mess.concat(helpMessage);
@@ -453,14 +457,16 @@ const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
 
   if (checkNoArgs && cli.args.length === 0) {
     console.log('');
-    console.log(colors.red('  missing argument'));
+    console.log(colors.red('missing argument'));
+    console.log('');
     cli.help(helpCB);
   } else if (checkWrongArgs) {
     if (typeof cli.args[cli.args.length - 1] !== 'object') {
       debug('not an object');
       if (!cli._execs[cli.args[0]]) {
         console.log('');
-        console.log(colors.red(`  unknown command "${cli.args[0]}"`));
+        console.log(colors.red(`unknown command "${cli.args[0]}"`));
+        console.log('');
         cli.help(helpCB);
       }
     }
@@ -483,6 +489,23 @@ const Spinner = (cmd) => {
     };
   }
   return Ora(oraOptions);
+};
+
+const checkUpdate = async (cmd) => {
+  if (cmd && !cmd.quiet && !cmd.raw) {
+    const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
+    const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
+    const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
+      debug,
+    );
+    if (update) {
+      const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
+      const spin = Spinner(cmd);
+      spin.info(
+        `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
+      );
+    }
+  }
 };
 
 const computeWalletCreateOptions = async (cmd) => {
@@ -593,11 +616,7 @@ const handleError = (error, cli, cmd) => {
       error: error.message,
     },
   });
-  if (cmd && cmd.raw) {
-    process.exit(1);
-  } else {
-    cli.help(helpCB);
-  }
+  process.exit(1);
 };
 
 const lbb = (str = '') => `\n${str}`;
@@ -619,6 +638,7 @@ const prettyRPC = (rpcObj) => {
 
 module.exports = {
   help,
+  checkUpdate,
   Spinner,
   handleError,
   info,
