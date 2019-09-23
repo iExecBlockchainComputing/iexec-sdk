@@ -6,12 +6,10 @@ const cli = require('commander');
 const Debug = require('debug');
 const checkForUpdate = require('update-check-es5');
 const isDocker = require('is-docker');
-const { ensureDir } = require('fs-extra');
 const {
   addGlobalOptions,
   addWalletCreateOptions,
   computeWalletCreateOptions,
-  createEncFolderPaths,
   handleError,
   help,
   Spinner,
