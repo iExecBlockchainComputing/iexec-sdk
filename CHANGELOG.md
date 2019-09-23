@@ -71,16 +71,29 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
 - [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
 - [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
-- fix numbers format in templates
 - fix everyone can claim a task
-- update api url
-- `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
-- dependencies update
 
 ### Removed
 
 - [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
 - [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
+
+## [3.0.35] - Unreleased
+
+### Added
+
+- global option `--quiet` disable update notification
+
+### Changed
+
+- global option `--raw` disable update notification
+- fix `iexec wallet create --raw` and `iexec wallet import --raw` JSON output on fail
+- fix numbers format in templates
+- update api url
+- `iexec registry validate <'app'|'dataset'|'workerpool'>` update schema validation for buyConf
+- dependencies update
+
+### Removed
 
 ## [3.0.34] - 2019-07-10
 

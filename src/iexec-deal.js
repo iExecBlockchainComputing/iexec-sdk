@@ -5,6 +5,7 @@ const {
   help,
   addGlobalOptions,
   addWalletLoadOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -26,6 +27,7 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName))
   .action(async (dealid, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {

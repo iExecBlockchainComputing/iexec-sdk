@@ -8,6 +8,7 @@ const {
   addWalletLoadOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  checkUpdate,
   handleError,
   desc,
   option,
@@ -45,6 +46,7 @@ init
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const initAll = !(
@@ -124,6 +126,7 @@ sign
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const signAll = !(
@@ -314,6 +317,7 @@ fill
   .option(...option.fillRequestParams())
   .description(desc.fill(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -574,6 +578,7 @@ publish
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
@@ -676,6 +681,7 @@ unpublish
   .option(...option.force())
   .description(desc.unpublish(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
@@ -796,6 +802,7 @@ cancel
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
@@ -890,6 +897,7 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {

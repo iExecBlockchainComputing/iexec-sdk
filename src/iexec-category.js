@@ -7,6 +7,7 @@ const {
   addWalletLoadOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  checkUpdate,
   handleError,
   help,
   desc,
@@ -24,6 +25,7 @@ const objName = 'category';
 const init = cli.command('init');
 addGlobalOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
+  await checkUpdate(cmd);
   const spinner = Spinner(cmd);
   try {
     const { saved, fileName } = await initObj(objName);
@@ -46,6 +48,7 @@ create
   .option(...option.txGasPrice())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -80,6 +83,7 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
   .action(async (index, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
@@ -103,6 +107,7 @@ count
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {

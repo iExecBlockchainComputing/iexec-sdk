@@ -16,6 +16,7 @@ const {
   addWalletLoadOptions,
   computeWalletLoadOptions,
   computeTxOptions,
+  checkUpdate,
   handleError,
   help,
   Spinner,
@@ -36,6 +37,7 @@ create
   .option(...option.forceCreate())
   .description(desc.createWallet())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const force = cmd.force || false;
@@ -51,7 +53,7 @@ create
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, spinner);
+      handleError(error, cli, cmd);
     }
   });
 
@@ -62,6 +64,7 @@ importPk
   .option(...option.forceCreate())
   .description(desc.importWallet())
   .action(async (privateKey, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const force = cmd.force || false;
@@ -78,7 +81,7 @@ importPk
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, spinner);
+      handleError(error, cli, cmd);
     }
   });
 
@@ -90,6 +93,7 @@ show
   .option(...option.showPrivateKey())
   .description(desc.showObj(objName, 'address'))
   .action(async (address, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -149,6 +153,7 @@ getEth
   .option(...option.chain())
   .description(desc.getETH())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -185,6 +190,7 @@ getRlc
   .option(...option.chain())
   .description(desc.getRLC())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -224,6 +230,7 @@ sendETH
   .option(...option.force())
   .description(desc.sendETH())
   .action(async (amount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -265,6 +272,7 @@ sendRLC
   .option(...option.force())
   .description(desc.sendRLC())
   .action(async (nRlcAmount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -309,6 +317,7 @@ sweep
   .option(...option.force())
   .description(desc.sweep())
   .action(async (cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -359,6 +368,7 @@ bridgeToSidechain
   .option(...option.force())
   .description(desc.bridgeToSidechain())
   .action(async (nRlcAmount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
@@ -421,6 +431,7 @@ bridgeToMainchain
   .option(...option.force())
   .description(desc.bridgeToMainchain())
   .action(async (nRlcAmount, cmd) => {
+    await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
