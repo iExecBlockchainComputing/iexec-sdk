@@ -20,6 +20,7 @@ const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
 const { checksummedAddress } = require('./utils');
+const { wrapCall } = require('./errorWrappers');
 const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
@@ -138,27 +139,37 @@ async function main() {
 
         const rlcAddress = useNative
           ? undefined
-          : await chain.contracts.fetchRLCAddress({
-            hub: hubAddress,
-          });
+          : await wrapCall(
+            chain.contracts.fetchRLCAddress({
+              hub: hubAddress,
+            }),
+          );
         const [
           clerkAddress,
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          chain.contracts.fetchClerkAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchAppRegistryAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchDatasetRegistryAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchWorkerpoolRegistryAddress({
-            hub: hubAddress,
-          }),
+          wrapCall(
+            chain.contracts.fetchClerkAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchAppRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchDatasetRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchWorkerpoolRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
         ]);
 
         const pocoVersion = packagelockJSON

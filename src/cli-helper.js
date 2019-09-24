@@ -646,7 +646,7 @@ const handleError = (error, cli, cmd) => {
   spinner.fail(`command "${commandName}" failed with ${error}`, {
     raw: {
       command: commandName,
-      error: error.message,
+      error: { name: error.name, message: error.message },
     },
   });
   process.exit(1);
