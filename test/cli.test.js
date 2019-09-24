@@ -1384,7 +1384,8 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.error).toBe('invalid password');
+      expect(res.error.message).toBe('invalid password');
+      expect(res.error.name).toBe('Error');
       expect(res.wallet).toBe(undefined);
       expect(res.balance).toBe(undefined);
     }, 10000);
@@ -1395,7 +1396,8 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.error).toBe('Missing address or wallet');
+      expect(res.error.message).toBe('Missing address or wallet');
+      expect(res.error.name).toBe('Error');
       expect(res.wallet).toBe(undefined);
       expect(res.balance).toBe(undefined);
     }, 10000);
@@ -1508,9 +1510,10 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.error).toBe(
+      expect(res.error.message).toBe(
         "ENOENT: no such file or directory, scandir 'null'",
       );
+      expect(res.error.name).toBe('Error');
     }, 10000);
   });
 
@@ -1749,7 +1752,10 @@ describe('[Common]', () => {
       expect(res.ok).toBe(false);
       expect(res.resultsPath).toBe(undefined);
       expect(res.error).not.toBe(undefined);
-      expect(res.error.indexOf('Failed to decrypt results key')).not.toBe(-1);
+      expect(
+        res.error.message.indexOf('Failed to decrypt results key'),
+      ).not.toBe(-1);
+      expect(res.error.name).toBe('Error');
     });
 
     test('iexec result decrypt --beneficiary-keystoredir <path>', async () => {
