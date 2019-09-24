@@ -45,6 +45,16 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
 - [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
 
+## [3.0.36] - 2019-09-24
+
+### Added
+
+### Changed
+
+- update params format for iexec core v3.2 compatibility
+
+### Removed
+
 ## [3.0.35] - 2019-09-23
 
 ### Added
