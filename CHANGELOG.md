@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `deal.show()` throw when the deal doesn't exists
 - [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
 - [BREAKING] `deal.computeTaskId()` returns a promise
+- [BREAKING] errors handling with `--raw` option now returns `{ command, error: { name, message } }` previously was `{ command, error: message }`
 - [DEPRECATED] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` is deprecated, use `IExec` constructor.
 - [DEPRECATED] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
 - [DEPRECATED] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
@@ -39,6 +40,8 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
 - [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
 - fix everyone can claim a task
+- fix `iexec task show` oracle results hexadecimal display (#88)
+- fix `iexec task show --download` oracle results error message
 
 ### Removed
 
