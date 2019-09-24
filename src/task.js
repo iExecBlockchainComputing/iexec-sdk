@@ -151,9 +151,11 @@ const fetchResults = async (
     if (resultAddress && resultAddress.substr(0, 6) === '/ipfs/') {
       debug('download from ipfs', resultAddress);
       res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
-    } else {
+    } else if (resultAddress && resultAddress.substr(0, 2) !== '0x') {
       debug('download from result repo', resultAddress);
       res = await downloadFromResultRepo(contracts, vTaskId, task, userAddress);
+    } else {
+      throw Error('No result uploaded for this task');
     }
     return res;
   } catch (error) {
