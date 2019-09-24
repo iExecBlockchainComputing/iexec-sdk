@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.36] - unreleased
+
+### Added
+
+### Changed
+
+- update params format for iexec core v3.2 compatibility
+
+### Removed
+
 ## [3.0.35] - 2019-09-23
 
 ### Added
