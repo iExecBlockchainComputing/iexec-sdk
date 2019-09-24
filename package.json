@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "3.0.35",
+  "version": "3.0.36",
   "description": "iExec SDK",
   "main": "dist/iexec-lib.js",
   "scripts": {
