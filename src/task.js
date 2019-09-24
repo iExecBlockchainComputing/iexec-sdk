@@ -1,4 +1,5 @@
 const Debug = require('debug');
+const { Buffer } = require('buffer');
 const deal = require('./deal');
 const {
   checkEvent,
@@ -41,6 +42,13 @@ const show = async (
     if (task.dealid === NULL_BYTES32) {
       throw new ObjectNotFoundError('task', vTaskId, chainId);
     }
+    const decodedResult = task.results
+      && Buffer.from(task.results.substr(2), 'hex').toString('utf8');
+    const displayResult = decodedResult
+      && (decodedResult.substr(0, 6) === '/ipfs/'
+        || decodedResult.substr(0, 4) === 'http')
+      ? decodedResult
+      : task.results;
     return Object.assign(
       {},
       task,
@@ -48,9 +56,7 @@ const show = async (
         statusName: TASK_STATUS_MAP[task.status],
       },
       {
-        results:
-          task.results
-          && Buffer.from(task.results.substr(2), 'hex').toString('utf8'),
+        results: displayResult,
       },
     );
   } catch (error) {
