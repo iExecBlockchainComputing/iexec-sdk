@@ -5,20 +5,28 @@ const {
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
-  throwIfMissing,
   multiaddrHexToHuman,
   getEventFromLogs,
 } = require('./utils');
+const {
+  addressSchema,
+  uint256Schema,
+  categorySchema,
+  appSchema,
+  datasetSchema,
+  workerpoolSchema,
+  throwIfMissing,
+} = require('./validator');
+const { wrapCall, wrapSend } = require('./errorWrappers');
 
 const debug = Debug('iexec:hub');
 
 const createObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
-  options,
 ) => {
   try {
-    const txReceipt = await contracts.createObj(objName)(obj, options);
+    const txReceipt = await wrapSend(contracts.createObj(objName)(obj));
     const event = getEventFromLogs(
       'Create'.concat(toUpperFirst(objName)),
       txReceipt.events,
@@ -34,33 +42,41 @@ const createObj = (objName = throwIfMissing()) => async (
   }
 };
 
+const deployApp = async (contracts, app) => createObj('app')(contracts, await appSchema().validate(app));
+const deployDataset = async (contracts, dataset) => createObj('dataset')(contracts, await datasetSchema().validate(dataset));
+const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool')(
+  contracts,
+  await workerpoolSchema().validate(workerpool),
+);
+
 const showObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
+  objAddressOrIndex = throwIfMissing(),
   userAddress,
 ) => {
   try {
     let objAddress;
     if (
-      !isEthAddress(objAdressOrIndex, { strict: false })
-      && Number.isInteger(Number(objAdressOrIndex))
+      !isEthAddress(objAddressOrIndex, { strict: false })
+      && Number.isInteger(Number(objAddressOrIndex))
     ) {
       if (!isEthAddress(userAddress)) throw Error('Missing userAddress');
       // INDEX case: need hit subHub to get obj address from index
-      objAddress = await contracts.getUserObjAddressByIndex(objName)(
-        userAddress,
-        objAdressOrIndex,
+      objAddress = await wrapCall(
+        contracts.getUserObjAddressByIndex(objName)(
+          userAddress,
+          objAddressOrIndex,
+        ),
       );
-    } else if (isEthAddress(objAdressOrIndex)) {
-      objAddress = objAdressOrIndex;
+    } else if (isEthAddress(objAddressOrIndex)) {
+      objAddress = objAddressOrIndex;
     } else {
       throw Error(
         'Argument is neither an integer index nor a valid ethereum address',
       );
     }
-
     const obj = bnifyNestedEthersBn(
-      await contracts.getObjProps(objName)(objAddress),
+      await wrapCall(contracts.getObjProps(objName)(objAddress)),
     );
     return { obj, objAddress };
   } catch (error) {
@@ -79,13 +95,32 @@ const cleanObj = (obj) => {
 
 const showApp = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('app')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
     userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_appMultiaddr && {
+      appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
+    },
+  );
+  return { objAddress, app: clean };
+};
+
+const showUserApp = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('app')(
+    contracts,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -98,13 +133,32 @@ const showApp = async (
 
 const showDataset = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('dataset')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
     userAddress,
+  );
+  const clean = Object.assign(
+    cleanObj(obj),
+    obj.m_datasetMultiaddr && {
+      datasetMultiaddr: multiaddrHexToHuman(obj.m_datasetMultiaddr),
+    },
+  );
+  return { objAddress, dataset: clean };
+};
+
+const showUserDataset = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('dataset')(
+    contracts,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -117,13 +171,27 @@ const showDataset = async (
 
 const showWorkerpool = async (
   contracts = throwIfMissing(),
-  objAdressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddressOrIndex = throwIfMissing(), // index is deprecated
+  userAddress, // deprecated
 ) => {
   const { obj, objAddress } = await showObj('workerpool')(
     contracts,
-    objAdressOrIndex,
+    objAddressOrIndex,
     userAddress,
+  );
+  const clean = cleanObj(obj);
+  return { objAddress, workerpool: clean };
+};
+
+const showUserWorkerpool = async (
+  contracts = throwIfMissing(),
+  index = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  const { obj, objAddress } = await showObj('workerpool')(
+    contracts,
+    await uint256Schema().validate(index),
+    await addressSchema().validate(userAddress),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -135,7 +203,7 @@ const countObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const objCountBN = ethersBnToBn(
-      await contracts.getUserObjCount(objName)(userAddress),
+      await wrapCall(contracts.getUserObjCount(objName)(userAddress)),
     );
     return objCountBN;
   } catch (error) {
@@ -144,12 +212,30 @@ const countObj = (objName = throwIfMissing()) => async (
   }
 };
 
+const countUserApps = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('app')(contracts, await addressSchema().validate(userAddress));
+const countUserDatasets = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('dataset')(contracts, await addressSchema().validate(userAddress));
+const countUserWorkerpools = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('workerpool')(
+  contracts,
+  await addressSchema().validate(userAddress),
+);
+
 const createCategory = async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
 ) => {
   try {
-    const txReceipt = await contracts.createCategory(obj);
+    const txReceipt = await wrapSend(
+      contracts.createCategory(await categorySchema().validate(obj)),
+    );
     const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
       strict: true,
     }).args;
@@ -166,7 +252,9 @@ const showCategory = async (
 ) => {
   try {
     const category = bnifyNestedEthersBn(
-      await contracts.getCategoryByIndex(index),
+      await wrapCall(
+        contracts.getCategoryByIndex(await uint256Schema().validate(index)),
+      ),
     );
     return category;
   } catch (error) {
@@ -178,7 +266,7 @@ const showCategory = async (
 const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
-      await contracts.getHubContract().countCategory(),
+      await wrapCall(contracts.getHubContract().countCategory()),
     );
     return countBN;
   } catch (error) {
@@ -190,7 +278,7 @@ const countCategory = async (contracts = throwIfMissing()) => {
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await contracts.getHubContract().FINAL_DEADLINE_RATIO(),
+      await wrapCall(contracts.getHubContract().FINAL_DEADLINE_RATIO()),
     );
     return timeoutRatio;
   } catch (error) {
@@ -200,12 +288,21 @@ const getTimeoutRatio = async (contracts = throwIfMissing()) => {
 };
 
 module.exports = {
-  createObj,
-  showObj,
+  createObj, // deprecated
+  deployApp,
+  deployDataset,
+  deployWorkerpool,
+  showObj, // deprecated
   showApp,
   showDataset,
   showWorkerpool,
-  countObj,
+  showUserApp,
+  showUserDataset,
+  showUserWorkerpool,
+  countObj, // deprecated
+  countUserApps,
+  countUserDatasets,
+  countUserWorkerpools,
   createCategory,
   showCategory,
   countCategory,

@@ -20,6 +20,7 @@ const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
 const { checksummedAddress } = require('./utils');
+const { wrapCall } = require('./errorWrappers');
 const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
@@ -109,7 +110,7 @@ async function main() {
 
   cli.command('task', 'manage iExec tasks');
 
-  cli.command('tee', 'interact with Trusted Execution Environment');
+  cli.command('result', 'manage results encryption');
 
   cli.command('registry', 'interact with iExec registry');
 
@@ -141,21 +142,31 @@ async function main() {
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          chain.contracts.fetchRLCAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchClerkAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchAppRegistryAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchDatasetRegistryAddress({
-            hub: hubAddress,
-          }),
-          chain.contracts.fetchWorkerpoolRegistryAddress({
-            hub: hubAddress,
-          }),
+          wrapCall(
+            chain.contracts.fetchRLCAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchClerkAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchAppRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchDatasetRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
+          wrapCall(
+            chain.contracts.fetchWorkerpoolRegistryAddress({
+              hub: hubAddress,
+            }),
+          ),
         ]);
 
         const pocoVersion = packagelockJSON

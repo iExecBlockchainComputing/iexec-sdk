@@ -80,7 +80,7 @@ deploy
       }
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const address = await hub.createObj(objName)(
+      const address = await hub.deployWorkerpool(
         chain.contracts,
         iexecConf[objName],
       );
@@ -123,11 +123,17 @@ show
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
       spinner.start(info.showing(objName));
-      const { workerpool, objAddress } = await hub.showWorkerpool(
-        chain.contracts,
-        addressOrIndex,
-        userAddress,
-      );
+      let res;
+      if (isAddress) {
+        res = await hub.showWorkerpool(chain.contracts, addressOrIndex);
+      } else {
+        res = await hub.showUserWorkerpool(
+          chain.contracts,
+          addressOrIndex,
+          userAddress,
+        );
+      }
+      const { workerpool, objAddress } = res;
       const cleanObj = stringifyNestedBn(workerpool);
       spinner.succeed(`${objName} ${objAddress} details:${pretty(cleanObj)}`, {
         raw: { address: objAddress, workerpool: cleanObj },
@@ -161,7 +167,7 @@ count
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
-      const objCountBN = await hub.countObj(objName)(
+      const objCountBN = await hub.countUserWorkerpools(
         chain.contracts,
         userAddress,
       );

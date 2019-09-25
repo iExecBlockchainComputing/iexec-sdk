@@ -22,3 +22,15 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# test output
+test/out/
+test/UTC*
+test/wallet.json
+test/chain.json
+test/iexec.json
+test/orders.json
+test/deployed.json
+test/results.zip
+test/datasets/
+test/.secrets

@@ -1,17 +1,19 @@
 const Debug = require('debug');
+const { Buffer } = require('buffer');
 const deal = require('./deal');
 const {
   checkEvent,
-  isBytes32,
-  isEthAddress,
   bnifyNestedEthersBn,
   cleanRPC,
-  throwIfMissing,
   getAuthorization,
   download,
   NULL_ADDRESS,
   NULL_BYTES32,
 } = require('./utils');
+const { getAddress } = require('./wallet');
+const { bytes32Schema, uint256Schema, throwIfMissing } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 
 const debug = Debug('iexec:task');
 const objName = 'task';
@@ -31,13 +33,22 @@ const show = async (
   taskid = throwIfMissing(),
 ) => {
   try {
-    if (!isBytes32(taskid, { strict: false })) throw Error('Invalid taskid');
+    const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
     const hubContract = contracts.getHubContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await hubContract.viewTask(taskid)),
+      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
     );
-    if (task.dealid === NULL_BYTES32) throw Error(`No task found for taskid ${taskid} on chain ${chainId}`);
+    if (task.dealid === NULL_BYTES32) {
+      throw new ObjectNotFoundError('task', vTaskId, chainId);
+    }
+    const decodedResult = task.results
+      && Buffer.from(task.results.substr(2), 'hex').toString('utf8');
+    const displayResult = decodedResult
+      && (decodedResult.substr(0, 6) === '/ipfs/'
+        || decodedResult.substr(0, 4) === 'http')
+      ? decodedResult
+      : task.results;
     return Object.assign(
       {},
       task,
@@ -45,9 +56,7 @@ const show = async (
         statusName: TASK_STATUS_MAP[task.status],
       },
       {
-        results:
-          task.results
-          && Buffer.from(task.results.substr(2), 'hex').toString('utf8'),
+        results: displayResult,
       },
     );
   } catch (error) {
@@ -63,16 +72,17 @@ const waitForTaskStatusChange = async (
   counter = 0,
 ) => {
   try {
-    isBytes32(taskid, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const vPrevStatus = await uint256Schema().validate(prevStatus);
+    const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
     debug('taskStatus', taskStatus);
     const taskStatusName = TASK_STATUS_MAP[taskStatus];
-    if (taskStatus !== prevStatus) {
+    if (taskStatus.toString() !== vPrevStatus) {
       return { status: taskStatus, statusName: taskStatusName };
     }
     await sleep(FETCH_INTERVAL);
-    return waitForTaskStatusChange(contracts, taskid, taskStatus, counter + 1);
+    return waitForTaskStatusChange(contracts, vTaskId, taskStatus, counter + 1);
   } catch (error) {
     debug('waitForTaskStatusChange()', error);
     throw error;
@@ -118,12 +128,14 @@ const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
 const fetchResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  userAddress = throwIfMissing(),
-  { ipfsGatewayURL } = {},
+  options = {},
+  options1 = {},
 ) => {
   try {
-    isEthAddress(userAddress, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const ipfsGatewayURL = options.ipfsGatewayURL || options1.ipfsGatewayURL;
+    const userAddress = await getAddress(contracts);
+    const task = await show(contracts, vTaskId);
     if (TASK_STATUS_MAP[task.status] !== 'COMPLETED') throw Error('Task is not completed');
     const tasksDeal = await deal.show(contracts, task.dealid);
     if (
@@ -139,9 +151,11 @@ const fetchResults = async (
     if (resultAddress && resultAddress.substr(0, 6) === '/ipfs/') {
       debug('download from ipfs', resultAddress);
       res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
-    } else {
+    } else if (resultAddress && resultAddress.substr(0, 2) !== '0x') {
       debug('download from result repo', resultAddress);
-      res = await downloadFromResultRepo(contracts, taskid, task, userAddress);
+      res = await downloadFromResultRepo(contracts, vTaskId, task, userAddress);
+    } else {
+      throw Error('No result uploaded for this task');
     }
     return res;
   } catch (error) {
@@ -153,12 +167,10 @@ const fetchResults = async (
 const claim = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  userAddress = throwIfMissing(),
 ) => {
   try {
-    isBytes32(taskid, { strict: true });
-    isEthAddress(userAddress, { strict: true });
-    const task = await show(contracts, taskid);
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
 
     if (
@@ -173,14 +185,6 @@ const claim = async (
     const tasksDeal = await deal.show(contracts, task.dealid);
     debug('tasksDeal', tasksDeal);
 
-    if (tasksDeal.requester.toLowerCase() !== userAddress.toLowerCase()) {
-      throw Error(
-        `Cannot claim a ${objName} requested by someone else: ${
-          tasksDeal.requester
-        }`,
-      );
-    }
-
     const now = Math.floor(Date.now() / 1000);
     const consensusTimeout = parseInt(task.finalDeadline, 10);
 
@@ -193,9 +197,9 @@ const claim = async (
     }
 
     const hubContract = contracts.getHubContract();
-    const claimTx = await hubContract.claim(taskid);
+    const claimTx = await wrapSend(hubContract.claim(taskid));
 
-    const claimTxReceipt = await claimTx.wait();
+    const claimTxReceipt = await wrapWait(claimTx.wait());
     if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;

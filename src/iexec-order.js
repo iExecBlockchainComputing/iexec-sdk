@@ -141,12 +141,7 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
 
-        const signedOrder = await order.signOrder(
-          chain.contracts,
-          order.APP_ORDER,
-          orderObj,
-          address,
-        );
+        const signedOrder = await order.signApporder(chain.contracts, orderObj);
         const { saved, fileName } = await saveSignedOrder(
           order.APP_ORDER,
           chain.id,
@@ -175,11 +170,9 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
 
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signDatasetorder(
           chain.contracts,
-          order.DATASET_ORDER,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.DATASET_ORDER,
@@ -211,11 +204,9 @@ sign
         );
         if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
 
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signWorkerpoolorder(
           chain.contracts,
-          order.WORKERPOOL_ORDER,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.WORKERPOOL_ORDER,
@@ -237,11 +228,9 @@ sign
         await chain.contracts.checkDeployedApp(orderObj.app, {
           strict: true,
         });
-        const signedOrder = await order.signOrder(
+        const signedOrder = await order.signRequestorder(
           chain.contracts,
-          order.REQUEST_ORDER,
           orderObj,
-          address,
         );
         const { saved, fileName } = await saveSignedOrder(
           order.REQUEST_ORDER,
@@ -382,11 +371,9 @@ fill
             pretty(unsignedOrder),
           );
         }
-        const signed = order.signOrder(
+        const signed = await order.signRequestorder(
           chain.contracts,
-          order.REQUEST_ORDER,
           unsignedOrder,
-          address,
         );
         return signed;
       };
@@ -552,7 +539,7 @@ publish
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
 
-      const [chain, signedOrders, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
@@ -562,20 +549,41 @@ publish
         const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
         if (!orderToPublish) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
         spinner.start(`publishing ${orderName}`);
-        const orderHash = await order.publishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderToPublish,
-          address,
-        );
+
+        let orderHash;
+        switch (orderName) {
+          case order.APP_ORDER:
+            orderHash = await order.publishApporder(
+              chain.contracts,
+              orderToPublish,
+            );
+            break;
+          case order.DATASET_ORDER:
+            orderHash = await order.publishDatasetorder(
+              chain.contracts,
+              orderToPublish,
+            );
+            break;
+          case order.WORKERPOOL_ORDER:
+            orderHash = await order.publishWorkerpoolorder(
+              chain.contracts,
+              orderToPublish,
+            );
+            break;
+          case order.REQUEST_ORDER:
+            orderHash = await order.publishRequestorder(
+              chain.contracts,
+              orderToPublish,
+            );
+            break;
+          default:
+        }
+
         spinner.succeed(
           `${orderName} successfully published with orderHash ${orderHash}`,
           { raw: { orderHash } },
@@ -615,7 +623,7 @@ unpublish
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
 
-      const [chain, signedOrders, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
@@ -632,9 +640,7 @@ unpublish
           const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToUnpublish) {
             throw new Error(
-              `No orderHash specified and no signed ${orderName} found for chain ${
-                chain.id
-              } in "orders.json"`,
+              `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
             );
           }
           orderHashToUnpublish = await order.computeOrderHash(
@@ -651,13 +657,35 @@ unpublish
         }
 
         spinner.start(`unpublishing ${orderName}`);
-        const unpublished = await order.unpublishOrder(
-          chain.contracts,
-          orderName,
-          chain.id,
-          orderHashToUnpublish,
-          address,
-        );
+
+        let unpublished;
+        switch (orderName) {
+          case order.APP_ORDER:
+            unpublished = await order.unpublishApporder(
+              chain.contracts,
+              orderHashToUnpublish,
+            );
+            break;
+          case order.DATASET_ORDER:
+            unpublished = await order.unpublishDatasetorder(
+              chain.contracts,
+              orderHashToUnpublish,
+            );
+            break;
+          case order.WORKERPOOL_ORDER:
+            unpublished = await order.unpublishWorkerpoolorder(
+              chain.contracts,
+              orderHashToUnpublish,
+            );
+            break;
+          case order.REQUEST_ORDER:
+            unpublished = await order.unpublishRequestorder(
+              chain.contracts,
+              orderHashToUnpublish,
+            );
+            break;
+          default:
+        }
         spinner.succeed(
           `${orderName} with orderHash ${unpublished} successfully unpublished`,
           { raw: { orderHash: unpublished } },
@@ -698,7 +726,7 @@ cancel
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [chain, signedOrders, { address }] = await Promise.all([
+      const [chain, signedOrders] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
         keystore.load(),
@@ -708,14 +736,27 @@ cancel
         const orderToCancel = signedOrders[chain.id][orderName];
         if (!orderToCancel) {
           throw new Error(
-            `Missing signed ${orderName} for chain ${
-              chain.id
-            } in "orders.json"`,
+            `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
           );
         }
         if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
         spinner.start(`canceling ${orderName}`);
-        await order.cancelOrder(chain.contracts, orderName, orderToCancel);
+
+        switch (orderName) {
+          case order.APP_ORDER:
+            await order.cancelApporder(chain.contracts, orderToCancel);
+            break;
+          case order.DATASET_ORDER:
+            await order.cancelDatasetorder(chain.contracts, orderToCancel);
+            break;
+          case order.WORKERPOOL_ORDER:
+            await order.cancelWorkerpoolorder(chain.contracts, orderToCancel);
+            break;
+          case order.REQUEST_ORDER:
+            await order.cancelRequestorder(chain.contracts, orderToCancel);
+            break;
+          default:
+        }
         spinner.succeed(`${orderName} successfully canceled`);
       };
 

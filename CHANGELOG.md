@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- IexecSDK constructor
+- `wallet.getAddress()` gives the current wallet address
+- `deal.show()` added key `tasks: { [idx]: [taskid] }` to the resolved value
+- dynamic cast and validation of inputs, invalid inputs throw `ValidationError`.
+- introduced TypedErrors `ValidationError`, `Web3ProviderError`, `Web3ProviderCallError`, `Web3ProviderSendError`, `Web3ProviderSignMessageError`, `ObjectNotFoundError`.
+
+### Changed
+
+- [BREAKING] `iexec tee` subcommands removed and replaced
+  - `iexec tee init` is replaced by `ìexec dataset init --encrypted`
+  - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
+  - `iexec tee generate-beneficiary-keys` is replaced by `iexec result generate-key`
+  - `iexec tee decrypt-result` is replaced by `iexec result decrypt`
+  - `iexec tee push-secret` is replaced by `iexec dataset push-secret` and `iexec result push-secret`
+  - `iexec tee check-secret` is replaced by `iexec dataset check-secret` and `iexec result check-secret`
+- [BREAKING] `.tee-secrets/`folder moved to `.secrets`
+- [BREAKING] default original dataset folder `tee/original-dataset/` folder moved to `datasets/original/`
+- [BREAKING] default encrypted dataset folder `tee/original-encrypted/` folder moved to `datasets/encrypted/`
+- [BREAKING] `iexec deal show` ends with error when the deal doesn't exists
+- [BREAKING] `deal.show()` throw when the deal doesn't exists
+- [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
+- [BREAKING] `deal.computeTaskId()` returns a promise
+- [BREAKING] errors handling with `--raw` option now returns `{ command, error: { name, message } }` previously was `{ command, error: message }`
+- [DEPRECATED] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` is deprecated, use `IExec` constructor.
+- [DEPRECATED] `order.signOrder()` is replaced by dedicated methods `order.signApporder()`, `order.signDatasetorder()`, `order.signWorkerpoolorder()`, `order.signRequestorder()`
+- [DEPRECATED] `order.cancelOrder()` is replaced by dedicated methods `order.cancelApporder()`, `order.cancelDatasetorder()`, `order.cancelWorkerpoolorder()`, `order.cancelRequestorder()`
+- [DEPRECATED] `order.publishOrder()` is replaced by dedicated methods `order.publishApporder()`, `order.publishDatasetorder()`, `order.publishWorkerpoolorder()`, `order.publishRequestorder()`
+- [DEPRECATED] `order.unpublishOrder()` is replaced by dedicated methods `order.unpublishApporder()`, `order.unpublishDatasetorder()`, `order.unpublishWorkerpoolorder()`, `order.unpublishRequestorder()`
+- [DEPRECATED] `hub.createObj()` is replaced by dedicated methods `hub.deployApp()`, `hub.deployDataset()`, `hub.deployWorkerpool()`
+- [DEPRECATED] `hub.countObj()` is replaced by dedicated methods `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
+- [DEPRECATED] `hub.showObj()` is replaced by dedicated methods `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
+- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserApp(contracts, index, userAddress)` or `hub.showApp(contracts, appAddress)`
+- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserDataset(contracts, index, userAddress)` or `hub.showDataset(contracts, datasetAddress)`
+- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
+- [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
+- [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
+- Update `multiaddr@6.1.0` to `multiaddr@7.1.0`: `/ipfs` protocol 421 is now displayed `/p2p`
+- fix everyone can claim a task
+- fix `iexec task show` oracle results hexadecimal display (#88)
+- fix `iexec task show --download` oracle results error message
+
+### Removed
+
+- [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
+- [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
+
 ## [3.0.36] - 2019-09-24
 
 ### Added

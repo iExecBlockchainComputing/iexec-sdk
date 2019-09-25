@@ -24,11 +24,7 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const {
-  NULL_ADDRESS,
-  isEthAddress,
-  humanToMultiaddrBuffer,
-} = require('./utils');
+const { NULL_ADDRESS, isEthAddress } = require('./utils');
 
 const objName = 'app';
 
@@ -81,24 +77,9 @@ deploy
           `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
         );
       }
-      const appMultiaddrBuffer = humanToMultiaddrBuffer(
-        iexecConf[objName].multiaddr,
-        { strict: false },
-      );
-      const appMREnclaveBuffer = Buffer.from(
-        iexecConf[objName].mrenclave,
-        'utf8',
-      );
-      const appToDeploy = Object.assign({}, iexecConf[objName], {
-        multiaddr: appMultiaddrBuffer,
-        mrenclave: appMREnclaveBuffer,
-      });
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const address = await hub.createObj(objName)(
-        chain.contracts,
-        appToDeploy,
-      );
+      const address = await hub.deployApp(chain.contracts, iexecConf[objName]);
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address },
       });
@@ -136,13 +117,19 @@ show
       if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
-
       spinner.start(info.showing(objName));
-      const { app, objAddress } = await hub.showApp(
-        chain.contracts,
-        addressOrIndex,
-        userAddress,
-      );
+
+      let res;
+      if (isAddress) {
+        res = await hub.showApp(chain.contracts, addressOrIndex);
+      } else {
+        res = await hub.showUserApp(
+          chain.contracts,
+          addressOrIndex,
+          userAddress,
+        );
+      }
+      const { app, objAddress } = res;
       spinner.succeed(`${objName} ${objAddress} details:${pretty(app)}`, {
         raw: { address: objAddress, app },
       });
@@ -173,10 +160,7 @@ count
       const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
       spinner.start(info.counting(objName));
-      const objCountBN = await hub.countObj(objName)(
-        chain.contracts,
-        userAddress,
-      );
+      const objCountBN = await hub.countUserApps(chain.contracts, userAddress);
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
         { raw: { count: objCountBN.toString() } },
