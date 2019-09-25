@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `hub.showUserWorkerpool(contracts, index, userAddress)` or `hub.showWorkerpool(contracts, workerpoolAddress)`
 - [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `task.claim(contracts, taskid)`
 - [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `task.fetchResults(contracts, taskid, options)`
+- Update `multiaddr@6.1.0` to `multiaddr@7.1.0`: `/ipfs` protocol 421 is now displayed `/p2p`
 - fix everyone can claim a task
 - fix `iexec task show` oracle results hexadecimal display (#88)
 - fix `iexec task show --download` oracle results error message
