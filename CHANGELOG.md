@@ -21,6 +21,9 @@ All notable changes to this project will be documented in this file.
   - `iexec tee decrypt-result` is replaced by `iexec result decrypt`
   - `iexec tee push-secret` is replaced by `iexec dataset push-secret` and `iexec result push-secret`
   - `iexec tee check-secret` is replaced by `iexec dataset check-secret` and `iexec result check-secret`
+- [BREAKING] `.tee-secrets/`folder moved to `.secrets`
+- [BREAKING] default original dataset folder `tee/original-dataset/` folder moved to `datasets/original/`
+- [BREAKING] default encrypted dataset folder `tee/original-encrypted/` folder moved to `datasets/encrypted/`
 - [BREAKING] `iexec deal show` ends with error when the deal doesn't exists
 - [BREAKING] `deal.show()` throw when the deal doesn't exists
 - [BREAKING] `deal.computeTaskIdsArray()` is no longer exposed (`deal.show()` resolves now as `{..., tasks: { [idx]: [taskid] }}`)
