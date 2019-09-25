@@ -2,7 +2,7 @@
 
 # iExec SDK V3
 
-[![Build Status](https://drone.iex.ec//api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
+[![Build Status](https://drone.iex.ec/api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
 
 The iExec SDK is a CLI and a JS library that allows easy interactions with iExec decentralized Marketplace in order to run off-chain computations.
@@ -258,6 +258,26 @@ iexec account withdraw 1000 # withdraw RLC from your account to your wallet
 
 # iExec SDK CLI API
 
+- [Help & Info](#help--info)
+- [Global options](#global-options)
+  - [Wallet options](#wallet-options)
+  - [Transactions options](#Transactions-options)
+- CLI commands
+  - [init](#init)
+  - [wallet](#wallet)
+  - [account](#account)
+  - [app](#app)
+  - [dataset](#dataset)
+  - [workerpool](#workerpool)
+  - [order](#order)
+  - [orderbook](#orderbook)
+  - [deal](#deal)
+  - [task](#task)
+  - [result](#result)
+  - [category](#category)
+  - [registry](#registry)
+- [CLI files and folders](#cli-files-and-folders)
+
 ## Help & Info
 
 ```bash
@@ -357,13 +377,14 @@ iexec app count --user <userAddress> # count user total number of app
 # --chain <chainName>
 # --user <address>
 iexec dataset init # init new dataset
+iexec dataset init --encrypted # init new dataset and folders for dataset encryption
 iexec dataset deploy # deploy new dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
 iexec dataset encrypt # generate a key and encrypt the dataset files from ./datasets/original/
 iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
-iexec dataset push-secret [datasetAddress] # push the secret for the dataset
+iexec dataset push-secret [datasetAddress] # push the secret for the encrypted dataset
 iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 ```
 
