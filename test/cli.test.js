@@ -1715,8 +1715,9 @@ describe('[Common]', () => {
         expect(res.secretPath).toBe(undefined);
         expect(res.privateKeyFile).toBe(undefined);
         expect(res.publicKeyFile).toBe(undefined);
+        expect(res.error.name).toBe('Error');
         expect(
-          res.error.indexOf(
+          res.error.message.indexOf(
             'Minimum node version to use this command is v10.12.0, found v',
           ),
         ).not.toBe(-1);
