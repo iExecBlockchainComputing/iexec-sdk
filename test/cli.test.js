@@ -1737,7 +1737,7 @@ describe('[Common]', () => {
         expect(res.publicKeyFile).toBe(
           '0x7bd4783FDCAD405A28052a0d1f11236A741da593_key.pub',
         );
-      });
+      }, 10000);
     }
 
     test('iexec result decrypt --force (wrong beneficiary key)', async () => {
