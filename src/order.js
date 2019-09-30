@@ -304,7 +304,11 @@ const signOrder = async (
     message,
   };
 
-  const sign = await signTypedDatav3(contracts.ethProvider, address, typedData);
+  const sign = await signTypedDatav3(
+    contracts.jsonRpcProvider,
+    address,
+    typedData,
+  );
   const signedOrder = Object.assign(saltedOrderObj, { sign });
   return signedOrder;
 };
@@ -413,7 +417,7 @@ const publishOrder = async (
     const authorization = await getAuthorization(
       chainId,
       address,
-      contracts.ethProvider,
+      contracts.jsonRpcProvider,
     );
     const response = await http.post(endpoint, body, { authorization });
     if (response.ok && response.saved && response.saved.orderHash) {
@@ -480,7 +484,7 @@ const unpublishOrder = async (
     const authorization = await getAuthorization(
       chainId,
       address,
-      contracts.ethProvider,
+      contracts.jsonRpcProvider,
     );
     const response = await http.post(endpoint, body, { authorization });
     if (response.ok && response.unpublished) {

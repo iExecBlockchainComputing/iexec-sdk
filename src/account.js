@@ -85,7 +85,7 @@ const withdraw = async (
     //   const withdrawGas = ethersBnToBn(
     //     await clerkContract.estimate.withdraw(amount),
     //   );
-    //   const gasPrice = new BN((await contracts.eth.getGasPrice()).toString());
+    //   const gasPrice = new BN((await contracts.jsonRpcProvider.getGasPrice()).toString());
     //   const withdrawWeiCost = withdrawGas.mul(gasPrice);
     //   const weiAmount = bnNRlcToBnWei(new BN(amount));
     //   debug('withdrawCost', withdrawWeiCost.toString());

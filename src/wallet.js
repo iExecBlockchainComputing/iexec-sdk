@@ -57,7 +57,9 @@ const ethFaucets = [
 ];
 
 const getAddress = async (contracts = throwIfMissing()) => {
-  const address = await wrapCall(contracts.eth.getSigner().getAddress());
+  const address = await wrapCall(
+    contracts.jsonRpcProvider.getSigner().getAddress(),
+  );
   return checksummedAddress(address);
 };
 
@@ -68,10 +70,7 @@ const checkBalances = async (
   try {
     const vAddress = await addressSchema().validate(address);
     const { isNative } = contracts;
-    const getETH = () => contracts.eth.getBalance(vAddress).catch((error) => {
-      debug(error);
-      return 0;
-    });
+    const getETH = () => contracts.jsonRpcProvider.getBalance(vAddress);
     const balances = {};
     if (isNative) {
       const weiBalance = await getETH();
@@ -179,7 +178,7 @@ const sendNativeToken = async (
     const vAddress = await addressSchema().validate(to);
     const vValue = await uint256Schema().validate(value);
     const hexValue = ethersBigNumberify(vValue).toHexString();
-    const ethSigner = contracts.eth.getSigner();
+    const ethSigner = contracts.jsonRpcProvider.getSigner();
     const tx = await wrapSend(
       ethSigner.sendTransaction({
         data: '0x',
@@ -258,7 +257,7 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
     const vAddressTo = await addressSchema().validate(to);
     const userAddress = await getAddress(contracts);
-    const code = await contracts.eth.getCode(vAddressTo);
+    const code = await contracts.jsonRpcProvider.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
     }
@@ -284,7 +283,9 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         balances = await checkBalances(contracts, userAddress);
       }
     }
-    const gasPrice = new BN((await contracts.eth.getGasPrice()).toString());
+    const gasPrice = new BN(
+      (await contracts.jsonRpcProvider.getGasPrice()).toString(),
+    );
     const gasLimit = new BN(21000);
     const txFee = gasPrice.mul(gasLimit);
     const sweepNative = balances.wei.sub(txFee);
@@ -327,7 +328,7 @@ const bridgeToSidechain = async (
     const homeBridgeContract = new Contract(
       vBridgeAddress,
       homeBridgeErcToNativeDesc.abi,
-      contracts.eth,
+      contracts.jsonRpcProvider,
     );
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
       wrapCall(homeBridgeContract.minPerTx()),
@@ -367,7 +368,7 @@ const bridgeToMainchain = async (
     const foreignBridgeContract = new Contract(
       vBridgeAddress,
       foreignBridgeErcToNativeDesc.abi,
-      contracts.eth,
+      contracts.jsonRpcProvider,
     );
 
     const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));

@@ -20,20 +20,7 @@ const pushSecret = async (
     const vSignerAddress = await getAddress(contracts);
     await stringSchema().validate(secret, { strict: true });
 
-    const personnalSign = data => new Promise((resolve, reject) => {
-      contracts.ethProvider.sendAsync(
-        {
-          method: 'personal_sign',
-          params: [vSignerAddress, data],
-        },
-        (err, result) => {
-          if (err) reject(err);
-          else if (result.error) reject(result.error);
-          else if (result.result) resolve(result.result);
-          else resolve(result); // should not happen
-        },
-      );
-    });
+    const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [vSignerAddress, data]);
     const sign = await wrapPersonalSign(
       personnalSign(secretPrefix.concat(secret)),
     );

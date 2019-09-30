@@ -113,7 +113,7 @@ const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
   const authorization = await getAuthorization(
     contracts.chainId,
     userAddress,
-    contracts.ethProvider,
+    contracts.jsonRpcProvider,
     { apiUrl: resultRepoBaseURL },
   );
   const res = await download('GET')(

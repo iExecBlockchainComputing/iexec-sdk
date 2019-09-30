@@ -258,20 +258,7 @@ const download = verb => async (
 };
 
 const signTypedDatav3 = async (eth, address, typedData) => {
-  const signTDv3 = td => new Promise((resolve, reject) => {
-    eth.sendAsync(
-      {
-        method: 'eth_signTypedData_v3',
-        params: [address, JSON.stringify(td)],
-      },
-      (err, result) => {
-        if (err) reject(err);
-        else if (result.error) reject(result.error);
-        else if (result.result) resolve(result.result);
-        else resolve(result); // should not happen
-      },
-    );
-  });
+  const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
   const sign = await wrapSignTypedDataV3(signTDv3(typedData));
   return sign;
 };
