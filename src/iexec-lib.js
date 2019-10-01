@@ -28,12 +28,47 @@ const utils = {
 };
 
 class IExec {
-  constructor({ ethProvider, chainId, hubAddress }) {
+  constructor(
+    { ethProvider, chainId, hubAddress },
+    { isNative = false, bridgeAddress, bridgedNetworkConf } = {},
+  ) {
     const contracts = createIExecContracts({
       ethProvider,
       chainId,
       hubAddress,
+      isNative,
     });
+    let bridgedContracts;
+    if (bridgedNetworkConf) {
+      const bridgedChainId = bridgedNetworkConf.chainId;
+      if (!chainId) {
+        throw new errors.ValidationError(
+          'Missing chainId in bridgedNetworkConf',
+        );
+      }
+      const bridgedHubAddress = bridgedNetworkConf.hubAddress;
+      const bridgedRpcUrl = bridgedNetworkConf.rpcURL;
+      if (!bridgedRpcUrl) {
+        throw new errors.ValidationError(
+          'Missing RpcURL in bridgedNetworkConf',
+        );
+      }
+      const bridgedBridgeAddress = bridgedNetworkConf.bridgeAddress;
+      if (!bridgedBridgeAddress) {
+        throw new errors.ValidationError(
+          'Missing bridgeAddress in bridgedNetworkConf',
+        );
+      }
+      const bridgedIsNative = !isNative;
+      const bridgedProvider = bridgedRpcUrl;
+      bridgedContracts = createIExecContracts({
+        chainId: bridgedChainId,
+        isNative: bridgedIsNative,
+        hubAddress: bridgedHubAddress,
+        ethProvider: bridgedProvider,
+      });
+    }
+
     this.wallet = {};
     this.wallet.getAddress = () => wallet.getAddress(contracts);
     this.wallet.checkBalances = address => wallet.checkBalances(contracts, address);
