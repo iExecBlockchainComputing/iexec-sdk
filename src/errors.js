@@ -55,6 +55,20 @@ class ObjectNotFoundError extends Error {
   }
 }
 
+class BridgeError extends Error {
+  constructor(originalError, sendTxHash) {
+    super(
+      `Failed to get bridged chain confirmation for transaction ${sendTxHash}`,
+    );
+    this.name = this.constructor.name;
+    this.sendTxHash = sendTxHash;
+    this.originalError = originalError;
+    if (originalError && typeof originalError === 'object') {
+      Object.assign(this, getPropsToCopy(originalError));
+    }
+  }
+}
+
 module.exports = {
   ObjectNotFoundError,
   ValidationError,
@@ -62,4 +76,5 @@ module.exports = {
   Web3ProviderCallError,
   Web3ProviderSendError,
   Web3ProviderSignMessageError,
+  BridgeError,
 };

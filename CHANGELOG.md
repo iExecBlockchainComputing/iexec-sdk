@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - optional bridge configuration in `chain.json`
 - `iexec wallet bridge-to-sidechain <nRlcAmount>` sending RLC from a mainchain to the bridged sidechain.
 - `iexec wallet bridge-to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
+- brindging RLC between mainchain an sidechain may throw `BridgeError`
 
 ### Changed
 

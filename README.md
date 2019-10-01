@@ -1827,6 +1827,7 @@ iexec sdk use typed errors, errors constructors are accessible through import.
 ```js
 import { errors } from 'iexec';
 const {
+  BridgeError,
   ObjectNotFoundError,
   ValidationError,
   Web3ProviderError,
@@ -1835,6 +1836,15 @@ const {
   Web3ProviderSignMessageError,
 } = errors;
 ```
+
+#### BridgeError
+
+`BridgeError` is thrown when sending RLC between mainchain and sidechain fail before the value transfert confirmation.
+
+Specific properties:
+
+- `error.originalError`: the original exception
+- `error.sendTxHash`: the send transaction
 
 #### ObjectNotFoundError
 
