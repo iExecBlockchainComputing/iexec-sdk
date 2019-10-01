@@ -218,6 +218,9 @@ class IExec {
     this.task.claim = taskid => task.claim(contracts, taskid);
     this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => task.fetchResults(contracts, taskid, { ipfsGatewayURL });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
+    this.network = {};
+    this.network.id = chainId;
+    this.network.isSidechain = !!isNative;
   }
 }
 
