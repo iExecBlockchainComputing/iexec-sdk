@@ -72,11 +72,23 @@ class IExec {
     this.wallet = {};
     this.wallet.getAddress = () => wallet.getAddress(contracts);
     this.wallet.checkBalances = address => wallet.checkBalances(contracts, address);
+    this.wallet.checkBridgedBalances = address => wallet.checkBalances(bridgedContracts, address);
     this.wallet.sendETH = (weiAmount, to) => wallet.sendETH(contracts, weiAmount, to);
     this.wallet.sendRLC = (nRlcAmount, to) => wallet.sendRLC(contracts, nRlcAmount, to);
     this.wallet.sweep = to => wallet.checkBalances(contracts, null, to);
+    this.wallet.bridgeToSidechain = nRlcAmount => wallet.bridgeToSidechain(contracts, bridgeAddress, nRlcAmount, {
+      bridgedContracts,
+      sidechainBridgeAddress:
+          bridgedNetworkConf && bridgedNetworkConf.bridgeAddress,
+    });
+    this.wallet.bridgeToMainchain = nRlcAmount => wallet.bridgeToMainchain(contracts, bridgeAddress, nRlcAmount, {
+      bridgedContracts,
+      mainchainBridgeAddress:
+          bridgedNetworkConf && bridgedNetworkConf.bridgeAddress,
+    });
     this.account = {};
     this.account.checkBalance = address => account.checkBalance(contracts, address);
+    this.account.checkBridgedBalance = address => account.checkBalance(bridgedContracts, address);
     this.account.deposit = nRlcAmount => account.deposit(contracts, nRlcAmount);
     this.account.withdraw = nRlcAmount => account.withdraw(contracts, nRlcAmount);
     this.app = {};
