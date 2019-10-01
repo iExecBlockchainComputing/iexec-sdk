@@ -14,6 +14,7 @@ const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNat
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
 const { addressSchema, uint256Schema, throwIfMissing } = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
+const { BridgeError } = require('./errors');
 
 const debug = Debug('iexec:wallet');
 
@@ -319,21 +320,27 @@ const bridgeToSidechain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
+  { sidechainBridgeAddress, bridgedContracts } = {},
 ) => {
+  let sendTxHash;
+  let receiveTxHash;
   try {
     const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vSidechainBridgeAddress = sidechainBridgeAddress
+      ? await addressSchema().validate(sidechainBridgeAddress)
+      : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
 
-    const homeBridgeContract = new Contract(
+    const ercBridgeContract = new Contract(
       vBridgeAddress,
-      homeBridgeErcToNativeDesc.abi,
+      foreignBridgeErcToNativeDesc.abi,
       contracts.jsonRpcProvider,
     );
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
-      wrapCall(homeBridgeContract.minPerTx()),
-      wrapCall(homeBridgeContract.maxPerTx()),
-      wrapCall(homeBridgeContract.withinExecutionLimit(vAmount)),
+      wrapCall(ercBridgeContract.minPerTx()),
+      wrapCall(ercBridgeContract.maxPerTx()),
+      wrapCall(ercBridgeContract.withinExecutionLimit(vAmount)),
     ]);
     if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
       throw Error(
@@ -347,10 +354,42 @@ const bridgeToSidechain = async (
     }
     if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
 
-    const sendTxHash = await sendRLC(contracts, vAmount, vBridgeAddress);
-    return { sendTxHash };
+    const sidechainBlockNumber = vSidechainBridgeAddress && bridgedContracts
+      ? await bridgedContracts.jsonRpcProvider.getBlockNumber()
+      : 0;
+
+    sendTxHash = await sendRLC(contracts, vAmount, vBridgeAddress);
+    debug('sendTxHash', sendTxHash);
+
+    if (vSidechainBridgeAddress && bridgedContracts) {
+      const waitAffirmationCompleted = txHash => new Promise((resolve) => {
+        debug('waitAffirmationCompleted');
+        const sidechainBridge = new Contract(
+          vSidechainBridgeAddress,
+          homeBridgeErcToNativeDesc.abi,
+          bridgedContracts.jsonRpcProvider,
+        );
+        sidechainBridge.on(
+          sidechainBridge.filters.AffirmationCompleted(),
+          (address, amount, refTxHash, event) => {
+            if (refTxHash === txHash) {
+              debug('AffirmationCompleted', event);
+              resolve(event);
+            }
+          },
+        );
+        bridgedContracts.jsonRpcProvider.resetEventsBlock(
+          sidechainBlockNumber,
+        );
+        debug(`watching events from block ${sidechainBlockNumber}`);
+      });
+      const event = await waitAffirmationCompleted(sendTxHash);
+      receiveTxHash = event.transactionHash;
+    }
+    return { sendTxHash, receiveTxHash };
   } catch (error) {
     debug('bridgeToSidechain()', error);
+    if (sendTxHash) throw new BridgeError(error, sendTxHash);
     throw error;
   }
 };
@@ -359,15 +398,21 @@ const bridgeToMainchain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
+  { mainchainBridgeAddress, bridgedContracts } = {},
 ) => {
+  let sendTxHash;
+  let receiveTxHash;
   try {
     const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vMainchainBridgeAddress = mainchainBridgeAddress
+      ? await addressSchema().validate(mainchainBridgeAddress)
+      : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
 
-    const foreignBridgeContract = new Contract(
+    const sidechainBridgeContract = new Contract(
       vBridgeAddress,
-      foreignBridgeErcToNativeDesc.abi,
+      homeBridgeErcToNativeDesc.abi,
       contracts.jsonRpcProvider,
     );
 
@@ -375,9 +420,9 @@ const bridgeToMainchain = async (
     const weiValue = bnWeiValue.toString();
 
     const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
-      wrapCall(foreignBridgeContract.minPerTx()),
-      wrapCall(foreignBridgeContract.maxPerTx()),
-      wrapCall(foreignBridgeContract.withinExecutionLimit(vAmount)),
+      wrapCall(sidechainBridgeContract.minPerTx()),
+      wrapCall(sidechainBridgeContract.maxPerTx()),
+      wrapCall(sidechainBridgeContract.withinExecutionLimit(vAmount)),
     ]);
     debug('minPerTx', minPerTx.toString());
     debug('maxPerTx', maxPerTx.toString());
@@ -399,14 +444,42 @@ const bridgeToMainchain = async (
     }
     if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
 
-    const sendTxHash = await sendNativeToken(
-      contracts,
-      weiValue,
-      vBridgeAddress,
-    );
-    return { sendTxHash };
+    const mainchainBlockNumber = vMainchainBridgeAddress && bridgedContracts
+      ? await bridgedContracts.jsonRpcProvider.getBlockNumber()
+      : 0;
+
+    sendTxHash = await sendNativeToken(contracts, weiValue, vBridgeAddress);
+    debug('sendTxHash', sendTxHash);
+
+    if (vMainchainBridgeAddress && bridgedContracts) {
+      const waitRelayedMessage = txHash => new Promise((resolve) => {
+        debug('waitRelayedMessage');
+        const mainchainBridge = new Contract(
+          vMainchainBridgeAddress,
+          foreignBridgeErcToNativeDesc.abi,
+          bridgedContracts.jsonRpcProvider,
+        );
+        mainchainBridge.on(
+          mainchainBridge.filters.RelayedMessage(),
+          (address, amount, refTxHash, event) => {
+            if (refTxHash === txHash) {
+              debug('RelayedMessage', event);
+              resolve(event);
+            }
+          },
+        );
+        bridgedContracts.jsonRpcProvider.resetEventsBlock(
+          mainchainBlockNumber,
+        );
+        debug(`watching events from block ${mainchainBlockNumber}`);
+      });
+      const event = await waitRelayedMessage(sendTxHash);
+      receiveTxHash = event.transactionHash;
+    }
+    return { sendTxHash, receiveTxHash };
   } catch (error) {
-    debug('bridgeToSidechain()', error);
+    debug('bridgeToMainchain()', error);
+    if (sendTxHash) throw new BridgeError(error, sendTxHash);
     throw error;
   }
 };
