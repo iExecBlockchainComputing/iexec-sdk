@@ -858,9 +858,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
-    expect(res.balance.ETH.replace('.', '').indexOf(res.balance.nRLC)).not.toBe(
-      -1,
-    );
+    expect(res.balance.ETH).toBe(undefined);
   });
 
   test('[sidechain] iexec wallet sendETH', async () => {
