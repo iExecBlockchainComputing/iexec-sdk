@@ -369,19 +369,26 @@ const bridgeToSidechain = async (
           homeBridgeErcToNativeDesc.abi,
           bridgedContracts.jsonRpcProvider,
         );
-        sidechainBridge.on(
-          sidechainBridge.filters.AffirmationCompleted(),
-          (address, amount, refTxHash, event) => {
-            if (refTxHash === txHash) {
-              debug('AffirmationCompleted', event);
-              resolve(event);
-            }
-          },
-        );
-        bridgedContracts.jsonRpcProvider.resetEventsBlock(
-          sidechainBlockNumber,
-        );
-        debug(`watching events from block ${sidechainBlockNumber}`);
+        const cleanListeners = () => sidechainBridge.removeAllListeners('AffirmationCompleted');
+        try {
+          sidechainBridge.on(
+            sidechainBridge.filters.AffirmationCompleted(),
+            (address, amount, refTxHash, event) => {
+              if (refTxHash === txHash) {
+                cleanListeners();
+                debug('AffirmationCompleted', event);
+                resolve(event);
+              }
+            },
+          );
+          bridgedContracts.jsonRpcProvider.resetEventsBlock(
+            sidechainBlockNumber,
+          );
+          debug(`watching events from block ${sidechainBlockNumber}`);
+        } catch (e) {
+          cleanListeners();
+          throw e;
+        }
       });
       const event = await waitAffirmationCompleted(sendTxHash);
       receiveTxHash = event.transactionHash;
@@ -459,19 +466,26 @@ const bridgeToMainchain = async (
           foreignBridgeErcToNativeDesc.abi,
           bridgedContracts.jsonRpcProvider,
         );
-        mainchainBridge.on(
-          mainchainBridge.filters.RelayedMessage(),
-          (address, amount, refTxHash, event) => {
-            if (refTxHash === txHash) {
-              debug('RelayedMessage', event);
-              resolve(event);
-            }
-          },
-        );
-        bridgedContracts.jsonRpcProvider.resetEventsBlock(
-          mainchainBlockNumber,
-        );
-        debug(`watching events from block ${mainchainBlockNumber}`);
+        const cleanListeners = () => mainchainBridge.removeAllListeners('RelayedMessage');
+        try {
+          mainchainBridge.on(
+            mainchainBridge.filters.RelayedMessage(),
+            (address, amount, refTxHash, event) => {
+              if (refTxHash === txHash) {
+                debug('RelayedMessage', event);
+                cleanListeners();
+                resolve(event);
+              }
+            },
+          );
+          bridgedContracts.jsonRpcProvider.resetEventsBlock(
+            mainchainBlockNumber,
+          );
+          debug(`watching events from block ${mainchainBlockNumber}`);
+        } catch (e) {
+          cleanListeners();
+          throw e;
+        }
       });
       const event = await waitRelayedMessage(sendTxHash);
       receiveTxHash = event.transactionHash;
