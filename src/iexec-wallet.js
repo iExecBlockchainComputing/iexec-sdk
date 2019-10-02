@@ -401,21 +401,38 @@ bridgeToSidechain
           chain.id,
         );
       }
+      const bridgedChainConfigured = !!(
+        chain.bridgedNetwork
+        && chain.bridgedNetwork.contracts
+        && chain.bridgedNetwork.bridge
+        && chain.bridgedNetwork.bridge.contract
+      );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
       spinner.start(`sending ${message}...`);
-      const { sendTxHash } = await wallet.bridgeToSidechain(
+      const { sendTxHash, receiveTxHash } = await wallet.bridgeToSidechain(
         chain.contracts,
         bridgeAddress,
         nRlcAmount,
+        {
+          sidechainBridgeAddress:
+            bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
+          bridgedContracts:
+            bridgedChainConfigured && chain.bridgedNetwork.contracts,
+        },
       );
       spinner.succeed(
-        `Sent ${message} (tx: ${sendTxHash})\nPlease wait for the agent to credit your wallet on chain ${bridgedNetworkId}`,
+        `Sent ${message} (tx: ${sendTxHash})\n${
+          bridgedChainConfigured
+            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+        }`,
         {
           raw: {
             amount: nRlcAmount,
             from: address,
             to: bridgeAddress,
             sendTxHash,
+            receiveTxHash,
           },
         },
       );
@@ -464,21 +481,38 @@ bridgeToMainchain
           chain.id,
         );
       }
+      const bridgedChainConfigured = !!(
+        chain.bridgedNetwork
+        && chain.bridgedNetwork.contracts
+        && chain.bridgedNetwork.bridge
+        && chain.bridgedNetwork.bridge.contract
+      );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
       spinner.start(`sending ${message}...`);
-      const { sendTxHash } = await wallet.bridgeToMainchain(
+      const { sendTxHash, receiveTxHash } = await wallet.bridgeToMainchain(
         chain.contracts,
         bridgeAddress,
         nRlcAmount,
+        {
+          mainchainBridgeAddress:
+            bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
+          bridgedContracts:
+            bridgedChainConfigured && chain.bridgedNetwork.contracts,
+        },
       );
       spinner.succeed(
-        `Sent ${message} (tx: ${sendTxHash})\nPlease wait for the agent to credit your wallet on chain ${bridgedNetworkId}`,
+        `Sent ${message} (tx: ${sendTxHash})\n${
+          bridgedChainConfigured
+            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+        }`,
         {
           raw: {
             amount: nRlcAmount,
             from: address,
             to: bridgeAddress,
             sendTxHash,
+            receiveTxHash,
           },
         },
       );
