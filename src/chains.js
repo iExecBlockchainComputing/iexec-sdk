@@ -17,7 +17,7 @@ const createChainFromConf = (
     signMessage,
     signPersonalMessage,
   },
-  { txOptions = {} } = {},
+  { txOptions = {}, bridgeConf } = {},
 ) => {
   try {
     const chain = Object.assign({}, chainConf);
@@ -33,14 +33,23 @@ const createChainFromConf = (
       },
       { gasPrice: txOptions.gasPrice },
     );
-    const ethSignerProvider = new SignerProvider(chainConf.host, signerOptions);
+    const ethProvider = new SignerProvider(chainConf.host, signerOptions);
     chain.name = chainName;
     chain.contracts = createIExecContracts({
-      ethSignerProvider,
+      ethProvider,
       chainId: chain.id,
       hubAddress: chain.hub,
       isNative: !!chain.native,
     });
+    if (bridgeConf) {
+      chain.bridgedNetwork = Object.assign({}, bridgeConf);
+      chain.bridgedNetwork.contracts = createIExecContracts({
+        ethProvider: bridgeConf.host,
+        chainId: bridgeConf.id,
+        hubAddress: bridgeConf.hub,
+        isNative: !!bridgeConf.native,
+      });
+    }
     return chain;
   } catch (error) {
     debug('createChainFromConf()', error);
@@ -86,7 +95,21 @@ const loadChain = async (
     }
     if (!name) throw Error('missing chain parameter. Check your "chain.json" file');
     debug('loading chain', name, conf);
-    const chain = createChainFromConf(name, conf, keystore, { txOptions });
+    let bridgeConf;
+    if (conf.bridge && conf.bridge.bridgedNetworkId) {
+      const names = Object.keys(chainsConf.chains);
+      names.forEach((n) => {
+        const chainConf = chainsConf.chains[n];
+        if (chainConf.id && chainConf.id === conf.bridge.bridgedNetworkId) {
+          bridgeConf = chainConf;
+        }
+      });
+    }
+    debug('bridged chain', bridgeConf);
+    const chain = createChainFromConf(name, conf, keystore, {
+      bridgeConf,
+      txOptions,
+    });
     spinner.info(`using chain [${name}]`);
     return chain;
   } catch (error) {
