@@ -123,20 +123,22 @@ show
       // show address ballance
       const addressToShow = address || userWallet.address;
       spinner.start(info.checkBalance(''));
-      const balances = await wallet.checkBalances(
-        chain.contracts,
-        addressToShow,
-      );
 
-      const strBalances = {
-        ETH: unit.fromWei(balances.wei, 'ether'),
-        nRLC: balances.nRLC.toString(),
+      const getBalances = async (contracts, userAddress) => {
+        const balances = await wallet.checkBalances(contracts, userAddress);
+        return {
+          ETH: contracts.isNative
+            ? undefined
+            : unit.fromWei(balances.wei, 'ether'),
+          nRLC: balances.nRLC.toString(),
+        };
       };
+      const balances = await getBalances(chain.contracts, addressToShow);
       spinner.succeed(
-        `Wallet ${chain.name} balances [${chain.id}]:${pretty(strBalances)}`,
+        `Wallet ${chain.name} balances [${chain.id}]:${pretty(balances)}`,
         {
           raw: Object.assign(
-            { balance: strBalances },
+            { balance: balances },
             !address && userWallet && { wallet: displayedWallet },
           ),
         },
