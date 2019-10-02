@@ -1,6 +1,6 @@
 ![iExec SDK logo](./iexec_sdk_logo.jpg)
 
-# iExec SDK V3
+# iExec SDK V4
 
 [![Build Status](https://drone.iex.ec/api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
@@ -79,7 +79,7 @@ iexec wallet show
 
 ### SDK CLI for Dapp developpers
 
-First go through [Init project](#init-project)
+First go through [Init project](#Init-project)
 
 #### Deploy an app
 
@@ -103,7 +103,7 @@ iexec order cancel --app <orderHash> # cancel your order
 
 ### SDK CLI for Dataset providers
 
-First go through [Init project](#init-project)
+First go through [Init project](#Init-project)
 
 #### Encrypt your dataset (optional)
 
@@ -145,7 +145,7 @@ iexec order cancel --dataset <orderHash> # cancel your order
 
 ### SDK CLI for Workerpools
 
-First go through [Init project](#init-project)
+First go through [Init project](#Init-project)
 
 #### Deploy a workerpool
 
@@ -181,7 +181,7 @@ iexec deal show <dealid> # show the detail of the deal you concludes
 
 ### SDK CLI for Requesters
 
-First go through [Init project](#init-project)
+First go through [Init project](#Init-project)
 
 #### Top up your iExec account to buy compution
 
@@ -241,7 +241,7 @@ iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the pr
 
 ### SDK CLI for workers
 
-First go through [Init project](#init-project)
+First go through [Init project](#Init-project)
 
 #### Top up your iExec account to buy compution
 
@@ -577,7 +577,14 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 
 ### chain.json
 
-The `chain.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec schedulers. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
+The `chain.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec Secret Management Services. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
+
+`default` set the default chain used by the SDK cli.
+optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
+optional key `sms` set the url of Secret Management Service used by the SDK cli on each chain.
+optional key `ipfsGateway` set the url of IPFS gateway used by the SDK cli on each chain (overwrite default value).
+optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedNetworkId` set the reference to the briged network specified by `id`.
+optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
 
 ```json
 {
@@ -585,8 +592,15 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   "chains": {
     "development": {
       "host": "http://localhost:8545",
-      "id": "*",
-      "sms": "http://localhost:5000"
+      "id": "1544020727674",
+      "sms": "http://localhost:5000",
+      "ipfsGateway": "http://localhost:8080",
+      "native": true,
+      "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
+      "bridge": {
+        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
+        "bridgedNetworkId": "123456789"
+      }
     },
     "ropsten": {
       "host": "https://ropsten.infura.io/v3/apiKey",
@@ -759,9 +773,20 @@ npm install iexec
 
 ### Instanciate the iExec SDK
 
-iExec SDK requires an eth signer provider and a chain id to work.
+#### IExec Constructor
 
-In your code:
+**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String } \[, options \])** => **IExec**
+
+_options:_
+
+- `hubAddress: Address` specify the address of iExec hub smart contract to use
+- `isNative: Boolean` true when the RLC is the chain native token
+- `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
+- `bridgedNetworkConf: { rpcURL: NodeRpcURL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+
+##### Basic configuration
+
+_Example:_
 
 ```js
 import { IExec } from 'iexec';
@@ -799,6 +824,54 @@ const getIExec = async () => {
 };
 ```
 
+##### Native configuration
+
+If you intend to use iExec SDK on a RLC native chain (ie: RLC is the native token), you must use `isNative` option.
+_NB:_ Default values are provided on well known native networks such iExec test sidechain `133` and iExec mainnet sidechain `134`.
+
+_Example:_
+
+```js
+import { IExec } from 'iexec';
+
+const iexec = new IExec(
+  {
+    ethProvider: ethProvider, // an eth signer provider like MetaMask
+    chainId: '134', // id of the chain (134 for iExec sidechain)
+  },
+  {
+    isNative: true, // iExec sidechain use RLC as native token
+  },
+);
+```
+
+##### Bridge configuration
+
+If you intend to bridge RLC from a chain to another (mainchain to sidechain or sidechain to mainchain), you must set `bridgeAddress` and `bridgedNetwork` options.
+
+_Example:_
+
+```js
+import { IExec } from 'iexec';
+
+const bridgeAddress = '0x...'; // Address of the RLC bridge smart contract on mainnet
+
+const bridgedNetworkConf = {
+  chainId: '134', // id of the bridged chain (134 for iExec sidechain)
+  hubAddress: '0x...', // Address of theiExec hub smart contract on bridged chain
+  rpcURL: 'https://myNode.ethnode', // url of a public node of bridged chain
+  bridgeAddress: '0x...'; // Address of the RLC bridge smart contract on bridged chain
+};
+
+const iexec = new IExec({
+  ethProvider: ethProvider, // an eth signer provider like MetaMask
+  chainId: '1', // id of the chain (1 for mainnet)
+}, {
+  bridgeAddress,
+  bridgedNetworkConf
+});
+```
+
 ### Use iexec sdk
 
 - [wallet](#iexecwallet): manage your wallet, send RLC...
@@ -810,6 +883,7 @@ const getIExec = async () => {
 - [app](#iexecapp): deploy a new app, show an existing one
 - [dataset](#iexecdataset): deploy a new dataset, show an existing one
 - [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
+- [network](iexecnetwork): useful information about the chain
 
 ### iexec.wallet
 
@@ -868,14 +942,56 @@ console.log('Transaction hash:', txHash);
 
 #### sweep
 
-iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendRLCTxHash: TxHash, sendETHTxHash: TxHash }**
+iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendNativeTxHash: TxHash, sendERC20TxHash: TxHash, errors }**
 
-> send all the RLC and the native token to the specified address
+> send all the RLC ERC20 (if applicable) and the native token to the specified address
 
 _Example:_
 
 ```js
 await sdk.wallet.sweep(toEthAddress);
+```
+
+#### bridgeToSidechain
+
+iexec.**wallet.bridgeToSidechain ( address: Uint256 )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
+
+> send some nRLC (1 nRLC = 1\*10^-9 RLC) to the sidechain.
+> RLC is send to the mainchain bridge smart contract on mainchain then credited on sidechain by the sidechain bridge smart contract
+> The optional `bridgeAddress` is required
+> The optional `bridgedNetworkConf` is required to get the `receiveTxHash` confirmation from the sidechain, if not set `receiveTxHash` will be `undefined`
+> see [Bridge configuration](#Bridge-configuration)
+
+_Example:_
+
+```js
+const { sendTxHash, receiveTxHash } = await sdk.wallet.bridgeToSidechain(
+  '1000000000',
+);
+console.log(
+  `Sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidechain (tx: ${receiveTxHash})`,
+);
+```
+
+#### bridgeToMainchain
+
+iexec.**wallet.bridgeToMainchain ( address: Uint256 )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
+
+> send some nRLC (1 nRLC = 1\*10^-9 RLC) to the mainchain.
+> RLC is send to the sidechain bridge smart contract on sidechain then credited on mainchain by the mainchain bridge smart contract
+> The optional `bridgeAddress` is required
+> The optional `bridgedNetworkConf` is required to get the `receiveTxHash` confirmation from the mainchain, if not set `receiveTxHash` will be `undefined`
+> see [Bridge configuration](#Bridge-configuration)
+
+_Example:_
+
+```js
+const { sendTxHash, receiveTxHash } = await sdk.wallet.bridgeToMainchain(
+  '1000000000',
+);
+console.log(
+  `Sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainchain (tx: ${receiveTxHash})`,
+);
 ```
 
 ### iexec.account
@@ -896,7 +1012,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### deposit
 
-iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **BN** >
+iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
 > deposit some nRLC (1 nRLC = 1\*10^-9 RLC) from user wallet to user account
 >
@@ -905,21 +1021,23 @@ iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **BN** >
 _Example:_
 
 ```js
-const depositedAmount = await iexec.account.deposit('1000000000');
-console.log('Deposited:', depositedAmount);
+const { amount, txHash } = await iexec.account.deposit('1000000000');
+console.log('Deposited:', amount);
+console.log('tx:', txHash);
 ```
 
 #### withdraw
 
-iexec.**account.withdraw ( nRlcAmount: Uint256 )** => Promise < **BN** >
+iexec.**account.withdraw ( nRlcAmount: Uint256 )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
 > withdraw some nRLC (1 nRLC = 1\*10^-9 RLC) from user account to user wallet
 
 _Example:_
 
 ```js
-const withdrawedAmount = await iexec.account.withdraw('1000000000');
-console.log('Withdrawed:', withdrawedAmount);
+const { amount, txHash } = await iexec.account.withdraw('1000000000');
+console.log('Withdrawed:', amount);
+console.log('tx:', txHash);
 ```
 
 ### iexec.orderbook
@@ -1206,7 +1324,7 @@ const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
 
 #### cancelApporder
 
-iexec.**order.cancelApporder ( order: SignedApporder )** => Promise < **Boolean** >
+iexec.**order.cancelApporder ( order: SignedApporder )** => Promise < **{ order: SignedApporder, txHash; TxHash }** >
 
 > cancel a SignedApporder on the blockchain.
 
@@ -1243,7 +1361,7 @@ const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
 
 #### cancelDatasetorder
 
-iexec.**order.cancelDatasetorder ( order: SignedDatasetorder )** => Promise < **Boolean** >
+iexec.**order.cancelDatasetorder ( order: SignedDatasetorder )** => Promise < **{ order: SignedDatasetorder, txHash; TxHash }** >
 
 > cancel a SignedDatasetorder on the blockchain.
 
@@ -1284,7 +1402,7 @@ const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
 
 #### cancelWorkerpoolorder
 
-iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **Boolean** >
+iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **{ order: SignedWorkerpoolorder, txHash; TxHash }** >
 
 > cancel a SignedWorkerpoolorder on the blockchain.
 
@@ -1321,7 +1439,7 @@ const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
 
 #### cancelRequestorder
 
-iexec.**order.cancelRequestorder ( order: SignedRequestorder )** => Promise < **Boolean** >
+iexec.**order.cancelRequestorder ( order: SignedRequestorder )** => Promise < **{ order: SignedRequestorder, txHash; TxHash }** >
 
 > cancel a SignedRequestorder on the blockchain.
 
@@ -1568,6 +1686,32 @@ const address = await iexec.workerpool.deploy({
   description: 'My workerpool',
 });
 console.log('deployed at', address);
+```
+
+### iexec.network
+
+#### id
+
+iexec.**network.id** => **String**
+
+> current chain Id
+
+_Example:_
+
+```js
+console.log('current chain:', iexec.network.id);
+```
+
+#### isSidechain
+
+iexec.**network.isSidechain** => **Boolean**
+
+> current is a sidechain
+
+_Example:_
+
+```js
+console.log('current chain is a sidechain:', iexec.network.isSidechain);
 ```
 
 ### Types

@@ -28,13 +28,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-- [BREAKING] removed `order.signOrder()` replaced by dedicated methods
-- [BREAKING] removed `order.cancelOrder()` replaced by dedicated methods
-- [BREAKING] removed `order.publishOrder()` replaced by dedicated methods
-- [BREAKING] removed `order.unpublishOrder()` replaced by dedicated methods
-- [BREAKING] removed `hub.createObj()` replaced by dedicated deploy methods
-- [BREAKING] removed `hub.showObj()` replaced by dedicated methods
-- [BREAKING] removed `hub.countObj()` replaced by dedicated deploy methods
+- [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 
 ## [3.1.0] - 2019-09-25
 
