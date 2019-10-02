@@ -29,8 +29,10 @@ const utils = {
 
 class IExec {
   constructor(
-    { ethProvider, chainId, hubAddress },
-    { isNative = false, bridgeAddress, bridgedNetworkConf } = {},
+    { ethProvider, chainId },
+    {
+      hubAddress, isNative, bridgeAddress, bridgedNetworkConf,
+    } = {},
   ) {
     const contracts = createIExecContracts({
       ethProvider,
@@ -59,7 +61,7 @@ class IExec {
           'Missing bridgeAddress in bridgedNetworkConf',
         );
       }
-      const bridgedIsNative = !isNative;
+      const bridgedIsNative = !contracts.isNative;
       const bridgedProvider = bridgedRpcUrl;
       bridgedContracts = createIExecContracts({
         chainId: bridgedChainId,
@@ -219,8 +221,8 @@ class IExec {
     this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => task.fetchResults(contracts, taskid, { ipfsGatewayURL });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     this.network = {};
-    this.network.id = chainId;
-    this.network.isSidechain = !!isNative;
+    this.network.id = contracts.chainId;
+    this.network.isSidechain = contracts.isNative;
   }
 }
 

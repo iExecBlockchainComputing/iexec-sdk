@@ -39,7 +39,7 @@ const createChainFromConf = (
       ethProvider,
       chainId: chain.id,
       hubAddress: chain.hub,
-      isNative: !!chain.native,
+      isNative: chain.native,
     });
     if (bridgeConf) {
       chain.bridgedNetwork = Object.assign({}, bridgeConf);
@@ -47,7 +47,10 @@ const createChainFromConf = (
         ethProvider: bridgeConf.host,
         chainId: bridgeConf.id,
         hubAddress: bridgeConf.hub,
-        isNative: !!bridgeConf.native,
+        isNative:
+          bridgeConf.native === undefined
+            ? !chain.contracts.isNative
+            : bridgeConf.native,
       });
     }
     return chain;

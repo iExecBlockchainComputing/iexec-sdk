@@ -1856,4 +1856,62 @@ describe('[Common]', () => {
       expect(res.fail).toBe(undefined);
     });
   });
+
+  describe('[mainchains/sidechains config]', () => {
+    beforeAll(async () => {
+      await execAsync(`${iexecPath} init --skip-wallet --force`);
+    });
+
+    test('no "native" overwites in templates', async () => {
+      const { chains } = await loadJSONFile('chain.json');
+      expect(chains.mainnet.native).toBe(undefined);
+      expect(chains.kovan.native).toBe(undefined);
+      expect(chains.goerli.native).toBe(undefined);
+      expect(chains.viviani.native).toBe(undefined);
+    }, 10000);
+
+    test('mainnet is not native', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+    }, 10000);
+
+    test('kovan is not native', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show ${ADDRESS} --chain kovan --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+    }, 10000);
+
+    test('goerli is not native', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).not.toBe(undefined);
+    }, 10000);
+
+    test('viviani is native', async () => {
+      const raw = await execAsync(
+        `${iexecPath} wallet show ${ADDRESS} --chain viviani --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).not.toBe(undefined);
+      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).toBe(undefined);
+    }, 10000);
+  });
 });
