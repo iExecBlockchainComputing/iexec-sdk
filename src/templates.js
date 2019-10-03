@@ -139,7 +139,6 @@ const chains = {
     viviani: {
       host: 'https://viviani.iex.ec',
       id: '133',
-      hub: '0x4735e4BC6B143099fDF14224a82429aA34ba4d04',
       bridge: {
         contract: '0x63CBf84596d0Dc13fCE1d8FA4470dc208390998a',
         bridgedNetworkId: '5',

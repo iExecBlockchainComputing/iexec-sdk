@@ -36,7 +36,7 @@
     "ethjs-unit": "0.1.6",
     "ethjs-util": "0.1.6",
     "fs-extra": "8.1.0",
-    "iexec-contracts-js-client": "^v4.0.0-alpha.2",
+    "iexec-contracts-js-client": "^v4.0.0-alpha.3",
     "iexec-schema-validator": "^v4.0.0-alpha.1",
     "image-size": "0.8.1",
     "inquirer": "7.0.0",
