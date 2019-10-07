@@ -426,14 +426,28 @@ const bridgeToMainchain = async (
     const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
     const weiValue = bnWeiValue.toString();
 
-    const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
+    const [
+      minPerTx,
+      maxPerTx,
+      withinLimit,
+      dailyLimit,
+      totalSpentPerDay,
+    ] = await Promise.all([
       wrapCall(sidechainBridgeContract.minPerTx()),
       wrapCall(sidechainBridgeContract.maxPerTx()),
-      wrapCall(sidechainBridgeContract.withinExecutionLimit(vAmount)),
+      wrapCall(sidechainBridgeContract.withinLimit(weiValue)),
+      wrapCall(sidechainBridgeContract.dailyLimit()),
+      wrapCall(
+        sidechainBridgeContract
+          .getCurrentDay()
+          .then(currentDay => sidechainBridgeContract.totalSpentPerDay(currentDay)),
+      ),
     ]);
     debug('minPerTx', minPerTx.toString());
     debug('maxPerTx', maxPerTx.toString());
-    debug('withinExecutionLimit', withinExecutionLimit);
+    debug('withinLimit', withinLimit);
+    debug('dailyLimit', dailyLimit.toString());
+    debug('totalSpentPerDay', totalSpentPerDay.toString());
 
     if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
       throw Error(
@@ -449,10 +463,18 @@ const bridgeToMainchain = async (
         )} nRLC`,
       );
     }
-    if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
+    if (!withinLimit) {
+      throw Error(
+        `Amount to bridge would exceed bridge daily limit. ${truncateBnWeiToBnNRlc(
+          ethersBnToBn(totalSpentPerDay),
+        )}/${truncateBnWeiToBnNRlc(
+          ethersBnToBn(dailyLimit),
+        )} nRLC already bridged today`,
+      );
+    }
 
     const mainchainBlockNumber = vMainchainBridgeAddress && bridgedContracts
-      ? await bridgedContracts.jsonRpcProvider.getBlockNumber()
+      ? await wrapCall(bridgedContracts.jsonRpcProvider.getBlockNumber())
       : 0;
 
     sendTxHash = await sendNativeToken(contracts, weiValue, vBridgeAddress);
