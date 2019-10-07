@@ -613,28 +613,24 @@ publish
             case order.APP_ORDER:
               orderHash = await order.publishApporder(
                 chain.contracts,
-                chain.id,
                 orderToPublish,
               );
               break;
             case order.DATASET_ORDER:
               orderHash = await order.publishDatasetorder(
                 chain.contracts,
-                chain.id,
                 orderToPublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               orderHash = await order.publishWorkerpoolorder(
                 chain.contracts,
-                chain.id,
                 orderToPublish,
               );
               break;
             case order.REQUEST_ORDER:
               orderHash = await order.publishRequestorder(
                 chain.contracts,
-                chain.id,
                 orderToPublish,
               );
               break;
@@ -734,28 +730,24 @@ unpublish
             case order.APP_ORDER:
               unpublished = await order.unpublishApporder(
                 chain.contracts,
-                chain.id,
                 orderHashToUnpublish,
               );
               break;
             case order.DATASET_ORDER:
               unpublished = await order.unpublishDatasetorder(
                 chain.contracts,
-                chain.id,
                 orderHashToUnpublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               unpublished = await order.unpublishWorkerpoolorder(
                 chain.contracts,
-                chain.id,
                 orderHashToUnpublish,
               );
               break;
             case order.REQUEST_ORDER:
               unpublished = await order.unpublishRequestorder(
                 chain.contracts,
-                chain.id,
                 orderHashToUnpublish,
               );
               break;
