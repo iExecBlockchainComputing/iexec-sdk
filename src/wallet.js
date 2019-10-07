@@ -2,6 +2,7 @@ const Debug = require('debug');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
 const { Contract } = require('ethers');
+const { Interface } = require('ethers').utils;
 const {
   ethersBnToBn,
   bnToEthersBn,
@@ -337,10 +338,11 @@ const bridgeToSidechain = async (
       foreignBridgeErcToNativeDesc.abi,
       contracts.jsonRpcProvider,
     );
-    const [minPerTx, maxPerTx, withinExecutionLimit] = await Promise.all([
+    const [minPerTx, maxPerTx, currentDay, dailyLimit] = await Promise.all([
       wrapCall(ercBridgeContract.minPerTx()),
       wrapCall(ercBridgeContract.maxPerTx()),
-      wrapCall(ercBridgeContract.withinExecutionLimit(vAmount)),
+      wrapCall(ercBridgeContract.getCurrentDay()),
+      wrapCall(ercBridgeContract.dailyLimit()),
     ]);
     if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
       throw Error(
@@ -352,7 +354,88 @@ const bridgeToSidechain = async (
         `Maximum amount allowed to bridge is ${maxPerTx.toString()} nRLC`,
       );
     }
-    if (!withinExecutionLimit) throw Error('Bridge daily limit reached');
+    // check daily amount transfered to bridge
+    const dayStartTimestamp = currentDay.toNumber() * (60 * 60 * 24);
+    debug('dayStartTimestamp', dayStartTimestamp);
+    const currentBlockNumber = await wrapCall(
+      contracts.jsonRpcProvider.getBlockNumber(),
+    );
+    debug('currentBlockNumber', currentBlockNumber);
+    const currentBlock = await wrapCall(
+      contracts.jsonRpcProvider.getBlock(currentBlockNumber),
+    );
+    const findBlockNumberByTimestamp = async (
+      lastTriedBlock,
+      targetTimestamp,
+      step,
+    ) => {
+      const triedBlockNumber = Math.max(lastTriedBlock.number - step, 0);
+      const triedBlock = await wrapCall(
+        contracts.jsonRpcProvider.getBlock(triedBlockNumber),
+      );
+      const triedBlockTimestamp = triedBlock.timestamp;
+      const remainingTime = triedBlockTimestamp - targetTimestamp;
+      debug('remainingTime', remainingTime);
+      if (remainingTime > 0) {
+        debug('triedBlockTimestamp', triedBlockTimestamp);
+        const stepTime = currentBlock.timestamp - triedBlockTimestamp;
+        debug('stepTime', stepTime);
+        const nextStep = Math.ceil((remainingTime / stepTime) * step) + 10;
+        debug('nextStep', nextStep);
+        return findBlockNumberByTimestamp(
+          triedBlock,
+          targetTimestamp,
+          nextStep,
+        );
+      }
+      return triedBlock.number;
+    };
+    const startBlockNumber = await findBlockNumberByTimestamp(
+      currentBlock,
+      dayStartTimestamp,
+      100,
+    );
+    debug('startBlockNumber', startBlockNumber);
+    const erc20Address = await contracts.fetchRLCAddress();
+    const erc20conctract = contracts.getRLCContract({ at: erc20Address });
+    const transferLogs = await contracts.jsonRpcProvider.getLogs({
+      fromBlock: startBlockNumber,
+      toBlock: 'latest',
+      address: erc20Address,
+      topics: [
+        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+      ],
+    });
+    const erc20Interface = new Interface(erc20conctract.interface.abi);
+    let totalSpentPerDay = new BN(0);
+    const processTransferLogs = async (logs, checkTimestamp = true) => {
+      if (logs.length === 0) return;
+      let isInvalidTimestamp = checkTimestamp;
+      if (checkTimestamp) {
+        const logTimestamp = (await wrapCall(
+          contracts.jsonRpcProvider.getBlock(logs[0].blockNumber),
+        )).timestamp;
+        isInvalidTimestamp = logTimestamp < dayStartTimestamp;
+      }
+      if (!isInvalidTimestamp) {
+        const parsedLog = erc20Interface.parseLog(logs[0]);
+        if (parsedLog.values.to === vBridgeAddress) {
+          totalSpentPerDay = totalSpentPerDay.add(
+            ethersBnToBn(parsedLog.values.value),
+          );
+        }
+      }
+      logs.shift();
+      await processTransferLogs(logs, isInvalidTimestamp);
+    };
+    await processTransferLogs(transferLogs);
+    debug('totalSpentPerDay', totalSpentPerDay.toString());
+    const withinLimit = totalSpentPerDay.lt(ethersBnToBn(dailyLimit));
+    if (!withinLimit) {
+      throw Error(
+        `Amount to bridge would exceed bridge daily limit. ${totalSpentPerDay}/${dailyLimit} nRLC already bridged today.`,
+      );
+    }
 
     const sidechainBlockNumber = vSidechainBridgeAddress && bridgedContracts
       ? await bridgedContracts.jsonRpcProvider.getBlockNumber()
