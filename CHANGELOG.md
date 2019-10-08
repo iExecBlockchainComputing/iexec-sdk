@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - [BREAKING] `wallet.sweep()` promise now resolves as `{sendNativeTxHash, sendERC20TxHash, errors}` on mainchains or `{sendNativeTxHash, errors}` on sidechains, previously was `{sendETHTxHash, sendRLCTxHash}`.
+- [BREAKING] `app.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
+- [BREAKING] `dataset.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
+- [BREAKING] `workerpool.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `account.deposit()` promise now resolves as `{amount, txHash}`, previously was `amount`.
 - [BREAKING] `account.withdraw()` promise now resolves as `{amount, txHash}`, previously was `amount`.
 - [BREAKING] `order.cancel()` promise now resolves as `{order, txHash}`, previously was `true`.

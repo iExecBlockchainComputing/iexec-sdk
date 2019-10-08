@@ -65,12 +65,12 @@ create
       }
       await keystore.load();
       spinner.start(info.creating('category'));
-      const catidBN = await hub.createCategory(
+      const { catid, txHash } = await hub.createCategory(
         chain.contracts,
         iexecConf[objName],
       );
-      spinner.succeed(`New category created with catid ${catidBN}`, {
-        raw: { catid: catidBN.toString() },
+      spinner.succeed(`New category created with catid ${catid}`, {
+        raw: { catid: catid.toString(), txHash },
       });
     } catch (error) {
       handleError(error, cli, cmd);

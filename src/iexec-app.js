@@ -79,9 +79,12 @@ deploy
       }
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const address = await hub.deployApp(chain.contracts, iexecConf[objName]);
+      const { address, txHash } = await hub.deployApp(
+        chain.contracts,
+        iexecConf[objName],
+      );
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
-        raw: { address },
+        raw: { address, txHash },
       });
       await saveDeployedObj(objName, chain.id, address);
     } catch (error) {

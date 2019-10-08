@@ -35,7 +35,8 @@ const createObj = (objName = throwIfMissing()) => async (
       },
     );
     const address = checksummedAddress(event.args[objName]);
-    return address;
+    const txHash = txReceipt.transactionHash;
+    return { address, txHash };
   } catch (error) {
     debug('createObj()', error);
     throw error;
@@ -233,7 +234,8 @@ const createCategory = async (
     const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
       strict: true,
     }).args;
-    return catid;
+    const txHash = txReceipt.transactionHash;
+    return { catid, txHash };
   } catch (error) {
     debug('createCategory()', error);
     throw error;
