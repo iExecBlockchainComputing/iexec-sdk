@@ -47,11 +47,13 @@ const deposit = async (
           .getRLCContract({
             at: rlcAddress,
           })
-          .approve(clerkAddress, vAmount),
+          .approve(clerkAddress, vAmount, contracts.txOptions),
       );
       const allowTxReceipt = await wrapWait(allowTx.wait());
       if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
-      const tx = await wrapSend(clerkContract.deposit(vAmount));
+      const tx = await wrapSend(
+        clerkContract.deposit(vAmount, contracts.txOptions),
+      );
       const txReceipt = await wrapWait(tx.wait());
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
@@ -59,7 +61,13 @@ const deposit = async (
       const weiAmount = bnToEthersBn(
         bnNRlcToBnWei(new BN(vAmount)),
       ).toHexString();
-      const tx = await wrapSend(clerkContract.deposit({ value: weiAmount }));
+      const tx = await wrapSend(
+        clerkContract.deposit({
+          value: weiAmount,
+          gasPrice:
+            (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
+        }),
+      );
       const txReceipt = await wrapWait(tx.wait());
       if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
@@ -92,7 +100,9 @@ const withdraw = async (
     //   debug('weiAmount', weiAmount.toString());
     //   if (withdrawWeiCost.gt(weiAmount)) throw Error('withdraw cost is higher than witdrawed amount');
     // }
-    const tx = await wrapSend(clerkContract.withdraw(vAmount));
+    const tx = await wrapSend(
+      clerkContract.withdraw(vAmount, contracts.txOptions),
+    );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };

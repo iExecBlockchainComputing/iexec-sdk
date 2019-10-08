@@ -14,6 +14,7 @@ const ethereumHost = DRONE ? 'ethereum' : 'localhost';
 const ethereumURL = `http://${ethereumHost}:8545`;
 const chainName = 'dev';
 const chainGasPrice = '20000000000';
+const nativeChainGasPrice = '0';
 let hubAddress;
 let nativeHubAddress;
 let networkId;
@@ -930,7 +931,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 10000);
 
   test('[sidechain] iexec account deposit 1000', async () => {
@@ -969,7 +970,7 @@ describe('[Sidechain]', () => {
     );
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 30000);
 
   test('[sidechain] iexec account withdraw 500', async () => {
@@ -1010,7 +1011,7 @@ describe('[Sidechain]', () => {
     );
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 30000);
 
   test('[common] iexec app init', async () => {
@@ -1029,7 +1030,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainApp = res.address;
   }, 15000);
 
@@ -1077,7 +1078,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDataset = res.address;
   }, 15000);
 
@@ -1127,7 +1128,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainWorkerpool = res.address;
   }, 15000);
 
@@ -1177,7 +1178,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   });
 
   test('[sidechain] iexec category show 0', async () => {
@@ -1231,7 +1232,7 @@ describe('[Sidechain]', () => {
     expect(res.txHash).not.toBe(undefined);
     const tx = await ethRPC.getTransaction(res.txHash);
     expect(tx).not.toBe(undefined);
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDealid = res.dealid;
   }, 10000);
 
@@ -1252,22 +1253,24 @@ describe('[Sidechain]', () => {
     expect(res.fail).toBe(undefined);
     const cancelAppordertx = await ethRPC.getTransaction(res.apporder.txHash);
     expect(cancelAppordertx).not.toBe(undefined);
-    expect(cancelAppordertx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(cancelAppordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
     const cancelDatasetordertx = await ethRPC.getTransaction(
-      res.daatsetorder.txHash,
+      res.datasetorder.txHash,
     );
     expect(cancelDatasetordertx).not.toBe(undefined);
-    expect(cancelDatasetordertx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(cancelDatasetordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
     const cancelWorkerpoolordertx = await ethRPC.getTransaction(
       res.workerpoolorder.txHash,
     );
     expect(cancelWorkerpoolordertx).not.toBe(undefined);
-    expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(
+      nativeChainGasPrice,
+    );
     const cancelRequestordertx = await ethRPC.getTransaction(
       res.requestorder.txHash,
     );
     expect(cancelRequestordertx).not.toBe(undefined);
-    expect(cancelRequestordertx.gasPrice.toString()).toBe(chainGasPrice);
+    expect(cancelRequestordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 10000);
 
   test('[sidechain] iexec deal show', async () => {

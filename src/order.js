@@ -356,7 +356,7 @@ const cancelOrder = async (
     const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContact = contracts.getClerkContract({ at: clerkAddress });
     const tx = await wrapSend(
-      clerkContact[objDesc[orderName].cancelMethode](args),
+      clerkContact[objDesc[orderName].cancelMethode](args, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
@@ -641,6 +641,7 @@ const matchOrders = async (
         datasetOrderStruct,
         workerpoolOrderStruct,
         requestOrderStruct,
+        contracts.txOptions,
       ),
     );
     const txReceipt = await wrapWait(tx.wait());

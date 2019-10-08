@@ -186,6 +186,8 @@ const sendNativeToken = async (
         data: '0x',
         to: vAddress,
         value: hexValue,
+        gasPrice:
+          (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
       }),
     );
     await wrapWait(tx.wait());
@@ -206,7 +208,9 @@ const sendERC20 = async (
   try {
     const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
-    const tx = await wrapSend(rlcContract.transfer(vAddress, vAmount));
+    const tx = await wrapSend(
+      rlcContract.transfer(vAddress, vAmount, contracts.txOptions),
+    );
     await wrapWait(tx.wait());
     return tx.hash;
   } catch (error) {

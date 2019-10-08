@@ -195,7 +195,9 @@ const claim = async (
     }
 
     const hubContract = contracts.getHubContract();
-    const claimTx = await wrapSend(hubContract.claim(taskid));
+    const claimTx = await wrapSend(
+      hubContract.claim(taskid, contracts.txOptions),
+    );
 
     const claimTxReceipt = await wrapWait(claimTx.wait());
     if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
