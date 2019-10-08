@@ -1451,7 +1451,7 @@ await iexec.order.cancelRequestorder(signedRequestorder);
 
 #### matchOrders
 
-iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} )** => Promise < **{ dealid, volume }** >
+iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
 
 > make a deal on-chain with compatible orders and trigger off-chain computation.
 

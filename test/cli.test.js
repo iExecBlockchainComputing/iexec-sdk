@@ -641,6 +641,10 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
     expect(res.dealid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDealid = res.dealid;
   }, 10000);
 
@@ -693,6 +697,10 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
     expect(res.dealid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[mainchain] iexec order cancel --app', async () => {
@@ -1208,6 +1216,10 @@ describe('[Sidechain]', () => {
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
     expect(res.dealid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     sidechainDealid = res.dealid;
   }, 10000);
 

@@ -650,7 +650,7 @@ const matchOrders = async (
       matchEvent,
       txReceipt.events,
     ).args;
-    return { dealid, volume: ethersBnToBn(volume) };
+    return { dealid, volume: ethersBnToBn(volume), txHash: tx.hash };
   } catch (error) {
     debug('matchOrders() error', error);
     throw error;

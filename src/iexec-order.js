@@ -550,7 +550,7 @@ fill
       // all checks passed send matchOrder
       await keystore.load();
       spinner.start(info.filling(objName));
-      const { dealid, volume } = await order.matchOrders(
+      const { dealid, volume, txHash } = await order.matchOrders(
         chain.contracts,
         appOrder,
         useDataset ? datasetOrder : undefined,
@@ -559,7 +559,7 @@ fill
       );
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
-        { raw: { dealid, volume: volume.toString() } },
+        { raw: { dealid, volume: volume.toString(), txHash } },
       );
     } catch (error) {
       handleError(error, cli, cmd);
