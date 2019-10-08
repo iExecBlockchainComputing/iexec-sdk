@@ -38,6 +38,7 @@ const execAsync = cmd => new Promise((res, rej) => {
 });
 
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
+const walletWithProvider = new ethers.Wallet(PRIVATE_KEY, ethRPC);
 
 const loadJSONFile = async (fileName) => {
   const filePath = path.join(process.cwd(), fileName);
@@ -56,13 +57,62 @@ const checkExists = async file => fs.pathExists(file);
 
 const filePath = fileName => path.join(process.cwd(), fileName);
 
-const editRequestorder = async (app, dataset, workerpool) => {
+const editRequestorder = async ({
+  app,
+  dataset,
+  workerpool,
+  category,
+  volume,
+}) => {
   if (!app || !dataset || !workerpool) throw Error('missing precondition');
   const iexecJson = await loadJSONFile('iexec.json');
   iexecJson.order.requestorder.app = app;
   iexecJson.order.requestorder.dataset = dataset;
   iexecJson.order.requestorder.workerpool = workerpool;
+  iexecJson.order.requestorder.category = category || iexecJson.order.requestorder.category;
+  iexecJson.order.requestorder.volume = volume || iexecJson.order.requestorder.volume;
   await saveJSONToFile(iexecJson, 'iexec.json');
+};
+
+const editWorkerpoolorder = async ({ category, volume }) => {
+  const iexecJson = await loadJSONFile('iexec.json');
+  iexecJson.order.workerpoolorder.category = category || iexecJson.order.workerpoolorder.category;
+  iexecJson.order.workerpoolorder.volume = volume || iexecJson.order.workerpoolorder.volume;
+  await saveJSONToFile(iexecJson, 'iexec.json');
+};
+
+const initializeTask = async (hub, dealid, idx) => {
+  const hubContract = new ethers.Contract(
+    hub,
+    [
+      {
+        constant: false,
+        inputs: [
+          {
+            name: '_dealid',
+            type: 'bytes32',
+          },
+          {
+            name: 'idx',
+            type: 'uint256',
+          },
+        ],
+        name: 'initialize',
+        outputs: [
+          {
+            name: '',
+            type: 'bytes32',
+          },
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    walletWithProvider,
+  );
+  const initTx = await hubContract.initialize(dealid, idx);
+  await initTx.wait();
 };
 
 // TESTS
@@ -94,7 +144,11 @@ describe('[Mainchain]', () => {
   let mainchainApp;
   let mainchainDataset;
   let mainchainWorkerpool;
+  let mainchainNoDurationCatid;
   let mainchainDealid;
+  let mainchainTaskid;
+  let mainchainDealidNoDuration;
+  let mainchainTaskidNoDuration;
 
   beforeAll(async () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -548,6 +602,22 @@ describe('[Mainchain]', () => {
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
+  test('[mainchain] iexec category create (workClockTimeRef=0)', async () => {
+    const iexecjson = await loadJSONFile('iexec.json');
+    iexecjson.category.workClockTimeRef = '0';
+    iexecjson.category.name = 'no duration';
+    await saveJSONToFile(iexecjson, 'iexec.json');
+    const raw = await execAsync(`${iexecPath} category create --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.catid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    mainchainNoDurationCatid = res.catid.toString();
+  });
+
   test('[mainchain] iexec category show 0', async () => {
     const raw = await execAsync(`${iexecPath} category show 0 --raw`);
     const res = JSON.parse(raw);
@@ -626,7 +696,15 @@ describe('[Mainchain]', () => {
 
   // edit order
   test('[mainchain] iexec order sign', async () => {
-    await editRequestorder(mainchainApp, mainchainDataset, mainchainWorkerpool);
+    await editRequestorder({
+      app: mainchainApp,
+      dataset: mainchainDataset,
+      workerpool: mainchainWorkerpool,
+      category: '0',
+    });
+    await editWorkerpoolorder({
+      category: '0',
+    });
     const raw = await execAsync(`${iexecPath} order sign --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -670,6 +748,10 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   test('[mainchain] iexec order sign --workerpool', async () => {
+    await editWorkerpoolorder({
+      category: mainchainNoDurationCatid,
+      volume: '6',
+    });
     const raw = await execAsync(`${iexecPath} order sign --workerpool --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -680,7 +762,13 @@ describe('[Mainchain]', () => {
   }, 10000);
 
   test('[mainchain] iexec order sign --request', async () => {
-    await editRequestorder(mainchainApp, mainchainDataset, mainchainWorkerpool);
+    await editRequestorder({
+      app: mainchainApp,
+      dataset: mainchainDataset,
+      workerpool: mainchainWorkerpool,
+      category: mainchainNoDurationCatid,
+      volume: '5',
+    });
     const raw = await execAsync(`${iexecPath} order sign --request --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -688,6 +776,19 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec order fill (BoT 5)', async () => {
+    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.volume).toBe('5');
+    expect(res.dealid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+    mainchainDealidNoDuration = res.dealid;
   }, 10000);
 
   test('[mainchain] iexec order fill --params <params> --force', async () => {
@@ -804,7 +905,29 @@ describe('[Mainchain]', () => {
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
     expect(res.deal.tasks).not.toBe(undefined);
+    expect(Object.keys(res.deal.tasks).length).toBe(1);
     expect(res.deal.tasks['0']).not.toBe(undefined);
+    mainchainTaskid = res.deal.tasks['0'];
+  }, 10000);
+
+  test('[mainchain] iexec deal show (BoT 5)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} deal show ${mainchainDealidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deal).not.toBe(undefined);
+    expect(res.deal.app.pointer).toBe(mainchainApp);
+    expect(res.deal.dataset.pointer).toBe(mainchainDataset);
+    expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(res.deal.requester).toBe(ADDRESS);
+    expect(res.deal.beneficiary).toBe(ADDRESS);
+    expect(res.deal.botFirst).toBe('0');
+    expect(res.deal.botSize).toBe('5');
+    expect(res.deal.tasks).not.toBe(undefined);
+    expect(Object.keys(res.deal.tasks).length).toBe(5);
+    expect(res.deal.tasks['0']).not.toBe(undefined);
+    mainchainTaskidNoDuration = res.deal.tasks['0'];
   }, 10000);
 
   test('[mainchain] iexec deal show (no deal)', async () => {
@@ -815,6 +938,110 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.deal).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec task show (not initialized)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task show ${mainchainTaskid} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.task).toBe(undefined);
+  }, 10000);
+
+  test('[mainchain] iexec task show (initialized)', async () => {
+    await initializeTask(hubAddress, mainchainDealid, 0);
+    const raw = await execAsync(
+      `${iexecPath} task show ${mainchainTaskid} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(mainchainDealid);
+    expect(res.task.idx).toBe('0');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.claimable).toBe(false);
+  }, 10000);
+
+  test('[mainchain] iexec task show (claimable)', async () => {
+    await initializeTask(hubAddress, mainchainDealidNoDuration, 0);
+    const raw = await execAsync(
+      `${iexecPath} task show ${mainchainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(mainchainDealidNoDuration);
+    expect(res.task.idx).toBe('0');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.claimable).toBe(true);
+  }, 10000);
+
+  test('[mainchain] iexec task claim', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task claim ${mainchainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  }, 10000);
+
+  test('[mainchain] iexec task show (claimed)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task show ${mainchainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(mainchainDealidNoDuration);
+    expect(res.task.idx).toBe('0');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('FAILED');
+    expect(res.claimable).toBe(false);
   }, 10000);
 
   // sendETH
@@ -868,7 +1095,11 @@ describe('[Sidechain]', () => {
   let sidechainApp;
   let sidechainDataset;
   let sidechainWorkerpool;
+  let sidechainNoDurationCatid;
   let sidechainDealid;
+  let sidechainTaskid;
+  let sidechainDealidNoDuration;
+  let sidechainTaskidNoDuration;
 
   beforeAll(async () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -1181,6 +1412,22 @@ describe('[Sidechain]', () => {
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   });
 
+  test('[sidechain] iexec category create (workClockTimeRef=0)', async () => {
+    const iexecjson = await loadJSONFile('iexec.json');
+    iexecjson.category.workClockTimeRef = '0';
+    iexecjson.category.name = 'no duration';
+    await saveJSONToFile(iexecjson, 'iexec.json');
+    const raw = await execAsync(`${iexecPath} category create --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.catid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    sidechainNoDurationCatid = res.catid.toString();
+  });
+
   test('[sidechain] iexec category show 0', async () => {
     const raw = await execAsync(`${iexecPath} category show 0 --raw`);
     const res = JSON.parse(raw);
@@ -1213,7 +1460,15 @@ describe('[Sidechain]', () => {
   });
 
   test('[sidechain] iexec order sign', async () => {
-    await editRequestorder(sidechainApp, sidechainDataset, sidechainWorkerpool);
+    await editRequestorder({
+      app: sidechainApp,
+      dataset: sidechainDataset,
+      workerpool: sidechainWorkerpool,
+      category: '0',
+    });
+    await editWorkerpoolorder({
+      category: '0',
+    });
     const raw = await execAsync(`${iexecPath} order sign --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1235,6 +1490,31 @@ describe('[Sidechain]', () => {
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDealid = res.dealid;
   }, 10000);
+
+  test('[sidechain] iexec order fill (BoT 5)', async () => {
+    await editRequestorder({
+      app: sidechainApp,
+      dataset: sidechainDataset,
+      workerpool: sidechainWorkerpool,
+      category: sidechainNoDurationCatid,
+      volume: '5',
+    });
+    await editWorkerpoolorder({
+      category: sidechainNoDurationCatid,
+      volume: '5',
+    });
+    await execAsync(`${iexecPath} order sign --raw`);
+    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.volume).toBe('5');
+    expect(res.dealid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    sidechainDealidNoDuration = res.dealid;
+  }, 20000);
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     const raw = await execAsync(
@@ -1288,7 +1568,29 @@ describe('[Sidechain]', () => {
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
     expect(res.deal.tasks).not.toBe(undefined);
+    expect(Object.keys(res.deal.tasks).length).toBe(1);
     expect(res.deal.tasks['0']).not.toBe(undefined);
+    sidechainTaskid = res.deal.tasks['0'];
+  }, 10000);
+
+  test('[sidechain] iexec deal show (BoT 5)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} deal show ${sidechainDealidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deal).not.toBe(undefined);
+    expect(res.deal.app.pointer).toBe(sidechainApp);
+    expect(res.deal.dataset.pointer).toBe(sidechainDataset);
+    expect(res.deal.workerpool.pointer).toBe(sidechainWorkerpool);
+    expect(res.deal.requester).toBe(ADDRESS);
+    expect(res.deal.beneficiary).toBe(ADDRESS);
+    expect(res.deal.botFirst).toBe('0');
+    expect(res.deal.botSize).toBe('5');
+    expect(res.deal.tasks).not.toBe(undefined);
+    expect(Object.keys(res.deal.tasks).length).toBe(5);
+    expect(res.deal.tasks['0']).not.toBe(undefined);
+    sidechainTaskidNoDuration = res.deal.tasks['2'];
   }, 10000);
 
   test('[sidechain] iexec deal show (no deal)', async () => {
@@ -1299,6 +1601,110 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.deal).toBe(undefined);
+  }, 10000);
+
+  test('[sidechain] iexec task show (not initialized)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task show ${sidechainTaskid} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.task).toBe(undefined);
+  }, 10000);
+
+  test('[sidechain] iexec task show (initialized)', async () => {
+    await initializeTask(nativeHubAddress, sidechainDealid, 0);
+    const raw = await execAsync(
+      `${iexecPath} task show ${sidechainTaskid} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(sidechainDealid);
+    expect(res.task.idx).toBe('0');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.claimable).toBe(false);
+  }, 10000);
+
+  test('[sidechain] iexec task show (claimable)', async () => {
+    await initializeTask(nativeHubAddress, sidechainDealidNoDuration, 2);
+    const raw = await execAsync(
+      `${iexecPath} task show ${sidechainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(sidechainDealidNoDuration);
+    expect(res.task.idx).toBe('2');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.claimable).toBe(true);
+  }, 10000);
+
+  test('[sidechain] iexec task claim', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task claim ${sidechainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.txHash).not.toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+  }, 10000);
+
+  test('[sidechain] iexec task show (claimed)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} task show ${sidechainTaskidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.task).not.toBe(undefined);
+    expect(res.task.dealid).toBe(sidechainDealidNoDuration);
+    expect(res.task.idx).toBe('2');
+    expect(res.task.timeref).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.contributionDeadline).not.toBe(undefined);
+    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.revealCounter).toBe('0');
+    expect(res.task.winnerCounter).toBe('0');
+    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(res.task.results).toBe('0x');
+    expect(res.task.statusName).toBe('FAILED');
+    expect(res.claimable).toBe(false);
   }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {
