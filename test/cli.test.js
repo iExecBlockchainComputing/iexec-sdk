@@ -710,11 +710,14 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).not.toBe(undefined);
-    expect(res.apporder.cancelTx).not.toBe(undefined);
+    expect(res.apporder.txHash).not.toBe(undefined);
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).toBe(undefined);
     expect(res.fail).toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.apporder.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[mainchain] iexec order cancel --dataset', async () => {
@@ -725,10 +728,13 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.apporder).toBe(undefined);
     expect(res.datasetorder).not.toBe(undefined);
-    expect(res.datasetorder.cancelTx).not.toBe(undefined);
+    expect(res.datasetorder.txHash).not.toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).toBe(undefined);
     expect(res.fail).toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.datasetorder.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[mainchain] iexec order cancel --workerpool', async () => {
@@ -740,9 +746,12 @@ describe('[Mainchain]', () => {
     expect(res.apporder).toBe(undefined);
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.workerpoolorder.cancelTx).not.toBe(undefined);
+    expect(res.workerpoolorder.txHash).not.toBe(undefined);
     expect(res.requestorder).toBe(undefined);
     expect(res.fail).toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.workerpoolorder.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[mainchain] iexec order cancel --request', async () => {
@@ -755,8 +764,11 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
-    expect(res.requestorder.cancelTx).not.toBe(undefined);
+    expect(res.requestorder.txHash).not.toBe(undefined);
     expect(res.fail).toBe(undefined);
+    const tx = await ethRPC.getTransaction(res.requestorder.txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[mainchain] iexec order cancel --app --dataset --workerpool --request (missing orders)', async () => {
@@ -1230,14 +1242,32 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).not.toBe(undefined);
-    expect(res.apporder.cancelTx).not.toBe(undefined);
+    expect(res.apporder.txHash).not.toBe(undefined);
     expect(res.datasetorder).not.toBe(undefined);
-    expect(res.datasetorder.cancelTx).not.toBe(undefined);
+    expect(res.datasetorder.txHash).not.toBe(undefined);
     expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.workerpoolorder.cancelTx).not.toBe(undefined);
+    expect(res.workerpoolorder.txHash).not.toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
-    expect(res.requestorder.cancelTx).not.toBe(undefined);
+    expect(res.requestorder.txHash).not.toBe(undefined);
     expect(res.fail).toBe(undefined);
+    const cancelAppordertx = await ethRPC.getTransaction(res.apporder.txHash);
+    expect(cancelAppordertx).not.toBe(undefined);
+    expect(cancelAppordertx.gasPrice.toString()).toBe(chainGasPrice);
+    const cancelDatasetordertx = await ethRPC.getTransaction(
+      res.daatsetorder.txHash,
+    );
+    expect(cancelDatasetordertx).not.toBe(undefined);
+    expect(cancelDatasetordertx.gasPrice.toString()).toBe(chainGasPrice);
+    const cancelWorkerpoolordertx = await ethRPC.getTransaction(
+      res.workerpoolorder.txHash,
+    );
+    expect(cancelWorkerpoolordertx).not.toBe(undefined);
+    expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(chainGasPrice);
+    const cancelRequestordertx = await ethRPC.getTransaction(
+      res.requestorder.txHash,
+    );
+    expect(cancelRequestordertx).not.toBe(undefined);
+    expect(cancelRequestordertx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
   test('[sidechain] iexec deal show', async () => {

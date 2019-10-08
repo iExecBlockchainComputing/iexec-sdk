@@ -853,7 +853,7 @@ cancel
           }
 
           spinner.info(`${orderName} successfully canceled (${cancelTx})`);
-          Object.assign(success, { [orderName]: { cancelTx } });
+          Object.assign(success, { [orderName]: { txHash: cancelTx } });
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
         }
