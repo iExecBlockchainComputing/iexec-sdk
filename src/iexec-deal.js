@@ -5,6 +5,8 @@ const {
   help,
   addGlobalOptions,
   addWalletLoadOptions,
+  computeWalletLoadOptions,
+  computeTxOptions,
   checkUpdate,
   handleError,
   desc,
@@ -44,27 +46,38 @@ show
     }
   });
 
-// const claim = cli.command('claim <dealid>');
-// addGlobalOptions(claim);
-// addWalletLoadOptions(claim);
-// claim
-//   .option(...option.chain())
-//   .description(desc.claimObj(objName))
-//   .action(async (dealid, cmd) => {
-//     const spinner = Spinner(cmd);
-//     try {
-//       const walletOptions = await computeWalletLoadOptions(cmd);
-//       const keystore = Keystore(walletOptions);
-//       const [chain, [address]] = await Promise.all([
-//         loadChain(cmd.chain, keystore, { spinner }),
-//         keystore.account(),
-//       ]);
-//       spinner.start(info.claiming(objName));
-//       const txHash = await deal.claim(chain.contracts, dealid, address);
-//       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
-//     } catch (error) {
-//       handleError(error, cli, cmd);
-//     }
-//   });
+const claim = cli.command('claim <dealid>');
+addGlobalOptions(claim);
+addWalletLoadOptions(claim);
+claim
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .description(desc.claimObj(objName))
+  .action(async (dealid, cmd) => {
+    await checkUpdate(cmd);
+    const spinner = Spinner(cmd);
+    try {
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const txOptions = computeTxOptions(cmd);
+      const [chain] = await Promise.all([
+        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        keystore.load(),
+      ]);
+      spinner.start(info.claiming(objName));
+      const { claimed, transactions } = await deal.claim(
+        chain.contracts,
+        dealid,
+      );
+      spinner.succeed(
+        `${objName} successfully claimed (${
+          Object.keys(claimed).length
+        } tasks claimed)`,
+        { raw: { claimed, transactions } },
+      );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
 
 help(cli);

@@ -1044,6 +1044,35 @@ describe('[Mainchain]', () => {
     expect(res.claimable).toBe(false);
   }, 10000);
 
+  test('[mainchain] iexec deal claim', async () => {
+    await initializeTask(hubAddress, mainchainDealidNoDuration, 2);
+    const raw = await execAsync(
+      `${iexecPath} deal claim ${mainchainDealidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.transactions).not.toBe(undefined);
+    expect(res.transactions.length).toBe(2);
+    expect(res.transactions[0].type).toBe('claimArray');
+    expect(res.transactions[1].type).toBe('initializeAndClaimArray');
+    expect(res.claimed).not.toBe(undefined);
+    expect(Object.keys(res.claimed).length).toBe(4);
+    expect(res.claimed['1']).not.toBe(undefined);
+    expect(res.claimed['2']).not.toBe(undefined);
+    expect(res.claimed['3']).not.toBe(undefined);
+    expect(res.claimed['4']).not.toBe(undefined);
+    const claimArrayTx = await ethRPC.getTransaction(
+      res.transactions[0].txHash,
+    );
+    expect(claimArrayTx).not.toBe(undefined);
+    expect(claimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
+    const initializeAndClaimArrayTx = await ethRPC.getTransaction(
+      res.transactions[0].txHash,
+    );
+    expect(initializeAndClaimArrayTx).not.toBe(undefined);
+    expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
+  }, 10000);
+
   // sendETH
   test('[mainchain] iexec wallet sendETH', async () => {
     const raw = await execAsync(
@@ -1705,6 +1734,37 @@ describe('[Sidechain]', () => {
     expect(res.task.results).toBe('0x');
     expect(res.task.statusName).toBe('FAILED');
     expect(res.claimable).toBe(false);
+  }, 10000);
+
+  test('[sidechain] iexec deal claim', async () => {
+    await initializeTask(nativeHubAddress, sidechainDealidNoDuration, 1);
+    const raw = await execAsync(
+      `${iexecPath} deal claim ${sidechainDealidNoDuration} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.transactions).not.toBe(undefined);
+    expect(res.transactions.length).toBe(2);
+    expect(res.transactions[0].type).toBe('claimArray');
+    expect(res.transactions[1].type).toBe('initializeAndClaimArray');
+    expect(res.claimed).not.toBe(undefined);
+    expect(Object.keys(res.claimed).length).toBe(4);
+    expect(res.claimed['0']).not.toBe(undefined);
+    expect(res.claimed['1']).not.toBe(undefined);
+    expect(res.claimed['3']).not.toBe(undefined);
+    expect(res.claimed['4']).not.toBe(undefined);
+    const claimArrayTx = await ethRPC.getTransaction(
+      res.transactions[0].txHash,
+    );
+    expect(claimArrayTx).not.toBe(undefined);
+    expect(claimArrayTx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    const initializeAndClaimArrayTx = await ethRPC.getTransaction(
+      res.transactions[0].txHash,
+    );
+    expect(initializeAndClaimArrayTx).not.toBe(undefined);
+    expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(
+      nativeChainGasPrice,
+    );
   }, 10000);
 
   test('[sidechain] iexec wallet sweep', async () => {

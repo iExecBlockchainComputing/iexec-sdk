@@ -441,7 +441,7 @@ iexec orderbook dataset <address> # show the best datasetorders published on the
 # OPTIONS
 # ---chain <chainName>
 iexec deal show <dealid> # show a deal identified by dealid
-iexec deal claim <dealid> # NOT IMPLEMENTED YET
+iexec deal claim <dealid> # claim all failed tasks from a deal
 ```
 
 ## task
@@ -1470,7 +1470,7 @@ console.log('deal:', res.dealid);
 
 #### show
 
-iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price }, dataset : { pointer: Address, owner: Address, price }, workerpool : { pointer: Address, owner: Address, price }, trust, category, tag, requester, beneficiary, callback, params, startTime, botFirst, botSize, workerStake, schedulerRewardRatio, tasks: \[...taskid\] }** >
+iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price }, dataset : { pointer: Address, owner: Address, price }, workerpool : { pointer: Address, owner: Address, price }, trust, category, tag, requester, beneficiary, callback, params, startTime, botFirst, botSize, workerStake, schedulerRewardRatio, tasks: { ...\[ {\[idx\]: taskid] }\] }** >
 
 > show the details of a deal.
 
@@ -1515,6 +1515,28 @@ const res = await iexec.deal.fetchRequesterDeals(
 );
 console.log('deals count:', res.count);
 console.log('last deal:', res.deals[0]);
+```
+
+#### claim
+
+iexec.**deal.claim ( dealid: Bytes32 )** => Promise < **{ claimed : { ...\[ {\[idx\]: taskid] }\] }, transactions: \[ { txHash: TxHash, type: String } \] }** >
+
+> claim all the failed task from a deal.
+> Depending the number and the status of task to claim, this may involve several transactions in order to fit in the blockchain gasLimit per block.
+> (mainnet actual gas limit is 10000000, this allows to claim 180 initialized task or 43 non-initialized tasks in one block)
+
+_Example:_
+
+```js
+const { claimed, transcations } = await iexec.deal.claim(
+  '0xe0ebfa1177a5997434fe14b5e88897950e07ff82e6976a024b07f30063249a1e',
+);
+Object.entries(claimed).forEach(e => {
+  console.log(`claimed task: idx ${e[0]} taskid ${e[1]}`);
+});
+transactions.forEach(e => {
+  console.log(`transaction ${e.type} hash ${e.txHash}`);
+});
 ```
 
 ### iexec.task

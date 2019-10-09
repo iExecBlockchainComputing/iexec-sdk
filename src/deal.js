@@ -3,8 +3,10 @@ const { defaultAbiCoder, keccak256 } = require('ethers').utils;
 const {
   cleanRPC,
   bnifyNestedEthersBn,
+  ethersBnToBn,
   http,
   NULL_ADDRESS,
+  BN,
 } = require('./utils');
 const {
   chainIdSchema,
@@ -16,7 +18,9 @@ const {
   throwIfMissing,
 } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
-const { wrapCall } = require('./errorWrappers');
+const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
+const { showCategory, getTimeoutRatio } = require('./hub');
+const showTask = require('./task').show;
 
 const debug = Debug('iexec:deal');
 
@@ -131,21 +135,130 @@ const show = async (
   }
 };
 
-// const claim = async (
-//   contracts = throwIfMissing(),
-//   dealid = throwIfMissing(),
-//   userAddress = throwIfMissing(),
-// ) => {
-//   try {
-//     throw new Error('Not implemented');
-//   } catch (error) {
-//     debug('claim()', error);
-//     throw error;
-//   }
-// };
+const claim = async (
+  contracts = throwIfMissing(),
+  dealid = throwIfMissing(),
+) => {
+  const transactions = [];
+  const claimed = {};
+  try {
+    const vDealid = await bytes32Schema().validate(dealid);
+    const deal = await show(contracts, vDealid);
+    const [{ workClockTimeRef }, timeoutRatio] = await Promise.all([
+      showCategory(contracts, deal.category),
+      getTimeoutRatio(contracts),
+    ]);
+    const consensusTimeout = deal.startTime
+      .add(timeoutRatio.mul(workClockTimeRef))
+      .toNumber();
+    const now = Math.floor(Date.now() / 1000);
+    if (now < consensusTimeout) {
+      throw Error(
+        `Cannot claim a deal before reaching the consensus timeout date: ${new Date(
+          1000 * consensusTimeout,
+        )}`,
+      );
+    }
+    const { tasks } = deal;
+    const initialized = [];
+    const notInitialized = [];
+
+    await Promise.all(
+      Object.entries(tasks).map(async ([idx, taskid]) => {
+        try {
+          const task = await showTask(contracts, taskid);
+          if (task.status < 3) {
+            initialized.push({ idx, taskid });
+          }
+        } catch (error) {
+          if (error instanceof ObjectNotFoundError) {
+            notInitialized.push({ idx, taskid });
+          } else throw error;
+        }
+      }),
+    );
+    if (initialized.length === 0 && notInitialized.length === 0) throw Error('Nothing to claim');
+    initialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
+    notInitialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
+    const lastBlock = await wrapCall(
+      contracts.jsonRpcProvider.getBlock('latest'),
+    );
+    const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
+    const hubContract = contracts.getHubContract();
+    if (initialized.length > 0) {
+      const EST_GAS_PER_CLAIM = new BN(55000);
+      const maxClaimPerTx = blockGasLimit.div(EST_GAS_PER_CLAIM);
+      const processClaims = async () => {
+        if (!initialized.length) return;
+        const initializedToProcess = initialized.splice(
+          0,
+          maxClaimPerTx.toNumber(),
+        );
+        const taskidToProcess = initializedToProcess.map(
+          ({ taskid }) => taskid,
+        );
+        const tx = await wrapSend(
+          hubContract.claimArray(taskidToProcess, contracts.txOptions),
+        );
+        debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
+        await wrapWait(tx.wait());
+        transactions.push({
+          txHash: tx.hash,
+          type: 'claimArray',
+        });
+        Object.assign(
+          claimed,
+          ...initializedToProcess.map(e => ({ [e.idx]: e.taskid })),
+        );
+        await processClaims();
+      };
+      await processClaims();
+    }
+    if (notInitialized.length > 0) {
+      const EST_GAS_PER_CLAIM = new BN(230000);
+      const maxClaimPerTx = blockGasLimit.div(EST_GAS_PER_CLAIM);
+
+      const processInitAndClaims = async () => {
+        if (!notInitialized.length) return;
+        const notInitializedToProcess = notInitialized.splice(
+          0,
+          maxClaimPerTx.toNumber(),
+        );
+        const idxToProcess = notInitializedToProcess.map(({ idx }) => idx);
+        const dealidArray = new Array(idxToProcess.length).fill(vDealid);
+        const tx = await wrapSend(
+          hubContract.initializeAndClaimArray(
+            dealidArray,
+            idxToProcess,
+            contracts.txOptions,
+          ),
+        );
+        debug(
+          `initializeAndClaimArray ${tx.hash} (${notInitializedToProcess.length} tasks)`,
+        );
+        await wrapWait(tx.wait());
+        transactions.push({
+          txHash: tx.hash,
+          type: 'initializeAndClaimArray',
+        });
+        Object.assign(
+          claimed,
+          ...notInitializedToProcess.map(e => ({ [e.idx]: e.taskid })),
+        );
+        await processInitAndClaims();
+      };
+      await processInitAndClaims();
+    }
+    return { transactions, claimed };
+  } catch (error) {
+    debug('claim()', error);
+    throw error;
+  }
+};
 
 module.exports = {
   show,
   computeTaskId,
   fetchRequesterDeals,
+  claim,
 };

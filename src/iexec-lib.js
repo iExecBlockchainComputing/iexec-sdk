@@ -127,6 +127,7 @@ class IExec {
       workerpoolAddress,
       beforeTimestamp,
     });
+    this.deal.claim = dealid => deal.claim(contracts, dealid);
     // this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
     //   order.APP_ORDER,
     //   contracts.chainId,
