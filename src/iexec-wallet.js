@@ -2,7 +2,6 @@
 
 const { parseEther } = require('ethers').utils;
 const cli = require('commander');
-const unit = require('ethjs-unit');
 const wallet = require('./wallet');
 const {
   Keystore,
@@ -26,7 +25,8 @@ const {
   pretty,
   info,
 } = require('./cli-helper');
-const { loadChain } = require('./chains.js');
+const { loadChain } = require('./chains');
+const { formatEth } = require('./utils');
 
 const objName = 'wallet';
 
@@ -127,9 +127,7 @@ show
       const getBalances = async (contracts, userAddress) => {
         const balances = await wallet.checkBalances(contracts, userAddress);
         return {
-          ETH: contracts.isNative
-            ? undefined
-            : unit.fromWei(balances.wei, 'ether'),
+          ETH: contracts.isNative ? undefined : formatEth(balances.wei),
           nRLC: balances.nRLC.toString(),
         };
       };
