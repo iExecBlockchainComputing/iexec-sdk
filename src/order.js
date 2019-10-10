@@ -10,7 +10,6 @@ const {
   getAuthorization,
   NULL_ADDRESS,
   NULL_BYTES32,
-  ensureString,
   signTypedDatav3,
 } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
@@ -413,7 +412,7 @@ const publishOrder = async (
     checkOrderName(orderName);
     const address = await getAddress(contracts);
     const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
-    const body = { chainId: ensureString(chainId), order: signedOrder };
+    const body = { chainId, order: signedOrder };
     const authorization = await getAuthorization(
       chainId,
       address,

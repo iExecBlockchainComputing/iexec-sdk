@@ -11,9 +11,9 @@ const {
   Spinner,
   pretty,
   info,
+  isEthAddress,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
-const { isEthAddress } = require('./utils');
 const { Keystore } = require('./keystore');
 const orderbook = require('./orderbook');
 

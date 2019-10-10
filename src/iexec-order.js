@@ -15,10 +15,11 @@ const {
   Spinner,
   pretty,
   info,
+  minBn,
+  isBytes32,
   command,
   prompt,
 } = require('./cli-helper');
-const { minBn, isBytes32 } = require('./utils');
 const {
   loadIExecConf,
   initOrderObj,

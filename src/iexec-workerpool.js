@@ -14,6 +14,7 @@ const {
   Spinner,
   pretty,
   info,
+  isEthAddress,
 } = require('./cli-helper');
 const hub = require('./hub');
 const {
@@ -25,7 +26,7 @@ const {
 const { stringifyNestedBn } = require('./utils');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const { NULL_ADDRESS, isEthAddress } = require('./utils');
+const { NULL_ADDRESS } = require('./utils');
 
 const objName = 'workerpool';
 

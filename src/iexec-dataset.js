@@ -19,6 +19,7 @@ const {
   Spinner,
   pretty,
   info,
+  isEthAddress,
   spawnAsync,
 } = require('./cli-helper');
 const hub = require('./hub');
@@ -34,7 +35,7 @@ const {
 const { Keystore } = require('./keystore');
 const secretMgtServ = require('./sms');
 const { loadChain } = require('./chains');
-const { NULL_ADDRESS, isEthAddress } = require('./utils');
+const { NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:iexec-dataset');
 

@@ -669,6 +669,36 @@ const prettyRPC = (rpcObj) => {
   return pretty(prettyObj);
 };
 
+const isEthAddress = (address, { strict = false } = {}) => {
+  const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
+  const isAddress = isHexString && address.length === 42;
+  if (!isAddress && strict) {
+    throw Error(`Address ${address} is not a valid Ethereum address`);
+  }
+  return isAddress;
+};
+
+const isBytes32 = (str, { strict = false } = {}) => {
+  if (
+    typeof str !== 'string'
+    || str.length !== 66
+    || str.substr(0, 2) !== '0x'
+  ) {
+    if (strict) throw new Error(`${str} is not a valid Bytes32 HexString`);
+    return false;
+  }
+  return true;
+};
+
+const minBn = (bnArray) => {
+  let min = new BN(bnArray[0]);
+  bnArray.map((e) => {
+    if (e.lt(min)) min = e;
+    return min;
+  });
+  return min;
+};
+
 const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
@@ -721,6 +751,9 @@ module.exports = {
   prompt,
   pretty,
   prettyRPC,
+  isEthAddress,
+  isBytes32,
+  minBn,
   lbb,
   lba,
   lb,
