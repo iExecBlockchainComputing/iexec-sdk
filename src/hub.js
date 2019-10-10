@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const {
   toUpperFirst,
-  isEthAddress,
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
@@ -50,38 +49,33 @@ const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool'
   await workerpoolSchema().validate(workerpool),
 );
 
-const showObj = (objName = throwIfMissing()) => async (
+const showObjByAddress = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
-  objAddressOrIndex = throwIfMissing(),
-  userAddress,
+  objAddress = throwIfMissing(),
 ) => {
   try {
-    let objAddress;
-    if (
-      !isEthAddress(objAddressOrIndex, { strict: false })
-      && Number.isInteger(Number(objAddressOrIndex))
-    ) {
-      if (!isEthAddress(userAddress)) throw Error('Missing userAddress');
-      // INDEX case: need hit subHub to get obj address from index
-      objAddress = await wrapCall(
-        contracts.getUserObjAddressByIndex(objName)(
-          userAddress,
-          objAddressOrIndex,
-        ),
-      );
-    } else if (isEthAddress(objAddressOrIndex)) {
-      objAddress = objAddressOrIndex;
-    } else {
-      throw Error(
-        'Argument is neither an integer index nor a valid ethereum address',
-      );
-    }
     const obj = bnifyNestedEthersBn(
       await wrapCall(contracts.getObjProps(objName)(objAddress)),
     );
     return { obj, objAddress };
   } catch (error) {
-    debug('showObj()', error);
+    debug('showObjByAddress()', error);
+    throw error;
+  }
+};
+
+const showObjByIndex = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  objIndex = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  try {
+    const objAddress = await wrapCall(
+      contracts.getUserObjAddressByIndex(objName)(userAddress, objIndex),
+    );
+    return showObjByAddress(objName)(contracts, objAddress);
+  } catch (error) {
+    debug('showObjByIndex()', error);
     throw error;
   }
 };
@@ -98,7 +92,7 @@ const showApp = async (
   contracts = throwIfMissing(),
   appAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('app')(
+  const { obj, objAddress } = await showObjByAddress('app')(
     contracts,
     await addressSchema().validate(appAddress),
   );
@@ -116,7 +110,7 @@ const showUserApp = async (
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('app')(
+  const { obj, objAddress } = await showObjByIndex('app')(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema().validate(userAddress),
@@ -134,7 +128,7 @@ const showDataset = async (
   contracts = throwIfMissing(),
   datasetAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('dataset')(
+  const { obj, objAddress } = await showObjByAddress('dataset')(
     contracts,
     await addressSchema().validate(datasetAddress),
   );
@@ -152,7 +146,7 @@ const showUserDataset = async (
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('dataset')(
+  const { obj, objAddress } = await showObjByIndex('dataset')(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema().validate(userAddress),
@@ -170,7 +164,7 @@ const showWorkerpool = async (
   contracts = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('workerpool')(
+  const { obj, objAddress } = await showObjByAddress('workerpool')(
     contracts,
     await addressSchema().validate(workerpoolAddress),
   );
@@ -183,7 +177,7 @@ const showUserWorkerpool = async (
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) => {
-  const { obj, objAddress } = await showObj('workerpool')(
+  const { obj, objAddress } = await showObjByIndex('workerpool')(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema().validate(userAddress),
