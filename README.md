@@ -1523,7 +1523,7 @@ iexec.**deal.claim ( dealid: Bytes32 )** => Promise < **{ claimed : { ...\[ {\[i
 
 > claim all the failed task from a deal.
 > Depending the number and the status of task to claim, this may involve several transactions in order to fit in the blockchain gasLimit per block.
-> (mainnet actual gas limit is 10000000, this allows to claim 180 initialized task or 43 non-initialized tasks in one block)
+> (mainnet actual gas limit is 10000000, this allows to claim 180 initialized task or 40 non-initialized tasks in one block)
 
 _Example:_
 

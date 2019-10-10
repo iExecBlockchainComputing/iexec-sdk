@@ -184,6 +184,7 @@ const claim = async (
       contracts.jsonRpcProvider.getBlock('latest'),
     );
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
+    debug('blockGasLimit', blockGasLimit.toString());
     const hubContract = contracts.getHubContract();
     if (initialized.length > 0) {
       const EST_GAS_PER_CLAIM = new BN(55000);
@@ -215,7 +216,7 @@ const claim = async (
       await processClaims();
     }
     if (notInitialized.length > 0) {
-      const EST_GAS_PER_CLAIM = new BN(230000);
+      const EST_GAS_PER_CLAIM = new BN(250000);
       const maxClaimPerTx = blockGasLimit.div(EST_GAS_PER_CLAIM);
 
       const processInitAndClaims = async () => {
