@@ -2481,7 +2481,7 @@ describe('[Common]', () => {
   });
 });
 
-describe.only('[lib utils]', () => {
+describe('[lib utils]', () => {
   test("parseEth('4.2')", () => {
     const res = utils.parseEth('4.2');
     expect(res instanceof BN).toBe(true);
