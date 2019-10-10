@@ -7,12 +7,24 @@ const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
 const errors = require('./errors');
-const { BN, NULL_ADDRESS, NULL_BYTES32 } = require('./utils');
+const {
+  BN,
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  parseEth,
+  parseRLC,
+  formatEth,
+  formatRLC,
+} = require('./utils');
 
 const utils = {
   BN,
   NULL_ADDRESS,
   NULL_BYTES32,
+  parseEth,
+  parseRLC,
+  formatEth,
+  formatRLC,
 };
 
 class IExec {

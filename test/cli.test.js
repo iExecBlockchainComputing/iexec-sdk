@@ -4,6 +4,7 @@ const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
+const { utils } = require('../src/iexec-lib');
 
 console.log('Node version:', process.version);
 
@@ -2477,5 +2478,62 @@ describe('[Common]', () => {
       expect(res.balance.nRLC).not.toBe(undefined);
       expect(res.balance.ETH).toBe(undefined);
     }, 10000);
+  });
+});
+
+describe.only('[lib utils]', () => {
+  test("parseEth('4.2')", () => {
+    const res = utils.parseEth('4.2');
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+  });
+  test('parseEth(4.2)', () => {
+    const res = utils.parseEth(4.2);
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+  });
+  test('parseEth(new BN(42))', () => {
+    const res = utils.parseEth(new BN(42));
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('42000000000000000000'))).toBe(true);
+  });
+  test("parseRLC('4.2')", () => {
+    const res = utils.parseRLC('4.2');
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('4200000000'))).toBe(true);
+  });
+  test('parseRLC(4.2)', () => {
+    const res = utils.parseRLC(4.2);
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('4200000000'))).toBe(true);
+  });
+  test('parseRLC(new BN(42))', () => {
+    const res = utils.parseRLC(new BN(42));
+    expect(res instanceof BN).toBe(true);
+    expect(res.eq(new BN('42000000000'))).toBe(true);
+  });
+  test("formatEth('4200000000000000000')", () => {
+    const res = utils.formatEth('4200000000000000000');
+    expect(res).toBe('4.2');
+  });
+  test('formatEth(42)', () => {
+    const res = utils.formatEth(42);
+    expect(res).toBe('0.000000000000000042');
+  });
+  test("formatEth(new BN('4200000000000000000'))", () => {
+    const res = utils.formatEth(new BN('4200000000000000000'));
+    expect(res).toBe('4.2');
+  });
+  test("formatRLC('4200000000000000000')", () => {
+    const res = utils.formatRLC('4200000000000000000');
+    expect(res).toBe('4200000000');
+  });
+  test('formatRLC(42)', () => {
+    const res = utils.formatRLC(42);
+    expect(res).toBe('0.000000042');
+  });
+  test("formatRLC(new BN('4200000000000000000'))", () => {
+    const res = utils.formatRLC(new BN('4200000000000000000'));
+    expect(res).toBe('4200000000');
   });
 });

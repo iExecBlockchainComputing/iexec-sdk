@@ -3,7 +3,14 @@ const fetch = require('cross-fetch');
 const { Buffer } = require('buffer');
 const qs = require('query-string');
 const BN = require('bn.js');
-const { getAddress, bigNumberify, randomBytes } = require('ethers').utils;
+const Big = require('big.js');
+const {
+  getAddress,
+  bigNumberify,
+  randomBytes,
+  formatEther,
+  parseEther,
+} = require('ethers').utils;
 const multiaddr = require('multiaddr');
 const { hashEIP712 } = require('./sig-utils');
 const { wrapSignTypedDataV3 } = require('./errorWrappers');
@@ -19,6 +26,61 @@ const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber')
 
 const bnToEthersBn = bn => bigNumberify(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
+
+const stringify = (val) => {
+  try {
+    let stringVal;
+    switch (typeof nRLC) {
+      case 'number':
+        stringVal = Number(val).toString();
+        break;
+      case 'string':
+        stringVal = val;
+        break;
+      default:
+        stringVal = val.toString();
+        break;
+    }
+    return stringVal;
+  } catch (error) {
+    debug('stringify()', error);
+    throw Error('Invalid val');
+  }
+};
+
+const formatRLC = (nRLC) => {
+  try {
+    Big.NE = -10;
+    Big.PE = 10;
+    return new Big(stringify(nRLC)).times(new Big(10).pow(-9)).toString();
+  } catch (error) {
+    debug('formatRLC()', error);
+    throw Error('Invalid nRLC');
+  }
+};
+
+const parseRLC = (rlc) => {
+  try {
+    Big.NE = -10;
+    Big.PE = 18;
+    const rlcAmount = new Big(stringify(rlc));
+    return new BN(rlcAmount.times(new Big(10).pow(9)).toString());
+  } catch (error) {
+    debug('parseRLC()', error);
+    throw Error('Invalid rlcString');
+  }
+};
+
+const formatEth = (wei) => {
+  try {
+    return formatEther(bigNumberify(stringify(wei)));
+  } catch (error) {
+    debug('formatEth()', error);
+    throw Error('Invalid wei');
+  }
+};
+
+const parseEth = ether => ethersBnToBn(parseEther(stringify(ether)));
 
 const truncateBnWeiToBnNRlc = (bnWei) => {
   const weiString = bnWei.toString();
@@ -283,6 +345,10 @@ const throwIfMissing = () => {
 
 module.exports = {
   BN,
+  formatRLC,
+  formatEth,
+  parseRLC,
+  parseEth,
   checksummedAddress,
   cleanRPC,
   checkEvent,
