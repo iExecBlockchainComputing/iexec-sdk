@@ -7,6 +7,7 @@ const { getAddress, bigNumberify, randomBytes } = require('ethers').utils;
 const multiaddr = require('multiaddr');
 const { hashEIP712 } = require('./sig-utils');
 const { wrapSignTypedDataV3 } = require('./errorWrappers');
+const { ValidationError } = require('./errors');
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
 
@@ -14,6 +15,8 @@ const debug = Debug('iexec:utils');
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
+const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
@@ -322,6 +325,43 @@ const throwIfMissing = () => {
 
 const ensureString = val => String(val);
 
+const TAG_MAP = {
+  tee: 1,
+  1: 'tee',
+};
+
+const encodeTag = (tags) => {
+  const binaryTags = new Array(256).fill(false);
+  tags.forEach((tag) => {
+    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`unknown tag ${tag}`);
+    binaryTags[TAG_MAP[tag] - 1] = true;
+  });
+  const binString = binaryTags.reduce(
+    (acc, curr) => (curr ? `1${acc}` : `0${acc}`),
+    '',
+  );
+  const hex = new BN(binString, 2).toString('hex');
+  const encodedTag = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    .substr(0, 66 - hex.length)
+    .concat(hex);
+  return encodedTag;
+};
+
+const decodeTag = (tag) => {
+  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  const binString = new BN(tag.substr(2), 'hex').toString(2);
+  const tags = [];
+  for (let i = 1; i < binString.length + 1; i += 1) {
+    const current = binString.charAt(binString.length - i);
+    if (current === '1') {
+      const currentTag = TAG_MAP[i];
+      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`unknown bit ${i}`);
+      tags.push(currentTag);
+    }
+  }
+  return tags;
+};
+
 module.exports = {
   BN,
   isString,
@@ -350,4 +390,7 @@ module.exports = {
   ensureString,
   throwIfMissing,
   signTypedDatav3,
+  encodeTag,
+  decodeTag,
+  bytes32Regex,
 };

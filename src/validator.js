@@ -2,7 +2,12 @@ const {
   string, number, object, mixed,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
-const { humanToMultiaddrBuffer, utf8ToBuffer } = require('./utils');
+const {
+  humanToMultiaddrBuffer,
+  utf8ToBuffer,
+  encodeTag,
+  bytes32Regex,
+} = require('./utils');
 const { ValidationError } = require('./errors');
 
 /* eslint no-template-curly-in-string: "off" */
@@ -49,7 +54,7 @@ const addressSchema = () => string()
 
 const bytes32Schema = () => string()
   .lowercase()
-  .matches(/^(0x)([0-9a-f]{2}){32}$/, '${path} must be a bytes32 hexstring');
+  .matches(bytes32Regex, '${path} must be a bytes32 hexstring');
 
 const orderSignSchema = () => string().matches(/^(0x)([0-9a-f]{2})*/, '${path} must be a valid signature');
 
@@ -60,12 +65,39 @@ const signed = () => ({
 
 const paramsSchema = () => string();
 
+const tagSchema = () => mixed()
+  .transform((value) => {
+    if (Array.isArray(value)) {
+      try {
+        const bytes32Tag = encodeTag(value);
+        return bytes32Tag;
+      } catch (e) {
+        throw new ValidationError(`invalid tag: ${e.message}`);
+      }
+    }
+    if (typeof value === 'string') {
+      const lowerCase = value.toLowerCase();
+      return lowerCase;
+      // try {
+      //   const bytes32Tag = encodeTag(decodeTag(value));
+      //   return bytes32Tag;
+      // } catch (e) {
+      //   throw new ValidationError(`invalid tag: ${e.message}`);
+      // }
+    }
+    throw new ValidationError('invalid tag');
+  })
+  .test('is-bytes32', '${path} must be a bytes32 hexstring', async (value) => {
+    const res = await bytes32Schema().validate(value);
+    return res;
+  });
+
 const apporderSchema = () => object(
   {
     app: addressSchema().required(),
     appprice: uint256Schema().required(),
     volume: uint256Schema().required(),
-    tag: bytes32Schema().required(),
+    tag: tagSchema().required(),
     datasetrestrict: addressSchema().required(),
     workerpoolrestrict: addressSchema().required(),
     requesterrestrict: addressSchema().required(),
@@ -80,7 +112,7 @@ const datasetorderSchema = () => object(
     dataset: addressSchema().required(),
     datasetprice: uint256Schema().required(),
     volume: uint256Schema().required(),
-    tag: bytes32Schema().required(),
+    tag: tagSchema().required(),
     apprestrict: addressSchema().required(),
     workerpoolrestrict: addressSchema().required(),
     requesterrestrict: addressSchema().required(),
@@ -98,7 +130,7 @@ const workerpoolorderSchema = () => object(
     workerpool: addressSchema().required(),
     workerpoolprice: uint256Schema().required(),
     volume: uint256Schema().required(),
-    tag: bytes32Schema().required(),
+    tag: tagSchema().required(),
     category: uint256Schema().required(),
     trust: uint256Schema().required(),
     apprestrict: addressSchema().required(),
@@ -123,7 +155,7 @@ const requestorderSchema = () => object(
     workerpoolmaxprice: uint256Schema().required(),
     requester: addressSchema().required(),
     volume: uint256Schema().required(),
-    tag: bytes32Schema().required(),
+    tag: tagSchema().required(),
     category: uint256Schema().required(),
     trust: uint256Schema().required(),
     beneficiary: addressSchema().required(),
@@ -199,6 +231,7 @@ module.exports = {
   requestorderSchema,
   signedRequestorderSchema,
   paramsSchema,
+  tagSchema,
   chainIdSchema,
   hexnumberSchema,
   positiveIntSchema,

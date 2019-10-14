@@ -15,6 +15,8 @@ const {
   checksummedAddress,
   isEthAddress,
   isBytes32,
+  encodeTag,
+  decodeTag,
 } = require('./utils');
 
 const utils = {
@@ -25,6 +27,8 @@ const utils = {
   isEthAddress,
   isBytes32,
   checksummedAddress,
+  encodeTag,
+  decodeTag,
 };
 
 class IExec {
