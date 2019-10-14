@@ -4,6 +4,7 @@ const {
   addressSchema,
   chainIdSchema,
   uint256Schema,
+  tagSchema,
   throwIfMissing,
 } = require('./validator');
 
@@ -53,7 +54,7 @@ const fetchDatasetOrderbook = async (
 const fetchWorkerpoolOrderbook = async (
   chainId = throwIfMissing(),
   category = throwIfMissing(),
-  { workerpoolAddress } = {},
+  { workerpoolAddress, minTag } = {},
 ) => {
   try {
     const body = Object.assign(
@@ -61,6 +62,9 @@ const fetchWorkerpoolOrderbook = async (
       { category: await uint256Schema().validate(category) },
       workerpoolAddress && {
         workerpool: await addressSchema().validate(workerpoolAddress),
+      },
+      minTag && {
+        minTag: await tagSchema().validate(minTag),
       },
     );
     const response = await http.get('orderbook/workerpool', body);
