@@ -21,11 +21,13 @@ const stringNumberSchema = () => string()
 
 const positiveIntSchema = () => number()
   .integer()
-  .min(0);
+  .min(0)
+  .max(Number.MAX_SAFE_INTEGER - 1);
 
 const positiveStrictIntSchema = () => number()
   .integer()
-  .min(1);
+  .min(1)
+  .max(Number.MAX_SAFE_INTEGER - 1);
 
 const hexnumberSchema = () => string()
   .lowercase()
