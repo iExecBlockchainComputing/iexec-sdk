@@ -279,7 +279,7 @@ sign
           spinner.info(
             info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
           );
-          Object.assign(success, { requestorder: saved });
+          Object.assign(success, { requestorder: signedOrder });
         } catch (error) {
           failed.push(`requestorder: ${error.message}`);
         }

@@ -713,6 +713,10 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).not.toBe(undefined);
     expect(res.workerpoolorder).not.toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder.app).not.toBe(undefined);
+    expect(res.datasetorder.dataset).not.toBe(undefined);
+    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
+    expect(res.requestorder.app).not.toBe(undefined);
   }, 30000);
 
   test('[mainchain] iexec order fill', async () => {
@@ -736,6 +740,7 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).toBe(undefined);
+    expect(res.apporder.app).not.toBe(undefined);
   }, 10000);
 
   test('[mainchain] iexec order sign --dataset', async () => {
@@ -746,6 +751,7 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).not.toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).toBe(undefined);
+    expect(res.datasetorder.dataset).not.toBe(undefined);
   }, 10000);
 
   test('[mainchain] iexec order sign --workerpool', async () => {
@@ -760,6 +766,7 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).not.toBe(undefined);
     expect(res.requestorder).toBe(undefined);
+    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
   }, 10000);
 
   test('[mainchain] iexec order sign --request', async () => {
@@ -777,6 +784,7 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder).toBe(undefined);
     expect(res.workerpoolorder).toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
+    expect(res.requestorder.app).not.toBe(undefined);
   }, 10000);
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
@@ -1506,6 +1514,10 @@ describe('[Sidechain]', () => {
     expect(res.datasetorder).not.toBe(undefined);
     expect(res.workerpoolorder).not.toBe(undefined);
     expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder.app).not.toBe(undefined);
+    expect(res.datasetorder.dataset).not.toBe(undefined);
+    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
+    expect(res.requestorder.app).not.toBe(undefined);
   }, 30000);
 
   test('[sidechain] iexec order fill', async () => {
