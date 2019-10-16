@@ -106,6 +106,7 @@ addGlobalOptions(orderbookWorkerpool);
 orderbookWorkerpool
   .option(...option.chain())
   .option(...option.category())
+  .option(...option.requiredTag())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -116,12 +117,12 @@ orderbookWorkerpool
       });
       if (address) isEthAddress(address, { strict: true });
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
-
+      const minTag = cmd.requireTag && cmd.requireTag.split(',');
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.id,
         cmd.category,
-        { workerpoolAddress: address },
+        { workerpoolAddress: address, minTag },
       );
       const workerpoolOrders = response.workerpoolOrders
         ? response.workerpoolOrders.map(e => ({

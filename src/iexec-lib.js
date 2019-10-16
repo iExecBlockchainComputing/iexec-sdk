@@ -15,6 +15,8 @@ const {
   checksummedAddress,
   isEthAddress,
   isBytes32,
+  encodeTag,
+  decodeTag,
 } = require('./utils');
 
 const utils = {
@@ -25,6 +27,8 @@ const utils = {
   isEthAddress,
   isBytes32,
   checksummedAddress,
+  encodeTag,
+  decodeTag,
 };
 
 class IExec {
@@ -152,20 +156,14 @@ class IExec {
       contracts.chainId,
       requestorderHash,
     );
-    this.orderbook.fetchAppOrderbook = appAddress => orderbook.fetchAppOrderbook(contracts.chainId, appAddress);
-    this.orderbook.fetchDatasetOrderbook = datasetAddress => orderbook.fetchDatasetOrderbook(contracts.chainId, datasetAddress);
-    this.orderbook.fetchWorkerpoolOrderbook = (
-      category,
-      { workerpoolAddress } = {},
-    ) => orderbook.fetchWorkerpoolOrderbook(contracts.chainId, category, {
-      workerpoolAddress,
-    });
-    this.orderbook.fetchRequestOrderbook = (
-      category,
-      { requesterAddress } = {},
-    ) => orderbook.fetchRequestOrderbook(contracts.chainId, category, {
-      requesterAddress,
-    });
+    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(contracts.chainId, appAddress, options);
+    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(
+      contracts.chainId,
+      datasetAddress,
+      options,
+    );
+    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(contracts.chainId, category, options);
+    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts.chainId, category, options);
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.claim = taskid => task.claim(contracts, taskid);

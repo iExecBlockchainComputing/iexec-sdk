@@ -26,6 +26,7 @@ const {
   signedWorkerpoolorderSchema,
   signedRequestorderSchema,
   paramsSchema,
+  tagSchema,
   chainIdSchema,
   bytes32Schema,
   uint256Schema,
@@ -665,7 +666,7 @@ const createApporder = async ({
   app: await addressSchema().validate(app),
   appprice: await uint256Schema().validate(appprice),
   volume: await uint256Schema().validate(volume),
-  tag: await bytes32Schema().validate(tag),
+  tag: await tagSchema().validate(tag),
   datasetrestrict: await addressSchema().validate(datasetrestrict),
   workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -683,7 +684,7 @@ const createDatasetorder = async ({
   dataset: await addressSchema().validate(dataset),
   datasetprice: await uint256Schema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
-  tag: await bytes32Schema().validate(tag),
+  tag: await tagSchema().validate(tag),
   apprestrict: await addressSchema().validate(apprestrict),
   workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -705,7 +706,7 @@ const createWorkerpoolorder = async ({
   volume: await uint256Schema().validate(volume),
   category: await bytes32Schema().validate(category),
   trust: await bytes32Schema().validate(trust),
-  tag: await bytes32Schema().validate(tag),
+  tag: await tagSchema().validate(tag),
   apprestrict: await addressSchema().validate(apprestrict),
   datasetrestrict: await addressSchema().validate(datasetrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -740,7 +741,7 @@ const createRequestorder = async ({
   callback: await addressSchema().validate(callback),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
-  tag: await bytes32Schema().validate(tag),
+  tag: await tagSchema().validate(tag),
 });
 
 module.exports = {

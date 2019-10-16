@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## Ureleased
+
+### Added
+
+- `iexec orderbook workerpool` added option `--require-tag <...tags>`
+- Support for tag array of string representation (ex: tee tag `0x0000000000000000000000000000000000000000000000000000000000000001` can be replaced by `['tee']` ), available in:
+  - `iexec.json`
+  - `orderbook` command
+  - js lib
+- Filtering options for orderbook in js lib
+
+### Changed
+
+### Removed
+
 ## [3.1.0] - 2019-09-25
 
 ### Added

@@ -214,6 +214,10 @@ const option = {
     '--dataset <address>',
     'show the best orders for specified dataset',
   ],
+  requiredTag: () => [
+    '--require-tag <tag...>',
+    'specify minimum required tags (usage --require-tag tag1,tag2)',
+  ],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet',

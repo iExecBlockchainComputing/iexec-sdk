@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
+const { utils } = require('../src/iexec-lib');
 
 console.log('Node version:', process.version);
 
@@ -758,4 +759,28 @@ test('iexec registry validate workerpool', async () => {
   expect(
     execAsync(`${iexecPath} registry validate workerpool`),
   ).resolves.not.toBe(1);
+});
+
+test("encodeTag(['tee'])", () => {
+  expect(utils.encodeTag(['tee'])).toBe(
+    '0x0000000000000000000000000000000000000000000000000000000000000001',
+  );
+});
+
+test('encodeTag unknown tag', () => {
+  expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
+});
+
+test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
+  expect(
+    utils.decodeTag(
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+    ),
+  ).toStrictEqual(['tee']);
+});
+
+test('decodeTag unknown bit tag', () => {
+  expect(() => utils.decodeTag(
+    '0x0000000000000000000000000000000000000000000000000000000000000002',
+  )).toThrow('unknown bit 2');
 });
