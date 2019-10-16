@@ -431,6 +431,7 @@ iexec orderbook requester --category <id> # show the best requestorders publishe
 iexec orderbook requester [address] --category <id> # filters the result on requester
 iexec orderbook workerpool --category <id> # show the best workerpools published on the Marketplace for the specified category
 iexec orderbook workerpool [address] --category <id> # filters the result on workerpool
+iexec orderbook workerpool --category <id> --require-tag <...tags> # show the best workerpools published on the Marketplace matchin the specified tags
 iexec orderbook app <address> # show the best apporders published on the Marketplace for the specified app
 iexec orderbook dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
 ```
@@ -1044,9 +1045,14 @@ console.log('tx:', txHash);
 
 #### fetchAppOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( address: Address )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified app
+>
+> _Optional_:
+>
+> - minVolume: filter on minimum volume remaining
+> - skip: skip first results
 
 _Example:_
 
@@ -1060,9 +1066,14 @@ console.log('total orders:', res.count);
 
 #### fetchDatasetOrderbook
 
-iexec.**orderbook.fetchDatasetOrderbook ( address: Address )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
+iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified dataset
+>
+> _Optional_:
+>
+> - minVolume: filter on minimum volume remaining
+> - skip: skip first results
 
 _Example:_
 
@@ -1076,11 +1087,18 @@ console.log('total orders:', res.count);
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( category: Uint256 \[, { workerpoolAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
 
 > find the cheapest orders for computing resource in specified category.
 >
-> _Optional_: filter on specific workerpoolAddress
+> _Optional_:
+>
+> - workerpoolAddress: filter on specific workerpoolAddress
+> - signerAddress: filter on specific signer (ie:workerpool owner)
+> - minTag: filter on minimum tags required
+> - minTrust: filter on minimum trust required
+> - minVolume: filter on minimum volume remaining
+> - skip: skip first results
 
 _Example:_
 
@@ -1092,11 +1110,18 @@ console.log('total orders:', res.count);
 
 #### fetchRequestOrderbook
 
-iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
+iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
 
 > find the best paying request orders for computing resource in specified category.
 >
-> _Optional_: filter on specific requesterAddress
+> _Optional_:
+>
+> - requesterAddress: filter on specific requesterAddress
+> - beneficiaryAddress: filter on specific beneficiaryAddress
+> - maxTag: filter on maximum tags required
+> - maxTrust: filter on maximum trust required
+> - minVolume: filter on minimum volume remaining
+> - skip: skip first results
 
 _Example:_
 
@@ -1771,6 +1796,15 @@ Accepted:
 - String
 - BN
 
+#### Tag
+
+`Tag` is task tag representation. A Tag is the encoding of 256 flags under a bytes32.
+
+Accepted:
+
+- Bytes32 encoded tag (ex: `0x0000000000000000000000000000000000000000000000000000000000000001`)
+- Array of tags (ex: `['tee']`)
+
 #### Multiaddress
 
 `Multiaddress` is resource address representation [multiaddr](https://github.com/multiformats/js-multiaddr).
@@ -1844,7 +1878,7 @@ Accepted:
 {
   name: String,
   description: String,
-  workClockTimeRef: Uint253
+  workClockTimeRef: Uint256
 }
 ```
 

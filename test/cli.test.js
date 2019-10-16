@@ -2536,4 +2536,24 @@ describe('[lib utils]', () => {
     const res = utils.formatRLC(new BN('4200000000000000000'));
     expect(res).toBe('4200000000');
   });
+  test("encodeTag(['tee'])", () => {
+    expect(utils.encodeTag(['tee'])).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+    );
+  });
+  test('encodeTag unknown tag', () => {
+    expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
+  });
+  test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
+    expect(
+      utils.decodeTag(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ),
+    ).toStrictEqual(['tee']);
+  });
+  test('decodeTag unknown bit tag', () => {
+    expect(() => utils.decodeTag(
+      '0x0000000000000000000000000000000000000000000000000000000000000002',
+    )).toThrow('unknown bit 2');
+  });
 });
