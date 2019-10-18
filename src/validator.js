@@ -10,6 +10,13 @@ const {
 } = require('./utils');
 const { ValidationError } = require('./errors');
 
+const isInteger = message => ({
+  test(value) {
+    return value == null || Number.isInteger(value);
+  },
+  message,
+});
+
 /* eslint no-template-curly-in-string: "off" */
 
 const stringNumberSchema = () => string()
@@ -19,13 +26,13 @@ const stringNumberSchema = () => string()
   })
   .matches(/^[0-9]*$/, '${path} must be a number');
 
-const positiveIntSchema = () => number()
-  .integer()
+const integerSchema = () => number().test(isInteger('${path} must be an integer'));
+
+const positiveIntSchema = () => integerSchema()
   .min(0)
   .max(Number.MAX_SAFE_INTEGER - 1);
 
-const positiveStrictIntSchema = () => number()
-  .integer()
+const positiveStrictIntSchema = () => integerSchema()
   .min(1)
   .max(Number.MAX_SAFE_INTEGER - 1);
 
