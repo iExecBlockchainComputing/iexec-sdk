@@ -43,6 +43,17 @@ pipeline:
       matrix:
         NODE_TAG: 8
 
+  dockerhub_v4:
+    image: plugins/docker
+    repo: iexechub/iexec-sdk
+    secrets: [docker_username, docker_password]
+    tags:
+      - alpha
+    when:
+      ref: [refs/tags/v4.0.0-alpha.*]
+      matrix:
+        NODE_TAG: 8
+
 services:
   ethereum:
     image: iexechub/poco-chaintest
