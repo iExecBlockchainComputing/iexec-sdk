@@ -18,6 +18,7 @@ const {
   encodeTag,
   decodeTag,
 } = require('./utils');
+const { getSignerFromPrivateKey } = require('./sig-utils');
 
 const utils = {
   BN,
@@ -29,6 +30,7 @@ const utils = {
   formatRLC,
   encodeTag,
   decodeTag,
+  getSignerFromPrivateKey,
 };
 
 class IExec {

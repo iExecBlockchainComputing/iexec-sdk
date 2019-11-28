@@ -761,8 +761,9 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 1. [Install the dependency in your JS project](#install-the-dependenciy-in-your-js-project)
 2. [Instanciate the iExec SDK](#instanciate-the-iexec-sdk)
 3. [Use iexec sdk](#use-iexec-sdk)
-4. [Types](#types)
-5. [Errors](#errors)
+4. [Utils](#utils)
+5. [Types](#types)
+6. [Errors](#errors)
 
 ### Install the dependency in your JS project
 
@@ -803,6 +804,8 @@ const iexec = new IExec({
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
 In the browser, you can get a signer provider from [MetaMask plugin](https://metamask.io/)
+
+In the server side, use [utils.getSignerFromPrivateKey](#getSignerFromPrivateKey)
 
 _Example:_
 
@@ -1759,6 +1762,62 @@ _Example:_
 
 ```js
 console.log('current chain is a sidechain:', iexec.network.isSidechain);
+```
+
+### Utils
+
+`utils` provides some utility functions for iExec.
+
+#### BN
+
+`BN` is instance of `bn.js` it allows big numbers manipulation in js (see [bn.js](https://www.npmjs.com/package/bn.js)).
+
+_Example:_
+
+```js
+new utils.BN(1);
+```
+
+#### NULL_ADDRESS
+
+Constant: the address 0 represention
+_Example:_
+
+```js
+console.log(utils.NULL_ADDRESS);
+```
+
+#### NULL_BYTES32
+
+Constant: an empty bytes32 represention
+_Example:_
+
+```js
+console.log(utils.NULL_BYTES32);
+```
+
+#### getSignerFromPrivateKey
+
+utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey [, options ] )** => SignerProvider
+
+Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
+
+_options:_
+
+- `gasPrice: Uint256` specify the gasPrice to use for transactions
+
+_Example:_
+
+```js
+const { IExec, utils } = require('iexec');
+const ethProvider = utils.getSignerFromPrivateKey(
+  'https://localhost:8545',
+  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+);
+const iexec = new IExec({
+  ethProvider,
+  chainId: '42',
+});
 ```
 
 ### Types

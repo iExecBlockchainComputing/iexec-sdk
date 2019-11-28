@@ -4,7 +4,7 @@ const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
-const { utils } = require('../src/iexec-lib');
+const { utils, IExec } = require('../src/iexec-lib');
 
 console.log('Node version:', process.version);
 
@@ -2567,5 +2567,131 @@ describe('[lib utils]', () => {
     expect(() => utils.decodeTag(
       '0x0000000000000000000000000000000000000000000000000000000000000002',
     )).toThrow('unknown bit 2');
+  });
+});
+
+describe('[lib utils getSignerFromPrivateKey]', () => {
+  test('sign tx send value', async () => {
+    const amount = new BN(1000);
+    const receiver = ADDRESS3;
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const senderInitialBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
+    const txHash = await iexec.wallet.sendETH(amount, receiver);
+    const senderFinalBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
+    expect(txHash).not.toBe(undefined);
+    expect(txHash.length).toBe(66);
+    expect(
+      senderFinalBalances.wei
+        .add(new BN(amount))
+        .lte(senderInitialBalances.wei),
+    ).toBe(true);
+    expect(senderFinalBalances.nRLC.eq(senderInitialBalances.nRLC)).toBe(true);
+    expect(
+      receiverFinalBalances.wei
+        .sub(new BN(amount))
+        .eq(receiverInitialBalances.wei),
+    ).toBe(true);
+    const tx = await ethRPC.getTransaction(txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  });
+  test('sign tx no value', async () => {
+    const amount = '1000000000';
+    const receiver = ADDRESS3;
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const senderInitialBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
+    const txHash = await iexec.wallet.sendRLC(amount, receiver);
+    const senderFinalBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
+    expect(txHash).not.toBe(undefined);
+    expect(txHash.length).toBe(66);
+    expect(senderFinalBalances.wei.lte(senderInitialBalances.wei)).toBe(true);
+    expect(
+      senderFinalBalances.nRLC
+        .add(new BN(amount))
+        .eq(senderInitialBalances.nRLC),
+    ).toBe(true);
+    expect(
+      receiverFinalBalances.nRLC
+        .sub(new BN(amount))
+        .eq(receiverInitialBalances.nRLC),
+    ).toBe(true);
+    const tx = await ethRPC.getTransaction(txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  });
+  test('with gasPrice option', async () => {
+    const amount = '1000000000';
+    const gasPrice = '123456789';
+    const receiver = ADDRESS3;
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY, {
+      gasPrice,
+    });
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const senderInitialBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
+    const txHash = await iexec.wallet.sendRLC(amount, receiver);
+    const senderFinalBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
+    expect(txHash).not.toBe(undefined);
+    expect(txHash.length).toBe(66);
+    expect(senderFinalBalances.wei.lte(senderInitialBalances.wei)).toBe(true);
+    expect(
+      senderFinalBalances.nRLC
+        .add(new BN(amount))
+        .eq(senderInitialBalances.nRLC),
+    ).toBe(true);
+    expect(
+      receiverFinalBalances.nRLC
+        .sub(new BN(amount))
+        .eq(receiverInitialBalances.nRLC),
+    ).toBe(true);
+    const tx = await ethRPC.getTransaction(txHash);
+    expect(tx).not.toBe(undefined);
+    expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
 });
