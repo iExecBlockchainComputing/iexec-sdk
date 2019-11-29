@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - `iexec wallet bridge-to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
 - brindging RLC between mainchain an sidechain may throw `BridgeError`
 - `deal.claim(dealid)` and `iexec deal claim`to claim all failed of a deal
+- `utils.getSignerFromPrivateKey()` creates a signer provider for server side applications
 
 ### Changed
 
@@ -29,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec order show --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec order unpublis --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec order fill --raw` volume in output is now formated as decimal string, previously was hexadecimal string.
+- [BREAKING] Ethereum public key representation changed, first byte `04` is no longuer skipped.
 
 ### Removed
 
