@@ -1270,7 +1270,7 @@ _Example:_
 
 ```js
 const workerpoolorderToSign = await iexec.order.createWorkerpoolorder({
-  dataset: '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
+  workerpool: '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
   workerpoolprice: '1000000000',
   category: '2',
   volume: '1',
@@ -1635,14 +1635,14 @@ console.log('task status is', res.statusName);
 
 #### show
 
-iexec.**app.show ( appAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
+iexec.**app.showApp ( appAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
 
 > show the details of an app.
 
 _Example:_
 
 ```js
-const { app } = await iexec.app.show(
+const { app } = await iexec.app.showApp(
   '0x917D71168fF60A10afD684d8D815b4A78097225D',
 );
 console.log('app:', app);
@@ -1650,14 +1650,14 @@ console.log('app:', app);
 
 #### deploy
 
-iexec.**app.deploy ( app: App )** => Promise < **{ address: Address, txHash: TxHash }** >
+iexec.**app.deployApp ( app: App )** => Promise < **{ address: Address, txHash: TxHash }** >
 
 > deploy an app on the blockchain.
 
 _Example:_
 
 ```js
-const { address } = await iexec.app.deploy({
+const { address } = await iexec.app.deployApp({
   owner: await iexec.wallet.getAddress(),
   name: 'My app',
   type: 'DOCKER',
@@ -1673,14 +1673,14 @@ console.log('deployed at', address);
 
 #### show
 
-iexec.**dataset.show ( datasetAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
+iexec.**dataset.showDataset ( datasetAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
 
 > show the details of a dataset.
 
 _Example:_
 
 ```js
-const { dataset } = await iexec.dataset.show(
+const { dataset } = await iexec.dataset.showDataset(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
 );
 console.log('dataset:', dataset);
@@ -1688,14 +1688,14 @@ console.log('dataset:', dataset);
 
 #### deploy
 
-iexec.**dataset.deploy ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
+iexec.**dataset.deployDataset ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
 
 > deploy a dataset on the blockchain.
 
 _Example:_
 
 ```js
-const { address } = await iexec.dataset.deploy({
+const { address } = await iexec.dataset.deployDataset({
   owner: await iexec.wallet.getAddress(),
   name: 'My dataset',
   multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
@@ -1709,14 +1709,14 @@ console.log('deployed at', address);
 
 #### show
 
-iexec.**workerpool.show ( workerpoolAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
+iexec.**workerpool.showWorkerpool ( workerpoolAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
 
 > show the details of a workerpool.
 
 _Example:_
 
 ```js
-const { workerpool } = await iexec.workerpool.show(
+const { workerpool } = await iexec.workerpool.showWorkerpool(
   '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
 );
 console.log('workerpool:', workerpool);
@@ -1724,14 +1724,14 @@ console.log('workerpool:', workerpool);
 
 #### deploy
 
-iexec.**workerpool.deploy ( workerpool: Workerpool )** => Promise < **{ address: Address, txHash: TxHash }** >
+iexec.**workerpool.deployWorkerpool ( workerpool: Workerpool )** => Promise < **{ address: Address, txHash: TxHash }** >
 
 > deploy a workerpool on the blockchain.
 
 _Example:_
 
 ```js
-const { address } = await iexec.workerpool.deploy({
+const { address } = await iexec.workerpool.deployWorkerpool({
   owner: await iexec.wallet.getAddress(),
   description: 'My workerpool',
 });
