@@ -1,6 +1,7 @@
-FROM node:11-alpine
+FROM node:10-alpine
 
-RUN apk add --no-cache git
+RUN apk update && apk upgrade
+RUN apk add --no-cache git python make g++
 
 ENV NODE_NO_WARNINGS 1
 ENV user node
