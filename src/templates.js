@@ -125,7 +125,7 @@ const chains = {
     kovan: {
       host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '42',
-      sms: 'https://sms-kovan.iex.ec',
+      sms: 'https://kovan-sms.iex.ec',
     },
     goerli: {
       host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
@@ -147,7 +147,7 @@ const chains = {
     mainnet: {
       host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '1',
-      sms: 'https://sms-mainnet.iex.ec',
+      sms: 'https://mainnet-sms.iex.ec',
       bridge: {
         contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
         bridgedNetworkId: '134',
@@ -156,6 +156,7 @@ const chains = {
     bellecour: {
       host: 'https://bellecour.iex.ec',
       id: '134',
+      sms: 'https://bellecour-sms.iex.ec',
       bridge: {
         contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
         bridgedNetworkId: '1',
