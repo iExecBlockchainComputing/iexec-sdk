@@ -29,7 +29,6 @@
     "core-js": "3.4.4",
     "cross-fetch": "3.0.4",
     "debug": "4.1.1",
-    "eth-sig-util": "2.5.1",
     "ethers": "4.0.40",
     "ethjs-custom-signer": "1.2.0",
     "fs-extra": "8.1.0",
