@@ -233,7 +233,8 @@ describe('[workflow]', () => {
     const signedorder = await iexec.order.signRequestorder(order);
     const totalPrice = new BN(order.appmaxprice)
       .add(new BN(order.datasetmaxprice))
-      .add(new BN(order.workerpoolmaxprice));
+      .add(new BN(order.workerpoolmaxprice))
+      .mul(new BN(order.volume));
     await iexec.account.deposit(totalPrice);
     expect(signedorder.sign).not.toBe(undefined);
     const matchOrdersRes = await iexec.order.matchOrders({
@@ -255,7 +256,7 @@ describe('[workflow]', () => {
     expect(claimDealRes.claimed).not.toBe(undefined);
     expect(Object.keys(claimDealRes.claimed).length).toBe(10);
     expect(claimDealRes.claimed[0]).not.toBe(undefined);
-  });
+  }, 10000);
 });
 
 describe('[getSignerFromPrivateKey]', () => {
