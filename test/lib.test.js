@@ -38,9 +38,33 @@ beforeAll(async () => {
 }, 15000);
 
 describe('[workflow]', () => {
+  let noDurationCatId;
   let apporder;
   let datasetorder;
   let workerpoolorder;
+  let workerpoolorderToClaim;
+  test('create category', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.hub.createCategory({
+      name: 'custom',
+      description: 'desc',
+      workClockTimeRef: '0',
+    });
+    noDurationCatId = res.catid.toString();
+    expect(res).not.toBe(undefined);
+    expect(res.catid).not.toBe(undefined);
+    expect(res.txHash).not.toBe(undefined);
+  });
   test('deploy and sell app', async () => {
     const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
     const iexec = new IExec(
@@ -131,6 +155,17 @@ describe('[workflow]', () => {
     const signedorder = await iexec.order.signWorkerpoolorder(order);
     workerpoolorder = signedorder;
     expect(signedorder.sign).not.toBe(undefined);
+    // generate no duration order
+    const orderToClaim = await iexec.order.createWorkerpoolorder({
+      workerpool: workerpoolDeployRes.address,
+      workerpoolprice: '0',
+      category: noDurationCatId,
+      volume: '1000',
+    });
+    workerpoolorderToClaim = await iexec.order.signWorkerpoolorder(
+      orderToClaim,
+    );
+    expect(workerpoolorderToClaim.sign).not.toBe(undefined);
   });
   test('buy computation', async () => {
     const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
@@ -171,6 +206,55 @@ describe('[workflow]', () => {
     expect(matchOrdersRes.dealid).not.toBe(undefined);
     expect(matchOrdersRes.txHash).not.toBe(undefined);
     expect(matchOrdersRes.volume.eq(new BN(1))).toBe(true);
+  });
+  test('claim deal uninitialized tasks', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: apporder.app,
+      appmaxprice: apporder.appprice,
+      dataset: datasetorder.dataset,
+      datasetmaxprice: datasetorder.datasetprice,
+      workerpoolmaxprice: workerpoolorderToClaim.workerpoolprice,
+      requester: await iexec.wallet.getAddress(),
+      category: workerpoolorderToClaim.category,
+      volume: '10',
+      params: 'test',
+    });
+    const signedorder = await iexec.order.signRequestorder(order);
+    const totalPrice = new BN(order.appmaxprice)
+      .add(new BN(order.datasetmaxprice))
+      .add(new BN(order.workerpoolmaxprice));
+    await iexec.account.deposit(totalPrice);
+    expect(signedorder.sign).not.toBe(undefined);
+    const matchOrdersRes = await iexec.order.matchOrders({
+      apporder,
+      datasetorder,
+      workerpoolorder: workerpoolorderToClaim,
+      requestorder: signedorder,
+    });
+    expect(matchOrdersRes).not.toBe(undefined);
+    expect(matchOrdersRes.dealid).not.toBe(undefined);
+    expect(matchOrdersRes.txHash).not.toBe(undefined);
+    expect(matchOrdersRes.volume.eq(new BN(10))).toBe(true);
+    const claimDealRes = await iexec.deal.claim(matchOrdersRes.dealid);
+    expect(claimDealRes).not.toBe(undefined);
+    expect(claimDealRes.transactions).not.toBe(undefined);
+    expect(claimDealRes.transactions.length).toBe(1);
+    expect(claimDealRes.transactions[0]).not.toBe(undefined);
+    expect(claimDealRes.transactions[0].type).toBe('initializeAndClaimArray');
+    expect(claimDealRes.claimed).not.toBe(undefined);
+    expect(Object.keys(claimDealRes.claimed).length).toBe(10);
+    expect(claimDealRes.claimed[0]).not.toBe(undefined);
   });
 });
 

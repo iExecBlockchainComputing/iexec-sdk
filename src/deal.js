@@ -20,7 +20,6 @@ const {
 const { ObjectNotFoundError } = require('./errors');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 const { showCategory, getTimeoutRatio } = require('./hub');
-const showTask = require('./task').show;
 
 const debug = Debug('iexec:deal');
 
@@ -135,6 +134,23 @@ const show = async (
   }
 };
 
+const getTaskStatus = async (
+  contracts = throwIfMissing(),
+  taskid = throwIfMissing(),
+) => {
+  try {
+    const vTaskId = await bytes32Schema().validate(taskid);
+    const hubContract = contracts.getHubContract();
+    const task = bnifyNestedEthersBn(
+      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
+    );
+    return new BN(task.status).toNumber();
+  } catch (error) {
+    debug('getTaskStatus()', error);
+    throw error;
+  }
+};
+
 const claim = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
@@ -165,15 +181,11 @@ const claim = async (
 
     await Promise.all(
       Object.entries(tasks).map(async ([idx, taskid]) => {
-        try {
-          const task = await showTask(contracts, taskid);
-          if (task.status < 3) {
-            initialized.push({ idx, taskid });
-          }
-        } catch (error) {
-          if (error instanceof ObjectNotFoundError) {
-            notInitialized.push({ idx, taskid });
-          } else throw error;
+        const taskStatus = await getTaskStatus(contracts, taskid);
+        if (taskStatus === 0) {
+          notInitialized.push({ idx, taskid });
+        } else if (taskStatus < 3) {
+          initialized.push({ idx, taskid });
         }
       }),
     );
