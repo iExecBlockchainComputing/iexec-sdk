@@ -26,7 +26,7 @@
     "buffer": "5.4.3",
     "colors": "1.4.0",
     "commander": "3.0.1",
-    "core-js": "3.4.4",
+    "core-js": "3.4.8",
     "cross-fetch": "3.0.4",
     "debug": "4.1.1",
     "ethers": "4.0.40",
@@ -49,16 +49,16 @@
     "yup": "0.27.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.7.4",
-    "@babel/core": "7.7.4",
-    "@babel/preset-env": "7.7.4",
-    "bluebird": "3.7.1",
-    "eslint": "5.16.0",
+    "@babel/cli": "7.7.5",
+    "@babel/core": "7.7.5",
+    "@babel/preset-env": "7.7.6",
+    "bluebird": "3.7.2",
+    "eslint": "6.7.2",
     "eslint-config-airbnb-base": "13.2.0",
-    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-import": "2.19.1",
     "jest": "24.9.0",
-    "prettier": "1.18.2",
-    "prettier-eslint": "9.0.0"
+    "prettier": "1.19.1",
+    "prettier-eslint": "9.0.1"
   },
   "babel": {
     "presets": [
