@@ -1,71 +1,180 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const {
-  defaultAbiCoder,
-  keccak256,
-  solidityKeccak256,
-  bigNumberify,
-} = require('ethers').utils;
-
+const { Buffer } = require('buffer');
+const { defaultAbiCoder, keccak256, joinSignature } = require('ethers').utils;
 const SignerProvider = require('ethjs-custom-signer');
 const { Wallet } = require('ethers');
-const ethSigUtils = require('eth-sig-util');
 
 const debug = Debug('iexec:sig-utils');
 
-const getStructType = (primaryType, members) => {
-  const reducer = (oldValue, e) => {
-    let newValue = oldValue;
-    if (newValue) newValue = newValue.concat(',');
-    newValue = newValue.concat(e.type.concat(' ').concat(e.name));
-    return newValue;
-  };
-  const args = members.reduce(reducer, String(''));
-  const structType = primaryType
-    .concat('(')
-    .concat(args)
-    .concat(')');
-  return structType;
+// Typed data signature inspired by eth-sig-util refactored to work with ethers
+const rawEncode = (encodedTypes, encodedValues) => Buffer.from(
+  defaultAbiCoder.encode(encodedTypes, encodedValues).substr(2),
+  'hex',
+);
+const sha3 = (value) => {
+  const b = Buffer.from(keccak256(Buffer.from(value)).substr(2), 'hex');
+  return b;
 };
 
-const hashStruct = (primaryType, members, obj) => {
-  const type = getStructType(primaryType, members);
-  const typeHash = keccak256(Buffer.from(type, 'utf8'));
-  const encodedTypes = ['bytes32'].concat(
-    members.map((e) => {
-      if (e.type === 'string' || e.type === 'bytes') return 'bytes32';
-      return e.type;
-    }),
-  );
-  const values = [typeHash].concat(
-    members.map((e) => {
-      if (e.type === 'string') return keccak256(Buffer.from(obj[e.name], 'utf8'));
-      if (e.type === 'uint256') return bigNumberify(obj[e.name]);
-      if (e.type === 'uint8') return bigNumberify(obj[e.name]);
-      return obj[e.name];
-    }),
-  );
-  const encoded = defaultAbiCoder.encode(encodedTypes, values);
-  const structHash = keccak256(encoded);
-  return structHash;
+const TYPED_MESSAGE_SCHEMA = {
+  type: 'object',
+  properties: {
+    types: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            type: { type: 'string' },
+          },
+          required: ['name', 'type'],
+        },
+      },
+    },
+    primaryType: { type: 'string' },
+    domain: { type: 'object' },
+    message: { type: 'object' },
+  },
+  required: ['types', 'primaryType', 'domain', 'message'],
+};
+
+const TypedDataUtils = {
+  encodeData(primaryType, data, types) {
+    const encodedTypes = ['bytes32'];
+    const encodedValues = [this.hashType(primaryType, types)];
+    types[primaryType].forEach((field) => {
+      let value = data[field.name];
+      if (value !== undefined) {
+        if (field.type === 'bytes') {
+          encodedTypes.push('bytes32');
+          value = sha3(value);
+          encodedValues.push(value);
+        } else if (field.type === 'string') {
+          encodedTypes.push('bytes32');
+          // convert string to buffer - prevents from interpreting strings like '0xabcd' as hex
+          if (typeof value === 'string') {
+            value = Buffer.from(value, 'utf8');
+          }
+          value = sha3(value);
+          encodedValues.push(value);
+        } else if (types[field.type] !== undefined) {
+          encodedTypes.push('bytes32');
+          value = sha3(this.encodeData(field.type, value, types));
+          encodedValues.push(value);
+        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+          throw new Error('Arrays currently unimplemented in encodeData');
+        } else {
+          encodedTypes.push(field.type);
+          encodedValues.push(value);
+        }
+      }
+    });
+    return rawEncode(encodedTypes, encodedValues);
+  },
+
+  encodeType(primaryType, types) {
+    let result = '';
+    let deps = this.findTypeDependencies(primaryType, types).filter(
+      dep => dep !== primaryType,
+    );
+    deps = [primaryType].concat(deps.sort());
+    deps.forEach((type) => {
+      const children = types[type];
+      if (!children) {
+        throw new Error(`No type definition specified: ${type}`);
+      }
+      result += `${type}(${types[type]
+        .map(obj => `${obj.type} ${obj.name}`)
+        .join(',')})`;
+    });
+    return result;
+  },
+
+  findTypeDependencies(primaryType, types, results = []) {
+    const [sanitizedPrimaryType] = primaryType.match(/^\w*/);
+    if (
+      results.includes(sanitizedPrimaryType)
+      || types[sanitizedPrimaryType] === undefined
+    ) {
+      return results;
+    }
+    results.push(sanitizedPrimaryType);
+    types[sanitizedPrimaryType].forEach((field) => {
+      this.findTypeDependencies(field.type, types, results).forEach((dep) => {
+        if (!results.includes(dep)) results.push(dep);
+      });
+    });
+    return results;
+  },
+
+  hashStruct(primaryType, data, types) {
+    return sha3(this.encodeData(primaryType, data, types));
+  },
+
+  hashType(primaryType, types) {
+    return sha3(this.encodeType(primaryType, types));
+  },
+
+  sanitizeData(data) {
+    const sanitizedData = {};
+    Object.keys(TYPED_MESSAGE_SCHEMA.properties).forEach((key) => {
+      if (data[key]) sanitizedData[key] = data[key];
+    });
+    if (sanitizedData.types) {
+      sanitizedData.types = Object.assign(
+        { EIP712Domain: [] },
+        sanitizedData.types,
+      );
+    }
+    return sanitizedData;
+  },
+
+  sign(typedData) {
+    const sanitizedData = this.sanitizeData(typedData);
+    const parts = [Buffer.from('1901', 'hex')];
+    parts.push(
+      this.hashStruct(
+        'EIP712Domain',
+        sanitizedData.domain,
+        sanitizedData.types,
+      ),
+    );
+    if (sanitizedData.primaryType !== 'EIP712Domain') {
+      parts.push(
+        this.hashStruct(
+          sanitizedData.primaryType,
+          sanitizedData.message,
+          sanitizedData.types,
+        ),
+      );
+    }
+    return sha3(Buffer.concat(parts));
+  },
+};
+
+const signTypedData = async (privateKey, msgParams) => {
+  try {
+    const wallet = new Wallet(privateKey);
+    const messageHash = TypedDataUtils.sign(msgParams.data);
+    const hexSig = await wallet.signingKey.signDigest(messageHash);
+    const signature = joinSignature(hexSig);
+    return signature;
+  } catch (error) {
+    debug('signTypedData()', error);
+    throw error;
+  }
 };
 
 const hashEIP712 = (typedData) => {
-  const domainSeparatorHash = hashStruct(
-    'EIP712Domain',
-    typedData.types.EIP712Domain,
-    typedData.domain,
-  );
-  const messageHash = hashStruct(
-    typedData.primaryType,
-    typedData.types[typedData.primaryType],
-    typedData.message,
-  );
-  const hash = solidityKeccak256(
-    ['bytes', 'bytes32', 'bytes32'],
-    ['0x1901', domainSeparatorHash, messageHash],
-  );
-  return hash;
+  try {
+    return '0x'.concat(TypedDataUtils.sign(typedData).toString('hex'));
+  } catch (error) {
+    debug('hashEIP712()', error);
+    throw error;
+  }
 };
 
 const accounts = wallet => async () => [wallet.address];
@@ -105,7 +214,7 @@ const signTypedDatav3 = wallet => async (address, typedData) => {
   try {
     const data = JSON.parse(typedData);
     const pk = Buffer.from(wallet.privateKey.substring(2), 'hex');
-    const sign = ethSigUtils.signTypedData(pk, {
+    const sign = signTypedData(pk, {
       data,
     });
     return sign;
