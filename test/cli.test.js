@@ -2441,9 +2441,8 @@ describe('[Common]', () => {
     test('no "native" overwites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
       expect(chains.mainnet.native).toBe(undefined);
+      expect(chains.bellecour.native).toBe(undefined);
       expect(chains.kovan.native).toBe(undefined);
-      expect(chains.goerli.native).toBe(undefined);
-      expect(chains.viviani.native).toBe(undefined);
     }, 10000);
 
     test('mainnet is not native', async () => {
@@ -2468,20 +2467,9 @@ describe('[Common]', () => {
       expect(res.balance.ETH).not.toBe(undefined);
     }, 10000);
 
-    test('goerli is not native', async () => {
+    test('bellecour is native', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
-    }, 10000);
-
-    test('viviani is native', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain viviani --raw`,
+        `${iexecPath} wallet show ${ADDRESS} --chain bellecour --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
