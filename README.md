@@ -698,7 +698,7 @@ The `orders.json` file, located in iExec project, locally stores your signed ord
       "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "beneficiary": "0x0000000000000000000000000000000000000000",
       "callback": "0x0000000000000000000000000000000000000000",
-      "params": "{ cmdline: '--help' }",
+      "params": "--help",
       "requester": "0x0000000000000000000000000000000000000000",
       "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "sign": "0x"
@@ -749,7 +749,7 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec310-zm93y?fontsize=14)
+- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec400-gr9tv?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
