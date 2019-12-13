@@ -381,10 +381,21 @@ const bridgeToSidechain = async (
       const remainingTime = triedBlockTimestamp - targetTimestamp;
       debug('remainingTime', remainingTime);
       if (remainingTime > 0) {
-        debug('triedBlockTimestamp', triedBlockTimestamp);
-        const stepTime = currentBlock.timestamp - triedBlockTimestamp;
+        debug(
+          'triedBlockTimestamp',
+          triedBlockTimestamp,
+          'lastTriedBlock.timestamp',
+          lastTriedBlock.timestamp,
+        );
+        const stepTime = Math.max(
+          lastTriedBlock.timestamp - triedBlockTimestamp,
+          100,
+        );
         debug('stepTime', stepTime);
-        const nextStep = Math.ceil((remainingTime / stepTime) * step) + 10;
+        const nextStep = Math.min(
+          Math.ceil((remainingTime / stepTime) * step) + 5,
+          1000,
+        );
         debug('nextStep', nextStep);
         return findBlockNumberByTimestamp(
           triedBlock,
