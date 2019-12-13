@@ -760,7 +760,7 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## How to use ?
 
-1. [Install the dependency in your JS project](#install-the-dependenciy-in-your-js-project)
+1. [Install the dependency in your JS project](#install-the-dependency-in-your-js-project)
 2. [Instanciate the iExec SDK](#instanciate-the-iexec-sdk)
 3. [Use iexec sdk](#use-iexec-sdk)
 4. [Utils](#utils)
