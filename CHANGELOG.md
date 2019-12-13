@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] currated utils
 - [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 
-## ## [3.1.1] - 2019-10-17
+## [3.1.1] - 2019-10-17
 
 ### Added
 
