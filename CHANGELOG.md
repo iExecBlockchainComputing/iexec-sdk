@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v4] - 2019-12-13
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Removed
+
+## [4.0.0] - 2019-12-13
 
 ### Added
 
