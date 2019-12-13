@@ -6,36 +6,36 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- optional bridge configuration in `chain.json`
 - `iexec wallet bridge-to-sidechain <nRlcAmount>` sending RLC from a mainchain to the bridged sidechain.
 - `iexec wallet bridge-to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
+- optional bridge configuration in `chain.json`
 - brindging RLC between mainchain an sidechain may throw `BridgeError`
 - `deal.claim(dealid)` and `iexec deal claim`to claim all failed of a deal
 - `utils.getSignerFromPrivateKey()` creates a signer provider for server side applications
 
 ### Changed
 
-- [BREAKING] `wallet.sweep()` promise now resolves as `{sendNativeTxHash, sendERC20TxHash, errors}` on mainchains or `{sendNativeTxHash, errors}` on sidechains, previously was `{sendETHTxHash, sendRLCTxHash}`.
+- [BREAKING] `iexec order init --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order sign --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order cancel --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order fill --raw` volume in output is now formated as decimal string, previously was hexadecimal string.
+- [BREAKING] `iexec order publish --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order unpublis --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order show --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec registry validate <object> --raw` output is now a single json `{ok, validated: [...fileNames], fail: [...errors]}`.
+- [BREAKING] Ethereum public key representation changed, first byte `04` is no longuer skipped.
 - [BREAKING] `app.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `dataset.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `workerpool.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `account.deposit()` promise now resolves as `{amount, txHash}`, previously was `amount`.
 - [BREAKING] `account.withdraw()` promise now resolves as `{amount, txHash}`, previously was `amount`.
+- [BREAKING] `wallet.sweep()` promise now resolves as `{sendNativeTxHash, sendERC20TxHash, errors}` on mainchains or `{sendNativeTxHash, errors}` on sidechains, previously was `{sendETHTxHash, sendRLCTxHash}`.
 - [BREAKING] `order.cancel()` promise now resolves as `{order, txHash}`, previously was `true`.
-- [BREAKING] `iexec registry validate <object> --raw` output is now a single json `{ok, validated: [...fileNames], fail: [...errors]}`.
-- [BREAKING] `iexec order init --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order sign --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order cancel --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order publish --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order show --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order unpublis --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order fill --raw` volume in output is now formated as decimal string, previously was hexadecimal string.
-- [BREAKING] Ethereum public key representation changed, first byte `04` is no longuer skipped.
 
 ### Removed
 
-- [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 - [BREAKING] currated utils
+- [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 
 ## ## [3.1.1] - 2019-10-17
 
