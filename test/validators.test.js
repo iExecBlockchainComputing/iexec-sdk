@@ -2,7 +2,7 @@ const BN = require('bn.js');
 const {
   // throwIfMissing,
   // stringSchema,
-  // uint256Schema,
+  uint256Schema,
   // addressSchema,
   // bytes32Schema,
   // apporderSchema,
@@ -170,6 +170,50 @@ describe('[positiveStrictIntSchema]', () => {
       new ValidationError(
         'this must be a `number` type, but the final value was: `NaN` (cast from the value `"0xfg"`).',
       ),
+    );
+  });
+});
+
+describe('[uint256Schema]', () => {
+  test('int', async () => {
+    await expect(uint256Schema().validate(48)).resolves.toBe('48');
+  });
+  test('string int', async () => {
+    await expect(uint256Schema().validate('9007199254740990')).resolves.toBe(
+      '9007199254740990',
+    );
+  });
+  test('BN', async () => {
+    await expect(
+      uint256Schema().validate(new BN('9007199254740990')),
+    ).resolves.toBe('9007199254740990');
+  });
+  test('string int > MAX_SAFE_INTEGER', async () => {
+    await expect(uint256Schema().validate('9007199254740992')).resolves.toBe(
+      '9007199254740992',
+    );
+  });
+  test('int 0', async () => {
+    await expect(uint256Schema().validate(0)).resolves.toBe('0');
+  });
+  test('throw with hex string', async () => {
+    await expect(uint256Schema().validate('0x01')).rejects.toThrow(
+      new ValidationError('this must be a number'),
+    );
+  });
+  test('throw with negative int', async () => {
+    await expect(uint256Schema().validate(-1)).rejects.toThrow(
+      new ValidationError('this must be a number'),
+    );
+  });
+  test('throw with negative string int', async () => {
+    await expect(uint256Schema().validate('-1')).rejects.toThrow(
+      new ValidationError('this must be a number'),
+    );
+  });
+  test('throw with invalid string', async () => {
+    await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
+      new ValidationError('this must be a number'),
     );
   });
 });
