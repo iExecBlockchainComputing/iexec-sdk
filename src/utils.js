@@ -345,6 +345,8 @@ const getSalt = () => {
 const TAG_MAP = {
   tee: 1,
   1: 'tee',
+  gpu: 9,
+  9: 'gpu',
 };
 
 const encodeTag = (tags) => {

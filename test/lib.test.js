@@ -445,6 +445,21 @@ describe('[lib utils]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000001',
     );
   });
+  test("encodeTag(['gpu'])", () => {
+    expect(utils.encodeTag(['gpu'])).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000100',
+    );
+  });
+  test("encodeTag(['gpu','tee'])", () => {
+    expect(utils.encodeTag(['gpu', 'tee'])).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+  });
+  test("encodeTag(['gpu','tee','gpu','tee'])", () => {
+    expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+  });
   test('encodeTag unknown tag', () => {
     expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
   });
