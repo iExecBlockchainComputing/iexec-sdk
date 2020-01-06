@@ -56,6 +56,20 @@ const ethFaucets = [
         'Go to https://gitter.im/kovan-testnet/faucet to manually ask for ETH',
     }),
   },
+  {
+    chainName: 'kovan',
+    name: 'faucet.kovan.network',
+    getETH: () => ({
+      error: 'Go to https://faucet.kovan.network to manually ask for ETH',
+    }),
+  },
+  {
+    chainName: 'goerli',
+    name: 'goerli-faucet.slock.it',
+    getETH: () => ({
+      error: 'Go to https://goerli-faucet.slock.it/ to manually ask for ETH',
+    }),
+  },
 ];
 
 const getAddress = async (contracts = throwIfMissing()) => {
@@ -427,9 +441,11 @@ const bridgeToSidechain = async (
       if (logs.length === 0) return;
       let isInvalidTimestamp = checkTimestamp;
       if (checkTimestamp) {
-        const logTimestamp = (await wrapCall(
-          contracts.jsonRpcProvider.getBlock(logs[0].blockNumber),
-        )).timestamp;
+        const logTimestamp = (
+          await wrapCall(
+            contracts.jsonRpcProvider.getBlock(logs[0].blockNumber),
+          )
+        ).timestamp;
         isInvalidTimestamp = logTimestamp < dayStartTimestamp;
       }
       if (!isInvalidTimestamp) {
