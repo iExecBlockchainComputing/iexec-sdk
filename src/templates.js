@@ -107,26 +107,27 @@ const chains = {
   default: 'kovan',
   chains: {
     dev: {
+      id: '1544020727674',
       host: 'http://localhost:8545',
       sms: 'http://localhost:5000',
-      id: '1544020727674',
       hub: '0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1',
       // hub: '0x531C0Cf1EF13099C3d3D7D90D522C89A06880113',
       // native: true,
     },
     kovan: {
-      host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '42',
+      host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       sms: 'https://kovan-sms.iex.ec',
     },
-    // goerli: {
-    //   host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
-    //   id: '5',
-    //   bridge: {
-    //     contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
-    //     bridgedNetworkId: '133',
-    //   },
-    // },
+    goerli: {
+      id: '5',
+      host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
+      sms: 'https://kovan-sms.iex.ec',
+      // bridge: {
+      //   contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
+      //   bridgedNetworkId: '133',
+      // },
+    },
     // viviani: {
     //   host: 'https://viviani.iex.ec',
     //   id: '133',
@@ -136,8 +137,8 @@ const chains = {
     //   },
     // },
     mainnet: {
-      host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       id: '1',
+      host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
       sms: 'https://mainnet-sms.iex.ec',
       bridge: {
         contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
@@ -145,8 +146,8 @@ const chains = {
       },
     },
     bellecour: {
-      host: 'https://bellecour.iex.ec',
       id: '134',
+      host: 'https://bellecour.iex.ec',
       sms: 'https://bellecour-sms.iex.ec',
       bridge: {
         contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',

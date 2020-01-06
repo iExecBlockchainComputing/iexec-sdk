@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - `gpu` tag is now supported
 - `getTransactionCount` option for custom nonce management
+- Goerli testnet added to `chain.json` run `iexec init --skip-wallet` to update `chain.json`
 
 ### Changed
 
