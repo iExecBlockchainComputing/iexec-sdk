@@ -6,8 +6,13 @@ console.log('Node version:', process.version);
 
 // CONFIG
 const { DRONE } = process.env;
+// 1 block / tx
 const ethereumHost = DRONE ? 'ethereum' : 'localhost';
 const ethereumURL = `http://${ethereumHost}:8545`;
+// blocktime 1s for concurrent tx test
+const ethereumHost1s = DRONE ? 'ethereum1s' : 'localhost';
+const ethereumURL1s = `http://${ethereumHost1s}:8545`;
+
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
 let hubAddress;
@@ -22,6 +27,7 @@ const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 // UTILS
 
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
+const ethRPC1s = new ethers.providers.JsonRpcProvider(ethereumURL1s);
 
 // TESTS
 beforeAll(async () => {
@@ -340,7 +346,7 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).not.toBe(undefined);
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
-  test('with gasPrice option', async () => {
+  test('gasPrice option', async () => {
     const amount = '1000000000';
     const gasPrice = '123456789';
     const receiver = ADDRESS2;
@@ -383,6 +389,127 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).not.toBe(undefined);
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
+  test('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
+    const amount = new BN(1000);
+    const receiver = ADDRESS2;
+    const nonceProvider = await (async (address) => {
+      const initNonce = ethers.utils.bigNumberify(
+        await ethRPC.send('eth_getTransactionCount', [address, 'latest']),
+      );
+      let i = 0;
+      const getNonce = () => initNonce.add(ethers.utils.bigNumberify(i++)).toHexString();
+      return {
+        getNonce,
+      };
+    })(ADDRESS);
+
+    const signer = utils.getSignerFromPrivateKey(ethereumURL1s, PRIVATE_KEY, {
+      getTransactionCount: nonceProvider.getNonce,
+    });
+
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const senderInitialBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
+
+    const resArray = await Promise.all([
+      iexec.workerpool.deployWorkerpool({
+        owner: ADDRESS,
+        description: 'My workerpool',
+      }),
+      iexec.app.deployApp({
+        owner: ADDRESS,
+        name: 'My app',
+        type: 'DOCKER',
+        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+        checksum:
+          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+        mrenclave: '',
+      }),
+      iexec.dataset.deployDataset({
+        owner: ADDRESS,
+        name: 'My dataset',
+        multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+        checksum:
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      }),
+      iexec.wallet.sendETH(amount, receiver),
+      iexec.wallet.sendETH(amount, receiver),
+      iexec.wallet.sendETH(amount, receiver),
+      iexec.account.deposit(amount),
+    ]);
+
+    expect(resArray).not.toBe(undefined);
+    expect(resArray.length).toBe(7);
+    const txHashArray = [
+      resArray[0].txHash,
+      resArray[1].txHash,
+      resArray[2].txHash,
+      resArray[3],
+      resArray[4],
+      resArray[5],
+      resArray[6].txHash,
+    ];
+    expect(txHashArray[0].length).toBe(66);
+    expect(txHashArray[1].length).toBe(66);
+    expect(txHashArray[2].length).toBe(66);
+    expect(txHashArray[3].length).toBe(66);
+    expect(txHashArray[4].length).toBe(66);
+    expect(txHashArray[5].length).toBe(66);
+    expect(txHashArray[6].length).toBe(66);
+
+    const tx0 = await ethRPC1s.getTransaction(txHashArray[0]);
+    expect(tx0).not.toBe(undefined);
+    expect(tx0.gasPrice.toString()).toBe(chainGasPrice);
+    const tx1 = await ethRPC1s.getTransaction(txHashArray[1]);
+    expect(tx1).not.toBe(undefined);
+    expect(tx1.gasPrice.toString()).toBe(chainGasPrice);
+    const tx2 = await ethRPC1s.getTransaction(txHashArray[2]);
+    expect(tx2).not.toBe(undefined);
+    expect(tx2.gasPrice.toString()).toBe(chainGasPrice);
+    const tx3 = await ethRPC1s.getTransaction(txHashArray[3]);
+    expect(tx3).not.toBe(undefined);
+    expect(tx3.gasPrice.toString()).toBe(chainGasPrice);
+    const tx4 = await ethRPC1s.getTransaction(txHashArray[4]);
+    expect(tx4).not.toBe(undefined);
+    expect(tx4.gasPrice.toString()).toBe(chainGasPrice);
+    const tx5 = await ethRPC1s.getTransaction(txHashArray[5]);
+    expect(tx5).not.toBe(undefined);
+    expect(tx5.gasPrice.toString()).toBe(chainGasPrice);
+    const tx6 = await ethRPC1s.getTransaction(txHashArray[6]);
+    expect(tx6).not.toBe(undefined);
+    expect(tx6.gasPrice.toString()).toBe(chainGasPrice);
+
+    const senderFinalBalances = await iexec.wallet.checkBalances(
+      await iexec.wallet.getAddress(),
+    );
+    const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
+    expect(
+      senderFinalBalances.wei
+        .add(new BN(amount))
+        .lte(senderInitialBalances.wei),
+    ).toBe(true);
+    expect(
+      receiverFinalBalances.wei
+        .sub(new BN(amount).mul(new BN(3)))
+        .eq(receiverInitialBalances.wei),
+    ).toBe(true);
+    expect(
+      senderInitialBalances.nRLC.eq(
+        senderFinalBalances.nRLC.add(new BN(amount)),
+      ),
+    ).toBe(true);
+  }, 20000);
 });
 
 describe('[lib utils]', () => {

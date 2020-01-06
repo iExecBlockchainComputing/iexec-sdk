@@ -1807,6 +1807,7 @@ Returns a web3 SignerProvider compliant with `IExec`. Use this only for server s
 _options:_
 
 - `gasPrice: Uint256` specify the gasPrice to use for transactions
+- `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
 
 _Example:_
 

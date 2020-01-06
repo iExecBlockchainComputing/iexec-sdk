@@ -59,3 +59,6 @@ services:
   ethereum:
     image: iexechub/poco-chaintest
     pull: true
+  ethereum-1s:
+    image: iexechub/poco-chaintest-1s
+    pull: true
