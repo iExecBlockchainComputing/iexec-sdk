@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- updated yup integer validation
+
 ### Removed
 
 ## [4.0.0] - 2019-12-13
