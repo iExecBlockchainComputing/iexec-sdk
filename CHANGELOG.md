@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `gpu` tag is now supported
+- `getTransactionCount` option for custom nonce management
 
 ### Changed
 

@@ -224,7 +224,11 @@ const signTypedDatav3 = wallet => async (address, typedData) => {
   }
 };
 
-const getSignerFromPrivateKey = (host, privateKey, { gasPrice } = {}) => {
+const getSignerFromPrivateKey = (
+  host,
+  privateKey,
+  { gasPrice, getTransactionCount } = {},
+) => {
   const wallet = new Wallet(privateKey);
   let gasPriceOption;
   if (gasPrice !== undefined) {
@@ -232,12 +236,16 @@ const getSignerFromPrivateKey = (host, privateKey, { gasPrice } = {}) => {
     if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPriceOption = '0x'.concat(bnGasPrice.toString('hex'));
   }
+  if (getTransactionCount !== undefined) {
+    if (typeof getTransactionCount !== 'function') throw Error('Invalid getTransactionCount, must be a function');
+  }
   return new SignerProvider(host, {
     accounts: accounts(wallet),
     signTransaction: signTransaction(wallet),
     signPersonalMessage: signPersonalMessage(wallet),
     signTypedDatav3: signTypedDatav3(wallet),
     gasPrice: gasPriceOption,
+    getTransactionCount,
   });
 };
 
