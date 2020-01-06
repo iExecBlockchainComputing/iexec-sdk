@@ -394,7 +394,7 @@ describe('[getSignerFromPrivateKey]', () => {
     const receiver = ADDRESS2;
     const nonceProvider = await (async (address) => {
       const initNonce = ethers.utils.bigNumberify(
-        await ethRPC.send('eth_getTransactionCount', [address, 'latest']),
+        await ethRPC1s.send('eth_getTransactionCount', [address, 'latest']),
       );
       let i = 0;
       const getNonce = () => initNonce.add(ethers.utils.bigNumberify(i++)).toHexString();
