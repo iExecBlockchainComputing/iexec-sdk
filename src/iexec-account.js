@@ -4,7 +4,7 @@ const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
-const { stringifyNestedBn } = require('./utils');
+const { stringifyNestedBn, NULL_ADDRESS } = require('./utils');
 const {
   help,
   addGlobalOptions,
@@ -93,16 +93,23 @@ show
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(
-        Object.assign({}, walletOptions, address && { isSigner: false }),
+        Object.assign({}, walletOptions, { isSigner: false }),
       );
 
       let userAddress;
       if (!address) {
         try {
-          const userWallet = await keystore.load();
-          userAddress = userWallet.address;
+          const [userWalletAddress] = await keystore.accounts();
+          if (userWalletAddress && userWalletAddress !== NULL_ADDRESS) {
+            userAddress = userWalletAddress;
+            spinner.info(`Current account address ${userWalletAddress}`);
+          } else {
+            throw Error('Wallet file not found');
+          }
         } catch (error) {
-          if (error.message === 'invalid password') throw error;
+          throw Error(
+            `Failed to load wallet address from keystore: ${error.message}`,
+          );
         }
       } else {
         userAddress = address;

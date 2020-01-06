@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - updated yup integer validation
+- `iexec wallet show` no longer requires password to show wallet content (issue #87)
+- `iexec account show` no longer requires password to show account content
 
 ### Removed
 

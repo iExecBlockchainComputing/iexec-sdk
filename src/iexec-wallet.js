@@ -26,7 +26,7 @@ const {
   info,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
-const { formatEth } = require('./utils');
+const { formatEth, NULL_ADDRESS } = require('./utils');
 
 const objName = 'wallet';
 
@@ -98,30 +98,52 @@ show
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(
-        Object.assign({}, walletOptions, address && { isSigner: false }),
+        Object.assign(
+          {},
+          walletOptions,
+          (address || !cmd.showPrivateKey) && { isSigner: false },
+        ),
       );
 
       let userWallet;
+      let userWalletAddress;
       let displayedWallet;
       try {
         if (!address) {
-          userWallet = await keystore.load();
-          displayedWallet = Object.assign(
-            {},
-            cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
-            { publicKey: userWallet.publicKey, address: userWallet.address },
-          );
-          // show user wallet
-          spinner.info(`Wallet file:${pretty(displayedWallet)}`);
+          if (cmd.showPrivateKey) {
+            userWallet = await keystore.load();
+            userWalletAddress = userWallet.address;
+            displayedWallet = Object.assign(
+              {},
+              cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
+              { publicKey: userWallet.publicKey, address: userWallet.address },
+            );
+            // show user wallet
+            spinner.info(`Wallet file:${pretty(displayedWallet)}`);
+          } else {
+            try {
+              [userWalletAddress] = await keystore.accounts();
+              if (userWalletAddress && userWalletAddress !== NULL_ADDRESS) {
+                spinner.info(`Current wallet address ${userWalletAddress}`);
+                displayedWallet = { address: userWalletAddress };
+              } else {
+                throw Error('Wallet file not found');
+              }
+            } catch (error) {
+              throw Error(
+                `Failed to load wallet address from keystore: ${error.message}`,
+              );
+            }
+          }
         }
       } catch (error) {
-        if (error.message === 'invalid password') throw error;
+        throw error;
       }
-      if (!userWallet && !address) throw Error('Missing address or wallet');
+      if (!userWalletAddress && !address) throw Error('Missing address or wallet');
 
       const chain = await loadChain(cmd.chain, keystore, { spinner });
-      // show address ballance
-      const addressToShow = address || userWallet.address;
+      // show address balance
+      const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
 
       const getBalances = async (contracts, userAddress) => {
@@ -137,7 +159,7 @@ show
         {
           raw: Object.assign(
             { balance: balances },
-            !address && userWallet && { wallet: displayedWallet },
+            !address && displayedWallet && { wallet: displayedWallet },
           ),
         },
       );

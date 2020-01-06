@@ -294,6 +294,19 @@ describe('[Mainchain]', () => {
     expect(res.balance.locked).toBe('0');
   }, 10000);
 
+  test('[common] iexec account show --wallet-address <address> (missing wallet file)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} account show --wallet-address ${ADDRESS2} --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.error.message).toBe(
+      'Failed to load wallet address from keystore: Wallet file not found',
+    );
+    expect(res.error.name).toBe('Error');
+    expect(res.balance).toBe(undefined);
+  }, 10000);
+
   // APP
   test('[common] iexec app init (no wallet)', async () => {
     await execAsync('mv wallet.json wallet.back');
@@ -1916,7 +1929,7 @@ describe('[Common]', () => {
       expect(res.wallet).not.toBe(undefined);
       expect(res.wallet).not.toBe(undefined);
       expect(res.wallet.address).toBe(ADDRESS);
-      expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
+      expect(res.wallet.publicKey).toBe(undefined);
       expect(res.wallet.privateKey).toBe(undefined);
       expect(res.balance.ETH).not.toBe(undefined);
       expect(res.balance.nRLC).not.toBe(undefined);
@@ -1946,15 +1959,15 @@ describe('[Common]', () => {
       expect(res.wallet).not.toBe(undefined);
       expect(res.wallet).not.toBe(undefined);
       expect(res.wallet.address).toBe(ADDRESS);
-      expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
+      expect(res.wallet.publicKey).toBe(undefined);
       expect(res.wallet.privateKey).toBe(undefined);
       expect(res.balance.ETH).not.toBe(undefined);
       expect(res.balance.nRLC).not.toBe(undefined);
     }, 10000);
 
-    test('iexec wallet show --wallet-address <address> (wrong password)', async () => {
+    test('iexec wallet show --show-private-key --wallet-address <address> (wrong password)', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show --password fail --wallet-address ${ADDRESS} --raw`,
+        `${iexecPath} wallet show --show-private-key --password fail --wallet-address ${ADDRESS} --raw`,
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
@@ -1970,7 +1983,9 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.error.message).toBe('Missing address or wallet');
+      expect(res.error.message).toBe(
+        'Failed to load wallet address from keystore: Wallet file not found',
+      );
       expect(res.error.name).toBe('Error');
       expect(res.wallet).toBe(undefined);
       expect(res.balance).toBe(undefined);
@@ -1978,9 +1993,9 @@ describe('[Common]', () => {
 
     // keystoredir custom
     test('iexec wallet import --keystoredir [path]', async () => {
-      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
-        () => {},
-      );
+      await execAsync(
+        'rm -rf out/keystore && mkdir out/keystore',
+      ).catch(() => {});
       const raw = await execAsync(
         `${iexecPath}  wallet import ${PRIVATE_KEY2} --password customPath --keystoredir ./out/keystore --raw`,
       );
@@ -2003,9 +2018,9 @@ describe('[Common]', () => {
 
     // keystoredir local
     test('iexec wallet import --keystoredir local', async () => {
-      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
-        () => {},
-      );
+      await execAsync(
+        'rm -rf out/keystore && mkdir out/keystore',
+      ).catch(() => {});
       const raw = await execAsync(
         `${iexecPath} wallet import ${PRIVATE_KEY3} --password 'my local pass phrase' --keystoredir local --raw`,
       );
