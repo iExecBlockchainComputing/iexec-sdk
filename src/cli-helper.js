@@ -455,22 +455,19 @@ const helpCB = (mess) => {
 
 const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
   cli.on('--help', outputHelpMessage);
-  cli.parse(process.argv);
 
-  if (checkNoArgs && cli.args.length === 0) {
+  cli.parse(process.argv);
+  if (checkNoArgs && process.argv.length < 3) {
     console.log('');
-    console.log(colors.red('missing argument'));
+    console.log(colors.red('Missing argument'));
     console.log('');
     cli.help(helpCB);
   } else if (checkWrongArgs) {
-    if (typeof cli.args[cli.args.length - 1] !== 'object') {
-      debug('not an object');
-      if (!cli._execs[cli.args[0]]) {
-        console.log('');
-        console.log(colors.red(`unknown command "${cli.args[0]}"`));
-        console.log('');
-        cli.help(helpCB);
-      }
+    if (!cli.commands.find(({ _name }) => _name === cli.rawArgs[2])) {
+      console.log('');
+      console.log(colors.red(`Unknown command "${cli._name} ${cli.args[0]}"`));
+      console.log('');
+      cli.help(helpCB);
     }
   }
 };
