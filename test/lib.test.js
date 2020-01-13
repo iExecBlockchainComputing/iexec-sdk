@@ -83,17 +83,32 @@ describe('[workflow]', () => {
         isNative: false,
       },
     );
+    const owner = await iexec.wallet.getAddress();
     const appDeployRes = await iexec.app.deployApp({
-      owner: await iexec.wallet.getAddress(),
+      owner,
       name: 'My app',
       type: 'DOCKER',
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: '',
+      mrenclave: 'abc|123|test',
     });
     expect(appDeployRes.address).not.toBe(undefined);
     expect(appDeployRes.txHash).not.toBe(undefined);
+
+    const appShowRes = await iexec.app.showApp(appDeployRes.address);
+    expect(appShowRes.objAddress).toBe(appDeployRes.address);
+    expect(appShowRes.app.owner).toBe(owner);
+    expect(appShowRes.app.appName).toBe('My app');
+    expect(appShowRes.app.appType).toBe('DOCKER');
+    expect(appShowRes.app.appMultiaddr).toBe(
+      'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+    );
+    expect(appShowRes.app.appChecksum).toBe(
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    );
+    expect(appShowRes.app.appMREnclave).toBe('abc|123|test');
+
     const order = await iexec.order.createApporder({
       app: appDeployRes.address,
       appprice: '1000000000',
@@ -115,8 +130,9 @@ describe('[workflow]', () => {
         isNative: false,
       },
     );
+    const owner = await iexec.wallet.getAddress();
     const datasetDeployRes = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
+      owner,
       name: 'My dataset',
       multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
       checksum:
@@ -124,6 +140,20 @@ describe('[workflow]', () => {
     });
     expect(datasetDeployRes.address).not.toBe(undefined);
     expect(datasetDeployRes.txHash).not.toBe(undefined);
+
+    const datasetShowRes = await iexec.dataset.showDataset(
+      datasetDeployRes.address,
+    );
+    expect(datasetShowRes.objAddress).toBe(datasetDeployRes.address);
+    expect(datasetShowRes.dataset.owner).toBe(owner);
+    expect(datasetShowRes.dataset.datasetName).toBe('My dataset');
+    expect(datasetShowRes.dataset.datasetMultiaddr).toBe(
+      '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    );
+    expect(datasetShowRes.dataset.datasetChecksum).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+
     const order = await iexec.order.createDatasetorder({
       dataset: datasetDeployRes.address,
       datasetprice: '1000000000',
@@ -145,12 +175,29 @@ describe('[workflow]', () => {
         isNative: false,
       },
     );
+    const owner = await iexec.wallet.getAddress();
     const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
+      owner,
       description: 'My workerpool',
     });
     expect(workerpoolDeployRes.address).not.toBe(undefined);
     expect(workerpoolDeployRes.txHash).not.toBe(undefined);
+
+    const workerpoolShowRes = await iexec.workerpool.showWorkerpool(
+      workerpoolDeployRes.address,
+    );
+    expect(workerpoolShowRes.objAddress).toBe(workerpoolDeployRes.address);
+    expect(workerpoolShowRes.workerpool.owner).toBe(owner);
+    expect(workerpoolShowRes.workerpool.workerpoolDescription).toBe(
+      'My workerpool',
+    );
+    expect(workerpoolShowRes.workerpool.schedulerRewardRatioPolicy).not.toBe(
+      undefined,
+    );
+    expect(workerpoolShowRes.workerpool.workerStakeRatioPolicy).not.toBe(
+      undefined,
+    );
+
     const order = await iexec.order.createWorkerpoolorder({
       workerpool: workerpoolDeployRes.address,
       workerpoolprice: '1000000000',

@@ -6,6 +6,7 @@ const {
   bnifyNestedEthersBn,
   multiaddrHexToHuman,
   getEventFromLogs,
+  hexToBuffer,
 } = require('./utils');
 const {
   addressSchema,
@@ -100,6 +101,9 @@ const showApp = async (
     cleanObj(obj),
     obj.m_appMultiaddr && {
       appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
+    },
+    obj.m_appMREnclave && {
+      appMREnclave: hexToBuffer(obj.m_appMREnclave).toString(),
     },
   );
   return { objAddress, app: clean };

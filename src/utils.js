@@ -125,10 +125,11 @@ const stringifyNestedBn = (obj) => {
 const checksummedAddress = address => getAddress(address);
 
 const utf8ToBuffer = str => Buffer.from(str, 'utf8');
+const hexToBuffer = hexString => Buffer.from(hexString.substr(2), 'hex');
 
 const multiaddrHexToHuman = (hexString) => {
   let res;
-  const buffer = Buffer.from(hexString.substr(2), 'hex');
+  const buffer = hexToBuffer(hexString);
   try {
     res = multiaddr(buffer).toString('utf8');
   } catch (error) {
@@ -399,6 +400,7 @@ module.exports = {
   multiaddrHexToHuman,
   humanToMultiaddrBuffer,
   utf8ToBuffer,
+  hexToBuffer,
   toUpperFirst,
   secToDate,
   getAuthorization,

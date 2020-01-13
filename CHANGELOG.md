@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - updated yup integer validation
 - `iexec wallet show` no longer requires password to show wallet content (issue #87)
 - `iexec account show` no longer requires password to show account content
+- fix `iexec.app.showApp(address)` and `iexec app show` now returns decoded `appMREnclave`
 
 ### Removed
 
@@ -26,7 +27,7 @@ All notable changes to this project will be documented in this file.
 - `iexec wallet bridge-to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
 - optional bridge configuration in `chain.json`
 - brindging RLC between mainchain an sidechain may throw `BridgeError`
-- `deal.claim(dealid)` and `iexec deal claim`to claim all failed of a deal
+- `deal.claim(dealid)` and `iexec deal claim` to claim all failed of a deal
 - `utils.getSignerFromPrivateKey()` creates a signer provider for server side applications
 
 ### Changed
