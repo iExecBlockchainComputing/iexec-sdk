@@ -65,7 +65,12 @@ const signed = () => ({
   sign: orderSignSchema().required(),
 });
 
-const paramsSchema = () => string();
+const paramsSchema = () => string().transform((value, originalValue) => {
+  if (typeof originalValue === 'object') {
+    return JSON.stringify(originalValue);
+  }
+  return value;
+});
 
 const tagSchema = () => mixed()
   .transform((value) => {

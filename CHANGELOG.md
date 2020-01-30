@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `requestorder.params` now accepts object in `iexec.json` and JS lib.
+
 ### Changed
 
 ### Removed

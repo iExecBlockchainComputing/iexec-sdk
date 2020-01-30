@@ -13,7 +13,7 @@ const {
   // signedWorkerpoolorderSchema,
   // requestorderSchema,
   // signedRequestorderSchema,
-  // paramsSchema,
+  paramsSchema,
   // tagSchema,
   // chainIdSchema,
   // hexnumberSchema,
@@ -215,5 +215,33 @@ describe('[uint256Schema]', () => {
     await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
       new ValidationError('this must be a number'),
     );
+  });
+});
+
+describe('[paramsSchema]', () => {
+  test('object', async () => {
+    await expect(
+      paramsSchema().validate({
+        iexec_args: 'test',
+        iexec_input_files: [
+          'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+          'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        ],
+      }),
+    ).resolves.toBe(
+      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
+    );
+  });
+  test('string', async () => {
+    await expect(
+      paramsSchema().validate(
+        '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
+      ),
+    ).resolves.toBe(
+      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
+    );
+  });
+  test('number', async () => {
+    await expect(paramsSchema().validate(42)).resolves.toBe('42');
   });
 });

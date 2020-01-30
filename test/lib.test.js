@@ -241,9 +241,17 @@ describe('[workflow]', () => {
       requester: await iexec.wallet.getAddress(),
       category: workerpoolorder.category,
       volume: '1',
-      params: 'test',
+      params: {
+        iexec_args: 'test',
+      },
     });
-    const signedorder = await iexec.order.signRequestorder(order);
+    const signedorder = await iexec.order.signRequestorder(
+      Object.assign({}, order, {
+        params: {
+          iexec_args: 'test',
+        },
+      }),
+    );
     const totalPrice = new BN(order.appmaxprice)
       .add(new BN(order.datasetmaxprice))
       .add(new BN(order.workerpoolmaxprice));
