@@ -635,8 +635,7 @@ const computeTxOptions = (cmd) => {
 
 const handleError = (error, cli, cmd) => {
   const spinner = Spinner(cmd);
-  const lastArg = cli.args[cli.args.length - 1];
-  const lastCommandName = typeof lastArg === 'object' ? lastArg._name : '';
+  const lastCommandName = cli.rawArgs[2] || '';
   const commandName = cli._name
     .split('-')
     .join(' ')
