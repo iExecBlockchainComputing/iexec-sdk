@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix SMS url in `chain.json`
+
 ### Removed
 
 ## [4.0.1] - 2020-01-17

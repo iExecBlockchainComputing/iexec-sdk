@@ -125,7 +125,7 @@ const chains = {
     goerli: {
       id: '5',
       host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
-      sms: 'https://kovan-sms.iex.ec',
+      sms: 'https://goerli-sms.iex.ec',
       // bridge: {
       //   contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
       //   bridgedNetworkId: '133',
