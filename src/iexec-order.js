@@ -30,6 +30,7 @@ const {
 const { loadChain } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
+const { getWorkerpoolOwner } = require('./hub');
 const account = require('./account');
 const templates = require('./templates');
 
@@ -156,13 +157,6 @@ sign
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
-          const owner = await order.getContractOwner(
-            chain.contracts,
-            order.APP_ORDER,
-            orderObj,
-          );
-          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only app owner can sign apporder');
-
           const signedOrder = await order.signApporder(
             chain.contracts,
             orderObj,
@@ -191,14 +185,6 @@ sign
           await chain.contracts.checkDeployedDataset(orderObj.dataset, {
             strict: true,
           });
-
-          const owner = await order.getContractOwner(
-            chain.contracts,
-            order.DATASET_ORDER,
-            orderObj,
-          );
-          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only dataset owner can sign datasetorder');
-
           const signedOrder = await order.signDatasetorder(
             chain.contracts,
             orderObj,
@@ -230,14 +216,6 @@ sign
           await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
             strict: true,
           });
-
-          const owner = await order.getContractOwner(
-            chain.contracts,
-            order.WORKERPOOL_ORDER,
-            orderObj,
-          );
-          if (address.toLowerCase() !== owner.toLowerCase()) throw new Error('only workerpool owner can sign workerpoolorder');
-
           const signedOrder = await order.signWorkerpoolorder(
             chain.contracts,
             orderObj,
@@ -531,10 +509,9 @@ fill
         await prompt.limitedStake(totalCost, stake, payableVolume);
       }
       // workerpool owner stake check
-      const workerpoolOwner = await order.getContractOwner(
+      const workerpoolOwner = await getWorkerpoolOwner(
         chain.contracts,
-        order.WORKERPOOL_ORDER,
-        workerpoolOrder,
+        workerpoolOrder.workerpool,
       );
       const schedulerBalance = await account.checkBalance(
         chain.contracts,
@@ -827,28 +804,27 @@ cancel
           let cancelTx;
           switch (orderName) {
             case order.APP_ORDER:
-              cancelTx = (await order.cancelApporder(
-                chain.contracts,
-                orderToCancel,
-              )).txHash;
+              cancelTx = (
+                await order.cancelApporder(chain.contracts, orderToCancel)
+              ).txHash;
               break;
             case order.DATASET_ORDER:
-              cancelTx = (await order.cancelDatasetorder(
-                chain.contracts,
-                orderToCancel,
-              )).txHash;
+              cancelTx = (
+                await order.cancelDatasetorder(chain.contracts, orderToCancel)
+              ).txHash;
               break;
             case order.WORKERPOOL_ORDER:
-              cancelTx = (await order.cancelWorkerpoolorder(
-                chain.contracts,
-                orderToCancel,
-              )).txHash;
+              cancelTx = (
+                await order.cancelWorkerpoolorder(
+                  chain.contracts,
+                  orderToCancel,
+                )
+              ).txHash;
               break;
             case order.REQUEST_ORDER:
-              cancelTx = (await order.cancelRequestorder(
-                chain.contracts,
-                orderToCancel,
-              )).txHash;
+              cancelTx = (
+                await order.cancelRequestorder(chain.contracts, orderToCancel)
+              ).txHash;
               break;
             default:
           }

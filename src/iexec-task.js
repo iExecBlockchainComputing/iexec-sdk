@@ -53,39 +53,32 @@ show
       debug('cmd.download', cmd.download);
 
       if (cmd.watch) {
-        const waitCompletedOrClaimed = async (initialStatus) => {
+        const waitFinalStatus = async (initialStatus = '') => {
           spinner.start(info.watching(objName));
-          const { status, statusName } = await task.waitForTaskStatusChange(
+          const {
+            status,
+            statusName,
+            taskTimedOut,
+          } = await task.waitForTaskStatusChange(
             chain.contracts,
             taskid,
             initialStatus,
           );
           spinner.info(`Task status ${statusName}`);
-          if (['FAILED', 'COMPLETED'].includes(task.TASK_STATUS_MAP[status])) {
-            return { status, statusName };
+          if ([3, 4].includes(status) || taskTimedOut) {
+            return { status, statusName, taskTimedOut };
           }
-          return waitCompletedOrClaimed(status);
+          return waitFinalStatus(status);
         };
-        await waitCompletedOrClaimed('');
+        await waitFinalStatus();
       }
 
       spinner.start(info.showing(objName));
       const taskResult = await task.show(chain.contracts, taskid);
 
-      let claimable = false;
-      const consensusTimeout = parseInt(taskResult.finalDeadline, 10);
-      const consensusTimeoutDate = new Date(consensusTimeout * 1000);
-      const now = Math.floor(Date.now() / 1000);
-      if (
-        ['UNSET', 'ACTIVE', 'REVEALING'].includes(
-          task.TASK_STATUS_MAP[taskResult.status],
-        )
-        && now > consensusTimeout
-      ) claimable = true;
-
       let resultPath;
       if (cmd.download) {
-        if (task.TASK_STATUS_MAP[taskResult.status] === 'COMPLETED') {
+        if (taskResult.status === 3) {
           spinner.start(info.downloading());
           const { body } = await task.fetchResults(chain.contracts, taskid, {
             ipfsGatewayURL: chain.ipfsGateway,
@@ -103,6 +96,8 @@ show
         }
       }
 
+      const claimable = taskResult.status < 3 && !!taskResult.taskTimedOut;
+
       const cleanTask = stringifyNestedBn(taskResult);
       const raw = Object.assign(
         { task: cleanTask },
@@ -117,7 +112,7 @@ show
       }
       if (claimable) {
         spinner.info(
-          `Consensus timeout date ${consensusTimeoutDate} exceeded but consensus not reached. You can claim the work to get a full refund using "iexec task claim"`,
+          'Consensus deadline reached before consensus. You can claim the task to get a full refund using "iexec task claim"',
         );
       }
     } catch (error) {

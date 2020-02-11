@@ -121,13 +121,26 @@ const show = async (
     if (!dealExists) {
       throw new ObjectNotFoundError('deal', dealid, chainId);
     }
+    const [{ workClockTimeRef }, timeoutRatio] = await Promise.all([
+      showCategory(contracts, deal.category),
+      getTimeoutRatio(contracts),
+    ]);
+    const finalTime = deal.startTime.add(timeoutRatio.mul(workClockTimeRef));
+    const now = Math.floor(Date.now() / 1000);
+    const deadlineReached = now >= finalTime.toNumber();
+
     const tasks = await computeTaskIdsArray(
       dealid,
       deal.botFirst.toString(),
       deal.botSize.toString(),
     );
-    const dealWithTasks = { ...deal, tasks };
-    return dealWithTasks;
+    const enhancedDeal = {
+      ...deal,
+      finalTime,
+      deadlineReached,
+      tasks,
+    };
+    return enhancedDeal;
   } catch (error) {
     debug('show()', error);
     throw error;
@@ -160,18 +173,10 @@ const claim = async (
   try {
     const vDealid = await bytes32Schema().validate(dealid);
     const deal = await show(contracts, vDealid);
-    const [{ workClockTimeRef }, timeoutRatio] = await Promise.all([
-      showCategory(contracts, deal.category),
-      getTimeoutRatio(contracts),
-    ]);
-    const consensusTimeout = deal.startTime
-      .add(timeoutRatio.mul(workClockTimeRef))
-      .toNumber();
-    const now = Math.floor(Date.now() / 1000);
-    if (now < consensusTimeout) {
+    if (!deal.deadlineReached) {
       throw Error(
-        `Cannot claim a deal before reaching the consensus timeout date: ${new Date(
-          1000 * consensusTimeout,
+        `Cannot claim a deal before reaching the final time: ${new Date(
+          1000 * deal.finalTime,
         )}`,
       );
     }

@@ -65,6 +65,8 @@ const signed = () => ({
   sign: orderSignSchema().required(),
 });
 
+const catidSchema = () => uint256Schema();
+
 const paramsSchema = () => string().transform((value, originalValue) => {
   if (typeof originalValue === 'object') {
     return JSON.stringify(originalValue);
@@ -79,20 +81,24 @@ const tagSchema = () => mixed()
         const bytes32Tag = encodeTag(value);
         return bytes32Tag;
       } catch (e) {
-        throw new ValidationError(`invalid tag: ${e.message}`);
+        return `invalid tag: ${e.message}`;
       }
     }
     if (typeof value === 'string') {
       const lowerCase = value.toLowerCase();
-      return lowerCase;
-      // try {
-      //   const bytes32Tag = encodeTag(decodeTag(value));
-      //   return bytes32Tag;
-      // } catch (e) {
-      //   throw new ValidationError(`invalid tag: ${e.message}`);
-      // }
+      if (lowerCase.substr(0, 2) === '0x') return lowerCase;
+      try {
+        const bytes32Tag = encodeTag(value.split(','));
+        return bytes32Tag;
+      } catch (e) {
+        return `invalid tag: ${e.message}`;
+      }
     }
-    throw new ValidationError('invalid tag');
+    return 'invalid tag';
+  })
+  .test('no-transform-error', '${value}', async (value) => {
+    if (value.substr(0, 2) !== '0x') return false;
+    return true;
   })
   .test('is-bytes32', '${path} must be a bytes32 hexstring', async (value) => {
     const res = await bytes32Schema().validate(value);
@@ -138,7 +144,7 @@ const workerpoolorderSchema = () => object(
     workerpoolprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    category: uint256Schema().required(),
+    category: catidSchema().required(),
     trust: uint256Schema().required(),
     apprestrict: addressSchema().required(),
     datasetrestrict: addressSchema().required(),
@@ -163,7 +169,7 @@ const requestorderSchema = () => object(
     requester: addressSchema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    category: uint256Schema().required(),
+    category: catidSchema().required(),
     trust: uint256Schema().required(),
     beneficiary: addressSchema().required(),
     callback: addressSchema().required(),
@@ -237,6 +243,7 @@ module.exports = {
   signedWorkerpoolorderSchema,
   requestorderSchema,
   signedRequestorderSchema,
+  catidSchema,
   paramsSchema,
   tagSchema,
   chainIdSchema,

@@ -6,11 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- `requestorder.params` now accepts object in `iexec.json` and JS lib.
+- `iexec app run [address]` allow to run an app on iExec at the market price
+- `deal.show(dealid)` and `iexec deal show` returns extra keys `finalTime: uint256` and `deadlineReached: Boolean`
+- `task.show(taskid)` and `iexec task show` returns extra keys `taskTimedOut: Boolean`
+- `requestorder.params` now accepts object in `iexec.json` and JS lib
 
 ### Changed
 
 - fix SMS url in `chain.json`
+- fix `task.show(taskid)` and `iexec task show` returned `statusName` is now set to `"TIMEOUT"` when task timed out
 
 ### Removed
 

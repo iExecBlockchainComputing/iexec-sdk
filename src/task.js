@@ -9,6 +9,7 @@ const {
   download,
   NULL_ADDRESS,
   NULL_BYTES32,
+  sleep,
 } = require('./utils');
 const { getAddress } = require('./wallet');
 const { bytes32Schema, uint256Schema, throwIfMissing } = require('./validator');
@@ -24,9 +25,9 @@ const TASK_STATUS_MAP = {
   2: 'REVEALING',
   3: 'COMPLETED',
   4: 'FAILED',
+  timeout: 'TIMEOUT',
 };
 const FETCH_INTERVAL = 5000;
-const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 const show = async (
   contracts = throwIfMissing(),
@@ -42,6 +43,11 @@ const show = async (
     if (task.dealid === NULL_BYTES32) {
       throw new ObjectNotFoundError('task', vTaskId, chainId);
     }
+
+    const now = Math.floor(Date.now() / 1000);
+    const consensusTimeout = parseInt(task.finalDeadline, 10);
+    const taskTimedOut = task.status !== 3 && now >= consensusTimeout;
+
     const decodedResult = task.results
       && Buffer.from(task.results.substr(2), 'hex').toString('utf8');
     const displayResult = decodedResult
@@ -53,8 +59,12 @@ const show = async (
       {},
       task,
       {
-        statusName: TASK_STATUS_MAP[task.status],
+        statusName:
+          task.status < 3 && taskTimedOut
+            ? TASK_STATUS_MAP.timeout
+            : TASK_STATUS_MAP[task.status],
       },
+      { taskTimedOut },
       {
         results: displayResult,
       },
@@ -69,20 +79,23 @@ const waitForTaskStatusChange = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   prevStatus = throwIfMissing(),
-  counter = 0,
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
     const vPrevStatus = await uint256Schema().validate(prevStatus);
     const task = await show(contracts, vTaskId);
-    const taskStatus = task.status;
-    debug('taskStatus', taskStatus);
-    const taskStatusName = TASK_STATUS_MAP[taskStatus];
-    if (taskStatus.toString() !== vPrevStatus) {
-      return { status: taskStatus, statusName: taskStatusName };
+    const taskStatusName = task.taskTimedOut
+      ? TASK_STATUS_MAP.timeout
+      : TASK_STATUS_MAP[task.status];
+    if (task.status.toString() !== vPrevStatus || task.taskTimedOut) {
+      return {
+        status: task.status,
+        statusName: taskStatusName,
+        taskTimedOut: task.taskTimedOut,
+      };
     }
     await sleep(FETCH_INTERVAL);
-    return waitForTaskStatusChange(contracts, vTaskId, taskStatus, counter + 1);
+    return waitForTaskStatusChange(contracts, vTaskId, task.status);
   } catch (error) {
     debug('waitForTaskStatusChange()', error);
     throw error;
@@ -134,7 +147,7 @@ const fetchResults = async (
     const vTaskId = await bytes32Schema().validate(taskid);
     const userAddress = await getAddress(contracts);
     const task = await show(contracts, vTaskId);
-    if (TASK_STATUS_MAP[task.status] !== 'COMPLETED') throw Error('Task is not completed');
+    if (task.status !== 3) throw Error('Task is not completed');
     const tasksDeal = await deal.show(contracts, task.dealid);
     if (
       userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
@@ -171,9 +184,7 @@ const claim = async (
     const task = await show(contracts, vTaskId);
     const taskStatus = task.status;
 
-    if (
-      ['COMPLETED', 'FAILED'].includes(TASK_STATUS_MAP[taskStatus.toString()])
-    ) {
+    if ([3, 4].includes(taskStatus)) {
       throw Error(
         `Cannot claim a ${objName} having status ${
           TASK_STATUS_MAP[taskStatus.toString()]
@@ -183,13 +194,10 @@ const claim = async (
     const tasksDeal = await deal.show(contracts, task.dealid);
     debug('tasksDeal', tasksDeal);
 
-    const now = Math.floor(Date.now() / 1000);
-    const consensusTimeout = parseInt(task.finalDeadline, 10);
-
-    if (now < consensusTimeout) {
+    if (!task.taskTimedOut) {
       throw Error(
-        `Cannot claim a ${objName} before reaching the consensus timeout date: ${new Date(
-          1000 * consensusTimeout,
+        `Cannot claim a ${objName} before reaching the consensus deadline date: ${new Date(
+          1000 * parseInt(task.finalDeadline, 10),
         )}`,
       );
     }

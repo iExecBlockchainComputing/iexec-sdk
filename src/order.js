@@ -6,7 +6,6 @@ const {
   ethersBnToBn,
   http,
   getSalt,
-  checksummedAddress,
   getAuthorization,
   NULL_ADDRESS,
   NULL_BYTES32,
@@ -14,6 +13,7 @@ const {
 } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
 const { getAddress } = require('./wallet');
+const { getAppOwner, getDatasetOwner, getWorkerpoolOwner } = require('./hub');
 const {
   addressSchema,
   apporderSchema,
@@ -89,8 +89,8 @@ const objDesc = {
       { name: 'salt', type: 'bytes32' },
     ],
     contractPropName: 'app',
-    contractName: 'app',
-    cancelMethode: 'cancelAppOrder',
+    ownerMethod: getAppOwner,
+    cancelMethod: 'cancelAppOrder',
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: 'apporders',
     dealField: 'appHash',
@@ -108,8 +108,8 @@ const objDesc = {
       { name: 'salt', type: 'bytes32' },
     ],
     contractPropName: 'dataset',
-    contractName: 'dataset',
-    cancelMethode: 'cancelDatasetOrder',
+    ownerMethod: getDatasetOwner,
+    cancelMethod: 'cancelDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: 'datasetorders',
     dealField: 'datasetHash',
@@ -129,8 +129,8 @@ const objDesc = {
       { name: 'salt', type: 'bytes32' },
     ],
     contractPropName: 'workerpool',
-    contractName: 'workerpool',
-    cancelMethode: 'cancelWorkerpoolOrder',
+    ownerMethod: getWorkerpoolOwner,
+    cancelMethod: 'cancelWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: 'workerpoolorders',
     dealField: 'workerpoolHash',
@@ -154,7 +154,7 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
-    cancelMethode: 'cancelRequestOrder',
+    cancelMethod: 'cancelRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: 'requestorders',
     dealField: 'requestHash',
@@ -185,19 +185,8 @@ const getContractOwner = async (
   orderName = throwIfMissing(),
   orderObj = throwIfMissing(),
 ) => {
-  try {
-    checkOrderName(orderName);
-    if (orderName === REQUEST_ORDER) throw new ValidationError('Invalid orderName');
-    const contractAddress = orderObj[objDesc[orderName].contractPropName];
-    const contract = contracts.getContract(objDesc[orderName].contractName)({
-      at: contractAddress,
-    });
-    const owner = checksummedAddress(await wrapCall(contract.owner()));
-    return owner;
-  } catch (error) {
-    debug('getContractOwner()', error);
-    throw error;
-  }
+  const contractAddress = orderObj[objDesc[orderName].contractPropName];
+  return objDesc[orderName].ownerMethod(contracts, contractAddress);
 };
 
 const computeOrderHash = async (
@@ -356,7 +345,7 @@ const cancelOrder = async (
     const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContact = contracts.getClerkContract({ at: clerkAddress });
     const tx = await wrapSend(
-      clerkContact[objDesc[orderName].cancelMethode](args, contracts.txOptions),
+      clerkContact[objDesc[orderName].cancelMethod](args, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
@@ -750,7 +739,6 @@ const createRequestorder = async ({
 
 module.exports = {
   computeOrderHash,
-  getContractOwner,
   getRemainingVolume,
   createApporder,
   createDatasetorder,
