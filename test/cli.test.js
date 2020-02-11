@@ -1076,14 +1076,14 @@ describe('[Mainchain]', () => {
     expect(res.tasks[0].status).toBe(0);
     expect(res.tasks[0].statusName).toBe('TIMEOUT');
     expect(res.tasks[0].taskTimedOut).toBe(true);
-    expect(res.tasksFailed).not.toBe(undefined);
-    expect(res.tasksFailed.length).toBe(1);
-    expect(res.tasksFailed[0].idx).toBe('0');
-    expect(res.tasksFailed[0].taskid).not.toBe(undefined);
-    expect(res.tasksFailed[0].dealid).toBe(res.deals[0].dealid);
-    expect(res.tasksFailed[0].status).toBe(0);
-    expect(res.tasksFailed[0].statusName).toBe('TIMEOUT');
-    expect(res.tasksFailed[0].taskTimedOut).toBe(true);
+    expect(res.failedTasks).not.toBe(undefined);
+    expect(res.failedTasks.length).toBe(1);
+    expect(res.failedTasks[0].idx).toBe('0');
+    expect(res.failedTasks[0].taskid).not.toBe(undefined);
+    expect(res.failedTasks[0].dealid).toBe(res.deals[0].dealid);
+    expect(res.failedTasks[0].status).toBe(0);
+    expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[0].taskTimedOut).toBe(true);
   }, 15000);
 
   // DEAL
