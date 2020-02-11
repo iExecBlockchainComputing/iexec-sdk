@@ -387,7 +387,7 @@ encryptDataset
           });
         } catch (error) {
           debug('docker pull', error);
-          throw Error(`Failled to pull docker image ${SCONE_IMAGE}`);
+          throw Error(`Failed to pull docker image ${SCONE_IMAGE}`);
         }
 
         const encryptDatasetFolder = async (folder) => {

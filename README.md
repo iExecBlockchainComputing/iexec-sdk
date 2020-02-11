@@ -90,6 +90,12 @@ iexec app deploy # deploy app on Ethereum and get an address
 iexec app show # show details of deployed app
 ```
 
+#### Run an app
+
+```bash
+iexec app run [address] # run an application on iExec at market price
+```
+
 #### Sell your app on the Marketplace
 
 ```bash
@@ -226,7 +232,7 @@ iexec order show --app <orderHash> --deals # show your order on the Marketplace 
 ```bash
 iexec deal show <dealid> # show your deal details, get the taskids
 iexec task show <taskid> # show the status of your task
-iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILLED
+iexec task show <taskid> --watch # wait until the task is COMPLETED or FAILED
 iexec task show <taskid> --download [fileName] # download the result of your COMPLETED task
 ```
 
@@ -369,6 +375,22 @@ iexec app deploy # deploy new app
 iexec app show [address|index] # show app details
 iexec app count # count your total number of app
 iexec app count --user <userAddress> # count user total number of app
+```
+
+### app run
+
+```bash
+iexec app run [appAddress] [options] # run an iExec application at market price (default run last deployed app)
+# OPTIONS
+--dataset [address] # run with a dataset (specified address or user's last deployed dataset)
+--workerpool [address] # run on a specific workerpool (specified address or user's last deployed workerpool)
+--category <catid> # run in specified category
+--params <string> # specify the params of the request
+--tag <tag...> # specify tags (usage --tag tag1,tag2)
+--trust <trust> # specify minimum trust
+--beneficiary <address> # specify the beneficiary of the request (default user address)
+--callback <address> # specify the callback address of the request
+--watch # watch execution status changes
 ```
 
 ## dataset
@@ -885,7 +907,7 @@ const iexec = new IExec({
 - [orderbook](#iexecorderboook): explore the iexec Marketplace
 - [order](#iexecorder): manage any type of order, make deals to start offchain computation
 - [deal](#iexecdeal): find your deals
-- [task](#iexectask): follow the computation, download results or claim failled executions
+- [task](#iexectask): follow the computation, download results or claim failed executions
 - [app](#iexecapp): deploy a new app, show an existing one
 - [dataset](#iexecdataset): deploy a new dataset, show an existing one
 - [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
@@ -1500,7 +1522,7 @@ console.log('deal:', res.dealid);
 
 #### show
 
-iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price }, dataset : { pointer: Address, owner: Address, price }, workerpool : { pointer: Address, owner: Address, price }, trust, category, tag, requester, beneficiary, callback, params, startTime, botFirst, botSize, workerStake, schedulerRewardRatio, tasks: { ...\[ {\[idx\]: taskid] }\] }** >
+iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price: BN }, dataset : { pointer: Address, owner: Address, price: BN }, workerpool : { pointer: Address, owner: Address, price: BN }, trust: BN, category: BN, tag: Tag, requester: Address, beneficiary: Address, callback: Address, params: String, startTime: BN, deadlineReached: Boolean, botFirst: BN, botSize: BN, workerStake: BN, schedulerRewardRatio: BN, tasks: { ...\[ {\[idx\]: taskid] }\] }** >
 
 > show the details of a deal.
 
@@ -1573,7 +1595,7 @@ transactions.forEach(e => {
 
 #### show
 
-iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status, dealid, idx, resultDigest, results, statusName }** >
+iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status: Number(0|1|2|3|4), dealid: Bytes32, idx: BN, timeref: BN, contributionDeadline: BN, revealDeadline: BN, finalDeadline: BN, consensusValue: Bytes32, revealCounter: BN, winnerCounter: BN, contributors: [...Address], resultDigest: Bytes32, results: HexString, statusName: String('UNSET'|'ACTIVE'|'REVEALING'|'COMPLETED'|'FAILED'|'TIMEOUT'), taskTimedOut: Boolean }** >
 
 > show the details of a task.
 

@@ -943,6 +943,149 @@ describe('[Mainchain]', () => {
     expect(res.fail.length).toBe(4);
   }, 10000);
 
+  test('[common] iexec app run --workerpool', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deals).not.toBe(undefined);
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).not.toBe(undefined);
+    expect(res.deals[0].txHash).not.toBe(undefined);
+
+    const rawDeal = await execAsync(
+      `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+    );
+    const resDeal = JSON.parse(rawDeal);
+    expect(resDeal.ok).toBe(true);
+    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal.app.pointer).toBe(mainchainApp);
+    expect(resDeal.deal.app.price).toBe('0');
+    expect(resDeal.deal.dataset.pointer).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.dataset.price).toBe('0');
+    expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(resDeal.deal.workerpool.price).toBe('0');
+    expect(resDeal.deal.category).toBe('0');
+    expect(resDeal.deal.params).toBe('');
+    expect(resDeal.deal.callback).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.requester).toBe(ADDRESS);
+    expect(resDeal.deal.beneficiary).toBe(ADDRESS);
+    expect(resDeal.deal.botFirst).toBe('0');
+    expect(resDeal.deal.botSize).toBe('1');
+    expect(resDeal.deal.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.trust).toBe('1');
+    expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+  }, 15000);
+
+  test('[common] iexec app run --workerpool --dataset --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      dataset: {
+        [networkId]: mainchainDataset,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool --dataset --params "test params" --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${ADDRESS2} --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deals).not.toBe(undefined);
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).not.toBe(undefined);
+    expect(res.deals[0].txHash).not.toBe(undefined);
+
+    const rawDeal = await execAsync(
+      `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+    );
+    const resDeal = JSON.parse(rawDeal);
+    expect(resDeal.ok).toBe(true);
+    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal.app.pointer).toBe(mainchainApp);
+    expect(resDeal.deal.app.price).toBe('0');
+    expect(resDeal.deal.dataset.pointer).toBe(mainchainDataset);
+    expect(resDeal.deal.dataset.price).toBe('0');
+    expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(resDeal.deal.workerpool.price).toBe('0');
+    expect(resDeal.deal.category).toBe('1');
+    expect(resDeal.deal.params).toBe('test params');
+    expect(resDeal.deal.callback).toBe(ADDRESS2);
+    expect(resDeal.deal.requester).toBe(ADDRESS);
+    expect(resDeal.deal.beneficiary).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.botFirst).toBe('0');
+    expect(resDeal.deal.botSize).toBe('1');
+    expect(resDeal.deal.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+    expect(resDeal.deal.trust).toBe('1');
+    expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+  }, 15000);
+
+  test('[common] iexec app run --workerpool --watch (timeout)', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool --category ${mainchainNoDurationCatid} --watch --force --raw`,
+    ).catch(e => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.deals).not.toBe(undefined);
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).not.toBe(undefined);
+    expect(res.deals[0].txHash).not.toBe(undefined);
+    expect(res.tasks).not.toBe(undefined);
+    expect(res.tasks.length).toBe(1);
+    expect(res.tasks[0].idx).toBe('0');
+    expect(res.tasks[0].taskid).not.toBe(undefined);
+    expect(res.tasks[0].dealid).toBe(res.deals[0].dealid);
+    expect(res.tasks[0].status).toBe(0);
+    expect(res.tasks[0].statusName).toBe('TIMEOUT');
+    expect(res.tasks[0].taskTimedOut).toBe(true);
+    expect(res.failedTasks).not.toBe(undefined);
+    expect(res.failedTasks.length).toBe(1);
+    expect(res.failedTasks[0].idx).toBe('0');
+    expect(res.failedTasks[0].taskid).not.toBe(undefined);
+    expect(res.failedTasks[0].dealid).toBe(res.deals[0].dealid);
+    expect(res.failedTasks[0].status).toBe(0);
+    expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[0].taskTimedOut).toBe(true);
+  }, 15000);
+
   // DEAL
   test('[mainchain] iexec deal show', async () => {
     const raw = await execAsync(
@@ -958,6 +1101,9 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
+    expect(res.deal.startTime).not.toBe(undefined);
+    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.deadlineReached).toBe(false);
     expect(res.deal.tasks).not.toBe(undefined);
     expect(Object.keys(res.deal.tasks).length).toBe(1);
     expect(res.deal.tasks['0']).not.toBe(undefined);
@@ -978,6 +1124,9 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('5');
+    expect(res.deal.startTime).not.toBe(undefined);
+    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.deadlineReached).toBe(true);
     expect(res.deal.tasks).not.toBe(undefined);
     expect(Object.keys(res.deal.tasks).length).toBe(5);
     expect(res.deal.tasks['0']).not.toBe(undefined);
@@ -1028,6 +1177,7 @@ describe('[Mainchain]', () => {
     );
     expect(res.task.results).toBe('0x');
     expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.task.taskTimedOut).toBe(false);
     expect(res.claimable).toBe(false);
   }, 10000);
 
@@ -1055,7 +1205,8 @@ describe('[Mainchain]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
     expect(res.task.results).toBe('0x');
-    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.task.statusName).toBe('TIMEOUT');
+    expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(true);
   }, 10000);
 
@@ -1095,6 +1246,7 @@ describe('[Mainchain]', () => {
     );
     expect(res.task.results).toBe('0x');
     expect(res.task.statusName).toBe('FAILED');
+    expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(false);
   }, 10000);
 
@@ -1654,6 +1806,9 @@ describe('[Sidechain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
+    expect(res.deal.startTime).not.toBe(undefined);
+    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.deadlineReached).toBe(false);
     expect(res.deal.tasks).not.toBe(undefined);
     expect(Object.keys(res.deal.tasks).length).toBe(1);
     expect(res.deal.tasks['0']).not.toBe(undefined);
@@ -1674,6 +1829,9 @@ describe('[Sidechain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('5');
+    expect(res.deal.startTime).not.toBe(undefined);
+    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.deadlineReached).toBe(true);
     expect(res.deal.tasks).not.toBe(undefined);
     expect(Object.keys(res.deal.tasks).length).toBe(5);
     expect(res.deal.tasks['0']).not.toBe(undefined);
@@ -1724,6 +1882,7 @@ describe('[Sidechain]', () => {
     );
     expect(res.task.results).toBe('0x');
     expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.task.taskTimedOut).toBe(false);
     expect(res.claimable).toBe(false);
   }, 10000);
 
@@ -1751,7 +1910,8 @@ describe('[Sidechain]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
     expect(res.task.results).toBe('0x');
-    expect(res.task.statusName).toBe('ACTIVE');
+    expect(res.task.statusName).toBe('TIMEOUT');
+    expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(true);
   }, 10000);
 
@@ -1791,6 +1951,7 @@ describe('[Sidechain]', () => {
     );
     expect(res.task.results).toBe('0x');
     expect(res.task.statusName).toBe('FAILED');
+    expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(false);
   }, 10000);
 

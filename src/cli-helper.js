@@ -99,6 +99,7 @@ const desc = {
   decryptResults: () => 'decrypt encrypted results with beneficary key',
   bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
   bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
+  appRun: () => 'run an iExec application at market price (default run last deployed app)',
 };
 
 const option = {
@@ -182,6 +183,30 @@ const option = {
     '--params <string>',
     'specify the params of the request (existing request order will be ignored)',
   ],
+  appRunParams: () => [
+    '--params <string>',
+    'specify the params of the request',
+  ],
+  appRunDataset: () => [
+    '--dataset [address]',
+    "run with a dataset (specified address or user's last deployed dataset)",
+  ],
+  appRunWorkerpool: () => [
+    '--workerpool [address]',
+    "run on a specific workerpool (specified address or user's last deployed workerpool)",
+  ],
+  appRunBeneficiary: () => [
+    '--beneficiary <address>',
+    'specify the beneficiary of the request (default user address)',
+  ],
+  appRunCallback: () => [
+    '--callback <address>',
+    'specify the callback address of the request',
+  ],
+  appRunCategory: () => ['--category <catid>', 'run in specified category'],
+  appRunTag: () => ['--tag <tag...>', 'specify tags (usage --tag tag1,tag2)'],
+  appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
+  appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
   token: () => ['--token <address>', 'custom erc20 token contract address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
