@@ -117,7 +117,7 @@ orderbookWorkerpool
       });
       if (address) isEthAddress(address, { strict: true });
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
-      const minTag = cmd.requireTag && cmd.requireTag.split(',');
+      const minTag = cmd.requireTag;
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.id,

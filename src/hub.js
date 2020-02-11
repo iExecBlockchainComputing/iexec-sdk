@@ -16,10 +16,13 @@ const {
   datasetSchema,
   workerpoolSchema,
   throwIfMissing,
+  ValidationError,
 } = require('./validator');
 const { wrapCall, wrapSend } = require('./errorWrappers');
 
 const debug = Debug('iexec:hub');
+
+const RESOURCE_NAMES = ['app', 'dataset', 'workerpool'];
 
 const createObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
@@ -269,6 +272,43 @@ const countCategory = async (contracts = throwIfMissing()) => {
   }
 };
 
+const checkResourceName = (type) => {
+  if (!RESOURCE_NAMES.includes(type)) throw new ValidationError(`Invalid resource name ${type}`);
+};
+
+const getOwner = async (
+  contracts = throwIfMissing(),
+  name = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    checkResourceName(name);
+    const contract = contracts.getContract(name)({
+      at: address,
+    });
+    const owner = checksummedAddress(await wrapCall(contract.owner()));
+    return owner;
+  } catch (error) {
+    debug('getOwner()', error);
+    throw error;
+  }
+};
+
+const getAppOwner = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => getOwner(contracts, 'app', address);
+
+const getDatasetOwner = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => getOwner(contracts, 'dataset', address);
+
+const getWorkerpoolOwner = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => getOwner(contracts, 'workerpool', address);
+
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
@@ -294,6 +334,9 @@ module.exports = {
   countUserApps,
   countUserDatasets,
   countUserWorkerpools,
+  getAppOwner,
+  getDatasetOwner,
+  getWorkerpoolOwner,
   createCategory,
   showCategory,
   countCategory,

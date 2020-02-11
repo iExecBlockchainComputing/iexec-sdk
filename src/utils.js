@@ -382,6 +382,14 @@ const decodeTag = (tag) => {
   return tags;
 };
 
+const sumTags = (tagArray) => {
+  const summedTags = [];
+  tagArray.forEach(hexTag => summedTags.push(...decodeTag(hexTag)));
+  return encodeTag(summedTags);
+};
+
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
 module.exports = {
   BN,
   formatRLC,
@@ -414,5 +422,7 @@ module.exports = {
   bnNRlcToBnWei,
   encodeTag,
   decodeTag,
+  sumTags,
   bytes32Regex,
+  sleep,
 };

@@ -1,6 +1,6 @@
 const ethers = require('ethers');
 const BN = require('bn.js');
-const { utils, IExec } = require('../src/iexec-lib');
+const { utils, IExec, errors } = require('../src/iexec-lib');
 
 console.log('Node version:', process.version);
 
@@ -28,6 +28,42 @@ const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 
 const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
 const ethRPC1s = new ethers.providers.JsonRpcProvider(ethereumURL1s);
+
+const walletWithProvider = new ethers.Wallet(PRIVATE_KEY, ethRPC);
+
+const initializeTask = async (hub, dealid, idx) => {
+  const hubContract = new ethers.Contract(
+    hub,
+    [
+      {
+        constant: false,
+        inputs: [
+          {
+            name: '_dealid',
+            type: 'bytes32',
+          },
+          {
+            name: 'idx',
+            type: 'uint256',
+          },
+        ],
+        name: 'initialize',
+        outputs: [
+          {
+            name: '',
+            type: 'bytes32',
+          },
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    walletWithProvider,
+  );
+  const initTx = await hubContract.initialize(dealid, idx);
+  await initTx.wait();
+};
 
 // TESTS
 beforeAll(async () => {
@@ -268,7 +304,8 @@ describe('[workflow]', () => {
     expect(matchOrdersRes.txHash).not.toBe(undefined);
     expect(matchOrdersRes.volume.eq(new BN(1))).toBe(true);
   });
-  test('claim deal uninitialized tasks', async () => {
+
+  test('show & claim task, show & claim deal (initialized & uninitialized tasks)', async () => {
     const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -308,14 +345,103 @@ describe('[workflow]', () => {
     expect(matchOrdersRes.dealid).not.toBe(undefined);
     expect(matchOrdersRes.txHash).not.toBe(undefined);
     expect(matchOrdersRes.volume.eq(new BN(10))).toBe(true);
+
+    const showDealRes = await iexec.deal.show(matchOrdersRes.dealid);
+    expect(showDealRes).not.toBe(undefined);
+    expect(showDealRes.app).not.toBe(undefined);
+    expect(showDealRes.app.pointer).toBe(apporder.app);
+    expect(showDealRes.app.owner).not.toBe(undefined);
+    expect(showDealRes.app.price.eq(new BN(apporder.appprice))).toBe(true);
+    expect(showDealRes.dataset).not.toBe(undefined);
+    expect(showDealRes.dataset.pointer).toBe(datasetorder.dataset);
+    expect(showDealRes.dataset.owner).not.toBe(undefined);
+    expect(
+      showDealRes.dataset.price.eq(new BN(datasetorder.datasetprice)),
+    ).toBe(true);
+    expect(showDealRes.workerpool).not.toBe(undefined);
+    expect(showDealRes.workerpool.pointer).toBe(
+      workerpoolorderToClaim.workerpool,
+    );
+    expect(showDealRes.workerpool.owner).not.toBe(undefined);
+    expect(
+      showDealRes.workerpool.price.eq(
+        new BN(workerpoolorderToClaim.workerpoolprice),
+      ),
+    ).toBe(true);
+    expect(showDealRes.trust.eq(new BN(1))).toBe(true);
+    expect(showDealRes.category.eq(new BN(signedorder.category))).toBe(true);
+    expect(showDealRes.tag).toBe(signedorder.tag);
+    expect(showDealRes.params).toBe(signedorder.params);
+    expect(showDealRes.startTime instanceof BN).toBe(true);
+    expect(showDealRes.finalTime instanceof BN).toBe(true);
+    expect(showDealRes.finalTime.gte(showDealRes.startTime)).toBe(true);
+    expect(showDealRes.deadlineReached).toBe(true);
+    expect(showDealRes.botFirst.eq(new BN(0))).toBe(true);
+    expect(showDealRes.botSize.eq(new BN(10))).toBe(true);
+    expect(showDealRes.workerStake.eq(new BN(0))).toBe(true);
+    expect(showDealRes.schedulerRewardRatio.eq(new BN(1))).toBe(true);
+    expect(showDealRes.requester).toBe(signedorder.requester);
+    expect(showDealRes.beneficiary).toBe(signedorder.beneficiary);
+    expect(showDealRes.callback).toBe(signedorder.callback);
+    expect(typeof showDealRes.tasks).toBe('object');
+    expect(showDealRes.tasks[0]).not.toBe(undefined);
+    expect(showDealRes.tasks[9]).not.toBe(undefined);
+    expect(showDealRes.tasks[10]).toBe(undefined);
+
+    const showTaskUnsetRes = await iexec.task
+      .show(showDealRes.tasks[0])
+      .catch(e => e);
+    expect(showTaskUnsetRes instanceof errors.ObjectNotFoundError).toBe(true);
+    expect(showTaskUnsetRes.message).toBe(
+      `No task found for id ${showDealRes.tasks[0]} on chain ${networkId}`,
+    );
+
+    const taskIdxToInit = 1;
+    await initializeTask(hubAddress, matchOrdersRes.dealid, taskIdxToInit);
+    const showTaskActiveRes = await iexec.task.show(
+      showDealRes.tasks[taskIdxToInit],
+    );
+    expect(showTaskActiveRes.status).toBe(1);
+    expect(showTaskActiveRes.dealid).toBe(matchOrdersRes.dealid);
+    expect(showTaskActiveRes.idx.eq(new BN(taskIdxToInit))).toBe(true);
+    expect(showTaskActiveRes.timeref.eq(new BN(0))).toBe(true);
+    expect(
+      showTaskActiveRes.contributionDeadline.eq(showDealRes.finalTime),
+    ).toBe(true);
+    expect(showTaskActiveRes.finalDeadline.eq(showDealRes.finalTime)).toBe(
+      true,
+    );
+    expect(showTaskActiveRes.revealCounter.eq(new BN(0))).toBe(true);
+    expect(showTaskActiveRes.winnerCounter.eq(new BN(0))).toBe(true);
+    expect(showTaskActiveRes.contributors).toStrictEqual({});
+    expect(showTaskActiveRes.consensusValue).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(showTaskActiveRes.resultDigest).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(showTaskActiveRes.results).toBe('0x');
+    expect(showTaskActiveRes.idx.eq(new BN(taskIdxToInit))).toBe(true);
+    expect(showTaskActiveRes.statusName).toBe('TIMEOUT');
+    expect(showTaskActiveRes.taskTimedOut).toBe(true);
+
+    const taskIdxToClaim = 2;
+    await initializeTask(hubAddress, matchOrdersRes.dealid, taskIdxToClaim);
+    const claimTaskRes = await iexec.task.claim(
+      showDealRes.tasks[taskIdxToClaim],
+    );
+    expect(claimTaskRes).not.toBe(undefined);
+
     const claimDealRes = await iexec.deal.claim(matchOrdersRes.dealid);
     expect(claimDealRes).not.toBe(undefined);
     expect(claimDealRes.transactions).not.toBe(undefined);
-    expect(claimDealRes.transactions.length).toBe(1);
+    expect(claimDealRes.transactions.length).toBe(2);
     expect(claimDealRes.transactions[0]).not.toBe(undefined);
-    expect(claimDealRes.transactions[0].type).toBe('initializeAndClaimArray');
+    expect(claimDealRes.transactions[0].type).toBe('claimArray');
+    expect(claimDealRes.transactions[1]).not.toBe(undefined);
+    expect(claimDealRes.transactions[1].type).toBe('initializeAndClaimArray');
     expect(claimDealRes.claimed).not.toBe(undefined);
-    expect(Object.keys(claimDealRes.claimed).length).toBe(10);
+    expect(Object.keys(claimDealRes.claimed).length).toBe(9);
     expect(claimDealRes.claimed[0]).not.toBe(undefined);
   }, 10000);
 });

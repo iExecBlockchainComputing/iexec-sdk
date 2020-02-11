@@ -14,7 +14,7 @@ const {
   // requestorderSchema,
   // signedRequestorderSchema,
   paramsSchema,
-  // tagSchema,
+  tagSchema,
   // chainIdSchema,
   // hexnumberSchema,
   positiveIntSchema,
@@ -243,5 +243,51 @@ describe('[paramsSchema]', () => {
   });
   test('number', async () => {
     await expect(paramsSchema().validate(42)).resolves.toBe('42');
+  });
+});
+
+describe('[tagSchema]', () => {
+  test('bytes 32 tags', async () => {
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      ),
+    ).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+  });
+  test('unknown bytes 32 tag is allowed', async () => {
+    await expect(
+      tagSchema().validate(
+        '0x1000000000000000000000000000000000000000000000000000000000000000',
+      ),
+    ).resolves.toBe(
+      '0x1000000000000000000000000000000000000000000000000000000000000000',
+    );
+  });
+  test('array of tags', async () => {
+    await expect(tagSchema().validate(['tee', 'gpu'])).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+  });
+  test('isolated tag', async () => {
+    await expect(tagSchema().validate('gpu')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000100',
+    );
+  });
+  test('comma separated tags', async () => {
+    await expect(tagSchema().validate('gpu,tee')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    );
+  });
+  test('unknown tag in array', async () => {
+    await expect(tagSchema().validate(['foo'])).rejects.toThrow(
+      new ValidationError('invalid tag: unknown tag foo'),
+    );
+  });
+  test('unknown isolated tag', async () => {
+    await expect(tagSchema().validate('foo')).rejects.toThrow(
+      new ValidationError('invalid tag: unknown tag foo'),
+    );
   });
 });
