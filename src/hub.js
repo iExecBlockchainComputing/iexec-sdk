@@ -276,6 +276,54 @@ const checkResourceName = (type) => {
   if (!RESOURCE_NAMES.includes(type)) throw new ValidationError(`Invalid resource name ${type}`);
 };
 
+const checkDeployedApp = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const at = await addressSchema().validate(address);
+    const isDeployed = await wrapCall(
+      contracts.checkDeployedApp(at, { strict: false }),
+    );
+    return isDeployed;
+  } catch (error) {
+    debug('checkDeployedApp()', error);
+    throw error;
+  }
+};
+
+const checkDeployedDataset = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const at = await addressSchema().validate(address);
+    const isDeployed = await wrapCall(
+      contracts.checkDeployedDataset(at, { strict: false }),
+    );
+    return isDeployed;
+  } catch (error) {
+    debug('checkDeployedDataset()', error);
+    throw error;
+  }
+};
+
+const checkDeployedWorkerpool = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const at = await addressSchema().validate(address);
+    const isDeployed = await wrapCall(
+      contracts.checkDeployedWorkerpool(at, { strict: false }),
+    );
+    return isDeployed;
+  } catch (error) {
+    debug('checkDeployedApp()', error);
+    throw error;
+  }
+};
+
 const getOwner = async (
   contracts = throwIfMissing(),
   name = throwIfMissing(),
@@ -297,17 +345,17 @@ const getOwner = async (
 const getAppOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'app', address);
+) => getOwner(contracts, 'app', await addressSchema().validate(address));
 
 const getDatasetOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'dataset', address);
+) => getOwner(contracts, 'dataset', await addressSchema().validate(address));
 
 const getWorkerpoolOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'workerpool', address);
+) => getOwner(contracts, 'workerpool', await addressSchema().validate(address));
 
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
@@ -325,6 +373,9 @@ module.exports = {
   deployApp,
   deployDataset,
   deployWorkerpool,
+  checkDeployedApp,
+  checkDeployedDataset,
+  checkDeployedWorkerpool,
   showApp,
   showDataset,
   showWorkerpool,

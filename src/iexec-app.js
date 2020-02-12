@@ -27,6 +27,9 @@ const {
   getDatasetOwner,
   getWorkerpoolOwner,
   showCategory,
+  checkDeployedApp,
+  checkDeployedDataset,
+  checkDeployedWorkerpool,
 } = require('./hub');
 const {
   loadIExecConf,
@@ -321,6 +324,7 @@ run
       debug('download', download);
 
       const getApporder = async () => {
+        if (!(await checkDeployedApp(chain.contracts, app))) throw Error(`No app deployed at address ${app}`);
         const appOwner = await getAppOwner(chain.contracts, app);
         const isAppOwner = appOwner.toLowerCase() === requester.toLowerCase();
         if (isAppOwner) {
@@ -345,6 +349,11 @@ run
 
       const getDatasetorder = async () => {
         if (!useDataset) return NULL_DATASETORDER;
+        if (
+          typeof dataset === 'string'
+          && dataset.toLowerCase() === NULL_ADDRESS
+        ) return NULL_DATASETORDER;
+        if (!(await checkDeployedDataset(chain.contracts, dataset))) throw Error(`No dataset deployed at address ${dataset}`);
         const datasetOwner = await getDatasetOwner(chain.contracts, dataset);
         const isDatasetOwner = datasetOwner.toLowerCase() === requester.toLowerCase();
         if (isDatasetOwner) {
@@ -379,6 +388,7 @@ run
       const getWorkerpoolorder = async () => {
         const minTag = sumTags([apporder.tag, datasetorder.tag, tag]);
         if (runOnWorkerpool) {
+          if (!(await checkDeployedWorkerpool(chain.contracts, workerpool))) throw Error(`No workerpool deployed at address ${workerpool}`);
           const workerpoolOwner = await getWorkerpoolOwner(
             chain.contracts,
             workerpool,

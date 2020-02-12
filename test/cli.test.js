@@ -995,6 +995,58 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.tasks['0']).not.toBe(undefined);
   }, 15000);
 
+  test('[common] iexec app run --workerpool --dataset 0x0000000000000000000000000000000000000000', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool --dataset 0x0000000000000000000000000000000000000000 --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deals).not.toBe(undefined);
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).not.toBe(undefined);
+    expect(res.deals[0].txHash).not.toBe(undefined);
+
+    const rawDeal = await execAsync(
+      `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+    );
+    const resDeal = JSON.parse(rawDeal);
+    expect(resDeal.ok).toBe(true);
+    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal.app.pointer).toBe(mainchainApp);
+    expect(resDeal.deal.app.price).toBe('0');
+    expect(resDeal.deal.dataset.pointer).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.dataset.price).toBe('0');
+    expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(resDeal.deal.workerpool.price).toBe('0');
+    expect(resDeal.deal.category).toBe('0');
+    expect(resDeal.deal.params).toBe('');
+    expect(resDeal.deal.callback).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.requester).toBe(ADDRESS);
+    expect(resDeal.deal.beneficiary).toBe(ADDRESS);
+    expect(resDeal.deal.botFirst).toBe('0');
+    expect(resDeal.deal.botSize).toBe('1');
+    expect(resDeal.deal.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.trust).toBe('1');
+    expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+  }, 15000);
+
   test('[common] iexec app run --workerpool --dataset --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
     const deployed = {
       app: {
