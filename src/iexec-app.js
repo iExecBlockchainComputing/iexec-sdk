@@ -38,6 +38,7 @@ const {
   loadDeployedObj,
 } = require('./fs');
 const {
+  getRemainingVolume,
   createApporder,
   createDatasetorder,
   createWorkerpoolorder,
@@ -48,6 +49,7 @@ const {
   signRequestorder,
   matchOrders,
   NULL_DATASETORDER,
+  WORKERPOOL_ORDER,
 } = require('./order');
 const deal = require('./deal');
 const task = require('./task');
@@ -424,8 +426,27 @@ run
               minTrust: trust,
             },
           );
-          const order = workerpoolOrders[0] && workerpoolOrders[0].order;
-          if (order) return order;
+
+          const getFirstOpen = async (i = 0) => {
+            const order = workerpoolOrders[i] && workerpoolOrders[i].order;
+            if (order) {
+              const workerpoolVolume = await getRemainingVolume(
+                chain.contracts,
+                WORKERPOOL_ORDER,
+                order,
+              );
+              if (workerpoolVolume.gte(new BN(0))) {
+                return order;
+              }
+              return getFirstOpen(i + 1);
+            }
+            return null;
+          };
+          const order = await getFirstOpen();
+
+          if (order) {
+            return order;
+          }
           if (strict) {
             throw Error(
               `No workerpoolorder matching your conditions available in category ${category}`,
