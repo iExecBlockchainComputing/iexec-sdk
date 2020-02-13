@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix `iexec order show --raw` output
+
 ### Removed
 
 ## [4.0.2] 2020-02-12
