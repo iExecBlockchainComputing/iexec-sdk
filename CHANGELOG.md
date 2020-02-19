@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `orderbook.fetchAppOrderbook` and `iexec orderbook app <address>` optional filters (dataset, workerpool, requester)
+- `orderbook.fetchDatasetOrderbook` and`iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
+
 ### Changed
 
 - fix `iexec order show --raw` output

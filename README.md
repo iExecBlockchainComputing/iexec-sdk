@@ -455,7 +455,9 @@ iexec orderbook workerpool --category <id> # show the best workerpools published
 iexec orderbook workerpool [address] --category <id> # filters the result on workerpool
 iexec orderbook workerpool --category <id> --require-tag <...tags> # show the best workerpools published on the Marketplace matchin the specified tags
 iexec orderbook app <address> # show the best apporders published on the Marketplace for the specified app
+iexec orderbook app <address> --dataset <address> --requester <address> --workerpool <address> # filter on specific dataset, requester, workerpool
 iexec orderbook dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
+iexec orderbook dataset <address> --app <address> --requester <address> --workerpool <address> # filter on specific app, requester, workerpool
 ```
 
 ## deal
@@ -1072,12 +1074,15 @@ console.log('tx:', txHash);
 
 #### fetchAppOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified app
 >
 > _Optional_:
 >
+> - dataset: filter on order available for specified dataset
+> - workerpool: filter on order available for specified workerpool
+> - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results
 
@@ -1093,12 +1098,15 @@ console.log('total orders:', res.count);
 
 #### fetchDatasetOrderbook
 
-iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
+iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified dataset
 >
 > _Optional_:
 >
+> - app: filter on order available for specified app
+> - workerpool: filter on order available for specified workerpool
+> - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results
 

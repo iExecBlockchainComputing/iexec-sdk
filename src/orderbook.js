@@ -15,12 +15,23 @@ const debug = Debug('iexec:orderbook');
 const fetchAppOrderbook = async (
   chainId = throwIfMissing(),
   appAddress = throwIfMissing(),
-  { minVolume, skip } = {},
+  {
+    minVolume, skip, dataset, workerpool, requester,
+  } = {},
 ) => {
   try {
     const body = Object.assign(
       { chainId: await chainIdSchema().validate(chainId) },
       { app: await addressSchema().validate(appAddress) },
+      dataset && {
+        dataset: await addressSchema().validate(dataset),
+      },
+      workerpool && {
+        workerpool: await addressSchema().validate(workerpool),
+      },
+      requester && {
+        requester: await addressSchema().validate(requester),
+      },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       },
@@ -40,12 +51,23 @@ const fetchAppOrderbook = async (
 const fetchDatasetOrderbook = async (
   chainId = throwIfMissing(),
   datasetAddress = throwIfMissing(),
-  { minVolume, skip } = {},
+  {
+    minVolume, skip, app, workerpool, requester,
+  } = {},
 ) => {
   try {
     const body = Object.assign(
       { chainId: await chainIdSchema().validate(chainId) },
       { dataset: await addressSchema().validate(datasetAddress) },
+      app && {
+        app: await addressSchema().validate(app),
+      },
+      workerpool && {
+        workerpool: await addressSchema().validate(workerpool),
+      },
+      requester && {
+        requester: await addressSchema().validate(requester),
+      },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       },
