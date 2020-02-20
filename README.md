@@ -1632,7 +1632,7 @@ await iexec.task.claim(
 
 #### fetchResults
 
-iexec.**task.claim ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
+iexec.**task.fetchResults ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
 
 > download the specified task result.
 >
