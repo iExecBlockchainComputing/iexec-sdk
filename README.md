@@ -1813,6 +1813,7 @@ new utils.BN(1);
 #### NULL_ADDRESS
 
 Constant: the address 0 represention
+
 _Example:_
 
 ```js
@@ -1822,10 +1823,58 @@ console.log(utils.NULL_ADDRESS);
 #### NULL_BYTES32
 
 Constant: an empty bytes32 represention
+
 _Example:_
 
 ```js
 console.log(utils.NULL_BYTES32);
+```
+
+#### encodeTag
+
+utils.**encodeTag ([...tag: String])** => tag: Bytes32
+
+> encode human readable tag array to the blockchain format Bytes32
+
+_Example:_
+
+```js
+console.log(utils.encodeTag(['tee', 'gpu']));
+```
+
+#### decodeTag
+
+utils.**decodeTag (tag: Bytes32)** => [...tag: String]
+
+> decode Bytes32 tag to human readable tag array
+
+_Example:_
+
+```js
+console.log(
+  utils.decodeTag(
+    '0x0000000000000000000000000000000000000000000000000000000000000001',
+  ),
+);
+```
+
+#### sumTags
+
+utils.**sumTags ([...tag: Bytes32])** => tag: Bytes32
+
+> sum Bytes32 tag array (allow to compute workerpool minimum required tag)
+
+_Example:_
+
+```js
+const appTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000100';
+const datasetTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000001';
+const requestTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
+const workerpoolMinTag = utils.sumTags([appTag, datasetTag, requestTag]);
+console.log('workerpoolMinTag', workerpoolMinTag);
 ```
 
 #### getSignerFromPrivateKey

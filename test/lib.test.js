@@ -694,93 +694,131 @@ describe('[getSignerFromPrivateKey]', () => {
 });
 
 describe('[lib utils]', () => {
-  test("parseEth('4.2')", () => {
-    const res = utils.parseEth('4.2');
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+  describe('parseEth', () => {
+    test("parseEth('4.2')", () => {
+      const res = utils.parseEth('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test('parseEth(4.2)', () => {
+      const res = utils.parseEth(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test('parseEth(new BN(42))', () => {
+      const res = utils.parseEth(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000000000000'))).toBe(true);
+    });
   });
-  test('parseEth(4.2)', () => {
-    const res = utils.parseEth(4.2);
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+  describe('parseRLC', () => {
+    test("parseRLC('4.2')", () => {
+      const res = utils.parseRLC('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test('parseRLC(4.2)', () => {
+      const res = utils.parseRLC(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test('parseRLC(new BN(42))', () => {
+      const res = utils.parseRLC(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000'))).toBe(true);
+    });
   });
-  test('parseEth(new BN(42))', () => {
-    const res = utils.parseEth(new BN(42));
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('42000000000000000000'))).toBe(true);
+  describe('formatEth', () => {
+    test("formatEth('4200000000000000000')", () => {
+      const res = utils.formatEth('4200000000000000000');
+      expect(res).toBe('4.2');
+    });
+    test('formatEth(42)', () => {
+      const res = utils.formatEth(42);
+      expect(res).toBe('0.000000000000000042');
+    });
+    test("formatEth(new BN('4200000000000000000'))", () => {
+      const res = utils.formatEth(new BN('4200000000000000000'));
+      expect(res).toBe('4.2');
+    });
   });
-  test("parseRLC('4.2')", () => {
-    const res = utils.parseRLC('4.2');
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000'))).toBe(true);
+  describe('formatRLC', () => {
+    test("formatRLC('4200000000000000000')", () => {
+      const res = utils.formatRLC('4200000000000000000');
+      expect(res).toBe('4200000000');
+    });
+    test('formatRLC(42)', () => {
+      const res = utils.formatRLC(42);
+      expect(res).toBe('0.000000042');
+    });
+    test("formatRLC(new BN('4200000000000000000'))", () => {
+      const res = utils.formatRLC(new BN('4200000000000000000'));
+      expect(res).toBe('4200000000');
+    });
   });
-  test('parseRLC(4.2)', () => {
-    const res = utils.parseRLC(4.2);
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000'))).toBe(true);
-  });
-  test('parseRLC(new BN(42))', () => {
-    const res = utils.parseRLC(new BN(42));
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('42000000000'))).toBe(true);
-  });
-  test("formatEth('4200000000000000000')", () => {
-    const res = utils.formatEth('4200000000000000000');
-    expect(res).toBe('4.2');
-  });
-  test('formatEth(42)', () => {
-    const res = utils.formatEth(42);
-    expect(res).toBe('0.000000000000000042');
-  });
-  test("formatEth(new BN('4200000000000000000'))", () => {
-    const res = utils.formatEth(new BN('4200000000000000000'));
-    expect(res).toBe('4.2');
-  });
-  test("formatRLC('4200000000000000000')", () => {
-    const res = utils.formatRLC('4200000000000000000');
-    expect(res).toBe('4200000000');
-  });
-  test('formatRLC(42)', () => {
-    const res = utils.formatRLC(42);
-    expect(res).toBe('0.000000042');
-  });
-  test("formatRLC(new BN('4200000000000000000'))", () => {
-    const res = utils.formatRLC(new BN('4200000000000000000'));
-    expect(res).toBe('4200000000');
-  });
-  test("encodeTag(['tee'])", () => {
-    expect(utils.encodeTag(['tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000001',
-    );
-  });
-  test("encodeTag(['gpu'])", () => {
-    expect(utils.encodeTag(['gpu'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000100',
-    );
-  });
-  test("encodeTag(['gpu','tee'])", () => {
-    expect(utils.encodeTag(['gpu', 'tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
-    );
-  });
-  test("encodeTag(['gpu','tee','gpu','tee'])", () => {
-    expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
-    );
-  });
-  test('encodeTag unknown tag', () => {
-    expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
-  });
-  test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
-    expect(
-      utils.decodeTag(
+  describe('encodeTag', () => {
+    test("encodeTag(['tee'])", () => {
+      expect(utils.encodeTag(['tee'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000001',
-      ),
-    ).toStrictEqual(['tee']);
+      );
+    });
+    test("encodeTag(['gpu'])", () => {
+      expect(utils.encodeTag(['gpu'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000100',
+      );
+    });
+    test("encodeTag(['gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test("encodeTag(['gpu','tee','gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test('encodeTag unknown tag', () => {
+      expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
+    });
   });
-  test('decodeTag unknown bit tag', () => {
-    expect(() => utils.decodeTag(
-      '0x0000000000000000000000000000000000000000000000000000000000000002',
-    )).toThrow('unknown bit 2');
+  describe('decodeTag', () => {
+    test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
+      expect(
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ),
+      ).toStrictEqual(['tee']);
+    });
+    test('decodeTag unknown bit tag', () => {
+      expect(() => utils.decodeTag(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      )).toThrow('unknown bit 2');
+    });
+  });
+  describe('sumTags', () => {
+    test('sumTags from Bytes32', () => {
+      expect(
+        utils.sumTags([
+          '0x0000000000000000000000000000000000000000000000000000000000000100',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test('sumTags unknown bit tag', () => {
+      expect(() => utils.sumTags([
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ])).toThrow('unknown bit 2');
+    });
+    test('sumTags invalid bytes32', () => {
+      expect(() => utils.sumTags([
+        '0x000000000000000000000000000000000000000000000000000000000000000z',
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ])).toThrow('tag must be bytes32 hex string');
+    });
   });
 });

@@ -17,6 +17,7 @@ const {
   formatRLC,
   encodeTag,
   decodeTag,
+  sumTags,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
 
@@ -30,6 +31,7 @@ const utils = {
   formatRLC,
   encodeTag,
   decodeTag,
+  sumTags,
   getSignerFromPrivateKey,
 };
 

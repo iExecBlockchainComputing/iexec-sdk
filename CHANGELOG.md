@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `orderbook.fetchAppOrderbook` and `iexec orderbook app <address>` optional filters (dataset, workerpool, requester)
-- `orderbook.fetchDatasetOrderbook` and`iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
+- `orderbook.fetchDatasetOrderbook` and `iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
+- `utils.sumTags([...Bytes32])` added to JS lib
 
 ### Changed
 
@@ -20,7 +21,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `iexec app run [address]` allow to run an app on iExec at the market price
-- `deal.show(dealid)` and `iexec deal show` returns extra keys `finalTime: uint256` and `deadlineReached: Boolean`
+- `deal.show(dealid)` and `iexec deal show` returns extra keys `finalTime: BN` and `deadlineReached: Boolean`
 - `task.show(taskid)` and `iexec task show` returns extra keys `taskTimedOut: Boolean`
 - `requestorder.params` now accepts object in `iexec.json` and JS lib
 
