@@ -6,6 +6,7 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
+const iexecProcess = require('./iexecProcess');
 const errors = require('./errors');
 const {
   BN,
@@ -221,7 +222,8 @@ class IExec {
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.claim = taskid => task.claim(contracts, taskid);
-    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => task.fetchResults(contracts, taskid, { ipfsGatewayURL });
+    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
+    this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     this.network = {};
     this.network.id = contracts.chainId;

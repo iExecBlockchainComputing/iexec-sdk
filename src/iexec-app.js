@@ -51,18 +51,19 @@ const {
   NULL_DATASETORDER,
   WORKERPOOL_ORDER,
 } = require('./order');
-const deal = require('./deal');
-const task = require('./task');
+const dealModule = require('./deal');
+const { TASK_STATUS_MAP } = require('./task');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
 } = require('./orderbook');
 const { checkBalance } = require('./account');
+const { obsTask } = require('./iexecProcess');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
 const {
-  NULL_ADDRESS, NULL_BYTES32, sumTags, BN, sleep,
+  NULL_ADDRESS, NULL_BYTES32, sumTags, BN,
 } = require('./utils');
 const {
   tagSchema,
@@ -71,7 +72,6 @@ const {
   paramsSchema,
   positiveIntSchema,
 } = require('./validator');
-const { ObjectNotFoundError } = require('./errors');
 
 const debug = Debug('iexec:iexec-app');
 
@@ -556,15 +556,15 @@ run
         });
       } else {
         spinner.info(`deal submitted with dealid ${dealid}`);
-        const { tasks, finalTime } = await deal.show(chain.contracts, dealid);
+        const { tasks } = await dealModule.show(chain.contracts, dealid);
         const tasksMap = Object.entries(tasks).reduce(
           (acc, [idx, taskid]) => Object.assign({}, acc, {
             [taskid]: {
-              idx,
+              taskid,
               dealid,
-              finalTime: finalTime.toNumber(),
+              idx,
               status: 0,
-              statusName: task.TASK_STATUS_MAP[0],
+              statusName: TASK_STATUS_MAP[0],
             },
           }),
           {},
@@ -579,45 +579,21 @@ run
           `Watching tasks execution...${renderTaskStatus(tasksMap)}`,
         );
 
-        const waitStatusChangeOrTimeout = async (taskid, initialStatus) => task
-          .waitForTaskStatusChange(chain.contracts, taskid, initialStatus)
-          .catch(async (e) => {
-            if (e instanceof ObjectNotFoundError) {
-              const now = Math.floor(Date.now() / 1000);
-              const deadlineReached = now > tasksMap[taskid].finalTime;
-              if (deadlineReached) {
-                return {
-                  status: 0,
-                  statusName: task.TASK_STATUS_MAP.timeout,
-                  taskTimedOut: true,
-                };
-              }
-              await sleep(5000);
-              return waitStatusChangeOrTimeout(taskid, initialStatus);
-            }
-            throw e;
-          });
-
-        const watchTask = async (taskid, initialStatus = '') => {
-          const {
-            status,
-            statusName,
-            taskTimedOut,
-          } = await waitStatusChangeOrTimeout(taskid, initialStatus);
-
-          tasksMap[taskid].status = status;
-          tasksMap[taskid].taskTimedOut = taskTimedOut;
-          tasksMap[taskid].statusName = statusName;
-          refreshProgress();
-          if ([3, 4].includes(status) || taskTimedOut) {
-            return {
-              status,
-              statusName,
-              taskTimedOut,
-            };
-          }
-          return watchTask(taskid, status);
-        };
+        const watchTask = taskid => new Promise((resolve, reject) => {
+          const tasksDealid = tasksMap[taskid].dealid;
+          let taskState;
+          obsTask(chain.contracts, taskid, { dealid: tasksDealid }).subscribe(
+            {
+              next: ({ task }) => {
+                taskState = task;
+                tasksMap[task.taskid] = { ...tasksMap[task.taskid], ...task };
+                refreshProgress();
+              },
+              error: e => reject(e),
+              complete: () => resolve(taskState),
+            },
+          );
+        });
 
         refreshProgress();
         await Promise.all(tasks.map(taskid => watchTask(taskid)));

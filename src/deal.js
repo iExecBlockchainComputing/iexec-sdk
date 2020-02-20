@@ -135,6 +135,7 @@ const show = async (
       deal.botSize.toString(),
     );
     const enhancedDeal = {
+      dealid: vDealid,
       ...deal,
       finalTime,
       deadlineReached,
