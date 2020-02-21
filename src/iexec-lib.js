@@ -221,9 +221,9 @@ class IExec {
     this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts.chainId, category, options);
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
+    this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.claim = taskid => task.claim(contracts, taskid);
     this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
-    this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     this.network = {};
     this.network.id = contracts.chainId;
