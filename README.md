@@ -12,7 +12,7 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - [CLI tutorials](#cli-tutorials)
 - [CLI documentation](#iexec-sdk-cli-api)
 - [JS lib documentation](#iexec-sdk-library-api)
-- [CHANGELOG](#https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CHANGELOG.md)
+- [CHANGELOG](./CHANGELOG.md)
 - The iExec Dapp Store: https://dapps.iex.ec
 - The iExec Data Store: https://data.iex.ec
 - The iExec Marketplace: https://market.iex.ec
@@ -21,7 +21,7 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - The RLC faucet: https://faucet.iex.ec
 - iExec main documentation: https://docs.iex.ec
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
-- [iExec data registry](https://github.com/iExecBlockchainComputing/iexec-data-registry), to apply for Data Store listing
+- [iExec data registry](https://github.com/iExecBlockchainComputing/iexec-datasets-registry), to apply for Data Store listing
 
 ## Install
 
@@ -200,22 +200,10 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the Marketplace
-iexec orderbook app <address> # find the best apporder on the Marketplace
-iexec orderbook dataset <address> # find the best datasetorder on the Marketplace
-iexec order init --request # reset requestorder fields in iexec.json
-iexec order sign --request # sign your requestorder
-iexec order fill --app <orderHash> --workerpool <orderHash> --dataset <orderHash> # fill orders from the Marketplace with signed request order and get a dealid
+iexec app run [address] [--dataset [address] --params <params> --category <id>] # run an iExec application at market price
 ```
 
-Alternatively you can generate the request on the fly
-
-```bash
-iexec orderbook workerpool --category <id> # find the best workerpoolorder for your category on the Marketplace
-iexec orderbook app <address> # find the best apporder on the Marketplace
-iexec orderbook dataset <address> # find the best datasetorder on the Marketplace
-iexec order fill --app <orderHash> --workerpool <orderHash> --dataset <orderHash> --params <params> # fill orders from the Marketplace with requested params and get a dealid
-```
+see [app run available options](#app-run)
 
 #### Or Buy computation at limit price on the Marketplace
 
@@ -437,8 +425,8 @@ iexec order sign --app --dataset --workerpool --request # sign the specific init
 iexec order publish --app --dataset --workerpool --request # publish the specific signed orders on iExec Marketplace
 iexec order show --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # show the specified published order from iExec Marketplace
 iexec order show --request [orderHash] --deals # show the deals produced by an order
-iexec order fill # fill a set of local signed orders (app + dataset + workerpool + request) and return a dealID
-iexec order fill --app <orderHash> --dataset <orderHash> --workerpool <orderHash> --request <orderHash> # fill a set of signed orders from iExec Marketplace and return a dealID
+iexec order fill # fill a set of local signed orders (app + dataset + workerpool + request) and return a dealid
+iexec order fill --app <orderHash> --dataset <orderHash> --workerpool <orderHash> --request <orderHash> # fill a set of signed orders from iExec Marketplace and return a dealid
 iexec order fill --params <params> # fill a set of signed orders generate a request order with specified params on the fly (existing apporder is ignored)
 iexec order cancel --app --dataset --workerpool --request # cancel a specific signed order
 iexec order unpublish --app [orderHash] --dataset [orderHash] --workerpool [orderHash] --request [orderHash] # unpublish a specific published order from iExec Marketplace (unpublished orders are still valid in the PoCo, to invalidate them use cancel)
@@ -517,7 +505,7 @@ iexec registry validate <'app'|'dataset'|'workerpool'> # validate an object befo
 - [deployed.json](#deployedjson)
 - [.secrets/](#secrets)
   - [.secrets/datasets/](#secretsdatasets)
-  - [.secrets/beneficary/](#secretsbeneficary)
+  - [.secrets/beneficary/](#secretsbeneficiary)
 - [datasets/](#datasets)
   - [datasets/original/](#datasetsoriginal)
   - [datasets/encrypted/](#datasetsencrypted)
@@ -906,14 +894,14 @@ const iexec = new IExec({
 
 - [wallet](#iexecwallet): manage your wallet, send RLC...
 - [account](#iexecaccount): manage your account, deposit, withdraw...
-- [orderbook](#iexecorderboook): explore the iexec Marketplace
+- [orderbook](#iexecorderbook): explore the iexec Marketplace
 - [order](#iexecorder): manage any type of order, make deals to start offchain computation
 - [deal](#iexecdeal): find your deals
 - [task](#iexectask): follow the computation, download results or claim failed executions
 - [app](#iexecapp): deploy a new app, show an existing one
 - [dataset](#iexecdataset): deploy a new dataset, show an existing one
 - [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
-- [network](iexecnetwork): useful information about the chain
+- [network](#iexecnetwork): useful information about the chain
 
 ### iexec.wallet
 
@@ -1632,7 +1620,7 @@ await iexec.task.claim(
 
 #### fetchResults
 
-iexec.**task.claim ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
+iexec.**task.fetchResults ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
 
 > download the specified task result.
 >
@@ -1647,7 +1635,60 @@ const res = await iexec.task.fetchResults(
 const binary = await res.blob();
 ```
 
-#### waitForTaskStatusChange
+#### obsTask
+
+iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observable < **{ subscribe: Function({ next: Function({ message: String, task: Task }), error: Function(Error), complete: Function() }) }** >
+
+> return an observable with subscribe method the task status changes.
+>
+> - next is called with initial status and after every status update
+> - error is called once on error and stops the updates
+> - complete is called once on task completion or timeout/fail
+>
+> _Optional_: specify the dealid of the task, this prevent error to be called when task is not yet initialized (ACTIVE)
+>
+> _messages_:
+>
+> - `TASK_STATUS_UPDATE`: task status changed
+> - `TASK_COMPLETED`: task is completed
+> - `TASK_TIMEOUT`: task timed out
+> - `TASK_FAILED`: task was claimed after timeout
+
+_Example:_
+
+```js
+// log task staus updtates
+const taskObservable = iexec.task.obsTask(
+  '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19',
+);
+
+const unsubscribe = taskObservable.subscribe({
+  next: ({ message, task }) => console.log(message, task.statusName),
+  error: e => console.error(e),
+  complete: () => console.log('final state reached'),
+});
+// call unsubscribe() to unsubscribe from taskObservable
+```
+
+```js
+// wait for task completion
+const waitFinalState = (taskid, dealid) =>
+  new Promise((resolve, reject) => {
+    let taskState;
+    iexec.task.obsTask(taskid, { dealid }).subscribe({
+      next ({task}) => taskState = task,
+      error: e => reject(e),
+      complete: () => resolve(taskState),
+    });
+  });
+
+const task = await waitFinalState(
+  '0x3c0ab2de0cd14de2746d0e1b6ae4ad07659c02f61ca24bffba500b1b2a216d30',
+  '0xbae010aa25684354e5dc9bf01b8dc8a05f36ed549a31a353e02917f62a496a43',
+);
+```
+
+#### waitForTaskStatusChange (deprecated prefer [obsTask](#obstask))
 
 iexec.**task.waitForTaskStatusChange ( taskid: Bytes32, initialStatus: Uint256 )** => Promise < **{ status: Uint256, statusName: String }** >
 
