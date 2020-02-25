@@ -224,7 +224,12 @@ class IExec {
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.claim = taskid => task.claim(contracts, taskid);
     this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
-    this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
+    this.task.waitForTaskStatusChange = (taskid, initialStatus) => {
+      console.warn(
+        '[iexec] task.waitForTaskStatusChange(taskid, initialStatus) is deprecated, please use task.obsTask(taskid, { dealid })',
+      );
+      return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
+    };
     this.network = {};
     this.network.id = contracts.chainId;
     this.network.isSidechain = contracts.isNative;
