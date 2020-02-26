@@ -374,6 +374,9 @@ run
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.id,
           dataset,
+          {
+            app,
+          },
         );
         const order = datasetOrders[0] && datasetOrders[0].order;
         spinner.stop();
