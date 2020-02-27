@@ -1326,6 +1326,7 @@ describe('[observables]', () => {
       new Promise(async (resolve, reject) => {
         unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
+            unsubObsDealBeforeComplete();
             obsDealUnsubBeforeCompleteValues.push(value);
           },
           error: () => reject(
@@ -1338,8 +1339,7 @@ describe('[observables]', () => {
         await sleep(10000);
         resolve();
       }),
-      sleep(3000).then(async () => {
-        unsubObsDealBeforeComplete();
+      sleep(5000).then(async () => {
         await initializeTask(hubAddress, dealid, 5);
         await sleep(1000);
         await initializeTask(hubAddress, dealid, 0);
