@@ -90,9 +90,9 @@ const fetchTaskResults = async (
 };
 
 const obsTaskMessages = {
-  TASK_STATUS_UPDATE: 'TASK_STATUS_UPDATE',
+  TASK_UPDATED: 'TASK_UPDATED',
   TASK_COMPLETED: 'TASK_COMPLETED',
-  TASK_TIMEOUT: 'TASK_TIMEOUT',
+  TASK_TIMEDOUT: 'TASK_TIMEDOUT',
   TASK_FAILED: 'TASK_FAILED',
 };
 
@@ -165,14 +165,14 @@ const obsTask = (
         }
         if (task.taskTimedOut) {
           safeObserver.next({
-            message: obsTaskMessages.TASK_TIMEOUT,
+            message: obsTaskMessages.TASK_TIMEDOUT,
             task,
           });
           safeObserver.complete();
           return;
         }
         safeObserver.next({
-          message: obsTaskMessages.TASK_STATUS_UPDATE,
+          message: obsTaskMessages.TASK_UPDATED,
           task,
         });
         if (!stop) await watchTask(task.status);
@@ -191,7 +191,88 @@ const obsTask = (
   return safeObserver.unsubscribe.bind(safeObserver);
 });
 
+const obsDealMessages = {
+  DEAL_UPDATED: 'DEAL_UPDATED',
+  DEAL_COMPLETED: 'DEAL_COMPLETED',
+  DEAL_TIMEDOUT: 'DEAL_TIMEDOUT',
+};
+
+const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new Observable((observer) => {
+  const safeObserver = new SafeObserver(observer);
+  let taskWatchers = [];
+
+  const startWatch = async () => {
+    try {
+      const deal = await dealModule.show(contracts, dealid);
+      const tasks = Object.entries(deal.tasks).reduce(
+        (acc, [idx, taskid]) => {
+          acc[idx] = { idx, taskid };
+          return acc;
+        },
+        {},
+      );
+
+      const callNext = () => {
+        const tasksCopy = { ...tasks };
+        const tasksArray = Object.values(tasksCopy);
+        if (!tasksArray.find(({ status }) => status === undefined)) {
+          let complete = false;
+          const tasksCount = tasksArray.length;
+          const completedTasksCount = tasksArray.filter(
+            task => task.status === 3,
+          ).length;
+          const failedTasksCount = tasksArray.filter(
+            task => task.taskTimedOut === true,
+          ).length;
+          let message;
+          if (completedTasksCount === tasksCount) {
+            message = obsDealMessages.DEAL_COMPLETED;
+            complete = true;
+          } else if (completedTasksCount + failedTasksCount === tasksCount) {
+            message = obsDealMessages.DEAL_TIMEDOUT;
+            complete = true;
+          } else {
+            message = obsDealMessages.DEAL_UPDATED;
+          }
+          safeObserver.next({
+            message,
+            tasksCount,
+            completedTasksCount,
+            failedTasksCount,
+            deal: { ...deal },
+            tasks: tasksCopy,
+          });
+          if (complete) {
+            safeObserver.complete();
+          }
+        }
+      };
+
+      taskWatchers = Object.entries(tasks).map(([idx, { taskid }]) => obsTask(contracts, taskid, { dealid }).subscribe({
+        next: ({ task }) => {
+          tasks[idx] = { ...tasks[idx], ...task };
+          callNext();
+        },
+        error: (e) => {
+          safeObserver.error(e);
+          taskWatchers.map(unsub => unsub());
+        },
+      }));
+    } catch (e) {
+      safeObserver.error(e);
+    }
+  };
+
+  safeObserver.unsub = () => {
+    // teardown callback
+    taskWatchers.map(unsub => unsub());
+  };
+  startWatch();
+  return safeObserver.unsubscribe.bind(safeObserver);
+});
+
 module.exports = {
   fetchTaskResults,
   obsTask,
+  obsDeal,
 };

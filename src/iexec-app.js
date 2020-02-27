@@ -51,15 +51,13 @@ const {
   NULL_DATASETORDER,
   WORKERPOOL_ORDER,
 } = require('./order');
-const dealModule = require('./deal');
-const { TASK_STATUS_MAP } = require('./task');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
 } = require('./orderbook');
 const { checkBalance } = require('./account');
-const { obsTask } = require('./iexecProcess');
+const { obsDeal } = require('./iexecProcess');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
 const {
@@ -559,73 +557,55 @@ run
         });
       } else {
         spinner.info(`deal submitted with dealid ${dealid}`);
-        const { tasks } = await dealModule.show(chain.contracts, dealid);
-        const tasksMap = Object.entries(tasks).reduce(
-          (acc, [idx, taskid]) => Object.assign({}, acc, {
-            [taskid]: {
-              taskid,
-              dealid,
-              idx,
-              status: 0,
-              statusName: TASK_STATUS_MAP[0],
-            },
-          }),
-          {},
-        );
 
         const renderTaskStatus = tasksStatusMap => pretty(
           Object.entries(tasksStatusMap).map(
-            ([taskid, { idx, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
+            ([idx, { taskid, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
           ),
         );
-        const refreshProgress = () => spinner.start(
-          `Watching tasks execution...${renderTaskStatus(tasksMap)}`,
-        );
 
-        const watchTask = taskid => new Promise((resolve, reject) => {
-          const tasksDealid = tasksMap[taskid].dealid;
-          let taskState;
-          obsTask(chain.contracts, taskid, { dealid: tasksDealid }).subscribe(
-            {
-              next: ({ task }) => {
-                taskState = task;
-                tasksMap[task.taskid] = { ...tasksMap[task.taskid], ...task };
-                refreshProgress();
-              },
-              error: e => reject(e),
-              complete: () => resolve(taskState),
+        const waitDealFinalState = () => new Promise((resolve, reject) => {
+          let dealState;
+          obsDeal(chain.contracts, dealid).subscribe({
+            next: (data) => {
+              dealState = data;
+              spinner.start(
+                `Watching tasks execution...${renderTaskStatus(data.tasks)}`,
+              );
             },
-          );
+            error: reject,
+            complete: () => resolve(dealState),
+          });
         });
 
-        refreshProgress();
-        await Promise.all(tasks.map(taskid => watchTask(taskid)));
+        const dealFinalState = await waitDealFinalState();
 
-        const tasksArray = Object.entries(tasksMap).map(
-          ([taskid, taskObj]) => ({
-            taskid,
-            idx: taskObj.idx,
-            dealid: taskObj.dealid,
-            status: taskObj.status,
-            statusName: taskObj.statusName,
-            taskTimedOut: taskObj.taskTimedOut,
-          }),
-        );
+        const tasksArray = Object.values(dealFinalState.tasks).map(task => ({
+          taskid: task.taskid,
+          idx: task.idx,
+          dealid: task.dealid,
+          status: task.status,
+          statusName: task.statusName,
+          taskTimedOut: task.taskTimedOut,
+        }));
         result.tasks = tasksArray;
         const failedTasks = tasksArray.reduce(
           (acc, curr) => (curr.status !== 3 ? [...acc, curr] : acc),
           [],
         );
         if (failedTasks.length === 0) {
-          spinner.succeed(`App run successful:${renderTaskStatus(tasksMap)}`, {
-            raw: result,
-          });
+          spinner.succeed(
+            `App run successful:${renderTaskStatus(dealFinalState.tasks)}`,
+            {
+              raw: result,
+            },
+          );
         } else {
           result.failedTasks = failedTasks;
           spinner.fail(
             `App run failed (${
               failedTasks.length
-            } tasks failed):${renderTaskStatus(tasksMap)}`,
+            } tasks failed):${renderTaskStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },

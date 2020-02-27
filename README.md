@@ -1531,6 +1531,41 @@ const deal = await iexec.deal.show(
 console.log('deal:', deal);
 ```
 
+#### obsDeal
+
+iexec.**deal.obsDeal ( dealid: Bytes32 )** => Observable < **{ subscribe: Function({ next: Function({ message: String, tasksCount: Int, completedTasksCount: Int, failedTasksCount: Int, deal: Deal, tasks: { ...\[ {\[idx\]: task ] }\] } }), error: Function(Error), complete: Function() }) }** >
+
+> return an observable with subscribe method to monitor the deal status changes.
+>
+> - next is called with initial status and after every task status update
+> - error is called once on error and stops the updates
+> - complete is called once on task completion or timeout/fail
+>
+> _messages_:
+>
+> - `DEAL_UPDATED`: deal status changed (task updated)
+> - `DEAL_COMPLETED`: all tasks are completed
+> - `DEAL_TIMEDOUT`: deal timed out before all tasks completion
+
+_Example:_
+
+```js
+const dealObservable = iexec.deal.obsDeal(
+  '0xbae010aa25684354e5dc9bf01b8dc8a05f36ed549a31a353e02917f62a496a43',
+);
+
+const unsubscribe = dealObservable.subscribe({
+  next: data =>
+    console.log(
+      data.message,
+      `completed tasks ${data.completedTasksCount}/${data.tasksCount}`,
+    ),
+  error: e => console.error(e),
+  complete: () => console.log('final state reached'),
+});
+// call unsubscribe() to unsubscribe from dealObservable
+```
+
 #### computeTaskId
 
 iexec.**deal.computeTaskId ( dealid: Bytes32, taskIdx: Uint256 )** => Promise < **taskid: Bytes32** >
@@ -1639,7 +1674,7 @@ const binary = await res.blob();
 
 iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observable < **{ subscribe: Function({ next: Function({ message: String, task: Task }), error: Function(Error), complete: Function() }) }** >
 
-> return an observable with subscribe method the task status changes.
+> return an observable with subscribe method to monitor the task status changes.
 >
 > - next is called with initial status and after every status update
 > - error is called once on error and stops the updates
@@ -1649,15 +1684,15 @@ iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observab
 >
 > _messages_:
 >
-> - `TASK_STATUS_UPDATE`: task status changed
+> - `TASK_UPDATED`: task status changed
 > - `TASK_COMPLETED`: task is completed
-> - `TASK_TIMEOUT`: task timed out
+> - `TASK_TIMEDOUT`: task timed out
 > - `TASK_FAILED`: task was claimed after timeout
 
 _Example:_
 
 ```js
-// log task staus updtates
+// log task updtates
 const taskObservable = iexec.task.obsTask(
   '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19',
 );

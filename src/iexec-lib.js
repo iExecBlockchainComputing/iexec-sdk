@@ -124,6 +124,7 @@ class IExec {
     this.hub.getTimeoutRatio = () => hub.getTimeoutRatio(contracts);
     this.deal = {};
     this.deal.show = dealid => deal.show(contracts, dealid);
+    this.deal.obsDeal = dealid => iexecProcess.obsDeal(contracts, dealid);
     this.deal.computeTaskId = (dealid, taskIdx) => deal.computeTaskId(dealid, taskIdx);
     this.deal.fetchRequesterDeals = (
       requesterAddress,
