@@ -1278,7 +1278,7 @@ describe('[observables]', () => {
         isNative: false,
       },
     );
-    const catid = await createCategory(iexec, { workClockTimeRef: 1 });
+    const catid = await createCategory(iexec, { workClockTimeRef: 2 });
     const apporder = await deployAndGetApporder(iexec, { volume: 10 });
     const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
       category: catid,
@@ -1341,6 +1341,7 @@ describe('[observables]', () => {
       sleep(3000).then(async () => {
         unsubObsDealBeforeComplete();
         await initializeTask(hubAddress, dealid, 5);
+        await sleep(1000);
         await initializeTask(hubAddress, dealid, 0);
         await sleep(6000);
       }),
@@ -1444,7 +1445,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
-  }, 30000);
+  }, 50000);
 });
 
 describe('[lib utils]', () => {
