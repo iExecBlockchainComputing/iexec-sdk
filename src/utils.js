@@ -389,6 +389,7 @@ const sumTags = (tagArray) => {
 };
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
+const FETCH_INTERVAL = 5000;
 
 module.exports = {
   BN,
@@ -425,4 +426,5 @@ module.exports = {
   sumTags,
   bytes32Regex,
   sleep,
+  FETCH_INTERVAL,
 };

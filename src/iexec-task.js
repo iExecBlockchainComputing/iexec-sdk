@@ -21,7 +21,9 @@ const {
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const { stringifyNestedBn } = require('./utils');
-const task = require('./task');
+const taskModule = require('./task');
+const { obsTask } = require('./iexecProcess');
+const { fetchTaskResults } = require('./iexecProcess');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -52,35 +54,33 @@ show
       debug('cmd.watch', cmd.watch);
       debug('cmd.download', cmd.download);
 
-      if (cmd.watch) {
-        const waitFinalStatus = async (initialStatus = '') => {
-          spinner.start(info.watching(objName));
-          const {
-            status,
-            statusName,
-            taskTimedOut,
-          } = await task.waitForTaskStatusChange(
-            chain.contracts,
-            taskid,
-            initialStatus,
-          );
-          spinner.info(`Task status ${statusName}`);
-          if ([3, 4].includes(status) || taskTimedOut) {
-            return { status, statusName, taskTimedOut };
-          }
-          return waitFinalStatus(status);
-        };
-        await waitFinalStatus();
-      }
-
       spinner.start(info.showing(objName));
-      const taskResult = await task.show(chain.contracts, taskid);
 
+      let taskFinalState;
+      if (cmd.watch) {
+        taskFinalState = await new Promise((resolve, reject) => {
+          let taskState;
+          obsTask(chain.contracts, taskid).subscribe({
+            next: ({ task }) => {
+              taskState = task;
+              spinner.start(
+                `${info.showing(objName)}\nTask status ${task.statusName}`,
+              );
+            },
+            error: e => reject(e),
+            complete: () => {
+              resolve(taskState);
+            },
+          });
+        });
+      }
+      const taskResult = taskFinalState || (await taskModule.show(chain.contracts, taskid));
+      spinner.info(`Task status ${taskResult.statusName}`);
       let resultPath;
       if (cmd.download) {
         if (taskResult.status === 3) {
           spinner.start(info.downloading());
-          const { body } = await task.fetchResults(chain.contracts, taskid, {
+          const { body } = await fetchTaskResults(chain.contracts, taskid, {
             ipfsGatewayURL: chain.ipfsGateway,
           });
           const resultFileName = cmd.download !== true ? cmd.download : taskid;
@@ -139,7 +139,7 @@ claim
         keystore.load(),
       ]);
       spinner.start(info.claiming(objName));
-      const txHash = await task.claim(chain.contracts, taskid);
+      const txHash = await taskModule.claim(chain.contracts, taskid);
       spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);

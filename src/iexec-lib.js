@@ -6,6 +6,7 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
+const iexecProcess = require('./iexecProcess');
 const errors = require('./errors');
 const {
   BN,
@@ -123,6 +124,7 @@ class IExec {
     this.hub.getTimeoutRatio = () => hub.getTimeoutRatio(contracts);
     this.deal = {};
     this.deal.show = dealid => deal.show(contracts, dealid);
+    this.deal.obsDeal = dealid => iexecProcess.obsDeal(contracts, dealid);
     this.deal.computeTaskId = (dealid, taskIdx) => deal.computeTaskId(dealid, taskIdx);
     this.deal.fetchRequesterDeals = (
       requesterAddress,
@@ -220,9 +222,15 @@ class IExec {
     this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts.chainId, category, options);
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
+    this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.claim = taskid => task.claim(contracts, taskid);
-    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => task.fetchResults(contracts, taskid, { ipfsGatewayURL });
-    this.task.waitForTaskStatusChange = (taskid, initialStatus) => task.waitForTaskStatusChange(contracts, taskid, initialStatus);
+    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
+    this.task.waitForTaskStatusChange = (taskid, initialStatus) => {
+      console.warn(
+        '[iexec] task.waitForTaskStatusChange(taskid, initialStatus) is deprecated, please use task.obsTask(taskid, { dealid })',
+      );
+      return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
+    };
     this.network = {};
     this.network.id = contracts.chainId;
     this.network.isSidechain = contracts.isNative;

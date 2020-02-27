@@ -1,17 +1,13 @@
 const Debug = require('debug');
 const { Buffer } = require('buffer');
-const deal = require('./deal');
 const {
   checkEvent,
   bnifyNestedEthersBn,
   cleanRPC,
-  getAuthorization,
-  download,
-  NULL_ADDRESS,
   NULL_BYTES32,
   sleep,
+  FETCH_INTERVAL,
 } = require('./utils');
-const { getAddress } = require('./wallet');
 const { bytes32Schema, uint256Schema, throwIfMissing } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
@@ -27,7 +23,6 @@ const TASK_STATUS_MAP = {
   4: 'FAILED',
   timeout: 'TIMEOUT',
 };
-const FETCH_INTERVAL = 5000;
 
 const show = async (
   contracts = throwIfMissing(),
@@ -55,20 +50,16 @@ const show = async (
         || decodedResult.substr(0, 4) === 'http')
       ? decodedResult
       : task.results;
-    return Object.assign(
-      {},
-      task,
-      {
-        statusName:
-          task.status < 3 && taskTimedOut
-            ? TASK_STATUS_MAP.timeout
-            : TASK_STATUS_MAP[task.status],
-      },
-      { taskTimedOut },
-      {
-        results: displayResult,
-      },
-    );
+    return {
+      taskid: vTaskId,
+      ...task,
+      statusName:
+        task.status < 3 && taskTimedOut
+          ? TASK_STATUS_MAP.timeout
+          : TASK_STATUS_MAP[task.status],
+      taskTimedOut,
+      results: displayResult,
+    };
   } catch (error) {
     debug('show()', error);
     throw error;
@@ -84,93 +75,13 @@ const waitForTaskStatusChange = async (
     const vTaskId = await bytes32Schema().validate(taskid);
     const vPrevStatus = await uint256Schema().validate(prevStatus);
     const task = await show(contracts, vTaskId);
-    const taskStatusName = task.taskTimedOut
-      ? TASK_STATUS_MAP.timeout
-      : TASK_STATUS_MAP[task.status];
     if (task.status.toString() !== vPrevStatus || task.taskTimedOut) {
-      return {
-        status: task.status,
-        statusName: taskStatusName,
-        taskTimedOut: task.taskTimedOut,
-      };
+      return task;
     }
     await sleep(FETCH_INTERVAL);
     return waitForTaskStatusChange(contracts, vTaskId, task.status);
   } catch (error) {
     debug('waitForTaskStatusChange()', error);
-    throw error;
-  }
-};
-
-const downloadFromIpfs = async (
-  ipfsAddress,
-  { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
-) => {
-  try {
-    debug(
-      'downloadFromIpfs()',
-      'ipfsGatewayURL',
-      ipfsGatewayURL,
-      'ipfsAddress',
-      ipfsAddress,
-    );
-    const res = await download('GET')(ipfsAddress, {}, {}, ipfsGatewayURL);
-    return res;
-  } catch (error) {
-    throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
-  }
-};
-
-const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
-  const resultRepoBaseURL = task.results.split(`${taskid}`)[0];
-  const authorization = await getAuthorization(
-    contracts.chainId,
-    userAddress,
-    contracts.jsonRpcProvider,
-    { apiUrl: resultRepoBaseURL },
-  );
-  const res = await download('GET')(
-    taskid,
-    { chainId: contracts.chainId },
-    { authorization },
-    resultRepoBaseURL,
-  );
-  return res;
-};
-
-const fetchResults = async (
-  contracts = throwIfMissing(),
-  taskid = throwIfMissing(),
-  { ipfsGatewayURL } = {},
-) => {
-  try {
-    const vTaskId = await bytes32Schema().validate(taskid);
-    const userAddress = await getAddress(contracts);
-    const task = await show(contracts, vTaskId);
-    if (task.status !== 3) throw Error('Task is not completed');
-    const tasksDeal = await deal.show(contracts, task.dealid);
-    if (
-      userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
-      && NULL_ADDRESS !== tasksDeal.beneficiary.toLowerCase()
-    ) {
-      throw Error(
-        `Only beneficiary ${tasksDeal.beneficiary} can download the result`,
-      );
-    }
-    const resultAddress = task.results;
-    let res;
-    if (resultAddress && resultAddress.substr(0, 6) === '/ipfs/') {
-      debug('download from ipfs', resultAddress);
-      res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
-    } else if (resultAddress && resultAddress.substr(0, 2) !== '0x') {
-      debug('download from result repo', resultAddress);
-      res = await downloadFromResultRepo(contracts, vTaskId, task, userAddress);
-    } else {
-      throw Error('No result uploaded for this task');
-    }
-    return res;
-  } catch (error) {
-    debug('fetchResults()', error);
     throw error;
   }
 };
@@ -191,8 +102,6 @@ const claim = async (
         }`,
       );
     }
-    const tasksDeal = await deal.show(contracts, task.dealid);
-    debug('tasksDeal', tasksDeal);
 
     if (!task.taskTimedOut) {
       throw Error(
@@ -220,7 +129,6 @@ const claim = async (
 module.exports = {
   TASK_STATUS_MAP,
   show,
-  fetchResults,
   waitForTaskStatusChange,
   claim,
 };

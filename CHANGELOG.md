@@ -9,10 +9,13 @@ All notable changes to this project will be documented in this file.
 - `orderbook.fetchAppOrderbook` and `iexec orderbook app <address>` optional filters (dataset, workerpool, requester)
 - `orderbook.fetchDatasetOrderbook` and `iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
 - `utils.sumTags([...Bytes32])` added to JS lib
+- `task.obsTask(taskid, { dealid })` observable for task status
+- `deal.obsDeal(dealid)` observable for deal status
 
 ### Changed
 
 - fix `iexec order show --raw` output
+- `task.waitForTaskStatusChange(taskid, initialStatus)` is deprecated prefer `task.obsTask(taskid)`
 
 ### Removed
 
