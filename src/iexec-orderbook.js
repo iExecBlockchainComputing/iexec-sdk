@@ -23,6 +23,9 @@ const orderbookApp = cli.command('app <address>');
 addGlobalOptions(orderbookApp);
 orderbookApp
   .option(...option.chain())
+  .option(...option.orderbookDataset())
+  .option(...option.orderbookWorkerpool())
+  .option(...option.orderbookRequester())
   .description(desc.showObj('app orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -31,10 +34,18 @@ orderbookApp
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
         spinner,
       });
+      const { dataset, workerpool, requester } = cmd;
       if (address) isEthAddress(address, { strict: true });
+      if (dataset) isEthAddress(dataset, { strict: true });
+      if (workerpool) isEthAddress(workerpool, { strict: true });
+      if (requester) isEthAddress(requester, { strict: true });
 
       spinner.start(info.showing(objName));
-      const response = await orderbook.fetchAppOrderbook(chain.id, address);
+      const response = await orderbook.fetchAppOrderbook(
+        chain.id,
+        address,
+        Object.assign({}, { dataset }, { workerpool }, { requester }),
+      );
       const appOrders = response.appOrders
         ? response.appOrders.map(e => ({
           orderHash: e.orderHash,
@@ -64,6 +75,9 @@ const orderbookDataset = cli.command('dataset <address>');
 addGlobalOptions(orderbookDataset);
 orderbookDataset
   .option(...option.chain())
+  .option(...option.orderbookApp())
+  .option(...option.orderbookWorkerpool())
+  .option(...option.orderbookRequester())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -72,10 +86,18 @@ orderbookDataset
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
         spinner,
       });
+      const { app, workerpool, requester } = cmd;
       if (address) isEthAddress(address, { strict: true });
+      if (app) isEthAddress(app, { strict: true });
+      if (workerpool) isEthAddress(workerpool, { strict: true });
+      if (requester) isEthAddress(requester, { strict: true });
 
       spinner.start(info.showing(objName));
-      const response = await orderbook.fetchDatasetOrderbook(chain.id, address);
+      const response = await orderbook.fetchDatasetOrderbook(
+        chain.id,
+        address,
+        Object.assign({}, { app }, { workerpool }, { requester }),
+      );
       const datasetOrders = response.datasetOrders
         ? response.datasetOrders.map(e => ({
           orderHash: e.orderHash,

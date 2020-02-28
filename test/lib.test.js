@@ -1,6 +1,7 @@
 const ethers = require('ethers');
 const BN = require('bn.js');
 const { utils, IExec, errors } = require('../src/iexec-lib');
+const { sleep } = require('../src/utils');
 
 console.log('Node version:', process.version);
 
@@ -63,6 +64,143 @@ const initializeTask = async (hub, dealid, idx) => {
   );
   const initTx = await hubContract.initialize(dealid, idx);
   await initTx.wait();
+};
+
+const deployAndGetApporder = async (
+  iexec,
+  {
+    appprice = 0,
+    volume = 1,
+    datasetrestrict,
+    workerpoolrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const address = await iexec.wallet.getAddress();
+  const appDeployRes = await iexec.app.deployApp({
+    owner: address,
+    name: 'My app',
+    type: 'DOCKER',
+    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+    checksum:
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    mrenclave: 'abc|123|test',
+  });
+  const app = appDeployRes.address;
+  const apporder = await iexec.order
+    .createApporder({
+      app,
+      appprice,
+      volume,
+      tag,
+      datasetrestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+    })
+    .then(iexec.order.signApporder);
+  return apporder;
+};
+
+const deployAndGetDatasetorder = async (
+  iexec,
+  {
+    datasetprice = 0,
+    volume = 1,
+    apprestrict,
+    workerpoolrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const address = await iexec.wallet.getAddress();
+  const datasetDeployRes = await iexec.dataset.deployDataset({
+    owner: address,
+    name: 'My dataset',
+    multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    checksum:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+  });
+  const dataset = datasetDeployRes.address;
+  const datasetorder = await iexec.order
+    .createDatasetorder({
+      dataset,
+      datasetprice,
+      volume,
+      tag,
+      apprestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+    })
+    .then(iexec.order.signDatasetorder);
+  return datasetorder;
+};
+
+const deployAndGetWorkerpoolorder = async (
+  iexec,
+  {
+    category = 0,
+    workerpoolprice = 0,
+    volume = 1,
+    trust,
+    apprestrict,
+    datasetrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const address = await iexec.wallet.getAddress();
+  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
+    owner: address,
+    description: 'My workerpool',
+  });
+  const workerpool = workerpoolDeployRes.address;
+  const workerpoolorder = await iexec.order
+    .createWorkerpoolorder({
+      workerpool,
+      workerpoolprice,
+      volume,
+      category,
+      trust,
+      tag,
+      apprestrict,
+      datasetrestrict,
+      requesterrestrict,
+    })
+    .then(iexec.order.signWorkerpoolorder);
+  return workerpoolorder;
+};
+
+const getMatchableRequestorder = async (
+  iexec,
+  { apporder, datasetorder, workerpoolorder } = {},
+) => {
+  const address = await iexec.wallet.getAddress();
+  const requestorder = await iexec.order
+    .createRequestorder({
+      requester: address,
+      app: apporder.app,
+      appmaxprice: apporder.appprice,
+      dataset: datasetorder ? datasetorder.dataset : utils.NULL_ADDRESS,
+      datasetmaxprice: datasetorder ? datasetorder.datasetprice : 0,
+      workerpool: workerpoolorder.workerpool,
+      workerpoolmaxprice: workerpoolorder.workerpoolprice,
+      category: workerpoolorder.category,
+      trust: workerpoolorder.trust,
+      volume: workerpoolorder.volume,
+    })
+    .then(iexec.order.signRequestorder);
+  return requestorder;
+};
+
+const createCategory = async (iexec, { workClockTimeRef = 0 } = {}) => {
+  const res = await iexec.hub.createCategory({
+    name: 'custom',
+    description: 'desc',
+    workClockTimeRef,
+  });
+  const catid = res.catid.toString();
+  return catid;
 };
 
 // TESTS
@@ -693,94 +831,749 @@ describe('[getSignerFromPrivateKey]', () => {
   }, 20000);
 });
 
-describe('[lib utils]', () => {
-  test("parseEth('4.2')", () => {
-    const res = utils.parseEth('4.2');
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
-  });
-  test('parseEth(4.2)', () => {
-    const res = utils.parseEth(4.2);
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000000000000'))).toBe(true);
-  });
-  test('parseEth(new BN(42))', () => {
-    const res = utils.parseEth(new BN(42));
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('42000000000000000000'))).toBe(true);
-  });
-  test("parseRLC('4.2')", () => {
-    const res = utils.parseRLC('4.2');
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000'))).toBe(true);
-  });
-  test('parseRLC(4.2)', () => {
-    const res = utils.parseRLC(4.2);
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('4200000000'))).toBe(true);
-  });
-  test('parseRLC(new BN(42))', () => {
-    const res = utils.parseRLC(new BN(42));
-    expect(res instanceof BN).toBe(true);
-    expect(res.eq(new BN('42000000000'))).toBe(true);
-  });
-  test("formatEth('4200000000000000000')", () => {
-    const res = utils.formatEth('4200000000000000000');
-    expect(res).toBe('4.2');
-  });
-  test('formatEth(42)', () => {
-    const res = utils.formatEth(42);
-    expect(res).toBe('0.000000000000000042');
-  });
-  test("formatEth(new BN('4200000000000000000'))", () => {
-    const res = utils.formatEth(new BN('4200000000000000000'));
-    expect(res).toBe('4.2');
-  });
-  test("formatRLC('4200000000000000000')", () => {
-    const res = utils.formatRLC('4200000000000000000');
-    expect(res).toBe('4200000000');
-  });
-  test('formatRLC(42)', () => {
-    const res = utils.formatRLC(42);
-    expect(res).toBe('0.000000042');
-  });
-  test("formatRLC(new BN('4200000000000000000'))", () => {
-    const res = utils.formatRLC(new BN('4200000000000000000'));
-    expect(res).toBe('4200000000');
-  });
-  test("encodeTag(['tee'])", () => {
-    expect(utils.encodeTag(['tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000001',
+describe('[observables]', () => {
+  test('task.obsTask', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
     );
-  });
-  test("encodeTag(['gpu'])", () => {
-    expect(utils.encodeTag(['gpu'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000100',
+    const catid = await createCategory(iexec, { workClockTimeRef: 10 });
+    const apporder = await deployAndGetApporder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders({
+      apporder,
+      workerpoolorder,
+      requestorder,
+    });
+    const { tasks } = await iexec.deal.show(dealid);
+    const taskid = tasks[0];
+
+    const obsTaskWithDealidValues = [];
+    const obsTaskUnsubBeforeNextValues = [];
+    const obsTaskAfterInitValues = [];
+
+    let unsubObsTaskWithDealid;
+    let unsubObsTaskBeforeNext;
+    let unsubObsTaskAfterInit;
+
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        unsubObsTaskWithDealid = iexec.task
+          .obsTask(taskid, { dealid })
+          .subscribe({
+            next: (value) => {
+              obsTaskWithDealidValues.push(value);
+            },
+            error: () => reject(Error('obsTask with dealid should not call error')),
+            complete: () => reject(Error('obsTask with dealid should not call complete')),
+          });
+      }),
+      new Promise(async (resolve, reject) => {
+        unsubObsTaskBeforeNext = iexec.task
+          .obsTask(taskid, { dealid })
+          .subscribe({
+            next: (value) => {
+              obsTaskUnsubBeforeNextValues.push(value);
+              try {
+                unsubObsTaskBeforeNext();
+              } catch (e) {
+                reject(e);
+              }
+            },
+            error: () => reject(Error('obsTask unsub before next should not call error')),
+            complete: () => reject(
+              Error('obsTask unsub before next should not call complete'),
+            ),
+          });
+        await sleep(10000);
+      }),
+      new Promise(async (resolve, reject) => {
+        await sleep(5000);
+        unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
+          next: (value) => {
+            obsTaskAfterInitValues.push(value);
+          },
+          error: () => reject(Error('obsTask after init should not call error')),
+          complete: () => reject(Error('obsTask after init should not call complete')),
+        });
+      }),
+      sleep(1000).then(async () => {
+        await initializeTask(hubAddress, dealid, 0);
+        await sleep(6000);
+      }),
+    ]);
+
+    expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
+    expect(unsubObsTaskBeforeNext).toBeInstanceOf(Function);
+    expect(unsubObsTaskAfterInit).toBeInstanceOf(Function);
+
+    unsubObsTaskWithDealid();
+    unsubObsTaskAfterInit();
+
+    expect(obsTaskWithDealidValues.length).toBe(2);
+
+    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
+    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
+    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskUnsubBeforeNextValues.length).toBe(1);
+
+    expect(obsTaskUnsubBeforeNextValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskUnsubBeforeNextValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskUnsubBeforeNextValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskUnsubBeforeNextValues[0].task.status).toBe(0);
+    expect(obsTaskUnsubBeforeNextValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskUnsubBeforeNextValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskAfterInitValues.length).toBe(1);
+
+    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
+    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
+  }, 30000);
+
+  test('task.obsTask (task timeout)', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
     );
-  });
-  test("encodeTag(['gpu','tee'])", () => {
-    expect(utils.encodeTag(['gpu', 'tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    const catid = await createCategory(iexec, { workClockTimeRef: 1 });
+    const apporder = await deployAndGetApporder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders({
+      apporder,
+      workerpoolorder,
+      requestorder,
+    });
+    const { tasks } = await iexec.deal.show(dealid);
+    const taskid = tasks[0];
+
+    const obsTaskWithDealidValues = [];
+    const obsTaskWithWrongDealidValues = [];
+    const obsTaskBeforeInitValues = [];
+    const obsTaskAfterInitValues = [];
+    const obsTaskUnsubBeforeCompleteValues = [];
+
+    let unsubObsTaskBeforeComplete;
+
+    const [
+      obsTaskWithDealidComplete,
+      obsTaskWithWrongDealidError,
+      obsTaskBeforeInitError,
+      obsTaskAfterInitComplete,
+    ] = await Promise.all([
+      new Promise((resolve, reject) => {
+        iexec.task.obsTask(taskid, { dealid }).subscribe({
+          next: (value) => {
+            obsTaskWithDealidValues.push(value);
+          },
+          error: () => reject(Error('obsTask with dealid should not call error')),
+          complete: resolve,
+        });
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task.obsTask(taskid, { dealid: utils.NULL_BYTES32 }).subscribe({
+          next: (value) => {
+            obsTaskWithWrongDealidValues.push(value);
+          },
+          error: resolve,
+          complete: () => reject(Error('obsTask with wrong dealid should not call complete')),
+        });
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task.obsTask(taskid).subscribe({
+          next: (value) => {
+            obsTaskBeforeInitValues.push(value);
+          },
+          error: resolve,
+          complete: () => reject(Error('obsTask before init should not call complete')),
+        });
+      }),
+      new Promise(async (resolve, reject) => {
+        await sleep(5000);
+        iexec.task.obsTask(taskid).subscribe({
+          next: (value) => {
+            obsTaskAfterInitValues.push(value);
+          },
+          error: () => reject(Error('obsTask after init should not call error')),
+          complete: resolve,
+        });
+      }),
+      new Promise(async (resolve, reject) => {
+        unsubObsTaskBeforeComplete = iexec.task
+          .obsTask(taskid, { dealid })
+          .subscribe({
+            next: (value) => {
+              obsTaskUnsubBeforeCompleteValues.push(value);
+            },
+            error: () => reject(Error('obsTask unsubscribed should nol call complete')),
+            complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
+          });
+        await sleep(1000);
+        resolve();
+      }),
+      sleep(1000).then(() => {
+        unsubObsTaskBeforeComplete();
+        initializeTask(hubAddress, dealid, 0);
+      }),
+    ]);
+
+    expect(obsTaskWithDealidComplete).toBeUndefined();
+    expect(obsTaskWithWrongDealidError).toEqual(
+      new errors.ObjectNotFoundError('deal', utils.NULL_BYTES32, networkId),
     );
-  });
-  test("encodeTag(['gpu','tee','gpu','tee'])", () => {
-    expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    expect(obsTaskBeforeInitError).toEqual(
+      new errors.ObjectNotFoundError('task', taskid, networkId),
     );
-  });
-  test('encodeTag unknown tag', () => {
-    expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
-  });
-  test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
+    expect(obsTaskAfterInitComplete).toBeUndefined();
+
+    expect(obsTaskWithDealidValues.length).toBe(3);
+
+    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
+    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
+    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[2].message).toBe('TASK_TIMEDOUT');
+    expect(obsTaskWithDealidValues[2].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[2].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[2].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[2].task.statusName).toBe('TIMEOUT');
+    expect(obsTaskWithDealidValues[2].task.taskTimedOut).toBe(true);
+
+    expect(obsTaskWithWrongDealidValues.length).toBe(0);
+
+    expect(obsTaskBeforeInitValues.length).toBe(0);
+
+    expect(obsTaskAfterInitValues.length).toBe(2);
+
+    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
+    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskAfterInitValues[1].message).toBe('TASK_TIMEDOUT');
+    expect(obsTaskAfterInitValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[1].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[1].task.statusName).toBe('TIMEOUT');
+    expect(obsTaskAfterInitValues[1].task.taskTimedOut).toBe(true);
+
+    expect(obsTaskUnsubBeforeCompleteValues.length).toBe(1);
+
+    expect(obsTaskUnsubBeforeCompleteValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
+  }, 30000);
+
+  test('deal.obsDeal', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const catid = await createCategory(iexec, { workClockTimeRef: 10 });
+    const apporder = await deployAndGetApporder(iexec, { volume: 10 });
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+      volume: 10,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders({
+      apporder,
+      workerpoolorder,
+      requestorder,
+    });
+
+    const obsDealValues = [];
+    const obsDealUnsubBeforeNextValues = [];
+
+    let unsubObsDeal;
+    let unsubObsDealBeforeNext;
+
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        unsubObsDeal = iexec.deal.obsDeal(dealid).subscribe({
+          next: (value) => {
+            obsDealValues.push(value);
+          },
+          error: () => reject(Error('obsDeal should not call error')),
+          complete: () => reject(Error('obsDeal should not call complete')),
+        });
+      }),
+      new Promise(async (resolve, reject) => {
+        unsubObsDealBeforeNext = iexec.deal.obsDeal(dealid).subscribe({
+          next: (value) => {
+            obsDealUnsubBeforeNextValues.push(value);
+            try {
+              unsubObsDealBeforeNext();
+            } catch (e) {
+              reject(e);
+            }
+          },
+          error: () => reject(Error('obsDeal unsub before next should not call error')),
+          complete: () => reject(Error('obsDeal unsub before next should not call complete')),
+        });
+        await sleep(10000);
+      }),
+      sleep(1000).then(async () => {
+        await initializeTask(hubAddress, dealid, 5);
+        await sleep(6000);
+        await initializeTask(hubAddress, dealid, 0);
+        await sleep(6000);
+      }),
+    ]);
+
+    expect(unsubObsDeal).toBeInstanceOf(Function);
+    expect(unsubObsDealBeforeNext).toBeInstanceOf(Function);
+
+    unsubObsDeal();
+
+    expect(obsDealValues.length).toBe(3);
+
+    expect(obsDealValues[0].message).toBe('DEAL_UPDATED');
+    expect(obsDealValues[0].tasksCount).toBe(10);
+    expect(obsDealValues[0].completedTasksCount).toBe(0);
+    expect(obsDealValues[0].failedTasksCount).toBe(0);
+    expect(obsDealValues[0].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealValues[0].tasks).length).toBe(10);
+    expect(obsDealValues[0].tasks[0].status).toBe(0);
+    expect(obsDealValues[0].tasks[1].status).toBe(0);
+    expect(obsDealValues[0].tasks[2].status).toBe(0);
+    expect(obsDealValues[0].tasks[3].status).toBe(0);
+    expect(obsDealValues[0].tasks[4].status).toBe(0);
+    expect(obsDealValues[0].tasks[5].status).toBe(0);
+    expect(obsDealValues[0].tasks[6].status).toBe(0);
+    expect(obsDealValues[0].tasks[7].status).toBe(0);
+    expect(obsDealValues[0].tasks[8].status).toBe(0);
+    expect(obsDealValues[0].tasks[9].status).toBe(0);
+
+    expect(obsDealValues[1].message).toBe('DEAL_UPDATED');
+    expect(obsDealValues[1].tasksCount).toBe(10);
+    expect(obsDealValues[1].completedTasksCount).toBe(0);
+    expect(obsDealValues[1].failedTasksCount).toBe(0);
+    expect(obsDealValues[1].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealValues[1].tasks).length).toBe(10);
+    expect(obsDealValues[1].tasks[0].status).toBe(0);
+    expect(obsDealValues[1].tasks[1].status).toBe(0);
+    expect(obsDealValues[1].tasks[2].status).toBe(0);
+    expect(obsDealValues[1].tasks[3].status).toBe(0);
+    expect(obsDealValues[1].tasks[4].status).toBe(0);
+    expect(obsDealValues[1].tasks[5].status).toBe(1);
+    expect(obsDealValues[1].tasks[6].status).toBe(0);
+    expect(obsDealValues[1].tasks[7].status).toBe(0);
+    expect(obsDealValues[1].tasks[8].status).toBe(0);
+    expect(obsDealValues[1].tasks[9].status).toBe(0);
+
+    expect(obsDealValues[2].message).toBe('DEAL_UPDATED');
+    expect(obsDealValues[2].tasksCount).toBe(10);
+    expect(obsDealValues[2].completedTasksCount).toBe(0);
+    expect(obsDealValues[2].failedTasksCount).toBe(0);
+    expect(obsDealValues[2].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealValues[2].tasks).length).toBe(10);
+    expect(obsDealValues[2].tasks[0].status).toBe(1);
+    expect(obsDealValues[2].tasks[1].status).toBe(0);
+    expect(obsDealValues[2].tasks[2].status).toBe(0);
+    expect(obsDealValues[2].tasks[3].status).toBe(0);
+    expect(obsDealValues[2].tasks[4].status).toBe(0);
+    expect(obsDealValues[2].tasks[5].status).toBe(1);
+    expect(obsDealValues[2].tasks[6].status).toBe(0);
+    expect(obsDealValues[2].tasks[7].status).toBe(0);
+    expect(obsDealValues[2].tasks[8].status).toBe(0);
+    expect(obsDealValues[2].tasks[9].status).toBe(0);
+
+    expect(obsDealUnsubBeforeNextValues.length).toBe(1);
+
+    expect(obsDealUnsubBeforeNextValues[0].message).toBe('DEAL_UPDATED');
+    expect(obsDealUnsubBeforeNextValues[0].tasksCount).toBe(10);
+    expect(obsDealUnsubBeforeNextValues[0].completedTasksCount).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].failedTasksCount).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealUnsubBeforeNextValues[0].tasks).length).toBe(
+      10,
+    );
+    expect(obsDealUnsubBeforeNextValues[0].tasks[0].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[1].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[2].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[3].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[4].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[5].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[6].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[7].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[8].status).toBe(0);
+    expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
+  }, 30000);
+
+  test('deal.obsDeal (deal timeout)', async () => {
+    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const catid = await createCategory(iexec, { workClockTimeRef: 2 });
+    const apporder = await deployAndGetApporder(iexec, { volume: 10 });
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+      volume: 10,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders({
+      apporder,
+      workerpoolorder,
+      requestorder,
+    });
+
+    const obsDealCompleteValues = [];
+    const obsDealWithWrongDealidValues = [];
+    const obsDealUnsubBeforeCompleteValues = [];
+
+    let unsubObsDealBeforeComplete;
+
+    const [
+      obsDealComplete,
+      obsDealWithWrongDealidError,
+      obsDealUnsubBeforeComplete,
+    ] = await Promise.all([
+      new Promise((resolve, reject) => {
+        iexec.deal.obsDeal(dealid).subscribe({
+          next: (value) => {
+            obsDealCompleteValues.push(value);
+          },
+          error: () => reject(Error('obsDeal should not call error')),
+          complete: resolve,
+        });
+      }),
+      new Promise((resolve, reject) => {
+        iexec.deal.obsDeal(utils.NULL_BYTES32).subscribe({
+          next: (value) => {
+            obsDealWithWrongDealidValues.push(value);
+          },
+          error: resolve,
+          complete: () => reject(Error('obsDeal with wrong dealid should not call complete')),
+        });
+      }),
+      new Promise(async (resolve, reject) => {
+        unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
+          next: (value) => {
+            unsubObsDealBeforeComplete();
+            obsDealUnsubBeforeCompleteValues.push(value);
+          },
+          error: () => reject(
+            Error('obsDeal unsub before complete should not call error'),
+          ),
+          complete: () => reject(
+            Error('obsDeal unsub before complete should not call complete'),
+          ),
+        });
+        await sleep(10000);
+        resolve();
+      }),
+      sleep(5000).then(async () => {
+        await initializeTask(hubAddress, dealid, 5);
+        await sleep(1000);
+        await initializeTask(hubAddress, dealid, 0);
+        await sleep(6000);
+      }),
+    ]);
+
+    expect(obsDealComplete).toBeUndefined();
+    expect(obsDealWithWrongDealidError).toEqual(
+      new errors.ObjectNotFoundError('deal', utils.NULL_BYTES32, networkId),
+    );
+    expect(obsDealUnsubBeforeComplete).toBeUndefined();
+
+    expect(obsDealCompleteValues.length).toBe(13);
+
+    expect(obsDealCompleteValues[0].message).toBe('DEAL_UPDATED');
+    expect(obsDealCompleteValues[0].tasksCount).toBe(10);
+    expect(obsDealCompleteValues[0].completedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[0].failedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[0].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealCompleteValues[0].tasks).length).toBe(10);
+    expect(obsDealCompleteValues[0].tasks[0].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[1].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[2].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[3].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[4].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[5].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[6].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[7].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[8].status).toBe(0);
+    expect(obsDealCompleteValues[0].tasks[9].status).toBe(0);
+
+    expect(obsDealCompleteValues[2].message).toBe('DEAL_UPDATED');
+    expect(obsDealCompleteValues[2].tasksCount).toBe(10);
+    expect(obsDealCompleteValues[2].completedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[2].failedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[2].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealCompleteValues[2].tasks).length).toBe(10);
+    expect(obsDealCompleteValues[2].tasks[0].status).toBe(1);
+    expect(obsDealCompleteValues[2].tasks[1].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[2].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[3].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[4].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[5].status).toBe(1);
+    expect(obsDealCompleteValues[2].tasks[6].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[7].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[8].status).toBe(0);
+    expect(obsDealCompleteValues[2].tasks[9].status).toBe(0);
+
+    expect(obsDealCompleteValues[11].message).toBe('DEAL_UPDATED');
+    expect(obsDealCompleteValues[11].tasksCount).toBe(10);
+    expect(obsDealCompleteValues[11].completedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[11].failedTasksCount).toBe(9);
+    expect(obsDealCompleteValues[11].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealCompleteValues[11].tasks).length).toBe(10);
+    expect(obsDealCompleteValues[11].tasks[0].status).toBe(1);
+    expect(obsDealCompleteValues[11].tasks[1].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[2].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[3].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[4].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[5].status).toBe(1);
+    expect(obsDealCompleteValues[11].tasks[6].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[7].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[8].status).toBe(0);
+    expect(obsDealCompleteValues[11].tasks[9].status).toBe(0);
+
+    expect(obsDealCompleteValues[12].message).toBe('DEAL_TIMEDOUT');
+    expect(obsDealCompleteValues[12].tasksCount).toBe(10);
+    expect(obsDealCompleteValues[12].completedTasksCount).toBe(0);
+    expect(obsDealCompleteValues[12].failedTasksCount).toBe(10);
+    expect(obsDealCompleteValues[12].deal.dealid).toBe(dealid);
+    expect(Object.entries(obsDealCompleteValues[12].tasks).length).toBe(10);
+    expect(obsDealCompleteValues[12].tasks[0].status).toBe(1);
+    expect(obsDealCompleteValues[12].tasks[1].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[2].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[3].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[4].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[5].status).toBe(1);
+    expect(obsDealCompleteValues[12].tasks[6].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[7].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[8].status).toBe(0);
+    expect(obsDealCompleteValues[12].tasks[9].status).toBe(0);
+
+    expect(obsDealWithWrongDealidValues.length).toBe(0);
+
+    expect(obsDealUnsubBeforeCompleteValues.length).toBe(1);
+
+    expect(obsDealUnsubBeforeCompleteValues[0].message).toBe('DEAL_UPDATED');
+    expect(obsDealUnsubBeforeCompleteValues[0].tasksCount).toBe(10);
+    expect(obsDealUnsubBeforeCompleteValues[0].completedTasksCount).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].failedTasksCount).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].deal.dealid).toBe(dealid);
     expect(
-      utils.decodeTag(
-        '0x0000000000000000000000000000000000000000000000000000000000000001',
-      ),
-    ).toStrictEqual(['tee']);
+      Object.entries(obsDealUnsubBeforeCompleteValues[0].tasks).length,
+    ).toBe(10);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[0].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[1].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[2].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[3].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[4].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[5].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[6].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
+    expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
+  }, 50000);
+});
+
+describe('[lib utils]', () => {
+  describe('parseEth', () => {
+    test("parseEth('4.2')", () => {
+      const res = utils.parseEth('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test('parseEth(4.2)', () => {
+      const res = utils.parseEth(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test('parseEth(new BN(42))', () => {
+      const res = utils.parseEth(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000000000000'))).toBe(true);
+    });
   });
-  test('decodeTag unknown bit tag', () => {
-    expect(() => utils.decodeTag(
-      '0x0000000000000000000000000000000000000000000000000000000000000002',
-    )).toThrow('unknown bit 2');
+  describe('parseRLC', () => {
+    test("parseRLC('4.2')", () => {
+      const res = utils.parseRLC('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test('parseRLC(4.2)', () => {
+      const res = utils.parseRLC(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test('parseRLC(new BN(42))', () => {
+      const res = utils.parseRLC(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000'))).toBe(true);
+    });
+  });
+  describe('formatEth', () => {
+    test("formatEth('4200000000000000000')", () => {
+      const res = utils.formatEth('4200000000000000000');
+      expect(res).toBe('4.2');
+    });
+    test('formatEth(42)', () => {
+      const res = utils.formatEth(42);
+      expect(res).toBe('0.000000000000000042');
+    });
+    test("formatEth(new BN('4200000000000000000'))", () => {
+      const res = utils.formatEth(new BN('4200000000000000000'));
+      expect(res).toBe('4.2');
+    });
+  });
+  describe('formatRLC', () => {
+    test("formatRLC('4200000000000000000')", () => {
+      const res = utils.formatRLC('4200000000000000000');
+      expect(res).toBe('4200000000');
+    });
+    test('formatRLC(42)', () => {
+      const res = utils.formatRLC(42);
+      expect(res).toBe('0.000000042');
+    });
+    test("formatRLC(new BN('4200000000000000000'))", () => {
+      const res = utils.formatRLC(new BN('4200000000000000000'));
+      expect(res).toBe('4200000000');
+    });
+  });
+  describe('encodeTag', () => {
+    test("encodeTag(['tee'])", () => {
+      expect(utils.encodeTag(['tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      );
+    });
+    test("encodeTag(['gpu'])", () => {
+      expect(utils.encodeTag(['gpu'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000100',
+      );
+    });
+    test("encodeTag(['gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test("encodeTag(['gpu','tee','gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test('encodeTag unknown tag', () => {
+      expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
+    });
+  });
+  describe('decodeTag', () => {
+    test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
+      expect(
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ),
+      ).toStrictEqual(['tee']);
+    });
+    test('decodeTag unknown bit tag', () => {
+      expect(() => utils.decodeTag(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      )).toThrow('unknown bit 2');
+    });
+  });
+  describe('sumTags', () => {
+    test('sumTags from Bytes32', () => {
+      expect(
+        utils.sumTags([
+          '0x0000000000000000000000000000000000000000000000000000000000000100',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+    test('sumTags unknown bit tag', () => {
+      expect(() => utils.sumTags([
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ])).toThrow('unknown bit 2');
+    });
+    test('sumTags invalid bytes32', () => {
+      expect(() => utils.sumTags([
+        '0x000000000000000000000000000000000000000000000000000000000000000z',
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ])).toThrow('tag must be bytes32 hex string');
+    });
   });
 });

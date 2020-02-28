@@ -2,12 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.3] 2020-02-27
+
+### Added
+
+- `orderbook.fetchAppOrderbook` and `iexec orderbook app <address>` optional filters (dataset, workerpool, requester)
+- `orderbook.fetchDatasetOrderbook` and `iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
+- `utils.sumTags([...Bytes32])` added to JS lib
+- `task.obsTask(taskid, { dealid })` observable for task status
+- `deal.obsDeal(dealid)` observable for deal status
+
+### Changed
+
+- fix `iexec order show --raw` output
+- `task.waitForTaskStatusChange(taskid, initialStatus)` is deprecated prefer `task.obsTask(taskid)`
+
+### Removed
+
 ## [4.0.2] 2020-02-12
 
 ### Added
 
 - `iexec app run [address]` allow to run an app on iExec at the market price
-- `deal.show(dealid)` and `iexec deal show` returns extra keys `finalTime: uint256` and `deadlineReached: Boolean`
+- `deal.show(dealid)` and `iexec deal show` returns extra keys `finalTime: BN` and `deadlineReached: Boolean`
 - `task.show(taskid)` and `iexec task show` returns extra keys `taskTimedOut: Boolean`
 - `requestorder.params` now accepts object in `iexec.json` and JS lib
 

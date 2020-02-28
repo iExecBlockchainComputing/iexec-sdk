@@ -38,6 +38,7 @@ const {
   loadDeployedObj,
 } = require('./fs');
 const {
+  getRemainingVolume,
   createApporder,
   createDatasetorder,
   createWorkerpoolorder,
@@ -48,19 +49,19 @@ const {
   signRequestorder,
   matchOrders,
   NULL_DATASETORDER,
+  WORKERPOOL_ORDER,
 } = require('./order');
-const deal = require('./deal');
-const task = require('./task');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
 } = require('./orderbook');
 const { checkBalance } = require('./account');
+const { obsDeal } = require('./iexecProcess');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
 const {
-  NULL_ADDRESS, NULL_BYTES32, sumTags, BN, sleep,
+  NULL_ADDRESS, NULL_BYTES32, sumTags, BN,
 } = require('./utils');
 const {
   tagSchema,
@@ -69,7 +70,6 @@ const {
   paramsSchema,
   positiveIntSchema,
 } = require('./validator');
-const { ObjectNotFoundError } = require('./errors');
 
 const debug = Debug('iexec:iexec-app');
 
@@ -372,6 +372,9 @@ run
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.id,
           dataset,
+          {
+            app,
+          },
         );
         const order = datasetOrders[0] && datasetOrders[0].order;
         spinner.stop();
@@ -424,8 +427,27 @@ run
               minTrust: trust,
             },
           );
-          const order = workerpoolOrders[0] && workerpoolOrders[0].order;
-          if (order) return order;
+
+          const getFirstOpen = async (i = 0) => {
+            const order = workerpoolOrders[i] && workerpoolOrders[i].order;
+            if (order) {
+              const workerpoolVolume = await getRemainingVolume(
+                chain.contracts,
+                WORKERPOOL_ORDER,
+                order,
+              );
+              if (workerpoolVolume.gte(new BN(0))) {
+                return order;
+              }
+              return getFirstOpen(i + 1);
+            }
+            return null;
+          };
+          const order = await getFirstOpen();
+
+          if (order) {
+            return order;
+          }
           if (strict) {
             throw Error(
               `No workerpoolorder matching your conditions available in category ${category}`,
@@ -535,97 +557,55 @@ run
         });
       } else {
         spinner.info(`deal submitted with dealid ${dealid}`);
-        const { tasks, finalTime } = await deal.show(chain.contracts, dealid);
-        const tasksMap = Object.entries(tasks).reduce(
-          (acc, [idx, taskid]) => Object.assign({}, acc, {
-            [taskid]: {
-              idx,
-              dealid,
-              finalTime: finalTime.toNumber(),
-              status: 0,
-              statusName: task.TASK_STATUS_MAP[0],
-            },
-          }),
-          {},
-        );
 
         const renderTaskStatus = tasksStatusMap => pretty(
           Object.entries(tasksStatusMap).map(
-            ([taskid, { idx, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
+            ([idx, { taskid, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
           ),
         );
-        const refreshProgress = () => spinner.start(
-          `Watching tasks execution...${renderTaskStatus(tasksMap)}`,
-        );
 
-        const waitStatusChangeOrTimeout = async (taskid, initialStatus) => task
-          .waitForTaskStatusChange(chain.contracts, taskid, initialStatus)
-          .catch(async (e) => {
-            if (e instanceof ObjectNotFoundError) {
-              const now = Math.floor(Date.now() / 1000);
-              const deadlineReached = now > tasksMap[taskid].finalTime;
-              if (deadlineReached) {
-                return {
-                  status: 0,
-                  statusName: task.TASK_STATUS_MAP.timeout,
-                  taskTimedOut: true,
-                };
-              }
-              await sleep(5000);
-              return waitStatusChangeOrTimeout(taskid, initialStatus);
-            }
-            throw e;
+        const waitDealFinalState = () => new Promise((resolve, reject) => {
+          let dealState;
+          obsDeal(chain.contracts, dealid).subscribe({
+            next: (data) => {
+              dealState = data;
+              spinner.start(
+                `Watching tasks execution...${renderTaskStatus(data.tasks)}`,
+              );
+            },
+            error: reject,
+            complete: () => resolve(dealState),
           });
+        });
 
-        const watchTask = async (taskid, initialStatus = '') => {
-          const {
-            status,
-            statusName,
-            taskTimedOut,
-          } = await waitStatusChangeOrTimeout(taskid, initialStatus);
+        const dealFinalState = await waitDealFinalState();
 
-          tasksMap[taskid].status = status;
-          tasksMap[taskid].taskTimedOut = taskTimedOut;
-          tasksMap[taskid].statusName = statusName;
-          refreshProgress();
-          if ([3, 4].includes(status) || taskTimedOut) {
-            return {
-              status,
-              statusName,
-              taskTimedOut,
-            };
-          }
-          return watchTask(taskid, status);
-        };
-
-        refreshProgress();
-        await Promise.all(tasks.map(taskid => watchTask(taskid)));
-
-        const tasksArray = Object.entries(tasksMap).map(
-          ([taskid, taskObj]) => ({
-            taskid,
-            idx: taskObj.idx,
-            dealid: taskObj.dealid,
-            status: taskObj.status,
-            statusName: taskObj.statusName,
-            taskTimedOut: taskObj.taskTimedOut,
-          }),
-        );
+        const tasksArray = Object.values(dealFinalState.tasks).map(task => ({
+          taskid: task.taskid,
+          idx: task.idx,
+          dealid: task.dealid,
+          status: task.status,
+          statusName: task.statusName,
+          taskTimedOut: task.taskTimedOut,
+        }));
         result.tasks = tasksArray;
         const failedTasks = tasksArray.reduce(
           (acc, curr) => (curr.status !== 3 ? [...acc, curr] : acc),
           [],
         );
         if (failedTasks.length === 0) {
-          spinner.succeed(`App run successful:${renderTaskStatus(tasksMap)}`, {
-            raw: result,
-          });
+          spinner.succeed(
+            `App run successful:${renderTaskStatus(dealFinalState.tasks)}`,
+            {
+              raw: result,
+            },
+          );
         } else {
           result.failedTasks = failedTasks;
           spinner.fail(
             `App run failed (${
               failedTasks.length
-            } tasks failed):${renderTaskStatus(tasksMap)}`,
+            } tasks failed):${renderTaskStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },

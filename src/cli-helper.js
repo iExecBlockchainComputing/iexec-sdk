@@ -225,22 +225,16 @@ const option = {
     'download a work result data to local filesystem, if completed',
   ],
   category: () => ['--category <id>', 'specify the work category'],
-  workerpoolOrderbook: () => [
+  orderbookWorkerpool: () => [
     '--workerpool <address>',
     'filter by workerpool address',
   ],
-  requesterOrderbook: () => [
+  orderbookRequester: () => [
     '--requester <address>',
     'filter by requester address',
   ],
-  appOrderbook: () => [
-    '--app <address>',
-    'show the best orders for specified app',
-  ],
-  datasetOrderbook: () => [
-    '--dataset <address>',
-    'show the best orders for specified dataset',
-  ],
+  orderbookApp: () => ['--app <address>', 'filter by app address'],
+  orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
     '--require-tag <tag...>',
     'specify minimum required tags (usage --require-tag tag1,tag2)',

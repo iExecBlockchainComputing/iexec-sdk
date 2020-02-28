@@ -928,12 +928,12 @@ show
             )}`
             : '\nDeals count: 0';
           const raw = Object.assign(
-            { orderHash },
-            { publishedOrder: orderToShow },
+            {},
+            orderToShow,
             deals && { deals: { count: deals.count, lastDeals: deals.deals } },
           );
-          spinner.succeed(`${orderString}${cmd.deals ? dealsString : ''}`);
-          Object.assign(success, { [orderName]: { cancelTx: raw } });
+          spinner.info(`${orderString}${cmd.deals ? dealsString : ''}`);
+          Object.assign(success, { [orderName]: raw });
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
         }
