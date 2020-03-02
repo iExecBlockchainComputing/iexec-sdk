@@ -1185,6 +1185,73 @@ describe('[Mainchain]', () => {
     mainchainTaskidNoDuration = res.deal.tasks['0'];
   }, 10000);
 
+  test('[mainchain] iexec deal show --watch (BoT 5 timeout)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} deal show ${mainchainDealidNoDuration} --watch --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deal).not.toBe(undefined);
+    expect(res.deal.app.pointer).toBe(mainchainApp);
+    expect(res.deal.dataset.pointer).toBe(mainchainDataset);
+    expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(res.deal.requester).toBe(ADDRESS);
+    expect(res.deal.beneficiary).toBe(ADDRESS);
+    expect(res.deal.botFirst).toBe('0');
+    expect(res.deal.botSize).toBe('5');
+    expect(res.deal.startTime).not.toBe(undefined);
+    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.deadlineReached).toBe(true);
+    expect(res.deal.tasks).not.toBe(undefined);
+    expect(Object.keys(res.deal.tasks).length).toBe(5);
+    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.tasksCount).toBe(5);
+    expect(res.completedTasksCount).toBe(0);
+    expect(res.failedTasksCount).toBe(5);
+    expect(res.tasks.length).toBe(5);
+    expect(res.tasks[0].idx).toBe('0');
+    expect(res.tasks[0].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.tasks[0].taskTimedOut).toBe(true);
+    expect(res.tasks[0].statusName).toBe('TIMEOUT');
+    expect(res.tasks[1].idx).toBe('1');
+    expect(res.tasks[1].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.tasks[1].taskTimedOut).toBe(true);
+    expect(res.tasks[1].statusName).toBe('TIMEOUT');
+    expect(res.tasks[2].idx).toBe('2');
+    expect(res.tasks[2].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.tasks[2].taskTimedOut).toBe(true);
+    expect(res.tasks[2].statusName).toBe('TIMEOUT');
+    expect(res.tasks[3].idx).toBe('3');
+    expect(res.tasks[3].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.tasks[3].taskTimedOut).toBe(true);
+    expect(res.tasks[3].statusName).toBe('TIMEOUT');
+    expect(res.tasks[4].idx).toBe('4');
+    expect(res.tasks[4].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.tasks[4].taskTimedOut).toBe(true);
+    expect(res.tasks[4].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks.length).toBe(5);
+    expect(res.failedTasks[0].idx).toBe('0');
+    expect(res.failedTasks[0].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.failedTasks[0].taskTimedOut).toBe(true);
+    expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[1].idx).toBe('1');
+    expect(res.failedTasks[1].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.failedTasks[1].taskTimedOut).toBe(true);
+    expect(res.failedTasks[1].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[2].idx).toBe('2');
+    expect(res.failedTasks[2].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.failedTasks[2].taskTimedOut).toBe(true);
+    expect(res.failedTasks[2].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[3].idx).toBe('3');
+    expect(res.failedTasks[3].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.failedTasks[3].taskTimedOut).toBe(true);
+    expect(res.failedTasks[3].statusName).toBe('TIMEOUT');
+    expect(res.failedTasks[4].idx).toBe('4');
+    expect(res.failedTasks[4].dealid).toBe(mainchainDealidNoDuration);
+    expect(res.failedTasks[4].taskTimedOut).toBe(true);
+    expect(res.failedTasks[4].statusName).toBe('TIMEOUT');
+  }, 10000);
+
   test('[mainchain] iexec deal show (no deal)', async () => {
     const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
     const raw = await execAsync(

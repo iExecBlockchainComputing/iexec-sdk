@@ -17,6 +17,7 @@ const {
   pretty,
   info,
   isEthAddress,
+  renderTasksStatus,
 } = require('./cli-helper');
 const {
   deployApp,
@@ -558,19 +559,13 @@ run
       } else {
         spinner.info(`deal submitted with dealid ${dealid}`);
 
-        const renderTaskStatus = tasksStatusMap => pretty(
-          Object.entries(tasksStatusMap).map(
-            ([idx, { taskid, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
-          ),
-        );
-
         const waitDealFinalState = () => new Promise((resolve, reject) => {
           let dealState;
           obsDeal(chain.contracts, dealid).subscribe({
             next: (data) => {
               dealState = data;
               spinner.start(
-                `Watching tasks execution...${renderTaskStatus(data.tasks)}`,
+                `Watching execution...\n${renderTasksStatus(data.tasks)}`,
               );
             },
             error: reject,
@@ -595,7 +590,7 @@ run
         );
         if (failedTasks.length === 0) {
           spinner.succeed(
-            `App run successful:${renderTaskStatus(dealFinalState.tasks)}`,
+            `App run successful:\n${renderTasksStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },
@@ -603,9 +598,7 @@ run
         } else {
           result.failedTasks = failedTasks;
           spinner.fail(
-            `App run failed (${
-              failedTasks.length
-            } tasks failed):${renderTaskStatus(dealFinalState.tasks)}`,
+            `App run failed:\n${renderTasksStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },

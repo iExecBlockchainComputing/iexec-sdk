@@ -219,7 +219,7 @@ const option = {
     '--show-private-key',
     'allow displaying walletprivate key',
   ],
-  watch: () => ['--watch', 'watch a work status changes'],
+  watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
     '--download [fileName]',
     'download a work result data to local filesystem, if completed',
@@ -718,6 +718,29 @@ const minBn = (bnArray) => {
   return min;
 };
 
+const renderTasksStatus = (tasksStatusMap) => {
+  const tasksArray = Object.values(tasksStatusMap);
+  const runningTasksArray = tasksArray.filter(
+    task => task.status !== 3 && !task.taskTimedOut,
+  );
+  const completedTasksArray = tasksArray.filter(task => task.status === 3);
+  const timedoutTasksArray = tasksArray.filter(task => task.taskTimedOut);
+  const completedMsg = `${completedTasksArray.length}/${tasksArray.length} tasks completed\n`;
+  const failedMsg = timedoutTasksArray.length > 0
+    ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed\n`
+    : '';
+  const statusMsg = runningTasksArray.length > 0
+    ? `${runningTasksArray.length}/${
+      tasksArray.length
+    } tasks running:${pretty(
+      runningTasksArray.map(
+        ({ idx, taskid, statusName }) => `Task idx ${idx} (${taskid}) status ${statusName}`,
+      ),
+    )}`
+    : '';
+  return `${completedMsg}${failedMsg}${statusMsg}`;
+};
+
 const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
@@ -777,4 +800,5 @@ module.exports = {
   lba,
   lb,
   spawnAsync,
+  renderTasksStatus,
 };
