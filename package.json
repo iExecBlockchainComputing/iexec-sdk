@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-sdk#readme",
   "dependencies": {
+    "aes-js": "3.1.2",
     "big.js": "5.2.2",
     "bn.js": "5.1.1",
     "buffer": "5.4.3",
@@ -39,6 +40,7 @@
     "is-docker": "2.0.0",
     "jszip": "3.2.2",
     "multiaddr": "7.2.1",
+    "node-rsa": "1.0.7",
     "ora": "4.0.3",
     "prettyjson": "1.2.1",
     "query-string": "6.9.0",
