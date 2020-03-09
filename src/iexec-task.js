@@ -17,13 +17,15 @@ const {
   Spinner,
   info,
   pretty,
+  createEncFolderPaths,
+  privateKeyName,
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const { stringifyNestedBn } = require('./utils');
 const taskModule = require('./task');
 const { obsTask } = require('./iexecProcess');
-const { fetchTaskResults } = require('./iexecProcess');
+const { fetchTaskResults, decryptResultsFile } = require('./iexecProcess');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -35,6 +37,9 @@ show
   .option(...option.chain())
   .option(...option.watch())
   .option(...option.download())
+  .option(...option.decrypt())
+  .option(...option.beneficiaryKeystoredir())
+  .option(...option.beneficiaryKeyFile())
   .description(desc.showObj(objName))
   .action(async (taskid, cmd) => {
     await checkUpdate(cmd);
@@ -79,14 +84,61 @@ show
       let resultPath;
       if (cmd.download) {
         if (taskResult.status === 3) {
+          const resultFileName = cmd.download !== true ? cmd.download : taskid;
+
+          resultPath = path.join(
+            process.cwd(),
+            resultFileName.length > 4
+              && resultFileName.substr(resultFileName.length - 4) === '.zip'
+              ? resultFileName
+              : `${resultFileName}.zip`,
+          );
+
           spinner.start(info.downloading());
-          const { body } = await fetchTaskResults(chain.contracts, taskid, {
+          const res = await fetchTaskResults(chain.contracts, taskid, {
             ipfsGatewayURL: chain.ipfsGateway,
           });
-          const resultFileName = cmd.download !== true ? cmd.download : taskid;
-          resultPath = path.join(process.cwd(), `${resultFileName}.zip`);
-          const stream = fs.createWriteStream(resultPath);
-          await body.pipe(stream);
+          if (cmd.decrypt) {
+            spinner.start(info.decrypting());
+            const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+            const exists = await fs.pathExists(beneficiarySecretsFolderPath);
+            if (!exists) {
+              throw Error(
+                "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+              );
+            }
+            let beneficiaryKeyPath;
+            if (cmd.beneficiaryKeyFile) {
+              beneficiaryKeyPath = path.join(
+                beneficiarySecretsFolderPath,
+                cmd.beneficiaryKeyFile,
+              );
+            } else {
+              const [address] = await keystore.accounts();
+              spinner.info(`Using beneficiary key for wallet ${address}`);
+              beneficiaryKeyPath = path.join(
+                beneficiarySecretsFolderPath,
+                privateKeyName(address),
+              );
+            }
+            let beneficiaryKey;
+            try {
+              beneficiaryKey = await fs.readFile(beneficiaryKeyPath, 'utf8');
+            } catch (error) {
+              debug(error);
+              throw Error(
+                `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
+              );
+            }
+            const result = await decryptResultsFile(
+              await res.arrayBuffer(),
+              beneficiaryKey,
+            );
+            await fs.writeFile(resultPath, result);
+          } else {
+            const stream = fs.createWriteStream(resultPath);
+            await res.body.pipe(stream);
+          }
         } else {
           spinner.info(
             `Task status is not COMPLETED, option ${

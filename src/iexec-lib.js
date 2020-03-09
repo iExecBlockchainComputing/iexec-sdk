@@ -231,6 +231,8 @@ class IExec {
       );
       return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     };
+    this.result = {};
+    this.result.decrypt = (resultBuffer, beneficiaryKey) => iexecProcess.decryptResultsFile(resultBuffer, beneficiaryKey);
     this.network = {};
     this.network.id = contracts.chainId;
     this.network.isSidechain = contracts.isNative;

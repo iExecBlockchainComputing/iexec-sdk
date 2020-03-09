@@ -31,7 +31,8 @@ const info = {
   deposited: amount => `deposited ${amount} nRLC to your iExec account`,
   withdrawing: () => 'making withdraw...',
   withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
-  downloading: () => 'downloading task result',
+  downloading: () => 'downloading result',
+  decrypting: () => 'decrypting result',
   downloaded: filePath => `downloaded task result to file ${filePath}`,
   claimed: (amount, address) => `claimed ${amount} nRLC from work ${address}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
@@ -222,8 +223,9 @@ const option = {
   watch: () => ['--watch', 'watch a work status changes'],
   download: () => [
     '--download [fileName]',
-    'download a work result data to local filesystem, if completed',
+    'download a task result data to local filesystem, if completed',
   ],
+  decrypt: () => ['--decrypt', 'decrypt an encrypted result'],
   category: () => ['--category <id>', 'specify the work category'],
   orderbookWorkerpool: () => [
     '--workerpool <address>',
@@ -640,6 +642,11 @@ const createEncFolderPaths = (cmd = {}) => {
   return paths;
 };
 
+const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
+const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
+const publicKeyName = address => `${address}_key.pub`;
+const privateKeyName = address => `${address}_key`;
+
 const computeTxOptions = (cmd) => {
   let gasPrice;
   if (cmd.gasPrice) {
@@ -767,6 +774,10 @@ module.exports = {
   computeWalletLoadOptions,
   computeTxOptions,
   createEncFolderPaths,
+  DEFAULT_ENCRYPTED_RESULTS_NAME,
+  DEFAULT_DECRYPTED_RESULTS_NAME,
+  publicKeyName,
+  privateKeyName,
   prompt,
   pretty,
   prettyRPC,

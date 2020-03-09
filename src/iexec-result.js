@@ -18,6 +18,10 @@ const {
   Spinner,
   prompt,
   createEncFolderPaths,
+  DEFAULT_ENCRYPTED_RESULTS_NAME,
+  DEFAULT_DECRYPTED_RESULTS_NAME,
+  publicKeyName,
+  privateKeyName,
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
@@ -26,11 +30,6 @@ const { Keystore } = require('./keystore');
 const { decryptResultsFile } = require('./iexecProcess');
 
 const debug = Debug('iexec:iexec-result');
-
-const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
-const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
-const publicKeyName = address => `${address}_key.pub`;
-const privateKeyName = address => `${address}_key`;
 
 const generateKeys = cli.command('generate-keys');
 addGlobalOptions(generateKeys);

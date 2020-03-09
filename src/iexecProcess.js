@@ -92,14 +92,17 @@ const fetchTaskResults = async (
   }
 };
 
-const decryptResultsFile = async (encResultsZip, beneficiaryKey) => {
+const decryptResultsFile = async (encResultsZipBuffer, beneficiaryKey) => {
   const rootFolder = 'iexec_out';
   const encKeyFile = 'encrypted_key';
   const encResultsFile = 'result.zip.aes';
 
+  const zipBuffer = Buffer.from(encResultsZipBuffer);
+  const keyBuffer = Buffer.from(beneficiaryKey);
+
   let zip;
   try {
-    zip = await new JSZip().loadAsync(encResultsZip);
+    zip = await new JSZip().loadAsync(zipBuffer);
   } catch (error) {
     debug(error);
     throw Error('Failed to load encrypted results zip file');
@@ -121,7 +124,7 @@ const decryptResultsFile = async (encResultsZip, beneficiaryKey) => {
   debug('Decrypting results key');
   let resultsKey;
   try {
-    const key = new NodeRSA(beneficiaryKey);
+    const key = new NodeRSA(keyBuffer);
     resultsKey = key.decrypt(encryptedResultsKeyBuffer);
   } catch (error) {
     debug(error);
