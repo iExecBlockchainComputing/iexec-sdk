@@ -1111,7 +1111,7 @@ console.log('total orders:', res.count);
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
 
 > find the cheapest orders for computing resource in specified category.
 >
