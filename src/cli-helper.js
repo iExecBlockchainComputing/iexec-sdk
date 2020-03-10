@@ -6,7 +6,7 @@ const prettyjson = require('prettyjson');
 const BN = require('bn.js');
 const path = require('path');
 const { spawn } = require('child_process');
-const checkForUpdate = require('update-check-es5');
+const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
 const packageJSON = require('../package.json');
 
