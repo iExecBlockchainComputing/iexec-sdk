@@ -19,8 +19,6 @@ const { hashEIP712 } = require('./sig-utils');
 const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_ethersType", "_hex", "_eventName"] }] */
-
 const debug = Debug('iexec:utils');
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -453,7 +451,6 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     debug('iv', iv);
 
     const decryptedFile = await new Promise((resolve, reject) => {
-      /* eslint new-cap: ["error", { "newIsCapExceptions": ["cbc"] }] */
       const aesCbc = new aesjs.ModeOfOperation.cbc(resultsKey, iv);
       const chunks = [];
       zip
