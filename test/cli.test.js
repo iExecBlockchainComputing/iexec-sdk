@@ -140,6 +140,10 @@ beforeAll(async () => {
   process.chdir('test');
 }, 15000);
 
+afterAll(() => {
+  process.chdir('..');
+});
+
 describe('[cli]', () => {
   test('iexec', async () => {
     const out = await execAsync(`${iexecPath}`);
