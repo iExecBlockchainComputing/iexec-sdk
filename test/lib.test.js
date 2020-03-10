@@ -1,5 +1,8 @@
 const ethers = require('ethers');
 const BN = require('bn.js');
+const fs = require('fs-extra');
+const path = require('path');
+const JSZip = require('jszip');
 const { utils, IExec, errors } = require('../src/iexec-lib');
 const { sleep } = require('../src/utils');
 
@@ -1574,6 +1577,76 @@ describe('[lib utils]', () => {
         '0x000000000000000000000000000000000000000000000000000000000000000z',
         '0x0000000000000000000000000000000000000000000000000000000000000001',
       ])).toThrow('tag must be bytes32 hex string');
+    });
+  });
+  describe('decryptResult', () => {
+    test('result.decryptResult()', async () => {
+      const encZip = await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+        ),
+      );
+      const beneficiaryKey = await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+        ),
+      );
+      const res = await utils.decryptResult(encZip, beneficiaryKey);
+      const resContent = [];
+      const resZip = await new JSZip().loadAsync(res);
+      resZip.forEach((relativePath, zipEntry) => {
+        resContent.push(zipEntry);
+      });
+      expect(resContent.length).toBe(2);
+      expect(resContent[0].name).toBe('volume.fspf');
+      expect(resContent[1].name).toBe('result.png');
+    });
+    test('result.decryptResult() string key', async () => {
+      const encZip = await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+        ),
+      );
+      const beneficiaryKey = (
+        await fs.readFile(
+          path.join(
+            process.cwd(),
+            'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+          ),
+        )
+      ).toString();
+      const res = await utils.decryptResult(encZip, beneficiaryKey);
+      const resContent = [];
+      const resZip = await new JSZip().loadAsync(res);
+      resZip.forEach((relativePath, zipEntry) => {
+        resContent.push(zipEntry);
+      });
+      expect(resContent.length).toBe(2);
+      expect(resContent[0].name).toBe('volume.fspf');
+      expect(resContent[1].name).toBe('result.png');
+    });
+    test('result.decryptResult() wrong key', async () => {
+      const encZip = await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+        ),
+      );
+      const beneficiaryKey = await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+        ),
+      );
+      const err = await utils
+        .decryptResult(encZip, beneficiaryKey)
+        .catch(e => e);
+      expect(err).toEqual(
+        new Error('Failed to decrypt results key with beneficiary key'),
+      );
     });
   });
 });

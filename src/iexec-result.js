@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 const Debug = require('debug');
-const JSZip = require('jszip');
 const cli = require('commander');
 const semver = require('semver');
 const fs = require('fs-extra');
 const path = require('path');
-const { createDecipheriv, generateKeyPair, privateDecrypt } = require('crypto');
+const { generateKeyPair } = require('crypto');
 const {
   help,
   addGlobalOptions,
@@ -19,41 +18,18 @@ const {
   Spinner,
   prompt,
   createEncFolderPaths,
+  DEFAULT_ENCRYPTED_RESULTS_NAME,
+  DEFAULT_DECRYPTED_RESULTS_NAME,
+  publicKeyName,
+  privateKeyName,
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const { saveTextToFile } = require('./fs');
 const { Keystore } = require('./keystore');
+const { decryptResult } = require('./utils');
 
 const debug = Debug('iexec:iexec-result');
-
-const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
-const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
-const publicKeyName = address => `${address}_key.pub`;
-const privateKeyName = address => `${address}_key`;
-
-const streamToBuffer = stream => new Promise((resolve, reject) => {
-  const buffers = [];
-  stream.on('error', reject);
-  stream.on('data', data => buffers.push(data));
-  stream.on('end', () => resolve(Buffer.concat(buffers)));
-});
-
-const extractFileFromZip = (jszip, file, destination) => new Promise((resolve, reject) => {
-  try {
-    jszip
-      .file(file)
-      .nodeStream()
-      .pipe(fs.createWriteStream(destination))
-      .on('finish', () => {
-        resolve();
-      });
-  } catch (error) {
-    reject(error);
-  }
-});
-
-const decipherAES = (secret, iv) => createDecipheriv('aes-256-cbc', secret, iv);
 
 const generateKeys = cli.command('generate-keys');
 addGlobalOptions(generateKeys);
@@ -182,33 +158,6 @@ decryptResults
         );
       }
 
-      const rootFolder = 'iexec_out';
-      const encKeyFile = 'encrypted_key';
-      const encResultsFile = 'result.zip.aes';
-
-      let zip;
-      try {
-        zip = await new JSZip().loadAsync(fs.readFile(inputFile));
-      } catch (error) {
-        debug(error);
-        throw Error(
-          `Failed to load encrypted results zip file from "${inputFile}"`,
-        );
-      }
-
-      let encryptedResultsKeyArrayBuffer;
-      try {
-        encryptedResultsKeyArrayBuffer = await zip
-          .file(`${rootFolder}/${encKeyFile}`)
-          .async('arraybuffer');
-      } catch (error) {
-        throw Error(`Missing ${encKeyFile} file in "${inputFile}"`);
-      }
-      const encryptedResultsKeyBuffer = Buffer.from(
-        encryptedResultsKeyArrayBuffer,
-        'ArrayBuffer',
-      );
-
       let beneficiaryKey;
       try {
         beneficiaryKey = await fs.readFile(beneficiaryKeyPath, 'utf8');
@@ -219,64 +168,16 @@ decryptResults
         );
       }
 
-      spinner.start('Decrypting results key');
-      let resultsKey;
-      try {
-        resultsKey = privateDecrypt(beneficiaryKey, encryptedResultsKeyBuffer);
-      } catch (error) {
-        debug(error);
-        throw Error(
-          `Failed to decrypt results key with "${beneficiaryKeyPath}"`,
-        );
-      }
-      debug('resultsKey', resultsKey);
-
-      const cleanFile = async (filePath) => {
-        try {
-          await fs.remove(filePath);
-        } catch (e) {
-          debug('cleanFile', filePath, e);
-        }
-      };
-
-      spinner.stop();
       const outputExists = await fs.exists(outputFile);
       if (outputExists && !cmd.force) await prompt.fileExists(outputFile);
+
       spinner.start('Decrypting results');
-      const tempResultsPath = path.join(process.cwd(), 'encryptedTemp');
-      try {
-        await extractFileFromZip(
-          zip,
-          `${rootFolder}/${encResultsFile}`,
-          tempResultsPath,
-        );
-        const ivStream = fs.createReadStream(tempResultsPath, {
-          start: 0,
-          end: 15,
-        });
-        const iv = await streamToBuffer(ivStream);
-        debug('iv', iv);
-
-        await new Promise((resolve, reject) => {
-          const out = fs.createWriteStream(outputFile);
-          out.on('close', () => resolve());
-          const encryptedResultsStream = fs.createReadStream(tempResultsPath, {
-            start: 16,
-          });
-          encryptedResultsStream
-            .on('error', e => reject(new Error(`Read error: ${e}`)))
-            .pipe(decipherAES(resultsKey, iv))
-            .on('error', e => reject(new Error(`Decipher error: ${e}`)))
-            .pipe(out)
-            .on('error', e => reject(new Error(`Write error: ${e}`)));
-        });
-        await cleanFile(tempResultsPath);
-      } catch (error) {
-        debug(error);
-        await Promise.all([cleanFile(tempResultsPath), cleanFile(outputFile)]);
-        throw Error('Failed to decrypt results with decrypted results key');
-      }
-
+      const encResultsZip = await fs.readFile(inputFile);
+      const decryptedResultsZip = await decryptResult(
+        encResultsZip,
+        beneficiaryKey,
+      );
+      await saveTextToFile(outputFile, decryptedResultsZip, { force: true });
       spinner.succeed(`Results successfully decrypted in ${outputFile}`, {
         raw: {
           resultsPath: outputFile,

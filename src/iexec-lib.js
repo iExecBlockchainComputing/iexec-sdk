@@ -19,6 +19,7 @@ const {
   encodeTag,
   decodeTag,
   sumTags,
+  decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
 
@@ -34,6 +35,7 @@ const utils = {
   decodeTag,
   sumTags,
   getSignerFromPrivateKey,
+  decryptResult,
 };
 
 class IExec {
