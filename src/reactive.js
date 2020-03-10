@@ -1,4 +1,3 @@
-/* eslint no-underscore-dangle: ["error", { "allow": ["_subscribe"] }] */
 class SafeObserver {
   constructor(destination) {
     this.destination = destination;

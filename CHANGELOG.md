@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `utils.decryptResult(encryptedResultFile, beneficiaryKey)` decrypt encrypted result with RSA beneficiary key
+- `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
+
+### Changed
+
+### Removed
+
+## [4.0.3] 2020-02-27
+
+### Added
+
 - `orderbook.fetchAppOrderbook` and `iexec orderbook app <address>` optional filters (dataset, workerpool, requester)
 - `orderbook.fetchDatasetOrderbook` and `iexec orderbook dataset <address>` optional filters (app, workerpool, requester)
 - `utils.sumTags([...Bytes32])` added to JS lib
