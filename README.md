@@ -465,6 +465,7 @@ iexec deal claim <dealid> # claim all failed tasks from a deal
 iexec task show <taskid> # show task identified by taskid
 iexec task show <taskid> --watch # wait for task to be COMPLETED or CLAIMED
 iexec task show <taskid> --download [fileName] # download the result of a COMPLETED task
+iexec task show <taskid> --download [fileName] --decrypt # download and decrypt the result of a COMPLETED task
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 ```
 
@@ -1951,6 +1952,29 @@ const requestTag =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 const workerpoolMinTag = utils.sumTags([appTag, datasetTag, requestTag]);
 console.log('workerpoolMinTag', workerpoolMinTag);
+```
+
+#### decryptResult
+
+utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
+
+> decrypt en encrypted result with the beneficiary RSA Key.
+> for encrypted result decryption see [utils.decryptResult](#decryptResult)
+
+_Example:_
+
+```js
+const beneficaryKey = await loadBeneficiaryKey(); // somehow load the beneficiary RSA private key
+
+const response = await iexec.task.fetchResults(
+  '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19',
+);
+const encFileBuffer = await response.arrayBuffer();
+const decryptedFileBuffer = await utils.decryptResult(
+  encFileBuffer,
+  beneficaryKey,
+);
+const binary = new Blob([decryptedFileBuffer]);
 ```
 
 #### getSignerFromPrivateKey

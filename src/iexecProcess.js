@@ -1,7 +1,4 @@
 const Debug = require('debug');
-const JSZip = require('jszip');
-const NodeRSA = require('node-rsa');
-const aesjs = require('aes-js');
 const { Observable, SafeObserver } = require('./reactive');
 const dealModule = require('./deal');
 const taskModule = require('./task');
@@ -89,108 +86,6 @@ const fetchTaskResults = async (
   } catch (error) {
     debug('fetchResults()', error);
     throw error;
-  }
-};
-
-const decryptResultsFile = async (encResultsZipBuffer, beneficiaryKey) => {
-  const rootFolder = 'iexec_out';
-  const encKeyFile = 'encrypted_key';
-  const encResultsFile = 'result.zip.aes';
-
-  const zipBuffer = Buffer.from(encResultsZipBuffer);
-  const keyBuffer = Buffer.from(beneficiaryKey);
-
-  let zip;
-  try {
-    zip = await new JSZip().loadAsync(zipBuffer);
-  } catch (error) {
-    debug(error);
-    throw Error('Failed to load encrypted results zip file');
-  }
-
-  let encryptedResultsKeyArrayBuffer;
-  try {
-    encryptedResultsKeyArrayBuffer = await zip
-      .file(`${rootFolder}/${encKeyFile}`)
-      .async('arraybuffer');
-  } catch (error) {
-    throw Error(`Missing ${encKeyFile} file in zip input file`);
-  }
-  const encryptedResultsKeyBuffer = Buffer.from(
-    encryptedResultsKeyArrayBuffer,
-    'ArrayBuffer',
-  );
-
-  debug('Decrypting results key');
-  let resultsKey;
-  try {
-    const key = new NodeRSA(keyBuffer);
-    resultsKey = key.decrypt(encryptedResultsKeyBuffer);
-  } catch (error) {
-    debug(error);
-    throw Error('Failed to decrypt results key with beneficiary key');
-  }
-  debug('resultsKey', resultsKey);
-  debug('Decrypting results');
-  try {
-    const iv = await new Promise((resolve, reject) => {
-      zip
-        .file(`${rootFolder}/${encResultsFile}`)
-        .nodeStream()
-        .on('data', (data) => {
-          try {
-            resolve(Buffer.from(data.slice(0, 16)));
-          } catch (e) {
-            debug('error', e);
-            reject(e);
-          }
-        })
-        .on('error', (e) => {
-          debug('error', e);
-          reject(e);
-        })
-        .resume();
-    });
-    debug('iv', iv);
-
-    const decryptedFile = await new Promise((resolve, reject) => {
-      /* eslint new-cap: ["error", { "newIsCapExceptions": ["cbc"] }] */
-      const aesCbc = new aesjs.ModeOfOperation.cbc(resultsKey, iv);
-      const chunks = [];
-      zip
-        .file(`${rootFolder}/${encResultsFile}`)
-        .nodeStream()
-        .on('data', (data) => {
-          try {
-            // remove 16 bytes iv from enc file
-            const buffer = chunks.length !== 0
-              ? Buffer.from(aesCbc.decrypt(data))
-              : Buffer.from(aesCbc.decrypt(data.slice(16)));
-            chunks.push(buffer);
-          } catch (e) {
-            debug('error', e);
-            reject(e);
-          }
-        })
-        .on('error', (e) => {
-          debug('error', e);
-          reject(e);
-        })
-        .on('end', async () => {
-          // remove pkcs7 padding
-          const lastChunk = chunks[chunks.length - 1];
-          const padding = lastChunk[lastChunk.length - 1];
-          if (!padding || padding > 16 || padding > lastChunk.length) throw Error('invalid padding');
-          const unpaddedChunk = lastChunk.slice(0, lastChunk.length - padding);
-          chunks[chunks.length - 1] = unpaddedChunk;
-          resolve(Buffer.concat(chunks));
-        })
-        .resume();
-    });
-    return decryptedFile;
-  } catch (error) {
-    debug(error);
-    throw Error('Failed to decrypt results with decrypted results key');
   }
 };
 
@@ -378,7 +273,6 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new
 
 module.exports = {
   fetchTaskResults,
-  decryptResultsFile,
   obsTask,
   obsDeal,
 };

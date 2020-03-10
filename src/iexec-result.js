@@ -27,7 +27,7 @@ const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const { saveTextToFile } = require('./fs');
 const { Keystore } = require('./keystore');
-const { decryptResultsFile } = require('./iexecProcess');
+const { decryptResult } = require('./utils');
 
 const debug = Debug('iexec:iexec-result');
 
@@ -173,7 +173,7 @@ decryptResults
 
       spinner.start('Decrypting results');
       const encResultsZip = await fs.readFile(inputFile);
-      const decryptedResultsZip = await decryptResultsFile(
+      const decryptedResultsZip = await decryptResult(
         encResultsZip,
         beneficiaryKey,
       );

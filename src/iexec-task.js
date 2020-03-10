@@ -22,10 +22,10 @@ const {
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
-const { stringifyNestedBn } = require('./utils');
+const { stringifyNestedBn, decryptResult } = require('./utils');
 const taskModule = require('./task');
 const { obsTask } = require('./iexecProcess');
-const { fetchTaskResults, decryptResultsFile } = require('./iexecProcess');
+const { fetchTaskResults } = require('./iexecProcess');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -130,7 +130,7 @@ show
                 `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
               );
             }
-            const result = await decryptResultsFile(
+            const result = await decryptResult(
               await res.arrayBuffer(),
               beneficiaryKey,
             );

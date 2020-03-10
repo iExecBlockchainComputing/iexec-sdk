@@ -19,6 +19,7 @@ const {
   encodeTag,
   decodeTag,
   sumTags,
+  decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
 
@@ -34,6 +35,7 @@ const utils = {
   decodeTag,
   sumTags,
   getSignerFromPrivateKey,
+  decryptResult,
 };
 
 class IExec {
@@ -231,8 +233,6 @@ class IExec {
       );
       return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     };
-    this.result = {};
-    this.result.decrypt = (resultBuffer, beneficiaryKey) => iexecProcess.decryptResultsFile(resultBuffer, beneficiaryKey);
     this.network = {};
     this.network.id = contracts.chainId;
     this.network.isSidechain = contracts.isNative;
