@@ -62,7 +62,11 @@ const { obsDeal } = require('./iexecProcess');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
 const {
-  NULL_ADDRESS, NULL_BYTES32, sumTags, BN,
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  sumTags,
+  BN,
+  stringifyNestedBn,
 } = require('./utils');
 const {
   tagSchema,
@@ -575,14 +579,9 @@ run
 
         const dealFinalState = await waitDealFinalState();
 
-        const tasksArray = Object.values(dealFinalState.tasks).map(task => ({
-          taskid: task.taskid,
-          idx: task.idx,
-          dealid: task.dealid,
-          status: task.status,
-          statusName: task.statusName,
-          taskTimedOut: task.taskTimedOut,
-        }));
+        const tasksArray = Object.values(dealFinalState.tasks).map(
+          stringifyNestedBn,
+        );
         result.tasks = tasksArray;
         const failedTasks = tasksArray.reduce(
           (acc, curr) => (curr.status !== 3 ? [...acc, curr] : acc),
