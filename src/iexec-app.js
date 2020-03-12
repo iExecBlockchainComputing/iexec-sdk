@@ -17,6 +17,7 @@ const {
   pretty,
   info,
   isEthAddress,
+  renderTasksStatus,
 } = require('./cli-helper');
 const {
   deployApp,
@@ -61,7 +62,11 @@ const { obsDeal } = require('./iexecProcess');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains');
 const {
-  NULL_ADDRESS, NULL_BYTES32, sumTags, BN,
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  sumTags,
+  BN,
+  stringifyNestedBn,
 } = require('./utils');
 const {
   tagSchema,
@@ -558,19 +563,13 @@ run
       } else {
         spinner.info(`deal submitted with dealid ${dealid}`);
 
-        const renderTaskStatus = tasksStatusMap => pretty(
-          Object.entries(tasksStatusMap).map(
-            ([idx, { taskid, statusName }]) => `Task idx ${idx} (${taskid}) status ${statusName}`,
-          ),
-        );
-
         const waitDealFinalState = () => new Promise((resolve, reject) => {
           let dealState;
           obsDeal(chain.contracts, dealid).subscribe({
             next: (data) => {
               dealState = data;
               spinner.start(
-                `Watching tasks execution...${renderTaskStatus(data.tasks)}`,
+                `Watching execution...\n${renderTasksStatus(data.tasks)}`,
               );
             },
             error: reject,
@@ -580,14 +579,9 @@ run
 
         const dealFinalState = await waitDealFinalState();
 
-        const tasksArray = Object.values(dealFinalState.tasks).map(task => ({
-          taskid: task.taskid,
-          idx: task.idx,
-          dealid: task.dealid,
-          status: task.status,
-          statusName: task.statusName,
-          taskTimedOut: task.taskTimedOut,
-        }));
+        const tasksArray = Object.values(dealFinalState.tasks).map(
+          stringifyNestedBn,
+        );
         result.tasks = tasksArray;
         const failedTasks = tasksArray.reduce(
           (acc, curr) => (curr.status !== 3 ? [...acc, curr] : acc),
@@ -595,7 +589,7 @@ run
         );
         if (failedTasks.length === 0) {
           spinner.succeed(
-            `App run successful:${renderTaskStatus(dealFinalState.tasks)}`,
+            `App run successful:\n${renderTasksStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },
@@ -603,9 +597,7 @@ run
         } else {
           result.failedTasks = failedTasks;
           spinner.fail(
-            `App run failed (${
-              failedTasks.length
-            } tasks failed):${renderTaskStatus(dealFinalState.tasks)}`,
+            `App run failed:\n${renderTasksStatus(dealFinalState.tasks)}`,
             {
               raw: result,
             },

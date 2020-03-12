@@ -2,12 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [4.0.3] 2020-02-27
+## Unreleased
 
 ### Added
 
 - `utils.decryptResult(encryptedResultFile, beneficiaryKey)` decrypt encrypted result with RSA beneficiary key
 - `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
+- `--watch` option added to `iexec deal show <dealid>` allow to watch execution status changes
 
 ### Changed
 

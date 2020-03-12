@@ -14,11 +14,13 @@ const {
   Spinner,
   info,
   pretty,
+  renderTasksStatus,
 } = require('./cli-helper');
 const { stringifyNestedBn } = require('./utils');
 const { Keystore } = require('./keystore');
 const { loadChain } = require('./chains.js');
 const deal = require('./deal');
+const { obsDeal } = require('./iexecProcess');
 
 const objName = 'deal';
 
@@ -27,6 +29,7 @@ addGlobalOptions(show);
 addWalletLoadOptions(show);
 show
   .option(...option.chain())
+  .option(...option.watch())
   .description(desc.showObj(objName))
   .action(async (dealid, cmd) => {
     await checkUpdate(cmd);
@@ -35,11 +38,50 @@ show
       const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
         spinner,
       });
-      spinner.start(info.showing(objName));
-      const dealResult = await deal.show(chain.contracts, dealid);
-      const cleanDeal = stringifyNestedBn(dealResult);
-      spinner.succeed(`Deal ${dealid} details: ${pretty(cleanDeal)}`, {
-        raw: { deal: cleanDeal },
+
+      let result;
+      if (cmd.watch) {
+        const waitDealFinalState = () => new Promise((resolve, reject) => {
+          let dealState;
+          obsDeal(chain.contracts, dealid).subscribe({
+            next: (data) => {
+              dealState = data;
+              spinner.start(
+                `Watching execution...\n${renderTasksStatus(data.tasks)}`,
+              );
+            },
+            error: reject,
+            complete: () => {
+              const tasks = Object.values(stringifyNestedBn(dealState.tasks));
+              const failedTasks = tasks.filter(task => task.taskTimedOut);
+              resolve({
+                tasksCount: dealState.tasksCount,
+                completedTasksCount: dealState.completedTasksCount,
+                failedTasksCount: dealState.failedTasksCount,
+                deal: stringifyNestedBn(dealState.deal),
+                tasks,
+                failedTasks,
+              });
+            },
+          });
+        });
+        result = await waitDealFinalState();
+
+        const dealStatus = result.failedTasksCount > 0 ? 'TIMEOUT' : 'COMPLETED';
+        spinner.stop();
+        spinner.info(
+          `Deal status ${dealStatus}\n${renderTasksStatus(result.tasks)}`,
+        );
+      } else {
+        spinner.start(info.showing(objName));
+        const dealResult = await deal.show(chain.contracts, dealid);
+        result = {
+          deal: stringifyNestedBn(dealResult),
+        };
+      }
+
+      spinner.succeed(`Deal ${dealid} details: ${pretty(result.deal)}`, {
+        raw: result,
       });
     } catch (error) {
       handleError(error, cli, cmd);
