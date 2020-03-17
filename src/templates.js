@@ -110,11 +110,10 @@ const chains = {
   default: 'kovan',
   chains: {
     dev: {
-      id: '1544020727674',
+      id: '65535',
       host: 'http://localhost:8545',
       sms: 'http://localhost:5000',
-      hub: '0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1',
-      // hub: '0x531C0Cf1EF13099C3d3D7D90D522C89A06880113',
+      hub: '0x0764146A7912e6bCB8C53e7ba2ce6b0fdFb7B734',
       // native: true,
     },
     kovan: {
