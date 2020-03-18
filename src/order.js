@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const {
+  cleanRPC,
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
@@ -8,6 +9,7 @@ const {
   getSalt,
   getAuthorization,
   NULL_ADDRESS,
+  NULL_BYTES,
   NULL_BYTES32,
   signTypedDatav3,
 } = require('./utils');
@@ -63,7 +65,7 @@ const NULL_DATASETORDER = {
   workerpoolrestrict: NULL_ADDRESS,
   requesterrestrict: NULL_ADDRESS,
   salt: NULL_BYTES32,
-  sign: '0x',
+  sign: NULL_BYTES,
 };
 
 const objDesc = {
@@ -90,7 +92,7 @@ const objDesc = {
     ],
     contractPropName: 'app',
     ownerMethod: getAppOwner,
-    cancelMethod: 'cancelAppOrder',
+    cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: 'apporders',
     dealField: 'appHash',
@@ -109,7 +111,7 @@ const objDesc = {
     ],
     contractPropName: 'dataset',
     ownerMethod: getDatasetOwner,
-    cancelMethod: 'cancelDatasetOrder',
+    cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: 'datasetorders',
     dealField: 'datasetHash',
@@ -130,7 +132,7 @@ const objDesc = {
     ],
     contractPropName: 'workerpool',
     ownerMethod: getWorkerpoolOwner,
-    cancelMethod: 'cancelWorkerpoolOrder',
+    cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: 'workerpoolorders',
     dealField: 'workerpoolHash',
@@ -154,7 +156,7 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
-    cancelMethod: 'cancelRequestOrder',
+    cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: 'requestorders',
     dealField: 'requestHash',
@@ -173,12 +175,11 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const getEIP712Domain = (chainId, verifyingContract) => ({
-  name: 'iExecODB',
-  version: '3.0-alpha',
-  chainId,
-  verifyingContract,
-});
+const getEIP712Domain = async (contracts) => {
+  const iexecContract = await contracts.getHubContract();
+  const domain = await wrapCall(iexecContract.domain());
+  return cleanRPC(domain);
+};
 
 const getContractOwner = async (
   contracts = throwIfMissing(),
@@ -212,8 +213,7 @@ const computeOrderHash = async (
         break;
       default:
     }
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
+    const domainObj = await getEIP712Domain(contracts);
     const types = {};
     types.EIP712Domain = objDesc.EIP712Domain.structMembers;
     types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
@@ -271,9 +271,7 @@ const signOrder = async (
       }`,
     );
   }
-
-  const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-  const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
+  const domainObj = await getEIP712Domain(contracts);
 
   const salt = getSalt();
   const saltedOrderObj = Object.assign(orderObj, { salt });
@@ -342,10 +340,18 @@ const cancelOrder = async (
   try {
     checkOrderName(orderName);
     const args = signedOrderToStruct(orderName, orderObj);
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
+    const remainingVolume = await getRemainingVolume(
+      contracts,
+      orderName,
+      orderObj,
+    );
+    if (remainingVolume.isZero()) throw Error(`${orderName} already canceled`);
+    const iexecContract = contracts.getHubContract();
     const tx = await wrapSend(
-      clerkContact[objDesc[orderName].cancelMethod](args, contracts.txOptions),
+      iexecContract[objDesc[orderName].cancelMethod](
+        [args, 1, NULL_BYTES],
+        contracts.txOptions,
+      ),
     );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);

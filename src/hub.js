@@ -1,12 +1,12 @@
 const Debug = require('debug');
 const {
-  toUpperFirst,
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
   multiaddrHexToHuman,
   getEventFromLogs,
   hexToBuffer,
+  NULL_ADDRESS,
 } = require('./utils');
 const {
   addressSchema,
@@ -30,14 +30,16 @@ const createObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const txReceipt = await wrapSend(contracts.createObj(objName)(obj));
-    const event = getEventFromLogs(
-      'Create'.concat(toUpperFirst(objName)),
-      txReceipt.events,
-      {
-        strict: true,
-      },
-    );
-    const address = checksummedAddress(event.args[objName]);
+    const event = getEventFromLogs('Transfer', txReceipt.events, {
+      strict: true,
+    });
+    const { tokenId } = event.args;
+    const hexTokenId = tokenId.toHexString().substring(2);
+    const lowerCaseAddress = NULL_ADDRESS.substr(
+      0,
+      42 - hexTokenId.length,
+    ).concat(hexTokenId);
+    const address = checksummedAddress(lowerCaseAddress);
     const txHash = txReceipt.transactionHash;
     return { address, txHash };
   } catch (error) {
@@ -360,7 +362,7 @@ const getWorkerpoolOwner = async (
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await wrapCall(contracts.getHubContract().FINAL_DEADLINE_RATIO()),
+      await wrapCall(contracts.getHubContract().final_deadline_ratio()),
     );
     return timeoutRatio;
   } catch (error) {

@@ -113,7 +113,7 @@ const chains = {
       id: '65535',
       host: 'http://localhost:8545',
       sms: 'http://localhost:5000',
-      hub: '0x0764146A7912e6bCB8C53e7ba2ce6b0fdFb7B734',
+      hub: '0xdFceb21CDA714B75AfcbE530E9aBDe7d8f96C939',
       // native: true,
     },
     kovan: {

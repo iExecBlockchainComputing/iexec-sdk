@@ -21,6 +21,7 @@ const { ValidationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
 
+const NULL_BYTES = '0x';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -181,17 +182,18 @@ const checkEvent = (eventName, events) => {
 };
 
 const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
-  let eventFound = {};
+  let eventFound;
   events.forEach((event) => {
     if (event.event === eventName) {
       eventFound = event;
     }
   });
-  if (!eventFound && strict) throw new Error(`Unknown event ${eventName}`);
+  if (!eventFound) {
+    if (strict) throw new Error(`Unknown event ${eventName}`);
+    return {};
+  }
   return eventFound;
 };
-
-const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
 
 const secToDate = (secs) => {
   const t = new Date(1970, 0, 1);
@@ -338,9 +340,7 @@ const getSalt = () => {
   const hex = bigNumberify(randomBytes(32))
     .toHexString()
     .substring(2);
-  const salt = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    .substr(0, 66 - hex.length)
-    .concat(hex);
+  const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
   return salt;
 };
 
@@ -513,12 +513,12 @@ module.exports = {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
   hexToBuffer,
-  toUpperFirst,
   secToDate,
   getAuthorization,
   http,
   download,
   getSalt,
+  NULL_BYTES,
   NULL_ADDRESS,
   NULL_BYTES32,
   signTypedDatav3,

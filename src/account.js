@@ -8,6 +8,7 @@ const {
 } = require('./utils');
 const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
+const { getAddress, checkBalances } = require('./wallet');
 
 const debug = Debug('iexec:account');
 
@@ -35,7 +36,15 @@ const deposit = async (
 ) => {
   try {
     const vAmount = await uint256Schema().validate(amount);
+    if (new BN(vAmount).lte(new BN(0))) throw Error('Deposit amount must be greather than 0');
     let txHash;
+
+    const { nRLC } = await checkBalances(
+      contracts,
+      await getAddress(contracts),
+    );
+    if (nRLC.lt(new BN(vAmount))) throw Error('Deposit amount exceed wallet balance');
+
     const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
@@ -55,7 +64,7 @@ const deposit = async (
         clerkContract.deposit(vAmount, contracts.txOptions),
       );
       const txReceipt = await wrapWait(tx.wait());
-      if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
+      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToEthersBn(
@@ -85,26 +94,21 @@ const withdraw = async (
 ) => {
   try {
     const vAmount = await uint256Schema().validate(amount);
+    if (new BN(vAmount).lte(new BN(0))) throw Error('Withdraw amount must be greather than 0');
     const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
     const clerkContract = contracts.getClerkContract({
       at: clerkAddress,
     });
-    // if (contracts.isNative) {
-    //   const withdrawGas = ethersBnToBn(
-    //     await clerkContract.estimate.withdraw(amount),
-    //   );
-    //   const gasPrice = new BN((await contracts.jsonRpcProvider.getGasPrice()).toString());
-    //   const withdrawWeiCost = withdrawGas.mul(gasPrice);
-    //   const weiAmount = bnNRlcToBnWei(new BN(amount));
-    //   debug('withdrawCost', withdrawWeiCost.toString());
-    //   debug('weiAmount', weiAmount.toString());
-    //   if (withdrawWeiCost.gt(weiAmount)) throw Error('withdraw cost is higher than witdrawed amount');
-    // }
+    const { stake } = await checkBalance(
+      contracts,
+      await getAddress(contracts),
+    );
+    if (stake.lt(new BN(vAmount))) throw Error('Withdraw amount exceed account balance');
     const tx = await wrapSend(
       clerkContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait());
-    if (!checkEvent('Withdraw', txReceipt.events)) throw Error('Withdraw not confirmed');
+    if (!checkEvent('Transfer', txReceipt.events)) throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {
     debug('withdraw()', error);
