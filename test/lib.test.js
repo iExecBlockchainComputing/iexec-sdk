@@ -4,18 +4,22 @@ const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
 const { utils, IExec, errors } = require('../src/iexec-lib');
-const { sleep } = require('../src/utils');
+const { sleep, bytes32Regex } = require('../src/utils');
 
 console.log('Node version:', process.version);
 
 // CONFIG
 const { DRONE } = process.env;
 // 1 block / tx
-const ethereumHost = DRONE ? 'ethereum' : 'localhost';
-const ethereumURL = `http://${ethereumHost}:8545`;
+const tokenChainUrl = DRONE ? 'http://ethereum:8545' : 'http://localhost:8545';
+const nativeChainUrl = DRONE
+  ? 'http://sidechain:8545'
+  : 'http://localhost:18545';
 // blocktime 1s for concurrent tx test
 const ethereumHost1s = DRONE ? 'ethereum1s' : 'localhost';
-const ethereumURL1s = `http://${ethereumHost1s}:8545`;
+const tokenChainUrl1s = DRONE
+  ? 'http://ethereum1s:8545'
+  : 'http://localhost:8545';
 
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
@@ -30,12 +34,14 @@ const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 
 // UTILS
 
-const ethRPC = new ethers.providers.JsonRpcProvider(ethereumURL);
-const ethRPC1s = new ethers.providers.JsonRpcProvider(ethereumURL1s);
+const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
+const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChainUrl1s);
+const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
 
-const walletWithProvider = new ethers.Wallet(PRIVATE_KEY, ethRPC);
+const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
+const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
 
-const initializeTask = async (hub, dealid, idx) => {
+const initializeTask = async (wallet, hub, dealid, idx) => {
   const hubContract = new ethers.Contract(
     hub,
     [
@@ -63,10 +69,16 @@ const initializeTask = async (hub, dealid, idx) => {
         type: 'function',
       },
     ],
-    walletWithProvider,
+    wallet,
   );
   const initTx = await hubContract.initialize(dealid, idx);
   await initTx.wait();
+};
+
+let sequenceId = Date.now();
+const getId = () => {
+  sequenceId += 1;
+  return sequenceId;
 };
 
 const deployAndGetApporder = async (
@@ -83,7 +95,7 @@ const deployAndGetApporder = async (
   const address = await iexec.wallet.getAddress();
   const appDeployRes = await iexec.app.deployApp({
     owner: address,
-    name: 'My app',
+    name: `app${getId()}`,
     type: 'DOCKER',
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
@@ -119,7 +131,7 @@ const deployAndGetDatasetorder = async (
   const address = await iexec.wallet.getAddress();
   const datasetDeployRes = await iexec.dataset.deployDataset({
     owner: address,
-    name: 'My dataset',
+    name: `dataset${getId()}`,
     multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
     checksum:
       '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -155,7 +167,7 @@ const deployAndGetWorkerpoolorder = async (
   const address = await iexec.wallet.getAddress();
   const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
     owner: address,
-    description: 'My workerpool',
+    description: `workerpool${getId()}`,
   });
   const workerpool = workerpoolDeployRes.address;
   const workerpoolorder = await iexec.order
@@ -208,15 +220,20 @@ const createCategory = async (iexec, { workClockTimeRef = 0 } = {}) => {
 
 // TESTS
 beforeAll(async () => {
-  const { chainId } = await ethRPC.getNetwork();
+  const { chainId } = await tokenChainRPC.getNetwork();
   console.log('chainId', chainId);
   networkId = `${chainId}`;
-  const block4 = await ethRPC.getBlock(4);
-  hubAddress = (await ethRPC.getTransaction(block4.transactions[0])).creates;
+
+  const factoryAddress = (
+    await tokenChainRPC.getTransaction(
+      (await tokenChainRPC.getBlock(4)).transactions[0],
+    )
+  ).creates;
+  console.log('factoryAddress', factoryAddress);
+
+  hubAddress = '0xD047d0445f745b0052a80a7fFC767c91ABFD8090';
+  nativeHubAddress = '0xD047d0445f745b0052a80a7fFC767c91ABFD8090';
   console.log('hubAddress', hubAddress);
-  const block28 = await ethRPC.getBlock(28);
-  nativeHubAddress = (await ethRPC.getTransaction(block28.transactions[0]))
-    .creates;
   console.log('nativeHubAddress', nativeHubAddress);
 }, 15000);
 
@@ -227,7 +244,7 @@ describe('[workflow]', () => {
   let workerpoolorder;
   let workerpoolorderToClaim;
   test('create category', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -249,7 +266,7 @@ describe('[workflow]', () => {
     expect(res.txHash).not.toBe(undefined);
   });
   test('deploy and sell app', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -261,9 +278,10 @@ describe('[workflow]', () => {
       },
     );
     const owner = await iexec.wallet.getAddress();
+    const appName = `My app${getId()}`;
     const appDeployRes = await iexec.app.deployApp({
       owner,
-      name: 'My app',
+      name: appName,
       type: 'DOCKER',
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
@@ -276,7 +294,7 @@ describe('[workflow]', () => {
     const appShowRes = await iexec.app.showApp(appDeployRes.address);
     expect(appShowRes.objAddress).toBe(appDeployRes.address);
     expect(appShowRes.app.owner).toBe(owner);
-    expect(appShowRes.app.appName).toBe('My app');
+    expect(appShowRes.app.appName).toBe(appName);
     expect(appShowRes.app.appType).toBe('DOCKER');
     expect(appShowRes.app.appMultiaddr).toBe(
       'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
@@ -296,7 +314,7 @@ describe('[workflow]', () => {
     expect(signedorder.sign).not.toBe(undefined);
   });
   test('deploy and sell dataset', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -308,9 +326,10 @@ describe('[workflow]', () => {
       },
     );
     const owner = await iexec.wallet.getAddress();
+    const datasetName = `My daatset${getId()}`;
     const datasetDeployRes = await iexec.dataset.deployDataset({
       owner,
-      name: 'My dataset',
+      name: datasetName,
       multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
       checksum:
         '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -323,7 +342,7 @@ describe('[workflow]', () => {
     );
     expect(datasetShowRes.objAddress).toBe(datasetDeployRes.address);
     expect(datasetShowRes.dataset.owner).toBe(owner);
-    expect(datasetShowRes.dataset.datasetName).toBe('My dataset');
+    expect(datasetShowRes.dataset.datasetName).toBe(datasetName);
     expect(datasetShowRes.dataset.datasetMultiaddr).toBe(
       '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
     );
@@ -341,7 +360,7 @@ describe('[workflow]', () => {
     expect(signedorder.sign).not.toBe(undefined);
   });
   test('deploy and sell computing power', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -353,9 +372,10 @@ describe('[workflow]', () => {
       },
     );
     const owner = await iexec.wallet.getAddress();
+    const desc = `workerpool${getId()}`;
     const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
       owner,
-      description: 'My workerpool',
+      description: desc,
     });
     expect(workerpoolDeployRes.address).not.toBe(undefined);
     expect(workerpoolDeployRes.txHash).not.toBe(undefined);
@@ -365,9 +385,7 @@ describe('[workflow]', () => {
     );
     expect(workerpoolShowRes.objAddress).toBe(workerpoolDeployRes.address);
     expect(workerpoolShowRes.workerpool.owner).toBe(owner);
-    expect(workerpoolShowRes.workerpool.workerpoolDescription).toBe(
-      'My workerpool',
-    );
+    expect(workerpoolShowRes.workerpool.workerpoolDescription).toBe(desc);
     expect(workerpoolShowRes.workerpool.schedulerRewardRatioPolicy).not.toBe(
       undefined,
     );
@@ -398,7 +416,7 @@ describe('[workflow]', () => {
     expect(workerpoolorderToClaim.sign).not.toBe(undefined);
   });
   test('buy computation', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -434,6 +452,7 @@ describe('[workflow]', () => {
       .add(new BN(order.workerpoolmaxprice));
     await iexec.account.deposit(totalPrice);
     expect(signedorder.sign).not.toBe(undefined);
+
     const matchOrdersRes = await iexec.order.matchOrders({
       apporder,
       datasetorder,
@@ -447,7 +466,7 @@ describe('[workflow]', () => {
   });
 
   test('show & claim task, show & claim deal (initialized & uninitialized tasks)', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -538,7 +557,12 @@ describe('[workflow]', () => {
     );
 
     const taskIdxToInit = 1;
-    await initializeTask(hubAddress, matchOrdersRes.dealid, taskIdxToInit);
+    await initializeTask(
+      tokenChainWallet,
+      hubAddress,
+      matchOrdersRes.dealid,
+      taskIdxToInit,
+    );
     const showTaskActiveRes = await iexec.task.show(
       showDealRes.tasks[taskIdxToInit],
     );
@@ -567,7 +591,12 @@ describe('[workflow]', () => {
     expect(showTaskActiveRes.taskTimedOut).toBe(true);
 
     const taskIdxToClaim = 2;
-    await initializeTask(hubAddress, matchOrdersRes.dealid, taskIdxToClaim);
+    await initializeTask(
+      tokenChainWallet,
+      hubAddress,
+      matchOrdersRes.dealid,
+      taskIdxToClaim,
+    );
     const claimTaskRes = await iexec.task.claim(
       showDealRes.tasks[taskIdxToClaim],
     );
@@ -591,7 +620,7 @@ describe('[getSignerFromPrivateKey]', () => {
   test('sign tx send value', async () => {
     const amount = new BN(1000);
     const receiver = ADDRESS2;
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -624,14 +653,14 @@ describe('[getSignerFromPrivateKey]', () => {
         .sub(new BN(amount))
         .eq(receiverInitialBalances.wei),
     ).toBe(true);
-    const tx = await ethRPC.getTransaction(txHash);
+    const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).not.toBe(undefined);
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
   test('sign tx no value', async () => {
     const amount = '1000000000';
     const receiver = ADDRESS2;
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -664,7 +693,7 @@ describe('[getSignerFromPrivateKey]', () => {
         .sub(new BN(amount))
         .eq(receiverInitialBalances.nRLC),
     ).toBe(true);
-    const tx = await ethRPC.getTransaction(txHash);
+    const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).not.toBe(undefined);
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
@@ -672,7 +701,7 @@ describe('[getSignerFromPrivateKey]', () => {
     const amount = '1000000000';
     const gasPrice = '123456789';
     const receiver = ADDRESS2;
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY, {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY, {
       gasPrice,
     });
     const iexec = new IExec(
@@ -707,7 +736,7 @@ describe('[getSignerFromPrivateKey]', () => {
         .sub(new BN(amount))
         .eq(receiverInitialBalances.nRLC),
     ).toBe(true);
-    const tx = await ethRPC.getTransaction(txHash);
+    const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).not.toBe(undefined);
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
@@ -716,7 +745,10 @@ describe('[getSignerFromPrivateKey]', () => {
     const receiver = ADDRESS2;
     const nonceProvider = await (async (address) => {
       const initNonce = ethers.utils.bigNumberify(
-        await ethRPC1s.send('eth_getTransactionCount', [address, 'latest']),
+        await tokenChainRPC1s.send('eth_getTransactionCount', [
+          address,
+          'latest',
+        ]),
       );
       let i = 0;
       const getNonce = () => initNonce.add(ethers.utils.bigNumberify(i++)).toHexString();
@@ -725,7 +757,7 @@ describe('[getSignerFromPrivateKey]', () => {
       };
     })(ADDRESS);
 
-    const signer = utils.getSignerFromPrivateKey(ethereumURL1s, PRIVATE_KEY, {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl1s, PRIVATE_KEY, {
       getTransactionCount: nonceProvider.getNonce,
     });
 
@@ -747,11 +779,11 @@ describe('[getSignerFromPrivateKey]', () => {
     const resArray = await Promise.all([
       iexec.workerpool.deployWorkerpool({
         owner: ADDRESS,
-        description: 'My workerpool',
+        description: `My workerpool${getId()}`,
       }),
       iexec.app.deployApp({
         owner: ADDRESS,
-        name: 'My app',
+        name: `My app${getId()}`,
         type: 'DOCKER',
         multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
         checksum:
@@ -760,7 +792,7 @@ describe('[getSignerFromPrivateKey]', () => {
       }),
       iexec.dataset.deployDataset({
         owner: ADDRESS,
-        name: 'My dataset',
+        name: `My dataset${getId()}`,
         multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
         checksum:
           '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -790,25 +822,25 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(txHashArray[5].length).toBe(66);
     expect(txHashArray[6].length).toBe(66);
 
-    const tx0 = await ethRPC1s.getTransaction(txHashArray[0]);
+    const tx0 = await tokenChainRPC1s.getTransaction(txHashArray[0]);
     expect(tx0).not.toBe(undefined);
     expect(tx0.gasPrice.toString()).toBe(chainGasPrice);
-    const tx1 = await ethRPC1s.getTransaction(txHashArray[1]);
+    const tx1 = await tokenChainRPC1s.getTransaction(txHashArray[1]);
     expect(tx1).not.toBe(undefined);
     expect(tx1.gasPrice.toString()).toBe(chainGasPrice);
-    const tx2 = await ethRPC1s.getTransaction(txHashArray[2]);
+    const tx2 = await tokenChainRPC1s.getTransaction(txHashArray[2]);
     expect(tx2).not.toBe(undefined);
     expect(tx2.gasPrice.toString()).toBe(chainGasPrice);
-    const tx3 = await ethRPC1s.getTransaction(txHashArray[3]);
+    const tx3 = await tokenChainRPC1s.getTransaction(txHashArray[3]);
     expect(tx3).not.toBe(undefined);
     expect(tx3.gasPrice.toString()).toBe(chainGasPrice);
-    const tx4 = await ethRPC1s.getTransaction(txHashArray[4]);
+    const tx4 = await tokenChainRPC1s.getTransaction(txHashArray[4]);
     expect(tx4).not.toBe(undefined);
     expect(tx4.gasPrice.toString()).toBe(chainGasPrice);
-    const tx5 = await ethRPC1s.getTransaction(txHashArray[5]);
+    const tx5 = await tokenChainRPC1s.getTransaction(txHashArray[5]);
     expect(tx5).not.toBe(undefined);
     expect(tx5.gasPrice.toString()).toBe(chainGasPrice);
-    const tx6 = await ethRPC1s.getTransaction(txHashArray[6]);
+    const tx6 = await tokenChainRPC1s.getTransaction(txHashArray[6]);
     expect(tx6).not.toBe(undefined);
     expect(tx6.gasPrice.toString()).toBe(chainGasPrice);
 
@@ -834,9 +866,104 @@ describe('[getSignerFromPrivateKey]', () => {
   }, 20000);
 });
 
+describe('[order]', () => {
+  test('order.cancelApporder', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await deployAndGetApporder(iexec);
+    const res = await iexec.order.cancelApporder(order);
+    expect(res.order).toEqual(order);
+    expect(res.txHash).toMatch(bytes32Regex);
+    await expect(iexec.order.cancelApporder(order)).rejects.toThrow(
+      Error('apporder already canceled'),
+    );
+  });
+
+  test('order.cancelDatasetorder', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await deployAndGetDatasetorder(iexec);
+    const res = await iexec.order.cancelDatasetorder(order);
+    expect(res.order).toEqual(order);
+    expect(res.txHash).toMatch(bytes32Regex);
+    await expect(iexec.order.cancelDatasetorder(order)).rejects.toThrow(
+      Error('datasetorder already canceled'),
+    );
+  });
+
+  test('order.cancelWorkerpoolorder', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await deployAndGetWorkerpoolorder(iexec);
+    const res = await iexec.order.cancelWorkerpoolorder(order);
+    expect(res.order).toEqual(order);
+    expect(res.txHash).toMatch(bytes32Regex);
+    await expect(iexec.order.cancelWorkerpoolorder(order)).rejects.toThrow(
+      Error('workerpoolorder already canceled'),
+    );
+  });
+
+  test('order.cancelRequestorder', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order
+      .createRequestorder({
+        app: utils.NULL_ADDRESS,
+        appmaxprice: 0,
+        workerpoolmaxprice: 0,
+        requester: await iexec.wallet.getAddress(),
+        volume: 1,
+        category: 1,
+      })
+      .then(iexec.order.signRequestorder);
+    const res = await iexec.order.cancelRequestorder(order);
+    expect(res.order).toEqual(order);
+    expect(res.txHash).toMatch(bytes32Regex);
+    await expect(iexec.order.cancelRequestorder(order)).rejects.toThrow(
+      Error('requestorder already canceled'),
+    );
+  });
+});
+
 describe('[observables]', () => {
   test('task.obsTask', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -914,7 +1041,7 @@ describe('[observables]', () => {
         });
       }),
       sleep(1000).then(async () => {
-        await initializeTask(hubAddress, dealid, 0);
+        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
         await sleep(6000);
       }),
     ]);
@@ -962,7 +1089,7 @@ describe('[observables]', () => {
   }, 30000);
 
   test('task.obsTask (task timeout)', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -1056,7 +1183,7 @@ describe('[observables]', () => {
       }),
       sleep(1000).then(() => {
         unsubObsTaskBeforeComplete();
-        initializeTask(hubAddress, dealid, 0);
+        initializeTask(tokenChainWallet, hubAddress, dealid, 0);
       }),
     ]);
 
@@ -1123,7 +1250,7 @@ describe('[observables]', () => {
   }, 30000);
 
   test('deal.obsDeal', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -1182,9 +1309,9 @@ describe('[observables]', () => {
         await sleep(10000);
       }),
       sleep(1000).then(async () => {
-        await initializeTask(hubAddress, dealid, 5);
+        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
         await sleep(6000);
-        await initializeTask(hubAddress, dealid, 0);
+        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
         await sleep(6000);
       }),
     ]);
@@ -1270,7 +1397,7 @@ describe('[observables]', () => {
   }, 30000);
 
   test('deal.obsDeal (deal timeout)', async () => {
-    const signer = utils.getSignerFromPrivateKey(ethereumURL, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -1343,9 +1470,9 @@ describe('[observables]', () => {
         resolve();
       }),
       sleep(5000).then(async () => {
-        await initializeTask(hubAddress, dealid, 5);
+        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
         await sleep(1000);
-        await initializeTask(hubAddress, dealid, 0);
+        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
         await sleep(6000);
       }),
     ]);
