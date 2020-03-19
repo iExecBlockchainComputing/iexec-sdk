@@ -4,22 +4,23 @@ const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
 const { utils, IExec, errors } = require('../src/iexec-lib');
-const { sleep, bytes32Regex } = require('../src/utils');
+const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
 
 console.log('Node version:', process.version);
 
 // CONFIG
 const { DRONE } = process.env;
 // 1 block / tx
-const tokenChainUrl = DRONE ? 'http://ethereum:8545' : 'http://localhost:8545';
+const tokenChainUrl = DRONE
+  ? 'http://token-chain:8545'
+  : 'http://localhost:8545';
 const nativeChainUrl = DRONE
-  ? 'http://sidechain:8545'
+  ? 'http://native-chain:8545'
   : 'http://localhost:18545';
 // blocktime 1s for concurrent tx test
-const ethereumHost1s = DRONE ? 'ethereum1s' : 'localhost';
 const tokenChainUrl1s = DRONE
-  ? 'http://ethereum1s:8545'
-  : 'http://localhost:8545';
+  ? 'http://token-chain-1s:8545'
+  : 'http://localhost:28545';
 
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
@@ -132,7 +133,7 @@ const deployAndGetDatasetorder = async (
   const datasetDeployRes = await iexec.dataset.deployDataset({
     owner: address,
     name: `dataset${getId()}`,
-    multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
     checksum:
       '0x0000000000000000000000000000000000000000000000000000000000000000',
   });
@@ -330,7 +331,7 @@ describe('[workflow]', () => {
     const datasetDeployRes = await iexec.dataset.deployDataset({
       owner,
       name: datasetName,
-      multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
       checksum:
         '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
@@ -793,7 +794,7 @@ describe('[getSignerFromPrivateKey]', () => {
       iexec.dataset.deployDataset({
         owner: ADDRESS,
         name: `My dataset${getId()}`,
-        multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
         checksum:
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       }),
@@ -866,8 +867,391 @@ describe('[getSignerFromPrivateKey]', () => {
   }, 20000);
 });
 
+describe('[app]', () => {
+  test('app.deployApp()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const app = {
+      owner: await iexec.wallet.getAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      mrenclave: 'abc|123|test',
+    };
+    const res = await iexec.app.deployApp(app);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.address).toMatch(addressRegex);
+
+    await expect(iexec.app.deployApp(app)).rejects.toThrow(
+      Error(`App already deployed at address ${res.address}`),
+    );
+  });
+  test('app.showApp()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const app = {
+      owner: await iexec.wallet.getAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      mrenclave: 'abc|123|test',
+    };
+    const { address } = await iexec.app.deployApp(app);
+
+    const res = await iexec.app.showApp(address);
+    expect(res.objAddress).toBe(address);
+    expect(res.app.owner).toBe(app.owner);
+    expect(res.app.registry).toMatch(addressRegex);
+    expect(res.app.appName).toBe(app.name);
+    expect(res.app.appType).toBe(app.type);
+    expect(res.app.appMultiaddr).toBe(app.multiaddr);
+    expect(res.app.appChecksum).toBe(app.checksum);
+    expect(res.app.appMREnclave).toBe(app.mrenclave);
+
+    await expect(iexec.app.showApp(utils.NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
+    );
+  });
+  test('app.countUserApps()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const app = {
+      owner: userAddress,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      mrenclave: 'abc|123|test',
+    };
+    const resBeforeDeploy = await iexec.app.countUserApps(userAddress);
+    await iexec.app.deployApp(app);
+    const res = await iexec.app.countUserApps(userAddress);
+    expect(resBeforeDeploy).toBeInstanceOf(BN);
+    expect(res).toBeInstanceOf(BN);
+    expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
+  });
+  test('app.showUserApp()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const app = {
+      owner: userAddress,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      mrenclave: 'abc|123|test',
+    };
+    const { address } = await iexec.app.deployApp(app);
+    const count = await iexec.app.countUserApps(userAddress);
+    const res = await iexec.app.showUserApp(count.sub(new BN(1)), userAddress);
+    expect(res.objAddress).toBe(address);
+    expect(res.app.owner).toBe(app.owner);
+    expect(res.app.registry).toMatch(addressRegex);
+    expect(res.app.appName).toBe(app.name);
+    expect(res.app.appType).toBe(app.type);
+    expect(res.app.appMultiaddr).toBe(app.multiaddr);
+    expect(res.app.appChecksum).toBe(app.checksum);
+    expect(res.app.appMREnclave).toBe(app.mrenclave);
+    await expect(iexec.app.showUserApp(count, userAddress)).rejects.toThrow(
+      Error('app not deployed'),
+    );
+  });
+});
+
+describe('[dataset]', () => {
+  test('dataset.deployDataset()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const dataset = {
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const res = await iexec.dataset.deployDataset(dataset);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.address).toMatch(addressRegex);
+
+    await expect(iexec.dataset.deployDataset(dataset)).rejects.toThrow(
+      Error(`Dataset already deployed at address ${res.address}`),
+    );
+  });
+  test('dataset.showDataset()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const dataset = {
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const { address } = await iexec.dataset.deployDataset(dataset);
+
+    const res = await iexec.dataset.showDataset(address);
+    expect(res.objAddress).toBe(address);
+    expect(res.dataset.owner).toBe(dataset.owner);
+    expect(res.dataset.registry).toMatch(addressRegex);
+    expect(res.dataset.datasetName).toBe(dataset.name);
+    expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
+    expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
+
+    await expect(iexec.dataset.showDataset(utils.NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('dataset', utils.NULL_ADDRESS, networkId),
+    );
+  });
+  test('dataset.countUserDatasets()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const dataset = {
+      owner: userAddress,
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const resBeforeDeploy = await iexec.dataset.countUserDatasets(userAddress);
+    await iexec.dataset.deployDataset(dataset);
+    const res = await iexec.dataset.countUserDatasets(userAddress);
+    expect(resBeforeDeploy).toBeInstanceOf(BN);
+    expect(res).toBeInstanceOf(BN);
+    expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
+  });
+  test('dataset.showUserDataset()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const dataset = {
+      owner: userAddress,
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const { address } = await iexec.dataset.deployDataset(dataset);
+    const count = await iexec.dataset.countUserDatasets(userAddress);
+    const res = await iexec.dataset.showUserDataset(
+      count.sub(new BN(1)),
+      userAddress,
+    );
+    expect(res.objAddress).toBe(address);
+    expect(res.dataset.owner).toBe(dataset.owner);
+    expect(res.dataset.registry).toMatch(addressRegex);
+    expect(res.dataset.datasetName).toBe(dataset.name);
+    expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
+    expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
+    await expect(
+      iexec.dataset.showUserDataset(count, userAddress),
+    ).rejects.toThrow(Error('dataset not deployed'));
+  });
+});
+
+describe('[workerpool]', () => {
+  test('workerpool.deployWorkerpool()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const res = await iexec.workerpool.deployWorkerpool(workerpool);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.address).toMatch(addressRegex);
+
+    await expect(iexec.workerpool.deployWorkerpool(workerpool)).rejects.toThrow(
+      Error(`Workerpool already deployed at address ${res.address}`),
+    );
+  });
+  test('workerpool.showWorkerpool()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+
+    const res = await iexec.workerpool.showWorkerpool(address);
+    expect(res.objAddress).toBe(address);
+    expect(res.workerpool.owner).toBe(workerpool.owner);
+    expect(res.workerpool.registry).toMatch(addressRegex);
+    expect(res.workerpool.schedulerRewardRatioPolicy).toBeInstanceOf(BN);
+    expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
+    expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
+
+    await expect(
+      iexec.workerpool.showWorkerpool(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
+      new errors.ObjectNotFoundError(
+        'workerpool',
+        utils.NULL_ADDRESS,
+        networkId,
+      ),
+    );
+  });
+  test('workerpool.countUserWorkerpools()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const workerpool = {
+      owner: userAddress,
+      description: `workerpool${getId()}`,
+    };
+    const resBeforeDeploy = await iexec.workerpool.countUserWorkerpools(
+      userAddress,
+    );
+    await iexec.workerpool.deployWorkerpool(workerpool);
+    const res = await iexec.workerpool.countUserWorkerpools(userAddress);
+    expect(resBeforeDeploy).toBeInstanceOf(BN);
+    expect(res).toBeInstanceOf(BN);
+    expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
+  });
+  test('workerpool.showUserWorkerpool()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const userAddress = await iexec.wallet.getAddress();
+    const workerpool = {
+      owner: userAddress,
+      description: `workerpool${getId()}`,
+    };
+    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    const count = await iexec.workerpool.countUserWorkerpools(userAddress);
+    const res = await iexec.workerpool.showUserWorkerpool(
+      count.sub(new BN(1)),
+      userAddress,
+    );
+    expect(res.objAddress).toBe(address);
+    expect(res.workerpool.owner).toBe(workerpool.owner);
+    expect(res.workerpool.registry).toMatch(addressRegex);
+    expect(res.workerpool.schedulerRewardRatioPolicy).toBeInstanceOf(BN);
+    expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
+    expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
+    await expect(
+      iexec.workerpool.showUserWorkerpool(count, userAddress),
+    ).rejects.toThrow(Error('workerpool not deployed'));
+  });
+});
+
 describe('[order]', () => {
-  test('order.cancelApporder', async () => {
+  test('order.cancelApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -888,7 +1272,7 @@ describe('[order]', () => {
     );
   });
 
-  test('order.cancelDatasetorder', async () => {
+  test('order.cancelDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -909,7 +1293,7 @@ describe('[order]', () => {
     );
   });
 
-  test('order.cancelWorkerpoolorder', async () => {
+  test('order.cancelWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -930,7 +1314,7 @@ describe('[order]', () => {
     );
   });
 
-  test('order.cancelRequestorder', async () => {
+  test('order.cancelRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -962,7 +1346,7 @@ describe('[order]', () => {
 });
 
 describe('[observables]', () => {
-  test('task.obsTask', async () => {
+  test('task.obsTask()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1088,7 +1472,7 @@ describe('[observables]', () => {
     expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
   }, 30000);
 
-  test('task.obsTask (task timeout)', async () => {
+  test('task.obsTask() (task timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1249,7 +1633,7 @@ describe('[observables]', () => {
     expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
   }, 30000);
 
-  test('deal.obsDeal', async () => {
+  test('deal.obsDeal()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1396,7 +1780,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
   }, 30000);
 
-  test('deal.obsDeal (deal timeout)', async () => {
+  test('deal.obsDeal() (deal timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {

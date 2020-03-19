@@ -57,9 +57,12 @@ pipeline:
         NODE_TAG: 8
 
 services:
-  ethereum:
-    image: iexechub/poco-chaintest
+  token-chain:
+    image: iexechub/poco-chaintest:v5-token
     pull: true
-  ethereum1s:
-    image: iexechub/poco-chaintest-1s
+  native-chain:
+    image: iexechub/poco-chaintest:v5-native
+    pull: true
+  token-chain-1s:
+    image: iexechub/poco-chaintest:v5-token-1s
     pull: true
