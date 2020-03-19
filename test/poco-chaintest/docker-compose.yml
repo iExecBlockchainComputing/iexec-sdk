@@ -6,6 +6,18 @@ services:
     ports:
       - 0.0.0.0:8545:8545
 
+  native-chaintest-v5:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:v5-native'
+    ports:
+      - 0.0.0.0:18545:8545
+
+  token-chaintest-v5-1s:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:v5-token-1s'
+    ports:
+      - 0.0.0.0:28545:8545
+
   token-chaintest-v5-explorer:
     restart: unless-stopped
     environment:
@@ -13,12 +25,6 @@ services:
     image: 'alethio/ethereum-lite-explorer'
     ports:
       - 0.0.0.0:8080:80
-
-  native-chaintest-v5:
-    restart: unless-stopped
-    image: 'iexechub/poco-chaintest:v5-native'
-    ports:
-      - 0.0.0.0:18545:8545
 
   native-chaintest-v5-explorer:
     restart: unless-stopped

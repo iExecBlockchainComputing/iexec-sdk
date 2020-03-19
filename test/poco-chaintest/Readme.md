@@ -23,6 +23,7 @@ cp config-token.json PoCo-dev/config/config.json
 
 ```bash
 docker build . -t iexechub/poco-chaintest:v5-token # build image with db
+docker build -f Dockerfile-1s . -t iexechub/poco-chaintest:v5-token-1s
 ```
 
 stop ganache
