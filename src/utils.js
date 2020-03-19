@@ -26,6 +26,7 @@ const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
+const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
@@ -528,6 +529,7 @@ module.exports = {
   decodeTag,
   sumTags,
   bytes32Regex,
+  addressRegex,
   sleep,
   FETCH_INTERVAL,
 };

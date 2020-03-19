@@ -78,7 +78,7 @@ const deposit = async (
         }),
       );
       const txReceipt = await wrapWait(tx.wait());
-      if (!checkEvent('Deposit', txReceipt.events)) throw Error('Deposit not confirmed');
+      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
     return { amount: vAmount, txHash };
