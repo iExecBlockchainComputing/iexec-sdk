@@ -428,9 +428,9 @@ describe('[Mainchain]', () => {
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec app show 1 (current user)', async () => {
+  test('[mainchain] iexec app show 0 (current user)', async () => {
     await execAsync('mv deployed.json deployed.back');
-    const raw = await execAsync(`${iexecPath} app show 1 --raw`);
+    const raw = await execAsync(`${iexecPath} app show 0 --raw`);
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -450,10 +450,10 @@ describe('[Mainchain]', () => {
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec app show 1 --user [address]', async () => {
+  test('[mainchain] iexec app show 0 --user [address]', async () => {
     await execAsync('mv wallet.json wallet.back');
     const raw = await execAsync(
-      `${iexecPath} app show 1 --user ${ADDRESS} --raw`,
+      `${iexecPath} app show 0 --user ${ADDRESS} --raw`,
     );
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
@@ -524,9 +524,9 @@ describe('[Mainchain]', () => {
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec dataset show 1 (current user)', async () => {
+  test('[mainchain] iexec dataset show 0 (current user)', async () => {
     await execAsync('mv deployed.json deployed.back');
-    const raw = await execAsync(`${iexecPath} dataset show 1 --raw`);
+    const raw = await execAsync(`${iexecPath} dataset show 0 --raw`);
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -548,10 +548,10 @@ describe('[Mainchain]', () => {
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec dataset show 1 --user [address]', async () => {
+  test('[mainchain] iexec dataset show 0 --user [address]', async () => {
     await execAsync('mv wallet.json wallet.back');
     const raw = await execAsync(
-      `${iexecPath} dataset show 1 --user ${ADDRESS} --raw`,
+      `${iexecPath} dataset show 0 --user ${ADDRESS} --raw`,
     );
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
@@ -622,9 +622,9 @@ describe('[Mainchain]', () => {
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec workerpool show 1 (current user)', async () => {
+  test('[mainchain] iexec workerpool show 0 (current user)', async () => {
     await execAsync('mv deployed.json deployed.back');
-    const raw = await execAsync(`${iexecPath} workerpool show 1 --raw`);
+    const raw = await execAsync(`${iexecPath} workerpool show 0 --raw`);
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -646,10 +646,10 @@ describe('[Mainchain]', () => {
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
-  test('[mainchain] iexec workerpool show 1 --user [address]', async () => {
+  test('[mainchain] iexec workerpool show 0 --user [address]', async () => {
     await execAsync('mv wallet.json wallet.back');
     const raw = await execAsync(
-      `${iexecPath} workerpool show 1 --user ${ADDRESS} --raw`,
+      `${iexecPath} workerpool show 0 --user ${ADDRESS} --raw`,
     );
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
