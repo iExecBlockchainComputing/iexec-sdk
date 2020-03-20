@@ -88,7 +88,7 @@ class IExec {
     this.wallet.checkBridgedBalances = address => wallet.checkBalances(bridgedContracts, address);
     this.wallet.sendETH = (weiAmount, to) => wallet.sendETH(contracts, weiAmount, to);
     this.wallet.sendRLC = (nRlcAmount, to) => wallet.sendRLC(contracts, nRlcAmount, to);
-    this.wallet.sweep = to => wallet.checkBalances(contracts, null, to);
+    this.wallet.sweep = to => wallet.sweep(contracts, to);
     this.wallet.bridgeToSidechain = nRlcAmount => wallet.bridgeToSidechain(contracts, bridgeAddress, nRlcAmount, {
       bridgedContracts,
       sidechainBridgeAddress:

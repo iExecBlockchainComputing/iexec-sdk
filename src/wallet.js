@@ -303,9 +303,9 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         balances = await checkBalances(contracts, userAddress);
       }
     }
-    const gasPrice = new BN(
-      (await contracts.jsonRpcProvider.getGasPrice()).toString(),
-    );
+    const gasPrice = contracts.txOptions && contracts.txOptions.gasPrice
+      ? ethersBnToBn(ethersBigNumberify(contracts.txOptions.gasPrice))
+      : ethersBnToBn(await contracts.jsonRpcProvider.getGasPrice());
     const gasLimit = new BN(21000);
     const txFee = gasPrice.mul(gasLimit);
     const sweepNative = balances.wei.sub(txFee);
