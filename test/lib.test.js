@@ -31,7 +31,9 @@ let networkId;
 const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
 const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
+const PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
+const ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 
 // UTILS
 
@@ -865,6 +867,619 @@ describe('[getSignerFromPrivateKey]', () => {
       ),
     ).toBe(true);
   }, 20000);
+});
+
+describe('[wallet]', () => {
+  test('wallet.getAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.wallet.getAddress();
+    expect(res).toBe(ADDRESS);
+  });
+  test('wallet.checkBalances()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(initialBalance.wei).toBeInstanceOf(BN);
+    expect(initialBalance.nRLC).toBeInstanceOf(BN);
+    await iexec.wallet.sendETH(5, utils.NULL_ADDRESS);
+    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(finalBalance.wei).toBeInstanceOf(BN);
+    expect(finalBalance.nRLC).toBeInstanceOf(BN);
+    expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(true);
+    expect(finalBalance.nRLC.add(new BN(10)).eq(initialBalance.nRLC)).toBe(
+      true,
+    );
+  });
+  test('wallet.checkBalances() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(initialBalance.wei).toBeInstanceOf(BN);
+    expect(initialBalance.nRLC).toBeInstanceOf(BN);
+    expect(
+      initialBalance.wei.eq(initialBalance.nRLC.mul(new BN(1000000000))),
+    ).toBe(true);
+    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(finalBalance.wei).toBeInstanceOf(BN);
+    expect(finalBalance.nRLC).toBeInstanceOf(BN);
+    expect(finalBalance.wei.add(new BN(10)).lt(initialBalance.wei)).toBe(true);
+    expect(finalBalance.nRLC.add(new BN(10)).eq(initialBalance.nRLC)).toBe(
+      true,
+    );
+    expect(finalBalance.wei.eq(finalBalance.nRLC.mul(new BN(1000000000)))).toBe(
+      true,
+    );
+  });
+  test.skip('wallet.checkBridgedBalances() (token)', async () => {
+    throw Error('TODO');
+  });
+  test.skip('wallet.checkBridgedBalances() (native)', async () => {
+    throw Error('TODO');
+  });
+  test('wallet.sendETH()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const txHash = await iexec.wallet.sendETH(5, ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(true);
+    expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
+    expect(
+      receiverFinalBalance.wei.eq(receiverInitialBalance.wei.add(new BN(5))),
+    ).toBe(true);
+    expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
+      true,
+    );
+  });
+  test('wallet.sendETH() (throw on native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    await expect(iexec.wallet.sendETH(10, ADDRESS3)).rejects.toThrow(
+      Error('sendETH() is disabled on sidechain, use sendRLC()'),
+    );
+  });
+  test('wallet.sendRLC()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const txHash = await iexec.wallet.sendRLC(5, ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
+    expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
+    expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(true);
+  });
+  test('wallet.sendRLC() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const txHash = await iexec.wallet.sendRLC(5, ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
+    expect(
+      finalBalance.wei
+        .add(new BN(5).mul(new BN(1000000000)))
+        .eq(initialBalance.wei),
+    ).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC.sub(new BN(5)).eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+    expect(
+      receiverFinalBalance.wei
+        .sub(new BN(5).mul(new BN(1000000000)))
+        .eq(receiverInitialBalance.wei),
+    ).toBe(true);
+  });
+  test('wallet.sweep()', async () => {
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY2),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH('10000000000000000', ADDRESS2);
+    await iexecRichman.wallet.sendRLC(20, ADDRESS2);
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const res = await iexec.wallet.sweep(ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(res.sendNativeTxHash).toMatch(bytes32Regex);
+    expect(res.sendERC20TxHash).toMatch(bytes32Regex);
+    expect(initialBalance.wei.gt(new BN(0))).toBe(true);
+    expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
+    expect(finalBalance.wei.eq(new BN(0))).toBe(true);
+    expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
+    expect(receiverFinalBalance.wei.gt(receiverInitialBalance.wei)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC
+        .sub(initialBalance.nRLC)
+        .eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+  });
+  test('wallet.sweep() (ERC20 fail)', async () => {
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY2),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH(100, ADDRESS2);
+    await iexecRichman.wallet.sendRLC(20, ADDRESS2);
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    await expect(iexec.wallet.sweep(ADDRESS3)).rejects.toThrow(
+      Error(
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': sender doesn't have enough funds to send tx. The upfront cost is: 725180000000000 and the sender's account only has: ${initialBalance.wei.toString()}`,
+      ),
+    );
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(initialBalance.wei.gt(new BN(0))).toBe(true);
+    expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
+    expect(finalBalance.wei.eq(initialBalance.wei)).toBe(true);
+    expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
+    expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(true);
+    expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
+      true,
+    );
+  });
+  test('wallet.sweep() (ERC20 success, native fail)', async () => {
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY2),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH('725180000000100', ADDRESS2);
+    await iexecRichman.wallet.sendRLC(20, ADDRESS2);
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const res = await iexec.wallet.sweep(ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(res.sendNativeTxHash).toBeUndefined();
+    expect(res.sendERC20TxHash).toMatch(bytes32Regex);
+    expect(res.errors.length).toBe(1);
+    expect(res.errors[0]).toBe(
+      "Failed to transfert native token': Tx fees are greather than wallet balance",
+    );
+    expect(initialBalance.wei.gt(new BN(0))).toBe(true);
+    expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
+    expect(finalBalance.wei.gt(new BN(0))).toBe(true);
+    expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
+    expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC
+        .sub(initialBalance.nRLC)
+        .eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+  });
+  test('wallet.sweep() (native)', async () => {
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          nativeChainUrl,
+          PRIVATE_KEY2,
+        ),
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    await iexecRichman.wallet.sendRLC(20, ADDRESS2);
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    const res = await iexec.wallet.sweep(ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS2);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(ADDRESS3);
+    expect(res.sendNativeTxHash).toMatch(bytes32Regex);
+    expect(res.sendERC20TxHash).toBeUndefined();
+    expect(initialBalance.wei.gt(new BN(0))).toBe(true);
+    expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
+    expect(finalBalance.wei.eq(new BN(0))).toBe(true);
+    expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
+    expect(
+      receiverFinalBalance.wei
+        .sub(initialBalance.wei)
+        .eq(receiverInitialBalance.wei),
+    ).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC
+        .sub(initialBalance.nRLC)
+        .eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+  });
+});
+
+describe('[account]', () => {
+  test('account.checkBalance()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.account.checkBalance(ADDRESS);
+    expect(initialBalance.stake).toBeInstanceOf(BN);
+    expect(initialBalance.locked).toBeInstanceOf(BN);
+    await iexec.account.deposit(5);
+    const finalBalance = await iexec.account.checkBalance(ADDRESS);
+    expect(finalBalance.stake).toBeInstanceOf(BN);
+    expect(finalBalance.locked).toBeInstanceOf(BN);
+    expect(finalBalance.stake.sub(new BN(5)).eq(initialBalance.stake)).toBe(
+      true,
+    );
+    expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
+  });
+  test.skip('account.checkBridgedBalance()', async () => {
+    throw Error('TODO');
+  });
+  test('account.deposit() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.deposit(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.sub(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (token, exceed wallet balance)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const { nRLC } = await iexec.wallet.checkBalances(ADDRESS);
+    await expect(iexec.account.deposit(nRLC.add(new BN(1)))).rejects.toThrow(
+      Error('Deposit amount exceed wallet balance'),
+    );
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
+      true,
+    );
+    expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.deposit(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.sub(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (native, exceed wallet balance)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const { nRLC } = await iexec.wallet.checkBalances(ADDRESS);
+    await expect(iexec.account.deposit(nRLC.add(new BN(1)))).rejects.toThrow(
+      Error('Deposit amount exceed wallet balance'),
+    );
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
+      true,
+    );
+    expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.withdraw() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexec.account.deposit(10);
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.withdraw(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.add(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.sub(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (token, exceed account balance)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexec.account.deposit(10);
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const { stake } = await iexec.account.checkBalance(ADDRESS);
+    await expect(iexec.account.withdraw(stake.add(new BN(1)))).rejects.toThrow(
+      Error('Withdraw amount exceed account balance'),
+    );
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
+      true,
+    );
+    expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    await iexec.account.deposit(10);
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.withdraw(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.add(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.sub(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (native, exceed account balance)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    await iexec.account.deposit(10);
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const { stake } = await iexec.account.checkBalance(ADDRESS);
+    await expect(iexec.account.withdraw(stake.add(new BN(1)))).rejects.toThrow(
+      Error('Withdraw amount exceed account balance'),
+    );
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
+      true,
+    );
+    expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
 });
 
 describe('[app]', () => {
