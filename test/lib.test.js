@@ -264,9 +264,9 @@ describe('[workflow]', () => {
       workClockTimeRef: '0',
     });
     noDurationCatId = res.catid.toString();
-    expect(res).not.toBe(undefined);
-    expect(res.catid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res).toBeDefined();
+    expect(res.catid).toBeDefined();
+    expect(res.txHash).toBeDefined();
   });
   test('deploy and sell app', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -291,8 +291,8 @@ describe('[workflow]', () => {
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       mrenclave: 'abc|123|test',
     });
-    expect(appDeployRes.address).not.toBe(undefined);
-    expect(appDeployRes.txHash).not.toBe(undefined);
+    expect(appDeployRes.address).toBeDefined();
+    expect(appDeployRes.txHash).toBeDefined();
 
     const appShowRes = await iexec.app.showApp(appDeployRes.address);
     expect(appShowRes.objAddress).toBe(appDeployRes.address);
@@ -314,7 +314,7 @@ describe('[workflow]', () => {
     });
     const signedorder = await iexec.order.signApporder(order);
     apporder = signedorder;
-    expect(signedorder.sign).not.toBe(undefined);
+    expect(signedorder.sign).toBeDefined();
   });
   test('deploy and sell dataset', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -337,8 +337,8 @@ describe('[workflow]', () => {
       checksum:
         '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    expect(datasetDeployRes.address).not.toBe(undefined);
-    expect(datasetDeployRes.txHash).not.toBe(undefined);
+    expect(datasetDeployRes.address).toBeDefined();
+    expect(datasetDeployRes.txHash).toBeDefined();
 
     const datasetShowRes = await iexec.dataset.showDataset(
       datasetDeployRes.address,
@@ -360,7 +360,7 @@ describe('[workflow]', () => {
     });
     const signedorder = await iexec.order.signDatasetorder(order);
     datasetorder = signedorder;
-    expect(signedorder.sign).not.toBe(undefined);
+    expect(signedorder.sign).toBeDefined();
   });
   test('deploy and sell computing power', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -380,8 +380,8 @@ describe('[workflow]', () => {
       owner,
       description: desc,
     });
-    expect(workerpoolDeployRes.address).not.toBe(undefined);
-    expect(workerpoolDeployRes.txHash).not.toBe(undefined);
+    expect(workerpoolDeployRes.address).toBeDefined();
+    expect(workerpoolDeployRes.txHash).toBeDefined();
 
     const workerpoolShowRes = await iexec.workerpool.showWorkerpool(
       workerpoolDeployRes.address,
@@ -405,7 +405,7 @@ describe('[workflow]', () => {
     await iexec.account.deposit(order.workerpoolprice);
     const signedorder = await iexec.order.signWorkerpoolorder(order);
     workerpoolorder = signedorder;
-    expect(signedorder.sign).not.toBe(undefined);
+    expect(signedorder.sign).toBeDefined();
     // generate no duration order
     const orderToClaim = await iexec.order.createWorkerpoolorder({
       workerpool: workerpoolDeployRes.address,
@@ -416,7 +416,7 @@ describe('[workflow]', () => {
     workerpoolorderToClaim = await iexec.order.signWorkerpoolorder(
       orderToClaim,
     );
-    expect(workerpoolorderToClaim.sign).not.toBe(undefined);
+    expect(workerpoolorderToClaim.sign).toBeDefined();
   });
   test('buy computation', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -454,7 +454,7 @@ describe('[workflow]', () => {
       .add(new BN(order.datasetmaxprice))
       .add(new BN(order.workerpoolmaxprice));
     await iexec.account.deposit(totalPrice);
-    expect(signedorder.sign).not.toBe(undefined);
+    expect(signedorder.sign).toBeDefined();
 
     const matchOrdersRes = await iexec.order.matchOrders({
       apporder,
@@ -462,9 +462,9 @@ describe('[workflow]', () => {
       workerpoolorder,
       requestorder: signedorder,
     });
-    expect(matchOrdersRes).not.toBe(undefined);
-    expect(matchOrdersRes.dealid).not.toBe(undefined);
-    expect(matchOrdersRes.txHash).not.toBe(undefined);
+    expect(matchOrdersRes).toBeDefined();
+    expect(matchOrdersRes.dealid).toBeDefined();
+    expect(matchOrdersRes.txHash).toBeDefined();
     expect(matchOrdersRes.volume.eq(new BN(1))).toBe(true);
   });
 
@@ -497,35 +497,35 @@ describe('[workflow]', () => {
       .add(new BN(order.workerpoolmaxprice))
       .mul(new BN(order.volume));
     await iexec.account.deposit(totalPrice);
-    expect(signedorder.sign).not.toBe(undefined);
+    expect(signedorder.sign).toBeDefined();
     const matchOrdersRes = await iexec.order.matchOrders({
       apporder,
       datasetorder,
       workerpoolorder: workerpoolorderToClaim,
       requestorder: signedorder,
     });
-    expect(matchOrdersRes).not.toBe(undefined);
-    expect(matchOrdersRes.dealid).not.toBe(undefined);
-    expect(matchOrdersRes.txHash).not.toBe(undefined);
+    expect(matchOrdersRes).toBeDefined();
+    expect(matchOrdersRes.dealid).toBeDefined();
+    expect(matchOrdersRes.txHash).toBeDefined();
     expect(matchOrdersRes.volume.eq(new BN(10))).toBe(true);
 
     const showDealRes = await iexec.deal.show(matchOrdersRes.dealid);
-    expect(showDealRes).not.toBe(undefined);
-    expect(showDealRes.app).not.toBe(undefined);
+    expect(showDealRes).toBeDefined();
+    expect(showDealRes.app).toBeDefined();
     expect(showDealRes.app.pointer).toBe(apporder.app);
-    expect(showDealRes.app.owner).not.toBe(undefined);
+    expect(showDealRes.app.owner).toBeDefined();
     expect(showDealRes.app.price.eq(new BN(apporder.appprice))).toBe(true);
-    expect(showDealRes.dataset).not.toBe(undefined);
+    expect(showDealRes.dataset).toBeDefined();
     expect(showDealRes.dataset.pointer).toBe(datasetorder.dataset);
-    expect(showDealRes.dataset.owner).not.toBe(undefined);
+    expect(showDealRes.dataset.owner).toBeDefined();
     expect(
       showDealRes.dataset.price.eq(new BN(datasetorder.datasetprice)),
     ).toBe(true);
-    expect(showDealRes.workerpool).not.toBe(undefined);
+    expect(showDealRes.workerpool).toBeDefined();
     expect(showDealRes.workerpool.pointer).toBe(
       workerpoolorderToClaim.workerpool,
     );
-    expect(showDealRes.workerpool.owner).not.toBe(undefined);
+    expect(showDealRes.workerpool.owner).toBeDefined();
     expect(
       showDealRes.workerpool.price.eq(
         new BN(workerpoolorderToClaim.workerpoolprice),
@@ -547,9 +547,9 @@ describe('[workflow]', () => {
     expect(showDealRes.beneficiary).toBe(signedorder.beneficiary);
     expect(showDealRes.callback).toBe(signedorder.callback);
     expect(typeof showDealRes.tasks).toBe('object');
-    expect(showDealRes.tasks[0]).not.toBe(undefined);
-    expect(showDealRes.tasks[9]).not.toBe(undefined);
-    expect(showDealRes.tasks[10]).toBe(undefined);
+    expect(showDealRes.tasks[0]).toBeDefined();
+    expect(showDealRes.tasks[9]).toBeDefined();
+    expect(showDealRes.tasks[10]).toBeUndefined();
 
     const showTaskUnsetRes = await iexec.task
       .show(showDealRes.tasks[0])
@@ -603,19 +603,19 @@ describe('[workflow]', () => {
     const claimTaskRes = await iexec.task.claim(
       showDealRes.tasks[taskIdxToClaim],
     );
-    expect(claimTaskRes).not.toBe(undefined);
+    expect(claimTaskRes).toBeDefined();
 
     const claimDealRes = await iexec.deal.claim(matchOrdersRes.dealid);
-    expect(claimDealRes).not.toBe(undefined);
-    expect(claimDealRes.transactions).not.toBe(undefined);
+    expect(claimDealRes).toBeDefined();
+    expect(claimDealRes.transactions).toBeDefined();
     expect(claimDealRes.transactions.length).toBe(2);
-    expect(claimDealRes.transactions[0]).not.toBe(undefined);
+    expect(claimDealRes.transactions[0]).toBeDefined();
     expect(claimDealRes.transactions[0].type).toBe('claimArray');
-    expect(claimDealRes.transactions[1]).not.toBe(undefined);
+    expect(claimDealRes.transactions[1]).toBeDefined();
     expect(claimDealRes.transactions[1].type).toBe('initializeAndClaimArray');
-    expect(claimDealRes.claimed).not.toBe(undefined);
+    expect(claimDealRes.claimed).toBeDefined();
     expect(Object.keys(claimDealRes.claimed).length).toBe(9);
-    expect(claimDealRes.claimed[0]).not.toBe(undefined);
+    expect(claimDealRes.claimed[0]).toBeDefined();
   }, 10000);
 });
 
@@ -643,7 +643,7 @@ describe('[getSignerFromPrivateKey]', () => {
       await iexec.wallet.getAddress(),
     );
     const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
-    expect(txHash).not.toBe(undefined);
+    expect(txHash).toBeDefined();
     expect(txHash.length).toBe(66);
     expect(
       senderFinalBalances.wei
@@ -657,7 +657,7 @@ describe('[getSignerFromPrivateKey]', () => {
         .eq(receiverInitialBalances.wei),
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
   test('sign tx no value', async () => {
@@ -683,7 +683,7 @@ describe('[getSignerFromPrivateKey]', () => {
       await iexec.wallet.getAddress(),
     );
     const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
-    expect(txHash).not.toBe(undefined);
+    expect(txHash).toBeDefined();
     expect(txHash.length).toBe(66);
     expect(senderFinalBalances.wei.lte(senderInitialBalances.wei)).toBe(true);
     expect(
@@ -697,7 +697,7 @@ describe('[getSignerFromPrivateKey]', () => {
         .eq(receiverInitialBalances.nRLC),
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
   test('gasPrice option', async () => {
@@ -726,7 +726,7 @@ describe('[getSignerFromPrivateKey]', () => {
       await iexec.wallet.getAddress(),
     );
     const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
-    expect(txHash).not.toBe(undefined);
+    expect(txHash).toBeDefined();
     expect(txHash.length).toBe(66);
     expect(senderFinalBalances.wei.lte(senderInitialBalances.wei)).toBe(true);
     expect(
@@ -740,7 +740,7 @@ describe('[getSignerFromPrivateKey]', () => {
         .eq(receiverInitialBalances.nRLC),
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
   test('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
@@ -806,7 +806,7 @@ describe('[getSignerFromPrivateKey]', () => {
       iexec.account.deposit(amount),
     ]);
 
-    expect(resArray).not.toBe(undefined);
+    expect(resArray).toBeDefined();
     expect(resArray.length).toBe(7);
     const txHashArray = [
       resArray[0].txHash,
@@ -826,25 +826,25 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(txHashArray[6].length).toBe(66);
 
     const tx0 = await tokenChainRPC1s.getTransaction(txHashArray[0]);
-    expect(tx0).not.toBe(undefined);
+    expect(tx0).toBeDefined();
     expect(tx0.gasPrice.toString()).toBe(chainGasPrice);
     const tx1 = await tokenChainRPC1s.getTransaction(txHashArray[1]);
-    expect(tx1).not.toBe(undefined);
+    expect(tx1).toBeDefined();
     expect(tx1.gasPrice.toString()).toBe(chainGasPrice);
     const tx2 = await tokenChainRPC1s.getTransaction(txHashArray[2]);
-    expect(tx2).not.toBe(undefined);
+    expect(tx2).toBeDefined();
     expect(tx2.gasPrice.toString()).toBe(chainGasPrice);
     const tx3 = await tokenChainRPC1s.getTransaction(txHashArray[3]);
-    expect(tx3).not.toBe(undefined);
+    expect(tx3).toBeDefined();
     expect(tx3.gasPrice.toString()).toBe(chainGasPrice);
     const tx4 = await tokenChainRPC1s.getTransaction(txHashArray[4]);
-    expect(tx4).not.toBe(undefined);
+    expect(tx4).toBeDefined();
     expect(tx4.gasPrice.toString()).toBe(chainGasPrice);
     const tx5 = await tokenChainRPC1s.getTransaction(txHashArray[5]);
-    expect(tx5).not.toBe(undefined);
+    expect(tx5).toBeDefined();
     expect(tx5.gasPrice.toString()).toBe(chainGasPrice);
     const tx6 = await tokenChainRPC1s.getTransaction(txHashArray[6]);
-    expect(tx6).not.toBe(undefined);
+    expect(tx6).toBeDefined();
     expect(tx6.gasPrice.toString()).toBe(chainGasPrice);
 
     const senderFinalBalances = await iexec.wallet.checkBalances(

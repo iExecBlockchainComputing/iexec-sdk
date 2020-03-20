@@ -255,11 +255,11 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.hubAddress).toBe(hubAddress);
-    // expect(res.pocoVersion).not.toBe(undefined);
-    expect(res.appRegistryAddress).not.toBe(undefined);
-    expect(res.datasetRegistryAddress).not.toBe(undefined);
-    expect(res.workerpoolRegistryAddress).not.toBe(undefined);
-    expect(res.rlcAddress).not.toBe(undefined);
+    // expect(res.pocoVersion).toBeDefined();
+    expect(res.appRegistryAddress).toBeDefined();
+    expect(res.datasetRegistryAddress).toBeDefined();
+    expect(res.workerpoolRegistryAddress).toBeDefined();
+    expect(res.rlcAddress).toBeDefined();
     expect(res.useNative).toBe(false);
   });
 
@@ -267,10 +267,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} wallet show --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.wallet).not.toBe(undefined);
-    expect(res.balance.ETH).not.toBe(undefined);
+    expect(res.wallet).toBeDefined();
+    expect(res.balance.ETH).toBeDefined();
     expect(res.balance.ETH).not.toBe('0');
-    expect(res.balance.nRLC).not.toBe(undefined);
+    expect(res.balance.nRLC).toBeDefined();
     expect(res.balance.nRLC).not.toBe('0');
     expect(res.balance.ETH.replace('.', '').indexOf(res.balance.nRLC)).toBe(-1);
   }, 10000);
@@ -292,7 +292,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.amount).toBe(amount);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
     const finalWalletBalance = new BN(
       JSON.parse(
@@ -311,7 +311,7 @@ describe('[Mainchain]', () => {
       true,
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 30000);
 
@@ -333,7 +333,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.amount).toBe(amount);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
     const finalWalletBalance = new BN(
       JSON.parse(
@@ -352,7 +352,7 @@ describe('[Mainchain]', () => {
       true,
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 30000);
 
@@ -360,7 +360,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} account show --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.balance).not.toBe(undefined);
+    expect(res.balance).toBeDefined();
     expect(res.balance.stake).not.toBe('0');
     // expect(res.balance.locked).toBe('0');
   }, 10000);
@@ -369,7 +369,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} account show ${ADDRESS3} --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.balance).not.toBe(undefined);
+    expect(res.balance).toBeDefined();
     expect(res.balance.stake).toBe('0');
     expect(res.balance.locked).toBe('0');
   }, 10000);
@@ -384,7 +384,7 @@ describe('[Mainchain]', () => {
       'Failed to load wallet address from keystore: Wallet file not found',
     );
     expect(res.error.name).toBe('Error');
-    expect(res.balance).toBe(undefined);
+    expect(res.balance).toBeUndefined();
   }, 10000);
 
   // APP
@@ -394,7 +394,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).not.toBe(ADDRESS);
   });
 
@@ -402,7 +402,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} app init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   });
 
@@ -411,10 +411,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} app deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainApp = res.address;
   }, 15000);
@@ -424,7 +424,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainApp);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -434,8 +434,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.app).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -446,7 +446,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainApp);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -458,8 +458,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.app).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -467,7 +467,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} app count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -479,7 +479,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -490,7 +490,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).not.toBe(ADDRESS);
   });
 
@@ -498,7 +498,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} dataset init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   });
 
@@ -507,10 +507,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} dataset deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDataset = res.address;
   }, 15000);
@@ -520,7 +520,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainDataset);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -530,8 +530,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -544,7 +544,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainDataset);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -556,8 +556,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -565,7 +565,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} dataset count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -577,7 +577,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -588,7 +588,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).not.toBe(ADDRESS);
   });
 
@@ -596,7 +596,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   });
 
@@ -605,10 +605,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainWorkerpool = res.address;
   }, 15000);
@@ -618,7 +618,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainWorkerpool);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -628,8 +628,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -642,7 +642,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(mainchainWorkerpool);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -654,8 +654,8 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -663,7 +663,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -675,7 +675,7 @@ describe('[Mainchain]', () => {
     await execAsync('mv wallet.back wallet.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -684,17 +684,17 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} category init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.category).not.toBe(undefined);
+    expect(res.category).toBeDefined();
   });
 
   test('[mainchain] iexec category create', async () => {
     const raw = await execAsync(`${iexecPath} category create --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.catid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.catid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
@@ -706,10 +706,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} category create --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.catid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.catid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainNoDurationCatid = res.catid.toString();
   });
@@ -719,14 +719,14 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.index).toBe('0');
-    expect(res.category).not.toBe(undefined);
+    expect(res.category).toBeDefined();
   });
 
   test('[mainchain] iexec category count', async () => {
     const raw = await execAsync(`${iexecPath} category count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   });
 
@@ -737,10 +737,10 @@ describe('[Mainchain]', () => {
     await execAsync('mv deployed.back deployed.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeDefined();
     expect(res.requestorder.requester).toBe(ADDRESS);
     expect(res.requestorder.beneficiary).toBe(ADDRESS);
   });
@@ -749,10 +749,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order init --app --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
     expect(res.apporder.app).toBe(mainchainApp);
   });
 
@@ -760,10 +760,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order init --dataset --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
     expect(res.datasetorder.dataset).toBe(mainchainDataset);
   });
 
@@ -771,10 +771,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order init --workerpool --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeUndefined();
     expect(res.workerpoolorder.workerpool).toBe(mainchainWorkerpool);
   });
 
@@ -782,10 +782,10 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order init --request --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeDefined();
     expect(res.requestorder.requester).toBe(ADDRESS);
     expect(res.requestorder.beneficiary).toBe(ADDRESS);
   });
@@ -804,14 +804,14 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order sign --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
-    expect(res.apporder.app).not.toBe(undefined);
-    expect(res.datasetorder.dataset).not.toBe(undefined);
-    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
-    expect(res.requestorder.app).not.toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeDefined();
+    expect(res.apporder.app).toBeDefined();
+    expect(res.datasetorder.dataset).toBeDefined();
+    expect(res.workerpoolorder.workerpool).toBeDefined();
+    expect(res.requestorder.app).toBeDefined();
   }, 30000);
 
   test('[mainchain] iexec order fill', async () => {
@@ -819,10 +819,10 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
-    expect(res.dealid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.dealid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDealid = res.dealid;
   }, 10000);
@@ -831,22 +831,22 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order sign --app --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.apporder.app).not.toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.apporder.app).toBeDefined();
   }, 10000);
 
   test('[mainchain] iexec order sign --dataset', async () => {
     const raw = await execAsync(`${iexecPath} order sign --dataset --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.datasetorder.dataset).not.toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.datasetorder.dataset).toBeDefined();
   }, 10000);
 
   test('[mainchain] iexec order sign --workerpool', async () => {
@@ -857,11 +857,11 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order sign --workerpool --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.workerpoolorder.workerpool).toBeDefined();
   }, 10000);
 
   test('[mainchain] iexec order sign --request', async () => {
@@ -875,11 +875,11 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} order sign --request --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
-    expect(res.requestorder.app).not.toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeDefined();
+    expect(res.requestorder.app).toBeDefined();
   }, 10000);
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
@@ -887,10 +887,10 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
-    expect(res.dealid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.dealid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDealidNoDuration = res.dealid;
   }, 10000);
@@ -902,10 +902,10 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
-    expect(res.dealid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.dealid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -916,14 +916,14 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.apporder.txHash).not.toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.fail).toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.apporder.txHash).toBeDefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.apporder.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -934,14 +934,14 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.datasetorder.txHash).not.toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.fail).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.datasetorder.txHash).toBeDefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.datasetorder.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -952,14 +952,14 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.workerpoolorder.txHash).not.toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
-    expect(res.fail).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.workerpoolorder.txHash).toBeDefined();
+    expect(res.requestorder).toBeUndefined();
+    expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.workerpoolorder.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -970,14 +970,14 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
-    expect(res.requestorder.txHash).not.toBe(undefined);
-    expect(res.fail).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeDefined();
+    expect(res.requestorder.txHash).toBeDefined();
+    expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.requestorder.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -990,10 +990,10 @@ describe('[Mainchain]', () => {
     await execAsync('mv orders.back orders.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.apporder).toBe(undefined);
-    expect(res.datasetorder).toBe(undefined);
-    expect(res.workerpoolorder).toBe(undefined);
-    expect(res.requestorder).toBe(undefined);
+    expect(res.apporder).toBeUndefined();
+    expect(res.datasetorder).toBeUndefined();
+    expect(res.workerpoolorder).toBeUndefined();
+    expect(res.requestorder).toBeUndefined();
     expect(res.fail.length).toBe(4);
   }, 10000);
 
@@ -1012,18 +1012,18 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deals).not.toBe(undefined);
+    expect(res.deals).toBeDefined();
     expect(res.deals.length).toBe(1);
     expect(res.deals[0].volume).toBe('1');
-    expect(res.deals[0].dealid).not.toBe(undefined);
-    expect(res.deals[0].txHash).not.toBe(undefined);
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
 
     const rawDeal = await execAsync(
       `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
     );
     const resDeal = JSON.parse(rawDeal);
     expect(resDeal.ok).toBe(true);
-    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal).toBeDefined();
     expect(resDeal.deal.app.pointer).toBe(mainchainApp);
     expect(resDeal.deal.app.price).toBe('0');
     expect(resDeal.deal.dataset.pointer).toBe(
@@ -1046,7 +1046,7 @@ describe('[Mainchain]', () => {
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
-    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+    expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
   test('[common] iexec app run --workerpool --dataset 0x0000000000000000000000000000000000000000', async () => {
@@ -1064,18 +1064,18 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deals).not.toBe(undefined);
+    expect(res.deals).toBeDefined();
     expect(res.deals.length).toBe(1);
     expect(res.deals[0].volume).toBe('1');
-    expect(res.deals[0].dealid).not.toBe(undefined);
-    expect(res.deals[0].txHash).not.toBe(undefined);
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
 
     const rawDeal = await execAsync(
       `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
     );
     const resDeal = JSON.parse(rawDeal);
     expect(resDeal.ok).toBe(true);
-    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal).toBeDefined();
     expect(resDeal.deal.app.pointer).toBe(mainchainApp);
     expect(resDeal.deal.app.price).toBe('0');
     expect(resDeal.deal.dataset.pointer).toBe(
@@ -1098,7 +1098,7 @@ describe('[Mainchain]', () => {
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
-    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+    expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
   test('[common] iexec app run --workerpool --dataset --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
@@ -1119,18 +1119,18 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deals).not.toBe(undefined);
+    expect(res.deals).toBeDefined();
     expect(res.deals.length).toBe(1);
     expect(res.deals[0].volume).toBe('1');
-    expect(res.deals[0].dealid).not.toBe(undefined);
-    expect(res.deals[0].txHash).not.toBe(undefined);
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
 
     const rawDeal = await execAsync(
       `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
     );
     const resDeal = JSON.parse(rawDeal);
     expect(resDeal.ok).toBe(true);
-    expect(resDeal.deal).not.toBe(undefined);
+    expect(resDeal.deal).toBeDefined();
     expect(resDeal.deal.app.pointer).toBe(mainchainApp);
     expect(resDeal.deal.app.price).toBe('0');
     expect(resDeal.deal.dataset.pointer).toBe(mainchainDataset);
@@ -1151,7 +1151,7 @@ describe('[Mainchain]', () => {
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
-    expect(resDeal.deal.tasks['0']).not.toBe(undefined);
+    expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
   test('[common] iexec app run --workerpool --watch (timeout)', async () => {
@@ -1169,23 +1169,23 @@ describe('[Mainchain]', () => {
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.deals).not.toBe(undefined);
+    expect(res.deals).toBeDefined();
     expect(res.deals.length).toBe(1);
     expect(res.deals[0].volume).toBe('1');
-    expect(res.deals[0].dealid).not.toBe(undefined);
-    expect(res.deals[0].txHash).not.toBe(undefined);
-    expect(res.tasks).not.toBe(undefined);
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
+    expect(res.tasks).toBeDefined();
     expect(res.tasks.length).toBe(1);
     expect(res.tasks[0].idx).toBe('0');
-    expect(res.tasks[0].taskid).not.toBe(undefined);
+    expect(res.tasks[0].taskid).toBeDefined();
     expect(res.tasks[0].dealid).toBe(res.deals[0].dealid);
     expect(res.tasks[0].status).toBe(0);
     expect(res.tasks[0].statusName).toBe('TIMEOUT');
     expect(res.tasks[0].taskTimedOut).toBe(true);
-    expect(res.failedTasks).not.toBe(undefined);
+    expect(res.failedTasks).toBeDefined();
     expect(res.failedTasks.length).toBe(1);
     expect(res.failedTasks[0].idx).toBe('0');
-    expect(res.failedTasks[0].taskid).not.toBe(undefined);
+    expect(res.failedTasks[0].taskid).toBeDefined();
     expect(res.failedTasks[0].dealid).toBe(res.deals[0].dealid);
     expect(res.failedTasks[0].status).toBe(0);
     expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
@@ -1199,7 +1199,7 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deal).not.toBe(undefined);
+    expect(res.deal).toBeDefined();
     expect(res.deal.app.pointer).toBe(mainchainApp);
     expect(res.deal.dataset.pointer).toBe(mainchainDataset);
     expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
@@ -1207,12 +1207,12 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
-    expect(res.deal.startTime).not.toBe(undefined);
-    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.startTime).toBeDefined();
+    expect(res.deal.finalTime).toBeDefined();
     expect(res.deal.deadlineReached).toBe(false);
-    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks).toBeDefined();
     expect(Object.keys(res.deal.tasks).length).toBe(1);
-    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.deal.tasks['0']).toBeDefined();
     mainchainTaskid = res.deal.tasks['0'];
   }, 10000);
 
@@ -1222,7 +1222,7 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deal).not.toBe(undefined);
+    expect(res.deal).toBeDefined();
     expect(res.deal.app.pointer).toBe(mainchainApp);
     expect(res.deal.dataset.pointer).toBe(mainchainDataset);
     expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
@@ -1230,12 +1230,12 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('5');
-    expect(res.deal.startTime).not.toBe(undefined);
-    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.startTime).toBeDefined();
+    expect(res.deal.finalTime).toBeDefined();
     expect(res.deal.deadlineReached).toBe(true);
-    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks).toBeDefined();
     expect(Object.keys(res.deal.tasks).length).toBe(5);
-    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.deal.tasks['0']).toBeDefined();
     mainchainTaskidNoDuration = res.deal.tasks['0'];
   }, 10000);
 
@@ -1245,7 +1245,7 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deal).not.toBe(undefined);
+    expect(res.deal).toBeDefined();
     expect(res.deal.app.pointer).toBe(mainchainApp);
     expect(res.deal.dataset.pointer).toBe(mainchainDataset);
     expect(res.deal.workerpool.pointer).toBe(mainchainWorkerpool);
@@ -1253,12 +1253,12 @@ describe('[Mainchain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('5');
-    expect(res.deal.startTime).not.toBe(undefined);
-    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.startTime).toBeDefined();
+    expect(res.deal.finalTime).toBeDefined();
     expect(res.deal.deadlineReached).toBe(true);
-    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks).toBeDefined();
     expect(Object.keys(res.deal.tasks).length).toBe(5);
-    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.deal.tasks['0']).toBeDefined();
     expect(res.tasksCount).toBe(5);
     expect(res.completedTasksCount).toBe(0);
     expect(res.failedTasksCount).toBe(5);
@@ -1313,7 +1313,7 @@ describe('[Mainchain]', () => {
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.deal).toBe(undefined);
+    expect(res.deal).toBeUndefined();
   }, 10000);
 
   test('[mainchain] iexec task show (not initialized)', async () => {
@@ -1322,7 +1322,7 @@ describe('[Mainchain]', () => {
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.task).toBe(undefined);
+    expect(res.task).toBeUndefined();
   }, 10000);
 
   test('[mainchain] iexec task show (initialized)', async () => {
@@ -1332,13 +1332,13 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(mainchainDealid);
     expect(res.task.idx).toBe('0');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -1366,13 +1366,13 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(mainchainDealidNoDuration);
     expect(res.task.idx).toBe('0');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -1394,9 +1394,9 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -1406,13 +1406,13 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(mainchainDealidNoDuration);
     expect(res.task.idx).toBe('0');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -1440,25 +1440,25 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.transactions).not.toBe(undefined);
+    expect(res.transactions).toBeDefined();
     expect(res.transactions.length).toBe(2);
     expect(res.transactions[0].type).toBe('claimArray');
     expect(res.transactions[1].type).toBe('initializeAndClaimArray');
-    expect(res.claimed).not.toBe(undefined);
+    expect(res.claimed).toBeDefined();
     expect(Object.keys(res.claimed).length).toBe(4);
-    expect(res.claimed['1']).not.toBe(undefined);
-    expect(res.claimed['2']).not.toBe(undefined);
-    expect(res.claimed['3']).not.toBe(undefined);
-    expect(res.claimed['4']).not.toBe(undefined);
+    expect(res.claimed['1']).toBeDefined();
+    expect(res.claimed['2']).toBeDefined();
+    expect(res.claimed['3']).toBeDefined();
+    expect(res.claimed['4']).toBeDefined();
     const claimArrayTx = await tokenChainRPC.getTransaction(
       res.transactions[0].txHash,
     );
-    expect(claimArrayTx).not.toBe(undefined);
+    expect(claimArrayTx).toBeDefined();
     expect(claimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
     const initializeAndClaimArrayTx = await tokenChainRPC.getTransaction(
       res.transactions[0].txHash,
     );
-    expect(initializeAndClaimArrayTx).not.toBe(undefined);
+    expect(initializeAndClaimArrayTx).toBeDefined();
     expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -1472,9 +1472,9 @@ describe('[Mainchain]', () => {
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(ADDRESS2);
     expect(res.amount).toBe('1');
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -1488,9 +1488,9 @@ describe('[Mainchain]', () => {
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(ADDRESS2);
     expect(res.amount).toBe('1000000000');
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 10000);
 
@@ -1503,9 +1503,9 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS2);
     expect(res.to).toBe(ADDRESS);
-    expect(res.sendERC20TxHash).not.toBe(undefined);
-    expect(res.sendNativeTxHash).not.toBe(undefined);
-    expect(res.errors).toBe(undefined);
+    expect(res.sendERC20TxHash).toBeDefined();
+    expect(res.sendNativeTxHash).toBeDefined();
+    expect(res.errors).toBeUndefined();
   }, 15000);
 });
 
@@ -1544,11 +1544,11 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.hubAddress).toBe(nativeHubAddress);
-    // expect(res.pocoVersion).not.toBe(undefined);
-    expect(res.appRegistryAddress).not.toBe(undefined);
-    expect(res.datasetRegistryAddress).not.toBe(undefined);
-    expect(res.workerpoolRegistryAddress).not.toBe(undefined);
-    expect(res.rlcAddress).toBe(undefined);
+    // expect(res.pocoVersion).toBeDefined();
+    expect(res.appRegistryAddress).toBeDefined();
+    expect(res.datasetRegistryAddress).toBeDefined();
+    expect(res.workerpoolRegistryAddress).toBeDefined();
+    expect(res.rlcAddress).toBeUndefined();
     expect(res.useNative).toBe(true);
   });
 
@@ -1557,7 +1557,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
-    expect(res.balance.ETH).toBe(undefined);
+    expect(res.balance.ETH).toBeUndefined();
   });
 
   test('[sidechain] iexec wallet sendETH', async () => {
@@ -1577,9 +1577,9 @@ describe('[Sidechain]', () => {
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(ADDRESS2);
     expect(res.amount).toBe('1000000000');
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 10000);
 
@@ -1599,7 +1599,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.amount).toBe(amount);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
     const finalWalletBalance = new BN(
       JSON.parse(
@@ -1618,7 +1618,7 @@ describe('[Sidechain]', () => {
       true,
     );
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 30000);
 
@@ -1640,7 +1640,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.amount).toBe(amount);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
     const finalWalletBalance = new BN(
       JSON.parse(
@@ -1659,7 +1659,7 @@ describe('[Sidechain]', () => {
       true,
     );
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 30000);
 
@@ -1667,7 +1667,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} app init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   });
 
@@ -1676,10 +1676,10 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} app deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainApp = res.address;
   }, 15000);
@@ -1691,7 +1691,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainApp);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1700,7 +1700,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainApp);
-    expect(res.app).not.toBe(undefined);
+    expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1708,7 +1708,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} app count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -1716,7 +1716,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} dataset init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   });
 
@@ -1725,10 +1725,10 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} dataset deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDataset = res.address;
   }, 15000);
@@ -1742,7 +1742,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainDataset);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1751,7 +1751,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainDataset);
-    expect(res.dataset).not.toBe(undefined);
+    expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1759,7 +1759,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} dataset count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -1767,7 +1767,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   });
 
@@ -1776,10 +1776,10 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool deploy --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.address).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.address).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainWorkerpool = res.address;
   }, 15000);
@@ -1793,7 +1793,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainWorkerpool);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1802,7 +1802,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.address).toBe(sidechainWorkerpool);
-    expect(res.workerpool).not.toBe(undefined);
+    expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
   }, 10000);
 
@@ -1810,7 +1810,7 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} workerpool count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   }, 10000);
 
@@ -1819,17 +1819,17 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} category init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.category).not.toBe(undefined);
+    expect(res.category).toBeDefined();
   });
 
   test('[sidechain] iexec category create', async () => {
     const raw = await execAsync(`${iexecPath} category create --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.catid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.catid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   });
 
@@ -1841,10 +1841,10 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} category create --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.catid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.catid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainNoDurationCatid = res.catid.toString();
   });
@@ -1854,14 +1854,14 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.index).toBe('0');
-    expect(res.category).not.toBe(undefined);
+    expect(res.category).toBeDefined();
   });
 
   test('[sidechain] iexec category count', async () => {
     const raw = await execAsync(`${iexecPath} category count --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.count).not.toBe(undefined);
+    expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
   });
 
@@ -1869,10 +1869,10 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} order init --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeDefined();
     expect(res.apporder.app).toBe(sidechainApp);
     expect(res.datasetorder.dataset).toBe(sidechainDataset);
     expect(res.workerpoolorder.workerpool).toBe(sidechainWorkerpool);
@@ -1893,14 +1893,14 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} order sign --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
-    expect(res.apporder.app).not.toBe(undefined);
-    expect(res.datasetorder.dataset).not.toBe(undefined);
-    expect(res.workerpoolorder.workerpool).not.toBe(undefined);
-    expect(res.requestorder.app).not.toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.requestorder).toBeDefined();
+    expect(res.apporder.app).toBeDefined();
+    expect(res.datasetorder.dataset).toBeDefined();
+    expect(res.workerpoolorder.workerpool).toBeDefined();
+    expect(res.requestorder.app).toBeDefined();
   }, 30000);
 
   test('[sidechain] iexec order fill', async () => {
@@ -1908,10 +1908,10 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
-    expect(res.dealid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.dealid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDealid = res.dealid;
   }, 10000);
@@ -1933,10 +1933,10 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
-    expect(res.dealid).not.toBe(undefined);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.dealid).toBeDefined();
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDealidNoDuration = res.dealid;
   }, 20000);
@@ -1950,36 +1950,36 @@ describe('[Sidechain]', () => {
     ).catch(e => e);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.apporder).not.toBe(undefined);
-    expect(res.apporder.txHash).not.toBe(undefined);
-    expect(res.datasetorder).not.toBe(undefined);
-    expect(res.datasetorder.txHash).not.toBe(undefined);
-    expect(res.workerpoolorder).not.toBe(undefined);
-    expect(res.workerpoolorder.txHash).not.toBe(undefined);
-    expect(res.requestorder).not.toBe(undefined);
-    expect(res.requestorder.txHash).not.toBe(undefined);
-    expect(res.fail).toBe(undefined);
+    expect(res.apporder).toBeDefined();
+    expect(res.apporder.txHash).toBeDefined();
+    expect(res.datasetorder).toBeDefined();
+    expect(res.datasetorder.txHash).toBeDefined();
+    expect(res.workerpoolorder).toBeDefined();
+    expect(res.workerpoolorder.txHash).toBeDefined();
+    expect(res.requestorder).toBeDefined();
+    expect(res.requestorder.txHash).toBeDefined();
+    expect(res.fail).toBeUndefined();
     const cancelAppordertx = await nativeChainRPC.getTransaction(
       res.apporder.txHash,
     );
-    expect(cancelAppordertx).not.toBe(undefined);
+    expect(cancelAppordertx).toBeDefined();
     expect(cancelAppordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
     const cancelDatasetordertx = await nativeChainRPC.getTransaction(
       res.datasetorder.txHash,
     );
-    expect(cancelDatasetordertx).not.toBe(undefined);
+    expect(cancelDatasetordertx).toBeDefined();
     expect(cancelDatasetordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
     const cancelWorkerpoolordertx = await nativeChainRPC.getTransaction(
       res.workerpoolorder.txHash,
     );
-    expect(cancelWorkerpoolordertx).not.toBe(undefined);
+    expect(cancelWorkerpoolordertx).toBeDefined();
     expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(
       nativeChainGasPrice,
     );
     const cancelRequestordertx = await nativeChainRPC.getTransaction(
       res.requestorder.txHash,
     );
-    expect(cancelRequestordertx).not.toBe(undefined);
+    expect(cancelRequestordertx).toBeDefined();
     expect(cancelRequestordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 10000);
 
@@ -1989,7 +1989,7 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deal).not.toBe(undefined);
+    expect(res.deal).toBeDefined();
     expect(res.deal.app.pointer).toBe(sidechainApp);
     expect(res.deal.dataset.pointer).toBe(sidechainDataset);
     expect(res.deal.workerpool.pointer).toBe(sidechainWorkerpool);
@@ -1997,12 +1997,12 @@ describe('[Sidechain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('1');
-    expect(res.deal.startTime).not.toBe(undefined);
-    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.startTime).toBeDefined();
+    expect(res.deal.finalTime).toBeDefined();
     expect(res.deal.deadlineReached).toBe(false);
-    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks).toBeDefined();
     expect(Object.keys(res.deal.tasks).length).toBe(1);
-    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.deal.tasks['0']).toBeDefined();
     sidechainTaskid = res.deal.tasks['0'];
   }, 10000);
 
@@ -2012,7 +2012,7 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.deal).not.toBe(undefined);
+    expect(res.deal).toBeDefined();
     expect(res.deal.app.pointer).toBe(sidechainApp);
     expect(res.deal.dataset.pointer).toBe(sidechainDataset);
     expect(res.deal.workerpool.pointer).toBe(sidechainWorkerpool);
@@ -2020,12 +2020,12 @@ describe('[Sidechain]', () => {
     expect(res.deal.beneficiary).toBe(ADDRESS);
     expect(res.deal.botFirst).toBe('0');
     expect(res.deal.botSize).toBe('5');
-    expect(res.deal.startTime).not.toBe(undefined);
-    expect(res.deal.finalTime).not.toBe(undefined);
+    expect(res.deal.startTime).toBeDefined();
+    expect(res.deal.finalTime).toBeDefined();
     expect(res.deal.deadlineReached).toBe(true);
-    expect(res.deal.tasks).not.toBe(undefined);
+    expect(res.deal.tasks).toBeDefined();
     expect(Object.keys(res.deal.tasks).length).toBe(5);
-    expect(res.deal.tasks['0']).not.toBe(undefined);
+    expect(res.deal.tasks['0']).toBeDefined();
     sidechainTaskidNoDuration = res.deal.tasks['2'];
   }, 10000);
 
@@ -2036,7 +2036,7 @@ describe('[Sidechain]', () => {
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.deal).toBe(undefined);
+    expect(res.deal).toBeUndefined();
   }, 10000);
 
   test('[sidechain] iexec task show (not initialized)', async () => {
@@ -2045,7 +2045,7 @@ describe('[Sidechain]', () => {
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.task).toBe(undefined);
+    expect(res.task).toBeUndefined();
   }, 10000);
 
   test('[sidechain] iexec task show (initialized)', async () => {
@@ -2060,13 +2060,13 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(sidechainDealid);
     expect(res.task.idx).toBe('0');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -2094,13 +2094,13 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(sidechainDealidNoDuration);
     expect(res.task.idx).toBe('2');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -2122,9 +2122,9 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.txHash).not.toBe(undefined);
+    expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
-    expect(tx).not.toBe(undefined);
+    expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 10000);
 
@@ -2134,13 +2134,13 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.task).not.toBe(undefined);
+    expect(res.task).toBeDefined();
     expect(res.task.dealid).toBe(sidechainDealidNoDuration);
     expect(res.task.idx).toBe('2');
-    expect(res.task.timeref).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.contributionDeadline).not.toBe(undefined);
-    expect(res.task.finalDeadline).not.toBe(undefined);
+    expect(res.task.timeref).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.contributionDeadline).toBeDefined();
+    expect(res.task.finalDeadline).toBeDefined();
     expect(res.task.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
@@ -2168,25 +2168,25 @@ describe('[Sidechain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.transactions).not.toBe(undefined);
+    expect(res.transactions).toBeDefined();
     expect(res.transactions.length).toBe(2);
     expect(res.transactions[0].type).toBe('claimArray');
     expect(res.transactions[1].type).toBe('initializeAndClaimArray');
-    expect(res.claimed).not.toBe(undefined);
+    expect(res.claimed).toBeDefined();
     expect(Object.keys(res.claimed).length).toBe(4);
-    expect(res.claimed['0']).not.toBe(undefined);
-    expect(res.claimed['1']).not.toBe(undefined);
-    expect(res.claimed['3']).not.toBe(undefined);
-    expect(res.claimed['4']).not.toBe(undefined);
+    expect(res.claimed['0']).toBeDefined();
+    expect(res.claimed['1']).toBeDefined();
+    expect(res.claimed['3']).toBeDefined();
+    expect(res.claimed['4']).toBeDefined();
     const claimArrayTx = await nativeChainRPC.getTransaction(
       res.transactions[0].txHash,
     );
-    expect(claimArrayTx).not.toBe(undefined);
+    expect(claimArrayTx).toBeDefined();
     expect(claimArrayTx.gasPrice.toString()).toBe(nativeChainGasPrice);
     const initializeAndClaimArrayTx = await nativeChainRPC.getTransaction(
       res.transactions[0].txHash,
     );
-    expect(initializeAndClaimArrayTx).not.toBe(undefined);
+    expect(initializeAndClaimArrayTx).toBeDefined();
     expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(
       nativeChainGasPrice,
     );
@@ -2201,9 +2201,9 @@ describe('[Sidechain]', () => {
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS2);
     expect(res.to).toBe(ADDRESS);
-    expect(res.sendERC20TxHash).toBe(undefined);
-    expect(res.sendNativeTxHash).not.toBe(undefined);
-    expect(res.errors).toBe(undefined);
+    expect(res.sendERC20TxHash).toBeUndefined();
+    expect(res.sendNativeTxHash).toBeDefined();
+    expect(res.errors).toBeUndefined();
   }, 15000);
 
   test('[sidechain] iexec wallet sweep (empty wallet)', async () => {
@@ -2214,8 +2214,8 @@ describe('[Sidechain]', () => {
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS2);
     expect(res.to).toBe(ADDRESS);
-    expect(res.sendERC20TxHash).toBe(undefined);
-    expect(res.sendNativeTxHash).toBe(undefined);
+    expect(res.sendERC20TxHash).toBeUndefined();
+    expect(res.sendNativeTxHash).toBeUndefined();
     expect(res.errors.length).toBe(1);
   }, 15000);
 });
@@ -2242,8 +2242,8 @@ describe('[Common]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.walletAddress).not.toBe(undefined);
-    expect(res.walletFile).not.toBe(undefined);
+    expect(res.walletAddress).toBeDefined();
+    expect(res.walletFile).toBeDefined();
     expect(res.configFile).toBe('iexec.json');
     expect(res.chainConfigFile).toBe('chain.json');
     expect(await checkExists(filePath('iexec.json'))).toBe(true);
@@ -2260,8 +2260,8 @@ describe('[Common]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.walletAddress).toBe(undefined);
-    expect(res.walletFile).toBe(undefined);
+    expect(res.walletAddress).toBeUndefined();
+    expect(res.walletFile).toBeUndefined();
     expect(res.configFile).toBe('iexec.json');
     expect(res.chainConfigFile).toBe('chain.json');
     expect(await checkExists(filePath('iexec.json'))).toBe(true);
@@ -2271,7 +2271,7 @@ describe('[Common]', () => {
   test('check update (no --raw)', async () => {
     await expect(
       execAsync(`${iexecPath} init --skip-wallet --force`),
-    ).resolves.not.toBe(undefined);
+    ).resolves.toBeDefined();
   }, 10000);
 
   describe('[wallet]', () => {
@@ -2301,9 +2301,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.address).toBe(ADDRESS);
-      expect(res.fileName).not.toBe(undefined);
+      expect(res.fileName).toBeDefined();
       const importedWalletFileName = res.fileName;
       importedWalletName = importedWalletFileName.split('/')[
         importedWalletFileName.split('/').length - 1
@@ -2316,8 +2316,8 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
-      expect(res.fileName).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
+      expect(res.fileName).toBeDefined();
     }, 10000);
 
     test('iexec wallet show --wallet-addres <address>', async () => {
@@ -2326,13 +2326,13 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS);
-      expect(res.wallet.publicKey).toBe(undefined);
-      expect(res.wallet.privateKey).toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.wallet.publicKey).toBeUndefined();
+      expect(res.wallet.privateKey).toBeUndefined();
+      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
     }, 10000);
 
     test('iexec wallet show --show-private-key --wallet-addres <address>', async () => {
@@ -2341,13 +2341,13 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS);
       expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
       expect(res.wallet.privateKey).toBe(PRIVATE_KEY);
-      expect(res.balance.ETH).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
     }, 10000);
 
     test('iexec wallet show --wallet-file <fileName>', async () => {
@@ -2356,13 +2356,13 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS);
-      expect(res.wallet.publicKey).toBe(undefined);
-      expect(res.wallet.privateKey).toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.wallet.publicKey).toBeUndefined();
+      expect(res.wallet.privateKey).toBeUndefined();
+      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
     }, 10000);
 
     test('iexec wallet show --show-private-key --wallet-address <address> (wrong password)', async () => {
@@ -2373,8 +2373,8 @@ describe('[Common]', () => {
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe('invalid password');
       expect(res.error.name).toBe('Error');
-      expect(res.wallet).toBe(undefined);
-      expect(res.balance).toBe(undefined);
+      expect(res.wallet).toBeUndefined();
+      expect(res.balance).toBeUndefined();
     }, 10000);
 
     test('iexec wallet show --wallet-address <address> (missing wallet file)', async () => {
@@ -2387,8 +2387,8 @@ describe('[Common]', () => {
         'Failed to load wallet address from keystore: Wallet file not found',
       );
       expect(res.error.name).toBe('Error');
-      expect(res.wallet).toBe(undefined);
-      expect(res.balance).toBe(undefined);
+      expect(res.wallet).toBeUndefined();
+      expect(res.balance).toBeUndefined();
     }, 10000);
 
     // keystoredir custom
@@ -2401,7 +2401,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.address).toBe(ADDRESS2);
       expect(res.fileName.indexOf('out/keystore/')).not.toBe(-1);
     }, 10000);
@@ -2412,7 +2412,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS2);
     }, 10000);
 
@@ -2426,7 +2426,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.address).toBe(ADDRESS3);
       expect(res.fileName.indexOf('/')).toBe(-1);
       localWalletFileName = res.fileName;
@@ -2438,7 +2438,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS3);
     }, 10000);
 
@@ -2450,7 +2450,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.privateKey).toBe(PRIVATE_KEY2);
       expect(res.wallet.address).toBe(ADDRESS2);
       expect(res.address).toBe(ADDRESS2);
@@ -2462,7 +2462,7 @@ describe('[Common]', () => {
       const raw = await execAsync(`${iexecPath} wallet show --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.wallet).not.toBe(undefined);
+      expect(res.wallet).toBeDefined();
       expect(res.wallet.address).toBe(ADDRESS2);
     }, 10000);
 
@@ -2470,12 +2470,12 @@ describe('[Common]', () => {
       const raw = await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
       expect(res.balance.ETH).not.toBe('0');
       expect(res.balance.nRLC).not.toBe('0');
-      expect(res.wallet).toBe(undefined);
+      expect(res.wallet).toBeUndefined();
     }, 10000);
   });
 
@@ -2487,9 +2487,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
     }, 10000);
 
     test('no wallet in keystore, fail on send', async () => {
@@ -2523,9 +2523,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.txHash).not.toBe(undefined);
+      expect(res.txHash).toBeDefined();
       const tx = await tokenChainRPC.getTransaction(res.txHash);
-      expect(tx).not.toBe(undefined);
+      expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('1000000001');
     });
     test('tx --gas-price 0', async () => {
@@ -2534,9 +2534,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.txHash).not.toBe(undefined);
+      expect(res.txHash).toBeDefined();
       const tx = await tokenChainRPC.getTransaction(res.txHash);
-      expect(tx).not.toBe(undefined);
+      expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('0');
     });
     test('tx --gas-price -1 (invalid gas-price)', async () => {
@@ -2545,7 +2545,7 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.txHash).toBe(undefined);
+      expect(res.txHash).toBeUndefined();
     });
   });
 
@@ -2589,8 +2589,8 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
-      expect(res.secretPath).not.toBe(undefined);
+      expect(res.encryptedDatasetFolderPath).toBeDefined();
+      expect(res.secretPath).toBeDefined();
       expect(
         res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
@@ -2632,8 +2632,8 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
-      expect(res.secretPath).not.toBe(undefined);
+      expect(res.encryptedDatasetFolderPath).toBeDefined();
+      expect(res.secretPath).toBeDefined();
       expect(
         res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
@@ -2657,8 +2657,8 @@ describe('[Common]', () => {
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
-        expect(res.encryptedDatasetFolderPath).not.toBe(undefined);
-        expect(res.secretPath).not.toBe(undefined);
+        expect(res.encryptedDatasetFolderPath).toBeDefined();
+        expect(res.secretPath).toBeDefined();
         expect(
           res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
         ).not.toBe(-1);
@@ -2701,9 +2701,9 @@ describe('[Common]', () => {
         ).catch(e => e.message);
         const res = JSON.parse(raw);
         expect(res.ok).toBe(false);
-        expect(res.secretPath).toBe(undefined);
-        expect(res.privateKeyFile).toBe(undefined);
-        expect(res.publicKeyFile).toBe(undefined);
+        expect(res.secretPath).toBeUndefined();
+        expect(res.privateKeyFile).toBeUndefined();
+        expect(res.publicKeyFile).toBeUndefined();
         expect(res.error.name).toBe('Error');
         expect(
           res.error.message.indexOf(
@@ -2718,7 +2718,7 @@ describe('[Common]', () => {
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
-        expect(res.secretPath).not.toBe(undefined);
+        expect(res.secretPath).toBeDefined();
         expect(res.secretPath.indexOf('.secrets/beneficiary')).not.toBe(-1);
         expect(res.privateKeyFile).toBe(
           '0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
@@ -2740,8 +2740,8 @@ describe('[Common]', () => {
       ).catch(e => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.resultsPath).toBe(undefined);
-      expect(res.error).not.toBe(undefined);
+      expect(res.resultsPath).toBeUndefined();
+      expect(res.error).toBeDefined();
       expect(
         res.error.message.indexOf('Failed to decrypt results key'),
       ).not.toBe(-1);
@@ -2754,7 +2754,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.resultsPath).not.toBe(undefined);
+      expect(res.resultsPath).toBeDefined();
       expect(res.resultsPath.indexOf('results.zip')).not.toBe(-1);
     });
 
@@ -2764,7 +2764,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.resultsPath).not.toBe(undefined);
+      expect(res.resultsPath).toBeDefined();
       expect(res.resultsPath.indexOf('results.zip')).not.toBe(-1);
     });
   });
@@ -2814,7 +2814,7 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
-      expect(res.fail).toBe(undefined);
+      expect(res.fail).toBeUndefined();
     });
 
     test('iexec registry validate dataset', async () => {
@@ -2829,7 +2829,7 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
-      expect(res.fail).toBe(undefined);
+      expect(res.fail).toBeUndefined();
     });
 
     test('iexec registry validate workerpool', async () => {
@@ -2844,7 +2844,7 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.validated.length).toBe(3);
-      expect(res.fail).toBe(undefined);
+      expect(res.fail).toBeUndefined();
     });
   });
 
@@ -2855,10 +2855,10 @@ describe('[Common]', () => {
 
     test('no "native" overwites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
-      expect(chains.mainnet.native).toBe(undefined);
-      expect(chains.bellecour.native).toBe(undefined);
-      expect(chains.kovan.native).toBe(undefined);
-      expect(chains.goerli.native).toBe(undefined);
+      expect(chains.mainnet.native).toBeUndefined();
+      expect(chains.bellecour.native).toBeUndefined();
+      expect(chains.kovan.native).toBeUndefined();
+      expect(chains.goerli.native).toBeUndefined();
     }, 10000);
 
     // not deployed yet
@@ -2868,9 +2868,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
+      expect(res.balance.ETH).toBeDefined();
     }, 10000);
 
     test.skip('kovan is not native', async () => {
@@ -2879,9 +2879,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
+      expect(res.balance.ETH).toBeDefined();
     }, 10000);
 
     test.skip('goerli is not native', async () => {
@@ -2890,9 +2890,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
-      expect(res.balance.ETH).not.toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
+      expect(res.balance.ETH).toBeDefined();
     }, 10000);
 
     test.skip('bellecour is native', async () => {
@@ -2901,9 +2901,9 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).not.toBe(undefined);
-      expect(res.balance.nRLC).not.toBe(undefined);
-      expect(res.balance.ETH).toBe(undefined);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.nRLC).toBeDefined();
+      expect(res.balance.ETH).toBeUndefined();
     }, 10000);
   });
 });
