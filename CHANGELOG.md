@@ -2,7 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Unreleased V5
+
+### Added
+
+### Changed
+
+- [BREAKING] `iexec app show <index>` & `app.showUserApp(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec dataset show <index>` & `dataset.showUserDataset(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec workerpool show <index>` & `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
+- fixed `iexec wallet sweep` & `wallet.sweep()`
+
+### Removed
+
+## Unreleased V4
 
 ### Added
 
