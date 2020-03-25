@@ -5,6 +5,7 @@ const {
   ethersBnToBn,
   bnNRlcToBnWei,
   bnToEthersBn,
+  NULL_BYTES,
 } = require('./utils');
 const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
@@ -51,20 +52,21 @@ const deposit = async (
     });
     if (!contracts.isNative) {
       const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
-      const allowTx = await wrapSend(
+      const tx = await wrapSend(
         contracts
           .getRLCContract({
             at: rlcAddress,
           })
-          .approve(clerkAddress, vAmount, contracts.txOptions),
-      );
-      const allowTxReceipt = await wrapWait(allowTx.wait());
-      if (!checkEvent('Approval', allowTxReceipt.events)) throw Error('Approval not confirmed');
-      const tx = await wrapSend(
-        clerkContract.deposit(vAmount, contracts.txOptions),
+          .approveAndCall(
+            clerkAddress,
+            vAmount,
+            NULL_BYTES,
+            contracts.txOptions,
+          ),
       );
       const txReceipt = await wrapWait(tx.wait());
-      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Deposit not confirmed');
+      if (!checkEvent('Approval', txReceipt.events)) throw Error('Approval not confirmed');
+      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Transfer not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToEthersBn(
