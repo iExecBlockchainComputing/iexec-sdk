@@ -67,6 +67,18 @@ pipeline:
       matrix:
         NODE_TAG: 8
 
+  dockerhub_v5-alpha:
+    image: plugins/docker
+    repo: iexechub/iexec-sdk
+    secrets: [docker_username, docker_password]
+    tags:
+      - alpha
+      - ${DRONE_TAG##v}
+    when:
+      ref: [refs/tags/v5-alpha.*]
+      matrix:
+        NODE_TAG: 8
+
 services:
   token-chain:
     image: iexechub/poco-chaintest:v5-token
