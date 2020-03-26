@@ -56,6 +56,17 @@ pipeline:
       matrix:
         NODE_TAG: 8
 
+  npm_v5-alpha:
+    image: plugins/npm
+    secrets: [npm_password]
+    username: sulliwane
+    email: sulliwane@gmail.com
+    tag: alpha
+    when:
+      ref: [refs/tags/v5-alpha.*]
+      matrix:
+        NODE_TAG: 8
+
 services:
   token-chain:
     image: iexechub/poco-chaintest:v5-token
