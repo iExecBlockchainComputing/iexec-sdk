@@ -17,19 +17,3 @@ services:
     image: 'iexechub/poco-chaintest:v5-token-1s'
     ports:
       - 0.0.0.0:28545:8545
-
-  token-chaintest-v5-explorer:
-    restart: unless-stopped
-    environment:
-      - 'APP_NODE_URL=http://localhost:8545'
-    image: 'alethio/ethereum-lite-explorer'
-    ports:
-      - 0.0.0.0:8080:80
-
-  native-chaintest-v5-explorer:
-    restart: unless-stopped
-    environment:
-      - 'APP_NODE_URL=http://localhost:18545'
-    image: 'alethio/ethereum-lite-explorer'
-    ports:
-      - 0.0.0.0:18080:80
