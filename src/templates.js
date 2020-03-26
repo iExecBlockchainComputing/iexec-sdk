@@ -107,13 +107,13 @@ const category = {
 };
 
 const chains = {
-  default: 'kovan',
+  default: 'dev',
   chains: {
     dev: {
       id: '65535',
       host: 'http://localhost:8545',
       sms: 'http://localhost:5000',
-      hub: '0xdFceb21CDA714B75AfcbE530E9aBDe7d8f96C939',
+      hub: '0xD047d0445f745b0052a80a7fFC767c91ABFD8090',
       // native: true,
     },
     kovan: {
