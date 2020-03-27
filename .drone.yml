@@ -63,7 +63,7 @@ pipeline:
     email: sulliwane@gmail.com
     tag: alpha
     when:
-      ref: [refs/tags/v5-alpha.*]
+      ref: [refs/tags/v5.0.0-alpha.*]
       matrix:
         NODE_TAG: 8
 
@@ -75,7 +75,7 @@ pipeline:
       - alpha
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v5-alpha.*]
+      ref: [refs/tags/v5.0.0-alpha.*]
       matrix:
         NODE_TAG: 8
 
