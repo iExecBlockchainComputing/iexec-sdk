@@ -165,6 +165,10 @@ class IExec {
     this.order.createDatasetorder = overwrite => order.createDatasetorder(overwrite);
     this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(overwrite);
     this.order.createRequestorder = overwrite => order.createRequestorder(overwrite);
+    this.order.hashApporder = apporder => order.hashApporder(contracts, apporder);
+    this.order.hashDatasetorder = datasetorder => order.hashDatasetorder(contracts, datasetorder);
+    this.order.hashWorkerpoolorder = workerpoolorder => order.hashWorkerpoolorder(contracts, workerpoolorder);
+    this.order.hashRequestorder = requestorder => order.hashRequestorder(contracts, requestorder);
     this.order.signApporder = apporder => order.signApporder(contracts, apporder);
     this.order.signDatasetorder = datasetorder => order.signDatasetorder(contracts, datasetorder);
     this.order.signWorkerpoolorder = workerpoolorder => order.signWorkerpoolorder(contracts, workerpoolorder);

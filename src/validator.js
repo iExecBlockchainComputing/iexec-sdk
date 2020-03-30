@@ -60,8 +60,11 @@ const bytes32Schema = () => string()
 
 const orderSignSchema = () => string().matches(/^(0x)([0-9a-f]{2})*/, '${path} must be a valid signature');
 
-const signed = () => ({
+const salted = () => ({
   salt: bytes32Schema().required(),
+});
+
+const signed = () => ({
   sign: orderSignSchema().required(),
 });
 
@@ -118,7 +121,12 @@ const apporderSchema = () => object(
   '${path} is not a valid signed apporder',
 );
 
-const signedApporderSchema = () => apporderSchema().shape(signed(), '${path} is not a valid signed apporder');
+const saltedApporderSchema = () => apporderSchema().shape(salted(), '${path} is not a valid salted apporder');
+
+const signedApporderSchema = () => saltedApporderSchema().shape(
+  signed(),
+  '${path} is not a valid signed apporder',
+);
 
 const datasetorderSchema = () => object(
   {
@@ -133,7 +141,12 @@ const datasetorderSchema = () => object(
   '${path} is not a valid signed datasetorder',
 );
 
-const signedDatasetorderSchema = () => datasetorderSchema().shape(
+const saltedDatasetorderSchema = () => datasetorderSchema().shape(
+  salted(),
+  '${path} is not a valid salted datasetorder',
+);
+
+const signedDatasetorderSchema = () => saltedDatasetorderSchema().shape(
   signed(),
   '${path} is not a valid signed datasetorder',
 );
@@ -153,9 +166,14 @@ const workerpoolorderSchema = () => object(
   '${path} is not a valid signed workerpoolorder',
 );
 
-const signedWorkerpoolorderSchema = () => workerpoolorderSchema().shape(
+const saltedWorkerpoolorderSchema = () => workerpoolorderSchema().shape(
+  salted(),
+  '${path} is not a valid salted workerpoolorder',
+);
+
+const signedWorkerpoolorderSchema = () => saltedWorkerpoolorderSchema().shape(
   signed(),
-  '${path} is not a valid signed workerpoolorder',
+  '${path} is not a valid salted workerpoolorder',
 );
 
 const requestorderSchema = () => object(
@@ -178,7 +196,12 @@ const requestorderSchema = () => object(
   '${path} is not a valid signed requestorder',
 );
 
-const signedRequestorderSchema = () => requestorderSchema().shape(
+const saltedRequestorderSchema = () => requestorderSchema().shape(
+  salted(),
+  '${path} is not a valid salted requestorder',
+);
+
+const signedRequestorderSchema = () => saltedRequestorderSchema().shape(
   signed(),
   '${path} is not a valid signed requestorder',
 );
@@ -236,12 +259,16 @@ module.exports = {
   addressSchema,
   bytes32Schema,
   apporderSchema,
+  saltedApporderSchema,
   signedApporderSchema,
   datasetorderSchema,
   signedDatasetorderSchema,
+  saltedDatasetorderSchema,
   workerpoolorderSchema,
+  saltedWorkerpoolorderSchema,
   signedWorkerpoolorderSchema,
   requestorderSchema,
+  saltedRequestorderSchema,
   signedRequestorderSchema,
   catidSchema,
   paramsSchema,

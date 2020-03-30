@@ -1866,6 +1866,126 @@ describe('[workerpool]', () => {
 });
 
 describe('[order]', () => {
+  test('order.hashApporder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order.createApporder({
+      app: ADDRESS2,
+      appprice: 1,
+      volume: 15,
+    });
+
+    const res = await iexec.order.hashApporder({
+      ...order,
+      salt:
+        '0x77d3087b2ff82dc336c1add5ad220a32e8b3f46201ad33a7afdb1d6442132e13',
+    });
+    expect(res).toMatch(bytes32Regex);
+    expect(res).toBe(
+      '0x86d860e8a837326452633594cfb3e76a830a9e119693c67196d189b7923d344f',
+    );
+  });
+
+  test('order.hashDatasetorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order.createDatasetorder({
+      dataset: ADDRESS2,
+      datasetprice: 1,
+      volume: 15,
+    });
+
+    const res = await iexec.order.hashDatasetorder({
+      ...order,
+      salt:
+        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+    });
+    expect(res).toMatch(bytes32Regex);
+    expect(res).toBe(
+      '0xda0b73a82ebd75caf492a471b2a56384d64cf27db503953f4430a3aec27f0257',
+    );
+  });
+
+  test('order.hashWorkerpoolorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order.createWorkerpoolorder({
+      workerpool: ADDRESS2,
+      workerpoolprice: 1,
+      volume: 15,
+      category: 5,
+    });
+
+    const res = await iexec.order.hashWorkerpoolorder({
+      ...order,
+      salt:
+        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+    });
+    expect(res).toMatch(bytes32Regex);
+    expect(res).toBe(
+      '0x894dec6b3dd5221645616d8c71adecc1d39b441c01fad4567605a143ba0f664c',
+    );
+  });
+
+  test('order.hashRequestorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: ADDRESS2,
+      appmaxprice: 1,
+      workerpoolmaxprice: 2,
+      requester: ADDRESS,
+      volume: 15,
+      category: 5,
+    });
+
+    const res = await iexec.order.hashRequestorder({
+      ...order,
+      salt:
+        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+    });
+    expect(res).toMatch(bytes32Regex);
+    expect(res).toBe(
+      '0x5a9f5a7076559fe668adf4740a90c977f9ac18bb1dbbf20887c7c0054e23294a',
+    );
+  });
+
   test('order.cancelApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

@@ -22,6 +22,10 @@ const {
   datasetorderSchema,
   workerpoolorderSchema,
   requestorderSchema,
+  saltedApporderSchema,
+  saltedDatasetorderSchema,
+  saltedWorkerpoolorderSchema,
+  saltedRequestorderSchema,
   signedApporderSchema,
   signedDatasetorderSchema,
   signedWorkerpoolorderSchema,
@@ -200,16 +204,16 @@ const computeOrderHash = async (
     let vOrder;
     switch (orderName) {
       case APP_ORDER:
-        vOrder = await signedApporderSchema().validate(order);
+        vOrder = await saltedApporderSchema().validate(order);
         break;
       case DATASET_ORDER:
-        vOrder = await signedDatasetorderSchema().validate(order);
+        vOrder = await saltedDatasetorderSchema().validate(order);
         break;
       case WORKERPOOL_ORDER:
-        vOrder = await signedWorkerpoolorderSchema().validate(order);
+        vOrder = await saltedWorkerpoolorderSchema().validate(order);
         break;
       case REQUEST_ORDER:
-        vOrder = await signedRequestorderSchema().validate(order);
+        vOrder = await saltedRequestorderSchema().validate(order);
         break;
       default:
     }
@@ -230,6 +234,39 @@ const computeOrderHash = async (
     throw error;
   }
 };
+
+const hashApporder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  APP_ORDER,
+  await saltedApporderSchema().validate(order),
+);
+const hashDatasetorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  DATASET_ORDER,
+  await saltedDatasetorderSchema().validate(order),
+);
+const hashWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  WORKERPOOL_ORDER,
+  await saltedWorkerpoolorderSchema().validate(order),
+);
+const hashRequestorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  REQUEST_ORDER,
+  await saltedRequestorderSchema().validate(order),
+);
 
 const getRemainingVolume = async (
   contracts = throwIfMissing(),
@@ -746,6 +783,10 @@ const createRequestorder = async ({
 module.exports = {
   computeOrderHash,
   getRemainingVolume,
+  hashApporder,
+  hashDatasetorder,
+  hashWorkerpoolorder,
+  hashRequestorder,
   createApporder,
   createDatasetorder,
   createWorkerpoolorder,

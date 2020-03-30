@@ -1251,6 +1251,18 @@ _Example:_
 const signedApporder = await iexec.order.signApporder(apporderToSign);
 ```
 
+#### hashApporder
+
+iexec.**order.hashApporder ( signedorder: SignerdApporder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashApporder(apporder);
+```
+
 #### createDatasetorder
 
 iexec.**order.createDatasetorder ( { dataset: Address, datasetprice: Uint256, volume: Uint256 \[, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
@@ -1279,6 +1291,18 @@ _Example:_
 const signedDatasetorder = await iexec.order.signDatasetorder(
   datasetorderToSign,
 );
+```
+
+#### hashDatasetorder
+
+iexec.**order.hashDatasetorder ( signedorder: SignerdDatasetorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashDatasetorder(datasetorder);
 ```
 
 #### createWorkerpoolorder
@@ -1310,6 +1334,18 @@ _Example:_
 const signedWorkerpoolorder = await iexec.order.signWorkerpoolorder(
   workerpoolorderToSign,
 );
+```
+
+#### hashWorkerpoolorder
+
+iexec.**order.hashWorkerpoolorder ( signedorder: SignerdWorkerpoolorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 ```
 
 #### createRequestorder
@@ -1344,6 +1380,18 @@ _Example:_
 const SignedRequestorder = await iexec.order.signRequestorder(
   requestorderToSign,
 );
+```
+
+#### hashRequestorder
+
+iexec.**order.hashRequestorder ( signedorder: SignerdRequestorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashRequestorder(requestorder);
 ```
 
 #### publishApporder
