@@ -1660,7 +1660,7 @@ iexec.**deal.claim ( dealid: Bytes32 )** => Promise < **{ claimed : { ...\[ {\[i
 _Example:_
 
 ```js
-const { claimed, transcations } = await iexec.deal.claim(
+const { claimed, transactions } = await iexec.deal.claim(
   '0xe0ebfa1177a5997434fe14b5e88897950e07ff82e6976a024b07f30063249a1e',
 );
 Object.entries(claimed).forEach(e => {
