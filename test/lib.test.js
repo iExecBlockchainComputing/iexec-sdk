@@ -616,7 +616,7 @@ describe('[workflow]', () => {
     expect(claimDealRes.claimed).toBeDefined();
     expect(Object.keys(claimDealRes.claimed).length).toBe(9);
     expect(claimDealRes.claimed[0]).toBeDefined();
-  }, 10000);
+  }, 15000);
 });
 
 describe('[getSignerFromPrivateKey]', () => {
