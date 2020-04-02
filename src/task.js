@@ -31,9 +31,9 @@ const show = async (
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
+      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
     );
     if (task.dealid === NULL_BYTES32) {
       throw new ObjectNotFoundError('task', vTaskId, chainId);
@@ -111,9 +111,9 @@ const claim = async (
       );
     }
 
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const claimTx = await wrapSend(
-      hubContract.claim(taskid, contracts.txOptions),
+      iexecContract.claim(taskid, contracts.txOptions),
     );
 
     const claimTxReceipt = await wrapWait(claimTx.wait());

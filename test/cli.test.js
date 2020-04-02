@@ -255,7 +255,6 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.hubAddress).toBe(hubAddress);
-    // expect(res.pocoVersion).toBeDefined();
     expect(res.appRegistryAddress).toBeDefined();
     expect(res.datasetRegistryAddress).toBeDefined();
     expect(res.workerpoolRegistryAddress).toBeDefined();

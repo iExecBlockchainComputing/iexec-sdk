@@ -311,7 +311,7 @@ const showCategory = async (
 const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
-      await wrapCall(contracts.getHubContract().countCategory()),
+      await wrapCall(contracts.getIExecContract().countCategory()),
     );
     return countBN;
   } catch (error) {
@@ -360,7 +360,7 @@ const getWorkerpoolOwner = async (
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await wrapCall(contracts.getHubContract().final_deadline_ratio()),
+      await wrapCall(contracts.getIExecContract().final_deadline_ratio()),
     );
     return timeoutRatio;
   } catch (error) {

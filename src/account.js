@@ -45,11 +45,8 @@ const deposit = async (
       await getAddress(contracts),
     );
     if (nRLC.lt(new BN(vAmount))) throw Error('Deposit amount exceed wallet balance');
-
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({
-      at: clerkAddress,
-    });
+    const iexecAddress = await contracts.fetchIExecAddress();
+    const iexecContract = contracts.getIExecContract();
     if (!contracts.isNative) {
       const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
       const tx = await wrapSend(
@@ -58,7 +55,7 @@ const deposit = async (
             at: rlcAddress,
           })
           .approveAndCall(
-            clerkAddress,
+            iexecAddress,
             vAmount,
             NULL_BYTES,
             contracts.txOptions,
@@ -73,7 +70,7 @@ const deposit = async (
         bnNRlcToBnWei(new BN(vAmount)),
       ).toHexString();
       const tx = await wrapSend(
-        clerkContract.deposit({
+        iexecContract.deposit({
           value: weiAmount,
           gasPrice:
             (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
@@ -97,17 +94,14 @@ const withdraw = async (
   try {
     const vAmount = await uint256Schema().validate(amount);
     if (new BN(vAmount).lte(new BN(0))) throw Error('Withdraw amount must be greather than 0');
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({
-      at: clerkAddress,
-    });
+    const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(
       contracts,
       await getAddress(contracts),
     );
     if (stake.lt(new BN(vAmount))) throw Error('Withdraw amount exceed account balance');
     const tx = await wrapSend(
-      clerkContract.withdraw(vAmount, contracts.txOptions),
+      iexecContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent('Transfer', txReceipt.events)) throw Error('Withdraw not confirmed');

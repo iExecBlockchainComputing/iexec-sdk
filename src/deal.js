@@ -112,10 +112,9 @@ const show = async (
   try {
     const vDealid = await bytes32Schema().validate(dealid);
     const { chainId } = contracts;
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const iexecContract = contracts.getIExecContract();
     const deal = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(clerkContract.viewDeal(vDealid))),
+      cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
     );
     const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
     if (!dealExists) {
@@ -154,9 +153,9 @@ const getTaskStatus = async (
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
+      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
     );
     return new BN(task.status).toNumber();
   } catch (error) {
@@ -203,7 +202,7 @@ const claim = async (
     );
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     if (initialized.length > 0) {
       const EST_GAS_PER_CLAIM = new BN(55000);
       const maxClaimPerTx = blockGasLimit.div(EST_GAS_PER_CLAIM);
@@ -217,7 +216,7 @@ const claim = async (
           ({ taskid }) => taskid,
         );
         const tx = await wrapSend(
-          hubContract.claimArray(taskidToProcess, contracts.txOptions),
+          iexecContract.claimArray(taskidToProcess, contracts.txOptions),
         );
         debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
         await wrapWait(tx.wait());
@@ -246,7 +245,7 @@ const claim = async (
         const idxToProcess = notInitializedToProcess.map(({ idx }) => idx);
         const dealidArray = new Array(idxToProcess.length).fill(vDealid);
         const tx = await wrapSend(
-          hubContract.initializeAndClaimArray(
+          iexecContract.initializeAndClaimArray(
             dealidArray,
             idxToProcess,
             contracts.txOptions,

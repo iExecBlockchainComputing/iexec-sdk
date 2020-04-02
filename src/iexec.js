@@ -130,7 +130,7 @@ async function main() {
           { spinner },
         );
         const hubAddress = checksummedAddress(
-          cmd.hub || chain.hub || (await chain.contracts.fetchHubAddress()),
+          cmd.hub || chain.hub || (await chain.contracts.fetchIExecAddress()),
         );
 
         spinner.start(info.checking('iExec contracts info'));
@@ -145,16 +145,10 @@ async function main() {
             }),
           );
         const [
-          clerkAddress,
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          wrapCall(
-            chain.contracts.fetchClerkAddress({
-              hub: hubAddress,
-            }),
-          ),
           wrapCall(
             chain.contracts.fetchAppRegistryAddress({
               hub: hubAddress,
@@ -182,8 +176,7 @@ async function main() {
           ...((useNative && {
             'native RLC': true,
           }) || { 'RLC ERC20 address': rlcAddress }),
-          'hub address': hubAddress || chain.contracts.hubAddress,
-          'clerk address': clerkAddress,
+          'iExec contract address': hubAddress || chain.contracts.hubAddress,
           'app registry address': appRegistryAddress,
           'dataset registry address': datasetRegistryAddress,
           'workerpool registry address': workerpoolRegistryAddress,

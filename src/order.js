@@ -180,7 +180,7 @@ const signedOrderToStruct = (orderName, orderObj) => {
 };
 
 const getEIP712Domain = async (contracts) => {
-  const iexecContract = await contracts.getHubContract();
+  const iexecContract = await contracts.getIExecContract();
   const domain = await wrapCall(iexecContract.domain());
   return cleanRPC(domain);
 };
@@ -277,11 +277,8 @@ const getRemainingVolume = async (
     checkOrderName(orderName);
     const initial = new BN(order.volume);
     const orderHash = await computeOrderHash(contracts, orderName, order);
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({
-      at: clerkAddress,
-    });
-    const cons = await wrapCall(clerkContract.viewConsumed(orderHash));
+    const iexecContract = contracts.getIExecContract();
+    const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
     const remain = initial.sub(consumed);
     return remain;
@@ -383,7 +380,7 @@ const cancelOrder = async (
       orderObj,
     );
     if (remainingVolume.isZero()) throw Error(`${orderName} already canceled`);
-    const iexecContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
       iexecContract[objDesc[orderName].cancelMethod](
         [args, 1, NULL_BYTES],
@@ -665,10 +662,9 @@ const matchOrders = async (
       vRequestOrder,
     );
 
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      clerkContract.matchOrders(
+      iexecContract.matchOrders(
         appOrderStruct,
         datasetOrderStruct,
         workerpoolOrderStruct,
