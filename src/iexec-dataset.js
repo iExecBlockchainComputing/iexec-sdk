@@ -627,7 +627,11 @@ checkSecret
       spinner.info(`Checking secret for address ${resourceAddress}`);
       const { sms } = chain;
       if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(sms, resourceAddress);
+      const res = await secretMgtServ.checkSecret(
+        chain.contracts,
+        sms,
+        resourceAddress,
+      );
       if (res.hash) {
         spinner.succeed(
           `Secret found for address ${resourceAddress} (hash: ${res.hash})`,

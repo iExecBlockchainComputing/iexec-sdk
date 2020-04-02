@@ -16,7 +16,9 @@ const pushSecret = async (
   secret = throwIfMissing(),
 ) => {
   try {
-    const vResourceAddress = await addressSchema().validate(resourceAddress);
+    const vResourceAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(resourceAddress);
     const vSignerAddress = await getAddress(contracts);
     await stringSchema().validate(secret, { strict: true });
 
@@ -41,11 +43,14 @@ const pushSecret = async (
 };
 
 const checkSecret = async (
+  contracts = throwIfMissing(),
   smsUrl = throwIfMissing(),
   resourceAddress = throwIfMissing(),
 ) => {
   try {
-    const vResourceAddress = await addressSchema().validate(resourceAddress);
+    const vResourceAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(resourceAddress);
     const res = await http.get(
       secretEndpoint(vResourceAddress),
       {},

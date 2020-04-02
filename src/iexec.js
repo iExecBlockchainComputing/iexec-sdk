@@ -19,7 +19,7 @@ const {
 const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
-const { checksummedAddress } = require('./utils');
+const { addressSchema } = require('./validator');
 const { wrapCall } = require('./errorWrappers');
 const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
@@ -129,14 +129,13 @@ async function main() {
           Keystore({ isSigner: false }),
           { spinner },
         );
-        const hubAddress = checksummedAddress(
+        spinner.start(info.checking('iExec contracts info'));
+        const hubAddress = await addressSchema({
+          ethProvider: chain.contracts.jsonRpcProvider,
+        }).validate(
           cmd.hub || chain.hub || (await chain.contracts.fetchIExecAddress()),
         );
-
-        spinner.start(info.checking('iExec contracts info'));
-
         const useNative = !!chain.contracts.isNative;
-
         const rlcAddress = useNative
           ? undefined
           : await wrapCall(

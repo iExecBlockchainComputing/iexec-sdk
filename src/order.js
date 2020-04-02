@@ -204,16 +204,24 @@ const computeOrderHash = async (
     let vOrder;
     switch (orderName) {
       case APP_ORDER:
-        vOrder = await saltedApporderSchema().validate(order);
+        vOrder = await saltedApporderSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(order);
         break;
       case DATASET_ORDER:
-        vOrder = await saltedDatasetorderSchema().validate(order);
+        vOrder = await saltedDatasetorderSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(order);
         break;
       case WORKERPOOL_ORDER:
-        vOrder = await saltedWorkerpoolorderSchema().validate(order);
+        vOrder = await saltedWorkerpoolorderSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(order);
         break;
       case REQUEST_ORDER:
-        vOrder = await saltedRequestorderSchema().validate(order);
+        vOrder = await saltedRequestorderSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(order);
         break;
       default:
     }
@@ -241,7 +249,9 @@ const hashApporder = async (
 ) => computeOrderHash(
   contracts,
   APP_ORDER,
-  await saltedApporderSchema().validate(order),
+  await saltedApporderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(order),
 );
 const hashDatasetorder = async (
   contracts = throwIfMissing(),
@@ -249,7 +259,9 @@ const hashDatasetorder = async (
 ) => computeOrderHash(
   contracts,
   DATASET_ORDER,
-  await saltedDatasetorderSchema().validate(order),
+  await saltedDatasetorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(order),
 );
 const hashWorkerpoolorder = async (
   contracts = throwIfMissing(),
@@ -257,7 +269,9 @@ const hashWorkerpoolorder = async (
 ) => computeOrderHash(
   contracts,
   WORKERPOOL_ORDER,
-  await saltedWorkerpoolorderSchema().validate(order),
+  await saltedWorkerpoolorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(order),
 );
 const hashRequestorder = async (
   contracts = throwIfMissing(),
@@ -265,7 +279,9 @@ const hashRequestorder = async (
 ) => computeOrderHash(
   contracts,
   REQUEST_ORDER,
-  await saltedRequestorderSchema().validate(order),
+  await saltedRequestorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(order),
 );
 
 const getRemainingVolume = async (
@@ -337,7 +353,13 @@ const signOrder = async (
 const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => signOrder(contracts, APP_ORDER, await apporderSchema().validate(apporder));
+) => signOrder(
+  contracts,
+  APP_ORDER,
+  await apporderSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    apporder,
+  ),
+);
 
 const signDatasetorder = async (
   contracts = throwIfMissing(),
@@ -345,7 +367,9 @@ const signDatasetorder = async (
 ) => signOrder(
   contracts,
   DATASET_ORDER,
-  await datasetorderSchema().validate(datasetorder),
+  await datasetorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(datasetorder),
 );
 
 const signWorkerpoolorder = async (
@@ -354,7 +378,9 @@ const signWorkerpoolorder = async (
 ) => signOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await workerpoolorderSchema().validate(workerpoolorder),
+  await workerpoolorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(workerpoolorder),
 );
 
 const signRequestorder = async (
@@ -363,7 +389,9 @@ const signRequestorder = async (
 ) => signOrder(
   contracts,
   REQUEST_ORDER,
-  await requestorderSchema().validate(requestorder),
+  await requestorderSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(requestorder),
 );
 
 const cancelOrder = async (
@@ -686,91 +714,139 @@ const matchOrders = async (
   }
 };
 
-const createApporder = async ({
-  app = throwIfMissing(),
-  appprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  tag = NULL_BYTES32,
-  datasetrestrict = NULL_ADDRESS,
-  workerpoolrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  app: await addressSchema().validate(app),
+const createApporder = async (
+  contracts = throwIfMissing(),
+  {
+    app = throwIfMissing(),
+    appprice = throwIfMissing(),
+    volume = throwIfMissing(),
+    tag = NULL_BYTES32,
+    datasetrestrict = NULL_ADDRESS,
+    workerpoolrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  app: await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    app,
+  ),
   appprice: await uint256Schema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
-  datasetrestrict: await addressSchema().validate(datasetrestrict),
-  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  datasetrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(datasetrestrict),
+  workerpoolrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(requesterrestrict),
 });
 
-const createDatasetorder = async ({
-  dataset = throwIfMissing(),
-  datasetprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  tag = NULL_BYTES32,
-  apprestrict = NULL_ADDRESS,
-  workerpoolrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  dataset: await addressSchema().validate(dataset),
+const createDatasetorder = async (
+  contracts = throwIfMissing(),
+  {
+    dataset = throwIfMissing(),
+    datasetprice = throwIfMissing(),
+    volume = throwIfMissing(),
+    tag = NULL_BYTES32,
+    apprestrict = NULL_ADDRESS,
+    workerpoolrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  dataset: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(dataset),
   datasetprice: await uint256Schema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
-  apprestrict: await addressSchema().validate(apprestrict),
-  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  apprestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(apprestrict),
+  workerpoolrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(requesterrestrict),
 });
 
-const createWorkerpoolorder = async ({
-  workerpool = throwIfMissing(),
-  workerpoolprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  category = throwIfMissing(),
-  trust = '0',
-  tag = NULL_BYTES32,
-  apprestrict = NULL_ADDRESS,
-  datasetrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  workerpool: await addressSchema().validate(workerpool),
+const createWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  {
+    workerpool = throwIfMissing(),
+    workerpoolprice = throwIfMissing(),
+    volume = throwIfMissing(),
+    category = throwIfMissing(),
+    trust = '0',
+    tag = NULL_BYTES32,
+    apprestrict = NULL_ADDRESS,
+    datasetrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  workerpool: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(workerpool),
   workerpoolprice: await uint256Schema().validate(workerpoolprice),
   volume: await uint256Schema().validate(volume),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
   tag: await tagSchema().validate(tag),
-  apprestrict: await addressSchema().validate(apprestrict),
-  datasetrestrict: await addressSchema().validate(datasetrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  apprestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(apprestrict),
+  datasetrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(datasetrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(requesterrestrict),
 });
 
-const createRequestorder = async ({
-  app = throwIfMissing(),
-  appmaxprice = throwIfMissing(),
-  workerpoolmaxprice = throwIfMissing(),
-  requester = throwIfMissing(),
-  volume = throwIfMissing(),
-  category = throwIfMissing(),
-  workerpool = NULL_ADDRESS,
-  dataset = NULL_ADDRESS,
-  datasetmaxprice = '0',
-  beneficiary,
-  params = '',
-  callback = NULL_ADDRESS,
-  trust = '0',
-  tag = NULL_BYTES32,
-} = {}) => ({
-  app: await addressSchema().validate(app),
+const createRequestorder = async (
+  contracts = throwIfMissing(),
+  {
+    app = throwIfMissing(),
+    appmaxprice = throwIfMissing(),
+    workerpoolmaxprice = throwIfMissing(),
+    requester = throwIfMissing(),
+    volume = throwIfMissing(),
+    category = throwIfMissing(),
+    workerpool = NULL_ADDRESS,
+    dataset = NULL_ADDRESS,
+    datasetmaxprice = '0',
+    beneficiary,
+    params = '',
+    callback = NULL_ADDRESS,
+    trust = '0',
+    tag = NULL_BYTES32,
+  } = {},
+) => ({
+  app: await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    app,
+  ),
   appmaxprice: await uint256Schema().validate(appmaxprice),
-  dataset: await addressSchema().validate(dataset),
+  dataset: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(dataset),
   datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
-  workerpool: await addressSchema().validate(workerpool),
+  workerpool: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(workerpool),
   workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
-  requester: await addressSchema().validate(requester),
-  beneficiary: await addressSchema().validate(beneficiary || requester),
+  requester: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(requester),
+  beneficiary: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(beneficiary || requester),
   volume: await uint256Schema().validate(volume),
   params: await paramsSchema().validate(params),
-  callback: await addressSchema().validate(callback),
+  callback: await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(callback),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
   tag: await tagSchema().validate(tag),

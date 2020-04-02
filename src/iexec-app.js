@@ -314,13 +314,15 @@ run
       debug('tag', tag);
       const trust = await positiveIntSchema().validate(cmd.trust);
       debug('trust', trust);
-      const callback = await addressSchema().validate(
-        cmd.callback || NULL_ADDRESS,
-      );
+      const callback = await addressSchema({
+        ethProvider: chain.contracts.jsonRpcProvider,
+      }).validate(cmd.callback || NULL_ADDRESS);
       debug('callback', callback);
       const beneficiary = cmd.beneficiary === undefined
         ? undefined
-        : await addressSchema().validate(cmd.beneficiary);
+        : await addressSchema({
+          ethProvider: chain.contracts.jsonRpcProvider,
+        }).validate(cmd.beneficiary);
       debug('beneficiary', beneficiary);
 
       const watch = !!cmd.watch || !!cmd.download;
@@ -334,7 +336,7 @@ run
         const isAppOwner = appOwner.toLowerCase() === requester.toLowerCase();
         if (isAppOwner) {
           spinner.start('creating apporder');
-          const order = await createApporder({
+          const order = await createApporder(chain.contracts, {
             app,
             appprice: 0,
             volume: 1,
@@ -345,7 +347,7 @@ run
           return order;
         }
         spinner.start('fetching apporder from iExec Marketplace');
-        const { appOrders } = await fetchAppOrderbook(chain.id, app);
+        const { appOrders } = await fetchAppOrderbook(chain.contracts, app);
         const order = appOrders[0] && appOrders[0].order;
         spinner.stop();
         if (!order) throw Error(`No order available for app ${app}`);
@@ -363,7 +365,7 @@ run
         const isDatasetOwner = datasetOwner.toLowerCase() === requester.toLowerCase();
         if (isDatasetOwner) {
           spinner.start('creating datasetorder');
-          const order = await createDatasetorder({
+          const order = await createDatasetorder(chain.contracts, {
             dataset,
             datasetprice: 0,
             volume: 1,
@@ -375,7 +377,7 @@ run
         }
         spinner.start('fetching datasetorder from iExec Marketplace');
         const { datasetOrders } = await fetchDatasetOrderbook(
-          chain.id,
+          chain.contracts,
           dataset,
           {
             app,
@@ -404,7 +406,7 @@ run
           const isWorkerpoolOwner = workerpoolOwner.toLowerCase() === requester.toLowerCase();
           if (isWorkerpoolOwner) {
             spinner.start('creating workerpoolorder');
-            const order = await createWorkerpoolorder({
+            const order = await createWorkerpoolorder(chain.contracts, {
               workerpool,
               workerpoolprice: 0,
               volume: 1,
@@ -424,7 +426,7 @@ run
         ) => {
           debug('try category', catid, 'strict', strict);
           const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
-            chain.id,
+            chain.contracts,
             catid,
             {
               workerpoolAddress: workerpool,
@@ -485,7 +487,7 @@ run
       debug('apporder', apporder);
       debug('datasetorder', datasetorder);
 
-      const requestorder = await createRequestorder({
+      const requestorder = await createRequestorder(chain.contracts, {
         app: apporder.app,
         appmaxprice: apporder.appprice,
         dataset: datasetorder.dataset,

@@ -13,7 +13,7 @@ const {
 const debug = Debug('iexec:orderbook');
 
 const fetchAppOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
   appAddress = throwIfMissing(),
   {
     minVolume, skip, dataset, workerpool, requester,
@@ -21,16 +21,26 @@ const fetchAppOrderbook = async (
 ) => {
   try {
     const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
-      { app: await addressSchema().validate(appAddress) },
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
+      {
+        app: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(appAddress),
+      },
       dataset && {
-        dataset: await addressSchema().validate(dataset),
+        dataset: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(dataset),
       },
       workerpool && {
-        workerpool: await addressSchema().validate(workerpool),
+        workerpool: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(workerpool),
       },
       requester && {
-        requester: await addressSchema().validate(requester),
+        requester: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(requester),
       },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
@@ -49,7 +59,7 @@ const fetchAppOrderbook = async (
 };
 
 const fetchDatasetOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
   datasetAddress = throwIfMissing(),
   {
     minVolume, skip, app, workerpool, requester,
@@ -57,16 +67,26 @@ const fetchDatasetOrderbook = async (
 ) => {
   try {
     const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
-      { dataset: await addressSchema().validate(datasetAddress) },
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
+      {
+        dataset: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(datasetAddress),
+      },
       app && {
-        app: await addressSchema().validate(app),
+        app: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(app),
       },
       workerpool && {
-        workerpool: await addressSchema().validate(workerpool),
+        workerpool: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(workerpool),
       },
       requester && {
-        requester: await addressSchema().validate(requester),
+        requester: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(requester),
       },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
@@ -90,7 +110,7 @@ const fetchDatasetOrderbook = async (
 };
 
 const fetchWorkerpoolOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
   category = throwIfMissing(),
   {
     workerpoolAddress, minTag, signerAddress, minTrust, minVolume, skip,
@@ -99,16 +119,20 @@ const fetchWorkerpoolOrderbook = async (
   try {
     const body = Object.assign(
       {},
-      { chainId: await chainIdSchema().validate(chainId) },
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
       { category: await uint256Schema().validate(category) },
       workerpoolAddress && {
-        workerpool: await addressSchema().validate(workerpoolAddress),
+        workerpool: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(workerpoolAddress),
       },
       minTag && {
         minTag: await tagSchema().validate(minTag),
       },
       signerAddress && {
-        signer: await addressSchema().validate(signerAddress),
+        signer: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(signerAddress),
       },
       minTrust && {
         minTrust: await positiveIntSchema().validate(minTrust),
@@ -136,7 +160,7 @@ const fetchWorkerpoolOrderbook = async (
 };
 
 const fetchRequestOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
   category = throwIfMissing(),
   {
     requesterAddress,
@@ -149,13 +173,17 @@ const fetchRequestOrderbook = async (
 ) => {
   try {
     const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
       { category: await uint256Schema().validate(category) },
       requesterAddress && {
-        requester: await addressSchema().validate(requesterAddress),
+        requester: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(requesterAddress),
       },
       beneficiaryAddress && {
-        beneficiary: await addressSchema().validate(beneficiaryAddress),
+        beneficiary: await addressSchema({
+          ethProvider: contracts.jsonRpcProvider,
+        }).validate(beneficiaryAddress),
       },
       maxTag && {
         maxTag: await tagSchema().validate(maxTag),

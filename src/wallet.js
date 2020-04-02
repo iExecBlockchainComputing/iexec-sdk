@@ -84,7 +84,9 @@ const checkBalances = async (
   address = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(address);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(address);
     const { isNative } = contracts;
     const getETH = () => contracts.jsonRpcProvider.getBalance(vAddress);
     const balances = {};
@@ -191,7 +193,9 @@ const sendNativeToken = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(to);
     const vValue = await uint256Schema().validate(value);
     const hexValue = ethersBigNumberify(vValue).toHexString();
     const ethSigner = contracts.jsonRpcProvider.getSigner();
@@ -217,7 +221,9 @@ const sendERC20 = async (
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
-  const vAddress = await addressSchema().validate(to);
+  const vAddress = await addressSchema({
+    ethProvider: contracts.jsonRpcProvider,
+  }).validate(to);
   const vAmount = await uint256Schema().validate(nRlcAmount);
   try {
     const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
@@ -239,7 +245,9 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(to);
     const vValue = await uint256Schema().validate(value);
     if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     const txHash = await sendNativeToken(contracts, vValue, vAddress);
@@ -256,7 +264,9 @@ const sendRLC = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(to);
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) {
       debug('send native token');
@@ -275,7 +285,9 @@ const sendRLC = async (
 
 const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
-    const vAddressTo = await addressSchema().validate(to);
+    const vAddressTo = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(to);
     const userAddress = await getAddress(contracts);
     const code = await contracts.jsonRpcProvider.getCode(vAddressTo);
     if (code !== '0x') {
@@ -344,9 +356,13 @@ const bridgeToSidechain = async (
   let sendTxHash;
   let receiveTxHash;
   try {
-    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vBridgeAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(bridgeAddress);
     const vSidechainBridgeAddress = sidechainBridgeAddress
-      ? await addressSchema().validate(sidechainBridgeAddress)
+      ? await addressSchema({
+        ethProvider: contracts.jsonRpcProvider,
+      }).validate(sidechainBridgeAddress)
       : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
@@ -524,9 +540,13 @@ const bridgeToMainchain = async (
   let sendTxHash;
   let receiveTxHash;
   try {
-    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vBridgeAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(bridgeAddress);
     const vMainchainBridgeAddress = mainchainBridgeAddress
-      ? await addressSchema().validate(mainchainBridgeAddress)
+      ? await addressSchema({
+        ethProvider: contracts.jsonRpcProvider,
+      }).validate(mainchainBridgeAddress)
       : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');

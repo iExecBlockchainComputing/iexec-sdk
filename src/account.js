@@ -18,7 +18,9 @@ const checkBalance = async (
   address = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(address);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(address);
     const { stake, locked } = await wrapCall(contracts.checkBalance(vAddress));
     const balance = {
       stake: ethersBnToBn(stake),

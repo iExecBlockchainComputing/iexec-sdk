@@ -24,21 +24,35 @@ const { showCategory, getTimeoutRatio } = require('./hub');
 const debug = Debug('iexec:deal');
 
 const fetchRequesterDeals = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
   requesterAddress = throwIfMissing(),
   {
     appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
   } = {},
 ) => {
   try {
-    const vRequesterAddress = await addressSchema().validate(requesterAddress);
-    const vChainId = await chainIdSchema().validate(chainId);
+    const vRequesterAddress = await addressSchema({
+      ethProvider: contracts.jsonRpcProvider,
+    }).validate(requesterAddress);
+    const vChainId = await chainIdSchema().validate(contracts.chainId);
     let vAppAddress;
     let vDatasetAddress;
     let vWorkerpoolAddress;
-    if (appAddress) vAppAddress = await addressSchema().validate(appAddress);
-    if (datasetAddress) vDatasetAddress = await addressSchema().validate(datasetAddress);
-    if (workerpoolAddress) vWorkerpoolAddress = await addressSchema().validate(workerpoolAddress);
+    if (appAddress) {
+      vAppAddress = await addressSchema({
+        ethProvider: contracts.jsonRpcProvider,
+      }).validate(appAddress);
+    }
+    if (datasetAddress) {
+      vDatasetAddress = await addressSchema({
+        ethProvider: contracts.jsonRpcProvider,
+      }).validate(datasetAddress);
+    }
+    if (workerpoolAddress) {
+      vWorkerpoolAddress = await addressSchema({
+        ethProvider: contracts.jsonRpcProvider,
+      }).validate(workerpoolAddress);
+    }
     const find = Object.assign(
       { requester: vRequesterAddress },
       appAddress && { 'app.pointer': vAppAddress },

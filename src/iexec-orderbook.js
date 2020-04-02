@@ -42,7 +42,7 @@ orderbookApp
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchAppOrderbook(
-        chain.id,
+        chain.contracts,
         address,
         Object.assign({}, { dataset }, { workerpool }, { requester }),
       );
@@ -94,7 +94,7 @@ orderbookDataset
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchDatasetOrderbook(
-        chain.id,
+        chain.contracts,
         address,
         Object.assign({}, { app }, { workerpool }, { requester }),
       );
@@ -142,7 +142,7 @@ orderbookWorkerpool
       const minTag = cmd.requireTag;
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
-        chain.id,
+        chain.contracts,
         cmd.category,
         { workerpoolAddress: address, minTag },
       );
@@ -192,7 +192,7 @@ orderbookRequester
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchRequestOrderbook(
-        chain.id,
+        chain.contracts,
         cmd.category,
         { requesterAddress: address },
       );

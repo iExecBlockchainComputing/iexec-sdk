@@ -133,7 +133,7 @@ class IExec {
       {
         appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
       } = {},
-    ) => deal.fetchRequesterDeals(contracts.chainId, requesterAddress, {
+    ) => deal.fetchRequesterDeals(contracts, requesterAddress, {
       appAddress,
       datasetAddress,
       workerpoolAddress,
@@ -161,10 +161,10 @@ class IExec {
     //   requestorderHash,
     // );
     this.order = {};
-    this.order.createApporder = overwrite => order.createApporder(overwrite);
-    this.order.createDatasetorder = overwrite => order.createDatasetorder(overwrite);
-    this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(overwrite);
-    this.order.createRequestorder = overwrite => order.createRequestorder(overwrite);
+    this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
+    this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
+    this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(contracts, overwrite);
+    this.order.createRequestorder = overwrite => order.createRequestorder(contracts, overwrite);
     this.order.hashApporder = apporder => order.hashApporder(contracts, apporder);
     this.order.hashDatasetorder = datasetorder => order.hashDatasetorder(contracts, datasetorder);
     this.order.hashWorkerpoolorder = workerpoolorder => order.hashWorkerpoolorder(contracts, workerpoolorder);
@@ -218,14 +218,10 @@ class IExec {
       contracts.chainId,
       requestorderHash,
     );
-    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(contracts.chainId, appAddress, options);
-    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(
-      contracts.chainId,
-      datasetAddress,
-      options,
-    );
-    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(contracts.chainId, category, options);
-    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts.chainId, category, options);
+    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(contracts, appAddress, options);
+    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(contracts, datasetAddress, options);
+    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(contracts, category, options);
+    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts, category, options);
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });

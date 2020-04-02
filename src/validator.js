@@ -165,100 +165,100 @@ const tagSchema = () => mixed()
     return res;
   });
 
-const apporderSchema = () => object(
+const apporderSchema = opt => object(
   {
-    app: addressSchema().required(),
+    app: addressSchema(opt).required(),
     appprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    datasetrestrict: addressSchema().required(),
-    workerpoolrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    datasetrestrict: addressSchema(opt).required(),
+    workerpoolrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
   '${path} is not a valid signed apporder',
 );
 
-const saltedApporderSchema = () => apporderSchema().shape(salted(), '${path} is not a valid salted apporder');
+const saltedApporderSchema = opt => apporderSchema(opt).shape(salted(), '${path} is not a valid salted apporder');
 
-const signedApporderSchema = () => saltedApporderSchema().shape(
+const signedApporderSchema = opt => saltedApporderSchema(opt).shape(
   signed(),
   '${path} is not a valid signed apporder',
 );
 
-const datasetorderSchema = () => object(
+const datasetorderSchema = opt => object(
   {
-    dataset: addressSchema().required(),
+    dataset: addressSchema(opt).required(),
     datasetprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    apprestrict: addressSchema().required(),
-    workerpoolrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    apprestrict: addressSchema(opt).required(),
+    workerpoolrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
   '${path} is not a valid signed datasetorder',
 );
 
-const saltedDatasetorderSchema = () => datasetorderSchema().shape(
+const saltedDatasetorderSchema = opt => datasetorderSchema(opt).shape(
   salted(),
   '${path} is not a valid salted datasetorder',
 );
 
-const signedDatasetorderSchema = () => saltedDatasetorderSchema().shape(
+const signedDatasetorderSchema = opt => saltedDatasetorderSchema(opt).shape(
   signed(),
   '${path} is not a valid signed datasetorder',
 );
 
-const workerpoolorderSchema = () => object(
+const workerpoolorderSchema = opt => object(
   {
-    workerpool: addressSchema().required(),
+    workerpool: addressSchema(opt).required(),
     workerpoolprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     category: catidSchema().required(),
     trust: uint256Schema().required(),
-    apprestrict: addressSchema().required(),
-    datasetrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    apprestrict: addressSchema(opt).required(),
+    datasetrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
   '${path} is not a valid signed workerpoolorder',
 );
 
-const saltedWorkerpoolorderSchema = () => workerpoolorderSchema().shape(
+const saltedWorkerpoolorderSchema = opt => workerpoolorderSchema(opt).shape(
   salted(),
   '${path} is not a valid salted workerpoolorder',
 );
 
-const signedWorkerpoolorderSchema = () => saltedWorkerpoolorderSchema().shape(
+const signedWorkerpoolorderSchema = opt => saltedWorkerpoolorderSchema(opt).shape(
   signed(),
   '${path} is not a valid salted workerpoolorder',
 );
 
-const requestorderSchema = () => object(
+const requestorderSchema = opt => object(
   {
-    app: addressSchema().required(),
+    app: addressSchema(opt).required(),
     appmaxprice: uint256Schema().required(),
-    dataset: addressSchema().required(),
+    dataset: addressSchema(opt).required(),
     datasetmaxprice: uint256Schema().required(),
-    workerpool: addressSchema().required(),
+    workerpool: addressSchema(opt).required(),
     workerpoolmaxprice: uint256Schema().required(),
-    requester: addressSchema().required(),
+    requester: addressSchema(opt).required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     category: catidSchema().required(),
     trust: uint256Schema().required(),
-    beneficiary: addressSchema().required(),
-    callback: addressSchema().required(),
+    beneficiary: addressSchema(opt).required(),
+    callback: addressSchema(opt).required(),
     params: paramsSchema(),
   },
   '${path} is not a valid signed requestorder',
 );
 
-const saltedRequestorderSchema = () => requestorderSchema().shape(
+const saltedRequestorderSchema = opt => requestorderSchema(opt).shape(
   salted(),
   '${path} is not a valid salted requestorder',
 );
 
-const signedRequestorderSchema = () => saltedRequestorderSchema().shape(
+const signedRequestorderSchema = opt => saltedRequestorderSchema(opt).shape(
   signed(),
   '${path} is not a valid signed requestorder',
 );
@@ -276,26 +276,26 @@ const mrenclaveSchema = () => mixed().transform((value) => {
   return utf8ToBuffer(value);
 });
 
-const appSchema = () => object({
-  owner: addressSchema().required(),
+const appSchema = opt => object({
+  owner: addressSchema(opt).required(),
   name: string().required(),
   type: string()
     .matches(/^(DOCKER){1}$/, '${path} is not a valid type')
     .required(),
-  multiaddr: multiaddressSchema().required(),
+  multiaddr: multiaddressSchema(opt).required(),
   checksum: bytes32Schema().required(),
   mrenclave: mrenclaveSchema().required(),
 });
 
-const datasetSchema = () => object({
-  owner: addressSchema().required(),
+const datasetSchema = opt => object({
+  owner: addressSchema(opt).required(),
   name: string().required(),
-  multiaddr: multiaddressSchema().required(),
+  multiaddr: multiaddressSchema(opt).required(),
   checksum: bytes32Schema().required(),
 });
 
-const workerpoolSchema = () => object({
-  owner: addressSchema().required(),
+const workerpoolSchema = opt => object({
+  owner: addressSchema(opt).required(),
   description: string().required(),
 });
 

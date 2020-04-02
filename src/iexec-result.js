@@ -267,7 +267,11 @@ checkSecret
       }
       const { sms } = chain;
       if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(sms, keyAddress);
+      const res = await secretMgtServ.checkSecret(
+        chain.contracts,
+        sms,
+        keyAddress,
+      );
       if (res.hash) {
         spinner.succeed(
           `Secret found for address ${keyAddress} (hash: ${res.hash})`,
