@@ -1,9 +1,10 @@
 const BN = require('bn.js');
+const { getDefaultProvider } = require('ethers');
 const {
   // throwIfMissing,
   // stringSchema,
   uint256Schema,
-  // addressSchema,
+  addressSchema,
   // bytes32Schema,
   // apporderSchema,
   // signedApporderSchema,
@@ -288,6 +289,56 @@ describe('[tagSchema]', () => {
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
       new ValidationError('invalid tag: unknown tag foo'),
+    );
+  });
+});
+
+describe('[addressSchema]', () => {
+  test('address', async () => {
+    await expect(
+      addressSchema().validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address 0x stripped', async () => {
+    await expect(
+      addressSchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address (with ethProvider)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('invalid address', async () => {
+    await expect(
+      addressSchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375'),
+    ).rejects.toThrow(
+      new ValidationError(
+        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
+      ),
+    );
+  });
+  test('ens (resolve ENS with ethProvider)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        'rlc.iexec.eth',
+      ),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('invalid ens (throw when ethProvider is missing)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        'pierre.iexec.eth',
+      ),
+    ).rejects.toThrow(
+      new ValidationError('unable to resolve ENS pierre.iexec.eth'),
+    );
+  });
+  test('ens (throw when ethProvider is missing)', async () => {
+    await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
+      new ValidationError('unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });

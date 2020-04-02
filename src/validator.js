@@ -1,3 +1,4 @@
+const Debug = require('debug');
 const {
   string, number, object, mixed,
 } = require('yup');
@@ -9,8 +10,11 @@ const {
   bytes32Regex,
 } = require('./utils');
 const { ValidationError } = require('./errors');
+const { wrapCall } = require('./errorWrappers');
 
 /* eslint no-template-curly-in-string: "off" */
+
+const debug = Debug('validators');
 
 const stringNumberSchema = () => string()
   .transform((value) => {
@@ -37,22 +41,75 @@ const uint256Schema = () => stringNumberSchema();
 
 const chainIdSchema = () => stringNumberSchema();
 
-const addressSchema = () => string()
+const addressSchema = ({ ethProvider } = {}) => mixed()
   .transform((value) => {
     try {
-      return getAddress(value.toLowerCase());
+      if (typeof value === 'string') {
+        if (value.match(/^.*\.eth$/)) {
+          if (
+            ethProvider
+              && ethProvider.resolveName
+              && typeof ethProvider.resolveName === 'function'
+          ) {
+            const addressPromise = new Promise(async (resolve, reject) => {
+              try {
+                debug('resolving ENS', value);
+                const resolved = await wrapCall(
+                  ethProvider.resolveName(value),
+                );
+                debug('resolved ENS', resolved);
+                resolve(resolved);
+              } catch (error) {
+                debug('ENS resolution error', error);
+              }
+              reject(value);
+            });
+            return addressPromise;
+          }
+          debug("no ethProvider ENS can't be resolved");
+        }
+        return getAddress(value.toLowerCase());
+      }
     } catch (e) {
-      return value;
+      debug('Error', e);
     }
+    return value;
   })
-  .test('is-address', '${path} is not a valid ethereum address', (value) => {
-    try {
-      getAddress(value);
+  .test(
+    'resolve-ens',
+    'unable to resolve ENS ${originalValue}',
+    async (value) => {
+      if (typeof value === 'string') {
+        if (value.match(/^.*\.eth$/)) {
+          return false;
+        }
+        return true;
+      }
+      try {
+        const address = await value;
+        if (!address) return false;
+        getAddress(address);
+        return true;
+      } catch (e) {
+        debug('resolve-ens', e);
+        return false;
+      }
+    },
+  )
+  .test(
+    'is-address',
+    '${originalValue} is not a valid ethereum address',
+    (value) => {
+      if (typeof value === 'string') {
+        try {
+          getAddress(value);
+        } catch (e) {
+          return false;
+        }
+      }
       return true;
-    } catch (e) {
-      return false;
-    }
-  });
+    },
+  );
 
 const bytes32Schema = () => string()
   .lowercase()
