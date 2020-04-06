@@ -324,7 +324,7 @@ const signOrder = async (
   const domainObj = await getEIP712Domain(contracts);
 
   const salt = getSalt();
-  const saltedOrderObj = Object.assign(orderObj, { salt });
+  const saltedOrderObj = { ...orderObj, salt };
 
   const order = objDesc[orderName].structMembers;
 
@@ -332,7 +332,7 @@ const signOrder = async (
   types.EIP712Domain = objDesc.EIP712Domain.structMembers;
   types[objDesc[orderName].primaryType] = order;
 
-  const message = orderObj;
+  const message = saltedOrderObj;
 
   const typedData = {
     types,
@@ -346,7 +346,7 @@ const signOrder = async (
     address,
     typedData,
   );
-  const signedOrder = Object.assign(saltedOrderObj, { sign });
+  const signedOrder = { ...saltedOrderObj, sign };
   return signedOrder;
 };
 
