@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const {
-  cleanRPC,
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
@@ -181,8 +180,14 @@ const signedOrderToStruct = (orderName, orderObj) => {
 
 const getEIP712Domain = async (contracts) => {
   const iexecContract = await contracts.getIExecContract();
-  const domain = await wrapCall(iexecContract.domain());
-  return cleanRPC(domain);
+  const {
+    name, version, chainId, verifyingContract,
+  } = await wrapCall(
+    iexecContract.domain(),
+  );
+  return {
+    name, version, chainId: chainId.toString(), verifyingContract,
+  };
 };
 
 const getContractOwner = async (
