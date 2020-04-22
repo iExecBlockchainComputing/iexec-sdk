@@ -363,9 +363,7 @@ const encodeTag = (tags) => {
     '',
   );
   const hex = new BN(binString, 2).toString('hex');
-  const encodedTag = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    .substr(0, 66 - hex.length)
-    .concat(hex);
+  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
   return encodedTag;
 };
 
@@ -385,9 +383,23 @@ const decodeTag = (tag) => {
 };
 
 const sumTags = (tagArray) => {
-  const summedTags = [];
-  tagArray.forEach(hexTag => summedTags.push(...decodeTag(hexTag)));
-  return encodeTag(summedTags);
+  const binStringArray = tagArray.map((hexTag) => {
+    if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+    return new BN(hexTag.substr(2), 'hex').toString(2);
+  });
+  let summedTagsBinString = '';
+  for (let i = 1; i < 256; i += 1) {
+    let currentBit = '0';
+    binStringArray.forEach((binString) => {
+      if (binString.charAt(binString.length - i) === '1') {
+        currentBit = '1';
+      }
+    });
+    summedTagsBinString = currentBit + summedTagsBinString;
+  }
+  const hex = new BN(summedTagsBinString, 2).toString('hex');
+  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
+  return encodedTag;
 };
 
 const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
