@@ -234,8 +234,8 @@ beforeAll(async () => {
   ).creates;
   console.log('factoryAddress', factoryAddress);
 
-  hubAddress = '0xD047d0445f745b0052a80a7fFC767c91ABFD8090';
-  nativeHubAddress = '0xD047d0445f745b0052a80a7fFC767c91ABFD8090';
+  hubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
+  nativeHubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
   console.log('hubAddress', hubAddress);
   console.log('nativeHubAddress', nativeHubAddress);
 }, 15000);
