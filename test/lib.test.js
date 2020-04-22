@@ -1891,7 +1891,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x86d860e8a837326452633594cfb3e76a830a9e119693c67196d189b7923d344f',
+      '0x383723d2e610b846b811b08beadffc12b01e7a7cdcf5a750f0983f1371b08af4',
     );
   });
 
@@ -1920,7 +1920,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xda0b73a82ebd75caf492a471b2a56384d64cf27db503953f4430a3aec27f0257',
+      '0x442d4287371cfa27bf7e83b6d20d87ee9964115716f119bae38ca374f91b757f',
     );
   });
 
@@ -1950,7 +1950,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x894dec6b3dd5221645616d8c71adecc1d39b441c01fad4567605a143ba0f664c',
+      '0x3c7b015c660502bc4de2c2ac93e8204b8e0982270415174081fb452e6d571f7c',
     );
   });
 
@@ -1982,7 +1982,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x5a9f5a7076559fe668adf4740a90c977f9ac18bb1dbbf20887c7c0054e23294a',
+      '0x83db4372c3f4205d7033e02cc6a5ada6867a599a6b6aea09791c0b8971083e73',
     );
   });
 
