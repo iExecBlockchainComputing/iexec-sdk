@@ -182,11 +182,11 @@ const option = {
   ],
   fillRequestParams: () => [
     '--params <string>',
-    'specify the params of the request (existing request order will be ignored)',
+    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   appRunParams: () => [
     '--params <string>',
-    'specify the params of the request',
+    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   appRunDataset: () => [
     '--dataset [address]',
@@ -205,7 +205,7 @@ const option = {
     'specify the callback address of the request',
   ],
   appRunCategory: () => ['--category <catid>', 'run in specified category'],
-  appRunTag: () => ['--tag <tag...>', 'specify tags (usage --tag tag1,tag2)'],
+  appRunTag: () => ['--tag <tag...>', 'specify tags\n* usage: --tag tag1,tag2'],
   appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
@@ -239,7 +239,7 @@ const option = {
   orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
     '--require-tag <tag...>',
-    'specify minimum required tags (usage --require-tag tag1,tag2)',
+    'specify minimum required tags\n* usage: --require-tag tag1,tag2',
   ],
   password: () => [
     '--password <password>',
@@ -660,6 +660,7 @@ const computeTxOptions = (cmd) => {
 };
 
 const handleError = (error, cli, cmd) => {
+  debug('error', error);
   const spinner = Spinner(cmd);
   const lastCommandName = cli.rawArgs[2] || '';
   const commandName = cli._name
