@@ -33,6 +33,14 @@ const order = require('./order');
 const { getWorkerpoolOwner } = require('./hub');
 const account = require('./account');
 const templates = require('./templates');
+const {
+  sumTags,
+  findMissingBitsInTag,
+  checkActiveBitInTag,
+  tagBitToHuman,
+  NULL_ADDRESS,
+  NULL_BYTES32,
+} = require('./utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -348,8 +356,7 @@ fill
       }
 
       const useDataset = requestOrderInput
-        ? requestOrderInput.dataset
-          !== '0x0000000000000000000000000000000000000000'
+        ? requestOrderInput.dataset !== NULL_ADDRESS
         : !!datasetOrder;
       debug('useDataset', useDataset);
 
@@ -385,9 +392,7 @@ fill
         const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
           app: appOrder.app,
           appmaxprice: appOrder.appprice,
-          dataset: useDataset
-            ? datasetOrder.dataset
-            : '0x0000000000000000000000000000000000000000',
+          dataset: useDataset ? datasetOrder.dataset : NULL_ADDRESS,
           datasetmaxprice: useDataset ? datasetOrder.datasetprice : '0',
           workerpool: workerpoolOrder.workerpool,
           workerpoolmaxprice: workerpoolOrder.workerpoolprice,
@@ -412,8 +417,7 @@ fill
       if (!requestOrder) {
         throw new Error('Missing requestorder');
       }
-      const useWorkerpool = requestOrder.workerpool
-        !== '0x0000000000000000000000000000000000000000';
+      const useWorkerpool = requestOrder.workerpool !== NULL_ADDRESS;
 
       // address matching check
       if (requestOrder.app.toLowerCase() !== appOrder.app.toLowerCase()) {
@@ -447,16 +451,37 @@ fill
           'Category mismatch between requestorder and workerpoolorder',
         );
       }
-
       // trust check
       const requestTrust = new BN(requestOrder.trust);
       const workerpoolTrust = new BN(workerpoolOrder.trust);
       if (workerpoolTrust.lt(requestTrust)) {
         throw new Error(
-          `WorkerpoolOrder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
+          `workerpoolorder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
         );
       }
-
+      // workerpool tag check
+      const workerpoolMissingTagBits = findMissingBitsInTag(
+        workerpoolOrder.tag,
+        sumTags([requestOrder.tag, appOrder.tag, datasetOrder.tag]),
+      );
+      if (workerpoolMissingTagBits.length > 0) {
+        throw Error(
+          `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+        );
+      }
+      // app tag check
+      const teeAppRequired = checkActiveBitInTag(
+        sumTags([
+          requestOrder.tag,
+          useDataset ? datasetOrder.tag : NULL_BYTES32,
+        ]),
+        1,
+      );
+      if (teeAppRequired) {
+        if (!checkActiveBitInTag(appOrder.tag, 1)) {
+          throw Error('Missing tag [tee] in apporder');
+        }
+      }
       // volumes check
       const requestVolume = await order.getRemainingVolume(
         chain.contracts,

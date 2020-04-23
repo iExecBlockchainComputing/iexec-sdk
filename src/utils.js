@@ -402,6 +402,37 @@ const sumTags = (tagArray) => {
   return encodedTag;
 };
 
+const findMissingBitsInTag = (tag, requiredTag) => {
+  debug('requiredTag', requiredTag);
+  debug('tag', tag);
+  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof requiredTag !== 'string' || !requiredTag.match(bytes32Regex)) throw new ValidationError('requiredTag must be bytes32 hex string');
+  const tagBinString = new BN(tag.substr(2), 'hex').toString(2);
+  const requiredTagBinString = new BN(requiredTag.substr(2), 'hex').toString(2);
+  const missingBits = [];
+  for (let i = 1; i <= requiredTagBinString.length; i += 1) {
+    if (
+      requiredTagBinString.charAt(requiredTagBinString.length - i) === '1'
+      && tagBinString.charAt(tagBinString.length - i) !== '1'
+    ) {
+      missingBits.push(i);
+    }
+  }
+  return missingBits;
+};
+
+const checkActiveBitInTag = (tag, bit) => {
+  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (!typeof bit === 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  const binString = new BN(tag.substr(2), 'hex').toString(2);
+  return binString.charAt(binString.length - bit) === '1';
+};
+
+const tagBitToHuman = (bit) => {
+  if (!typeof bit === 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  return TAG_MAP[bit] || bit;
+};
+
 const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   const rootFolder = 'iexec_out';
   const encKeyFile = 'encrypted_key';
@@ -540,6 +571,9 @@ module.exports = {
   encodeTag,
   decodeTag,
   sumTags,
+  findMissingBitsInTag,
+  checkActiveBitInTag,
+  tagBitToHuman,
   bytes32Regex,
   addressRegex,
   sleep,

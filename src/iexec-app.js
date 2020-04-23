@@ -64,7 +64,9 @@ const { loadChain } = require('./chains');
 const {
   NULL_ADDRESS,
   NULL_BYTES32,
+  encodeTag,
   sumTags,
+  checkActiveBitInTag,
   BN,
   stringifyNestedBn,
 } = require('./utils');
@@ -362,7 +364,10 @@ run
           return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
-        const { appOrders } = await fetchAppOrderbook(chain.contracts, app);
+        const teeAppRequired = checkActiveBitInTag(tag, 1);
+        const { appOrders } = await fetchAppOrderbook(chain.contracts, app, {
+          ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
+        });
         const order = appOrders[0] && appOrders[0].order;
         if (!order) throw Error(`No order available for app ${app}`);
         return order;
