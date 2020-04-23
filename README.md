@@ -1073,6 +1073,8 @@ iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, 
 > - workerpool: filter on order available for specified workerpool
 > - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
+> - minTag: filter on minimum tag required
+> - maxTag: filter on maximun tag accepted
 > - skip: skip first results
 
 _Example:_
@@ -1097,6 +1099,8 @@ iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, w
 > - workerpool: filter on order available for specified workerpool
 > - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
+> - minTag: filter on minimum tag required
+> - maxTag: filter on maximun tag accepted
 > - skip: skip first results
 
 _Example:_
@@ -1119,7 +1123,7 @@ iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolA
 >
 > - workerpoolAddress: filter on specific workerpoolAddress
 > - signerAddress: filter on specific signer (ie:workerpool owner)
-> - minTag: filter on minimum tags required
+> - minTag: filter on minimum tag required
 > - minTrust: filter on minimum trust required
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results
@@ -1142,7 +1146,7 @@ iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddre
 >
 > - requesterAddress: filter on specific requesterAddress
 > - beneficiaryAddress: filter on specific beneficiaryAddress
-> - maxTag: filter on maximum tags required
+> - maxTag: filter on maximum tag accepted
 > - maxTrust: filter on maximum trust required
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results

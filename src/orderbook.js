@@ -16,9 +16,18 @@ const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   appAddress = throwIfMissing(),
   {
-    minVolume, skip, dataset, workerpool, requester,
+    minVolume, skip, dataset, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
+  debug({
+    minVolume,
+    skip,
+    dataset,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+  });
   try {
     const body = Object.assign(
       { chainId: await chainIdSchema().validate(contracts.chainId) },
@@ -45,6 +54,12 @@ const fetchAppOrderbook = async (
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       },
+      minTag && {
+        minTag: await tagSchema().validate(minTag),
+      },
+      maxTag && {
+        maxTag: await tagSchema().validate(maxTag),
+      },
       skip && {
         skip: await positiveIntSchema().validate(skip),
       },
@@ -62,7 +77,7 @@ const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   datasetAddress = throwIfMissing(),
   {
-    minVolume, skip, app, workerpool, requester,
+    minVolume, skip, app, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
   try {
@@ -90,6 +105,12 @@ const fetchDatasetOrderbook = async (
       },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
+      },
+      minTag && {
+        minTag: await tagSchema().validate(minTag),
+      },
+      maxTag && {
+        maxTag: await tagSchema().validate(maxTag),
       },
       skip && {
         skip: await positiveIntSchema().validate(skip),
