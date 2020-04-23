@@ -265,6 +265,11 @@ run
         );
       }
       debug('useDeployedApp', useDeployedApp, 'app', app);
+      if (useDeployedApp) {
+        spinner.info(
+          'No app specified, using last app deployed from "deployed.json"',
+        );
+      }
 
       const useDataset = cmd.dataset !== undefined;
       const useDeployedDataset = useDataset && cmd.dataset === true;
@@ -283,6 +288,11 @@ run
         'dataset',
         dataset,
       );
+      if (useDeployedDataset) {
+        spinner.info(
+          'No dataset specified, using last dataset deployed from "deployed.json"',
+        );
+      }
 
       const runOnWorkerpool = cmd.workerpool !== undefined;
       const useDeployedWorkerpool = runOnWorkerpool && cmd.workerpool === true;
@@ -301,6 +311,11 @@ run
         'workerpool',
         workerpool,
       );
+      if (useDeployedWorkerpool) {
+        spinner.info(
+          'No workerpool specified, using last workerpool deployed from "deployed.json"',
+        );
+      }
 
       const [requester] = await keystore.accounts();
       debug('requester', requester);
@@ -331,11 +346,12 @@ run
       debug('download', download);
 
       const getApporder = async () => {
+        spinner.info(`Using app ${app}`);
         if (!(await checkDeployedApp(chain.contracts, app))) throw Error(`No app deployed at address ${app}`);
         const appOwner = await getAppOwner(chain.contracts, app);
         const isAppOwner = appOwner.toLowerCase() === requester.toLowerCase();
         if (isAppOwner) {
-          spinner.start('creating apporder');
+          spinner.info('Creating apporder');
           const order = await createApporder(chain.contracts, {
             app,
             appprice: 0,
@@ -343,18 +359,19 @@ run
             requesterrestrict: requester,
             tag,
           }).then(o => signApporder(chain.contracts, o));
-          spinner.stop();
           return order;
         }
-        spinner.start('fetching apporder from iExec Marketplace');
+        spinner.info('Fetching apporder from iExec Marketplace');
         const { appOrders } = await fetchAppOrderbook(chain.contracts, app);
         const order = appOrders[0] && appOrders[0].order;
-        spinner.stop();
         if (!order) throw Error(`No order available for app ${app}`);
         return order;
       };
 
       const getDatasetorder = async () => {
+        spinner.info(
+          useDataset ? `Using dataset ${dataset}` : 'Not using dataset',
+        );
         if (!useDataset) return NULL_DATASETORDER;
         if (
           typeof dataset === 'string'
@@ -364,7 +381,7 @@ run
         const datasetOwner = await getDatasetOwner(chain.contracts, dataset);
         const isDatasetOwner = datasetOwner.toLowerCase() === requester.toLowerCase();
         if (isDatasetOwner) {
-          spinner.start('creating datasetorder');
+          spinner.info('Creating datasetorder');
           const order = await createDatasetorder(chain.contracts, {
             dataset,
             datasetprice: 0,
@@ -372,10 +389,9 @@ run
             requesterrestrict: requester,
             tag,
           }).then(o => signDatasetorder(chain.contracts, o));
-          spinner.stop();
           return order;
         }
-        spinner.start('fetching datasetorder from iExec Marketplace');
+        spinner.info('Fetching datasetorder from iExec Marketplace');
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.contracts,
           dataset,
@@ -384,10 +400,11 @@ run
           },
         );
         const order = datasetOrders[0] && datasetOrders[0].order;
-        spinner.stop();
         if (!order) throw Error(`No order available for dataset ${dataset}`);
         return order;
       };
+
+      spinner.start('Preparing deal');
 
       const apporder = await getApporder();
       const datasetorder = await getDatasetorder();
@@ -396,7 +413,13 @@ run
       debug('datasetorder', datasetorder);
 
       const getWorkerpoolorder = async () => {
+        spinner.info(
+          workerpool
+            ? `Using workerpool ${workerpool}`
+            : 'Using any workerpool',
+        );
         const minTag = sumTags([apporder.tag, datasetorder.tag, tag]);
+        debug('minTag', minTag);
         if (runOnWorkerpool) {
           if (!(await checkDeployedWorkerpool(chain.contracts, workerpool))) throw Error(`No workerpool deployed at address ${workerpool}`);
           const workerpoolOwner = await getWorkerpoolOwner(
@@ -405,7 +428,7 @@ run
           );
           const isWorkerpoolOwner = workerpoolOwner.toLowerCase() === requester.toLowerCase();
           if (isWorkerpoolOwner) {
-            spinner.start('creating workerpoolorder');
+            spinner.info('Creating workerpoolorder');
             const order = await createWorkerpoolorder(chain.contracts, {
               workerpool,
               workerpoolprice: 0,
@@ -415,11 +438,10 @@ run
               trust,
               category: category || 0,
             }).then(o => signWorkerpoolorder(chain.contracts, o));
-            spinner.stop();
             return order;
           }
         }
-        spinner.start('fetching workerpoolorder from iExec Marketplace');
+        spinner.info('Fetching workerpoolorder from iExec Marketplace');
         const fetchWorkerpoolOrder = async (
           catid = 0,
           { strict = false } = {},
@@ -474,7 +496,6 @@ run
         const order = await fetchWorkerpoolOrder(category, {
           strict: useCategory,
         });
-        spinner.stop();
         if (!order) {
           throw Error(`No workerpoolorder available in category ${category}`);
         }
@@ -487,6 +508,7 @@ run
       debug('apporder', apporder);
       debug('datasetorder', datasetorder);
 
+      spinner.info('Creating requestorder');
       const requestorder = await createRequestorder(chain.contracts, {
         app: apporder.app,
         appmaxprice: apporder.appprice,
@@ -517,6 +539,8 @@ run
           `Not enough RLC on your account (${totalCost} nRLC required). Run "iexec account deposit" to topup your account.`,
         );
       }
+
+      spinner.stop();
 
       if (!cmd.force) {
         await prompt.custom(
