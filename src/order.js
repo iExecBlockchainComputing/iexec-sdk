@@ -11,10 +11,22 @@ const {
   NULL_BYTES,
   NULL_BYTES32,
   signTypedDatav3,
+  sumTags,
+  findMissingBitsInTag,
+  checkActiveBitInTag,
+  tagBitToHuman,
 } = require('./utils');
 const { hashEIP712 } = require('./sig-utils');
 const { getAddress } = require('./wallet');
-const { getAppOwner, getDatasetOwner, getWorkerpoolOwner } = require('./hub');
+const { checkBalance } = require('./account');
+const {
+  checkDeployedApp,
+  checkDeployedDataset,
+  checkDeployedWorkerpool,
+  getAppOwner,
+  getDatasetOwner,
+  getWorkerpoolOwner,
+} = require('./hub');
 const {
   addressSchema,
   apporderSchema,
@@ -186,7 +198,10 @@ const getEIP712Domain = async (contracts) => {
     iexecContract.domain(),
   );
   return {
-    name, version, chainId: chainId.toString(), verifyingContract,
+    name,
+    version,
+    chainId: chainId.toString(),
+    verifyingContract,
   };
 };
 
@@ -319,7 +334,7 @@ const signOrder = async (
     ? orderObj.requester
     : await getContractOwner(contracts, orderName, orderObj);
   const address = await getAddress(contracts);
-  if (signerAddress.toLowerCase() !== address.toLowerCase()) {
+  if (signerAddress !== address) {
     throw Error(
       `Invalid order signer, must be the ${
         orderName === REQUEST_ORDER ? 'requester' : 'resource owner'
@@ -661,6 +676,19 @@ const fetchDealsByOrderHash = async (
   }
 };
 
+const verifySign = async (
+  contracts = throwIfMissing(),
+  signer = throwIfMissing(),
+  orderHash = throwIfMissing(),
+  sign = throwIfMissing(),
+) => {
+  const iexecContract = contracts.getIExecContract();
+  const isValid = await wrapCall(
+    iexecContract.verifySignature(signer, orderHash, sign),
+  );
+  return !!isValid;
+};
+
 const matchOrders = async (
   contracts = throwIfMissing(),
   appOrder = throwIfMissing(),
@@ -681,6 +709,243 @@ const matchOrders = async (
       signedRequestorderSchema().validate(requestOrder),
     ]);
 
+    // deployment checks
+    const checkAppDeployedAsync = async () => {
+      if (!(await checkDeployedApp(contracts, vAppOrder.app))) {
+        throw new Error(`no app deployed at address ${vAppOrder.app}`);
+      }
+    };
+    const checkDatasetDeployedAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
+          throw new Error(
+            `no dataset deployed at address ${vDatasetOrder.dataset}`,
+          );
+        }
+      }
+    };
+    const checkWorkerpoolDeployedAsync = async () => {
+      if (
+        !(await checkDeployedWorkerpool(contracts, vWorkerpoolOrder.workerpool))
+      ) {
+        throw new Error(
+          `no workerpool deployed at address ${vWorkerpoolOrder.workerpool}`,
+        );
+      }
+    };
+
+    await Promise.all([
+      checkAppDeployedAsync(),
+      checkDatasetDeployedAsync(),
+      checkWorkerpoolDeployedAsync(),
+    ]);
+
+    // signatures checks
+    const checkAppSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        await getAppOwner(contracts, vAppOrder.app),
+        await hashApporder(contracts, vAppOrder),
+        vAppOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('apporder invalid sign');
+      }
+    };
+    const checkDatasetSignAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        const isValid = await verifySign(
+          contracts,
+          await getDatasetOwner(contracts, vDatasetOrder.dataset),
+          await hashDatasetorder(contracts, vDatasetOrder),
+          vDatasetOrder.sign,
+        );
+        if (!isValid) {
+          throw new Error('datasetorder invalid sign');
+        }
+      }
+    };
+    const checkWorkerpoolSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        await getWorkerpoolOwner(contracts, vWorkerpoolOrder.workerpool),
+        await hashWorkerpoolorder(contracts, vWorkerpoolOrder),
+        vWorkerpoolOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('workerpoolorder invalid sign');
+      }
+    };
+    const checkRequestSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        vRequestOrder.requester,
+        await hashRequestorder(contracts, vRequestOrder),
+        vRequestOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('requestorder invalid sign');
+      }
+    };
+
+    await Promise.all([
+      checkAppSignAsync(),
+      checkDatasetSignAsync(),
+      checkWorkerpoolSignAsync(),
+      checkRequestSignAsync(),
+    ]);
+
+    // address checks
+    if (vRequestOrder.app !== vAppOrder.app) {
+      throw new Error(
+        `app address mismatch between requestorder (${vRequestOrder.app}) and apporder (${vAppOrder.app})`,
+      );
+    }
+    if (
+      vRequestOrder.dataset !== NULL_ADDRESS
+      && vRequestOrder.dataset !== vDatasetOrder.dataset
+    ) {
+      throw new Error(
+        `dataset address mismatch between requestorder (${vRequestOrder.dataset}) and datasetorder (${vDatasetOrder.dataset})`,
+      );
+    }
+    if (
+      vRequestOrder.workerpool !== NULL_ADDRESS
+      && vRequestOrder.workerpool !== vWorkerpoolOrder.workerpool
+    ) {
+      throw new Error(
+        `workerpool address mismatch between requestorder (${vRequestOrder.workerpool}) and workerpoolorder (${vWorkerpoolOrder.workerpool})`,
+      );
+    }
+    // category check
+    const requestCat = new BN(vRequestOrder.category);
+    const workerpoolCat = new BN(vWorkerpoolOrder.category);
+    if (!workerpoolCat.eq(requestCat)) {
+      throw new Error(
+        `category mismatch between requestorder (${requestCat}) and workerpoolorder (${workerpoolCat})`,
+      );
+    }
+    // trust check
+    const requestTrust = new BN(vRequestOrder.trust);
+    const workerpoolTrust = new BN(vWorkerpoolOrder.trust);
+    if (workerpoolTrust.lt(requestTrust)) {
+      throw new Error(
+        `workerpoolorder trust is too low (expected ${requestTrust}, got ${workerpoolTrust})`,
+      );
+    }
+    // workerpool tag check
+    const workerpoolMissingTagBits = findMissingBitsInTag(
+      vWorkerpoolOrder.tag,
+      sumTags([vRequestOrder.tag, vAppOrder.tag, vDatasetOrder.tag]),
+    );
+    if (workerpoolMissingTagBits.length > 0) {
+      throw Error(
+        `missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+      );
+    }
+    // app tag check
+    const teeAppRequired = checkActiveBitInTag(
+      sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
+      1,
+    );
+    if (teeAppRequired) {
+      if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
+        throw Error('missing tag [tee] in apporder');
+      }
+    }
+    // price check
+    const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
+    const workerpoolMaxPrice = new BN(vRequestOrder.workerpoolmaxprice);
+    const appPrice = new BN(vAppOrder.appprice);
+    const appMaxPrice = new BN(vRequestOrder.appmaxprice);
+    const datasetPrice = new BN(vDatasetOrder.datasetprice);
+    const datasetMaxPrice = new BN(vRequestOrder.datasetmaxprice);
+    if (appMaxPrice.lt(appPrice)) {
+      throw new Error(
+        `appmaxprice too low (expected ${appPrice}, got ${appMaxPrice})`,
+      );
+    }
+    if (workerpoolMaxPrice.lt(workerpoolPrice)) {
+      throw new Error(
+        `workerpoolmaxprice too low (expected ${workerpoolPrice}, got ${workerpoolMaxPrice})`,
+      );
+    }
+    if (datasetMaxPrice.lt(datasetPrice)) {
+      throw new Error(
+        `datasetmaxprice too low (expected ${datasetPrice}, got ${datasetMaxPrice})`,
+      );
+    }
+
+    // volumes checks
+    const checkRequestVolumeAsync = async () => {
+      const requestVolume = await getRemainingVolume(
+        contracts,
+        REQUEST_ORDER,
+        vRequestOrder,
+      );
+      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+    };
+    const checkWorkerpoolVolumeAsync = async () => {
+      const workerpoolVolume = await getRemainingVolume(
+        contracts,
+        WORKERPOOL_ORDER,
+        vWorkerpoolOrder,
+      );
+      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+    };
+    const checkAppVolumeAsync = async () => {
+      const appVolume = await getRemainingVolume(
+        contracts,
+        APP_ORDER,
+        vAppOrder,
+      );
+      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+    };
+    const checkDatasetVolumeAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        const datasetVolume = await getRemainingVolume(
+          contracts,
+          DATASET_ORDER,
+          vDatasetOrder,
+        );
+        if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
+      }
+    };
+    // account stake check
+    const checkRequesterSolvabilityAsync = async () => {
+      const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
+      const { stake } = await checkBalance(contracts, vRequestOrder.requester);
+      if (stake.lt(costPerTask)) {
+        throw new Error(
+          `cost per task (${costPerTask}) is greather than requester account stake (${stake}). orders can't be matched. if you are the requester, you should deposit to top up your account`,
+        );
+      }
+    };
+
+    // workerpool owner stake check
+    const checkWorkerpoolStakeAsync = async () => {
+      const workerpoolOwner = await getWorkerpoolOwner(
+        contracts,
+        vWorkerpoolOrder.workerpool,
+      );
+      const { stake } = await checkBalance(contracts, workerpoolOwner);
+      const requiredStake = workerpoolPrice.mul(new BN(30)).div(new BN(100));
+      if (stake.lt(requiredStake)) {
+        throw Error(
+          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). orders can't be matched. if you are the workerpool owner, you should deposit to top up your account`,
+        );
+      }
+    };
+
+    await Promise.all([
+      checkWorkerpoolVolumeAsync(),
+      checkRequestVolumeAsync(),
+      checkAppVolumeAsync(),
+      checkDatasetVolumeAsync(),
+      checkRequesterSolvabilityAsync(),
+      checkWorkerpoolStakeAsync(),
+    ]);
+
     const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
     const datasetOrderStruct = signedOrderToStruct(
       DATASET_ORDER,
@@ -694,7 +959,6 @@ const matchOrders = async (
       REQUEST_ORDER,
       vRequestOrder,
     );
-
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
       iexecContract.matchOrders(

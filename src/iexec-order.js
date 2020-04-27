@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const Debug = require('debug');
-const BN = require('bn.js');
 const cli = require('commander');
 const {
   help,
@@ -15,7 +14,6 @@ const {
   Spinner,
   pretty,
   info,
-  minBn,
   isBytes32,
   command,
   prompt,
@@ -30,17 +28,8 @@ const {
 const { loadChain } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
-const { getWorkerpoolOwner } = require('./hub');
-const account = require('./account');
 const templates = require('./templates');
-const {
-  sumTags,
-  findMissingBitsInTag,
-  checkActiveBitInTag,
-  tagBitToHuman,
-  NULL_ADDRESS,
-  NULL_BYTES32,
-} = require('./utils');
+const { NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -364,29 +353,6 @@ fill
       if (!datasetOrder && useDataset) throw new Error('Missing datasetorder');
       if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
 
-      const appVolume = await order.getRemainingVolume(
-        chain.contracts,
-        order.APP_ORDER,
-        appOrder,
-      );
-      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-
-      const datasetVolume = useDataset && datasetOrder
-        ? await order.getRemainingVolume(
-          chain.contracts,
-          order.DATASET_ORDER,
-          datasetOrder,
-        )
-        : new BN(2).pow(new BN(256)).sub(new BN(1));
-      if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
-
-      const workerpoolVolume = await order.getRemainingVolume(
-        chain.contracts,
-        order.WORKERPOOL_ORDER,
-        workerpoolOrder,
-      );
-      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
-
       const computeRequestOrder = async () => {
         const { address } = await keystore.load();
         const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
@@ -417,140 +383,7 @@ fill
       if (!requestOrder) {
         throw new Error('Missing requestorder');
       }
-      const useWorkerpool = requestOrder.workerpool !== NULL_ADDRESS;
 
-      // address matching check
-      if (requestOrder.app.toLowerCase() !== appOrder.app.toLowerCase()) {
-        throw new Error(
-          'App address mismatch between requestorder and apporder',
-        );
-      }
-      if (
-        useDataset
-        && requestOrder.dataset.toLowerCase()
-          !== datasetOrder.dataset.toLowerCase()
-      ) {
-        throw new Error(
-          'Dataset address mismatch between requestorder and datasetorder',
-        );
-      }
-      if (
-        useWorkerpool
-        && requestOrder.workerpool.toLowerCase()
-          !== workerpoolOrder.workerpool.toLowerCase()
-      ) {
-        throw new Error(
-          'Workerpool address mismatch between requestorder and workerpoolorder',
-        );
-      }
-      // category check
-      const requestCat = new BN(requestOrder.category);
-      const workerpoolCat = new BN(workerpoolOrder.category);
-      if (!workerpoolCat.eq(requestCat)) {
-        throw new Error(
-          'Category mismatch between requestorder and workerpoolorder',
-        );
-      }
-      // trust check
-      const requestTrust = new BN(requestOrder.trust);
-      const workerpoolTrust = new BN(workerpoolOrder.trust);
-      if (workerpoolTrust.lt(requestTrust)) {
-        throw new Error(
-          `workerpoolorder trust is too low, got ${workerpoolTrust} expected ${requestTrust}`,
-        );
-      }
-      // workerpool tag check
-      const workerpoolMissingTagBits = findMissingBitsInTag(
-        workerpoolOrder.tag,
-        sumTags([requestOrder.tag, appOrder.tag, datasetOrder.tag]),
-      );
-      if (workerpoolMissingTagBits.length > 0) {
-        throw Error(
-          `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
-        );
-      }
-      // app tag check
-      const teeAppRequired = checkActiveBitInTag(
-        sumTags([
-          requestOrder.tag,
-          useDataset ? datasetOrder.tag : NULL_BYTES32,
-        ]),
-        1,
-      );
-      if (teeAppRequired) {
-        if (!checkActiveBitInTag(appOrder.tag, 1)) {
-          throw Error('Missing tag [tee] in apporder');
-        }
-      }
-      // volumes check
-      const requestVolume = await order.getRemainingVolume(
-        chain.contracts,
-        order.REQUEST_ORDER,
-        requestOrder,
-      );
-      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
-
-      const maxVolume = minBn([
-        appVolume,
-        datasetVolume,
-        workerpoolVolume,
-        requestVolume,
-      ]);
-      if (requestVolume.gt(maxVolume) && !cmd.force) await prompt.limitedVolume(maxVolume, requestVolume);
-      // price check
-      const workerpoolPrice = new BN(workerpoolOrder.workerpoolprice);
-      const workerpoolMaxPrice = new BN(requestOrder.workerpoolmaxprice);
-      const appPrice = new BN(appOrder.appprice);
-      const appMaxPrice = new BN(requestOrder.appmaxprice);
-      const datasetPrice = useDataset
-        ? new BN(datasetOrder.datasetprice)
-        : new BN(0);
-      const datasetMaxPrice = new BN(requestOrder.datasetmaxprice);
-      if (appMaxPrice.lt(appPrice)) throw new Error(`appmaxprice too low, expected ${appPrice}`);
-      if (workerpoolMaxPrice.lt(workerpoolPrice)) {
-        throw new Error(
-          `workerpoolmaxprice too low, expected ${workerpoolPrice}`,
-        );
-      }
-      if (datasetMaxPrice.lt(datasetPrice)) {
-        throw new Error(`datasetmaxprice too low, expected ${datasetPrice}`);
-      }
-      // account stake check
-      const costPerWork = appPrice.add(datasetPrice).add(workerpoolPrice);
-      const { stake } = await account.checkBalance(
-        chain.contracts,
-        requestOrder.requester,
-      );
-      if (stake.lt(costPerWork)) {
-        throw new Error(
-          `Cost per task is ${costPerWork} nRLC and requester has ${stake} nRLC available. Orders can't be matched. If you are the requester, you should run "iexec account deposit <amount>" to top up your account`,
-        );
-      }
-      const totalCost = costPerWork.mul(maxVolume);
-      if (stake.lt(totalCost) && !cmd.force) {
-        const payableVolume = costPerWork.isZero()
-          ? new BN(0)
-          : stake.div(costPerWork);
-        await prompt.limitedStake(totalCost, stake, payableVolume);
-      }
-      // workerpool owner stake check
-      const workerpoolOwner = await getWorkerpoolOwner(
-        chain.contracts,
-        workerpoolOrder.workerpool,
-      );
-      const schedulerBalance = await account.checkBalance(
-        chain.contracts,
-        workerpoolOwner,
-      );
-      const schedulerStakeBN = schedulerBalance.stake;
-      if (schedulerStakeBN.mul(new BN(3)).lt(workerpoolPrice)) {
-        throw Error(
-          `Workerpool required stake is ${workerpoolPrice.mul(
-            new BN(3),
-          )} nRLC and workerpool owner has ${stake} nRLC available. Orders can't be matched. If you are the workerpool owner, you should run "iexec account deposit <amount>" to top up your account`,
-        );
-      }
-      // all checks passed send matchOrder
       await keystore.load();
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await order.matchOrders(
