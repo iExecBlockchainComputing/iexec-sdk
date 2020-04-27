@@ -1392,7 +1392,7 @@ describe('[account]', () => {
       true,
     );
   });
-  test('account.deposit() (token, exceed account balance)', async () => {
+  test('account.withdraw() (token, exceed account balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1421,7 +1421,7 @@ describe('[account]', () => {
       true,
     );
   });
-  test('account.deposit() (native)', async () => {
+  test('account.withdraw() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1451,7 +1451,7 @@ describe('[account]', () => {
       true,
     );
   });
-  test('account.deposit() (native, exceed account balance)', async () => {
+  test('account.withdraw() (native, exceed account balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -1478,6 +1478,22 @@ describe('[account]', () => {
     expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
     expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
       true,
+    );
+  });
+  test('account.withdraw() (withdraw amount 0)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(iexec.account.withdraw(0)).rejects.toThrow(
+      Error('Withdraw amount must be greather than 0'),
     );
   });
 });
