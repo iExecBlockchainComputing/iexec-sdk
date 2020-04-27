@@ -2594,7 +2594,7 @@ describe('[order]', () => {
     expect(res.volume).toBeInstanceOf(BN);
     expect(res.volume.eq(new BN(1))).toBe(true);
     expect(res.dealid).toMatch(bytes32Regex);
-  }, 30000);
+  }, 60000);
 });
 
 describe('[observables]', () => {
