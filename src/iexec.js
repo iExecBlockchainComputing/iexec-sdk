@@ -167,8 +167,8 @@ async function main() {
 
         const pocoVersion = packagelockJSON
           && packagelockJSON.dependencies
-          && packagelockJSON.dependencies['iexec-poco']
-          && packagelockJSON.dependencies['iexec-poco'].version;
+          && packagelockJSON.dependencies['@iexec/poco']
+          && packagelockJSON.dependencies['@iexec/poco'].version;
 
         const iexecAddresses = {
           'iExec PoCo version': pocoVersion,
