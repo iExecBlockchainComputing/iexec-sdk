@@ -282,7 +282,7 @@ const appSchema = opt => object({
   type: string()
     .matches(/^(DOCKER){1}$/, '${path} is not a valid type')
     .required(),
-  multiaddr: multiaddressSchema(opt).required(),
+  multiaddr: multiaddressSchema().required(),
   checksum: bytes32Schema().required(),
   mrenclave: mrenclaveSchema().required(),
 });
@@ -290,7 +290,7 @@ const appSchema = opt => object({
 const datasetSchema = opt => object({
   owner: addressSchema(opt).required(),
   name: string().required(),
-  multiaddr: multiaddressSchema(opt).required(),
+  multiaddr: multiaddressSchema().required(),
   checksum: bytes32Schema().required(),
 });
 
