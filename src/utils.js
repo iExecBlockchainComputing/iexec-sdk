@@ -423,13 +423,13 @@ const findMissingBitsInTag = (tag, requiredTag) => {
 
 const checkActiveBitInTag = (tag, bit) => {
   if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
-  if (!typeof bit === 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   return binString.charAt(binString.length - bit) === '1';
 };
 
 const tagBitToHuman = (bit) => {
-  if (!typeof bit === 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
   return TAG_MAP[bit] || bit;
 };
 
