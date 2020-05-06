@@ -223,15 +223,22 @@ pushSecret
       }
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
-      const res = await secretMgtServ.pushSecret(
+      const secretExists = await secretMgtServ.checkWeb2SecretExists(
         contracts,
         sms,
         address,
-        secretToPush,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       );
-      if (res.hash) {
-        spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
-          raw: res,
+      const pushed = await secretMgtServ.pushWeb2Secret(
+        contracts,
+        sms,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+        secretToPush,
+        { update: secretExists },
+      );
+      if (pushed) {
+        spinner.succeed('Secret successfully pushed', {
+          raw: {},
         });
       } else {
         throw Error('Something went wrong');
@@ -265,23 +272,22 @@ checkSecret
         [keyAddress] = await keystore.accounts();
         spinner.info(`Checking secret for wallet ${keyAddress}`);
       }
-      const { sms } = chain;
+      const { contracts, sms } = chain;
       if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(
-        chain.contracts,
+      const secretExists = await secretMgtServ.checkWeb2SecretExists(
+        contracts,
         sms,
         keyAddress,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       );
-      if (res.hash) {
-        spinner.succeed(
-          `Secret found for address ${keyAddress} (hash: ${res.hash})`,
-          {
-            raw: Object.assign(res, { isKnownAddress: true }),
-          },
-        );
+      console.log(secretExists);
+      if (secretExists) {
+        spinner.succeed(`Secret found for address ${keyAddress}`, {
+          raw: { isKnownAddress: true },
+        });
       } else {
         spinner.succeed(`No secret found for address ${keyAddress}`, {
-          raw: Object.assign(res, { isKnownAddress: false }),
+          raw: { isKnownAddress: false },
         });
       }
     } catch (error) {

@@ -3,12 +3,16 @@ services:
   token-chaintest-v5:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:v5-token'
+    expose:
+      - '8545'
     ports:
       - 0.0.0.0:8545:8545
 
   native-chaintest-v5:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:v5-native'
+    expose:
+      - '8545'
     ports:
       - 0.0.0.0:18545:8545
 
@@ -17,3 +21,41 @@ services:
     image: 'iexechub/poco-chaintest:v5-token-1s'
     ports:
       - 0.0.0.0:28545:8545
+
+  token-sms:
+    image: nexus.iex.ec/iexec-sms:0.0.1-SNAPSHOT-4ccc1bb
+    environment:
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chaintest-v5:8545
+      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
+      - IEXEC_SCONE_CAS_HOST=cas
+      - SCONE_CAS_ADDR=cas:18765
+      - SCONE_LAS_ADDR=las:18766
+      - SCONE_CONFIG_ID=s1/iexec-sms
+      - SCONE_HEAP=3G
+      - SCONE_LOG=6
+      - SCONE_VERSION=1
+      - SCONE_SYSLIBS=1
+    ports:
+      - 5000:15000
+      - 5443:15443
+    depends_on:
+      - token-chaintest-v5
+
+  native-sms:
+    image: nexus.iex.ec/iexec-sms:0.0.1-SNAPSHOT-4ccc1bb
+    environment:
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://native-chaintest-v5:8545
+      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
+      - IEXEC_SCONE_CAS_HOST=cas
+      - SCONE_CAS_ADDR=cas:18765
+      - SCONE_LAS_ADDR=las:18766
+      - SCONE_CONFIG_ID=s1/iexec-sms
+      - SCONE_HEAP=3G
+      - SCONE_LOG=6
+      - SCONE_VERSION=1
+      - SCONE_SYSLIBS=1
+    ports:
+      - 15000:15000
+      - 15443:15443
+    depends_on:
+      - native-chaintest-v5
