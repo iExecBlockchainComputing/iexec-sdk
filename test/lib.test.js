@@ -1825,7 +1825,7 @@ describe('[dataset]', () => {
     ).rejects.toThrow(Error('dataset not deployed'));
   });
   if (!DRONE) {
-    // require nexus.iex.ec image
+    // this test require nexus.iex.ec image
     test('dataset.pushDatasetSecret()', async () => {
       const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
       const smsUrl = DRONE ? 'http://token-sms' : 'http://localhost:5000';
@@ -3387,7 +3387,7 @@ describe('[observables]', () => {
 
 describe('[result]', () => {
   if (!DRONE) {
-    // require nexus.iex.ec image
+    // this test require nexus.iex.ec image
     test('result.pushResultEncryptionKey()', async () => {
       const randomWallet = ethers.Wallet.createRandom();
       const signer = utils.getSignerFromPrivateKey(

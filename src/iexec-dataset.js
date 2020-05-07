@@ -583,15 +583,15 @@ pushSecret
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
-      const res = await secretMgtServ.pushWeb3Secret(
+      const isPushed = await secretMgtServ.pushWeb3Secret(
         contracts,
         sms,
         resourceAddress,
         secretToPush,
       );
-      if (res.hash) {
-        spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
-          raw: res,
+      if (isPushed) {
+        spinner.succeed('Secret successfully pushed', {
+          raw: {},
         });
       } else {
         throw Error('Something went wrong');
@@ -634,11 +634,11 @@ checkSecret
       );
       if (secretIsSet) {
         spinner.succeed(`Secret found for dataset ${resourceAddress}`, {
-          raw: { isKnownAddress: true },
+          raw: { isSecretSet: true },
         });
       } else {
         spinner.succeed(`No secret found for dataset ${resourceAddress}`, {
-          raw: { isKnownAddress: false },
+          raw: { isSecretSet: false },
         });
       }
     } catch (error) {
