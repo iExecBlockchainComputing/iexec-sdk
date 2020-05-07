@@ -484,7 +484,10 @@ const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
     console.log('');
     cli.help(helpCB);
   } else if (checkWrongArgs) {
-    if (!cli.commands.find(({ _name }) => _name === cli.rawArgs[2])) {
+    if (
+      !cli.commands.find(({ _name }) => _name === cli.rawArgs[2])
+      && !cli.commands.find(({ _alias }) => _alias === cli.rawArgs[2])
+    ) {
       console.log('');
       console.log(colors.red(`Unknown command "${cli._name} ${cli.args[0]}"`));
       console.log('');

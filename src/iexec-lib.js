@@ -6,6 +6,7 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
+const secretMgtServ = require('./sms');
 const iexecProcess = require('./iexecProcess');
 const errors = require('./errors');
 const {
@@ -42,7 +43,7 @@ class IExec {
   constructor(
     { ethProvider, chainId },
     {
-      hubAddress, isNative, bridgeAddress, bridgedNetworkConf,
+      hubAddress, isNative, bridgeAddress, bridgedNetworkConf, smsUrl,
     } = {},
   ) {
     const contracts = createIExecContracts({
@@ -82,6 +83,15 @@ class IExec {
       });
     }
 
+    const getSmsUrl = () => {
+      if (smsUrl) {
+        return smsUrl;
+      }
+      throw Error(
+        `smsUrl option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
     this.wallet = {};
     this.wallet.getAddress = () => wallet.getAddress(contracts);
     this.wallet.checkBalances = address => wallet.checkBalances(contracts, address);
@@ -114,6 +124,17 @@ class IExec {
     this.dataset.showDataset = address => hub.showDataset(contracts, address);
     this.dataset.showUserDataset = (index, userAddress) => hub.showUserDataset(contracts, index, userAddress);
     this.dataset.countUserDatasets = address => hub.countUserDatasets(contracts, address);
+    this.dataset.checkDatasetSecretExists = datasetAddress => secretMgtServ.checkWeb3SecretExists(
+      contracts,
+      getSmsUrl(),
+      datasetAddress,
+    );
+    this.dataset.pushDatasetSecret = (datasetAddress, datasetSecret) => secretMgtServ.pushWeb3Secret(
+      contracts,
+      getSmsUrl(),
+      datasetAddress,
+      datasetSecret,
+    );
     this.workerpool = {};
     this.workerpool.deployWorkerpool = workerpool => hub.deployWorkerpool(contracts, workerpool);
     this.workerpool.showWorkerpool = address => hub.showWorkerpool(contracts, address);
@@ -233,6 +254,26 @@ class IExec {
       );
       return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     };
+    this.result = {};
+    this.result.checkResultEncryptionKeyExists = address => secretMgtServ.checkWeb2SecretExists(
+      contracts,
+      getSmsUrl(),
+      address,
+      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+    );
+    this.result.pushResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
+      contracts,
+      getSmsUrl(),
+      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+      publicKey,
+    );
+    this.result.updateResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
+      contracts,
+      getSmsUrl(),
+      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+      publicKey,
+      { update: true },
+    );
     this.network = {};
     this.network.id = contracts.chainId;
     this.network.isSidechain = contracts.isNative;

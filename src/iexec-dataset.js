@@ -583,15 +583,15 @@ pushSecret
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
-      const res = await secretMgtServ.pushSecret(
+      const isPushed = await secretMgtServ.pushWeb3Secret(
         contracts,
         sms,
         resourceAddress,
         secretToPush,
       );
-      if (res.hash) {
-        spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
-          raw: res,
+      if (isPushed) {
+        spinner.succeed('Secret successfully pushed', {
+          raw: {},
         });
       } else {
         throw Error('Something went wrong');
@@ -627,21 +627,18 @@ checkSecret
       spinner.info(`Checking secret for address ${resourceAddress}`);
       const { sms } = chain;
       if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(
+      const secretIsSet = await secretMgtServ.checkWeb3SecretExists(
         chain.contracts,
         sms,
         resourceAddress,
       );
-      if (res.hash) {
-        spinner.succeed(
-          `Secret found for address ${resourceAddress} (hash: ${res.hash})`,
-          {
-            raw: Object.assign(res, { isKnownAddress: true }),
-          },
-        );
+      if (secretIsSet) {
+        spinner.succeed(`Secret found for dataset ${resourceAddress}`, {
+          raw: { isSecretSet: true },
+        });
       } else {
-        spinner.succeed(`No secret found for address ${resourceAddress}`, {
-          raw: Object.assign(res, { isKnownAddress: false }),
+        spinner.succeed(`No secret found for dataset ${resourceAddress}`, {
+          raw: { isSecretSet: false },
         });
       }
     } catch (error) {

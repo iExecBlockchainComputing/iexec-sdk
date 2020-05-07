@@ -31,7 +31,9 @@ const { decryptResult } = require('./utils');
 
 const debug = Debug('iexec:iexec-result');
 
-const generateKeys = cli.command('generate-keys');
+const generateKeys = cli
+  .command('generate-encryption-keypair')
+  .alias('generate-keys');
 addGlobalOptions(generateKeys);
 addWalletLoadOptions(generateKeys);
 generateKeys
@@ -57,8 +59,8 @@ generateKeys
       const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
       await fs.ensureDir(beneficiarySecretsFolderPath);
 
-      spinner.info(`Generate beneficiary keys for wallet address ${address}`);
-      spinner.start('Generating new beneficiary keys');
+      spinner.info(`Generate encryption keypair for wallet address ${address}`);
+      spinner.start('Generating new keypair');
 
       const { privateKey, publicKey } = await new Promise((resolve, reject) => {
         generateKeyPair(
@@ -98,7 +100,7 @@ generateKeys
       });
 
       spinner.succeed(
-        `Beneficiary keys pair "${priKeyFileName}" and "${pubKeyFileName}" generated in "${beneficiarySecretsFolderPath}", make sure to backup this key pair\nRun "iexec result push-secret" to securely share your public key for result encryption`,
+        `Encryption keypair "${priKeyFileName}" and "${pubKeyFileName}" generated in "${beneficiarySecretsFolderPath}", make sure to backup this keypair\nRun "iexec result push-encryption-key" to securely share your public key for result encryption`,
         {
           raw: {
             secretPath: beneficiarySecretsFolderPath,
@@ -129,7 +131,7 @@ decryptResults
 
       if (!exists) {
         throw Error(
-          "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+          'beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
         );
       }
 
@@ -151,7 +153,7 @@ decryptResults
         );
       } else {
         const [address] = await keystore.accounts();
-        spinner.info(`Using beneficiary key for wallet ${address}`);
+        spinner.info(`Using beneficiary encryption key for wallet ${address}`);
         beneficiaryKeyPath = path.join(
           beneficiarySecretsFolderPath,
           privateKeyName(address),
@@ -164,7 +166,7 @@ decryptResults
       } catch (error) {
         debug(error);
         throw Error(
-          `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
+          `Failed to load beneficiary encryption key from "${beneficiaryKeyPath}"`,
         );
       }
 
@@ -188,13 +190,13 @@ decryptResults
     }
   });
 
-const pushSecret = cli.command('push-secret');
+const pushSecret = cli.command('push-encryption-key').alias('push-secret');
 addGlobalOptions(pushSecret);
 addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
-  .description(desc.pushSecret())
+  .description(desc.pushResultKey())
   .action(async (cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
@@ -223,15 +225,22 @@ pushSecret
       }
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
-      const res = await secretMgtServ.pushSecret(
+      const secretExists = await secretMgtServ.checkWeb2SecretExists(
         contracts,
         sms,
         address,
-        secretToPush,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       );
-      if (res.hash) {
-        spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
-          raw: res,
+      const isPushed = await secretMgtServ.pushWeb2Secret(
+        contracts,
+        sms,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+        secretToPush,
+        { update: secretExists },
+      );
+      if (isPushed) {
+        spinner.succeed('Encryption key successfully pushed', {
+          raw: {},
         });
       } else {
         throw Error('Something went wrong');
@@ -241,7 +250,9 @@ pushSecret
     }
   });
 
-const checkSecret = cli.command('check-secret [address]');
+const checkSecret = cli
+  .command('check-encryption-key [address]')
+  .alias('check-secret');
 addGlobalOptions(checkSecret);
 addWalletLoadOptions(checkSecret);
 checkSecret
@@ -263,25 +274,23 @@ checkSecret
         keyAddress = address;
       } else {
         [keyAddress] = await keystore.accounts();
-        spinner.info(`Checking secret for wallet ${keyAddress}`);
+        spinner.info(`Checking encryption key exists for wallet ${keyAddress}`);
       }
-      const { sms } = chain;
+      const { contracts, sms } = chain;
       if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(
-        chain.contracts,
+      const secretExists = await secretMgtServ.checkWeb2SecretExists(
+        contracts,
         sms,
         keyAddress,
+        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       );
-      if (res.hash) {
-        spinner.succeed(
-          `Secret found for address ${keyAddress} (hash: ${res.hash})`,
-          {
-            raw: Object.assign(res, { isKnownAddress: true }),
-          },
-        );
+      if (secretExists) {
+        spinner.succeed(`Encryption key found for address ${keyAddress}`, {
+          raw: { isEncryptionKeySet: true },
+        });
       } else {
-        spinner.succeed(`No secret found for address ${keyAddress}`, {
-          raw: Object.assign(res, { isKnownAddress: false }),
+        spinner.succeed(`No encryption key found for address ${keyAddress}`, {
+          raw: { isEncryptionKeySet: false },
         });
       }
     } catch (error) {
