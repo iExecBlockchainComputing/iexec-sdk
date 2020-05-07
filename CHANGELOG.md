@@ -7,12 +7,21 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution
+- `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
+- `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
+- `iexec.result.pushResultEncryptionKey(aes256PubKey)` push the beneficary result encryption key to the SMS
+- `iexec.result.updateResultEncryptionKey(aes256PubKey)` update the beneficary result encryption key in the SMS
+- `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
 
 ### Changed
 
 - [BREAKING] `iexec app show <index>` & `app.showUserApp(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec dataset show <index>` & `dataset.showUserDataset(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec workerpool show <index>` & `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec result generate-keys` is deprecated, use `iexec result generate-encryption-keypair`
+- [BREAKING] `iexec result push-secret` is deprecated, use `iexec result push-encryption-key`
+- [BREAKING] `iexec result check-secret` is deprecated, use `iexec result check-encryption-key` returned json key is now `isEncryptionKeySet` previously was `isKnownAddress`
+- [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
 - fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods
 
