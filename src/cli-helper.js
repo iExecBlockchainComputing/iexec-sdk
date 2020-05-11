@@ -101,6 +101,7 @@ const desc = {
   bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
   bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  initStorage: () => 'initialize the remote storage',
 };
 
 const option = {

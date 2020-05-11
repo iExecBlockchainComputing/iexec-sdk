@@ -1,11 +1,11 @@
 const Debug = require('debug');
 const { Buffer } = require('buffer');
-const fetch = require('cross-fetch');
 const qs = require('query-string');
 const { keccak256, arrayify } = require('ethers').utils;
 const { getAddress } = require('./wallet');
 const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
 const { wrapPersonalSign } = require('./errorWrappers');
+const { httpCall } = require('./utils');
 
 const debug = Debug('iexec:sms');
 
@@ -17,21 +17,6 @@ const reservedSecretKeyName = {
   // result storage
   IEXEC_RESULT_DROPBOX_TOKEN: 'iexec-result-dropbox-token',
   IEXEC_RESULT_IEXEC_IPFS_TOKEN: 'iexec-result-iexec-ipfs-token',
-};
-
-const httpCall = verb => async (url, body = {}, optionalHeaders = {}) => {
-  const headers = Object.assign({}, optionalHeaders);
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      verb === 'GET' || verb === 'HEAD' ? undefined : { body },
-    ),
-  );
-  return response;
 };
 
 const concatenateAndHash = (...hexaStringArray) => {
@@ -85,7 +70,7 @@ const pushWeb3Secret = async (
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
-    if (res.status === 204) {
+    if (res.ok) {
       return true;
     }
     if (res.status === 409) {
@@ -139,7 +124,7 @@ const pushWeb2Secret = async (
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
-    if (res.status === 204) {
+    if (res.ok) {
       return true;
     }
     if (res.status === 409) {
@@ -176,7 +161,7 @@ const checkWeb3SecretExists = async (
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
-    if (res.status === 204) {
+    if (res.ok) {
       return true;
     }
     if (res.status === 404) {
@@ -210,7 +195,7 @@ const checkWeb2SecretExists = async (
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
-    if (res.status === 204) {
+    if (res.ok) {
       return true;
     }
     if (res.status === 404) {

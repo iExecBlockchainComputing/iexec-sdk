@@ -112,6 +112,8 @@ async function main() {
 
   cli.command('result', 'manage results encryption');
 
+  cli.command('storage', 'manage remote storage');
+
   cli.command('registry', 'interact with iExec registry');
 
   const infoCmd = cli.command('info');
