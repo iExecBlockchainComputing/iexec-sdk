@@ -797,9 +797,10 @@ npm install iexec
 _options:_
 
 - `hubAddress: Address` specify the address of iExec hub smart contract to use
+- `smsURL: URL` specify the Secret Management System to use
 - `isNative: Boolean` true when the RLC is the chain native token
 - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
-- `bridgedNetworkConf: { rpcURL: NodeRpcURL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+- `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 
 ##### Basic configuration
 

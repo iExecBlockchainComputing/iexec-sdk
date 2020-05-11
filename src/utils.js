@@ -299,7 +299,7 @@ const getAuthorization = async (
   chainId,
   address,
   ethProvider,
-  { apiUrl = API_URL, challengeEndpoint = 'challenge' } = {},
+  { apiURL = API_URL, challengeEndpoint = 'challenge' } = {},
 ) => {
   try {
     const challenge = await httpRequest('GET')(
@@ -309,7 +309,7 @@ const getAuthorization = async (
         address,
       },
       {},
-      apiUrl,
+      apiURL,
     );
     debug('challenge', challenge);
     const typedData = challenge.data || challenge;

@@ -43,7 +43,7 @@ class IExec {
   constructor(
     { ethProvider, chainId },
     {
-      hubAddress, isNative, bridgeAddress, bridgedNetworkConf, smsUrl,
+      hubAddress, isNative, bridgeAddress, bridgedNetworkConf, smsURL,
     } = {},
   ) {
     const contracts = createIExecContracts({
@@ -61,8 +61,8 @@ class IExec {
         );
       }
       const bridgedHubAddress = bridgedNetworkConf.hubAddress;
-      const bridgedRpcUrl = bridgedNetworkConf.rpcURL;
-      if (!bridgedRpcUrl) {
+      const bridgedRpcURL = bridgedNetworkConf.rpcURL;
+      if (!bridgedRpcURL) {
         throw new errors.ValidationError(
           'Missing RpcURL in bridgedNetworkConf',
         );
@@ -74,7 +74,7 @@ class IExec {
         );
       }
       const bridgedIsNative = !contracts.isNative;
-      const bridgedProvider = bridgedRpcUrl;
+      const bridgedProvider = bridgedRpcURL;
       bridgedContracts = createIExecContracts({
         chainId: bridgedChainId,
         isNative: bridgedIsNative,
@@ -83,12 +83,12 @@ class IExec {
       });
     }
 
-    const getSmsUrl = () => {
-      if (smsUrl) {
-        return smsUrl;
+    const getSmsURL = () => {
+      if (smsURL) {
+        return smsURL;
       }
       throw Error(
-        `smsUrl option not set and no default value for your chain ${chainId}`,
+        `smsURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -126,12 +126,12 @@ class IExec {
     this.dataset.countUserDatasets = address => hub.countUserDatasets(contracts, address);
     this.dataset.checkDatasetSecretExists = datasetAddress => secretMgtServ.checkWeb3SecretExists(
       contracts,
-      getSmsUrl(),
+      getSmsURL(),
       datasetAddress,
     );
     this.dataset.pushDatasetSecret = (datasetAddress, datasetSecret) => secretMgtServ.pushWeb3Secret(
       contracts,
-      getSmsUrl(),
+      getSmsURL(),
       datasetAddress,
       datasetSecret,
     );
@@ -257,19 +257,19 @@ class IExec {
     this.result = {};
     this.result.checkResultEncryptionKeyExists = address => secretMgtServ.checkWeb2SecretExists(
       contracts,
-      getSmsUrl(),
+      getSmsURL(),
       address,
       secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
     );
     this.result.pushResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
       contracts,
-      getSmsUrl(),
+      getSmsURL(),
       secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       publicKey,
     );
     this.result.updateResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
       contracts,
-      getSmsUrl(),
+      getSmsURL(),
       secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
       publicKey,
       { update: true },

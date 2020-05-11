@@ -40,7 +40,7 @@ const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
     contracts.chainId,
     userAddress,
     contracts.jsonRpcProvider,
-    { apiUrl: resultRepoBaseURL },
+    { apiURL: resultRepoBaseURL },
   );
   const res = await download('GET')(
     taskid,

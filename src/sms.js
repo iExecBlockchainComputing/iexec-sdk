@@ -56,7 +56,7 @@ const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) => c
 
 const pushWeb3Secret = async (
   contracts = throwIfMissing(),
-  smsUrl = throwIfMissing(),
+  smsURL = throwIfMissing(),
   resourceAddress = throwIfMissing(),
   secretValue = throwIfMissing(),
 ) => {
@@ -74,7 +74,7 @@ const pushWeb3Secret = async (
     const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [vSignerAddress, data]);
     const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
     const res = await httpCall('POST')(
-      `${smsUrl}/secrets/web3?${qs.stringify({
+      `${smsURL}/secrets/web3?${qs.stringify({
         secretAddress: vResourceAddress,
       })}`,
       secretValue,
@@ -83,7 +83,7 @@ const pushWeb3Secret = async (
       },
     ).catch((e) => {
       debug(e);
-      throw Error(`SMS at ${smsUrl} didn't answered`);
+      throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.status === 204) {
       return true;
@@ -109,7 +109,7 @@ const pushWeb3Secret = async (
 
 const pushWeb2Secret = async (
   contracts = throwIfMissing(),
-  smsUrl = throwIfMissing(),
+  smsURL = throwIfMissing(),
   secretName = throwIfMissing(),
   secretValue = throwIfMissing(),
   { update = false } = {},
@@ -127,7 +127,7 @@ const pushWeb2Secret = async (
     const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [ownerAddress, data]);
     const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
     const res = await httpCall(update ? 'PUT' : 'POST')(
-      `${smsUrl}/secrets/web2?${qs.stringify({
+      `${smsURL}/secrets/web2?${qs.stringify({
         ownerAddress,
         secretName,
       })}`,
@@ -137,7 +137,7 @@ const pushWeb2Secret = async (
       },
     ).catch((e) => {
       debug(e);
-      throw Error(`SMS at ${smsUrl} didn't answered`);
+      throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.status === 204) {
       return true;
@@ -159,7 +159,7 @@ const pushWeb2Secret = async (
 
 const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
-  smsUrl = throwIfMissing(),
+  smsURL = throwIfMissing(),
   resourceAddress = throwIfMissing(),
 ) => {
   try {
@@ -167,14 +167,14 @@ const checkWeb3SecretExists = async (
       ethProvider: contracts.jsonRpcProvider,
     }).validate(resourceAddress);
     const res = await httpCall('HEAD')(
-      `${smsUrl}/secrets/web3?${qs.stringify({
+      `${smsURL}/secrets/web3?${qs.stringify({
         secretAddress: vResourceAddress,
       })}`,
       undefined,
       {},
     ).catch((e) => {
       debug(e);
-      throw Error(`SMS at ${smsUrl} didn't answered`);
+      throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.status === 204) {
       return true;
@@ -191,7 +191,7 @@ const checkWeb3SecretExists = async (
 
 const checkWeb2SecretExists = async (
   contracts = throwIfMissing(),
-  smsUrl = throwIfMissing(),
+  smsURL = throwIfMissing(),
   ownerAddress = throwIfMissing(),
   secretName = throwIfMissing(),
 ) => {
@@ -200,7 +200,7 @@ const checkWeb2SecretExists = async (
       ethProvider: contracts.jsonRpcProvider,
     }).validate(ownerAddress);
     const res = await httpCall('HEAD')(
-      `${smsUrl}/secrets/web2?${qs.stringify({
+      `${smsURL}/secrets/web2?${qs.stringify({
         ownerAddress: vOwnerAddress,
         secretName,
       })}`,
@@ -208,7 +208,7 @@ const checkWeb2SecretExists = async (
       {},
     ).catch((e) => {
       debug(e);
-      throw Error(`SMS at ${smsUrl} didn't answered`);
+      throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.status === 204) {
       return true;
