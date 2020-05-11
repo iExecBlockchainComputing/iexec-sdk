@@ -227,10 +227,10 @@ iexec task show <taskid> --download [fileName] # download the result of your COM
 #### Use results encryption
 
 ```bash
-iexec result generate-encryption-keypair # generate private/public AES keypair for result encryption
-iexec result push-encryption-key # share the public AES key with the secret management service, all your results will be encrypted with this key
+iexec result generate-encryption-keypair # generate private/public RSA keypair for result encryption
+iexec result push-encryption-key # share the public RSA key with the secret management service, all your results will be encrypted with this key
 # Go through the normal buy process  and download the result of the computation #
-iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private AES key
+iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private RSA key
 ```
 
 ### SDK CLI for workers
@@ -1961,7 +1961,7 @@ console.log('current chain is a sidechain:', iexec.network.isSidechain);
 
 #### pushResultEncryptionKey
 
-iexec.**result.pushResultEncryptionKey ( aes256PublicKey: String )** => Promise < **success: Boolean** >
+iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String )** => Promise < **success: Boolean** >
 
 > push an encryption public key to the SMS, this allow results encryption
 
@@ -1989,7 +1989,7 @@ console.log('encryption key pushed:', pushed);
 
 #### updateResultEncryptionKey
 
-iexec.**result.updateResultEncryptionKey ( aes256PublicKey: String )** => Promise < **success: Boolean** >
+iexec.**result.updateResultEncryptionKey ( rsa256PublicKey: String )** => Promise < **success: Boolean** >
 
 > update the encryption public key in the SMS
 

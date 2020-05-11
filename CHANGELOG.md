@@ -9,8 +9,8 @@ All notable changes to this project will be documented in this file.
 - ENS resolution
 - `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
 - `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
-- `iexec.result.pushResultEncryptionKey(aes256PubKey)` push the beneficary result encryption key to the SMS
-- `iexec.result.updateResultEncryptionKey(aes256PubKey)` update the beneficary result encryption key in the SMS
+- `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficary result encryption key to the SMS
+- `iexec.result.updateResultEncryptionKey(rsaPubKey)` update the beneficary result encryption key in the SMS
 - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
 
 ### Changed
