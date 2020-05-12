@@ -298,6 +298,7 @@ const option = {
     '--gas-price <wei>',
     'set custom gas price for transactions (in wei)',
   ],
+  forceUpdateSecret: () => ['--force-update', 'update if already exists'],
 };
 
 const addGlobalOptions = (cli) => {

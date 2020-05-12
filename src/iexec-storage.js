@@ -16,6 +16,7 @@ const {
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const resultProxyServ = require('./result-proxy.js');
+const { getStorageTokenKeyName } = require('./iexecSecretsUtils');
 const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-storage');
@@ -51,7 +52,7 @@ initStorage
           contracts,
           smsURL,
           address,
-          secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_IEXEC_IPFS_TOKEN,
+          getStorageTokenKeyName(),
         );
         if (alreadyInitialized) {
           spinner.info('Default storage already initialized');
@@ -63,8 +64,9 @@ initStorage
         const isPushed = await secretMgtServ.pushWeb2Secret(
           contracts,
           smsURL,
-          secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_IEXEC_IPFS_TOKEN,
+          getStorageTokenKeyName(),
           token,
+          { forceUpdate: true },
         );
         if (isPushed) {
           spinner.info('Default storage initialized');

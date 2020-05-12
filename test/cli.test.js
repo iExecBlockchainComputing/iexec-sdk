@@ -2875,11 +2875,36 @@ describe('[Common]', () => {
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
+        expect(res.isPushed).toBe(true);
+        expect(res.isUpdated).toBe(false);
         const rawAlreadyExists = await execAsync(
           `${iexecPath} result push-encryption-key --raw`,
+        ).catch(e => e.message);
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(false);
+      }, 10000);
+
+      test('iexec result push-encryption-key --force-update', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+        await execAsync(
+          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+        );
+        const raw = await execAsync(
+          `${iexecPath} result push-encryption-key --force-update --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isPushed).toBe(true);
+        expect(res.isUpdated).toBe(false);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} result push-encryption-key --force-update --raw`,
         );
         const resAlreadyExists = JSON.parse(rawAlreadyExists);
         expect(resAlreadyExists.ok).toBe(true);
+        expect(resAlreadyExists.isPushed).toBe(true);
+        expect(resAlreadyExists.isUpdated).toBe(true);
       }, 10000);
 
       test('iexec result push-secret (v4 legacy name)', async () => {
@@ -2892,11 +2917,6 @@ describe('[Common]', () => {
         const raw = await execAsync(`${iexecPath} result push-secret --raw`);
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} result push-secret --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
       }, 10000);
 
       test('iexec result check-encryption-key', async () => {
@@ -2995,6 +3015,24 @@ describe('[Common]', () => {
       expect(res.resultsPath).toBeDefined();
       expect(res.resultsPath.indexOf('results.zip')).not.toBe(-1);
     });
+  });
+
+  describe('[storage]', () => {
+    if (!DRONE) {
+      // this test require nexus.iex.ec image
+      test('iexec storage init', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(`${iexecPath} storage init --raw`);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage init --raw`,
+        );
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(true);
+      }, 10000);
+    }
   });
 
   describe('[registry]', () => {

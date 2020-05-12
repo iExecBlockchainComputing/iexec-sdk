@@ -264,6 +264,24 @@ describe('[IExec]', () => {
       ),
     );
   });
+  test('resultProxy required function throw if no resultProxyURL configured', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    expect(() => iexec.storage.defaultStorageLogin()).toThrow(
+      Error(
+        `resultProxyURL option not set and no default value for your chain ${networkId}`,
+      ),
+    );
+  });
 });
 
 describe('[workflow]', () => {
@@ -1828,7 +1846,7 @@ describe('[dataset]', () => {
     // this test require nexus.iex.ec image
     test('dataset.pushDatasetSecret()', async () => {
       const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -1864,7 +1882,7 @@ describe('[dataset]', () => {
     test('dataset.pushDatasetSecret() (not deployed)', async () => {
       const randomAddress = ethers.Wallet.createRandom().address;
       const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -1886,7 +1904,7 @@ describe('[dataset]', () => {
     });
     test('dataset.pushDatasetSecret() (invalid owner)', async () => {
       const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -1942,7 +1960,7 @@ describe('[dataset]', () => {
     });
     test('dataset.checkDatasetSecretExists()', async () => {
       const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -3394,7 +3412,7 @@ describe('[result]', () => {
         tokenChainUrl,
         randomWallet.privateKey,
       );
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -3407,7 +3425,8 @@ describe('[result]', () => {
         },
       );
       const pushRes = await iexec.result.pushResultEncryptionKey('oops');
-      expect(pushRes).toBe(true);
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
       await expect(
         iexec.result.pushResultEncryptionKey('oops'),
       ).rejects.toThrow(
@@ -3415,6 +3434,35 @@ describe('[result]', () => {
           `secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
         ),
       );
+    });
+    test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
+        forceUpdate: true,
+      });
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
+      const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
+        forceUpdate: true,
+      });
+      expect(pushSameRes.isPushed).toBe(true);
+      expect(pushSameRes.isUpdated).toBe(true);
     });
     test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
       const randomWallet = ethers.Wallet.createRandom();
@@ -3438,44 +3486,13 @@ describe('[result]', () => {
         iexec.result.pushResultEncryptionKey('oops'),
       ).rejects.toThrow(Error(`SMS at ${smsURL} didn't answered`));
     });
-    test('result.updateResultEncryptionKey()', async () => {
-      const randomWallet = ethers.Wallet.createRandom();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(
-        iexec.result.updateResultEncryptionKey('Oops'),
-      ).rejects.toThrow(
-        Error(
-          `secret "iexec-result-encryption-public-key" not found for ${randomWallet.address}`,
-        ),
-      );
-      await iexec.result.pushResultEncryptionKey('oops');
-      const pushRes = await iexec.result.updateResultEncryptionKey('Oops');
-      expect(pushRes).toBe(true);
-      const pushSameRes = await iexec.result.updateResultEncryptionKey('Oops');
-      expect(pushSameRes).toBe(true);
-    });
     test('result.checkResultEncryptionKeyExists()', async () => {
       const randomWallet = ethers.Wallet.createRandom();
       const signer = utils.getSignerFromPrivateKey(
         tokenChainUrl,
         randomWallet.privateKey,
       );
-      const smsURL = DRONE ? 'http://token-sms' : 'http://localhost:5000';
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -3496,6 +3513,215 @@ describe('[result]', () => {
         randomWallet.address,
       );
       expect(withSecretRes).toBe(true);
+    });
+  }
+});
+
+describe('[storage]', () => {
+  if (!DRONE) {
+    // this test require nexus.iex.ec image
+    test('storage.defaultStorageLogin()', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const resultProxyURL = DRONE
+        ? 'http://token-result-proxy:18089'
+        : 'http://localhost:18089';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          resultProxyURL,
+        },
+      );
+      const token = await iexec.storage.defaultStorageLogin();
+      expect(typeof token).toBe('string');
+      expect(token.split('.').length).toBe(3);
+      const token2 = await iexec.storage.defaultStorageLogin();
+      expect(token2).toBe(token);
+    });
+    test('storage.pushStorageToken()', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const pushRes = await iexec.storage.pushStorageToken('oops');
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
+      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+        Error(
+          `secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+        ),
+      );
+    });
+    test('storage.pushStorageToken() (provider: "default")', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const pushRes = await iexec.storage.pushStorageToken('oops', {
+        provider: 'default',
+      });
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
+      await expect(
+        iexec.storage.pushStorageToken('oops', { provider: 'default' }),
+      ).rejects.toThrow(
+        Error(
+          `secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+        ),
+      );
+    });
+    test('storage.pushStorageToken() (provider: "dropbox")', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const pushRes = await iexec.storage.pushStorageToken('oops', {
+        provider: 'dropbox',
+      });
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
+      await expect(
+        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+      ).rejects.toThrow(
+        Error(
+          `secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
+        ),
+      );
+    });
+    test('storage.pushStorageToken() (forceUpdate)', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const pushRes = await iexec.storage.pushStorageToken('oops', {
+        forceUpdate: true,
+      });
+      expect(pushRes.isPushed).toBe(true);
+      expect(pushRes.isUpdated).toBe(false);
+      const updateRes = await iexec.storage.pushStorageToken('oops', {
+        forceUpdate: true,
+      });
+      expect(updateRes.isPushed).toBe(true);
+      expect(updateRes.isUpdated).toBe(true);
+    });
+    test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+        Error(`SMS at ${smsURL} didn't answered`),
+      );
+    });
+    test('storage.checkStorageTokenExists()', async () => {
+      const randomWallet = ethers.Wallet.createRandom();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        randomWallet.privateKey,
+      );
+      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          smsURL,
+        },
+      );
+      const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
+        randomWallet.address,
+        { provider: 'dropbox' },
+      );
+      expect(withoutSecretRes).toBe(false);
+      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+      const withSecretRes = await iexec.storage.checkStorageTokenExists(
+        randomWallet.address,
+        { provider: 'dropbox' },
+      );
+      expect(withSecretRes).toBe(true);
+      const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
+        randomWallet.address,
+      );
+      expect(unsetProviderRes).toBe(false);
+      expect(() => iexec.storage.checkStorageTokenExists(randomWallet.address, {
+        provider: 'test',
+      })).toThrow(Error('"test" not supported'));
     });
   }
 });

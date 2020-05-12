@@ -25,6 +25,7 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
+const { getResultEncryptionKeyName } = require('./iexecSecretsUtils');
 const { saveTextToFile } = require('./fs');
 const { Keystore } = require('./keystore');
 const { decryptResult } = require('./utils');
@@ -196,6 +197,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
+  .option(...option.forceUpdateSecret())
   .description(desc.pushResultKey())
   .action(async (cmd) => {
     await checkUpdate(cmd);
@@ -225,22 +227,19 @@ pushSecret
       }
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
-      const secretExists = await secretMgtServ.checkWeb2SecretExists(
+      const {
+        isPushed,
+        isUpdated,
+      } = await secretMgtServ.pushWeb2Secret(
         contracts,
         sms,
-        address,
-        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
-      );
-      const isPushed = await secretMgtServ.pushWeb2Secret(
-        contracts,
-        sms,
-        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+        getResultEncryptionKeyName(),
         secretToPush,
-        { update: secretExists },
+        { forceUpdate: !!cmd.forceUpdate },
       );
       if (isPushed) {
         spinner.succeed('Encryption key successfully pushed', {
-          raw: {},
+          raw: { isPushed, isUpdated },
         });
       } else {
         throw Error('Something went wrong');
@@ -282,7 +281,7 @@ checkSecret
         contracts,
         sms,
         keyAddress,
-        secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+        getResultEncryptionKeyName(),
       );
       if (secretExists) {
         spinner.succeed(`Encryption key found for address ${keyAddress}`, {
