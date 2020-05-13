@@ -210,7 +210,6 @@ const option = {
   appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
-  token: () => ['--token <address>', 'custom erc20 token contract address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
   forceCreate: () => [
     '--force',
