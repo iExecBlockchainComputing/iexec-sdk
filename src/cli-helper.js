@@ -244,7 +244,7 @@ const option = {
   ],
   password: () => [
     '--password <password>',
-    'password used to encrypt the wallet',
+    'password used to encrypt the wallet (unsafe)',
   ],
   unencrypted: () => [
     '--unencrypted',
@@ -299,6 +299,10 @@ const option = {
     'set custom gas price for transactions (in wei)',
   ],
   forceUpdateSecret: () => ['--force-update', 'update if already exists'],
+  storageToken: () => [
+    '--token <token>',
+    'storage provider authorization token (unsafe)',
+  ],
 };
 
 const addGlobalOptions = (cli) => {
@@ -337,13 +341,14 @@ const question = async (
 
 const promptPassword = async (
   message,
-  { error = 'operation aborted by user', strict = true } = {},
+  { error = 'operation aborted by user', strict = true, useMask = false } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
       type: 'password',
       name: 'pw',
       message,
+      mask: useMask ? '*' : undefined,
     },
   ]);
   if (answer.pw) return answer.pw;
@@ -364,7 +369,7 @@ const promptConfirmedPassword = async (
 };
 
 const prompt = {
-  password: message => promptPassword(message),
+  password: (message, options) => promptPassword(message, options),
   confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),

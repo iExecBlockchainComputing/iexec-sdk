@@ -3026,11 +3026,128 @@ describe('[Common]', () => {
         const raw = await execAsync(`${iexecPath} storage init --raw`);
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(true);
+        expect(res.isUpdated).toBe(false);
         const rawAlreadyExists = await execAsync(
           `${iexecPath} storage init --raw`,
+        ).catch(e => e.message);
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(false);
+        expect(resAlreadyExists.error.message).toBe(
+          'default storage is already initialized, use --force-update option to update your storage token',
+        );
+      }, 10000);
+
+      test('iexec storage init --force-update', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(
+          `${iexecPath} storage init --force-update --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(true);
+        expect(res.isUpdated).toBe(false);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage init --force-update --raw`,
         );
         const resAlreadyExists = JSON.parse(rawAlreadyExists);
         expect(resAlreadyExists.ok).toBe(true);
+        expect(resAlreadyExists.isInitilized).toBe(true);
+        expect(resAlreadyExists.isUpdated).toBe(true);
+      }, 10000);
+
+      test('iexec storage init dropbox', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(
+          `${iexecPath} storage init dropbox --token oops --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(true);
+        expect(res.isUpdated).toBe(false);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage init dropbox --token oops --raw`,
+        ).catch(e => e.message);
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(false);
+        expect(resAlreadyExists.error.message).toBe(
+          'dropbox storage is already initialized, use --force-update option to update your storage token',
+        );
+      }, 10000);
+
+      test('iexec storage init unsupported', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(
+          `${iexecPath} storage init unsupported --token oops --raw`,
+        ).catch(e => e.message);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(false);
+        expect(res.error.message).toBe('"unsupported" not supported');
+      }, 10000);
+
+      test('iexec storage check', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(`${iexecPath} storage check --raw`);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(false);
+        await execAsync(`${iexecPath} storage init --raw`);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage check --raw`,
+        );
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(true);
+        expect(resAlreadyExists.isInitilized).toBe(true);
+      }, 10000);
+
+      test('iexec storage check --user', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        const randomAddress = getRandomAddress();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(
+          `${iexecPath} storage check --user ${randomAddress} --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(false);
+        await execAsync(`${iexecPath} storage init --raw`);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage check --user ${randomAddress} --raw`,
+        );
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(true);
+        expect(resAlreadyExists.isInitilized).toBe(false);
+      }, 10000);
+
+      test('iexec storage check dropbox', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(`${iexecPath} storage check dropbox --raw`);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.isInitilized).toBe(false);
+        await execAsync(`${iexecPath} storage init dropbox --token oops --raw`);
+        const rawAlreadyExists = await execAsync(
+          `${iexecPath} storage check dropbox --raw`,
+        );
+        const resAlreadyExists = JSON.parse(rawAlreadyExists);
+        expect(resAlreadyExists.ok).toBe(true);
+        expect(resAlreadyExists.isInitilized).toBe(true);
+      }, 10000);
+
+      test('iexec storage check unsupported', async () => {
+        const { privateKey, publicKey, address } = getRandomWallet();
+        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+        const raw = await execAsync(
+          `${iexecPath} storage check unsupported --raw`,
+        ).catch(e => e.message);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(false);
+        expect(res.error.message).toBe('"unsupported" not supported');
       }, 10000);
     }
   });
