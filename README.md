@@ -74,7 +74,8 @@ required steps before following any other workflow.
 iexec init # create all required files
 iexec wallet getETH # ask faucet for ETH, this may require manual action
 iexec wallet getRLC # ask iExec faucet for RLC
-iexec wallet show
+iexec wallet show # show your wallet
+iexec storage init # initialize your remote storage
 ```
 
 ### SDK CLI for Dapp developpers
@@ -476,9 +477,21 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 # --chain <chainName>
 iexec result generate-encryption-keypair # generate a beneficiary keypair to encrypt and decrypt the results
 iexec result push-encryption-key # push the encryption key for the beneficiary
+iexec result push-encryption-key --force-update # push the encryption key for the beneficiary, update if exists
 iexec result push-encryption-key --secret-file [secretPath] # specify a file path for reading the secret
 iexec result decrypt [encryptedResultsPath] # decrypt encrypted results with beneficary key
 iexec result check-encryption-key [userAddress] # check if a encryption key exists for the user
+```
+
+## storage
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec storage init # initialize the IPFS based default remote storage
+iexec storage init [provider] # initialize the specified remote storage (supported "default"|"dropbox")
+iexec storage check [provider] # check if the specified remote storage is initialized
+iexec storage check [provider] --user <address> # check if the remote storage of specified user is initialized
 ```
 
 ## category
@@ -798,6 +811,7 @@ _options:_
 
 - `hubAddress: Address` specify the address of iExec hub smart contract to use
 - `smsURL: URL` specify the Secret Management System to use
+- `resultProxyURL: URL` specify the result proxy to use for results remote storage
 - `isNative: Boolean` true when the RLC is the chain native token
 - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
@@ -1932,6 +1946,96 @@ const { address } = await iexec.workerpool.deployWorkerpool({
 console.log('deployed at', address);
 ```
 
+### Result
+
+#### pushResultEncryptionKey
+
+iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
+
+> push an encryption public key to the SMS, this allow results encryption
+> _options:_
+
+- `forceUpdate: Boolean` update if exists
+
+_Example:_
+
+```js
+const { isPushed } = await iexec.result.pushResultEncryptionKey(
+  '-----BEGIN PUBLIC KEY-----
+  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0gKRKKNCLe1O+A8nRsOc
+  gnnvLwE+rpvmKnjOTzoR8ZBTaIjD1dqlhPyJ3kgUnKyCNqru9ayf0srUddwj+20N
+  zdLvhI03cYD+GFYM6rrGvaUekGZ43f309f3wOrQjNkTeGo+K+hloHL/gmuN/XML9
+  MST/01+mdCImPdG+dxk4RQAsFS7HE00VXsVjcLGeZ95AKILFJKLbCOJxxvsQ+L1g
+  rameEwTUF1Mb5TJnV44YZJiCKYFj6/6zrZ3+pdUjxBSN96iOyE2KiYeNuhEEJbjb
+  4rWl+TpWLmDkLIeyL3TpDTRedaXVx6h7DOOphX5vG63+5UIHol3vJwPbeODiFWH0
+  hpFcFVPoW3wQgEpSMhUabg59Hc0rnXfM5nrIRS+SHTzjD7jpbSisGzXKcuHMc69g
+  brEHGJsNnxr0A65PzN1RMJGq44lnjeTPZnjWjM7PnnfH72MiWmwVptB38QP5+tao
+  UJu9HvZdCr9ZzdHebO5mCWIBKEt9bLRa2LMgAYfWVg21ARfIzjvc9GCwuu+958GR
+  O/VhIFB71aaAxpGmK9bX5U5QN6Tpjn/ykRIBEyY0Y6CJUkc33KhVvxXSirIpcZCO
+  OY8MsmW8+J2ZJI1JA0DIR2LHingtFWlQprd7lt6AxzcYSizeWVTZzM7trbBExBGq
+  VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
+  -----END PUBLIC KEY-----',
+);
+console.log('encryption key pushed:', isPushed);
+```
+
+#### checkResultEncryptionKeyExists
+
+iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
+
+> check if an encryption key exists in the SMS
+
+_Example:_
+
+```js
+const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
+  await iexec.wallet.getAddress(),
+);
+console.log('encryption key set:', isMyKeySet);
+```
+
+### Storage
+
+#### defaultStorageLogin
+
+iexec.**storage.defaultStorageLogin ()** => Promise < **token: String** >
+
+> get an authorization token from the default IPFS based remote storage. [Share this token through the SMS](#pushStorageToken) to allows the worker to push your tasks results to the default remote storage.
+
+#### pushStorageToken
+
+iexec.**storage.pushStorageToken ( token: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
+
+> push a storage provider authorization token to the SMS, this allow results storage
+
+_options:_
+
+- `provider: String` specify storage provider (supported: `"default", "dropbox"`, )
+- `forceUpdate: Boolean` update if exists
+
+_Example:_
+
+```js
+const defaultStorageToken = await iexec.storage.defaultStorageLogin();
+const { isPushed } = await iexec.storage.pushStorageToken(defaultStorageToken);
+console.log('default storage initialized:', isPushed);
+```
+
+#### checkResultEncryptionKeyExists
+
+iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
+
+> check if an encryption key exists in the SMS
+
+_Example:_
+
+```js
+const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
+  await iexec.wallet.getAddress(),
+);
+console.log('encryption key set:', isMyKeySet);
+```
+
 ### iexec.network
 
 #### id
@@ -1956,79 +2060,6 @@ _Example:_
 
 ```js
 console.log('current chain is a sidechain:', iexec.network.isSidechain);
-```
-
-### Result
-
-#### pushResultEncryptionKey
-
-iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String )** => Promise < **success: Boolean** >
-
-> push an encryption public key to the SMS, this allow results encryption
-
-_Example:_
-
-```js
-const pushed = await iexec.result.pushResultEncryptionKey(
-  '-----BEGIN PUBLIC KEY-----
-  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0gKRKKNCLe1O+A8nRsOc
-  gnnvLwE+rpvmKnjOTzoR8ZBTaIjD1dqlhPyJ3kgUnKyCNqru9ayf0srUddwj+20N
-  zdLvhI03cYD+GFYM6rrGvaUekGZ43f309f3wOrQjNkTeGo+K+hloHL/gmuN/XML9
-  MST/01+mdCImPdG+dxk4RQAsFS7HE00VXsVjcLGeZ95AKILFJKLbCOJxxvsQ+L1g
-  rameEwTUF1Mb5TJnV44YZJiCKYFj6/6zrZ3+pdUjxBSN96iOyE2KiYeNuhEEJbjb
-  4rWl+TpWLmDkLIeyL3TpDTRedaXVx6h7DOOphX5vG63+5UIHol3vJwPbeODiFWH0
-  hpFcFVPoW3wQgEpSMhUabg59Hc0rnXfM5nrIRS+SHTzjD7jpbSisGzXKcuHMc69g
-  brEHGJsNnxr0A65PzN1RMJGq44lnjeTPZnjWjM7PnnfH72MiWmwVptB38QP5+tao
-  UJu9HvZdCr9ZzdHebO5mCWIBKEt9bLRa2LMgAYfWVg21ARfIzjvc9GCwuu+958GR
-  O/VhIFB71aaAxpGmK9bX5U5QN6Tpjn/ykRIBEyY0Y6CJUkc33KhVvxXSirIpcZCO
-  OY8MsmW8+J2ZJI1JA0DIR2LHingtFWlQprd7lt6AxzcYSizeWVTZzM7trbBExBGq
-  VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
-  -----END PUBLIC KEY-----',
-);
-console.log('encryption key pushed:', pushed);
-```
-
-#### updateResultEncryptionKey
-
-iexec.**result.updateResultEncryptionKey ( rsa256PublicKey: String )** => Promise < **success: Boolean** >
-
-> update the encryption public key in the SMS
-
-_Example:_
-
-```js
-const pushed = await iexec.result.updateResultEncryptionKey(
-  '-----BEGIN PUBLIC KEY-----
-  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0gKRKKNCLe1O+A8nRsOc
-  gnnvLwE+rpvmKnjOTzoR8ZBTaIjD1dqlhPyJ3kgUnKyCNqru9ayf0srUddwj+20N
-  zdLvhI03cYD+GFYM6rrGvaUekGZ43f309f3wOrQjNkTeGo+K+hloHL/gmuN/XML9
-  MST/01+mdCImPdG+dxk4RQAsFS7HE00VXsVjcLGeZ95AKILFJKLbCOJxxvsQ+L1g
-  rameEwTUF1Mb5TJnV44YZJiCKYFj6/6zrZ3+pdUjxBSN96iOyE2KiYeNuhEEJbjb
-  4rWl+TpWLmDkLIeyL3TpDTRedaXVx6h7DOOphX5vG63+5UIHol3vJwPbeODiFWH0
-  hpFcFVPoW3wQgEpSMhUabg59Hc0rnXfM5nrIRS+SHTzjD7jpbSisGzXKcuHMc69g
-  brEHGJsNnxr0A65PzN1RMJGq44lnjeTPZnjWjM7PnnfH72MiWmwVptB38QP5+tao
-  UJu9HvZdCr9ZzdHebO5mCWIBKEt9bLRa2LMgAYfWVg21ARfIzjvc9GCwuu+958GR
-  O/VhIFB71aaAxpGmK9bX5U5QN6Tpjn/ykRIBEyY0Y6CJUkc33KhVvxXSirIpcZCO
-  OY8MsmW8+J2ZJI1JA0DIR2LHingtFWlQprd7lt6AxzcYSizeWVTZzM7trbBExBGq
-  VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
-  -----END PUBLIC KEY-----',
-);
-console.log('encryption key updated:', pushed);
-```
-
-#### checkResultEncryptionKeyExists
-
-iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
-
-> check if an encryption key exists in the SMS
-
-_Example:_
-
-```js
-const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
-  await iexec.wallet.getAddress(),
-);
-console.log('encryption key set:', isMyKeySet);
 ```
 
 ### Utils
@@ -2117,7 +2148,6 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
 > decrypt en encrypted result with the beneficiary RSA Key.
-> for encrypted result decryption see [utils.decryptResult](#decryptResult)
 
 _Example:_
 
@@ -2137,7 +2167,7 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### getSignerFromPrivateKey
 
-utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey [, options ] )** => SignerProvider
+utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
 
 Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
 
