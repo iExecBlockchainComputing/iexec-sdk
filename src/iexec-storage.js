@@ -17,7 +17,7 @@ const {
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const resultProxyServ = require('./result-proxy.js');
-const { getStorageTokenKeyName } = require('./iexecSecretsUtils');
+const { getStorageTokenKeyName } = require('./secrets-utils');
 const { Keystore } = require('./keystore');
 
 const debug = Debug('iexec:iexec-storage');

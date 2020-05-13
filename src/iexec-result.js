@@ -25,7 +25,7 @@ const {
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
-const { getResultEncryptionKeyName } = require('./iexecSecretsUtils');
+const { getResultEncryptionKeyName } = require('./secrets-utils');
 const { saveTextToFile } = require('./fs');
 const { Keystore } = require('./keystore');
 const { decryptResult } = require('./utils');

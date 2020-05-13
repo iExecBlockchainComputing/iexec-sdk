@@ -10,7 +10,7 @@ const secretMgtServ = require('./sms');
 const {
   getStorageTokenKeyName,
   getResultEncryptionKeyName,
-} = require('./iexecSecretsUtils');
+} = require('./secrets-utils');
 const resultProxyServ = require('./result-proxy');
 const iexecProcess = require('./iexecProcess');
 const errors = require('./errors');
