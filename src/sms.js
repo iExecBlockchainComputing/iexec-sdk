@@ -1,11 +1,10 @@
 const Debug = require('debug');
 const { Buffer } = require('buffer');
-const qs = require('query-string');
 const { keccak256, arrayify } = require('ethers').utils;
 const { getAddress } = require('./wallet');
+const { httpRequest } = require('./api-utils');
 const { addressSchema, stringSchema, throwIfMissing } = require('./validator');
 const { wrapPersonalSign } = require('./errorWrappers');
-const { httpCall } = require('./utils');
 
 const debug = Debug('iexec:sms');
 
@@ -40,13 +39,13 @@ const checkWeb3SecretExists = async (
     const vResourceAddress = await addressSchema({
       ethProvider: contracts.jsonRpcProvider,
     }).validate(resourceAddress);
-    const res = await httpCall('HEAD')(
-      `${smsURL}/secrets/web3?${qs.stringify({
+    const res = await httpRequest('HEAD')({
+      api: smsURL,
+      endpoint: '/secrets/web3',
+      query: {
         secretAddress: vResourceAddress,
-      })}`,
-      undefined,
-      {},
-    ).catch((e) => {
+      },
+    }).catch((e) => {
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
@@ -73,14 +72,14 @@ const checkWeb2SecretExists = async (
     const vOwnerAddress = await addressSchema({
       ethProvider: contracts.jsonRpcProvider,
     }).validate(ownerAddress);
-    const res = await httpCall('HEAD')(
-      `${smsURL}/secrets/web2?${qs.stringify({
+    const res = await httpRequest('HEAD')({
+      api: smsURL,
+      endpoint: '/secrets/web2',
+      query: {
         ownerAddress: vOwnerAddress,
         secretName,
-      })}`,
-      undefined,
-      {},
-    ).catch((e) => {
+      },
+    }).catch((e) => {
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
@@ -116,15 +115,17 @@ const pushWeb3Secret = async (
     const binaryChallenge = arrayify(challenge);
     const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [vSignerAddress, data]);
     const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
-    const res = await httpCall('POST')(
-      `${smsURL}/secrets/web3?${qs.stringify({
+    const res = await httpRequest('POST')({
+      api: smsURL,
+      endpoint: '/secrets/web3',
+      query: {
         secretAddress: vResourceAddress,
-      })}`,
-      secretValue,
-      {
+      },
+      body: secretValue,
+      headers: {
         Authorization: auth,
       },
-    ).catch((e) => {
+    }).catch((e) => {
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
@@ -179,16 +180,18 @@ const pushWeb2Secret = async (
     const binaryChallenge = arrayify(challenge);
     const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [ownerAddress, data]);
     const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
-    const res = await httpCall(update ? 'PUT' : 'POST')(
-      `${smsURL}/secrets/web2?${qs.stringify({
+    const res = await httpRequest(update ? 'PUT' : 'POST')({
+      api: smsURL,
+      endpoint: '/secrets/web2',
+      query: {
         ownerAddress,
         secretName,
-      })}`,
-      secretValue,
-      {
+      },
+      body: secretValue,
+      headers: {
         Authorization: auth,
       },
-    ).catch((e) => {
+    }).catch((e) => {
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
