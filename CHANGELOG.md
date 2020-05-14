@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution
+- `iexec storage init [provider]` initialize the remote storage
+- `iexec storage check [provider]` check if the remote storage is initialized
+- `iexec.storage.defaultStorageLogin()` get an authorization token for default remote storage
+- `iexec.storage.pushStorageToken()` push a storage token to the SMS
 - `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
 - `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
 - `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficary result encryption key to the SMS

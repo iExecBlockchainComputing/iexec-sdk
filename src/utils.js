@@ -289,6 +289,21 @@ const download = verb => async (
   return response;
 };
 
+const httpCall = verb => async (url, body = {}, optionalHeaders = {}) => {
+  const headers = Object.assign({}, optionalHeaders);
+  const response = await fetch(
+    url,
+    Object.assign(
+      {
+        method: verb,
+        headers,
+      },
+      verb === 'GET' || verb === 'HEAD' ? undefined : { body },
+    ),
+  );
+  return response;
+};
+
 const signTypedDatav3 = async (eth, address, typedData) => {
   const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
   const sign = await wrapSignTypedDataV3(signTDv3(typedData));
@@ -560,6 +575,7 @@ module.exports = {
   secToDate,
   getAuthorization,
   http,
+  httpCall,
   download,
   getSalt,
   NULL_BYTES,

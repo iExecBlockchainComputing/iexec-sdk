@@ -101,6 +101,7 @@ const desc = {
   bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
   bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  initStorage: () => 'initialize the remote storage',
 };
 
 const option = {
@@ -209,7 +210,6 @@ const option = {
   appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
-  token: () => ['--token <address>', 'custom erc20 token contract address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
   forceCreate: () => [
     '--force',
@@ -243,7 +243,7 @@ const option = {
   ],
   password: () => [
     '--password <password>',
-    'password used to encrypt the wallet',
+    'password used to encrypt the wallet (unsafe)',
   ],
   unencrypted: () => [
     '--unencrypted',
@@ -297,6 +297,11 @@ const option = {
     '--gas-price <wei>',
     'set custom gas price for transactions (in wei)',
   ],
+  forceUpdateSecret: () => ['--force-update', 'update if already exists'],
+  storageToken: () => [
+    '--token <token>',
+    'storage provider authorization token (unsafe)',
+  ],
 };
 
 const addGlobalOptions = (cli) => {
@@ -335,13 +340,14 @@ const question = async (
 
 const promptPassword = async (
   message,
-  { error = 'operation aborted by user', strict = true } = {},
+  { error = 'operation aborted by user', strict = true, useMask = false } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
       type: 'password',
       name: 'pw',
       message,
+      mask: useMask ? '*' : undefined,
     },
   ]);
   if (answer.pw) return answer.pw;
@@ -362,7 +368,7 @@ const promptConfirmedPassword = async (
 };
 
 const prompt = {
-  password: message => promptPassword(message),
+  password: (message, options) => promptPassword(message, options),
   confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),

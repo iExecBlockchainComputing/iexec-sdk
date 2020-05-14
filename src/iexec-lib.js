@@ -7,6 +7,11 @@ const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
 const secretMgtServ = require('./sms');
+const {
+  getStorageTokenKeyName,
+  getResultEncryptionKeyName,
+} = require('./secrets-utils');
+const resultProxyServ = require('./result-proxy');
 const iexecProcess = require('./iexecProcess');
 const errors = require('./errors');
 const {
@@ -43,7 +48,12 @@ class IExec {
   constructor(
     { ethProvider, chainId },
     {
-      hubAddress, isNative, bridgeAddress, bridgedNetworkConf, smsURL,
+      hubAddress,
+      isNative,
+      bridgeAddress,
+      bridgedNetworkConf,
+      resultProxyURL,
+      smsURL,
     } = {},
   ) {
     const contracts = createIExecContracts({
@@ -89,6 +99,15 @@ class IExec {
       }
       throw Error(
         `smsURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getResultProxyURL = () => {
+      if (resultProxyURL) {
+        return resultProxyURL;
+      }
+      throw Error(
+        `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -259,20 +278,35 @@ class IExec {
       contracts,
       getSmsURL(),
       address,
-      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+      getResultEncryptionKeyName(),
     );
-    this.result.pushResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
+    this.result.pushResultEncryptionKey = (
+      publicKey,
+      { forceUpdate = false } = {},
+    ) => secretMgtServ.pushWeb2Secret(
       contracts,
       getSmsURL(),
-      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
+      getResultEncryptionKeyName(),
       publicKey,
+      { forceUpdate },
     );
-    this.result.updateResultEncryptionKey = publicKey => secretMgtServ.pushWeb2Secret(
+    this.storage = {};
+    this.storage.defaultStorageLogin = () => resultProxyServ.login(contracts, getResultProxyURL());
+    this.storage.checkStorageTokenExists = (address, { provider } = {}) => secretMgtServ.checkWeb2SecretExists(
       contracts,
       getSmsURL(),
-      secretMgtServ.reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
-      publicKey,
-      { update: true },
+      address,
+      getStorageTokenKeyName(provider),
+    );
+    this.storage.pushStorageToken = (
+      token,
+      { provider, forceUpdate = false } = {},
+    ) => secretMgtServ.pushWeb2Secret(
+      contracts,
+      getSmsURL(),
+      getStorageTokenKeyName(provider),
+      token,
+      { forceUpdate },
     );
     this.network = {};
     this.network.id = contracts.chainId;

@@ -112,6 +112,7 @@ const chains = {
     dev: {
       id: '65535',
       host: 'http://localhost:8545',
+      resultProxy: 'http://localhost:18089',
       sms: 'http://localhost:5000',
       hub: '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB',
       // native: true,
