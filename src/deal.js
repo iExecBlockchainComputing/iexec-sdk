@@ -4,10 +4,10 @@ const {
   cleanRPC,
   bnifyNestedEthersBn,
   ethersBnToBn,
-  http,
   NULL_ADDRESS,
   BN,
 } = require('./utils');
+const { jsonApi, IEXEC_GATEWAY_URL } = require('./api-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -71,7 +71,11 @@ const fetchRequesterDeals = async (
       },
       find,
     };
-    const response = await http.post('deals', body);
+    const response = await jsonApi.post({
+      api: IEXEC_GATEWAY_URL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return {
         count: response.count,

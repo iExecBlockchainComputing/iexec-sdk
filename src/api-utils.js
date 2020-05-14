@@ -6,7 +6,7 @@ const { wrapSignTypedDataV3 } = require('./errorWrappers');
 
 const debug = Debug('iexec:api-utils');
 
-const API_URL = 'https://gateway.iex.ec';
+const IEXEC_GATEWAY_URL = 'https://gateway.iex.ec';
 
 const makeBody = (method, body) => {
   if (method === 'POST' || method === 'PUT') {
@@ -116,7 +116,7 @@ const signTypedDatav3 = async (eth, address, typedData) => {
   return sign;
 };
 
-const getAuthorization = (api = API_URL, endpoint = '/challenge') => async (
+const getAuthorization = (api, endpoint = '/challenge') => async (
   chainId,
   address,
   ethProvider,
@@ -151,4 +151,5 @@ module.exports = {
   jsonApi,
   downloadApi,
   getAuthorization,
+  IEXEC_GATEWAY_URL,
 };
