@@ -82,7 +82,7 @@ const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     const json = await response.json();
-    if (json.error) throw new Error(json.error);
+    if (json.error) throw new Error(`API error: ${json.error}`);
     if (response.status === 200 && json) return json;
   }
   throw new Error('The http response is not of JSON type');
