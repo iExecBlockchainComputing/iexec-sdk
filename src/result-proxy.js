@@ -1,7 +1,7 @@
 const Debug = require('debug');
-const qs = require('query-string');
 const { getAddress } = require('./wallet');
-const { getAuthorization, throwIfMissing, httpCall } = require('./utils');
+const { getAuthorization, httpRequest } = require('./api-utils');
+const { throwIfMissing } = require('./validator');
 
 const debug = Debug('iexec:result-proxy');
 
@@ -12,18 +12,16 @@ const login = async (
   try {
     const userAddress = await getAddress(contracts);
     const authorization = await getAuthorization(
-      contracts.chainId,
-      userAddress,
-      contracts.jsonRpcProvider,
-      { apiURL: resultProxyURL, challengeEndpoint: '/results/challenge' },
-    );
+      resultProxyURL,
+      '/results/challenge',
+    )(contracts.chainId, userAddress, contracts.jsonRpcProvider);
     debug(authorization);
-    const res = await httpCall('POST')(
-      `${resultProxyURL}/results/login?${qs.stringify({
-        chainId: contracts.chainId,
-      })}`,
-      authorization,
-    ).catch((e) => {
+    const res = await httpRequest('POST')({
+      api: resultProxyURL,
+      endpoint: '/results/login',
+      query: { chainId: contracts.chainId },
+      body: authorization,
+    }).catch((e) => {
       debug(e);
       throw Error(`result proxy at ${resultProxyURL} didn't answered`);
     });
