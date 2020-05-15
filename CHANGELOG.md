@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
 - fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods
+- fixed method name `iexec.order.publishWorkerpoolorder()`
+- fixed method name `iexec.order.unpublishWorkerpoolorder()`
 
 ### Removed
 

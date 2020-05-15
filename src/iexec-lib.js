@@ -219,11 +219,11 @@ class IExec {
     this.order.cancelRequestorder = signedRequestorder => order.cancelRequestorder(contracts, signedRequestorder);
     this.order.publishApporder = signedApporder => order.publishApporder(contracts, signedApporder);
     this.order.publishDatasetorder = signedDatasetorder => order.publishDatasetorder(contracts, signedDatasetorder);
-    this.order.publishWorkerpool = signedWorkerpoolorder => order.publishWorkerpoolorder(contracts, signedWorkerpoolorder);
+    this.order.publishWorkerpoolorder = signedWorkerpoolorder => order.publishWorkerpoolorder(contracts, signedWorkerpoolorder);
     this.order.publishRequestorder = signedRequestorder => order.publishRequestorder(contracts, signedRequestorder);
     this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, apporderHash);
     this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(contracts, datasetorderHash);
-    this.order.unpublishWorkerpool = workerpoolorderHash => order.unpublishWorkerpoolorder(contracts, workerpoolorderHash);
+    this.order.unpublishWorkerpoolorder = workerpoolorderHash => order.unpublishWorkerpoolorder(contracts, workerpoolorderHash);
     this.order.unpublishRequestorder = requestorderHash => order.unpublishRequestorder(contracts, requestorderHash);
     this.order.matchOrders = ({
       apporder,
