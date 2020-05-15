@@ -4,9 +4,7 @@ const {
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
-  http,
   getSalt,
-  getAuthorization,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
@@ -16,6 +14,7 @@ const {
   checkActiveBitInTag,
   tagBitToHuman,
 } = require('./utils');
+const { jsonApi, getAuthorization, IEXEC_GATEWAY_URL } = require('./api-utils');
 const { hashEIP712 } = require('./sig-utils');
 const { getAddress } = require('./wallet');
 const { checkBalance } = require('./account');
@@ -109,7 +108,7 @@ const objDesc = {
     ownerMethod: getAppOwner,
     cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
-    apiEndpoint: 'apporders',
+    apiEndpoint: '/apporders',
     dealField: 'appHash',
   },
   [DATASET_ORDER]: {
@@ -128,7 +127,7 @@ const objDesc = {
     ownerMethod: getDatasetOwner,
     cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
-    apiEndpoint: 'datasetorders',
+    apiEndpoint: '/datasetorders',
     dealField: 'datasetHash',
   },
   [WORKERPOOL_ORDER]: {
@@ -149,7 +148,7 @@ const objDesc = {
     ownerMethod: getWorkerpoolOwner,
     cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
-    apiEndpoint: 'workerpoolorders',
+    apiEndpoint: '/workerpoolorders',
     dealField: 'workerpoolHash',
   },
   [REQUEST_ORDER]: {
@@ -173,7 +172,7 @@ const objDesc = {
     ],
     cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
-    apiEndpoint: 'requestorders',
+    apiEndpoint: '/requestorders',
     dealField: 'requestHash',
   },
 };
@@ -489,14 +488,17 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
     const body = { chainId, order: signedOrder };
     const authorization = await getAuthorization(
-      chainId,
-      address,
-      contracts.jsonRpcProvider,
-    );
-    const response = await http.post(endpoint, body, { authorization });
+      IEXEC_GATEWAY_URL,
+      '/challenge',
+    )(contracts.chainId, address, contracts.jsonRpcProvider);
+    const response = await jsonApi.post({
+      api: IEXEC_GATEWAY_URL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/publish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
     }
@@ -556,14 +558,17 @@ const unpublishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
     const body = { chainId, orderHash };
     const authorization = await getAuthorization(
-      chainId,
-      address,
-      contracts.jsonRpcProvider,
-    );
-    const response = await http.post(endpoint, body, { authorization });
+      IEXEC_GATEWAY_URL,
+      '/challenge',
+    )(contracts.chainId, address, contracts.jsonRpcProvider);
+    const response = await jsonApi.post({
+      api: IEXEC_GATEWAY_URL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/unpublish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
@@ -633,13 +638,16 @@ const fetchPublishedOrderByHash = async (
       limit: 1,
       find: { orderHash: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: IEXEC_GATEWAY_URL,
+      endpoint: objDesc[orderName].apiEndpoint,
+      body,
+    });
     if (response.ok && response.orders) {
       if (response.orders[0]) return response.orders[0];
       throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
     }
-
-    throw Error('An error occured while getting order');
+    throw Error('An error occured while fetching order');
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);
     throw error;
@@ -656,7 +664,6 @@ const fetchDealsByOrderHash = async (
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const hashFiedName = objDesc[orderName].dealField;
-    const endpoint = 'deals';
     const body = {
       chainId: vChainId,
       sort: {
@@ -665,7 +672,11 @@ const fetchDealsByOrderHash = async (
       limit: 1,
       find: { [hashFiedName]: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: IEXEC_GATEWAY_URL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
     }
