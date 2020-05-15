@@ -2,7 +2,7 @@ const Debug = require('debug');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
+const { signTypedDatav3 } = require('./utils');
 
 const debug = Debug('iexec:api-utils');
 
@@ -58,7 +58,6 @@ const httpRequest = method => async ({
   const baseURL = api;
   const queryString = makeQueryString(method, query);
   const url = baseURL.concat(endpoint, queryString);
-  debug('makeBody()', makeBody(method, body));
   const response = await fetch(url, {
     method,
     ...makeHeaders(method, headers, body),
@@ -99,7 +98,7 @@ const jsonApi = {
   }).then(responseToJson),
 };
 
-const downloadApi = {
+const downloadZipApi = {
   get: args => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
@@ -108,12 +107,6 @@ const downloadApi = {
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
   }).then(checkResponseOk),
-};
-
-const signTypedDatav3 = async (eth, address, typedData) => {
-  const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
-  const sign = await wrapSignTypedDataV3(signTDv3(typedData));
-  return sign;
 };
 
 const getAuthorization = (api, endpoint = '/challenge') => async (
@@ -149,7 +142,7 @@ const getAuthorization = (api, endpoint = '/challenge') => async (
 module.exports = {
   httpRequest,
   jsonApi,
-  downloadApi,
+  downloadZipApi,
   getAuthorization,
   IEXEC_GATEWAY_URL,
 };
