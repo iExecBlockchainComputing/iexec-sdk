@@ -180,26 +180,26 @@ class IExec {
       beforeTimestamp,
     });
     this.deal.claim = dealid => deal.claim(contracts, dealid);
-    // this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
-    //   order.APP_ORDER,
-    //   contracts.chainId,
-    //   apporderHash,
-    // );
-    // this.deal.fetchDealsByDatasetorder = datasetorderHash => order.fetchDealsByOrderHash(
-    //   order.DATASET_ORDER,
-    //   contracts.chainId,
-    //   datasetorderHash,
-    // );
-    // this.deal.fetchDealsByWorkerpoolorder = workerpoolorderHash => order.fetchDealsByOrderHash(
-    //   order.WORKERPOOL_ORDER,
-    //   contracts.chainId,
-    //   workerpoolorderHash,
-    // );
-    // this.deal.fetchDealsByRequestorder = requestorderHash => order.fetchDealsByOrderHash(
-    //   order.REQUEST_ORDER,
-    //   contracts.chainId,
-    //   requestorderHash,
-    // );
+    this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
+      order.APP_ORDER,
+      contracts.chainId,
+      apporderHash,
+    );
+    this.deal.fetchDealsByDatasetorder = datasetorderHash => order.fetchDealsByOrderHash(
+      order.DATASET_ORDER,
+      contracts.chainId,
+      datasetorderHash,
+    );
+    this.deal.fetchDealsByWorkerpoolorder = workerpoolorderHash => order.fetchDealsByOrderHash(
+      order.WORKERPOOL_ORDER,
+      contracts.chainId,
+      workerpoolorderHash,
+    );
+    this.deal.fetchDealsByRequestorder = requestorderHash => order.fetchDealsByOrderHash(
+      order.REQUEST_ORDER,
+      contracts.chainId,
+      requestorderHash,
+    );
     this.order = {};
     this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
     this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
