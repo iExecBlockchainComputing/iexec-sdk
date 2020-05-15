@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { jsonApi, IEXEC_GATEWAY_URL } = require('./api-utils');
+const { jsonApi } = require('./api-utils');
 const {
   addressSchema,
   chainIdSchema,
@@ -14,6 +14,7 @@ const debug = Debug('iexec:orderbook');
 
 const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   {
     minVolume, skip, dataset, workerpool, requester, minTag, maxTag,
@@ -66,7 +67,7 @@ const fetchAppOrderbook = async (
       },
     );
     const response = await jsonApi.get({
-      api: IEXEC_GATEWAY_URL,
+      api: iexecGatewayURL,
       endpoint: '/orderbook/app',
       query,
     });
@@ -80,6 +81,7 @@ const fetchAppOrderbook = async (
 
 const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
   {
     minVolume, skip, app, workerpool, requester, minTag, maxTag,
@@ -123,7 +125,7 @@ const fetchDatasetOrderbook = async (
       },
     );
     const response = await jsonApi.get({
-      api: IEXEC_GATEWAY_URL,
+      api: iexecGatewayURL,
       endpoint: '/orderbook/dataset',
       query,
     });
@@ -142,6 +144,7 @@ const fetchDatasetOrderbook = async (
 
 const fetchWorkerpoolOrderbook = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
     workerpoolAddress, minTag, signerAddress, minTrust, minVolume, skip,
@@ -176,7 +179,7 @@ const fetchWorkerpoolOrderbook = async (
       },
     );
     const response = await jsonApi.get({
-      api: IEXEC_GATEWAY_URL,
+      api: iexecGatewayURL,
       endpoint: '/orderbook/workerpool',
       query,
     });
@@ -196,6 +199,7 @@ const fetchWorkerpoolOrderbook = async (
 
 const fetchRequestOrderbook = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
     requesterAddress,
@@ -235,7 +239,7 @@ const fetchRequestOrderbook = async (
       },
     );
     const response = await jsonApi.get({
-      api: IEXEC_GATEWAY_URL,
+      api: iexecGatewayURL,
       endpoint: '/orderbook/request',
       query,
     });

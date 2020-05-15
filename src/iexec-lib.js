@@ -28,6 +28,7 @@ const {
   decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
+const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const utils = {
   BN,
@@ -54,6 +55,7 @@ class IExec {
       bridgedNetworkConf,
       resultProxyURL,
       smsURL,
+      iexecGatewayURL,
     } = {},
   ) {
     const contracts = createIExecContracts({
@@ -109,6 +111,13 @@ class IExec {
       throw Error(
         `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
+    };
+
+    const getIexecGatewayURL = () => {
+      if (iexecGatewayURL) {
+        return iexecGatewayURL;
+      }
+      return IEXEC_GATEWAY_URL;
     };
 
     this.wallet = {};
@@ -258,10 +267,30 @@ class IExec {
       contracts.chainId,
       requestorderHash,
     );
-    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(contracts, appAddress, options);
-    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(contracts, datasetAddress, options);
-    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(contracts, category, options);
-    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts, category, options);
+    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      appAddress,
+      options,
+    );
+    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      datasetAddress,
+      options,
+    );
+    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      category,
+      options,
+    );
+    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      category,
+      options,
+    );
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
