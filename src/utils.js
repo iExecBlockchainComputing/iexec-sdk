@@ -1,7 +1,5 @@
 const Debug = require('debug');
-const fetch = require('cross-fetch');
 const { Buffer } = require('buffer');
-const qs = require('query-string');
 const BN = require('bn.js');
 const Big = require('big.js');
 const JSZip = require('jszip');
@@ -15,7 +13,6 @@ const {
   parseEther,
 } = require('ethers').utils;
 const multiaddr = require('multiaddr');
-const { hashEIP712 } = require('./sig-utils');
 const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
 
@@ -202,154 +199,10 @@ const secToDate = (secs) => {
   return t;
 };
 
-const API_URL = 'https://gateway.iex.ec/';
-
-const makeBody = (verb, body) => {
-  if (verb === 'GET') return {};
-  return { body: JSON.stringify(body) };
-};
-
-const makeQueryString = (verb, body) => {
-  if (verb === 'GET' && Object.keys(body).length !== 0) {
-    return '?'.concat(qs.stringify(body));
-  }
-  return '';
-};
-
-const httpRequest = verb => async (
-  endpoint,
-  body = {},
-  optionalHeaders = {},
-  api = API_URL,
-) => {
-  const baseURL = api;
-  const queryString = makeQueryString(verb, body);
-  const url = baseURL.concat(endpoint, queryString);
-  const headers = Object.assign(
-    {
-      Accept: 'application/json',
-      'content-type': 'application/json',
-    },
-    optionalHeaders,
-  );
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      makeBody(verb, body),
-    ),
-  );
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.indexOf('application/json') !== -1) {
-    const json = await response.json();
-    if (json.error) throw new Error(json.error);
-    if (response.status === 200 && json) return json;
-  } else {
-    throw new Error('The http response is not of JSON type');
-  }
-  throw new Error('API call error');
-};
-
-const download = verb => async (
-  endpoint,
-  body = {},
-  optionalHeaders = {},
-  api = API_URL,
-) => {
-  const baseURL = api;
-  const queryString = makeQueryString(verb, body);
-  const url = baseURL.concat(endpoint, queryString);
-  const headers = Object.assign(
-    {
-      Accept: ['application/zip'],
-      'content-type': 'application/json',
-    },
-    optionalHeaders,
-  );
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      makeBody(verb, body),
-    ),
-  );
-  if (!response.ok) {
-    throw Error(
-      `API call error: ${response.status} ${
-        response.statusText ? response.statusText : ''
-      }`,
-    );
-  }
-  return response;
-};
-
-const httpCall = verb => async (url, body = {}, optionalHeaders = {}) => {
-  const headers = Object.assign({}, optionalHeaders);
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      verb === 'GET' || verb === 'HEAD' ? undefined : { body },
-    ),
-  );
-  return response;
-};
-
 const signTypedDatav3 = async (eth, address, typedData) => {
   const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
   const sign = await wrapSignTypedDataV3(signTDv3(typedData));
   return sign;
-};
-
-const getAuthorization = async (
-  chainId,
-  address,
-  ethProvider,
-  { apiURL = API_URL, challengeEndpoint = 'challenge' } = {},
-) => {
-  try {
-    const challenge = await httpRequest('GET')(
-      challengeEndpoint,
-      {
-        chainId,
-        address,
-      },
-      {},
-      apiURL,
-    );
-    debug('challenge', challenge);
-    const typedData = challenge.data || challenge;
-    debug('typedData', typedData);
-    const sign = await signTypedDatav3(ethProvider, address, typedData);
-    debug('sign', sign);
-    const hash = hashEIP712(typedData);
-    debug('hash', hash);
-    const separator = '_';
-    const authorization = hash
-      .concat(separator)
-      .concat(sign)
-      .concat(separator)
-      .concat(address);
-    debug('authorization', authorization);
-    return authorization;
-  } catch (error) {
-    debug('getAuthorization()', error);
-    throw Error('Failed to get authorization');
-  }
-};
-
-const http = {
-  get: httpRequest('GET'),
-  post: httpRequest('POST'),
 };
 
 const getSalt = () => {
@@ -573,10 +426,6 @@ module.exports = {
   utf8ToBuffer,
   hexToBuffer,
   secToDate,
-  getAuthorization,
-  http,
-  httpCall,
-  download,
   getSalt,
   NULL_BYTES,
   NULL_ADDRESS,
