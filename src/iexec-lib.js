@@ -182,12 +182,17 @@ class IExec {
       {
         appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
       } = {},
-    ) => deal.fetchRequesterDeals(contracts, requesterAddress, {
-      appAddress,
-      datasetAddress,
-      workerpoolAddress,
-      beforeTimestamp,
-    });
+    ) => deal.fetchRequesterDeals(
+      contracts,
+      getIexecGatewayURL(),
+      requesterAddress,
+      {
+        appAddress,
+        datasetAddress,
+        workerpoolAddress,
+        beforeTimestamp,
+      },
+    );
     this.deal.claim = dealid => deal.claim(contracts, dealid);
     this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
       getIexecGatewayURL(),

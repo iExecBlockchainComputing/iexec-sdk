@@ -7,7 +7,7 @@ const {
   NULL_ADDRESS,
   BN,
 } = require('./utils');
-const { jsonApi, IEXEC_GATEWAY_URL } = require('./api-utils');
+const { jsonApi } = require('./api-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -25,6 +25,7 @@ const debug = Debug('iexec:deal');
 
 const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
   {
     appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
@@ -72,7 +73,7 @@ const fetchRequesterDeals = async (
       find,
     };
     const response = await jsonApi.post({
-      api: IEXEC_GATEWAY_URL,
+      api: iexecGatewayURL,
       endpoint: '/deals',
       body,
     });
