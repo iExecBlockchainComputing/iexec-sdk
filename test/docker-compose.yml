@@ -1,110 +1,35 @@
 version: '3.4'
+
+networks:
+  blockchain:
+  gateway:
+  resultproxy:
+
 services:
   token-chaintest-v5:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:v5-token'
+    image: 'iexechub/poco-chaintest:v5.0.1-token'
     expose:
       - '8545'
     ports:
       - 8545:8545
+    networks:
+      - blockchain
 
   native-chaintest-v5:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:v5-native'
+    image: 'iexechub/poco-chaintest:v5.0.1-native'
     expose:
       - '8545'
     ports:
       - 18545:8545
+    networks:
+      - blockchain
 
   token-chaintest-v5-1s:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:v5-token-1s'
+    image: 'iexechub/poco-chaintest:v5.0.1-token-1s'
     ports:
       - 28545:8545
-
-  token-sms:
-    image: nexus.iex.ec/iexec-sms:0.0.1-SNAPSHOT-4ccc1bb
-    environment:
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chaintest-v5:8545
-      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
-      - IEXEC_SCONE_CAS_HOST=cas
-      - SCONE_CAS_ADDR=cas:18765
-      - SCONE_LAS_ADDR=las:18766
-      - SCONE_CONFIG_ID=s1/iexec-sms
-      - SCONE_HEAP=3G
-      - SCONE_LOG=6
-      - SCONE_VERSION=1
-      - SCONE_SYSLIBS=1
-    ports:
-      - 5000:15000
-      - 5443:15443
-    depends_on:
-      - token-chaintest-v5
-
-  native-sms:
-    image: nexus.iex.ec/iexec-sms:0.0.1-SNAPSHOT-4ccc1bb
-    environment:
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://native-chaintest-v5:8545
-      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
-      - IEXEC_SCONE_CAS_HOST=cas
-      - SCONE_CAS_ADDR=cas:18765
-      - SCONE_LAS_ADDR=las:18766
-      - SCONE_CONFIG_ID=s1/iexec-sms
-      - SCONE_HEAP=3G
-      - SCONE_LOG=6
-      - SCONE_VERSION=1
-      - SCONE_SYSLIBS=1
-    ports:
-      - 15000:15000
-      - 15443:15443
-    depends_on:
-      - native-chaintest-v5
-
-  token-result-proxy:
-    image: nexus.iex.ec/iexec-result-proxy:0.0.1-SNAPSHOT-cbed534
-    environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chaintest-v5:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chaintest-v5:8545
-      - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=47017
-      - IEXEC_IPFS_HOST=ipfs
-    ports:
-      - 18089:18089
-
-  token-result-proxy-mongo:
-    image: mongo:4-xenial
-    entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 47017"
-    expose:
-      - '47017'
-
-  native-result-proxy:
-    image: nexus.iex.ec/iexec-result-proxy:0.0.1-SNAPSHOT-cbed534
-    environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://native-chaintest-v5:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://native-chaintest-v5:8545
-      - MONGO_HOST=native-result-proxy-mongo
-      - MONGO_PORT=47017
-      - IEXEC_IPFS_HOST=ipfs
-    ports:
-      - 28089:18089
-
-  result-proxy-mongo:
-    image: mongo:4-xenial
-    container_name: result-proxy-mongo
-    entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 47017"
-    expose:
-      - '47017'
-
-  ipfs:
-    restart: unless-stopped
-    image: ipfs/go-ipfs:v0.4.20
-    container_name: ipfs
-    volumes:
-      - /tmp/ipfs-docker-staging:/export
-      - /tmp/ipfs-docker-data:/data/ipfs
-    expose:
-      - '8080'
-      - '4001'
-      - '5001'
+    networks:
+      - blockchain
