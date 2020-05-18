@@ -3094,243 +3094,254 @@ describe('[order]', () => {
 });
 
 describe('[orderbook]', () => {
-  test('orderbook.fetchApporder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    const orderHash = await iexec.order.hashApporder(apporder);
-    await expect(iexec.orderbook.fetchApporder(orderHash)).rejects.toThrow(
-      Error(`No apporder found for id ${orderHash} on chain ${networkId}`),
-    );
-    await iexec.order.publishApporder(apporder);
-    const found = await iexec.orderbook.fetchApporder(orderHash);
-    expect(found.order).toLooseEqual(apporder);
-    expect(found.status).toBe('open');
-    expect(found.remaining).toBe(1);
-    expect(found.publicationTimestamp).toBeDefined();
-  });
-  test('orderbook.fetchDatasetorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const orderHash = await iexec.order.hashDatasetorder(datasetorder);
-    await expect(iexec.orderbook.fetchDatasetorder(orderHash)).rejects.toThrow(
-      Error(`No datasetorder found for id ${orderHash} on chain ${networkId}`),
-    );
-    await iexec.order.publishDatasetorder(datasetorder);
-    const found = await iexec.orderbook.fetchDatasetorder(orderHash);
-    expect(found.order).toLooseEqual(datasetorder);
-    expect(found.status).toBe('open');
-    expect(found.remaining).toBe(1);
-    expect(found.publicationTimestamp).toBeDefined();
-  });
-  test('orderbook.fetchWorkerpoolorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
-    await expect(
-      iexec.orderbook.fetchWorkerpoolorder(orderHash),
-    ).rejects.toThrow(
-      Error(
-        `No workerpoolorder found for id ${orderHash} on chain ${networkId}`,
-      ),
-    );
-    await iexec.order.publishWorkerpoolorder(workerpoolorder);
-    const found = await iexec.orderbook.fetchWorkerpoolorder(orderHash);
-    expect(found.order).toLooseEqual(workerpoolorder);
-    expect(found.status).toBe('open');
-    expect(found.remaining).toBe(1);
-    expect(found.publicationTimestamp).toBeDefined();
-  });
-  test('orderbook.fetchRequestorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    await iexec.order.publishApporder(apporder);
-    const requestorder = await iexec.order
-      .createRequestorder({
-        requester: await iexec.wallet.getAddress(),
-        app: apporder.app,
-        appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
-        datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
-        workerpoolmaxprice: 0,
-        category: 1,
-        trust: 0,
-        volume: 1,
-      })
-      .then(iexec.order.signRequestorder);
-    const orderHash = await iexec.order.hashRequestorder(requestorder);
-    await expect(iexec.orderbook.fetchRequestorder(orderHash)).rejects.toThrow(
-      Error(`No requestorder found for id ${orderHash} on chain ${networkId}`),
-    );
-    await iexec.order.publishRequestorder(requestorder);
-    const found = await iexec.orderbook.fetchRequestorder(orderHash);
-    expect(found.order).toLooseEqual(requestorder);
-    expect(found.status).toBe('open');
-    expect(found.remaining).toBe(1);
-    expect(found.publicationTimestamp).toBeDefined();
-  });
-  test('orderbook.fetchAppOrderbook()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const appAddress = getRandomAddress();
-    const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
-    expect(res.count).toBe(0);
-    expect(res.appOrders).toStrictEqual([]);
-  });
-  test('orderbook.fetchDatasetOrderbook()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const datasetAddress = getRandomAddress();
-    const res = await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
-    expect(res.count).toBe(0);
-    expect(res.datasetOrders).toStrictEqual([]);
-  });
-  test('orderbook.fetchWorkerpoolOrderbook()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const res = await iexec.orderbook.fetchWorkerpoolOrderbook(2);
-    expect(res.count).toBe(0);
-    expect(res.workerpoolOrders).toStrictEqual([]);
-  });
-  test('orderbook.fetchRequestOrderbook()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexecGatewayURL = DRONE
-      ? 'http://token-gateway:3000'
-      : 'http://localhost:13000';
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-      },
-    );
-    const res = await iexec.orderbook.fetchRequestOrderbook(2);
-    expect(res.count).toBe(0);
-    expect(res.requestOrders).toStrictEqual([]);
-  });
+  if (WITH_STACK) {
+    // this test requires running local stack
+    test('orderbook.fetchApporder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const apporder = await deployAndGetApporder(iexec);
+      const orderHash = await iexec.order.hashApporder(apporder);
+      await expect(iexec.orderbook.fetchApporder(orderHash)).rejects.toThrow(
+        Error(`No apporder found for id ${orderHash} on chain ${networkId}`),
+      );
+      await iexec.order.publishApporder(apporder);
+      const found = await iexec.orderbook.fetchApporder(orderHash);
+      expect(found.order).toLooseEqual(apporder);
+      expect(found.status).toBe('open');
+      expect(found.remaining).toBe(1);
+      expect(found.publicationTimestamp).toBeDefined();
+    });
+    test('orderbook.fetchDatasetorder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const datasetorder = await deployAndGetDatasetorder(iexec);
+      const orderHash = await iexec.order.hashDatasetorder(datasetorder);
+      await expect(
+        iexec.orderbook.fetchDatasetorder(orderHash),
+      ).rejects.toThrow(
+        Error(
+          `No datasetorder found for id ${orderHash} on chain ${networkId}`,
+        ),
+      );
+      await iexec.order.publishDatasetorder(datasetorder);
+      const found = await iexec.orderbook.fetchDatasetorder(orderHash);
+      expect(found.order).toLooseEqual(datasetorder);
+      expect(found.status).toBe('open');
+      expect(found.remaining).toBe(1);
+      expect(found.publicationTimestamp).toBeDefined();
+    });
+    test('orderbook.fetchWorkerpoolorder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
+      await expect(
+        iexec.orderbook.fetchWorkerpoolorder(orderHash),
+      ).rejects.toThrow(
+        Error(
+          `No workerpoolorder found for id ${orderHash} on chain ${networkId}`,
+        ),
+      );
+      await iexec.order.publishWorkerpoolorder(workerpoolorder);
+      const found = await iexec.orderbook.fetchWorkerpoolorder(orderHash);
+      expect(found.order).toLooseEqual(workerpoolorder);
+      expect(found.status).toBe('open');
+      expect(found.remaining).toBe(1);
+      expect(found.publicationTimestamp).toBeDefined();
+    });
+    test('orderbook.fetchRequestorder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const apporder = await deployAndGetApporder(iexec);
+      await iexec.order.publishApporder(apporder);
+      const requestorder = await iexec.order
+        .createRequestorder({
+          requester: await iexec.wallet.getAddress(),
+          app: apporder.app,
+          appmaxprice: apporder.appprice,
+          dataset: utils.NULL_ADDRESS,
+          datasetmaxprice: 0,
+          workerpool: utils.NULL_ADDRESS,
+          workerpoolmaxprice: 0,
+          category: 1,
+          trust: 0,
+          volume: 1,
+        })
+        .then(iexec.order.signRequestorder);
+      const orderHash = await iexec.order.hashRequestorder(requestorder);
+      await expect(
+        iexec.orderbook.fetchRequestorder(orderHash),
+      ).rejects.toThrow(
+        Error(
+          `No requestorder found for id ${orderHash} on chain ${networkId}`,
+        ),
+      );
+      await iexec.order.publishRequestorder(requestorder);
+      const found = await iexec.orderbook.fetchRequestorder(orderHash);
+      expect(found.order).toLooseEqual(requestorder);
+      expect(found.status).toBe('open');
+      expect(found.remaining).toBe(1);
+      expect(found.publicationTimestamp).toBeDefined();
+    });
+    test('orderbook.fetchAppOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const appAddress = getRandomAddress();
+      const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
+      expect(res.count).toBe(0);
+      expect(res.appOrders).toStrictEqual([]);
+    });
+    test('orderbook.fetchDatasetOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const datasetAddress = getRandomAddress();
+      const res = await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
+      expect(res.count).toBe(0);
+      expect(res.datasetOrders).toStrictEqual([]);
+    });
+    test('orderbook.fetchWorkerpoolOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const res = await iexec.orderbook.fetchWorkerpoolOrderbook(2);
+      expect(res.count).toBe(0);
+      expect(res.workerpoolOrders).toStrictEqual([]);
+    });
+    test('orderbook.fetchRequestOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const res = await iexec.orderbook.fetchRequestOrderbook(2);
+      expect(res.count).toBe(0);
+      expect(res.requestOrders).toStrictEqual([]);
+    });
+  }
 });
 
 describe('[observables]', () => {
