@@ -5,6 +5,7 @@ const {
   bnifyNestedEthersBn,
   cleanRPC,
   NULL_BYTES32,
+  NULL_BYTES,
   sleep,
   FETCH_INTERVAL,
 } = require('./utils');
@@ -22,6 +23,20 @@ const TASK_STATUS_MAP = {
   3: 'COMPLETED',
   4: 'FAILED',
   timeout: 'TIMEOUT',
+};
+
+const decodeTaskResult = (results) => {
+  try {
+    if (results !== NULL_BYTES) {
+      const json = JSON.parse(
+        Buffer.from(results.substr(2), 'hex').toString('utf8'),
+      );
+      return json;
+    }
+  } catch (e) {
+    // nothing to do
+  }
+  return {};
 };
 
 const show = async (
@@ -42,14 +57,7 @@ const show = async (
     const now = Math.floor(Date.now() / 1000);
     const consensusTimeout = parseInt(task.finalDeadline, 10);
     const taskTimedOut = task.status !== 3 && now >= consensusTimeout;
-
-    const decodedResult = task.results
-      && Buffer.from(task.results.substr(2), 'hex').toString('utf8');
-    const displayResult = decodedResult
-      && (decodedResult.substr(0, 6) === '/ipfs/'
-        || decodedResult.substr(0, 4) === 'http')
-      ? decodedResult
-      : task.results;
+    const decodedResult = decodeTaskResult(task.results);
     return {
       taskid: vTaskId,
       ...task,
@@ -58,7 +66,7 @@ const show = async (
           ? TASK_STATUS_MAP.timeout
           : TASK_STATUS_MAP[task.status],
       taskTimedOut,
-      results: displayResult,
+      results: decodedResult,
     };
   } catch (error) {
     debug('show()', error);
