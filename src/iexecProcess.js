@@ -34,11 +34,16 @@ const fetchTaskResults = async (
     const task = await taskModule.show(contracts, vTaskId);
     if (task.status !== 3) throw Error('Task is not completed');
     const { storage, location } = task.results;
-    if (!storage || !location) {
+    if (storage === 'none') {
       throw Error('No result uploaded for this task');
     }
     if (storage !== 'ipfs') {
       throw Error(`Task result stored on ${storage}, download not supported`);
+    }
+    if (!location) {
+      throw Error(
+        'Missing location key in task results, download not supported',
+      );
     }
     const res = await downloadFromIpfs(location, { ipfsGatewayURL });
     return res;

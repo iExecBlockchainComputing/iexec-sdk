@@ -36,7 +36,7 @@ const decodeTaskResult = (results) => {
   } catch (e) {
     // nothing to do
   }
-  return {};
+  return { storage: 'none' };
 };
 
 const show = async (
