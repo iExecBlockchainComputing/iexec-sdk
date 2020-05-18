@@ -16,6 +16,7 @@ const {
 const { loadChain } = require('./chains');
 const { Keystore } = require('./keystore');
 const orderbook = require('./orderbook');
+const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const objName = 'orderbook';
 
@@ -43,6 +44,7 @@ orderbookApp
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchAppOrderbook(
         chain.contracts,
+        chain.iexecGateway || IEXEC_GATEWAY_URL,
         address,
         Object.assign({}, { dataset }, { workerpool }, { requester }),
       );
@@ -95,6 +97,7 @@ orderbookDataset
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchDatasetOrderbook(
         chain.contracts,
+        chain.iexecGateway || IEXEC_GATEWAY_URL,
         address,
         Object.assign({}, { app }, { workerpool }, { requester }),
       );
@@ -143,6 +146,7 @@ orderbookWorkerpool
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.contracts,
+        chain.iexecGateway || IEXEC_GATEWAY_URL,
         cmd.category,
         { workerpoolAddress: address, minTag },
       );
@@ -193,6 +197,7 @@ orderbookRequester
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchRequestOrderbook(
         chain.contracts,
+        chain.iexecGateway || IEXEC_GATEWAY_URL,
         cmd.category,
         { requesterAddress: address },
       );

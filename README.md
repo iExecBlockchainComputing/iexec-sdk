@@ -1078,7 +1078,7 @@ console.log('tx:', txHash);
 
 #### fetchAppOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, appOrders: \[ { order: SignedApporder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified app
 >
@@ -1098,13 +1098,13 @@ _Example:_
 const res = await iexec.orderbook.fetchAppOrderbook(
   '0xdBDF1FE51fd3AF9aD94fb63824EbD977518d64b3',
 );
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.appOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchDatasetOrderbook
 
-iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
+iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, datasetOrders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified dataset
 >
@@ -1124,13 +1124,13 @@ _Example:_
 const res = await iexec.orderbook.fetchDatasetOrderbook(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
 );
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.datasetOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, workerpoolOrders: \[ { order: SignedWorkerpoolorder, status, remaining} \] }** >
 
 > find the cheapest orders for computing resource in specified category.
 >
@@ -1147,13 +1147,13 @@ _Example:_
 
 ```js
 const res = await iexec.orderbook.fetchWorkerpoolOrderbook('1');
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.workerpoolOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchRequestOrderbook
 
-iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
+iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, requestOrders: \[ { order: SignedRequestorder, status, remaining} \] }** >
 
 > find the best paying request orders for computing resource in specified category.
 >
@@ -1170,7 +1170,7 @@ _Example:_
 
 ```js
 const res = await iexec.orderbook.fetchRequestOrderbook('1');
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.requestOrders[0].order);
 console.log('total orders:', res.count);
 ```
 

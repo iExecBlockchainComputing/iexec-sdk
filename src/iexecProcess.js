@@ -2,13 +2,8 @@ const Debug = require('debug');
 const { Observable, SafeObserver } = require('./reactive');
 const dealModule = require('./deal');
 const taskModule = require('./task');
-const {
-  getAuthorization,
-  download,
-  NULL_ADDRESS,
-  sleep,
-  FETCH_INTERVAL,
-} = require('./utils');
+const { NULL_ADDRESS, sleep, FETCH_INTERVAL } = require('./utils');
+const { getAuthorization, downloadZipApi } = require('./api-utils');
 const { getAddress } = require('./wallet');
 const { bytes32Schema, throwIfMissing } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
@@ -20,14 +15,10 @@ const downloadFromIpfs = async (
   { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
 ) => {
   try {
-    debug(
-      'downloadFromIpfs()',
-      'ipfsGatewayURL',
-      ipfsGatewayURL,
-      'ipfsAddress',
-      ipfsAddress,
-    );
-    const res = await download('GET')(ipfsAddress, {}, {}, ipfsGatewayURL);
+    const res = await await downloadZipApi.get({
+      api: ipfsGatewayURL,
+      endpoint: ipfsAddress,
+    });
     return res;
   } catch (error) {
     throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
@@ -35,19 +26,18 @@ const downloadFromIpfs = async (
 };
 
 const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
-  const resultRepoBaseURL = task.results.split(`${taskid}`)[0];
-  const authorization = await getAuthorization(
+  const resultRepoBaseURL = task.results.split(`/${taskid}`)[0];
+  const authorization = await getAuthorization(resultRepoBaseURL, '/challenge')(
     contracts.chainId,
     userAddress,
     contracts.jsonRpcProvider,
-    { apiURL: resultRepoBaseURL },
   );
-  const res = await download('GET')(
-    taskid,
-    { chainId: contracts.chainId },
-    { authorization },
-    resultRepoBaseURL,
-  );
+  const res = await downloadZipApi.get({
+    api: resultRepoBaseURL,
+    endpoint: `/${taskid}`,
+    query: { chainId: contracts.chainId },
+    headers: { authorization },
+  });
   return res;
 };
 

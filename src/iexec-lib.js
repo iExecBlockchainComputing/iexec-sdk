@@ -28,6 +28,7 @@ const {
   decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
+const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const utils = {
   BN,
@@ -54,6 +55,7 @@ class IExec {
       bridgedNetworkConf,
       resultProxyURL,
       smsURL,
+      iexecGatewayURL,
     } = {},
   ) {
     const contracts = createIExecContracts({
@@ -109,6 +111,13 @@ class IExec {
       throw Error(
         `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
+    };
+
+    const getIexecGatewayURL = () => {
+      if (iexecGatewayURL) {
+        return iexecGatewayURL;
+      }
+      return IEXEC_GATEWAY_URL;
     };
 
     this.wallet = {};
@@ -173,33 +182,42 @@ class IExec {
       {
         appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
       } = {},
-    ) => deal.fetchRequesterDeals(contracts, requesterAddress, {
-      appAddress,
-      datasetAddress,
-      workerpoolAddress,
-      beforeTimestamp,
-    });
+    ) => deal.fetchRequesterDeals(
+      contracts,
+      getIexecGatewayURL(),
+      requesterAddress,
+      {
+        appAddress,
+        datasetAddress,
+        workerpoolAddress,
+        beforeTimestamp,
+      },
+    );
     this.deal.claim = dealid => deal.claim(contracts, dealid);
-    // this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
-    //   order.APP_ORDER,
-    //   contracts.chainId,
-    //   apporderHash,
-    // );
-    // this.deal.fetchDealsByDatasetorder = datasetorderHash => order.fetchDealsByOrderHash(
-    //   order.DATASET_ORDER,
-    //   contracts.chainId,
-    //   datasetorderHash,
-    // );
-    // this.deal.fetchDealsByWorkerpoolorder = workerpoolorderHash => order.fetchDealsByOrderHash(
-    //   order.WORKERPOOL_ORDER,
-    //   contracts.chainId,
-    //   workerpoolorderHash,
-    // );
-    // this.deal.fetchDealsByRequestorder = requestorderHash => order.fetchDealsByOrderHash(
-    //   order.REQUEST_ORDER,
-    //   contracts.chainId,
-    //   requestorderHash,
-    // );
+    this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
+      getIexecGatewayURL(),
+      order.APP_ORDER,
+      contracts.chainId,
+      apporderHash,
+    );
+    this.deal.fetchDealsByDatasetorder = datasetorderHash => order.fetchDealsByOrderHash(
+      getIexecGatewayURL(),
+      order.DATASET_ORDER,
+      contracts.chainId,
+      datasetorderHash,
+    );
+    this.deal.fetchDealsByWorkerpoolorder = workerpoolorderHash => order.fetchDealsByOrderHash(
+      getIexecGatewayURL(),
+      order.WORKERPOOL_ORDER,
+      contracts.chainId,
+      workerpoolorderHash,
+    );
+    this.deal.fetchDealsByRequestorder = requestorderHash => order.fetchDealsByOrderHash(
+      getIexecGatewayURL(),
+      order.REQUEST_ORDER,
+      contracts.chainId,
+      requestorderHash,
+    );
     this.order = {};
     this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
     this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
@@ -217,14 +235,38 @@ class IExec {
     this.order.cancelDatasetorder = signedDatasetorder => order.cancelDatasetorder(contracts, signedDatasetorder);
     this.order.cancelWorkerpoolorder = signedWorkerpoolorder => order.cancelWorkerpoolorder(contracts, signedWorkerpoolorder);
     this.order.cancelRequestorder = signedRequestorder => order.cancelRequestorder(contracts, signedRequestorder);
-    this.order.publishApporder = signedApporder => order.publishApporder(contracts, signedApporder);
-    this.order.publishDatasetorder = signedDatasetorder => order.publishDatasetorder(contracts, signedDatasetorder);
-    this.order.publishWorkerpool = signedWorkerpoolorder => order.publishWorkerpoolorder(contracts, signedWorkerpoolorder);
-    this.order.publishRequestorder = signedRequestorder => order.publishRequestorder(contracts, signedRequestorder);
-    this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, apporderHash);
-    this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(contracts, datasetorderHash);
-    this.order.unpublishWorkerpool = workerpoolorderHash => order.unpublishWorkerpoolorder(contracts, workerpoolorderHash);
-    this.order.unpublishRequestorder = requestorderHash => order.unpublishRequestorder(contracts, requestorderHash);
+    this.order.publishApporder = signedApporder => order.publishApporder(contracts, getIexecGatewayURL(), signedApporder);
+    this.order.publishDatasetorder = signedDatasetorder => order.publishDatasetorder(
+      contracts,
+      getIexecGatewayURL(),
+      signedDatasetorder,
+    );
+    this.order.publishWorkerpoolorder = signedWorkerpoolorder => order.publishWorkerpoolorder(
+      contracts,
+      getIexecGatewayURL(),
+      signedWorkerpoolorder,
+    );
+    this.order.publishRequestorder = signedRequestorder => order.publishRequestorder(
+      contracts,
+      getIexecGatewayURL(),
+      signedRequestorder,
+    );
+    this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, getIexecGatewayURL(), apporderHash);
+    this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(
+      contracts,
+      getIexecGatewayURL(),
+      datasetorderHash,
+    );
+    this.order.unpublishWorkerpoolorder = workerpoolorderHash => order.unpublishWorkerpoolorder(
+      contracts,
+      getIexecGatewayURL(),
+      workerpoolorderHash,
+    );
+    this.order.unpublishRequestorder = requestorderHash => order.unpublishRequestorder(
+      contracts,
+      getIexecGatewayURL(),
+      requestorderHash,
+    );
     this.order.matchOrders = ({
       apporder,
       datasetorder = order.NULL_DATASETORDER,
@@ -239,29 +281,53 @@ class IExec {
     );
     this.orderbook = {};
     this.orderbook.fetchApporder = apporderHash => order.fetchPublishedOrderByHash(
+      getIexecGatewayURL(),
       order.APP_ORDER,
       contracts.chainId,
       apporderHash,
     );
     this.orderbook.fetchDatasetorder = datasetorderHash => order.fetchPublishedOrderByHash(
+      getIexecGatewayURL(),
       order.DATASET_ORDER,
       contracts.chainId,
       datasetorderHash,
     );
     this.orderbook.fetchWorkerpoolorder = workerpoolorderHash => order.fetchPublishedOrderByHash(
+      getIexecGatewayURL(),
       order.WORKERPOOL_ORDER,
       contracts.chainId,
       workerpoolorderHash,
     );
     this.orderbook.fetchRequestorder = requestorderHash => order.fetchPublishedOrderByHash(
+      getIexecGatewayURL(),
       order.REQUEST_ORDER,
       contracts.chainId,
       requestorderHash,
     );
-    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(contracts, appAddress, options);
-    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(contracts, datasetAddress, options);
-    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(contracts, category, options);
-    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(contracts, category, options);
+    this.orderbook.fetchAppOrderbook = (appAddress, options = {}) => orderbook.fetchAppOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      appAddress,
+      options,
+    );
+    this.orderbook.fetchDatasetOrderbook = (datasetAddress, options = {}) => orderbook.fetchDatasetOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      datasetAddress,
+      options,
+    );
+    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      category,
+      options,
+    );
+    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(
+      contracts,
+      getIexecGatewayURL(),
+      category,
+      options,
+    );
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });

@@ -4,10 +4,10 @@ const {
   cleanRPC,
   bnifyNestedEthersBn,
   ethersBnToBn,
-  http,
   NULL_ADDRESS,
   BN,
 } = require('./utils');
+const { jsonApi } = require('./api-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -25,6 +25,7 @@ const debug = Debug('iexec:deal');
 
 const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
   {
     appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
@@ -71,7 +72,11 @@ const fetchRequesterDeals = async (
       },
       find,
     };
-    const response = await http.post('deals', body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return {
         count: response.count,

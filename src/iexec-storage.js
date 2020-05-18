@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
 const cli = require('commander');
 const {
   help,
@@ -19,8 +18,6 @@ const secretMgtServ = require('./sms.js');
 const resultProxyServ = require('./result-proxy.js');
 const { getStorageTokenKeyName } = require('./secrets-utils');
 const { Keystore } = require('./keystore');
-
-const debug = Debug('iexec:iexec-storage');
 
 const initStorage = cli.command('init [provider]');
 addGlobalOptions(initStorage);

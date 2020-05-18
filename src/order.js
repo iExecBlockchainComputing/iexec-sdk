@@ -4,9 +4,7 @@ const {
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
-  http,
   getSalt,
-  getAuthorization,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
@@ -16,6 +14,7 @@ const {
   checkActiveBitInTag,
   tagBitToHuman,
 } = require('./utils');
+const { jsonApi, getAuthorization } = require('./api-utils');
 const { hashEIP712 } = require('./sig-utils');
 const { getAddress } = require('./wallet');
 const { checkBalance } = require('./account');
@@ -109,7 +108,7 @@ const objDesc = {
     ownerMethod: getAppOwner,
     cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
-    apiEndpoint: 'apporders',
+    apiEndpoint: '/apporders',
     dealField: 'appHash',
   },
   [DATASET_ORDER]: {
@@ -128,7 +127,7 @@ const objDesc = {
     ownerMethod: getDatasetOwner,
     cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
-    apiEndpoint: 'datasetorders',
+    apiEndpoint: '/datasetorders',
     dealField: 'datasetHash',
   },
   [WORKERPOOL_ORDER]: {
@@ -149,7 +148,7 @@ const objDesc = {
     ownerMethod: getWorkerpoolOwner,
     cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
-    apiEndpoint: 'workerpoolorders',
+    apiEndpoint: '/workerpoolorders',
     dealField: 'workerpoolHash',
   },
   [REQUEST_ORDER]: {
@@ -173,7 +172,7 @@ const objDesc = {
     ],
     cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
-    apiEndpoint: 'requestorders',
+    apiEndpoint: '/requestorders',
     dealField: 'requestHash',
   },
 };
@@ -482,6 +481,7 @@ const cancelRequestorder = async (
 
 const publishOrder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   signedOrder = throwIfMissing(),
@@ -489,14 +489,18 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
     const body = { chainId, order: signedOrder };
-    const authorization = await getAuthorization(
-      chainId,
+    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
+      contracts.chainId,
       address,
       contracts.jsonRpcProvider,
     );
-    const response = await http.post(endpoint, body, { authorization });
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/publish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
     }
@@ -509,9 +513,11 @@ const publishOrder = async (
 
 const publishApporder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedApporder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   APP_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedApporderSchema().validate(signedApporder),
@@ -519,9 +525,11 @@ const publishApporder = async (
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   DATASET_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedDatasetorderSchema().validate(signedDatasetorder),
@@ -529,9 +537,11 @@ const publishDatasetorder = async (
 
 const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   WORKERPOOL_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
@@ -539,9 +549,11 @@ const publishWorkerpoolorder = async (
 
 const publishRequestorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   REQUEST_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedRequestorderSchema().validate(signedRequestorder),
@@ -549,6 +561,7 @@ const publishRequestorder = async (
 
 const unpublishOrder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
@@ -556,14 +569,18 @@ const unpublishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
     const body = { chainId, orderHash };
-    const authorization = await getAuthorization(
-      chainId,
+    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
+      contracts.chainId,
       address,
       contracts.jsonRpcProvider,
     );
-    const response = await http.post(endpoint, body, { authorization });
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/unpublish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
@@ -576,9 +593,11 @@ const unpublishOrder = async (
 
 const unpublishApporder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   apporderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   APP_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(apporderHash),
@@ -586,9 +605,11 @@ const unpublishApporder = async (
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   DATASET_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(datasetorderHash),
@@ -596,9 +617,11 @@ const unpublishDatasetorder = async (
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   WORKERPOOL_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(workerpoolorderHash),
@@ -606,15 +629,18 @@ const unpublishWorkerpoolorder = async (
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   requestorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   REQUEST_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await bytes32Schema().validate(requestorderHash),
 );
 
 const fetchPublishedOrderByHash = async (
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
@@ -633,13 +659,16 @@ const fetchPublishedOrderByHash = async (
       limit: 1,
       find: { orderHash: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint,
+      body,
+    });
     if (response.ok && response.orders) {
       if (response.orders[0]) return response.orders[0];
       throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
     }
-
-    throw Error('An error occured while getting order');
+    throw Error('An error occured while fetching order');
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);
     throw error;
@@ -647,6 +676,7 @@ const fetchPublishedOrderByHash = async (
 };
 
 const fetchDealsByOrderHash = async (
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
@@ -656,7 +686,6 @@ const fetchDealsByOrderHash = async (
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const hashFiedName = objDesc[orderName].dealField;
-    const endpoint = 'deals';
     const body = {
       chainId: vChainId,
       sort: {
@@ -665,7 +694,11 @@ const fetchDealsByOrderHash = async (
       limit: 1,
       find: { [hashFiedName]: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
     }
