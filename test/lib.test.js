@@ -1916,7 +1916,7 @@ describe('[dataset]', () => {
         iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
       ).rejects.toThrow(
         Error(
-          `secret already exists for ${datasetAddress} and can't be updated`,
+          `Secret already exists for ${datasetAddress} and can't be updated`,
         ),
       );
     });
@@ -1942,7 +1942,7 @@ describe('[dataset]', () => {
         iexec.dataset.pushDatasetSecret(randomAddress, 'oops'),
       ).rejects.toThrow(
         Error(
-          `wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
         ),
       );
     });
@@ -1975,7 +1975,7 @@ describe('[dataset]', () => {
         iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
       ).rejects.toThrow(
         Error(
-          `wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
+          `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
         ),
       );
     });
@@ -2429,7 +2429,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTemplate,
         requestorder: requestorderTemplate,
       }),
-    ).rejects.toThrow(Error(`no app deployed at address ${POOR_ADDRESS3}`));
+    ).rejects.toThrow(Error(`No app deployed at address ${POOR_ADDRESS3}`));
     const datasetorderNotDeployed = {
       ...datasetorderTemplate,
       dataset: POOR_ADDRESS3,
@@ -2441,7 +2441,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTemplate,
         requestorder: requestorderTemplate,
       }),
-    ).rejects.toThrow(Error(`no dataset deployed at address ${POOR_ADDRESS3}`));
+    ).rejects.toThrow(Error(`No dataset deployed at address ${POOR_ADDRESS3}`));
     const workerpoolorderNotDeployed = {
       ...workerpoolorderTemplate,
       workerpool: POOR_ADDRESS3,
@@ -2454,7 +2454,7 @@ describe('[order]', () => {
         requestorder: requestorderTemplate,
       }),
     ).rejects.toThrow(
-      Error(`no workerpool deployed at address ${POOR_ADDRESS3}`),
+      Error(`No workerpool deployed at address ${POOR_ADDRESS3}`),
     );
     // invalid sign
     const apporderInvalidSign = {
@@ -2610,7 +2610,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTagGpu,
         requestorder: requestorderTagTeeGpu,
       }),
-    ).rejects.toThrow(Error('missing tags [tee] in workerpoolorder'));
+    ).rejects.toThrow(Error('Missing tags [tee] in workerpoolorder'));
     const apporderTagGpu = await iexec.order.signApporder({
       ...apporderTemplate,
       tag: utils.encodeTag(['gpu']),
@@ -2622,7 +2622,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTagTee,
         requestorder: requestorderTemplate,
       }),
-    ).rejects.toThrow(Error('missing tags [gpu] in workerpoolorder'));
+    ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
     const datasetorderTagTeeGpu = await iexec.order.signDatasetorder({
       ...datasetorderTemplate,
       tag: utils.encodeTag(['gpu', 'tee']),
@@ -2634,7 +2634,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTagTee,
         requestorder: requestorderTemplate,
       }),
-    ).rejects.toThrow(Error('missing tags [gpu] in workerpoolorder'));
+    ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
     // app tag check
     const datasetorderTagTee = await iexec.order.signDatasetorder({
       ...datasetorderTemplate,
@@ -2647,7 +2647,7 @@ describe('[order]', () => {
         workerpoolorder: workerpoolorderTagTee,
         requestorder: requestorderTemplate,
       }),
-    ).rejects.toThrow(Error('missing tag [tee] in apporder'));
+    ).rejects.toThrow(Error('Missing tag [tee] in apporder'));
     // price check
     const apporderTooExpensive = await iexec.order.signApporder({
       ...apporderTemplate,
@@ -2795,7 +2795,7 @@ describe('[order]', () => {
       }),
     ).rejects.toThrow(
       Error(
-        "cost per task (6) is greather than requester account stake (5). orders can't be matched. if you are the requester, you should deposit to top up your account",
+        "Cost per task (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account",
       ),
     );
 
@@ -2821,7 +2821,7 @@ describe('[order]', () => {
       }),
     ).rejects.toThrow(
       Error(
-        "workerpool required stake (2) is greather than workerpool owner's account stake (1). orders can't be matched. if you are the workerpool owner, you should deposit to top up your account",
+        "workerpool required stake (2) is greather than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account",
       ),
     );
 
@@ -3989,7 +3989,7 @@ describe('[result]', () => {
         iexec.result.pushResultEncryptionKey('oops'),
       ).rejects.toThrow(
         Error(
-          `secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
+          `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
         ),
       );
     });
@@ -4127,7 +4127,7 @@ describe('[storage]', () => {
       expect(pushRes.isUpdated).toBe(false);
       await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
         Error(
-          `secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
         ),
       );
     });
@@ -4158,7 +4158,7 @@ describe('[storage]', () => {
         iexec.storage.pushStorageToken('oops', { provider: 'default' }),
       ).rejects.toThrow(
         Error(
-          `secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
         ),
       );
     });
@@ -4189,7 +4189,7 @@ describe('[storage]', () => {
         iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
       ).rejects.toThrow(
         Error(
-          `secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
+          `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
         ),
       );
     });
@@ -4626,7 +4626,7 @@ describe('[lib utils]', () => {
       );
     });
     test('encodeTag unknown tag', () => {
-      expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('unknown tag foo');
+      expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('Unknown tag foo');
     });
   });
   describe('decodeTag', () => {
@@ -4640,7 +4640,7 @@ describe('[lib utils]', () => {
     test('decodeTag unknown bit tag', () => {
       expect(() => utils.decodeTag(
         '0x0000000000000000000000000000000000000000000000000000000000000002',
-      )).toThrow('unknown bit 2');
+      )).toThrow('Unknown bit 2');
     });
   });
   describe('sumTags', () => {

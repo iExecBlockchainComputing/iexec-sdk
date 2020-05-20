@@ -552,7 +552,7 @@ const computeWalletCreateOptions = async (cmd) => {
       );
     }
     if (!pw && !cmd.unencrypted) {
-      throw Error('missing wallet password');
+      throw Error('Missing wallet password');
     }
     if (pw && cmd.unencrypted) {
       spinner.warn('option --unencrypted will be ingnored');

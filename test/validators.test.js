@@ -283,12 +283,12 @@ describe('[tagSchema]', () => {
   });
   test('unknown tag in array', async () => {
     await expect(tagSchema().validate(['foo'])).rejects.toThrow(
-      new ValidationError('invalid tag: unknown tag foo'),
+      new ValidationError('Invalid tag: Unknown tag foo'),
     );
   });
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
-      new ValidationError('invalid tag: unknown tag foo'),
+      new ValidationError('Invalid tag: Unknown tag foo'),
     );
   });
 });

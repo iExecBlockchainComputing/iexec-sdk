@@ -132,7 +132,7 @@ decryptResults
 
       if (!exists) {
         throw Error(
-          'beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
+          'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
         );
       }
 

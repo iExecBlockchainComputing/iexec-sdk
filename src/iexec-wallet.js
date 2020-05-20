@@ -263,7 +263,7 @@ sendETH
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       const weiAmount = parseEther(amount).toString();
-      if (!cmd.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
@@ -305,7 +305,7 @@ sendRLC
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
 
-      if (!cmd.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('Missing --to option');
 
       if (!cmd.force) {
         await prompt.transferRLC(nRlcAmount, chain.name, cmd.to, chain.id);
@@ -349,7 +349,7 @@ sweep
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
-      if (!cmd.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ETH and RLC')(
           chain.name,

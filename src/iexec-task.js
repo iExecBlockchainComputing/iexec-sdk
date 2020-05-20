@@ -104,7 +104,7 @@ show
             const exists = await fs.pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
-                "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+                'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
             let beneficiaryKeyPath;

@@ -83,20 +83,20 @@ const loadChain = async (
             conf = chainConf;
           }
         });
-        if (!name) throw Error(`missing "${chainName}" chain in "chain.json"`);
+        if (!name) throw Error(`Missing "${chainName}" chain in "chain.json"`);
       }
     } else if (chainsConf.default) {
       if (chainsConf.chains[chainsConf.default]) {
         name = chainsConf.default;
         conf = chainsConf.chains[chainsConf.default];
       } else {
-        throw Error(`missing "${chainsConf.default}" chain in "chain.json"`);
+        throw Error(`Missing "${chainsConf.default}" chain in "chain.json"`);
       }
     } else if (chainsConf.chains && chainsConf.chains.kovan) {
       name = 'kovan';
       conf = chainsConf.chain.kovan;
     }
-    if (!name) throw Error('missing chain parameter. Check your "chain.json" file');
+    if (!name) throw Error('Missing chain parameter. Check your "chain.json" file');
     debug('loading chain', name, conf);
     let bridgeConf;
     if (conf.bridge && conf.bridge.bridgedNetworkId) {

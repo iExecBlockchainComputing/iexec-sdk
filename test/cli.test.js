@@ -2738,7 +2738,7 @@ describe('[Common]', () => {
         );
         expect(resPushNotAllowed.ok).toBe(false);
         expect(resPushNotAllowed.error.message).toBe(
-          `wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
         );
         await execAsync(`${iexecPath} dataset init`);
         await setDatasetUniqueName();
@@ -2756,7 +2756,7 @@ describe('[Common]', () => {
         );
         expect(resAlreadyExists.ok).toBe(false);
         expect(resAlreadyExists.error.message).toBe(
-          `secret already exists for ${address} and can't be updated`,
+          `Secret already exists for ${address} and can't be updated`,
         );
       }, 15000);
 

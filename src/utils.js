@@ -223,7 +223,7 @@ const TAG_MAP = {
 const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
   tags.forEach((tag) => {
-    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`unknown tag ${tag}`);
+    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`Unknown tag ${tag}`);
     binaryTags[TAG_MAP[tag] - 1] = true;
   });
   const binString = binaryTags.reduce(
@@ -243,7 +243,7 @@ const decodeTag = (tag) => {
     const current = binString.charAt(binString.length - i);
     if (current === '1') {
       const currentTag = TAG_MAP[i];
-      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`unknown bit ${i}`);
+      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`Unknown bit ${i} in tag`);
       tags.push(currentTag);
     }
   }
@@ -291,13 +291,13 @@ const findMissingBitsInTag = (tag, requiredTag) => {
 
 const checkActiveBitInTag = (tag, bit) => {
   if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
-  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   return binString.charAt(binString.length - bit) === '1';
 };
 
 const tagBitToHuman = (bit) => {
-  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('invalid bit tag');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
   return TAG_MAP[bit] || bit;
 };
 
@@ -388,7 +388,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
           // remove pkcs7 padding
           const lastChunk = chunks[chunks.length - 1];
           const padding = lastChunk[lastChunk.length - 1];
-          if (!padding || padding > 16 || padding > lastChunk.length) throw Error('invalid padding');
+          if (!padding || padding > 16 || padding > lastChunk.length) throw Error('Invalid padding');
           const unpaddedChunk = lastChunk.slice(0, lastChunk.length - padding);
           chunks[chunks.length - 1] = unpaddedChunk;
           resolve(Buffer.concat(chunks));
