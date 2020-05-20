@@ -13,57 +13,34 @@ const packageJSON = require('../package.json');
 const debug = Debug('help');
 
 const info = {
-  waitMiners: () => 'waiting for transaction to be mined...',
-  checkBalance: currency => `checking ${currency} balances...`,
-  topUp: currency => `Run "iexec wallet get${currency}" to ask faucets for ${currency}`,
-  userAborted: () => 'operation aborted by user.',
-  logging: () => 'logging into iExec...',
-  creating: obj => `creating ${obj}...`,
-  placing: obj => `placing ${obj}...`,
-  filling: obj => `filling ${obj}...`,
-  cancelling: obj => `cancelling ${obj}...`,
-  deploying: obj => `deploying ${obj}...`,
-  showing: obj => `showing ${obj}...`,
-  counting: obj => `counting ${obj}...`,
-  depositing: () => 'making deposit...',
-  watching: obj => `watching ${obj}...`,
-  claiming: obj => `claiming ${obj}...`,
-  deposited: amount => `deposited ${amount} nRLC to your iExec account`,
-  withdrawing: () => 'making withdraw...',
-  withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
-  downloading: () => 'downloading result',
-  decrypting: () => 'decrypting result',
-  downloaded: filePath => `downloaded task result to file ${filePath}`,
-  claimed: (amount, address) => `claimed ${amount} nRLC from work ${address}`,
+  checkBalance: currency => `Checking ${currency} balances...`,
+  userAborted: () => 'Operation aborted by user.',
+  creating: obj => `Creating ${obj}...`,
+  filling: obj => `Filling ${obj}...`,
+  cancelling: obj => `Cancelling ${obj}...`,
+  deploying: obj => `Deploying ${obj}...`,
+  showing: obj => `Showing ${obj}...`,
+  counting: obj => `Counting ${obj}...`,
+  depositing: () => 'Making deposit...',
+  claiming: obj => `Claiming ${obj}...`,
+  deposited: amount => `Deposited ${amount} nRLC to your iExec account`,
+  withdrawing: () => 'Making withdraw...',
+  withdrawed: amount => `Withdrawed ${amount} nRLC from your iExec account`,
+  downloading: () => 'Downloading result',
+  decrypting: () => 'Decrypting result',
+  downloaded: filePath => `Downloaded task result to file ${filePath}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
-  checking: obj => `checking ${obj}...`,
-  tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
-  valid: obj => `${obj} is valid`,
-  notValid: obj => `${obj} is NOT valid`,
-  teeInit: () => 'created TEE folders tree structure',
+  checking: obj => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
-const command = {
-  show: () => 'show',
-  deposit: () => 'deposit <amount>',
-  withdraw: () => 'withdraw <amount>',
-  fill: () => 'fill',
-  cancel: () => 'cancel',
-  sign: () => 'sign',
-  publish: () => 'publish',
-  unpublish: () => 'unpublish',
-};
-
 const desc = {
   raw: () => 'use raw output',
-  hubAddress: () => 'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chain.json"',
   userAddress: () => 'custom user address',
   initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
-  placeObj: objName => `place a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
@@ -72,7 +49,6 @@ const desc = {
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   claimObj: objName => `claim a ${objName} that is not COMPLETED`,
-  login: () => 'login into your iExec account',
   deposit: () => 'deposit RLC onto your iExec account',
   withdraw: () => 'withdraw RLC from your iExec account',
   getETH: () => 'apply for ETH from pre-registered faucets',
@@ -80,18 +56,13 @@ const desc = {
   sendETH: () => 'send ETH to an address',
   sendRLC: () => 'send nRLC to an address',
   sweep: () => 'send all ETH and RLC to an address',
-  encryptWallet: () => 'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
-  decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
-  encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
-  teeInit: () => 'init the TEE folders tree structure',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
   publish: objName => `publish a signed ${objName}`,
   unpublish: objName => `unpublish a signed ${objName}`,
-  pushSecret: () => 'push a secret to the secret management service',
   pushDatasetSecret: () => 'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () => 'push the public encryption key to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
@@ -102,13 +73,13 @@ const desc = {
   bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
   initStorage: () => 'initialize the remote storage',
+  checkStorage: () => 'check if the remote storage is initialized',
 };
 
 const option = {
   quiet: () => ['--quiet', 'stop prompting updates'],
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
-  hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
@@ -324,7 +295,7 @@ const addWalletLoadOptions = (cli) => {
 
 const question = async (
   message,
-  { error = 'operation aborted by user', strict = true } = {},
+  { error = info.userAborted(), strict = true } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
@@ -340,7 +311,7 @@ const question = async (
 
 const promptPassword = async (
   message,
-  { error = 'operation aborted by user', strict = true, useMask = false } = {},
+  { error = info.userAborted(), strict = true, useMask = false } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
@@ -797,7 +768,6 @@ module.exports = {
   Spinner,
   handleError,
   info,
-  command,
   desc,
   option,
   addGlobalOptions,

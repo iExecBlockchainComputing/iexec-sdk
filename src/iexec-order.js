@@ -15,7 +15,6 @@ const {
   pretty,
   info,
   isBytes32,
-  command,
   prompt,
 } = require('./cli-helper');
 const {
@@ -114,7 +113,7 @@ init
     }
   });
 
-const sign = cli.command(command.sign());
+const sign = cli.command('sign');
 addGlobalOptions(sign);
 addWalletLoadOptions(sign);
 sign
@@ -280,7 +279,7 @@ sign
     }
   });
 
-const fill = cli.command(command.fill());
+const fill = cli.command('fill');
 addGlobalOptions(fill);
 addWalletLoadOptions(fill);
 fill
@@ -404,7 +403,7 @@ fill
     }
   });
 
-const publish = cli.command(command.publish());
+const publish = cli.command('publish');
 addGlobalOptions(publish);
 addWalletLoadOptions(publish);
 publish
@@ -507,7 +506,7 @@ publish
     }
   });
 
-const unpublish = cli.command(command.unpublish());
+const unpublish = cli.command('unpublish');
 addGlobalOptions(unpublish);
 addWalletLoadOptions(unpublish);
 unpublish
@@ -627,7 +626,7 @@ unpublish
     }
   });
 
-const cancel = cli.command(command.cancel());
+const cancel = cli.command('cancel');
 addGlobalOptions(cancel);
 addWalletLoadOptions(cancel);
 cancel

@@ -17,13 +17,12 @@ const {
   desc,
   Spinner,
   info,
-  command,
   pretty,
 } = require('./cli-helper');
 
 const objName = 'account';
 
-const deposit = cli.command(command.deposit());
+const deposit = cli.command('deposit <amount>');
 addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
@@ -52,7 +51,7 @@ deposit
     }
   });
 
-const withdraw = cli.command(command.withdraw());
+const withdraw = cli.command('withdraw <amount>');
 addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw

@@ -120,7 +120,6 @@ async function main() {
   addGlobalOptions(infoCmd);
   infoCmd
     .option(...option.chain())
-    .option(...option.hub())
     .description(desc.info())
     .action(async (cmd) => {
       await checkUpdate(cmd);
@@ -134,9 +133,7 @@ async function main() {
         spinner.start(info.checking('iExec contracts info'));
         const hubAddress = await addressSchema({
           ethProvider: chain.contracts.jsonRpcProvider,
-        }).validate(
-          cmd.hub || chain.hub || (await chain.contracts.fetchIExecAddress()),
-        );
+        }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
         const useNative = !!chain.contracts.isNative;
         const rlcAddress = useNative
           ? undefined
