@@ -46,7 +46,7 @@ create
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `Your wallet address is ${res.address}\nwallet saved in "${
+        `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
         { raw: res },
@@ -74,7 +74,7 @@ importPk
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `Your wallet address is ${res.address}\nwallet saved in "${
+        `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
         { raw: res },
@@ -184,7 +184,7 @@ getEth
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
-      spinner.start(`requesting ETH from ${chain.name} faucets...`);
+      spinner.start(`Requesting ETH from ${chain.name} faucets...`);
       const faucetsResponses = await wallet.getETH(chain.name, address);
       const responsesString = faucetsResponses.reduce(
         (accu, curr) => accu.concat(
@@ -221,7 +221,7 @@ getRlc
         keystore.load(),
         loadChain(cmd.chain, keystore, { spinner }),
       ]);
-      spinner.start(`requesting ${chain.name} faucet for nRLC...`);
+      spinner.start(`Requesting ${chain.name} faucet for nRLC...`);
       const faucetsResponses = await wallet.getRLC(chain.name, address);
       const responsesString = faucetsResponses.reduce(
         (accu, curr) => accu.concat(
@@ -269,7 +269,7 @@ sendETH
       }
 
       const message = `${amount} ${chain.name} ETH from ${address} to ${cmd.to}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const txHash = await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
@@ -312,7 +312,7 @@ sendRLC
       }
 
       const message = `${nRlcAmount} ${chain.name} nRLC from ${address} to ${cmd.to}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
 
       const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, cmd.to);
 
@@ -357,7 +357,7 @@ sweep
           chain.id,
         );
       }
-      spinner.start('sweeping wallet...');
+      spinner.start('Sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
         chain.contracts,
         cmd.to,
@@ -428,7 +428,7 @@ bridgeToSidechain
         && chain.bridgedNetwork.bridge.contract
       );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const { sendTxHash, receiveTxHash } = await wallet.bridgeToSidechain(
         chain.contracts,
         bridgeAddress,
@@ -508,7 +508,7 @@ bridgeToMainchain
         && chain.bridgedNetwork.bridge.contract
       );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const { sendTxHash, receiveTxHash } = await wallet.bridgeToMainchain(
         chain.contracts,
         bridgeAddress,

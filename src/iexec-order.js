@@ -66,7 +66,7 @@ init
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
         try {
-          spinner.start(`creating ${orderName}`);
+          spinner.start(`Creating ${orderName}`);
           const overwrite = {};
           if (resourceName === 'request') {
             const [address] = await keystore.accounts();
@@ -98,7 +98,7 @@ init
 
       if (failed.length === 0) {
         spinner.succeed(
-          "Successfully initialized, you can edit in 'iexec.json'",
+          'Successfully initialized, you can edit in "iexec.json"',
           {
             raw: success,
           },
@@ -145,7 +145,7 @@ sign
       const failed = [];
 
       const signAppOrder = async () => {
-        spinner.start('signing apporder');
+        spinner.start('Signing apporder');
         try {
           const orderObj = iexecConf.order.apporder;
           if (!orderObj) {
@@ -173,7 +173,7 @@ sign
       };
 
       const signDatasetOrder = async () => {
-        spinner.start('signing datasetorder');
+        spinner.start('Signing datasetorder');
         try {
           const orderObj = iexecConf.order.datasetorder;
           if (!orderObj) {
@@ -202,7 +202,7 @@ sign
       };
 
       const signWorkerpoolOrder = async () => {
-        spinner.start('signing workerpoolorder');
+        spinner.start('Signing workerpoolorder');
         try {
           const orderObj = iexecConf.order.workerpoolorder;
           if (!orderObj) {
@@ -232,7 +232,7 @@ sign
       };
 
       const signRequestOrder = async () => {
-        spinner.start('signing requestorder');
+        spinner.start('Signing requestorder');
         try {
           const orderObj = iexecConf.order.requestorder;
           if (!orderObj) {
@@ -266,7 +266,7 @@ sign
       if (cmd.request || signAll) await signRequestOrder();
 
       if (failed.length === 0) {
-        spinner.succeed("Successfully signed and stored in 'orders.json'", {
+        spinner.succeed('Successfully signed and stored in "orders.json"', {
           raw: success,
         });
       } else {
@@ -443,7 +443,7 @@ publish
             );
           }
           if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
-          spinner.start(`publishing ${orderName}`);
+          spinner.start(`Publishing ${orderName}`);
 
           let orderHash;
           switch (orderName) {
@@ -565,7 +565,7 @@ unpublish
             }
           }
 
-          spinner.start(`unpublishing ${orderName}`);
+          spinner.start(`Unpublishing ${orderName}`);
           let unpublished;
           switch (orderName) {
             case order.APP_ORDER:
@@ -667,7 +667,7 @@ cancel
             );
           }
           if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
-          spinner.start(`canceling ${orderName}`);
+          spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
             case order.APP_ORDER:

@@ -112,7 +112,7 @@ claim
         dealid,
       );
       spinner.succeed(
-        `${objName} successfully claimed (${
+        `Deal successfully claimed (${
           Object.keys(claimed).length
         } tasks claimed)`,
         { raw: { claimed, transactions } },

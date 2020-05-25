@@ -343,7 +343,7 @@ const prompt = {
   confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
-  overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
+  overwrite: (file, options) => question(`"${file}" already exists, replace it with new one?`, options),
   dirNotEmpty: (dir, options) => question(
     `Directory ${dir} is not empty, continue and replace content?`,
     options,
@@ -515,7 +515,7 @@ const computeWalletCreateOptions = async (cmd) => {
     if (cmd.password) {
       pw = cmd.password;
       spinner.warn(
-        'option --password may be unsafe, make sure to know what you do',
+        'Option --password may be unsafe, make sure to know what you do',
       );
     } else if (!cmd.unencrypted) {
       pw = await prompt.confimedPassword(
@@ -526,11 +526,11 @@ const computeWalletCreateOptions = async (cmd) => {
       throw Error('Missing wallet password');
     }
     if (pw && cmd.unencrypted) {
-      spinner.warn('option --unencrypted will be ingnored');
+      spinner.warn('Option --unencrypted will be ingnored');
     }
     if (cmd.unencrypted) {
       spinner.warn(
-        'using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
+        'Using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
       );
     }
 
@@ -650,7 +650,7 @@ const handleError = (error, cli, cmd) => {
   if (!cmd || !cmd.raw) {
     console.log('\n');
   }
-  spinner.fail(`command "${commandName}" failed with ${error}`, {
+  spinner.fail(`Command "${commandName}" failed with ${error}`, {
     raw: {
       command: commandName,
       error: { name: error.name, message: error.message },

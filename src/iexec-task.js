@@ -192,7 +192,7 @@ claim
       ]);
       spinner.start(info.claiming(objName));
       const txHash = await taskModule.claim(chain.contracts, taskid);
-      spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
+      spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);
     }

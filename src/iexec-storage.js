@@ -121,7 +121,7 @@ checkStorage
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAdress = cmd.user || address;
       spinner.info(
-        `checking ${providerName} storage token for user ${userAdress}`,
+        `Checking ${providerName} storage token for user ${userAdress}`,
       );
       const tokenExists = await secretMgtServ.checkWeb2SecretExists(
         contracts,

@@ -109,7 +109,7 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await keystore.load();
@@ -169,7 +169,7 @@ show
         );
       }
       const { dataset, objAddress } = res;
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(dataset)}`, {
+      spinner.succeed(`Dataset ${objAddress} details:${pretty(dataset)}`, {
         raw: { address: objAddress, dataset },
       });
     } catch (error) {
@@ -281,7 +281,7 @@ encryptDataset
 
       if (!eDSF || !eODF || !eEDF) {
         throw Error(
-          "Folders for dataset encryption are missing, did you forget to run 'iexec dataset init --encrypted'?",
+          'Folders for dataset encryption are missing, did you forget to run "iexec dataset init --encrypted"?',
         );
       }
 

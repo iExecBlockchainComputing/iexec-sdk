@@ -76,7 +76,7 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await keystore.load();
@@ -136,7 +136,7 @@ show
       }
       const { workerpool, objAddress } = res;
       const cleanObj = stringifyNestedBn(workerpool);
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(cleanObj)}`, {
+      spinner.succeed(`Workerpool ${objAddress} details:${pretty(cleanObj)}`, {
         raw: { address: objAddress, workerpool: cleanObj },
       });
     } catch (error) {

@@ -68,7 +68,7 @@ async function main() {
           spinner.info(
             `Your wallet address is ${
               walletRes.address
-            } wallet file saved in "${
+            } Wallet file saved in "${
               walletRes.fileName
             }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
           );

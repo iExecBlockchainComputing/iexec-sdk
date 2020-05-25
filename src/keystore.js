@@ -178,7 +178,7 @@ const Keystore = ({
       } catch (error) {
         debug('getWalletFileName()', error);
         throw Error(
-          `Missing keystore directory ${fileDir}, did you forget to run 'iexec wallet create' ?`,
+          `Missing keystore directory ${fileDir}, did you forget to run "iexec wallet create" ?`,
         );
       }
       const match = files

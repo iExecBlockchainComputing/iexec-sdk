@@ -60,7 +60,7 @@ create
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await keystore.load();

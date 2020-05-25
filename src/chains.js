@@ -113,7 +113,7 @@ const loadChain = async (
       bridgeConf,
       txOptions,
     });
-    spinner.info(`using chain [${name}]`);
+    spinner.info(`Using chain [${name}]`);
     return chain;
   } catch (error) {
     debug('loadChain()', error);
