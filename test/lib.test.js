@@ -670,7 +670,7 @@ describe('[workflow]', () => {
     expect(showTaskActiveRes.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(showTaskActiveRes.results).toBe('0x');
+    expect(showTaskActiveRes.results).toStrictEqual({ storage: 'none' });
     expect(showTaskActiveRes.idx.eq(new BN(taskIdxToInit))).toBe(true);
     expect(showTaskActiveRes.statusName).toBe('TIMEOUT');
     expect(showTaskActiveRes.taskTimedOut).toBe(true);

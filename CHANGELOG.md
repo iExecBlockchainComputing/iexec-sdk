@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec result push-secret` is deprecated, use `iexec result push-encryption-key`
 - [BREAKING] `iexec result check-secret` is deprecated, use `iexec result check-encryption-key` returned json key is now `isEncryptionKeySet` previously was `isKnownAddress`
 - [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
+- [BREAKING] `iexec task show` & `task.show(taskid)` returned task.results is an object previously was url or hexString
 - fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods
 - fixed method name `iexec.order.publishWorkerpoolorder()`

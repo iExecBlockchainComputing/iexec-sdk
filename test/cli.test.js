@@ -1410,7 +1410,7 @@ describe('[Mainchain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
     expect(res.task.taskTimedOut).toBe(false);
     expect(res.claimable).toBe(false);
@@ -1444,7 +1444,7 @@ describe('[Mainchain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
     expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(true);
@@ -1484,7 +1484,7 @@ describe('[Mainchain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
     expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(false);
@@ -2132,7 +2132,7 @@ describe('[Sidechain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
     expect(res.task.taskTimedOut).toBe(false);
     expect(res.claimable).toBe(false);
@@ -2166,7 +2166,7 @@ describe('[Sidechain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
     expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(true);
@@ -2206,7 +2206,7 @@ describe('[Sidechain]', () => {
     expect(res.task.resultDigest).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    expect(res.task.results).toBe('0x');
+    expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
     expect(res.task.taskTimedOut).toBe(true);
     expect(res.claimable).toBe(false);

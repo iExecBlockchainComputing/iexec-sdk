@@ -2,9 +2,8 @@ const Debug = require('debug');
 const { Observable, SafeObserver } = require('./reactive');
 const dealModule = require('./deal');
 const taskModule = require('./task');
-const { NULL_ADDRESS, sleep, FETCH_INTERVAL } = require('./utils');
-const { getAuthorization, downloadZipApi } = require('./api-utils');
-const { getAddress } = require('./wallet');
+const { sleep, FETCH_INTERVAL } = require('./utils');
+const { downloadZipApi } = require('./api-utils');
 const { bytes32Schema, throwIfMissing } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
 
@@ -25,22 +24,6 @@ const downloadFromIpfs = async (
   }
 };
 
-const downloadFromResultRepo = async (contracts, taskid, task, userAddress) => {
-  const resultRepoBaseURL = task.results.split(`/${taskid}`)[0];
-  const authorization = await getAuthorization(resultRepoBaseURL, '/challenge')(
-    contracts.chainId,
-    userAddress,
-    contracts.jsonRpcProvider,
-  );
-  const res = await downloadZipApi.get({
-    api: resultRepoBaseURL,
-    endpoint: `/${taskid}`,
-    query: { chainId: contracts.chainId },
-    headers: { authorization },
-  });
-  return res;
-};
-
 const fetchTaskResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
@@ -48,30 +31,21 @@ const fetchTaskResults = async (
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const userAddress = await getAddress(contracts);
     const task = await taskModule.show(contracts, vTaskId);
     if (task.status !== 3) throw Error('Task is not completed');
-
-    const tasksDeal = await dealModule.show(contracts, task.dealid);
-    if (
-      userAddress.toLowerCase() !== tasksDeal.beneficiary.toLowerCase()
-      && NULL_ADDRESS !== tasksDeal.beneficiary.toLowerCase()
-    ) {
-      throw Error(
-        `Only beneficiary ${tasksDeal.beneficiary} can download the result`,
-      );
-    }
-    const resultAddress = task.results;
-    let res;
-    if (resultAddress && resultAddress.substr(0, 6) === '/ipfs/') {
-      debug('download from ipfs', resultAddress);
-      res = await downloadFromIpfs(resultAddress, { ipfsGatewayURL });
-    } else if (resultAddress && resultAddress.substr(0, 2) !== '0x') {
-      debug('download from result repo', resultAddress);
-      res = await downloadFromResultRepo(contracts, vTaskId, task, userAddress);
-    } else {
+    const { storage, location } = task.results;
+    if (storage === 'none') {
       throw Error('No result uploaded for this task');
     }
+    if (storage !== 'ipfs') {
+      throw Error(`Task result stored on ${storage}, download not supported`);
+    }
+    if (!location) {
+      throw Error(
+        'Missing location key in task results, download not supported',
+      );
+    }
+    const res = await downloadFromIpfs(location, { ipfsGatewayURL });
     return res;
   } catch (error) {
     debug('fetchResults()', error);
