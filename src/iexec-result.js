@@ -32,6 +32,8 @@ const { decryptResult } = require('./utils');
 
 const debug = Debug('iexec:iexec-result');
 
+cli.name('iexec result').usage('<command> [options]');
+
 const generateKeys = cli
   .command('generate-encryption-keypair')
   .alias('generate-keys');

@@ -30,6 +30,8 @@ const { formatEth, NULL_ADDRESS } = require('./utils');
 
 const objName = 'wallet';
 
+cli.name('iexec wallet').usage('<command> [options]');
+
 const create = cli.command('create');
 addGlobalOptions(create);
 addWalletCreateOptions(create);

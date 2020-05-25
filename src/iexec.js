@@ -25,6 +25,7 @@ const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
+cli.name('iexec').usage('[command] [options]');
 
 async function main() {
   const init = cli.command('init');

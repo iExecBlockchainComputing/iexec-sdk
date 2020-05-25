@@ -30,6 +30,8 @@ const { NULL_ADDRESS } = require('./utils');
 
 const objName = 'workerpool';
 
+cli.name('iexec workerpool').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);

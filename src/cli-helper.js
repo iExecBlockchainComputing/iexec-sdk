@@ -443,7 +443,7 @@ const oraOptions = {
   },
 };
 
-const helpMessage = '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
+const helpMessage = '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n';
 const outputHelpMessage = () => console.log(helpMessage);
 const helpCB = (mess) => {
   const newMessage = mess.concat(helpMessage);
@@ -456,7 +456,6 @@ const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
 
   cli.parse(process.argv);
   if (checkNoArgs && process.argv.length < 3) {
-    console.log('');
     console.log(colors.red('Missing argument'));
     console.log('');
     cli.help(helpCB);
@@ -465,7 +464,6 @@ const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
       !cli.commands.find(({ _name }) => _name === cli.rawArgs[2])
       && !cli.commands.find(({ _alias }) => _alias === cli.rawArgs[2])
     ) {
-      console.log('');
       console.log(colors.red(`Unknown command "${cli._name} ${cli.args[0]}"`));
       console.log('');
       cli.help(helpCB);

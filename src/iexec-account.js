@@ -22,6 +22,8 @@ const {
 
 const objName = 'account';
 
+cli.name('iexec account').usage('<command> [options]');
+
 const deposit = cli.command('deposit <amount>');
 addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);

@@ -24,6 +24,8 @@ const { obsDeal } = require('./iexecProcess');
 
 const objName = 'deal';
 
+cli.name('iexec deal').usage('<command> [options]');
+
 const show = cli.command('show <dealid>');
 addGlobalOptions(show);
 addWalletLoadOptions(show);

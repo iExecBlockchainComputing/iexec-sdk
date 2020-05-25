@@ -19,6 +19,8 @@ const resultProxyServ = require('./result-proxy.js');
 const { getStorageTokenKeyName } = require('./secrets-utils');
 const { Keystore } = require('./keystore');
 
+cli.name('iexec storage').usage('<command> [options]');
+
 const initStorage = cli.command('init [provider]');
 addGlobalOptions(initStorage);
 addWalletLoadOptions(initStorage);

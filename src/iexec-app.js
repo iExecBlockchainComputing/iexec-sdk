@@ -82,6 +82,8 @@ const debug = Debug('iexec:iexec-app');
 
 const objName = 'app';
 
+cli.name('iexec app').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);

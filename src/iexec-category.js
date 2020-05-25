@@ -22,6 +22,8 @@ const { Keystore } = require('./keystore');
 
 const objName = 'category';
 
+cli.name('iexec category').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {

@@ -41,6 +41,8 @@ const debug = Debug('iexec:iexec-dataset');
 
 const objName = 'dataset';
 
+cli.name('iexec dataset').usage('<command> [options]');
+
 const defaultSecretName = 'dataset.secret';
 
 const init = cli.command('init');

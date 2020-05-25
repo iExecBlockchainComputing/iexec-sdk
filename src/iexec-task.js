@@ -30,6 +30,8 @@ const { fetchTaskResults } = require('./iexecProcess');
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
 
+cli.name('iexec task').usage('<command> [options]');
+
 const show = cli.command('show <taskid>');
 addGlobalOptions(show);
 addWalletLoadOptions(show);

@@ -34,6 +34,8 @@ const { IEXEC_GATEWAY_URL } = require('./api-utils');
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
+cli.name('iexec order').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);

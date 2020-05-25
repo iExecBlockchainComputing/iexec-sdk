@@ -29,6 +29,8 @@ const {
 
 const debug = Debug('iexec:iexec-registry');
 
+cli.name('iexec registry').usage('<command> [options]');
+
 const LOGO_SIDE = 180;
 const repo = 'https://github.com/iExecBlockchainComputing/';
 const objectNames = ['app', 'workerpool', 'dataset'];

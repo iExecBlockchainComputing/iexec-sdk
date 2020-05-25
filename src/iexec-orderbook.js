@@ -20,6 +20,8 @@ const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const objName = 'orderbook';
 
+cli.name('iexec orderbook').usage('<command> [options]');
+
 const orderbookApp = cli.command('app <address>');
 addGlobalOptions(orderbookApp);
 orderbookApp
