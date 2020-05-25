@@ -141,7 +141,7 @@ const tagSchema = () => mixed()
         const bytes32Tag = encodeTag(value);
         return bytes32Tag;
       } catch (e) {
-        return `invalid tag: ${e.message}`;
+        return `Invalid tag: ${e.message}`;
       }
     }
     if (typeof value === 'string') {
@@ -151,10 +151,10 @@ const tagSchema = () => mixed()
         const bytes32Tag = encodeTag(value.split(','));
         return bytes32Tag;
       } catch (e) {
-        return `invalid tag: ${e.message}`;
+        return `Invalid tag: ${e.message}`;
       }
     }
-    return 'invalid tag';
+    return 'Invalid tag';
   })
   .test('no-transform-error', '${value}', async (value) => {
     if (value.substr(0, 2) !== '0x') return false;
@@ -268,7 +268,7 @@ const multiaddressSchema = () => mixed().transform((value) => {
   if (typeof value === 'string') {
     return humanToMultiaddrBuffer(value, { strict: false });
   }
-  throw new ValidationError('invalid multiaddr');
+  throw new ValidationError('Invalid multiaddr');
 });
 
 const mrenclaveSchema = () => mixed().transform((value) => {
@@ -306,7 +306,7 @@ const categorySchema = () => object({
 });
 
 const throwIfMissing = () => {
-  throw new ValidationError('missing parameter');
+  throw new ValidationError('Missing parameter');
 };
 
 module.exports = {

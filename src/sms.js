@@ -134,12 +134,12 @@ const pushWeb3Secret = async (
     }
     if (res.status === 409) {
       throw Error(
-        `secret already exists for ${vResourceAddress} and can't be updated`,
+        `Secret already exists for ${vResourceAddress} and can't be updated`,
       );
     }
     if (res.status === 401) {
       throw Error(
-        `wallet ${vSignerAddress} is not allowed to set secret for ${vResourceAddress}`,
+        `Wallet ${vSignerAddress} is not allowed to set secret for ${vResourceAddress}`,
       );
     }
     throw Error(
@@ -169,7 +169,7 @@ const pushWeb2Secret = async (
       secretName,
     );
     if (secretExists && !forceUpdate) {
-      throw Error(`secret "${secretName}" already exists for ${ownerAddress}`);
+      throw Error(`Secret "${secretName}" already exists for ${ownerAddress}`);
     }
     const update = !!secretExists;
     const challenge = getChallengeForSetWeb2Secret(

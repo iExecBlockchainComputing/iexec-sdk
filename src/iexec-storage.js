@@ -19,6 +19,8 @@ const resultProxyServ = require('./result-proxy.js');
 const { getStorageTokenKeyName } = require('./secrets-utils');
 const { Keystore } = require('./keystore');
 
+cli.name('iexec storage').usage('<command> [options]');
+
 const initStorage = cli.command('init [provider]');
 addGlobalOptions(initStorage);
 addWalletLoadOptions(initStorage);
@@ -103,7 +105,7 @@ addGlobalOptions(checkStorage);
 addWalletLoadOptions(checkStorage);
 checkStorage
   .option(...option.user())
-  .description(desc.initStorage())
+  .description(desc.checkStorage())
   .action(async (provider, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
@@ -121,7 +123,7 @@ checkStorage
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAdress = cmd.user || address;
       spinner.info(
-        `checking ${providerName} storage token for user ${userAdress}`,
+        `Checking ${providerName} storage token for user ${userAdress}`,
       );
       const tokenExists = await secretMgtServ.checkWeb2SecretExists(
         contracts,

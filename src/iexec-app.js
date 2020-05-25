@@ -82,6 +82,8 @@ const debug = Debug('iexec:iexec-app');
 
 const objName = 'app';
 
+cli.name('iexec app').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
@@ -128,7 +130,7 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await keystore.load();
@@ -183,7 +185,7 @@ show
         res = await showUserApp(chain.contracts, addressOrIndex, userAddress);
       }
       const { app, objAddress } = res;
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(app)}`, {
+      spinner.succeed(`App ${objAddress} details:${pretty(app)}`, {
         raw: { address: objAddress, app },
       });
     } catch (error) {
@@ -576,7 +578,7 @@ run
         );
       }
 
-      spinner.start('submitting deal');
+      spinner.start('Submitting deal');
       const { dealid, volume, txHash } = await matchOrders(
         chain.contracts,
         apporder,
@@ -588,11 +590,11 @@ run
       result.deals.push({ dealid, volume: volume.toString(), txHash });
 
       if (!watch) {
-        spinner.succeed(`deal submitted with dealid ${dealid}`, {
+        spinner.succeed(`Deal submitted with dealid ${dealid}`, {
           raw: result,
         });
       } else {
-        spinner.info(`deal submitted with dealid ${dealid}`);
+        spinner.info(`Deal submitted with dealid ${dealid}`);
 
         const waitDealFinalState = () => new Promise((resolve, reject) => {
           let dealState;

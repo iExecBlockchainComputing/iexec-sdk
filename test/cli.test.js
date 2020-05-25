@@ -257,34 +257,44 @@ afterAll(() => {
 
 describe('[cli]', () => {
   test('iexec', async () => {
-    const out = await execAsync(`${iexecPath}`);
-    expect(out.indexOf('Usage: iexec [options] [command]')).not.toBe(-1);
+    const out = await execAsync(`${iexecPath}`).catch(e => e);
+    expect(out instanceof Error).toBe(true);
+    expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
+      -1,
+    );
   });
   test('invalid command', async () => {
     const out = await execAsync(`${iexecPath} test`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Unknown command "iexec test"')).not.toBe(-1);
-    expect(out.message.indexOf('Usage: iexec [options] [command]')).not.toBe(
-      -1,
-    );
+    expect(
+      out.message.indexOf("error: unknown command 'test'. See 'iexec --help'."),
+    ).not.toBe(-1);
+  });
+  test('unknown option', async () => {
+    const out = await execAsync(`${iexecPath} --test`).catch(e => e);
+    expect(out instanceof Error).toBe(true);
+    expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
   test('missing subcommand', async () => {
     const out = await execAsync(`${iexecPath} app`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Missing argument')).not.toBe(-1);
     expect(
-      out.message.indexOf('Usage: iexec-app [options] [command]'),
+      out.message.indexOf('Usage: iexec app <command> [options]'),
     ).not.toBe(-1);
   });
   test('invalid subcommand', async () => {
     const out = await execAsync(`${iexecPath} app test`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Unknown command "iexec-app test"')).not.toBe(
-      -1,
-    );
     expect(
-      out.message.indexOf('Usage: iexec-app [options] [command]'),
+      out.message.indexOf(
+        "error: unknown command 'test'. See 'iexec app --help'.",
+      ),
     ).not.toBe(-1);
+  });
+  test('subcommand unknown option', async () => {
+    const out = await execAsync(`${iexecPath} app --test`).catch(e => e);
+    expect(out instanceof Error).toBe(true);
+    expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
 });
 
@@ -2738,7 +2748,7 @@ describe('[Common]', () => {
         );
         expect(resPushNotAllowed.ok).toBe(false);
         expect(resPushNotAllowed.error.message).toBe(
-          `wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
         );
         await execAsync(`${iexecPath} dataset init`);
         await setDatasetUniqueName();
@@ -2756,7 +2766,7 @@ describe('[Common]', () => {
         );
         expect(resAlreadyExists.ok).toBe(false);
         expect(resAlreadyExists.error.message).toBe(
-          `secret already exists for ${address} and can't be updated`,
+          `Secret already exists for ${address} and can't be updated`,
         );
       }, 15000);
 

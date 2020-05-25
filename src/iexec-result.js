@@ -32,6 +32,8 @@ const { decryptResult } = require('./utils');
 
 const debug = Debug('iexec:iexec-result');
 
+cli.name('iexec result').usage('<command> [options]');
+
 const generateKeys = cli
   .command('generate-encryption-keypair')
   .alias('generate-keys');
@@ -132,7 +134,7 @@ decryptResults
 
       if (!exists) {
         throw Error(
-          'beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
+          'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
         );
       }
 

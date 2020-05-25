@@ -289,7 +289,7 @@ const zipDirectory = async (dirPath, { force = false } = {}) => {
               await fs.readFile(path.join(dirPath, relativePath)),
             );
           } else {
-            throw Error(`cannot zip ${pathArray}`);
+            throw Error(`Cannot zip ${pathArray}`);
           }
         }),
       );

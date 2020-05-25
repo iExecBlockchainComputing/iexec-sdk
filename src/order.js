@@ -745,14 +745,14 @@ const matchOrders = async (
     // deployment checks
     const checkAppDeployedAsync = async () => {
       if (!(await checkDeployedApp(contracts, vAppOrder.app))) {
-        throw new Error(`no app deployed at address ${vAppOrder.app}`);
+        throw new Error(`No app deployed at address ${vAppOrder.app}`);
       }
     };
     const checkDatasetDeployedAsync = async () => {
       if (vDatasetOrder.dataset !== NULL_ADDRESS) {
         if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
           throw new Error(
-            `no dataset deployed at address ${vDatasetOrder.dataset}`,
+            `No dataset deployed at address ${vDatasetOrder.dataset}`,
           );
         }
       }
@@ -762,7 +762,7 @@ const matchOrders = async (
         !(await checkDeployedWorkerpool(contracts, vWorkerpoolOrder.workerpool))
       ) {
         throw new Error(
-          `no workerpool deployed at address ${vWorkerpoolOrder.workerpool}`,
+          `No workerpool deployed at address ${vWorkerpoolOrder.workerpool}`,
         );
       }
     };
@@ -873,7 +873,7 @@ const matchOrders = async (
     );
     if (workerpoolMissingTagBits.length > 0) {
       throw Error(
-        `missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+        `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
       );
     }
     // app tag check
@@ -883,7 +883,7 @@ const matchOrders = async (
     );
     if (teeAppRequired) {
       if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
-        throw Error('missing tag [tee] in apporder');
+        throw Error('Missing tag [tee] in apporder');
       }
     }
     // price check
@@ -950,7 +950,7 @@ const matchOrders = async (
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
-          `cost per task (${costPerTask}) is greather than requester account stake (${stake}). orders can't be matched. if you are the requester, you should deposit to top up your account`,
+          `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
         );
       }
     };
@@ -965,7 +965,7 @@ const matchOrders = async (
       const requiredStake = workerpoolPrice.mul(new BN(30)).div(new BN(100));
       if (stake.lt(requiredStake)) {
         throw Error(
-          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). orders can't be matched. if you are the workerpool owner, you should deposit to top up your account`,
+          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
         );
       }
     };

@@ -25,6 +25,7 @@ const packageJSON = require('../package.json');
 const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
+cli.name('iexec').usage('[command] [options]');
 
 async function main() {
   const init = cli.command('init');
@@ -68,7 +69,7 @@ async function main() {
           spinner.info(
             `Your wallet address is ${
               walletRes.address
-            } wallet file saved in "${
+            } Wallet file saved in "${
               walletRes.fileName
             }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
           );
@@ -120,7 +121,6 @@ async function main() {
   addGlobalOptions(infoCmd);
   infoCmd
     .option(...option.chain())
-    .option(...option.hub())
     .description(desc.info())
     .action(async (cmd) => {
       await checkUpdate(cmd);
@@ -134,9 +134,7 @@ async function main() {
         spinner.start(info.checking('iExec contracts info'));
         const hubAddress = await addressSchema({
           ethProvider: chain.contracts.jsonRpcProvider,
-        }).validate(
-          cmd.hub || chain.hub || (await chain.contracts.fetchIExecAddress()),
-        );
+        }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
         const useNative = !!chain.contracts.isNative;
         const rlcAddress = useNative
           ? undefined

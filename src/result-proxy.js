@@ -23,13 +23,13 @@ const login = async (
       body: authorization,
     }).catch((e) => {
       debug(e);
-      throw Error(`result proxy at ${resultProxyURL} didn't answered`);
+      throw Error(`Result Proxy at ${resultProxyURL} didn't answered`);
     });
     if (res.ok) {
       const token = await res.text();
       return token;
     }
-    throw Error(`result proxy login failed: ${res.status} ${res.statusText}`);
+    throw Error(`Result Proxy login failed: ${res.status} ${res.statusText}`);
   } catch (error) {
     debug('login()', error);
     throw error;

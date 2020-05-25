@@ -22,6 +22,8 @@ const { Keystore } = require('./keystore');
 
 const objName = 'category';
 
+cli.name('iexec category').usage('<command> [options]');
+
 const init = cli.command('init');
 addGlobalOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
@@ -60,7 +62,7 @@ create
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await keystore.load();

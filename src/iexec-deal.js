@@ -24,6 +24,8 @@ const { obsDeal } = require('./iexecProcess');
 
 const objName = 'deal';
 
+cli.name('iexec deal').usage('<command> [options]');
+
 const show = cli.command('show <dealid>');
 addGlobalOptions(show);
 addWalletLoadOptions(show);
@@ -112,7 +114,7 @@ claim
         dealid,
       );
       spinner.succeed(
-        `${objName} successfully claimed (${
+        `Deal successfully claimed (${
           Object.keys(claimed).length
         } tasks claimed)`,
         { raw: { claimed, transactions } },

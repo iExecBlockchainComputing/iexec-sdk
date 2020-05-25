@@ -20,6 +20,8 @@ const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const objName = 'orderbook';
 
+cli.name('iexec orderbook').usage('<command> [options]');
+
 const orderbookApp = cli.command('app <address>');
 addGlobalOptions(orderbookApp);
 orderbookApp
@@ -59,7 +61,7 @@ orderbookApp
         : [];
 
       const successMessage = appOrders.length > 0
-        ? `Orderbook\napp orders details:${pretty(appOrders)}\n`
+        ? `Orderbook\nApp orders details:${pretty(appOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -67,7 +69,7 @@ orderbookApp
           appOrders: response.appOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -112,7 +114,7 @@ orderbookDataset
         : [];
 
       const successMessage = datasetOrders.length > 0
-        ? `Orderbook\ndataset orders details:${pretty(datasetOrders)}\n`
+        ? `Orderbook\nDataset orders details:${pretty(datasetOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -120,7 +122,7 @@ orderbookDataset
           datasetOrders: response.datasetOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -163,7 +165,7 @@ orderbookWorkerpool
         : [];
 
       const successMessage = workerpoolOrders.length > 0
-        ? `Orderbook\nworkerpool orders details:${pretty(workerpoolOrders)}\n`
+        ? `Orderbook\nWorkerpool orders details:${pretty(workerpoolOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -172,7 +174,7 @@ orderbookWorkerpool
           workerpoolOrders: response.workerpoolOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -217,7 +219,7 @@ orderbookRequester
         : [];
 
       const successMessage = requestOrders.length > 0
-        ? `Orderbook\nrequest orders details:${pretty(requestOrders)}\n`
+        ? `Orderbook\nRequest orders details:${pretty(requestOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -225,7 +227,7 @@ orderbookRequester
           requestOrders: response.requestOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }

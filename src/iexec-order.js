@@ -15,7 +15,6 @@ const {
   pretty,
   info,
   isBytes32,
-  command,
   prompt,
 } = require('./cli-helper');
 const {
@@ -34,6 +33,8 @@ const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
+
+cli.name('iexec order').usage('<command> [options]');
 
 const init = cli.command('init');
 addGlobalOptions(init);
@@ -67,7 +68,7 @@ init
       const initOrder = async (resourceName) => {
         const orderName = resourceName.concat('order');
         try {
-          spinner.start(`creating ${orderName}`);
+          spinner.start(`Creating ${orderName}`);
           const overwrite = {};
           if (resourceName === 'request') {
             const [address] = await keystore.accounts();
@@ -99,7 +100,7 @@ init
 
       if (failed.length === 0) {
         spinner.succeed(
-          "Successfully initialized, you can edit in 'iexec.json'",
+          'Successfully initialized, you can edit in "iexec.json"',
           {
             raw: success,
           },
@@ -114,7 +115,7 @@ init
     }
   });
 
-const sign = cli.command(command.sign());
+const sign = cli.command('sign');
 addGlobalOptions(sign);
 addWalletLoadOptions(sign);
 sign
@@ -146,7 +147,7 @@ sign
       const failed = [];
 
       const signAppOrder = async () => {
-        spinner.start('signing apporder');
+        spinner.start('Signing apporder');
         try {
           const orderObj = iexecConf.order.apporder;
           if (!orderObj) {
@@ -174,7 +175,7 @@ sign
       };
 
       const signDatasetOrder = async () => {
-        spinner.start('signing datasetorder');
+        spinner.start('Signing datasetorder');
         try {
           const orderObj = iexecConf.order.datasetorder;
           if (!orderObj) {
@@ -203,7 +204,7 @@ sign
       };
 
       const signWorkerpoolOrder = async () => {
-        spinner.start('signing workerpoolorder');
+        spinner.start('Signing workerpoolorder');
         try {
           const orderObj = iexecConf.order.workerpoolorder;
           if (!orderObj) {
@@ -233,7 +234,7 @@ sign
       };
 
       const signRequestOrder = async () => {
-        spinner.start('signing requestorder');
+        spinner.start('Signing requestorder');
         try {
           const orderObj = iexecConf.order.requestorder;
           if (!orderObj) {
@@ -267,7 +268,7 @@ sign
       if (cmd.request || signAll) await signRequestOrder();
 
       if (failed.length === 0) {
-        spinner.succeed("Successfully signed and stored in 'orders.json'", {
+        spinner.succeed('Successfully signed and stored in "orders.json"', {
           raw: success,
         });
       } else {
@@ -280,7 +281,7 @@ sign
     }
   });
 
-const fill = cli.command(command.fill());
+const fill = cli.command('fill');
 addGlobalOptions(fill);
 addWalletLoadOptions(fill);
 fill
@@ -404,7 +405,7 @@ fill
     }
   });
 
-const publish = cli.command(command.publish());
+const publish = cli.command('publish');
 addGlobalOptions(publish);
 addWalletLoadOptions(publish);
 publish
@@ -444,7 +445,7 @@ publish
             );
           }
           if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
-          spinner.start(`publishing ${orderName}`);
+          spinner.start(`Publishing ${orderName}`);
 
           let orderHash;
           switch (orderName) {
@@ -507,7 +508,7 @@ publish
     }
   });
 
-const unpublish = cli.command(command.unpublish());
+const unpublish = cli.command('unpublish');
 addGlobalOptions(unpublish);
 addWalletLoadOptions(unpublish);
 unpublish
@@ -566,7 +567,7 @@ unpublish
             }
           }
 
-          spinner.start(`unpublishing ${orderName}`);
+          spinner.start(`Unpublishing ${orderName}`);
           let unpublished;
           switch (orderName) {
             case order.APP_ORDER:
@@ -627,7 +628,7 @@ unpublish
     }
   });
 
-const cancel = cli.command(command.cancel());
+const cancel = cli.command('cancel');
 addGlobalOptions(cancel);
 addWalletLoadOptions(cancel);
 cancel
@@ -668,7 +669,7 @@ cancel
             );
           }
           if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
-          spinner.start(`canceling ${orderName}`);
+          spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
             case order.APP_ORDER:

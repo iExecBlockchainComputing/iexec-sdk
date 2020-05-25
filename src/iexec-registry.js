@@ -29,6 +29,8 @@ const {
 
 const debug = Debug('iexec:iexec-registry');
 
+cli.name('iexec registry').usage('<command> [options]');
+
 const LOGO_SIDE = 180;
 const repo = 'https://github.com/iExecBlockchainComputing/';
 const objectNames = ['app', 'workerpool', 'dataset'];
@@ -58,14 +60,10 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
   try {
     if (!objectNames.includes(object)) {
       throw Error(
-        `unknown object "${object}". Must be one of [${objectNames}]`,
+        `Unknown object "${object}". Must be one of [${objectNames}]`,
       );
     }
-
     const objectName = objectMap[object].name;
-    debug('object', object);
-    debug('objectMap[object]', objectMap[object]);
-
     // validate iexec.json
     const iexecConf = await loadIExecConf();
     const validated = [];
@@ -76,7 +74,6 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
     } catch (confError) {
       failed.push(`${IEXEC_FILE_NAME}: ${confError.message}`);
     }
-
     // validate logo file
     const logoPath = path.join(process.cwd(), iexecConf.logo);
     let logoFile;
@@ -91,12 +88,12 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
       }
       const logoExt = path.extname(iexecConf.logo).substr(1);
       if (!(logoSize.type === logoExt)) {
-        throw Error(`extension mismatch: ${logoSize.type} =/= ${logoExt}`);
+        throw Error(`Extension mismatch: ${logoSize.type} =/= ${logoExt}`);
       }
       validated.push(iexecConf.logo);
     } catch (logoError) {
       const errorMessage = logoError.code === 'ENOENT'
-        ? `missing "${iexecConf.logo}" logo image file`
+        ? `Missing "${iexecConf.logo}" logo image file`
         : logoError.message;
       failed.push(`${iexecConf.logo}: ${errorMessage}`);
     }
@@ -108,7 +105,7 @@ validate.description(desc.validateRessource()).action(async (object, cmd) => {
 
       if (!(objectName in deployedObj)) {
         throw Error(
-          `missing ${objectName} field. You should run "iexec ${object} deploy"`,
+          `Missing ${objectName} field. You should run "iexec ${object} deploy"`,
         );
       }
       validated.push(DEPLOYED_FILE_NAME);

@@ -30,6 +30,8 @@ const { fetchTaskResults } = require('./iexecProcess');
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
 
+cli.name('iexec task').usage('<command> [options]');
+
 const show = cli.command('show <taskid>');
 addGlobalOptions(show);
 addWalletLoadOptions(show);
@@ -104,7 +106,7 @@ show
             const exists = await fs.pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
-                "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+                'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
             let beneficiaryKeyPath;
@@ -192,7 +194,7 @@ claim
       ]);
       spinner.start(info.claiming(objName));
       const txHash = await taskModule.claim(chain.contracts, taskid);
-      spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
+      spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);
     }
