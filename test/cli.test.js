@@ -257,26 +257,27 @@ afterAll(() => {
 
 describe('[cli]', () => {
   test('iexec', async () => {
-    const out = await execAsync(`${iexecPath}`);
-    expect(out.indexOf('Usage: iexec [command] [options]')).not.toBe(-1);
-  });
-  test('invalid command', async () => {
-    const out = await execAsync(`${iexecPath} test`).catch(e => e);
+    const out = await execAsync(`${iexecPath}`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Unknown command "iexec test"')).not.toBe(-1);
     expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
       -1,
     );
   });
+  test('invalid command', async () => {
+    const out = await execAsync(`${iexecPath} test`).catch(e => e);
+    expect(out instanceof Error).toBe(true);
+    expect(
+      out.message.indexOf("error: unknown command 'test'. See 'iexec --help'."),
+    ).not.toBe(-1);
+  });
   test('unknown option', async () => {
     const out = await execAsync(`${iexecPath} --test`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf("unknown option '--test'")).not.toBe(-1);
+    expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
   test('missing subcommand', async () => {
     const out = await execAsync(`${iexecPath} app`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Missing argument')).not.toBe(-1);
     expect(
       out.message.indexOf('Usage: iexec app <command> [options]'),
     ).not.toBe(-1);
@@ -284,17 +285,16 @@ describe('[cli]', () => {
   test('invalid subcommand', async () => {
     const out = await execAsync(`${iexecPath} app test`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf('Unknown command "iexec app test"')).not.toBe(
-      -1,
-    );
     expect(
-      out.message.indexOf('Usage: iexec app <command> [options]'),
+      out.message.indexOf(
+        "error: unknown command 'test'. See 'iexec app --help'.",
+      ),
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {
     const out = await execAsync(`${iexecPath} app --test`).catch(e => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf("unknown option '--test'")).not.toBe(-1);
+    expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
 });
 
