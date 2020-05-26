@@ -199,22 +199,22 @@ describe('[uint256Schema]', () => {
   });
   test('throw with hex string', async () => {
     await expect(uint256Schema().validate('0x01')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('0x01 is not a valid uint256'),
     );
   });
   test('throw with negative int', async () => {
     await expect(uint256Schema().validate(-1)).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(uint256Schema().validate('-1')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with invalid string', async () => {
     await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('0xfg is not a valid uint256'),
     );
   });
 });
@@ -282,13 +282,13 @@ describe('[tagSchema]', () => {
     );
   });
   test('unknown tag in array', async () => {
-    await expect(tagSchema().validate(['foo'])).rejects.toThrow(
-      new ValidationError('Invalid tag: Unknown tag foo'),
+    await expect(tagSchema().validate(['tee', 'foo'])).rejects.toThrow(
+      new ValidationError('tee,foo is not a valid tag. Unknown tag foo'),
     );
   });
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
-      new ValidationError('Invalid tag: Unknown tag foo'),
+      new ValidationError('foo is not a valid tag. Unknown tag foo'),
     );
   });
 });
@@ -318,6 +318,13 @@ describe('[addressSchema]', () => {
       new ValidationError(
         '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
       ),
+    );
+  });
+  test('address undefined (throw)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(undefined),
+    ).rejects.toThrow(
+      new ValidationError('undefined is not a valid ethereum address'),
     );
   });
   test('ens (resolve ENS with ethProvider)', async () => {
