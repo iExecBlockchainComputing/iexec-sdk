@@ -1244,7 +1244,7 @@ console.log('remaining:', res.remaining);
 
 #### createApporder
 
-iexec.**order.createApporder ( { app: Address, appprice: Uint256, volume: Uint256 \[, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
+iexec.**order.createApporder ( { app: Address \[, appprice: Uint256, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
 > create an apporder with specified params
 
@@ -1284,7 +1284,7 @@ const hash = await iexec.order.hashApporder(apporder);
 
 #### createDatasetorder
 
-iexec.**order.createDatasetorder ( { dataset: Address, datasetprice: Uint256, volume: Uint256 \[, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
+iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: Uint256, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
 > create a datasetorder with specified params
 
@@ -1326,7 +1326,7 @@ const hash = await iexec.order.hashDatasetorder(datasetorder);
 
 #### createWorkerpoolorder
 
-iexec.**order.createWorkerpoolorder ( { workerpool: Address, workerpoolprice: Uint256, category: Uint256, volume: Uint256 \[, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
+iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: Uint256, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
 > create a workerpoolorder with specified params
 
@@ -1369,9 +1369,33 @@ const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 
 #### createRequestorder
 
-iexec.**order.createRequestorder ( { app: Address, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, category: Uint256, volume: Uint256 \[, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
+iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
+
+_mandatory values:_
+
+- `app`: address of the app to run
+- `category`: id of the selected computation category
+
+_optional values:_
+
+- `params`: object, map of execution params:
+  - `iexec_args`: string arguments to pass to the application
+  - `iexec_input_files`: array of url of input files for the application, default `[]`
+  - `iexec_result_storage_provider`: selected storage provider `"ipfs"|"dropbox"`, default `"ipfs"`
+  - `iexec_result_encryption`: boolean should encrypt the result default `false`
+- `dataset`: address of the dataset to use, default no dataset `NULL_ADDRESS`
+- `workerpool`: allow only specific workerpool, default all workerpools allowed `NULL_ADDRESS`
+- `appmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the app, default 0 RLC `"0"`
+- `workerpoolmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the workerpool, default 0 RLC `"0"`
+- `datasetmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the dataset, default 0 RLC `"0"`
+- `volume`: number of tasks to execute, default `"1"`
+- `requester`: address paying for the computation, default current wallet address
+- `beneficiary`: address allowed to get the results, default `requester` or current wallet address
+- `callback`: smart contract to call after each task execution, default no callback `NULL_ADDRESS`
+- `tag`: required tags, default no tag required `[]`
+- `trust`: minimum trust level to reach in the PoCo, default minimum trust `"0"`
 
 _Example:_
 
@@ -1380,7 +1404,6 @@ const requestorderToSign = await iexec.order.createRequestorder({
   app: '0xdBDF1FE51fd3AF9aD94fb63824EbD977518d64b3',
   appmaxprice: '0',
   workerpoolmaxprice: '1000000000',
-  requester: await iexec.wallet.getAddress(),
   category: '2',
   volume: '1',
   params: 'ETH USD 9 2019-09-03T08:37:00.000Z',

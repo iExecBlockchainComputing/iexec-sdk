@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const {
-  string, number, object, mixed,
+  string, number, object, mixed, boolean, array,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
 const {
@@ -9,6 +9,8 @@ const {
   encodeTag,
   bytes32Regex,
 } = require('./utils');
+const { paramsKeyName } = require('./params-utils');
+const { teePostComputeDefaults } = require('./secrets-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
 
@@ -132,6 +134,46 @@ const signed = () => ({
 });
 
 const catidSchema = () => uint256Schema();
+
+const objParamsSchema = () => object({
+  [paramsKeyName.IEXEC_ARGS]: string(),
+  [paramsKeyName.IEXEC_INPUT_FILES]: array().of(
+    string().url('${path} ${originalValue} is not a valid URL'),
+  ),
+  [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: boolean(),
+  [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string()
+    .default('ipfs')
+    .when('$isTee', {
+      is: true,
+      then: string().oneOf(
+        ['ipfs', 'dropbox'],
+        '${path} "${value}" is not supported for ${isTee} TEE tasks use supported storage provider ${values}',
+      ),
+      otherwise: string().oneOf(
+        ['ipfs'],
+        '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
+      ),
+    })
+    .required(),
+  [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
+    'iexec_result_storage_provider',
+    {
+      is: 'ipfs',
+      then: string()
+        .when('$resultProxyURL', (resultProxyURL, schema) => schema.default(resultProxyURL))
+        .required('${path} is required field with "ipfs" storage'),
+      otherwise: string().notRequired(),
+    },
+  ),
+  [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(),
+  // workarond this should not be required in the future
+  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_IMAGE]: string()
+    .default(teePostComputeDefaults.image)
+    .required('${path} is required field for TEE tasks'),
+  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_FINGERPRINT]: string()
+    .default(teePostComputeDefaults.fingerprint)
+    .required('${path} is required field for TEE tasks'),
+});
 
 const paramsSchema = () => string().transform((value, originalValue) => {
   if (typeof originalValue === 'object') {
@@ -293,7 +335,7 @@ const mrenclaveSchema = () => mixed().transform((value) => {
   return utf8ToBuffer(value);
 });
 
-const appTypeSchema = () => mixed().oneOf(['DOCKER'], '${originalValue} is not a valid type');
+const appTypeSchema = () => string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
 const appSchema = opt => object({
   owner: addressSchema(opt).required(),
@@ -346,6 +388,7 @@ module.exports = {
   signedRequestorderSchema,
   catidSchema,
   paramsSchema,
+  objParamsSchema,
   tagSchema,
   chainIdSchema,
   hexnumberSchema,

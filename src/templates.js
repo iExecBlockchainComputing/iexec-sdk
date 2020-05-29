@@ -55,19 +55,19 @@ const order = {
     app: '0x0000000000000000000000000000000000000000',
     appprice: '0',
     volume: '1000000',
-    tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    datasetrestrict: '0x0000000000000000000000000000000000000000',
-    workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-    requesterrestrict: '0x0000000000000000000000000000000000000000',
+    tag: [],
+    datasetrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    workerpoolrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
   },
   datasetorder: {
     dataset: '0x0000000000000000000000000000000000000000',
     datasetprice: '0',
     volume: '1000000',
-    tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    apprestrict: '0x0000000000000000000000000000000000000000',
-    workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-    requesterrestrict: '0x0000000000000000000000000000000000000000',
+    tag: [], // todo remove from default
+    apprestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    workerpoolrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
   },
   workerpoolorder: {
     workerpool: '0x0000000000000000000000000000000000000000',
@@ -75,10 +75,10 @@ const order = {
     volume: '1',
     category: '0',
     trust: '0',
-    tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    apprestrict: '0x0000000000000000000000000000000000000000',
-    datasetrestrict: '0x0000000000000000000000000000000000000000',
-    requesterrestrict: '0x0000000000000000000000000000000000000000',
+    tag: [], // todo remove from default
+    apprestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    datasetrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
+    requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
   },
   requestorder: {
     app: '0x0000000000000000000000000000000000000000',
@@ -89,13 +89,14 @@ const order = {
     workerpoolmaxprice: '0',
     volume: '1',
     category: '0',
-    trust: '0',
-    tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    beneficiary: '0x0000000000000000000000000000000000000000',
-    callback: '0x0000000000000000000000000000000000000000',
+    trust: '0', // todo remove from default
+    tag: [], // todo remove from default
+    beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
+    callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {
       iexec_args: '',
       iexec_input_files: [],
+      iexec_result_encryption: false, // todo remove from default
     },
   },
 };

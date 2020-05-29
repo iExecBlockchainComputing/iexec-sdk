@@ -272,6 +272,10 @@ const option = {
     '--token <token>',
     'storage provider authorization token (unsafe)',
   ],
+  skipRequestCheck: () => [
+    '--skip-request-check',
+    'skip request validity checks, this may result in task execution fail',
+  ],
 };
 
 const addGlobalOptions = (cli) => {

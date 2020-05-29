@@ -17,6 +17,7 @@ const {
   isBytes32,
   prompt,
 } = require('./cli-helper');
+const { checkRequestRequirements } = require('./request-helper');
 const {
   loadIExecConf,
   initOrderObj,
@@ -27,7 +28,6 @@ const {
 const { loadChain } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
-const templates = require('./templates');
 const { NULL_ADDRESS } = require('./utils');
 const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
@@ -124,6 +124,7 @@ sign
   .option(...option.signWorkerpoolOrder())
   .option(...option.signRequestOrder())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
@@ -149,10 +150,14 @@ sign
       const signAppOrder = async () => {
         spinner.start('Signing apporder');
         try {
-          const orderObj = iexecConf.order.apporder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.apporder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
           }
+          const orderObj = await order.createApporder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
@@ -177,10 +182,14 @@ sign
       const signDatasetOrder = async () => {
         spinner.start('Signing datasetorder');
         try {
-          const orderObj = iexecConf.order.datasetorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.datasetorder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
           }
+          const orderObj = await order.createDatasetorder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedDataset(orderObj.dataset, {
             strict: true,
           });
@@ -206,12 +215,16 @@ sign
       const signWorkerpoolOrder = async () => {
         spinner.start('Signing workerpoolorder');
         try {
-          const orderObj = iexecConf.order.workerpoolorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.workerpoolorder;
+          if (!loadedOrder) {
             throw new Error(
               info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
             );
           }
+          const orderObj = await order.createWorkerpoolorder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
             strict: true,
           });
@@ -236,13 +249,34 @@ sign
       const signRequestOrder = async () => {
         spinner.start('Signing requestorder');
         try {
-          const orderObj = iexecConf.order.requestorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.requestorder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
           }
+          const orderObj = await order.createRequestorder(
+            {
+              contracts: chain.contracts,
+              resultProxyURL: chain.resultProxy,
+            },
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
+          if (!cmd.skipRequestCheck) {
+            await checkRequestRequirements(
+              { contracts: chain.contracts, smsURL: chain.sms },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `Request requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipRequestCheck()[0]
+                } to skip request requirement check)`,
+              );
+            });
+          }
           const signedOrder = await order.signRequestorder(
             chain.contracts,
             orderObj,
@@ -287,6 +321,7 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.txGasPrice())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
@@ -357,18 +392,20 @@ fill
       if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
-        const { address } = await keystore.load();
-        const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
-          app: appOrder.app,
-          appmaxprice: appOrder.appprice,
-          dataset: useDataset ? datasetOrder.dataset : NULL_ADDRESS,
-          datasetmaxprice: useDataset ? datasetOrder.datasetprice : '0',
-          workerpool: workerpoolOrder.workerpool,
-          workerpoolmaxprice: workerpoolOrder.workerpoolprice,
-          requester: address,
-          category: workerpoolOrder.category,
-          params: inputParams || ' ',
-        });
+        await keystore.load();
+        const unsignedOrder = await order.createRequestorder(
+          { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+          {
+            app: appOrder.app,
+            appmaxprice: appOrder.appprice || undefined,
+            dataset: useDataset ? datasetOrder.dataset : undefined,
+            datasetmaxprice: useDataset ? datasetOrder.datasetprice : undefined,
+            workerpool: workerpoolOrder.workerpool || undefined,
+            workerpoolmaxprice: workerpoolOrder.workerpoolprice || undefined,
+            category: workerpoolOrder.category,
+            params: inputParams || undefined,
+          },
+        );
         if (!cmd.force) {
           await prompt.signGeneratedOrder(
             order.REQUEST_ORDER,
@@ -385,6 +422,21 @@ fill
       const requestOrder = requestOrderInput || (await computeRequestOrder());
       if (!requestOrder) {
         throw new Error('Missing requestorder');
+      }
+
+      if (!cmd.skipRequestCheck) {
+        await checkRequestRequirements(
+          { contracts: chain.contracts, smsURL: chain.sms },
+          requestOrder,
+        ).catch((e) => {
+          throw Error(
+            `Request requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipRequestCheck()[0]
+            } to skip request requirement check)`,
+          );
+        });
       }
 
       await keystore.load();
@@ -414,6 +466,7 @@ publish
   .option(...option.publishWorkerpoolOrder())
   .option(...option.publishRequestOrder())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
@@ -471,6 +524,20 @@ publish
               );
               break;
             case order.REQUEST_ORDER:
+              if (!cmd.skipRequestCheck) {
+                await checkRequestRequirements(
+                  { contracts: chain.contracts, smsURL: chain.sms },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `Request requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipRequestCheck()[0]
+                    } to skip request requirement check)`,
+                  );
+                });
+              }
               orderHash = await order.publishRequestorder(
                 chain.contracts,
                 chain.iexecGateway || IEXEC_GATEWAY_URL,
@@ -479,7 +546,6 @@ publish
               break;
             default:
           }
-
           spinner.info(
             `${orderName} successfully published with orderHash ${orderHash}`,
           );

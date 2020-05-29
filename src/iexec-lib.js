@@ -13,6 +13,7 @@ const {
 } = require('./secrets-utils');
 const resultProxyServ = require('./result-proxy');
 const iexecProcess = require('./iexecProcess');
+const { checkRequestRequirements } = require('./request-helper');
 const errors = require('./errors');
 const {
   BN,
@@ -222,7 +223,10 @@ class IExec {
     this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
     this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
     this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(contracts, overwrite);
-    this.order.createRequestorder = overwrite => order.createRequestorder(contracts, overwrite);
+    this.order.createRequestorder = overwrite => order.createRequestorder(
+      { contracts, resultProxyURL: getResultProxyURL() },
+      overwrite,
+    );
     this.order.hashApporder = apporder => order.hashApporder(contracts, apporder);
     this.order.hashDatasetorder = datasetorder => order.hashDatasetorder(contracts, datasetorder);
     this.order.hashWorkerpoolorder = workerpoolorder => order.hashWorkerpoolorder(contracts, workerpoolorder);
@@ -230,7 +234,21 @@ class IExec {
     this.order.signApporder = apporder => order.signApporder(contracts, apporder);
     this.order.signDatasetorder = datasetorder => order.signDatasetorder(contracts, datasetorder);
     this.order.signWorkerpoolorder = workerpoolorder => order.signWorkerpoolorder(contracts, workerpoolorder);
-    this.order.signRequestorder = requestorder => order.signRequestorder(contracts, requestorder);
+    this.order.signRequestorder = async (
+      requestorder,
+      { checkRequirements = false } = {},
+    ) => order.signRequestorder(
+      contracts,
+      checkRequirements === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          requestorder,
+        ).then(() => requestorder)
+        : requestorder,
+    );
     this.order.cancelApporder = signedApporder => order.cancelApporder(contracts, signedApporder);
     this.order.cancelDatasetorder = signedDatasetorder => order.cancelDatasetorder(contracts, signedDatasetorder);
     this.order.cancelWorkerpoolorder = signedWorkerpoolorder => order.cancelWorkerpoolorder(contracts, signedWorkerpoolorder);

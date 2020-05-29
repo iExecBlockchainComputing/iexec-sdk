@@ -38,6 +38,7 @@ const {
   saveDeployedObj,
   loadDeployedObj,
 } = require('./fs');
+const { checkRequestRequirements } = require('./request-helper');
 const {
   getRemainingVolume,
   createApporder,
@@ -70,6 +71,7 @@ const {
   BN,
   stringifyNestedBn,
 } = require('./utils');
+const { IEXEC_GATEWAY_URL } = require('./api-utils');
 const {
   tagSchema,
   catidSchema,
@@ -240,6 +242,7 @@ run
   .option(...option.appRunCallback())
   .option(...option.appRunWatch())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .description(desc.appRun())
   .action(async (appAddress, cmd) => {
     await checkUpdate(cmd);
@@ -331,7 +334,7 @@ run
       debug('useCategory', useCategory, 'category', category);
       const tag = await tagSchema().validate(cmd.tag || NULL_BYTES32);
       debug('tag', tag);
-      const trust = await positiveIntSchema().validate(cmd.trust);
+      const trust = await positiveIntSchema().validate(cmd.trust || '0');
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.jsonRpcProvider,
@@ -367,9 +370,14 @@ run
         }
         spinner.info('Fetching apporder from iExec Marketplace');
         const teeAppRequired = checkActiveBitInTag(tag, 1);
-        const { appOrders } = await fetchAppOrderbook(chain.contracts, app, {
-          ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
-        });
+        const { appOrders } = await fetchAppOrderbook(
+          chain.contracts,
+          IEXEC_GATEWAY_URL,
+          app,
+          {
+            ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
+          },
+        );
         const order = appOrders[0] && appOrders[0].order;
         if (!order) throw Error(`No order available for app ${app}`);
         return order;
@@ -401,6 +409,7 @@ run
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.contracts,
+          IEXEC_GATEWAY_URL,
           dataset,
           {
             app,
@@ -456,6 +465,7 @@ run
           debug('try category', catid, 'strict', strict);
           const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
+            IEXEC_GATEWAY_URL,
             catid,
             {
               workerpoolAddress: workerpool,
@@ -516,22 +526,43 @@ run
       debug('datasetorder', datasetorder);
 
       spinner.info('Creating requestorder');
-      const requestorder = await createRequestorder(chain.contracts, {
-        app: apporder.app,
-        appmaxprice: apporder.appprice,
-        dataset: datasetorder.dataset,
-        datasetmaxprice: datasetorder.datasetprice,
-        workerpool: workerpoolorder.workerpool,
-        workerpoolmaxprice: workerpoolorder.workerpoolprice,
-        requester,
-        volume: 1,
-        tag,
-        category: workerpoolorder.category,
-        trust,
-        beneficiary: beneficiary || requester,
-        callback,
-        params,
-      }).then(o => signRequestorder(chain.contracts, o));
+      const requestorderToSign = await createRequestorder(
+        { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+        {
+          app: apporder.app,
+          appmaxprice: apporder.appprice,
+          dataset: datasetorder.dataset,
+          datasetmaxprice: datasetorder.datasetprice,
+          workerpool: workerpoolorder.workerpool,
+          workerpoolmaxprice: workerpoolorder.workerpoolprice,
+          requester,
+          volume: 1,
+          tag,
+          category: workerpoolorder.category,
+          trust,
+          beneficiary: beneficiary || requester,
+          callback,
+          params,
+        },
+      );
+      if (!cmd.skipRequestCheck) {
+        await checkRequestRequirements(
+          { contracts: chain.contracts, smsURL: chain.sms },
+          requestorderToSign,
+        ).catch((e) => {
+          throw Error(
+            `Request requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipRequestCheck()[0]
+            } to skip request requirement check)`,
+          );
+        });
+      }
+      const requestorder = await signRequestorder(
+        chain.contracts,
+        requestorderToSign,
+      );
 
       debug('requestorder', requestorder);
 
