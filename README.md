@@ -281,7 +281,7 @@ iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
-iexec info --chain kovan
+iexec info --chain goerli
 ```
 
 ## Global options
@@ -608,19 +608,21 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 `default` set the default chain used by the SDK cli.
 optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-optional key `sms` set the url of Secret Management Service used by the SDK cli on each chain.
-optional key `ipfsGateway` set the url of IPFS gateway used by the SDK cli on each chain (overwrite default value).
+optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
+optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
 optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedNetworkId` set the reference to the briged network specified by `id`.
 optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
 
 ```json
 {
-  "default": "kovan",
+  "default": "goerli",
   "chains": {
     "development": {
       "host": "http://localhost:8545",
       "id": "1544020727674",
       "sms": "http://localhost:5000",
+      "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:8080",
       "native": true,
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
@@ -629,23 +631,14 @@ optional key `native` specify whether or not the chain native token is RLC (over
         "bridgedNetworkId": "123456789"
       }
     },
-    "ropsten": {
-      "host": "https://ropsten.infura.io/v3/apiKey",
-      "id": "3"
-    },
-    "rinkeby": {
-      "host": "https://rinkeby.infura.io/v3/apiKey",
-      "id": "4"
-    },
-    "kovan": {
-      "host": "https://kovan.infura.io/v3/apiKey",
-      "id": "42",
-      "sms": "https://sms-kovan.iex.ec"
+    "goerli": {
+      "id": "5"
     },
     "mainnet": {
-      "host": "https://mainnet.infura.io/v3/apiKey ",
-      "id": "1",
-      "sms": "https://sms-mainnet.iex.ec"
+      "id": "1"
+    },
+    "bellecour": {
+      "id": "134"
     }
   }
 }
@@ -812,6 +805,7 @@ npm install iexec
 > - `hubAddress: Address` specify the address of iExec hub smart contract to use
 > - `smsURL: URL` specify the Secret Management System to use
 > - `resultProxyURL: URL` specify the result proxy to use for results remote storage
+> - `ipfsGatewayURL: URL` specify the IPFS gateway to use
 > - `isNative: Boolean` true when the RLC is the chain native token
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
@@ -825,11 +819,11 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '42', // id of the chain (42 for kovan)
+  chainId: '5', // id of the chain (5 for goerli)
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (mainnet) and '42' (kovan testnet)).
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain)).
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
@@ -858,7 +852,19 @@ const getIExec = async () => {
 };
 ```
 
-##### Native configuration
+##### Sidechain configuration
+
+###### Adding iExec sidechain to MetaMask
+
+Click `Custom RPC` in the MetaMask Networks dropdown and fill with the following values:
+
+- Network Name: Bellecour (iExec sidechain)
+- New RPC URL: https://bellecour.iex.ec
+- ChainID (optional): 134
+- Symbol (optional): xRLC
+- Block Explorer URL (optional): https://blockscout-bellecour.iex.ec
+
+###### Connecting iExec SDK to iExec sidechain
 
 If you intend to use iExec SDK on a RLC native chain (ie: RLC is the native token), you must use `isNative` option.
 _NB:_ Default values are provided on well known native networks such iExec test sidechain `133` and iExec mainnet sidechain `134`.
@@ -893,7 +899,7 @@ const bridgeAddress = '0x...'; // Address of the RLC bridge smart contract on ma
 const bridgedNetworkConf = {
   chainId: '134', // id of the bridged chain (134 for iExec sidechain)
   hubAddress: '0x...', // Address of theiExec hub smart contract on bridged chain
-  rpcURL: 'https://myNode.ethnode', // url of a public node of bridged chain
+  rpcURL: 'https://bellecour.iex.ec', // url of a public node of bridged chain
   bridgeAddress: '0x...'; // Address of the RLC bridge smart contract on bridged chain
 };
 
@@ -1799,11 +1805,9 @@ await iexec.task.claim(
 
 #### fetchResults
 
-iexec.**task.fetchResults ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
+iexec.**task.fetchResults ( taskid: Bytes32 )** => Promise < **fetchResponse: Response** >
 
 > download the specified task result. only supported for IPFS stored results
->
-> _Optional_: overwrite the ipfs gateway to use for results stored on ipfs.
 
 _Example:_
 
