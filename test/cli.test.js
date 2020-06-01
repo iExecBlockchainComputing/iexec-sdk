@@ -96,6 +96,8 @@ const setTokenChain = options => saveJSONToFile(
         id: networkId,
         host: tokenChainUrl,
         hub: hubAddress,
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
         ...options,
       },
     },
@@ -112,6 +114,8 @@ const setNativeChain = options => saveJSONToFile(
         host: nativeChainUrl,
         hub: hubAddress,
         native: true,
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
         ...options,
       },
     },
@@ -873,7 +877,9 @@ describe('[Mainchain]', () => {
     await editWorkerpoolorder({
       category: '0',
     });
-    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --raw --skip-request-check`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeDefined();
@@ -887,7 +893,9 @@ describe('[Mainchain]', () => {
   }, 30000);
 
   test('[mainchain] iexec order fill', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
@@ -944,7 +952,9 @@ describe('[Mainchain]', () => {
       category: mainchainNoDurationCatid,
       volume: '5',
     });
-    const raw = await execAsync(`${iexecPath} order sign --request --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --request --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeUndefined();
@@ -955,7 +965,9 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
@@ -969,7 +981,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill --params <params> --force', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --params 'arg --option "multiple words"' --force --raw`,
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1080,7 +1092,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --force --raw`,
+      `${iexecPath} app run --workerpool --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1105,7 +1117,9 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
-    expect(resDeal.deal.params).toBe('');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
+    );
     expect(resDeal.deal.callback).toBe(
       '0x0000000000000000000000000000000000000000',
     );
@@ -1132,7 +1146,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset 0x0000000000000000000000000000000000000000 --force --raw`,
+      `${iexecPath} app run --workerpool --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1157,7 +1171,9 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
-    expect(resDeal.deal.params).toBe('');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
+    );
     expect(resDeal.deal.callback).toBe(
       '0x0000000000000000000000000000000000000000',
     );
@@ -1187,7 +1203,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset --params "test params" --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} app run --workerpool --dataset --params "test params" --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1210,7 +1226,9 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('1');
-    expect(resDeal.deal.params).toBe('test params');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089","iexec_args":"test params"}',
+    );
     expect(resDeal.deal.callback).toBe(POOR_ADDRESS1);
     expect(resDeal.deal.requester).toBe(ADDRESS);
     expect(resDeal.deal.beneficiary).toBe(
@@ -1237,7 +1255,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --category ${mainchainNoDurationCatid} --watch --force --raw`,
+      `${iexecPath} app run --workerpool --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -1956,7 +1974,9 @@ describe('[Sidechain]', () => {
     await editWorkerpoolorder({
       category: '0',
     });
-    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeDefined();
@@ -1970,7 +1990,9 @@ describe('[Sidechain]', () => {
   }, 30000);
 
   test('[sidechain] iexec order fill', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
@@ -1995,7 +2017,9 @@ describe('[Sidechain]', () => {
       volume: '5',
     });
     await execAsync(`${iexecPath} order sign --raw`);
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
@@ -2009,7 +2033,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --app --dataset --workerpool --request --force --raw`,
+      `${iexecPath} order sign --app --dataset --workerpool --request --skip-request-check --force --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,

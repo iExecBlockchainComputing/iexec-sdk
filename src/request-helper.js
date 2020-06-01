@@ -17,7 +17,18 @@ const createObjParams = async ({
   noCast = false,
   resultProxyURL,
 } = {}) => {
-  const inputParams = typeof params === 'string' ? JSON.parse(params) : params;
+  let inputParams;
+  if (typeof params === 'string') {
+    try {
+      inputParams = JSON.parse(params);
+    } catch (e) {
+      inputParams = {
+        iexec_args: params,
+      };
+    }
+  } else {
+    inputParams = params;
+  }
   const isTee = checkActiveBitInTag(tag, 1);
   const objParams = await objParamsSchema().validate(inputParams, {
     strict: noCast,
