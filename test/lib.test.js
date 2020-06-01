@@ -510,6 +510,7 @@ describe('[workflow]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -560,6 +561,7 @@ describe('[workflow]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -571,7 +573,6 @@ describe('[workflow]', () => {
       requester: await iexec.wallet.getAddress(),
       category: workerpoolorderToClaim.category,
       volume: '10',
-      params: 'test',
     });
     const signedorder = await iexec.order.signRequestorder(order);
     const totalPrice = new BN(order.appmaxprice)
@@ -2267,6 +2268,7 @@ describe('[order]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -2285,7 +2287,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x83db4372c3f4205d7033e02cc6a5ada6867a599a6b6aea09791c0b8971083e73',
+      '0x7ecd981f4188dfc1456a4dac4d711fa07fc1280d938ce86cdcfb5da3f19d5ef8',
     );
   });
 
@@ -2362,6 +2364,7 @@ describe('[order]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const order = await iexec.order
@@ -2392,6 +2395,7 @@ describe('[order]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const poolManagerSigner = utils.getSignerFromPrivateKey(
@@ -2928,6 +2932,7 @@ describe('[order]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -3061,6 +3066,7 @@ describe('[order]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -3214,6 +3220,7 @@ describe('[orderbook]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -3355,6 +3362,7 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const catid = await createCategory(iexec, { workClockTimeRef: 10 });
@@ -3481,6 +3489,7 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const catid = await createCategory(iexec, { workClockTimeRef: 1 });
@@ -3642,6 +3651,7 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const catid = await createCategory(iexec, { workClockTimeRef: 10 });
@@ -3789,6 +3799,7 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
     const catid = await createCategory(iexec, { workClockTimeRef: 2 });
@@ -4304,6 +4315,7 @@ describe('[deal]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const requesterAddress = await iexec.wallet.getAddress();
@@ -4379,6 +4391,7 @@ describe('[deal]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -4421,6 +4434,7 @@ describe('[deal]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -4465,6 +4479,7 @@ describe('[deal]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
@@ -4511,6 +4526,7 @@ describe('[deal]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
       const apporder = await deployAndGetApporder(iexec);
