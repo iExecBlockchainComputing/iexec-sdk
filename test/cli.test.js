@@ -3291,14 +3291,12 @@ describe('[Common]', () => {
 
     test('no "native" overwites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
-      expect(chains.mainnet.native).toBeUndefined();
-      expect(chains.bellecour.native).toBeUndefined();
-      expect(chains.kovan.native).toBeUndefined();
       expect(chains.goerli.native).toBeUndefined();
+      expect(chains.mainnet.native).toBeUndefined();
+      // expect(chains.bellecour.native).toBeUndefined();
     });
 
-    // not deployed yet
-    test.skip('mainnet is not native', async () => {
+    test('mainnet is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
       );
@@ -3309,18 +3307,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).toBeDefined();
     });
 
-    test.skip('kovan is not native', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain kovan --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
-    });
-
-    test.skip('goerli is not native', async () => {
+    test('goerli is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
       );
@@ -3331,6 +3318,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).toBeDefined();
     });
 
+    // not deployed yet
     test.skip('bellecour is native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain bellecour --raw`,

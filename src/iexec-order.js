@@ -16,6 +16,7 @@ const {
   info,
   isBytes32,
   prompt,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { checkRequestRequirements } = require('./request-helper');
 const {
@@ -29,7 +30,6 @@ const { loadChain } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
 const { NULL_ADDRESS } = require('./utils');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -349,7 +349,7 @@ fill
             `Fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
           const orderRes = await order.fetchPublishedOrderByHash(
-            chain.iexecGateway || IEXEC_GATEWAY_URL,
+            getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
@@ -504,21 +504,21 @@ publish
             case order.APP_ORDER:
               orderHash = await order.publishApporder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case order.DATASET_ORDER:
               orderHash = await order.publishDatasetorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               orderHash = await order.publishWorkerpoolorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
@@ -539,7 +539,7 @@ publish
               }
               orderHash = await order.publishRequestorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
@@ -638,28 +638,28 @@ unpublish
             case order.APP_ORDER:
               unpublished = await order.unpublishApporder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.DATASET_ORDER:
               unpublished = await order.unpublishDatasetorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               unpublished = await order.unpublishWorkerpoolorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.REQUEST_ORDER:
               unpublished = await order.unpublishRequestorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
@@ -839,7 +839,7 @@ show
           isBytes32(orderHash);
           spinner.start(info.showing(orderName));
           const orderToShow = await order.fetchPublishedOrderByHash(
-            chain.iexecGateway || IEXEC_GATEWAY_URL,
+            getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
@@ -847,7 +847,7 @@ show
           let deals;
           if (cmd.deals) {
             deals = await order.fetchDealsByOrderHash(
-              chain.iexecGateway || IEXEC_GATEWAY_URL,
+              getPropertyFormChain(chain, 'iexecGateway'),
               orderName,
               chain.id,
               orderHash,

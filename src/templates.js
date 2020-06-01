@@ -108,7 +108,7 @@ const category = {
 };
 
 const chains = {
-  default: 'dev',
+  default: 'goerli',
   chains: {
     dev: {
       id: '65535',
@@ -118,45 +118,11 @@ const chains = {
       hub: '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB',
       // native: true,
     },
-    kovan: {
-      id: '42',
-      host: 'https://kovan.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
-      sms: 'https://kovan-sms.iex.ec',
-    },
     goerli: {
       id: '5',
-      host: 'https://goerli.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
-      sms: 'https://goerli-sms.iex.ec',
-      // bridge: {
-      //   contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
-      //   bridgedNetworkId: '133',
-      // },
     },
-    // viviani: {
-    //   host: 'https://viviani.iex.ec',
-    //   id: '133',
-    //   bridge: {
-    //     contract: '0x63CBf84596d0Dc13fCE1d8FA4470dc208390998a',
-    //     bridgedNetworkId: '5',
-    //   },
-    // },
     mainnet: {
       id: '1',
-      host: 'https://mainnet.infura.io/v3/f3e0664e01504f5ab2b4360853ce0dc7',
-      sms: 'https://mainnet-sms.iex.ec',
-      bridge: {
-        contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
-        bridgedNetworkId: '134',
-      },
-    },
-    bellecour: {
-      id: '134',
-      host: 'https://bellecour.iex.ec',
-      sms: 'https://bellecour-sms.iex.ec',
-      bridge: {
-        contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
-        bridgedNetworkId: '1',
-      },
     },
   },
 };

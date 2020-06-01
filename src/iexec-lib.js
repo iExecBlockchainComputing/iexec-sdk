@@ -29,7 +29,7 @@ const {
   decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
+const { getChainDefaults } = require('./config');
 
 const utils = {
   BN,
@@ -56,6 +56,7 @@ class IExec {
       bridgedNetworkConf,
       resultProxyURL,
       smsURL,
+      ipfsGatewayURL,
       iexecGatewayURL,
     } = {},
   ) {
@@ -97,8 +98,9 @@ class IExec {
     }
 
     const getSmsURL = () => {
-      if (smsURL) {
-        return smsURL;
+      const value = smsURL || getChainDefaults(chainId).sms;
+      if (value !== undefined) {
+        return value;
       }
       throw Error(
         `smsURL option not set and no default value for your chain ${chainId}`,
@@ -106,8 +108,9 @@ class IExec {
     };
 
     const getResultProxyURL = () => {
-      if (resultProxyURL) {
-        return resultProxyURL;
+      const value = resultProxyURL || getChainDefaults(chainId).resultProxy;
+      if (value !== undefined) {
+        return value;
       }
       throw Error(
         `resultProxyURL option not set and no default value for your chain ${chainId}`,
@@ -115,10 +118,23 @@ class IExec {
     };
 
     const getIexecGatewayURL = () => {
-      if (iexecGatewayURL) {
-        return iexecGatewayURL;
+      const value = iexecGatewayURL || getChainDefaults(chainId).iexecGateway;
+      if (value !== undefined) {
+        return value;
       }
-      return IEXEC_GATEWAY_URL;
+      throw Error(
+        `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getIpfsGatewayURL = () => {
+      const value = ipfsGatewayURL || getChainDefaults(chainId).ipfsGateway;
+      if (value !== undefined) {
+        return value;
+      }
+      throw Error(
+        `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
     };
 
     this.wallet = {};
@@ -372,7 +388,9 @@ class IExec {
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.claim = taskid => task.claim(contracts, taskid);
-    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
+    this.task.fetchResults = taskid => iexecProcess.fetchTaskResults(contracts, taskid, {
+      ipfsGatewayURL: getIpfsGatewayURL(),
+    });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => {
       console.warn(
         '[iexec] task.waitForTaskStatusChange(taskid, initialStatus) is deprecated, please use task.obsTask(taskid, { dealid })',

@@ -18,6 +18,7 @@ const {
   info,
   isEthAddress,
   renderTasksStatus,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const {
   deployApp,
@@ -71,7 +72,6 @@ const {
   BN,
   stringifyNestedBn,
 } = require('./utils');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
 const {
   tagSchema,
   catidSchema,
@@ -372,7 +372,7 @@ run
         const teeAppRequired = checkActiveBitInTag(tag, 1);
         const { appOrders } = await fetchAppOrderbook(
           chain.contracts,
-          IEXEC_GATEWAY_URL,
+          getPropertyFormChain(chain, 'iexecGateway'),
           app,
           {
             ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
@@ -409,7 +409,7 @@ run
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.contracts,
-          IEXEC_GATEWAY_URL,
+          getPropertyFormChain(chain, 'iexecGateway'),
           dataset,
           {
             app,
@@ -465,7 +465,7 @@ run
           debug('try category', catid, 'strict', strict);
           const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
-            IEXEC_GATEWAY_URL,
+            getPropertyFormChain(chain, 'iexecGateway'),
             catid,
             {
               workerpoolAddress: workerpool,

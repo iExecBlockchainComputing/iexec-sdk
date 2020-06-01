@@ -28,7 +28,7 @@ const info = {
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: filePath => `Downloaded task result to file ${filePath}`,
-  missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
+  missingAddress: obj => `${obj} address not provided to CLI AND missing in "deployed.json"`,
   checking: obj => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
@@ -620,6 +620,12 @@ const computeTxOptions = (cmd) => {
   return Object.assign({}, { gasPrice });
 };
 
+const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
+  const value = chain[property];
+  if (value === undefined && strict) throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
+  return value;
+};
+
 const handleError = (error, cli, cmd) => {
   debug('error', error);
   const spinner = Spinner(cmd);
@@ -751,6 +757,7 @@ module.exports = {
   info,
   desc,
   option,
+  getPropertyFormChain,
   addGlobalOptions,
   addWalletCreateOptions,
   addWalletLoadOptions,

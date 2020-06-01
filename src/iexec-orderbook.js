@@ -12,11 +12,11 @@ const {
   pretty,
   info,
   isEthAddress,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
 const { Keystore } = require('./keystore');
 const orderbook = require('./orderbook');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const objName = 'orderbook';
 
@@ -46,7 +46,7 @@ orderbookApp
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchAppOrderbook(
         chain.contracts,
-        chain.iexecGateway || IEXEC_GATEWAY_URL,
+        getPropertyFormChain(chain, 'iexecGateway'),
         address,
         Object.assign({}, { dataset }, { workerpool }, { requester }),
       );
@@ -99,7 +99,7 @@ orderbookDataset
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchDatasetOrderbook(
         chain.contracts,
-        chain.iexecGateway || IEXEC_GATEWAY_URL,
+        getPropertyFormChain(chain, 'iexecGateway'),
         address,
         Object.assign({}, { app }, { workerpool }, { requester }),
       );
@@ -148,7 +148,7 @@ orderbookWorkerpool
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.contracts,
-        chain.iexecGateway || IEXEC_GATEWAY_URL,
+        getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
         { workerpoolAddress: address, minTag },
       );
@@ -199,7 +199,7 @@ orderbookRequester
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchRequestOrderbook(
         chain.contracts,
-        chain.iexecGateway || IEXEC_GATEWAY_URL,
+        getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
         { requesterAddress: address },
       );
