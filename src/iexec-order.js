@@ -139,7 +139,7 @@ sign
       );
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [chain, iexecConf, { address }] = await Promise.all([
+      const [chain, iexecConf] = await Promise.all([
         loadChain(cmd.chain, keystore, { spinner }),
         loadIExecConf(),
         keystore.load(),
@@ -280,7 +280,6 @@ sign
           const signedOrder = await order.signRequestorder(
             chain.contracts,
             orderObj,
-            address,
           );
           const { saved, fileName } = await saveSignedOrder(
             order.REQUEST_ORDER,

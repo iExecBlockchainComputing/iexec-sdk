@@ -1048,7 +1048,9 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order cancel --request', async () => {
-    await execAsync(`${iexecPath} order sign --request --raw`);
+    await execAsync(
+      `${iexecPath} order sign --request --skip-request-check --raw`,
+    );
     const raw = await execAsync(
       `${iexecPath} order cancel --request --force --raw`,
     );
@@ -2016,7 +2018,7 @@ describe('[Sidechain]', () => {
       category: sidechainNoDurationCatid,
       volume: '5',
     });
-    await execAsync(`${iexecPath} order sign --raw`);
+    await execAsync(`${iexecPath} order sign --skip-request-check --raw`);
     const raw = await execAsync(
       `${iexecPath} order fill --skip-request-check --raw`,
     );
