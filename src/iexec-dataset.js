@@ -21,6 +21,7 @@ const {
   info,
   isEthAddress,
   spawnAsync,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const hub = require('./hub');
 const {
@@ -557,8 +558,8 @@ pushSecret
         loadDeployedObj(objName),
       ]);
 
-      const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
+      const { contracts } = chain;
+      const sms = getPropertyFormChain(chain, 'sms');
 
       const { address } = await keystore.load();
       debug('address', address);
@@ -627,8 +628,7 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const { sms } = chain;
-      if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
+      const sms = getPropertyFormChain(chain, 'sms');
       const secretIsSet = await secretMgtServ.checkWeb3SecretExists(
         chain.contracts,
         sms,

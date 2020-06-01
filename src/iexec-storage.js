@@ -12,6 +12,7 @@ const {
   option,
   prompt,
   Spinner,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
@@ -38,15 +39,10 @@ initStorage
         loadChain(cmd.chain, keystore, { spinner }),
         keystore.accounts(),
       ]);
-      const { contracts, sms, resultProxy } = chain;
-      const smsURL = sms;
-      const resultProxyURL = resultProxy;
-      if (!smsURL) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
-      if (!resultProxyURL) {
-        throw Error(
-          `Missing resultProxy in "chain.json" for chain ${chain.id}`,
-        );
-      }
+      const { contracts } = chain;
+      const smsURL = getPropertyFormChain(chain, 'sms');
+      const resultProxyURL = getPropertyFormChain(chain, 'resultProxy');
+
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
 
@@ -116,9 +112,8 @@ checkStorage
         loadChain(cmd.chain, keystore, { spinner }),
         keystore.accounts(),
       ]);
-      const { contracts, sms } = chain;
-      const smsURL = sms;
-      if (!smsURL) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
+      const { contracts } = chain;
+      const smsURL = getPropertyFormChain(chain, 'sms');
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAdress = cmd.user || address;
