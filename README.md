@@ -807,14 +807,14 @@ npm install iexec
 
 **new Iexec ({ ethProvider: Web3SignerProvider, chainId: String } \[, options \])** => **IExec**
 
-_options:_
-
-- `hubAddress: Address` specify the address of iExec hub smart contract to use
-- `smsURL: URL` specify the Secret Management System to use
-- `resultProxyURL: URL` specify the result proxy to use for results remote storage
-- `isNative: Boolean` true when the RLC is the chain native token
-- `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
-- `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+> _options:_
+>
+> - `hubAddress: Address` specify the address of iExec hub smart contract to use
+> - `smsURL: URL` specify the Secret Management System to use
+> - `resultProxyURL: URL` specify the result proxy to use for results remote storage
+> - `isNative: Boolean` true when the RLC is the chain native token
+> - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
+> - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 
 ##### Basic configuration
 
@@ -1247,6 +1247,19 @@ console.log('remaining:', res.remaining);
 iexec.**order.createApporder ( { app: Address \[, appprice: Uint256, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
 > create an apporder with specified params
+>
+> _mandatory values:_
+>
+> - `app`: address of the app
+>
+> _optional values:_
+>
+> - `appprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: required tags, default no tag required `[]`
+> - `datasetrestrict`: restrict usage to specific dataset address, default no restrict `NULL_ADDRESS`
+> - `workerpoolrestrict`: restrict usage to specific workerpool address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1287,6 +1300,19 @@ const hash = await iexec.order.hashApporder(apporder);
 iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: Uint256, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
 > create a datasetorder with specified params
+>
+> _mandatory values:_
+>
+> - `dataset`: address of the dataset
+>
+> _optional values:_
+>
+> - `datasetprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: required tags, default no tag required `[]`
+> - `apprestrict`: restrict usage to specific app address, default no restrict `NULL_ADDRESS`
+> - `workerpoolrestrict`: restrict usage to specific workerpool address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1329,6 +1355,21 @@ const hash = await iexec.order.hashDatasetorder(datasetorder);
 iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: Uint256, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
 > create a workerpoolorder with specified params
+>
+> _mandatory values:_
+>
+> - `workerpool`: address of the workerpool
+> - `category`: id of the selected computation category
+>
+> _optional values:_
+>
+> - `workerpoolprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: available tags, default no tag `[]`
+> - `trust`: available trust, default minimum trust `"0"`
+> - `apprestrict`: restrict usage to specific app address, default no restrict `NULL_ADDRESS`
+> - `datasetrestrict`: restrict usage to specific dataset address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1372,30 +1413,30 @@ const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
-
-_mandatory values:_
-
-- `app`: address of the app to run
-- `category`: id of the selected computation category
-
-_optional values:_
-
-- `params`: object, map of execution params:
-  - `iexec_args`: string arguments to pass to the application
-  - `iexec_input_files`: array of url of input files for the application, default `[]`
-  - `iexec_result_storage_provider`: selected storage provider `"ipfs"|"dropbox"`, default `"ipfs"`
-  - `iexec_result_encryption`: boolean should encrypt the result default `false`
-- `dataset`: address of the dataset to use, default no dataset `NULL_ADDRESS`
-- `workerpool`: allow only specific workerpool, default all workerpools allowed `NULL_ADDRESS`
-- `appmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the app, default 0 RLC `"0"`
-- `workerpoolmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the workerpool, default 0 RLC `"0"`
-- `datasetmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the dataset, default 0 RLC `"0"`
-- `volume`: number of tasks to execute, default `"1"`
-- `requester`: address paying for the computation, default current wallet address
-- `beneficiary`: address allowed to get the results, default `requester` or current wallet address
-- `callback`: smart contract to call after each task execution, default no callback `NULL_ADDRESS`
-- `tag`: required tags, default no tag required `[]`
-- `trust`: minimum trust level to reach in the PoCo, default minimum trust `"0"`
+>
+> _mandatory values:_
+>
+> - `app`: address of the app to run
+> - `category`: id of the selected computation category
+>
+> _optional values:_
+>
+> - `params`: object, map of execution params:
+>   - `iexec_args`: string arguments to pass to the application
+>   - `iexec_input_files`: array of url of input files for the application, default `[]`
+>   - `iexec_result_storage_provider`: selected storage provider `"ipfs"|"dropbox"`, default `"ipfs"`
+>   - `iexec_result_encryption`: boolean should encrypt the result default `false`
+> - `dataset`: address of the dataset to use, default no dataset `NULL_ADDRESS`
+> - `workerpool`: allow only specific workerpool, default all workerpools allowed `NULL_ADDRESS`
+> - `appmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the app, default 0 RLC `"0"`
+> - `workerpoolmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the workerpool, default 0 RLC `"0"`
+> - `datasetmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the dataset, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `requester`: address paying for the computation, default current wallet address
+> - `beneficiary`: address allowed to get the results, default `requester` or current wallet address
+> - `callback`: smart contract to call after each task execution, default no callback `NULL_ADDRESS`
+> - `tag`: required tags, default no tag required `[]`
+> - `trust`: minimum trust level to reach in the PoCo, default minimum trust `"0"`
 
 _Example:_
 
@@ -1412,9 +1453,13 @@ const requestorderToSign = await iexec.order.createRequestorder({
 
 #### signRequestorder
 
-iexec.**order.signRequestorder ( requestorderToSign: Requestorder )** => Promise < **SignedRequestorder** >
+iexec.**order.signRequestorder ( requestorderToSign: Requestorder \[, options: Object \] )** => Promise < **SignedRequestorder** >
 
 > sign a requestorder to produce a SignedRequestorder valid for the PoCo.
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1553,9 +1598,13 @@ await iexec.order.cancelWorkerpoolorder(signedWorkerpoolorder);
 
 #### publishRequestorder
 
-iexec.**order.publishRequestorder ( order: SignedRequestorder )** => Promise < **orderHash: Bytes32** >
+iexec.**order.publishRequestorder ( order: SignedRequestorder \[, options: Object \] )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedRequestorder on the offchain marketplace, the order will be available for other users
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1590,9 +1639,13 @@ await iexec.order.cancelRequestorder(signedRequestorder);
 
 #### matchOrders
 
-iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
+iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} \[, options: Object \] )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
 
 > make a deal on-chain with compatible orders and trigger off-chain computation.
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1767,9 +1820,9 @@ iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observab
 
 > return an observable with subscribe method to monitor the task status changes.
 >
-> - next is called with initial status and after every status update
-> - error is called once on error and stops the updates
-> - complete is called once on task completion or timeout/fail
+> - `next` is called with initial status and after every status update
+> - `error` is called once on error and stops the updates
+> - `complete` is called once on task completion or timeout/fail
 >
 > _Optional_: specify the dealid of the task, this prevent error to be called when task is not yet initialized (ACTIVE)
 >
@@ -1977,8 +2030,8 @@ iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String \[, options \])** 
 
 > push an encryption public key to the SMS, this allow results encryption
 > _options:_
-
-- `forceUpdate: Boolean` update if exists
+>
+> - `forceUpdate: Boolean` update if exists
 
 _Example:_
 
@@ -2030,11 +2083,11 @@ iexec.**storage.defaultStorageLogin ()** => Promise < **token: String** >
 iexec.**storage.pushStorageToken ( token: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
 
 > push a storage provider authorization token to the SMS, this allow results storage
-
-_options:_
-
-- `provider: String` specify storage provider (supported: `"default", "dropbox"`, )
-- `forceUpdate: Boolean` update if exists
+>
+> _options:_
+>
+> - `provider: String` specify storage provider (supported: `"default", "dropbox"`, )
+> - `forceUpdate: Boolean` update if exists
 
 _Example:_
 
@@ -2192,12 +2245,12 @@ const binary = new Blob([decryptedFileBuffer]);
 
 utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
 
-Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
-
-_options:_
-
-- `gasPrice: Uint256` specify the gasPrice to use for transactions
-- `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
+> Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
+>
+> _options:_
+>
+> - `gasPrice: Uint256` specify the gasPrice to use for transactions
+> - `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
 
 _Example:_
 
