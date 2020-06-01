@@ -236,7 +236,7 @@ class IExec {
     this.order.signWorkerpoolorder = workerpoolorder => order.signWorkerpoolorder(contracts, workerpoolorder);
     this.order.signRequestorder = async (
       requestorder,
-      { checkRequest = false } = {},
+      { checkRequest = true } = {},
     ) => order.signRequestorder(
       contracts,
       checkRequest === true
@@ -264,10 +264,21 @@ class IExec {
       getIexecGatewayURL(),
       signedWorkerpoolorder,
     );
-    this.order.publishRequestorder = signedRequestorder => order.publishRequestorder(
+    this.order.publishRequestorder = async (
+      signedRequestorder,
+      { checkRequest = true } = {},
+    ) => order.publishRequestorder(
       contracts,
       getIexecGatewayURL(),
-      signedRequestorder,
+      checkRequest === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          signedRequestorder,
+        ).then(() => signedRequestorder)
+        : signedRequestorder,
     );
     this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, getIexecGatewayURL(), apporderHash);
     this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(
@@ -292,7 +303,7 @@ class IExec {
         workerpoolorder,
         requestorder,
       },
-      { checkRequest = false } = {},
+      { checkRequest = true } = {},
     ) => order.matchOrders(
       contracts,
       apporder,
