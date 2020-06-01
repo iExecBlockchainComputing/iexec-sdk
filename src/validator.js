@@ -147,7 +147,7 @@ const objParamsSchema = () => object({
       is: true,
       then: string().oneOf(
         ['ipfs', 'dropbox'],
-        '${path} "${value}" is not supported for ${isTee} TEE tasks use supported storage provider ${values}',
+        '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
       ),
       otherwise: string().oneOf(
         ['ipfs'],
@@ -173,7 +173,7 @@ const objParamsSchema = () => object({
   [paramsKeyName.IEXEC_TEE_POST_COMPUTE_FINGERPRINT]: string()
     .default(teePostComputeDefaults.fingerprint)
     .required('${path} is required field for TEE tasks'),
-});
+}).noUnknown(true, 'Unknown key "${unknown}" in params');
 
 const paramsSchema = () => string().transform((value, originalValue) => {
   if (typeof originalValue === 'object') {
