@@ -9,6 +9,9 @@ const paramsKeyName = {
   IEXEC_DEVELOPER_LOGGER: 'iexec_developer_logger',
 };
 
+const storageProviders = () => ['ipfs', 'dropbox'];
+
 module.exports = {
   paramsKeyName,
+  storageProviders,
 };

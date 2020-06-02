@@ -7,9 +7,15 @@ const path = require('path');
 const { spawn } = require('child_process');
 const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
+const { storageProviders } = require('./params-utils');
 const packageJSON = require('../package.json');
 
 const debug = Debug('help');
+
+const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
+  (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
+  init,
+);
 
 const info = {
   checkBalance: currency => `Checking ${currency} balances...`,
@@ -152,32 +158,9 @@ const option = {
     'specify the requestorder from the marketplace to fill',
   ],
   fillRequestParams: () => [
-    '--params <string>',
+    '--params <json>',
     'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
-  appRunParams: () => [
-    '--params <string>',
-    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
-  ],
-  appRunDataset: () => [
-    '--dataset [address]',
-    "run with a dataset (specified address or user's last deployed dataset)",
-  ],
-  appRunWorkerpool: () => [
-    '--workerpool [address]',
-    "run on a specific workerpool (specified address or user's last deployed workerpool)",
-  ],
-  appRunBeneficiary: () => [
-    '--beneficiary <address>',
-    'specify the beneficiary of the request (default user address)',
-  ],
-  appRunCallback: () => [
-    '--callback <address>',
-    'specify the callback address of the request',
-  ],
-  appRunCategory: () => ['--category <catid>', 'run in specified category'],
-  appRunTag: () => ['--tag <tag...>', 'specify tags\n* usage: --tag tag1,tag2'],
-  appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
@@ -221,7 +204,10 @@ const option = {
   ],
   keystoredir: () => [
     '--keystoredir <path>',
-    "specify the wallet directory <'global'|'local'|custom>",
+    `specify the wallet directory <${listOfChoices([
+      'global',
+      'local',
+    ])}|custom>`,
   ],
   walletAddress: () => [
     '--wallet-address <walletAddress>',
@@ -261,7 +247,10 @@ const option = {
   ],
   datasetEncryptionAlgorithm: () => [
     '--algorithm <algorithm>',
-    "specify the encryption algorithm to use <'aes-256-cbc'|'scone'>",
+    `specify the encryption algorithm to use <${listOfChoices([
+      'aes-256-cbc',
+      'scone',
+    ])}>`,
   ],
   txGasPrice: () => [
     '--gas-price <wei>',
@@ -275,6 +264,78 @@ const option = {
   skipRequestCheck: () => [
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
+  ],
+};
+
+const orderOption = {
+  app: () => [
+    `--app <${listOfChoices(['deployed'], 'address')}>`,
+    'app address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  dataset: () => [
+    `--dataset <${listOfChoices(['deployed'], 'address')}>`,
+    'dataset address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  workerpool: () => [
+    `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
+    'workerpool address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  appprice: () => ['--app-price <nRlcAmount>', 'app price per task'],
+  datasetprice: () => [
+    '--dataset-price <nRlcAmount>',
+    'dataset price per task',
+  ],
+  workerpoolprice: () => [
+    '--workerpool-price <nRlcAmount>',
+    'workerpool price per task',
+  ],
+  volume: () => ['--volume <volume>', 'number of run'],
+  tag: () => ['--tag <tag...>', 'specify tags\n* usage: --tag tag1,tag2'],
+  category: () => ['--category <id>', 'id of the task category'],
+  trust: () => ['--trust <integer>', 'trust level'],
+  apprestrict: () => [
+    '--app-restrict <address>',
+    'restrict usage to specific app',
+  ],
+  datasetrestrict: () => [
+    '--dataset-restrict <address>',
+    'restrict usage to specific dataset',
+  ],
+  workerpoolrestrict: () => [
+    '--workerpool-restrict <address>',
+    'restrict usage to specific workerpool',
+  ],
+  requesterrestrict: () => [
+    '--requester-restrict <address>',
+    'restrict usage to specific requester',
+  ],
+  beneficiary: () => [
+    '--beneficiary <address>',
+    'specify the beneficiary of the request (default user address)',
+  ],
+  callback: () => [
+    '--callback <address>',
+    'specify the callback address of the request',
+  ],
+  params: () => [
+    '--params <json>',
+    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+  ],
+  requestArgs: () => [
+    '--args <string>',
+    'specify the arguments to pass to the app',
+  ],
+  requestInputFiles: () => [
+    '--input-files <fileUrl...>',
+    'specify the URL of input files to be used by the app\n* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip',
+  ],
+  requestEncryptResult: () => [
+    '--encrypt-result',
+    'encrypt the result archive with the beneficiary public key',
+  ],
+  requestStorageProvider: () => [
+    `--storage-provider <${listOfChoices(storageProviders())}>`,
+    'specify the storage to use to store the result archive',
   ],
 };
 
@@ -454,9 +515,8 @@ const help = (cli) => {
   cli.parse();
 };
 
-const Spinner = (cmd) => {
-  // debug('Spinner use raw', !!(cmd && cmd.raw));
-  if (cmd && cmd.raw) {
+const Spinner = (opts) => {
+  if (opts && opts.raw) {
     const nothing = () => {};
     const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify(Object.assign({ ok: true }, raw)));
     const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify(Object.assign({ ok: false }, raw)));
@@ -472,8 +532,8 @@ const Spinner = (cmd) => {
   return Ora(oraOptions);
 };
 
-const checkUpdate = async (cmd) => {
-  if (cmd && !cmd.quiet && !cmd.raw) {
+const checkUpdate = async (opts) => {
+  if (opts && !opts.quiet && !opts.raw) {
     const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
     const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
     const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
@@ -481,7 +541,7 @@ const checkUpdate = async (cmd) => {
     );
     if (update) {
       const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
-      const spin = Spinner(cmd);
+      const spin = Spinner(opts);
       spin.info(
         `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
       );
@@ -489,38 +549,38 @@ const checkUpdate = async (cmd) => {
   }
 };
 
-const computeWalletCreateOptions = async (cmd) => {
-  const spinner = Spinner(cmd);
+const computeWalletCreateOptions = async (opts) => {
+  const spinner = Spinner(opts);
   try {
     let pw;
-    if (cmd.password) {
-      pw = cmd.password;
+    if (opts.password) {
+      pw = opts.password;
       spinner.warn(
         'Option --password may be unsafe, make sure to know what you do',
       );
-    } else if (!cmd.unencrypted) {
+    } else if (!opts.unencrypted) {
       pw = await prompt.confimedPassword(
         'Please choose a password for wallet encryption',
       );
     }
-    if (!pw && !cmd.unencrypted) {
+    if (!pw && !opts.unencrypted) {
       throw Error('Missing wallet password');
     }
-    if (pw && cmd.unencrypted) {
+    if (pw && opts.unencrypted) {
       spinner.warn('Option --unencrypted will be ingnored');
     }
-    if (cmd.unencrypted) {
+    if (opts.unencrypted) {
       spinner.warn(
         'Using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
       );
     }
 
-    const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
-    const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const keystorePath = cmd.keystoredir
-      && cmd.keystoredir !== 'local'
-      && cmd.keystoredir !== 'global'
-      ? cmd.keystoredir
+    const global = (opts.keystoredir && opts.keystoredir === 'global') || !opts.keystoredir;
+    const local = (opts.keystoredir && opts.keystoredir === 'local') || false;
+    const keystorePath = opts.keystoredir
+      && opts.keystoredir !== 'local'
+      && opts.keystoredir !== 'global'
+      ? opts.keystoredir
       : false;
 
     return {
@@ -537,21 +597,21 @@ const computeWalletCreateOptions = async (cmd) => {
   }
 };
 
-const computeWalletLoadOptions = (cmd) => {
+const computeWalletLoadOptions = (opts) => {
   try {
-    const global = (cmd && cmd.keystoredir && cmd.keystoredir === 'global')
-      || !cmd
-      || !cmd.keystoredir;
-    const local = (cmd && cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const keystorePath = cmd
-      && cmd.keystoredir
-      && cmd.keystoredir !== 'local'
-      && cmd.keystoredir !== 'global'
-      ? cmd.keystoredir
+    const global = (opts && opts.keystoredir && opts.keystoredir === 'global')
+      || !opts
+      || !opts.keystoredir;
+    const local = (opts && opts.keystoredir && opts.keystoredir === 'local') || false;
+    const keystorePath = opts
+      && opts.keystoredir
+      && opts.keystoredir !== 'local'
+      && opts.keystoredir !== 'global'
+      ? opts.keystoredir
       : false;
-    const password = (cmd && cmd.password) || false;
-    const walletFileName = (cmd && cmd.walletFile) || false;
-    const walletAddress = (cmd && cmd.walletAddress) || false;
+    const password = (opts && opts.password) || false;
+    const walletFileName = (opts && opts.walletFile) || false;
+    const walletAddress = (opts && opts.walletAddress) || false;
     return {
       walletOptions: {
         global,
@@ -575,22 +635,22 @@ const datasetsFolderName = 'datasets';
 const originalDatasetFolderName = 'original';
 const encryptedDatasetFolderName = 'encrypted';
 
-const createEncFolderPaths = (cmd = {}) => {
+const createEncFolderPaths = (opts = {}) => {
   const absolutePath = relativeOrAbsolutePath => (path.isAbsolute(relativeOrAbsolutePath)
     ? relativeOrAbsolutePath
     : path.join(process.cwd(), relativeOrAbsolutePath));
 
-  const datasetSecretsFolderPath = cmd.datasetKeystoredir
-    ? absolutePath(cmd.datasetKeystoredir)
+  const datasetSecretsFolderPath = opts.datasetKeystoredir
+    ? absolutePath(opts.datasetKeystoredir)
     : path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
-  const beneficiarySecretsFolderPath = cmd.beneficiaryKeystoredir
-    ? absolutePath(cmd.beneficiaryKeystoredir)
+  const beneficiarySecretsFolderPath = opts.beneficiaryKeystoredir
+    ? absolutePath(opts.beneficiaryKeystoredir)
     : path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
-  const originalDatasetFolderPath = cmd.originalDatasetDir
-    ? absolutePath(cmd.originalDatasetDir)
+  const originalDatasetFolderPath = opts.originalDatasetDir
+    ? absolutePath(opts.originalDatasetDir)
     : path.join(process.cwd(), datasetsFolderName, originalDatasetFolderName);
-  const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
-    ? absolutePath(cmd.encryptedDatasetDir)
+  const encryptedDatasetFolderPath = opts.encryptedDatasetDir
+    ? absolutePath(opts.encryptedDatasetDir)
     : path.join(process.cwd(), datasetsFolderName, encryptedDatasetFolderName);
 
   const paths = {
@@ -608,11 +668,11 @@ const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 const publicKeyName = address => `${address}_key.pub`;
 const privateKeyName = address => `${address}_key`;
 
-const computeTxOptions = (cmd) => {
+const computeTxOptions = (opts) => {
   let gasPrice;
-  if (cmd.gasPrice) {
-    if (!/^\d+$/i.test(cmd.gasPrice)) throw Error('Invalid gas price value');
-    const bnGasPrice = new BN(cmd.gasPrice);
+  if (opts.gasPrice) {
+    if (!/^\d+$/i.test(opts.gasPrice)) throw Error('Invalid gas price value');
+    const bnGasPrice = new BN(opts.gasPrice);
     if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
@@ -626,15 +686,15 @@ const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
   return value;
 };
 
-const handleError = (error, cli, cmd) => {
+const handleError = (error, cli, opts) => {
   debug('error', error);
-  const spinner = Spinner(cmd);
+  const spinner = Spinner(opts);
   const lastCommandName = cli.rawArgs[2] || '';
   const commandName = cli._name
     .split('-')
     .join(' ')
     .concat(' ', lastCommandName);
-  if (!cmd || !cmd.raw) {
+  if (!opts || !opts.raw) {
     console.log('\n');
   }
   spinner.fail(`Command "${commandName}" failed with ${error}`, {
@@ -757,6 +817,7 @@ module.exports = {
   info,
   desc,
   option,
+  orderOption,
   getPropertyFormChain,
   addGlobalOptions,
   addWalletCreateOptions,

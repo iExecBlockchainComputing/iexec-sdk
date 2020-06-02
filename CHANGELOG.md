@@ -29,6 +29,8 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec result check-secret` is deprecated, use `iexec result check-encryption-key` returned json key is now `isEncryptionKeySet` previously was `isKnownAddress`
 - [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
 - [BREAKING] `iexec task show` & `task.show(taskid)` returned task.results is an object previously was url or hexString
+- `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
+- `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] standardized Error messages format, capitalized first letter.
 - standardized CLI messages format
 - fixed `iexec wallet sweep` & `wallet.sweep()`

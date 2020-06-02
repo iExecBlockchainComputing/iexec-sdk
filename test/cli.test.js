@@ -1083,7 +1083,7 @@ describe('[Mainchain]', () => {
     expect(res.fail.length).toBe(4);
   });
 
-  test('[common] iexec app run --workerpool', async () => {
+  test('[common] iexec app run --workerpool deployed', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1094,7 +1094,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1137,7 +1137,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --dataset 0x0000000000000000000000000000000000000000', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1148,7 +1148,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1191,7 +1191,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --dataset --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1205,7 +1205,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset --params "test params" --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1246,7 +1246,64 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --watch (timeout)', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      dataset: {
+        [networkId]: mainchainDataset,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee --skip-request-check --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deals).toBeDefined();
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
+
+    const rawDeal = await execAsync(
+      `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+    );
+    const resDeal = JSON.parse(rawDeal);
+    expect(resDeal.ok).toBe(true);
+    expect(resDeal.deal).toBeDefined();
+    expect(resDeal.deal.app.pointer).toBe(mainchainApp);
+    expect(resDeal.deal.app.price).toBe('0');
+    expect(resDeal.deal.dataset.pointer).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.dataset.price).toBe('0');
+    expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(resDeal.deal.workerpool.price).toBe('0');
+    expect(resDeal.deal.category).toBe('0');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"dropbox","iexec_result_encryption":true,"iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_args":"command --help"}',
+    );
+    expect(resDeal.deal.callback).toBe(
+      '0x0000000000000000000000000000000000000000',
+    );
+    expect(resDeal.deal.requester).toBe(ADDRESS);
+    expect(resDeal.deal.beneficiary).toBe(ADDRESS);
+    expect(resDeal.deal.botFirst).toBe('0');
+    expect(resDeal.deal.botSize).toBe('1');
+    expect(resDeal.deal.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+    );
+    expect(resDeal.deal.trust).toBe('1');
+    expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+    expect(resDeal.deal.tasks['0']).toBeDefined();
+  }, 15000);
+
+  test('[common] iexec app run --workerpool deployed --watch (timeout)', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1257,7 +1314,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);

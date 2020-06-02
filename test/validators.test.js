@@ -15,6 +15,7 @@ const {
   // requestorderSchema,
   // signedRequestorderSchema,
   paramsSchema,
+  paramsInputFilesArraySchema,
   tagSchema,
   // chainIdSchema,
   // hexnumberSchema,
@@ -245,6 +246,52 @@ describe('[paramsSchema]', () => {
   });
   test('number', async () => {
     await expect(paramsSchema().validate(42)).resolves.toBe('42');
+  });
+});
+
+describe('[paramsInputFilesArraySchema]', () => {
+  test('array of URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate([
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ]),
+    ).resolves.toEqual([
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+    ]);
+  });
+  test('string comma separated list of URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate(
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf,https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ),
+    ).resolves.toEqual([
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+    ]);
+  });
+  test('empty string', async () => {
+    await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
+      new ValidationError('"" is not a valid URL'),
+    );
+  });
+  test('string invalid URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate('example.com/foo.txt'),
+    ).rejects.toThrow(
+      new ValidationError('"example.com/foo.txt" is not a valid URL'),
+    );
+  });
+  test('empty array', async () => {
+    await expect(paramsInputFilesArraySchema().validate([])).resolves.toEqual(
+      [],
+    );
+  });
+  test('undefined', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate(undefined),
+    ).resolves.toEqual(undefined);
   });
 });
 

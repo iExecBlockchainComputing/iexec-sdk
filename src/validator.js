@@ -9,7 +9,7 @@ const {
   encodeTag,
   bytes32Regex,
 } = require('./utils');
-const { paramsKeyName } = require('./params-utils');
+const { paramsKeyName, storageProviders } = require('./params-utils');
 const { teePostComputeDefaults } = require('./secrets-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
@@ -146,7 +146,7 @@ const objParamsSchema = () => object({
     .when('$isTee', {
       is: true,
       then: string().oneOf(
-        ['ipfs', 'dropbox'],
+        storageProviders(),
         '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
       ),
       otherwise: string().oneOf(
@@ -175,12 +175,53 @@ const objParamsSchema = () => object({
     .required('${path} is required field for TEE tasks'),
 }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
-const paramsSchema = () => string().transform((value, originalValue) => {
-  if (typeof originalValue === 'object') {
-    return JSON.stringify(originalValue);
-  }
-  return value;
-});
+const paramsSchema = () => string()
+  .transform((value, originalValue) => {
+    if (typeof originalValue === 'object') {
+      return JSON.stringify(originalValue);
+    }
+    return value;
+  })
+  .test(
+    'is-json',
+    '${originalValue} is not a valid params, must be a json',
+    (value) => {
+      if (value === undefined) {
+        return true;
+      }
+      try {
+        JSON.parse(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+  );
+
+const paramsArgsSchema = () => string();
+
+const paramsInputFilesArraySchema = () => array()
+  .transform((value, originalValue) => {
+    if (Array.isArray(originalValue)) {
+      return originalValue;
+    }
+    if (typeof originalValue === 'string') {
+      return originalValue.split(',');
+    }
+    return value;
+  })
+  .of(
+    string()
+      .url('"${value}" is not a valid URL')
+      .required('"${value}" is not a valid URL'),
+  );
+
+const paramsEncryptResultSchema = () => boolean();
+
+const paramsStorageProviderSchema = () => string().oneOf(
+  storageProviders(),
+  '"${value}" is not a valid storage provider use one of ${values}',
+);
 
 const tagSchema = () => mixed()
   .transform((value) => {
@@ -389,6 +430,10 @@ module.exports = {
   catidSchema,
   paramsSchema,
   objParamsSchema,
+  paramsArgsSchema,
+  paramsInputFilesArraySchema,
+  paramsEncryptResultSchema,
+  paramsStorageProviderSchema,
   tagSchema,
   chainIdSchema,
   hexnumberSchema,
