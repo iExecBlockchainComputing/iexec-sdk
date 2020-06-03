@@ -34,7 +34,10 @@ const { NULL_ADDRESS } = require('./utils');
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
-cli.name('iexec order').usage('<command> [options]');
+cli
+  .name('iexec order')
+  .usage('<command> [options]')
+  .storeOptionsAsProperties(false);
 
 const init = cli.command('init');
 addGlobalOptions(init);
@@ -47,21 +50,22 @@ init
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const initAll = !(
-        cmd.app
-        || cmd.dataset
-        || cmd.workerpool
-        || cmd.request
+        opts.app
+        || opts.dataset
+        || opts.workerpool
+        || opts.request
       );
 
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(opts.chain, keystore, { spinner });
       const success = {};
       const failed = [];
 
@@ -93,10 +97,10 @@ init
         }
       };
 
-      if (cmd.app || initAll) await initOrder('app');
-      if (cmd.dataset || initAll) await initOrder('dataset');
-      if (cmd.workerpool || initAll) await initOrder('workerpool');
-      if (cmd.request || initAll) await initOrder('request');
+      if (opts.app || initAll) await initOrder('app');
+      if (opts.dataset || initAll) await initOrder('dataset');
+      if (opts.workerpool || initAll) await initOrder('workerpool');
+      if (opts.request || initAll) await initOrder('request');
 
       if (failed.length === 0) {
         spinner.succeed(
@@ -111,7 +115,7 @@ init
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -128,19 +132,20 @@ sign
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const signAll = !(
-        cmd.app
-        || cmd.dataset
-        || cmd.workerpool
-        || cmd.request
+        opts.app
+        || opts.dataset
+        || opts.workerpool
+        || opts.request
       );
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadIExecConf(),
         keystore.load(),
       ]);
@@ -263,7 +268,7 @@ sign
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
-          if (!cmd.skipRequestCheck) {
+          if (!opts.skipRequestCheck) {
             await checkRequestRequirements(
               { contracts: chain.contracts, smsURL: chain.sms },
               orderObj,
@@ -295,10 +300,10 @@ sign
         }
       };
 
-      if (cmd.app || signAll) await signAppOrder();
-      if (cmd.dataset || signAll) await signDatasetOrder();
-      if (cmd.workerpool || signAll) await signWorkerpoolOrder();
-      if (cmd.request || signAll) await signRequestOrder();
+      if (opts.app || signAll) await signAppOrder();
+      if (opts.dataset || signAll) await signDatasetOrder();
+      if (opts.workerpool || signAll) await signWorkerpoolOrder();
+      if (opts.request || signAll) await signRequestOrder();
 
       if (failed.length === 0) {
         spinner.succeed('Successfully signed and stored in "orders.json"', {
@@ -310,7 +315,7 @@ sign
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -329,18 +334,19 @@ fill
   .option(...option.fillRequestParams())
   .description(desc.fill(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
       ]);
 
-      const inputParams = cmd.params;
+      const inputParams = opts.params;
       const requestOnTheFly = inputParams !== undefined;
 
       const getOrderByHash = async (orderName, orderHash) => {
@@ -363,21 +369,21 @@ fill
         }
         throw Error(`Invalid ${orderName} hash`);
       };
-      const appOrder = cmd.app
-        ? await getOrderByHash(order.APP_ORDER, cmd.app)
+      const appOrder = opts.app
+        ? await getOrderByHash(order.APP_ORDER, opts.app)
         : signedOrders[chain.id].apporder;
-      const datasetOrder = cmd.dataset
-        ? await getOrderByHash(order.DATASET_ORDER, cmd.dataset)
+      const datasetOrder = opts.dataset
+        ? await getOrderByHash(order.DATASET_ORDER, opts.dataset)
         : signedOrders[chain.id].datasetorder;
-      const workerpoolOrder = cmd.workerpool
-        ? await getOrderByHash(order.WORKERPOOL_ORDER, cmd.workerpool)
+      const workerpoolOrder = opts.workerpool
+        ? await getOrderByHash(order.WORKERPOOL_ORDER, opts.workerpool)
         : signedOrders[chain.id].workerpoolorder;
       let requestOrderInput;
       if (requestOnTheFly) {
         requestOrderInput = undefined;
       } else {
-        requestOrderInput = cmd.request
-          ? await getOrderByHash(order.REQUEST_ORDER, cmd.request)
+        requestOrderInput = opts.request
+          ? await getOrderByHash(order.REQUEST_ORDER, opts.request)
           : signedOrders[chain.id].requestorder;
       }
 
@@ -405,7 +411,7 @@ fill
             params: inputParams || undefined,
           },
         );
-        if (!cmd.force) {
+        if (!opts.force) {
           await prompt.signGeneratedOrder(
             order.REQUEST_ORDER,
             pretty(unsignedOrder),
@@ -423,7 +429,7 @@ fill
         throw new Error('Missing requestorder');
       }
 
-      if (!cmd.skipRequestCheck) {
+      if (!opts.skipRequestCheck) {
         await checkRequestRequirements(
           { contracts: chain.contracts, smsURL: chain.sms },
           requestOrder,
@@ -452,7 +458,7 @@ fill
         { raw: { dealid, volume: volume.toString(), txHash } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -469,19 +475,20 @@ publish
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -496,7 +503,7 @@ publish
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+          if (!opts.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
           spinner.start(`Publishing ${orderName}`);
 
           let orderHash;
@@ -523,7 +530,7 @@ publish
               );
               break;
             case order.REQUEST_ORDER:
-              if (!cmd.skipRequestCheck) {
+              if (!opts.skipRequestCheck) {
                 await checkRequestRequirements(
                   { contracts: chain.contracts, smsURL: chain.sms },
                   orderToPublish,
@@ -554,10 +561,10 @@ publish
         }
       };
 
-      if (cmd.app) await publishOrder(order.APP_ORDER);
-      if (cmd.dataset) await publishOrder(order.DATASET_ORDER);
-      if (cmd.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
-      if (cmd.request) await publishOrder(order.REQUEST_ORDER);
+      if (opts.app) await publishOrder(order.APP_ORDER);
+      if (opts.dataset) await publishOrder(order.DATASET_ORDER);
+      if (opts.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
+      if (opts.request) await publishOrder(order.REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully published', {
@@ -569,7 +576,7 @@ publish
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -585,19 +592,20 @@ unpublish
   .option(...option.force())
   .description(desc.unpublish(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -624,7 +632,7 @@ unpublish
               orderName,
               orderToUnpublish,
             );
-            if (!cmd.force) {
+            if (!opts.force) {
               await prompt.unpublishFromJsonFile(
                 orderName,
                 pretty(orderToUnpublish),
@@ -674,10 +682,10 @@ unpublish
         }
       };
 
-      if (cmd.app) await unpublishOrder(order.APP_ORDER, cmd.app);
-      if (cmd.dataset) await unpublishOrder(order.DATASET_ORDER, cmd.dataset);
-      if (cmd.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
-      if (cmd.request) await unpublishOrder(order.REQUEST_ORDER, cmd.request);
+      if (opts.app) await unpublishOrder(order.APP_ORDER, opts.app);
+      if (opts.dataset) await unpublishOrder(order.DATASET_ORDER, opts.dataset);
+      if (opts.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await unpublishOrder(order.REQUEST_ORDER, opts.request);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully unpublished', {
@@ -689,7 +697,7 @@ unpublish
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -706,19 +714,20 @@ cancel
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -733,7 +742,7 @@ cancel
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+          if (!opts.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
           spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
@@ -770,10 +779,10 @@ cancel
         }
       };
 
-      if (cmd.app) await cancelOrder(order.APP_ORDER);
-      if (cmd.dataset) await cancelOrder(order.DATASET_ORDER);
-      if (cmd.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
-      if (cmd.request) await cancelOrder(order.REQUEST_ORDER);
+      if (opts.app) await cancelOrder(order.APP_ORDER);
+      if (opts.dataset) await cancelOrder(order.DATASET_ORDER);
+      if (opts.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
+      if (opts.request) await cancelOrder(order.REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully canceled', {
@@ -785,7 +794,7 @@ cancel
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -800,15 +809,16 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(opts.chain, Keystore({ isSigner: false }), {
         spinner,
       });
       const success = {};
@@ -845,7 +855,7 @@ show
             orderHash,
           );
           let deals;
-          if (cmd.deals) {
+          if (opts.deals) {
             deals = await order.fetchDealsByOrderHash(
               getPropertyFormChain(chain, 'iexecGateway'),
               orderName,
@@ -868,17 +878,17 @@ show
             orderToShow,
             deals && { deals: { count: deals.count, lastDeals: deals.deals } },
           );
-          spinner.info(`${orderString}${cmd.deals ? dealsString : ''}`);
+          spinner.info(`${orderString}${opts.deals ? dealsString : ''}`);
           Object.assign(success, { [orderName]: raw });
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
         }
       };
 
-      if (cmd.app) await showOrder(order.APP_ORDER, cmd.app);
-      if (cmd.dataset) await showOrder(order.DATASET_ORDER, cmd.dataset);
-      if (cmd.workerpool) await showOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
-      if (cmd.request) await showOrder(order.REQUEST_ORDER, cmd.request);
+      if (opts.app) await showOrder(order.APP_ORDER, opts.app);
+      if (opts.dataset) await showOrder(order.DATASET_ORDER, opts.dataset);
+      if (opts.workerpool) await showOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await showOrder(order.REQUEST_ORDER, opts.request);
       if (failed.length === 0) {
         spinner.succeed('Successfully found', {
           raw: success,
@@ -889,7 +899,7 @@ show
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
