@@ -101,9 +101,7 @@ iexec app run [address] # run an application on iExec at market price
 
 ```bash
 iexec orderbook app <address> # check if you have valid sell orders for your app on the Marketplace
-iexec order init --app # reset apporder fields in iexec.json
-iexec order sign --app # sign your apporder
-iexec order publish --app # publish your apporder on the Marketplace and get an orderHash
+iexec app publish [address] # publish an apporder on the Marketplace and get an orderHash
 iexec order show --app [orderHash] # show your order on the Marketplace
 iexec order cancel --app <orderHash> # cancel your order
 ```
@@ -142,10 +140,7 @@ iexec dataset push-secret # Push the secret in the Secret Management Service (sm
 
 ```bash
 iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the Marketplace
-iexec order init --dataset # reset datasetorder fields in iexec.json
-vim iexec.json # edit your selling policy, set restrictions, price ...
-iexec order sign --dataset # sign your datasetorder
-iexec order publish --dataset #publish your datasetorder on the Marketplace and get an orderHash
+iexec dataset publish [address] --tag tee --app-restrict <address> # publish a datasetorder (restricted to specific app running in Trusted Execution Environment) on the Marketplace and get an orderHash
 iexec order show --dataset [orderHash] # show your order on the Marketplace
 iexec order cancel --dataset <orderHash> # cancel your order
 ```
@@ -167,10 +162,7 @@ iexec workerpool show # show details of deployed workerpool
 
 ```bash
 iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the Marketplace
-iexec order init --workerpool # reset workerpoolorder fields in iexec.json
-iexec order sign --workerpool # sign your workerpoolorder
-iexec order publish --workerpool # publish your workerpoolorder on the Marketplace and get an orderHash
-iexec order show --workerpool [orderHash] # show your order on the Marketplace
+iexec publish workerpool # publish a workerpoolorder on the Marketplace and get an orderHash
 iexec order cancel --workerpool <orderHash> # cancel your order
 ```
 
@@ -359,8 +351,9 @@ iexec account withdraw <amount> # withdraw the specified amount of RLC from your
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec app init # init new app
-iexec app deploy # deploy new app
+iexec app init # init the app template
+iexec app deploy # deploy the app on the blockchain
+iexec app publish # publish an apporder to make your app publicly available on the marketplace (use options to manage access)
 iexec app show [address|index] # show app details
 iexec app count # count your total number of app
 iexec app count --user <userAddress> # count user total number of app
@@ -388,9 +381,10 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec dataset init # init new dataset
-iexec dataset init --encrypted # init new dataset and folders for dataset encryption
-iexec dataset deploy # deploy new dataset
+iexec dataset init # init the dataset template
+iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
+iexec dataset deploy # deploy the dataset on the blockchain
+iexec dataset publish # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
@@ -406,8 +400,9 @@ iexec dataset check-secret [datasetAddress] # check if a secret exists for the d
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec workerpool init # init new workerpool
-iexec workerpool deploy # deploy new workerpool
+iexec workerpool init # init the workerpool template
+iexec workerpool deploy # deploy the workerpool on the blockchain
+iexec workerpool publish --price 100 # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
 iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool
@@ -499,7 +494,7 @@ iexec storage check [provider] --user <address> # check if the remote storage of
 ```bash
 # OPTIONS
 # --chain <chainName>
-iexec category init # init new category
+iexec category init # init the category template
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count total number of category
@@ -646,7 +641,7 @@ optional key `native` specify whether or not the chain native token is RLC (over
 
 ### deployed.json
 
-The `deployed.json` file, located in iExec project, locally stores your last deployed resources address. These address are used when you run a commande without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
+The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a commande without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
 
 ```json
 {
@@ -664,7 +659,7 @@ The `deployed.json` file, located in iExec project, locally stores your last dep
 
 ### orders.json
 
-The `orders.json` file, located in iExec project, locally stores your signed orders. This file is used when you publish an order on the Marketplace and when you fill orders without specified orders from the Marketplace.
+The `orders.json` file, located in iExec project, locally stores your latest signed orders. This file is used when you publish an order on the Marketplace and when you fill orders without specified orders from the Marketplace.
 
 ```json
 {
