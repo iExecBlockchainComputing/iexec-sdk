@@ -65,7 +65,7 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
               } catch (error) {
                 debug('ENS resolution error', error);
               }
-              reject(value);
+              resolve(null);
             });
             return addressPromise;
           }
@@ -80,7 +80,7 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
   })
   .test(
     'resolve-ens',
-    'unable to resolve ENS ${originalValue}',
+    'Unable to resolve ENS ${originalValue}',
     async (value) => {
       if (value === undefined) {
         return true;

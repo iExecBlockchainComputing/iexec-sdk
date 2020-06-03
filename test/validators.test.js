@@ -618,12 +618,12 @@ describe('[addressSchema]', () => {
         'pierre.iexec.eth',
       ),
     ).rejects.toThrow(
-      new ValidationError('unable to resolve ENS pierre.iexec.eth'),
+      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
     );
   });
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
-      new ValidationError('unable to resolve ENS rlc.iexec.eth'),
+      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });
