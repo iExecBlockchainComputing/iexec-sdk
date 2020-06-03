@@ -30,16 +30,20 @@ const { NULL_ADDRESS } = require('./utils');
 
 const objName = 'workerpool';
 
-cli.name('iexec workerpool').usage('<command> [options]');
+cli
+  .name('iexec workerpool')
+  .usage('<command> [options]')
+  .storeOptionsAsProperties(false);
 
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
-  await checkUpdate(cmd);
-  const spinner = Spinner(cmd);
+  const opts = cmd.opts();
+  await checkUpdate(opts);
+  const spinner = Spinner(opts);
   try {
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
       Object.assign({}, walletOptions, { isSigner: false }),
     );
@@ -54,7 +58,7 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
       { raw: { workerpool: saved } },
     );
   } catch (error) {
-    handleError(error, cli, cmd);
+    handleError(error, cli, opts);
   }
 });
 
@@ -66,14 +70,15 @@ deploy
   .option(...option.txGasPrice())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -92,7 +97,7 @@ deploy
       });
       await saveDeployedObj(objName, chain.id, address);
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -104,15 +109,16 @@ show
   .option(...option.user())
   .description(desc.showObj(objName))
   .action(async (cliAddressOrIndex, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
       Object.assign({}, walletOptions, { isSigner: false }),
     );
     try {
       const [chain, [address], deployedObj] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         keystore.accounts(),
         loadDeployedObj(objName),
       ]);
@@ -120,7 +126,7 @@ show
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
@@ -142,7 +148,7 @@ show
         raw: { address: objAddress, workerpool: cleanObj },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -154,19 +160,20 @@ count
   .option(...option.user())
   .description(desc.countObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign({}, walletOptions, { isSigner: false }),
       );
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         keystore.accounts(),
       ]);
 
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
@@ -179,7 +186,7 @@ count
         { raw: { count: objCountBN.toString() } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
