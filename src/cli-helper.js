@@ -47,6 +47,7 @@ const desc = {
   initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
+  publishObj: objName => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
   fill: objName => `fill an ${objName} to execute a work`,
@@ -280,6 +281,7 @@ const orderOption = {
     `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
     'workerpool address, use "deployed" to use last deployed from "deployed.json"',
   ],
+  price: () => ['--price <nRlcAmount>', 'price per task'],
   appprice: () => ['--app-price <nRlcAmount>', 'app price per task'],
   datasetprice: () => [
     '--dataset-price <nRlcAmount>',
