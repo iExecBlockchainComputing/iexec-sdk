@@ -16,14 +16,27 @@ const {
   handleError,
   desc,
   option,
+  orderOption,
   Spinner,
   pretty,
   info,
+  prompt,
   isEthAddress,
   spawnAsync,
   getPropertyFormChain,
 } = require('./cli-helper');
-const hub = require('./hub');
+const {
+  checkDeployedDataset,
+  deployDataset,
+  countUserDatasets,
+  showDataset,
+  showUserDataset,
+} = require('./hub');
+const {
+  createDatasetorder,
+  signDatasetorder,
+  publishDatasetorder,
+} = require('./order');
 const {
   loadIExecConf,
   initObj,
@@ -122,7 +135,7 @@ deploy
       }
       await keystore.load();
       spinner.start(info.deploying(objName));
-      const { address, txHash } = await hub.deployDataset(
+      const { address, txHash } = await deployDataset(
         chain.contracts,
         iexecConf[objName],
       );
@@ -169,9 +182,9 @@ show
 
       let res;
       if (isAddress) {
-        res = await hub.showDataset(chain.contracts, addressOrIndex);
+        res = await showDataset(chain.contracts, addressOrIndex);
       } else {
-        res = await hub.showUserDataset(
+        res = await showUserDataset(
           chain.contracts,
           addressOrIndex,
           userAddress,
@@ -211,10 +224,7 @@ count
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
-      const objCountBN = await hub.countUserDatasets(
-        chain.contracts,
-        userAddress,
-      );
+      const objCountBN = await countUserDatasets(chain.contracts, userAddress);
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
         { raw: { count: objCountBN.toString() } },
@@ -653,6 +663,80 @@ checkSecret
           raw: { isSecretSet: false },
         });
       }
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const publish = cli.command('publish [datasetAddress]');
+addGlobalOptions(publish);
+addWalletLoadOptions(publish);
+publish
+  .description(desc.publishObj(objName))
+  .option(...option.chain())
+  .option(...option.force())
+  .option(...orderOption.price())
+  .option(...orderOption.volume())
+  .option(...orderOption.tag())
+  .option(...orderOption.apprestrict())
+  // .option(...orderOption.workerpoolrestrict()) // not allowed by iExec marketplace
+  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
+    const keystore = Keystore(walletOptions);
+    try {
+      const [chain, deployedObj] = await Promise.all([
+        loadChain(opts.chain, keystore, { spinner }),
+        loadDeployedObj(objName),
+      ]);
+      const useDeployedObj = !objAddress;
+      const address = objAddress || (deployedObj && deployedObj[chain.id]);
+      if (!address) {
+        throw Error(
+          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
+        );
+      }
+      debug('useDeployedObj', useDeployedObj, 'address', address);
+      if (useDeployedObj) {
+        spinner.info(
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+        );
+      }
+      spinner.info(`Creating ${objName}order for ${objName} ${address}`);
+      if (!(await checkDeployedDataset(chain.contracts, address))) {
+        throw Error(`No ${objName} deployed at address ${address}`);
+      }
+      const overrides = {
+        dataset: address,
+        datasetprice: opts.price,
+        volume: opts.volume,
+        tag: opts.tag,
+        apprestrict: opts.appRestrict,
+        workerpoolrestrict: opts.workerpoolRestrict,
+        requesterrestrict: opts.requesterRestrict,
+      };
+      const orderToSign = await createDatasetorder(chain.contracts, overrides);
+      if (!opts.force) {
+        await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
+      }
+      await keystore.load();
+      const signedOrder = await signDatasetorder(chain.contracts, orderToSign);
+      const orderHash = await publishDatasetorder(
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
+        signedOrder,
+      );
+      spinner.succeed(
+        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
+        {
+          raw: {
+            orderHash,
+          },
+        },
+      );
     } catch (error) {
       handleError(error, cli, opts);
     }
