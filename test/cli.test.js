@@ -1633,6 +1633,7 @@ describe('[Mainchain]', () => {
     describe('[with stack]', () => {
       // this test requires running local stack
       test('[common] iexec app publish (from depoyed)', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} app init`);
         await setAppUniqueName();
@@ -1662,6 +1663,7 @@ describe('[Mainchain]', () => {
       }, 15000);
 
       test('[mainchain] iexec app publish [address] with options', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} app init`);
         await setAppUniqueName();
@@ -1694,6 +1696,7 @@ describe('[Mainchain]', () => {
       }, 15000);
 
       test('[common] iexec dataset publish (from depoyed)', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} dataset init`);
         await setDatasetUniqueName();
@@ -1725,6 +1728,7 @@ describe('[Mainchain]', () => {
       }, 15000);
 
       test('[mainchain] iexec dataset publish [address] with options', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} dataset init`);
         await setDatasetUniqueName();
@@ -1757,6 +1761,7 @@ describe('[Mainchain]', () => {
       }, 15000);
 
       test('[common] iexec workerpool publish (from depoyed)', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} workerpool init`);
         await setWorkerpoolUniqueDescription();
@@ -1789,7 +1794,8 @@ describe('[Mainchain]', () => {
         });
       }, 15000);
 
-      test.only('[mainchain] iexec workerpool publish [address] with options', async () => {
+      test('[mainchain] iexec workerpool publish [address] with options', async () => {
+        await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} account deposit 10`);
         await execAsync(`${iexecPath} workerpool init`);
