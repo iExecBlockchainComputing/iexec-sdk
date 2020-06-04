@@ -13,6 +13,7 @@ const {
 } = require('./secrets-utils');
 const resultProxyServ = require('./result-proxy');
 const iexecProcess = require('./iexecProcess');
+const { checkRequestRequirements } = require('./request-helper');
 const errors = require('./errors');
 const {
   BN,
@@ -28,7 +29,7 @@ const {
   decryptResult,
 } = require('./utils');
 const { getSignerFromPrivateKey } = require('./sig-utils');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
+const { getChainDefaults } = require('./config');
 
 const utils = {
   BN,
@@ -55,6 +56,7 @@ class IExec {
       bridgedNetworkConf,
       resultProxyURL,
       smsURL,
+      ipfsGatewayURL,
       iexecGatewayURL,
     } = {},
   ) {
@@ -96,8 +98,9 @@ class IExec {
     }
 
     const getSmsURL = () => {
-      if (smsURL) {
-        return smsURL;
+      const value = smsURL || getChainDefaults(chainId).sms;
+      if (value !== undefined) {
+        return value;
       }
       throw Error(
         `smsURL option not set and no default value for your chain ${chainId}`,
@@ -105,8 +108,9 @@ class IExec {
     };
 
     const getResultProxyURL = () => {
-      if (resultProxyURL) {
-        return resultProxyURL;
+      const value = resultProxyURL || getChainDefaults(chainId).resultProxy;
+      if (value !== undefined) {
+        return value;
       }
       throw Error(
         `resultProxyURL option not set and no default value for your chain ${chainId}`,
@@ -114,10 +118,23 @@ class IExec {
     };
 
     const getIexecGatewayURL = () => {
-      if (iexecGatewayURL) {
-        return iexecGatewayURL;
+      const value = iexecGatewayURL || getChainDefaults(chainId).iexecGateway;
+      if (value !== undefined) {
+        return value;
       }
-      return IEXEC_GATEWAY_URL;
+      throw Error(
+        `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getIpfsGatewayURL = () => {
+      const value = ipfsGatewayURL || getChainDefaults(chainId).ipfsGateway;
+      if (value !== undefined) {
+        return value;
+      }
+      throw Error(
+        `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
     };
 
     this.wallet = {};
@@ -222,7 +239,10 @@ class IExec {
     this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
     this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
     this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(contracts, overwrite);
-    this.order.createRequestorder = overwrite => order.createRequestorder(contracts, overwrite);
+    this.order.createRequestorder = overwrite => order.createRequestorder(
+      { contracts, resultProxyURL: getResultProxyURL() },
+      overwrite,
+    );
     this.order.hashApporder = apporder => order.hashApporder(contracts, apporder);
     this.order.hashDatasetorder = datasetorder => order.hashDatasetorder(contracts, datasetorder);
     this.order.hashWorkerpoolorder = workerpoolorder => order.hashWorkerpoolorder(contracts, workerpoolorder);
@@ -230,7 +250,21 @@ class IExec {
     this.order.signApporder = apporder => order.signApporder(contracts, apporder);
     this.order.signDatasetorder = datasetorder => order.signDatasetorder(contracts, datasetorder);
     this.order.signWorkerpoolorder = workerpoolorder => order.signWorkerpoolorder(contracts, workerpoolorder);
-    this.order.signRequestorder = requestorder => order.signRequestorder(contracts, requestorder);
+    this.order.signRequestorder = async (
+      requestorder,
+      { checkRequest = true } = {},
+    ) => order.signRequestorder(
+      contracts,
+      checkRequest === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          requestorder,
+        ).then(() => requestorder)
+        : requestorder,
+    );
     this.order.cancelApporder = signedApporder => order.cancelApporder(contracts, signedApporder);
     this.order.cancelDatasetorder = signedDatasetorder => order.cancelDatasetorder(contracts, signedDatasetorder);
     this.order.cancelWorkerpoolorder = signedWorkerpoolorder => order.cancelWorkerpoolorder(contracts, signedWorkerpoolorder);
@@ -246,10 +280,21 @@ class IExec {
       getIexecGatewayURL(),
       signedWorkerpoolorder,
     );
-    this.order.publishRequestorder = signedRequestorder => order.publishRequestorder(
+    this.order.publishRequestorder = async (
+      signedRequestorder,
+      { checkRequest = true } = {},
+    ) => order.publishRequestorder(
       contracts,
       getIexecGatewayURL(),
-      signedRequestorder,
+      checkRequest === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          signedRequestorder,
+        ).then(() => signedRequestorder)
+        : signedRequestorder,
     );
     this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, getIexecGatewayURL(), apporderHash);
     this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(
@@ -267,17 +312,28 @@ class IExec {
       getIexecGatewayURL(),
       requestorderHash,
     );
-    this.order.matchOrders = ({
-      apporder,
-      datasetorder = order.NULL_DATASETORDER,
-      workerpoolorder,
-      requestorder,
-    } = {}) => order.matchOrders(
+    this.order.matchOrders = async (
+      {
+        apporder,
+        datasetorder = order.NULL_DATASETORDER,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest = true } = {},
+    ) => order.matchOrders(
       contracts,
       apporder,
       datasetorder,
       workerpoolorder,
-      requestorder,
+      checkRequest === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          requestorder,
+        ).then(() => requestorder)
+        : requestorder,
     );
     this.orderbook = {};
     this.orderbook.fetchApporder = apporderHash => order.fetchPublishedOrderByHash(
@@ -332,7 +388,9 @@ class IExec {
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
     this.task.claim = taskid => task.claim(contracts, taskid);
-    this.task.fetchResults = (taskid, { ipfsGatewayURL } = {}) => iexecProcess.fetchTaskResults(contracts, taskid, { ipfsGatewayURL });
+    this.task.fetchResults = taskid => iexecProcess.fetchTaskResults(contracts, taskid, {
+      ipfsGatewayURL: getIpfsGatewayURL(),
+    });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => {
       console.warn(
         '[iexec] task.waitForTaskStatusChange(taskid, initialStatus) is deprecated, please use task.obsTask(taskid, { dealid })',

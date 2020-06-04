@@ -12,12 +12,14 @@ const {
   handleError,
   desc,
   option,
+  orderOption,
   prompt,
   Spinner,
   pretty,
   info,
   isEthAddress,
   renderTasksStatus,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const {
   deployApp,
@@ -38,6 +40,7 @@ const {
   saveDeployedObj,
   loadDeployedObj,
 } = require('./fs');
+const { checkRequestRequirements } = require('./request-helper');
 const {
   getRemainingVolume,
   createApporder,
@@ -48,6 +51,7 @@ const {
   signDatasetorder,
   signWorkerpoolorder,
   signRequestorder,
+  publishApporder,
   matchOrders,
   NULL_DATASETORDER,
   WORKERPOOL_ORDER,
@@ -70,28 +74,37 @@ const {
   BN,
   stringifyNestedBn,
 } = require('./utils');
+const { paramsKeyName } = require('./params-utils');
 const {
   tagSchema,
   catidSchema,
   addressSchema,
   paramsSchema,
   positiveIntSchema,
+  paramsArgsSchema,
+  paramsInputFilesArraySchema,
+  paramsStorageProviderSchema,
+  paramsEncryptResultSchema,
 } = require('./validator');
 
 const debug = Debug('iexec:iexec-app');
 
 const objName = 'app';
 
-cli.name('iexec app').usage('<command> [options]');
+cli
+  .name('iexec app')
+  .usage('<command> [options]')
+  .storeOptionsAsProperties(false);
 
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
-  await checkUpdate(cmd);
-  const spinner = Spinner(cmd);
+  const opts = cmd.opts();
+  await checkUpdate(opts);
+  const spinner = Spinner(opts);
   try {
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
       Object.assign({}, walletOptions, { isSigner: false }),
     );
@@ -106,7 +119,7 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
       { raw: { app: saved } },
     );
   } catch (error) {
-    handleError(error, cli, cmd);
+    handleError(error, cli, opts);
   }
 });
 
@@ -118,14 +131,15 @@ deploy
   .option(...option.txGasPrice())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -144,7 +158,7 @@ deploy
       });
       await saveDeployedObj(objName, chain.id, address);
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -156,15 +170,16 @@ show
   .option(...option.user())
   .description(desc.showObj(objName))
   .action(async (cliAddressOrIndex, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign({}, walletOptions, { isSigner: false }),
       );
       const [chain, [address], deployedObj] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         keystore.accounts(),
         loadDeployedObj(objName),
       ]);
@@ -172,7 +187,7 @@ show
       const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
@@ -189,7 +204,7 @@ show
         raw: { address: objAddress, app },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -201,18 +216,19 @@ count
   .option(...option.user())
   .description(desc.countObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
       Object.assign({}, walletOptions, { isSigner: false }),
     );
     try {
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         keystore.accounts(),
       ]);
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
       spinner.start(info.counting(objName));
       const objCountBN = await countUserApps(chain.contracts, userAddress);
@@ -221,7 +237,81 @@ count
         { raw: { count: objCountBN.toString() } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
+    }
+  });
+
+const publish = cli.command('publish [appAddress]');
+addGlobalOptions(publish);
+addWalletLoadOptions(publish);
+publish
+  .description(desc.publishObj(objName))
+  .option(...option.chain())
+  .option(...option.force())
+  .option(...orderOption.price())
+  .option(...orderOption.volume())
+  .option(...orderOption.tag())
+  // .option(...orderOption.datasetrestrict()) // not allowed by iExec marketplace
+  // .option(...orderOption.workerpoolrestrict()) // not allowed by iExec marketplace
+  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
+    const keystore = Keystore(walletOptions);
+    try {
+      const [chain, deployedObj] = await Promise.all([
+        loadChain(opts.chain, keystore, { spinner }),
+        loadDeployedObj(objName),
+      ]);
+      const useDeployedObj = !objAddress;
+      const address = objAddress || (deployedObj && deployedObj[chain.id]);
+      if (!address) {
+        throw Error(
+          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
+        );
+      }
+      debug('useDeployedObj', useDeployedObj, 'address', address);
+      if (useDeployedObj) {
+        spinner.info(
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+        );
+      }
+      spinner.info(`Creating ${objName}order for ${objName} ${address}`);
+      if (!(await checkDeployedApp(chain.contracts, address))) {
+        throw Error(`No ${objName} deployed at address ${address}`);
+      }
+      const overrides = {
+        app: address,
+        appprice: opts.price,
+        volume: opts.volume,
+        tag: opts.tag,
+        datasetrestrict: opts.datasetRestrict,
+        workerpoolrestrict: opts.workerpoolRestrict,
+        requesterrestrict: opts.requesterRestrict,
+      };
+      const orderToSign = await createApporder(chain.contracts, overrides);
+      if (!opts.force) {
+        await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
+      }
+      await keystore.load();
+      const signedOrder = await signApporder(chain.contracts, orderToSign);
+      const orderHash = await publishApporder(
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
+        signedOrder,
+      );
+      spinner.succeed(
+        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
+        {
+          raw: {
+            orderHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
     }
   });
 
@@ -230,21 +320,27 @@ addGlobalOptions(run);
 addWalletLoadOptions(run);
 run
   .option(...option.chain())
-  .option(...option.appRunDataset())
-  .option(...option.appRunWorkerpool())
-  .option(...option.appRunCategory())
-  .option(...option.appRunParams())
-  .option(...option.appRunTag())
-  .option(...option.appRunTrust())
-  .option(...option.appRunBeneficiary())
-  .option(...option.appRunCallback())
+  .option(...orderOption.dataset())
+  .option(...orderOption.workerpool())
+  .option(...orderOption.category())
+  .option(...orderOption.tag())
+  .option(...orderOption.trust())
+  .option(...orderOption.beneficiary())
+  .option(...orderOption.callback())
+  .option(...orderOption.params())
+  .option(...orderOption.requestArgs())
+  .option(...orderOption.requestInputFiles())
+  .option(...orderOption.requestEncryptResult())
+  .option(...orderOption.requestStorageProvider())
   .option(...option.appRunWatch())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .description(desc.appRun())
   .action(async (appAddress, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const [
@@ -253,7 +349,7 @@ run
         deployedDataset,
         deployedWorkerpool,
       ] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadDeployedObj('app'),
         loadDeployedObj('dataset'),
         loadDeployedObj('workerpool'),
@@ -275,13 +371,13 @@ run
         );
       }
 
-      const useDataset = cmd.dataset !== undefined;
-      const useDeployedDataset = useDataset && cmd.dataset === true;
+      const useDataset = opts.dataset !== undefined;
+      const useDeployedDataset = useDataset && opts.dataset === 'deployed';
       const dataset = useDataset
-        && (useDeployedDataset ? deployedDataset[chain.id] : cmd.dataset);
+        && (useDeployedDataset ? deployedDataset[chain.id] : opts.dataset);
       if (useDataset && !dataset) {
         throw Error(
-          `Missing address for option --dataset [address] and no dataset found in "deployed.json" for chain ${chain.id}`,
+          `No dataset found in "deployed.json" for chain ${chain.id}`,
         );
       }
       debug(
@@ -293,18 +389,18 @@ run
         dataset,
       );
       if (useDeployedDataset) {
-        spinner.info(
-          'No dataset specified, using last dataset deployed from "deployed.json"',
-        );
+        spinner.info('Using last dataset deployed from "deployed.json"');
       }
 
-      const runOnWorkerpool = cmd.workerpool !== undefined;
-      const useDeployedWorkerpool = runOnWorkerpool && cmd.workerpool === true;
+      const runOnWorkerpool = opts.workerpool !== undefined;
+      const useDeployedWorkerpool = runOnWorkerpool && opts.workerpool === 'deployed';
       const workerpool = runOnWorkerpool
-        && (useDeployedWorkerpool ? deployedWorkerpool[chain.id] : cmd.workerpool);
+        && (useDeployedWorkerpool
+          ? deployedWorkerpool[chain.id]
+          : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
         throw Error(
-          `Missing address for option --workerpool [address] and no workerpool found in "deployed.json" for chain ${chain.id}`,
+          `No workerpool found in "deployed.json" for chain ${chain.id}`,
         );
       }
       debug(
@@ -316,37 +412,61 @@ run
         workerpool,
       );
       if (useDeployedWorkerpool) {
-        spinner.info(
-          'No workerpool specified, using last workerpool deployed from "deployed.json"',
-        );
+        spinner.info('Using last workerpool deployed from "deployed.json"');
       }
 
       const [requester] = await keystore.accounts();
       debug('requester', requester);
 
-      const params = await paramsSchema().validate(cmd.params);
+      const inputParams = await paramsSchema().validate(opts.params);
+      const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
+      const inputParamsInputFiles = await paramsInputFilesArraySchema().validate(
+        opts.inputFiles,
+      );
+      const inputParamsStorageProvider = await paramsStorageProviderSchema().validate(
+        opts.storageProvider,
+      );
+      const inputParamsResultEncrytion = await paramsEncryptResultSchema().validate(
+        opts.encryptResult,
+      );
+
+      const params = {
+        ...(inputParams !== undefined && JSON.parse(inputParams)),
+        ...(inputParamsArgs !== undefined && {
+          [paramsKeyName.IEXEC_ARGS]: inputParamsArgs,
+        }),
+        ...(inputParamsInputFiles !== undefined && {
+          [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+        }),
+        ...(inputParamsStorageProvider !== undefined && {
+          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: inputParamsStorageProvider,
+        }),
+        ...(inputParamsResultEncrytion !== undefined && {
+          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
+        }),
+      };
       debug('params', params);
-      const category = await catidSchema().validate(cmd.category);
+      const category = await catidSchema().validate(opts.category);
       const useCategory = category !== undefined;
       debug('useCategory', useCategory, 'category', category);
-      const tag = await tagSchema().validate(cmd.tag || NULL_BYTES32);
+      const tag = await tagSchema().validate(opts.tag || NULL_BYTES32);
       debug('tag', tag);
-      const trust = await positiveIntSchema().validate(cmd.trust);
+      const trust = await positiveIntSchema().validate(opts.trust || '0');
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.jsonRpcProvider,
-      }).validate(cmd.callback || NULL_ADDRESS);
+      }).validate(opts.callback || NULL_ADDRESS);
       debug('callback', callback);
-      const beneficiary = cmd.beneficiary === undefined
+      const beneficiary = opts.beneficiary === undefined
         ? undefined
         : await addressSchema({
           ethProvider: chain.contracts.jsonRpcProvider,
-        }).validate(cmd.beneficiary);
+        }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
-      const watch = !!cmd.watch || !!cmd.download;
+      const watch = !!opts.watch || !!opts.download;
       debug('watch', watch);
-      const download = !!cmd.download;
+      const download = !!opts.download;
       debug('download', download);
 
       const getApporder = async () => {
@@ -367,9 +487,14 @@ run
         }
         spinner.info('Fetching apporder from iExec Marketplace');
         const teeAppRequired = checkActiveBitInTag(tag, 1);
-        const { appOrders } = await fetchAppOrderbook(chain.contracts, app, {
-          ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
-        });
+        const { appOrders } = await fetchAppOrderbook(
+          chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
+          app,
+          {
+            ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
+          },
+        );
         const order = appOrders[0] && appOrders[0].order;
         if (!order) throw Error(`No order available for app ${app}`);
         return order;
@@ -401,6 +526,7 @@ run
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { datasetOrders } = await fetchDatasetOrderbook(
           chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
           dataset,
           {
             app,
@@ -456,6 +582,7 @@ run
           debug('try category', catid, 'strict', strict);
           const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
+            getPropertyFormChain(chain, 'iexecGateway'),
             catid,
             {
               workerpoolAddress: workerpool,
@@ -516,22 +643,43 @@ run
       debug('datasetorder', datasetorder);
 
       spinner.info('Creating requestorder');
-      const requestorder = await createRequestorder(chain.contracts, {
-        app: apporder.app,
-        appmaxprice: apporder.appprice,
-        dataset: datasetorder.dataset,
-        datasetmaxprice: datasetorder.datasetprice,
-        workerpool: workerpoolorder.workerpool,
-        workerpoolmaxprice: workerpoolorder.workerpoolprice,
-        requester,
-        volume: 1,
-        tag,
-        category: workerpoolorder.category,
-        trust,
-        beneficiary: beneficiary || requester,
-        callback,
-        params,
-      }).then(o => signRequestorder(chain.contracts, o));
+      const requestorderToSign = await createRequestorder(
+        { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+        {
+          app: apporder.app,
+          appmaxprice: apporder.appprice,
+          dataset: datasetorder.dataset,
+          datasetmaxprice: datasetorder.datasetprice,
+          workerpool: workerpoolorder.workerpool,
+          workerpoolmaxprice: workerpoolorder.workerpoolprice,
+          requester,
+          volume: 1,
+          tag,
+          category: workerpoolorder.category,
+          trust,
+          beneficiary: beneficiary || requester,
+          callback,
+          params,
+        },
+      );
+      if (!opts.skipRequestCheck) {
+        await checkRequestRequirements(
+          { contracts: chain.contracts, smsURL: chain.sms },
+          requestorderToSign,
+        ).catch((e) => {
+          throw Error(
+            `Request requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipRequestCheck()[0]
+            } to skip request requirement check)`,
+          );
+        });
+      }
+      const requestorder = await signRequestorder(
+        chain.contracts,
+        requestorderToSign,
+      );
 
       debug('requestorder', requestorder);
 
@@ -549,7 +697,7 @@ run
 
       spinner.stop();
 
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.custom(
           `Do you want to spend ${totalCost} nRLC to execute the following request: ${pretty(
             {
@@ -559,7 +707,9 @@ run
                   ? `${requestorder.dataset} (${requestorder.datasetmaxprice} nRLC)`
                   : undefined,
               workerpool: `${requestorder.workerpool} (${requestorder.workerpoolmaxprice} nRLC)`,
-              params: requestorder.params || undefined,
+              params:
+                (requestorder.params && JSON.parse(requestorder.params))
+                || undefined,
               category: requestorder.category,
               tag:
                 requestorder.tag !== NULL_BYTES32
@@ -638,7 +788,7 @@ run
         }
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

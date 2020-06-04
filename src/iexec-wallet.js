@@ -24,6 +24,7 @@ const {
   prompt,
   pretty,
   info,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
 const { formatEth, NULL_ADDRESS } = require('./utils');
@@ -403,16 +404,17 @@ bridgeToSidechain
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
-      const bridgeAddress = chain.bridge && chain.bridge.contract;
-      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      const brigeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = brigeConf && brigeConf.contract;
+      const bridgedNetworkId = brigeConf && brigeConf.bridgedNetworkId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!bridgedNetworkId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+          `Missing bridge bridgedNetworkId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {
@@ -483,16 +485,17 @@ bridgeToMainchain
         loadChain(cmd.chain, keystore, { spinner, txOptions }),
       ]);
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
-      const bridgeAddress = chain.bridge && chain.bridge.contract;
-      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      const brigeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = brigeConf && brigeConf.contract;
+      const bridgedNetworkId = brigeConf && brigeConf.bridgedNetworkId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!bridgedNetworkId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+          `Missing bridge bridgedNetworkId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {

@@ -34,6 +34,8 @@ const POOR_PRIVATE_KEY1 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea
 const POOR_ADDRESS1 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 const POOR_PRIVATE_KEY2 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
 const POOR_ADDRESS2 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 // UTILS
 const execAsync = cmd => new Promise((res, rej) => {
@@ -96,6 +98,8 @@ const setTokenChain = options => saveJSONToFile(
         id: networkId,
         host: tokenChainUrl,
         hub: hubAddress,
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
         ...options,
       },
     },
@@ -112,6 +116,8 @@ const setNativeChain = options => saveJSONToFile(
         host: nativeChainUrl,
         hub: hubAddress,
         native: true,
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
         ...options,
       },
     },
@@ -873,7 +879,9 @@ describe('[Mainchain]', () => {
     await editWorkerpoolorder({
       category: '0',
     });
-    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --raw --skip-request-check`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeDefined();
@@ -887,7 +895,9 @@ describe('[Mainchain]', () => {
   }, 30000);
 
   test('[mainchain] iexec order fill', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
@@ -944,7 +954,9 @@ describe('[Mainchain]', () => {
       category: mainchainNoDurationCatid,
       volume: '5',
     });
-    const raw = await execAsync(`${iexecPath} order sign --request --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --request --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeUndefined();
@@ -955,7 +967,9 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
@@ -969,7 +983,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill --params <params> --force', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --params 'arg --option "multiple words"' --force --raw`,
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1036,7 +1050,9 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order cancel --request', async () => {
-    await execAsync(`${iexecPath} order sign --request --raw`);
+    await execAsync(
+      `${iexecPath} order sign --request --skip-request-check --raw`,
+    );
     const raw = await execAsync(
       `${iexecPath} order cancel --request --force --raw`,
     );
@@ -1069,7 +1085,7 @@ describe('[Mainchain]', () => {
     expect(res.fail.length).toBe(4);
   });
 
-  test('[common] iexec app run --workerpool', async () => {
+  test('[common] iexec app run --workerpool deployed', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1080,7 +1096,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --force --raw`,
+      `${iexecPath} app run --workerpool deployed --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1098,30 +1114,26 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal).toBeDefined();
     expect(resDeal.deal.app.pointer).toBe(mainchainApp);
     expect(resDeal.deal.app.price).toBe('0');
-    expect(resDeal.deal.dataset.pointer).toBe(
-      '0x0000000000000000000000000000000000000000',
-    );
+    expect(resDeal.deal.dataset.pointer).toBe(NULL_ADDRESS);
     expect(resDeal.deal.dataset.price).toBe('0');
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
-    expect(resDeal.deal.params).toBe('');
-    expect(resDeal.deal.callback).toBe(
-      '0x0000000000000000000000000000000000000000',
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
     );
+    expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
     expect(resDeal.deal.beneficiary).toBe(ADDRESS);
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
-    expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(resDeal.deal.tag).toBe(NULL_BYTES32);
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --dataset 0x0000000000000000000000000000000000000000', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1132,7 +1144,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset 0x0000000000000000000000000000000000000000 --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1150,30 +1162,26 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal).toBeDefined();
     expect(resDeal.deal.app.pointer).toBe(mainchainApp);
     expect(resDeal.deal.app.price).toBe('0');
-    expect(resDeal.deal.dataset.pointer).toBe(
-      '0x0000000000000000000000000000000000000000',
-    );
+    expect(resDeal.deal.dataset.pointer).toBe(NULL_ADDRESS);
     expect(resDeal.deal.dataset.price).toBe('0');
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
-    expect(resDeal.deal.params).toBe('');
-    expect(resDeal.deal.callback).toBe(
-      '0x0000000000000000000000000000000000000000',
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
     );
+    expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
     expect(resDeal.deal.beneficiary).toBe(ADDRESS);
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
-    expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(resDeal.deal.tag).toBe(NULL_BYTES32);
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --dataset --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1187,7 +1195,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --dataset --params "test params" --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1210,12 +1218,12 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('1');
-    expect(resDeal.deal.params).toBe('test params');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089","iexec_args":"test params"}',
+    );
     expect(resDeal.deal.callback).toBe(POOR_ADDRESS1);
     expect(resDeal.deal.requester).toBe(ADDRESS);
-    expect(resDeal.deal.beneficiary).toBe(
-      '0x0000000000000000000000000000000000000000',
-    );
+    expect(resDeal.deal.beneficiary).toBe(NULL_ADDRESS);
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
     expect(resDeal.deal.tag).toBe(
@@ -1226,7 +1234,60 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.tasks['0']).toBeDefined();
   }, 15000);
 
-  test('[common] iexec app run --workerpool --watch (timeout)', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee', async () => {
+    const deployed = {
+      app: {
+        [networkId]: mainchainApp,
+      },
+      dataset: {
+        [networkId]: mainchainDataset,
+      },
+      workerpool: {
+        [networkId]: mainchainWorkerpool,
+      },
+    };
+    await saveJSONToFile(deployed, 'deployed.json');
+    const raw = await execAsync(
+      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee --skip-request-check --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.deals).toBeDefined();
+    expect(res.deals.length).toBe(1);
+    expect(res.deals[0].volume).toBe('1');
+    expect(res.deals[0].dealid).toBeDefined();
+    expect(res.deals[0].txHash).toBeDefined();
+
+    const rawDeal = await execAsync(
+      `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+    );
+    const resDeal = JSON.parse(rawDeal);
+    expect(resDeal.ok).toBe(true);
+    expect(resDeal.deal).toBeDefined();
+    expect(resDeal.deal.app.pointer).toBe(mainchainApp);
+    expect(resDeal.deal.app.price).toBe('0');
+    expect(resDeal.deal.dataset.pointer).toBe(NULL_ADDRESS);
+    expect(resDeal.deal.dataset.price).toBe('0');
+    expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
+    expect(resDeal.deal.workerpool.price).toBe('0');
+    expect(resDeal.deal.category).toBe('0');
+    expect(resDeal.deal.params).toBe(
+      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"dropbox","iexec_result_encryption":true,"iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_args":"command --help"}',
+    );
+    expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
+    expect(resDeal.deal.requester).toBe(ADDRESS);
+    expect(resDeal.deal.beneficiary).toBe(ADDRESS);
+    expect(resDeal.deal.botFirst).toBe('0');
+    expect(resDeal.deal.botSize).toBe('1');
+    expect(resDeal.deal.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+    );
+    expect(resDeal.deal.trust).toBe('1');
+    expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+    expect(resDeal.deal.tasks['0']).toBeDefined();
+  }, 15000);
+
+  test('[common] iexec app run --workerpool deployed --watch (timeout)', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1237,7 +1298,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool --category ${mainchainNoDurationCatid} --watch --force --raw`,
+      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
     ).catch(e => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -1411,15 +1472,11 @@ describe('[Mainchain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
     expect(res.task.taskTimedOut).toBe(false);
@@ -1445,15 +1502,11 @@ describe('[Mainchain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
     expect(res.task.taskTimedOut).toBe(true);
@@ -1485,15 +1538,11 @@ describe('[Mainchain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
     expect(res.task.taskTimedOut).toBe(true);
@@ -1579,6 +1628,203 @@ describe('[Mainchain]', () => {
     expect(res.sendNativeTxHash).toBeDefined();
     expect(res.errors).toBeUndefined();
   }, 15000);
+
+  if (WITH_STACK) {
+    describe('[with stack]', () => {
+      // this test requires running local stack
+      test('[common] iexec app publish (from depoyed)', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} app init`);
+        await setAppUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} app deploy --raw`),
+        );
+        const raw = await execAsync(`${iexecPath} app publish --force --raw`);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --app ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.apporder.order).toEqual({
+          app: address,
+          appprice: 0,
+          volume: 1,
+          tag: NULL_BYTES32,
+          datasetrestrict: NULL_ADDRESS,
+          workerpoolrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.apporder.order.sign,
+          salt: orderShowRes.apporder.order.salt,
+        });
+      }, 15000);
+
+      test('[mainchain] iexec app publish [address] with options', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} app init`);
+        await setAppUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} app deploy --raw`),
+        );
+        const raw = await execAsync(
+          `${iexecPath} app publish ${address} --price 10 --volume 100 --tag tee --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --app ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.apporder.order).toEqual({
+          app: address,
+          appprice: 10,
+          volume: 100,
+          tag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          datasetrestrict: NULL_ADDRESS,
+          workerpoolrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.apporder.order.sign,
+          salt: orderShowRes.apporder.order.salt,
+        });
+      }, 15000);
+
+      test('[common] iexec dataset publish (from depoyed)', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} dataset init`);
+        await setDatasetUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} dataset deploy --raw`),
+        );
+        const raw = await execAsync(
+          `${iexecPath} dataset publish --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.datasetorder.order).toEqual({
+          dataset: address,
+          datasetprice: 0,
+          volume: 1,
+          tag: NULL_BYTES32,
+          apprestrict: NULL_ADDRESS,
+          workerpoolrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.datasetorder.order.sign,
+          salt: orderShowRes.datasetorder.order.salt,
+        });
+      }, 15000);
+
+      test('[mainchain] iexec dataset publish [address] with options', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} dataset init`);
+        await setDatasetUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} dataset deploy --raw`),
+        );
+        const raw = await execAsync(
+          `${iexecPath} dataset publish ${address} --price 10 --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.datasetorder.order).toEqual({
+          dataset: address,
+          datasetprice: 10,
+          volume: 100,
+          tag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          apprestrict: POOR_ADDRESS1,
+          workerpoolrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.datasetorder.order.sign,
+          salt: orderShowRes.datasetorder.order.salt,
+        });
+      }, 15000);
+
+      test('[common] iexec workerpool publish (from depoyed)', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} workerpool init`);
+        await setWorkerpoolUniqueDescription();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} workerpool deploy --raw`),
+        );
+        const raw = await execAsync(
+          `${iexecPath} workerpool publish --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.workerpoolorder.order).toEqual({
+          workerpool: address,
+          workerpoolprice: 0,
+          volume: 1,
+          tag: NULL_BYTES32,
+          trust: 0,
+          category: 0,
+          apprestrict: NULL_ADDRESS,
+          datasetrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.workerpoolorder.order.sign,
+          salt: orderShowRes.workerpoolorder.order.salt,
+        });
+      }, 15000);
+
+      test.only('[mainchain] iexec workerpool publish [address] with options', async () => {
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} account deposit 10`);
+        await execAsync(`${iexecPath} workerpool init`);
+        await setWorkerpoolUniqueDescription();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} workerpool deploy --raw`),
+        );
+        const raw = await execAsync(
+          `${iexecPath} workerpool publish ${address} --price 2 --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.orderHash).toBeDefined();
+        const orderShowRes = JSON.parse(
+          await execAsync(
+            `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+          ),
+        );
+        expect(orderShowRes.workerpoolorder.order).toEqual({
+          workerpool: address,
+          workerpoolprice: 2,
+          volume: 5,
+          tag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          trust: 20,
+          category: 1,
+          apprestrict: NULL_ADDRESS,
+          datasetrestrict: NULL_ADDRESS,
+          requesterrestrict: NULL_ADDRESS,
+          sign: orderShowRes.workerpoolorder.order.sign,
+          salt: orderShowRes.workerpoolorder.order.salt,
+        });
+      }, 20000);
+    });
+  }
 });
 
 describe('[Sidechain]', () => {
@@ -1956,7 +2202,9 @@ describe('[Sidechain]', () => {
     await editWorkerpoolorder({
       category: '0',
     });
-    const raw = await execAsync(`${iexecPath} order sign --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order sign --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeDefined();
@@ -1970,7 +2218,9 @@ describe('[Sidechain]', () => {
   }, 30000);
 
   test('[sidechain] iexec order fill', async () => {
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('1');
@@ -1994,8 +2244,10 @@ describe('[Sidechain]', () => {
       category: sidechainNoDurationCatid,
       volume: '5',
     });
-    await execAsync(`${iexecPath} order sign --raw`);
-    const raw = await execAsync(`${iexecPath} order fill --raw`);
+    await execAsync(`${iexecPath} order sign --skip-request-check --raw`);
+    const raw = await execAsync(
+      `${iexecPath} order fill --skip-request-check --raw`,
+    );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.volume).toBe('5');
@@ -2009,7 +2261,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --app --dataset --workerpool --request --force --raw`,
+      `${iexecPath} order sign --app --dataset --workerpool --request --skip-request-check --force --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
@@ -2133,15 +2385,11 @@ describe('[Sidechain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
     expect(res.task.taskTimedOut).toBe(false);
@@ -2167,15 +2415,11 @@ describe('[Sidechain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
     expect(res.task.taskTimedOut).toBe(true);
@@ -2207,15 +2451,11 @@ describe('[Sidechain]', () => {
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.contributionDeadline).toBeDefined();
     expect(res.task.finalDeadline).toBeDefined();
-    expect(res.task.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
     expect(res.task.contributors).toStrictEqual({});
-    expect(res.task.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-    );
+    expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
     expect(res.task.taskTimedOut).toBe(true);
@@ -2735,68 +2975,70 @@ describe('[Common]', () => {
 
     if (WITH_STACK) {
       // this test requires nexus.iex.ec image
-      test('iexec dataset push-secret', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-        await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
-        const randomAddress = getRandomAddress();
-        const resPushNotAllowed = JSON.parse(
-          await execAsync(
-            `${iexecPath} dataset push-secret ${randomAddress} --raw`,
-          ).catch(e => e.message),
-        );
-        expect(resPushNotAllowed.ok).toBe(false);
-        expect(resPushNotAllowed.error.message).toBe(
-          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
-        );
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} dataset deploy --raw`),
-        );
-        const resPush = JSON.parse(
-          await execAsync(`${iexecPath} dataset push-secret --raw`),
-        );
-        expect(resPush.ok).toBe(true);
-        const resAlreadyExists = JSON.parse(
-          await execAsync(`${iexecPath} dataset push-secret --raw`).catch(
-            e => e.message,
-          ),
-        );
-        expect(resAlreadyExists.ok).toBe(false);
-        expect(resAlreadyExists.error.message).toBe(
-          `Secret already exists for ${address} and can't be updated`,
-        );
-      }, 15000);
+      describe('[with stack]', () => {
+        test('iexec dataset push-secret', async () => {
+          await setRichWallet();
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
+          await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+          const randomAddress = getRandomAddress();
+          const resPushNotAllowed = JSON.parse(
+            await execAsync(
+              `${iexecPath} dataset push-secret ${randomAddress} --raw`,
+            ).catch(e => e.message),
+          );
+          expect(resPushNotAllowed.ok).toBe(false);
+          expect(resPushNotAllowed.error.message).toBe(
+            `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+          );
+          await execAsync(`${iexecPath} dataset init`);
+          await setDatasetUniqueName();
+          const { address } = JSON.parse(
+            await execAsync(`${iexecPath} dataset deploy --raw`),
+          );
+          const resPush = JSON.parse(
+            await execAsync(`${iexecPath} dataset push-secret --raw`),
+          );
+          expect(resPush.ok).toBe(true);
+          const resAlreadyExists = JSON.parse(
+            await execAsync(`${iexecPath} dataset push-secret --raw`).catch(
+              e => e.message,
+            ),
+          );
+          expect(resAlreadyExists.ok).toBe(false);
+          expect(resAlreadyExists.error.message).toBe(
+            `Secret already exists for ${address} and can't be updated`,
+          );
+        }, 15000);
 
-      test('iexec dataset check-secret', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-        await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        await execAsync(`${iexecPath} dataset deploy --raw`);
-        const resMyDataset = JSON.parse(
-          await execAsync(`${iexecPath} dataset check-secret --raw`),
-        );
-        expect(resMyDataset.ok).toBe(true);
-        expect(resMyDataset.isSecretSet).toBe(false);
-        await execAsync(`${iexecPath} dataset push-secret --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} dataset check-secret --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isSecretSet).toBe(true);
-        const rawRandomDataset = await execAsync(
-          `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
-        );
-        const resRandomDataset = JSON.parse(rawRandomDataset);
-        expect(resRandomDataset.ok).toBe(true);
-        expect(resRandomDataset.isSecretSet).toBe(false);
-      }, 15000);
+        test('iexec dataset check-secret', async () => {
+          await setRichWallet();
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
+          await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+          await execAsync(`${iexecPath} dataset init`);
+          await setDatasetUniqueName();
+          await execAsync(`${iexecPath} dataset deploy --raw`);
+          const resMyDataset = JSON.parse(
+            await execAsync(`${iexecPath} dataset check-secret --raw`),
+          );
+          expect(resMyDataset.ok).toBe(true);
+          expect(resMyDataset.isSecretSet).toBe(false);
+          await execAsync(`${iexecPath} dataset push-secret --raw`);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} dataset check-secret --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isSecretSet).toBe(true);
+          const rawRandomDataset = await execAsync(
+            `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
+          );
+          const resRandomDataset = JSON.parse(rawRandomDataset);
+          expect(resRandomDataset.ok).toBe(true);
+          expect(resRandomDataset.isSecretSet).toBe(false);
+        }, 15000);
+      });
     }
   });
 
@@ -2875,122 +3117,139 @@ describe('[Common]', () => {
     }
 
     if (WITH_STACK) {
-      // this test requires nexus.iex.ec image
-      test('iexec result push-encryption-key', async () => {
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
-        await execAsync(
-          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
-        );
-        const raw = await execAsync(
-          `${iexecPath} result push-encryption-key --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isPushed).toBe(true);
-        expect(res.isUpdated).toBe(false);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} result push-encryption-key --raw`,
-        ).catch(e => e.message);
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(false);
-      });
+      describe('[with stack]', () => {
+        // this test requires nexus.iex.ec image
+        test('iexec result push-encryption-key', async () => {
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+          await execAsync(
+            `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+          );
+          const raw = await execAsync(
+            `${iexecPath} result push-encryption-key --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isPushed).toBe(true);
+          expect(res.isUpdated).toBe(false);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} result push-encryption-key --raw`,
+          ).catch(e => e.message);
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(false);
+        });
 
-      test('iexec result push-encryption-key --force-update', async () => {
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
-        await execAsync(
-          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
-        );
-        const raw = await execAsync(
-          `${iexecPath} result push-encryption-key --force-update --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isPushed).toBe(true);
-        expect(res.isUpdated).toBe(false);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} result push-encryption-key --force-update --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isPushed).toBe(true);
-        expect(resAlreadyExists.isUpdated).toBe(true);
-      });
+        test('iexec result push-encryption-key --force-update', async () => {
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+          await execAsync(
+            `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+          );
+          const raw = await execAsync(
+            `${iexecPath} result push-encryption-key --force-update --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isPushed).toBe(true);
+          expect(res.isUpdated).toBe(false);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} result push-encryption-key --force-update --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isPushed).toBe(true);
+          expect(resAlreadyExists.isUpdated).toBe(true);
+        });
 
-      test('iexec result push-secret (v4 legacy name)', async () => {
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
-        await execAsync(
-          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
-        );
-        const raw = await execAsync(`${iexecPath} result push-secret --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-      });
+        test('iexec result push-secret (v4 legacy name)', async () => {
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+          await execAsync(
+            `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+          );
+          const raw = await execAsync(`${iexecPath} result push-secret --raw`);
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+        });
 
-      test('iexec result check-encryption-key', async () => {
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        const { privateKey, publicKey, address } = getRandomWallet();
-        const rawUserKey = await execAsync(
-          `${iexecPath} result check-encryption-key ${address} --raw`,
-        );
-        const resUserKey = JSON.parse(rawUserKey);
-        expect(resUserKey.ok).toBe(true);
-        expect(resUserKey.isEncryptionKeySet).toBe(false);
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
-        await execAsync(
-          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
-        );
-        const rawMyKey = await execAsync(
-          `${iexecPath} result check-encryption-key --raw`,
-        );
-        const resMyKey = JSON.parse(rawMyKey);
-        expect(resMyKey.ok).toBe(true);
-        expect(resMyKey.isEncryptionKeySet).toBe(false);
-        await execAsync(`${iexecPath} result push-encryption-key --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} result check-encryption-key --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
-      });
+        test('iexec result check-encryption-key', async () => {
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          const { privateKey, publicKey, address } = getRandomWallet();
+          const rawUserKey = await execAsync(
+            `${iexecPath} result check-encryption-key ${address} --raw`,
+          );
+          const resUserKey = JSON.parse(rawUserKey);
+          expect(resUserKey.ok).toBe(true);
+          expect(resUserKey.isEncryptionKeySet).toBe(false);
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+          await execAsync(
+            `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+          );
+          const rawMyKey = await execAsync(
+            `${iexecPath} result check-encryption-key --raw`,
+          );
+          const resMyKey = JSON.parse(rawMyKey);
+          expect(resMyKey.ok).toBe(true);
+          expect(resMyKey.isEncryptionKeySet).toBe(false);
+          await execAsync(`${iexecPath} result push-encryption-key --raw`);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} result check-encryption-key --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
+        });
 
-      test('iexec result check-secret (v4 legacy name)', async () => {
-        await setTokenChainParity({ sms: 'http://localhost:5000' });
-        const { privateKey, publicKey, address } = getRandomWallet();
-        const rawUserKey = await execAsync(
-          `${iexecPath} result check-secret ${address} --raw`,
-        );
-        const resUserKey = JSON.parse(rawUserKey);
-        expect(resUserKey.ok).toBe(true);
-        expect(resUserKey.isEncryptionKeySet).toBe(false);
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
-        await execAsync(
-          `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
-        );
-        const rawMyKey = await execAsync(
-          `${iexecPath} result check-secret --raw`,
-        );
-        const resMyKey = JSON.parse(rawMyKey);
-        expect(resMyKey.ok).toBe(true);
-        expect(resMyKey.isEncryptionKeySet).toBe(false);
-        await execAsync(`${iexecPath} result push-encryption-key --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} result check-secret --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
+        test('iexec result check-secret (v4 legacy name)', async () => {
+          await setTokenChainParity({ sms: 'http://localhost:5000' });
+          const { privateKey, publicKey, address } = getRandomWallet();
+          const rawUserKey = await execAsync(
+            `${iexecPath} result check-secret ${address} --raw`,
+          );
+          const resUserKey = JSON.parse(rawUserKey);
+          expect(resUserKey.ok).toBe(true);
+          expect(resUserKey.isEncryptionKeySet).toBe(false);
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
+          await execAsync(
+            `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
+          );
+          const rawMyKey = await execAsync(
+            `${iexecPath} result check-secret --raw`,
+          );
+          const resMyKey = JSON.parse(rawMyKey);
+          expect(resMyKey.ok).toBe(true);
+          expect(resMyKey.isEncryptionKeySet).toBe(false);
+          await execAsync(`${iexecPath} result push-encryption-key --raw`);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} result check-secret --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
+        });
       });
     }
 
@@ -3039,142 +3298,172 @@ describe('[Common]', () => {
 
   describe('[storage]', () => {
     if (WITH_STACK) {
-      // this test requires nexus.iex.ec image
-      beforeAll(async () => {
-        await setTokenChainParity({
-          resultProxy: 'http://localhost:18089',
-          sms: 'http://localhost:5000',
+      describe('[with stack]', () => {
+        // this test requires nexus.iex.ec image
+        beforeAll(async () => {
+          await setTokenChainParity({
+            resultProxy: 'http://localhost:18089',
+            sms: 'http://localhost:5000',
+          });
         });
-      });
 
-      test('iexec storage init', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(`${iexecPath} storage init --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(true);
-        expect(res.isUpdated).toBe(false);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage init --raw`,
-        ).catch(e => e.message);
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(false);
-        expect(resAlreadyExists.error.message).toBe(
-          'default storage is already initialized, use --force-update option to update your storage token',
-        );
-      });
+        test('iexec storage init', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(`${iexecPath} storage init --raw`);
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(true);
+          expect(res.isUpdated).toBe(false);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage init --raw`,
+          ).catch(e => e.message);
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(false);
+          expect(resAlreadyExists.error.message).toBe(
+            'default storage is already initialized, use --force-update option to update your storage token',
+          );
+        });
 
-      test('iexec storage init --force-update', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(
-          `${iexecPath} storage init --force-update --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(true);
-        expect(res.isUpdated).toBe(false);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage init --force-update --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isInitilized).toBe(true);
-        expect(resAlreadyExists.isUpdated).toBe(true);
-      });
+        test('iexec storage init --force-update', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage init --force-update --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(true);
+          expect(res.isUpdated).toBe(false);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage init --force-update --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isInitilized).toBe(true);
+          expect(resAlreadyExists.isUpdated).toBe(true);
+        });
 
-      test('iexec storage init dropbox', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(
-          `${iexecPath} storage init dropbox --token oops --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(true);
-        expect(res.isUpdated).toBe(false);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage init dropbox --token oops --raw`,
-        ).catch(e => e.message);
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(false);
-        expect(resAlreadyExists.error.message).toBe(
-          'dropbox storage is already initialized, use --force-update option to update your storage token',
-        );
-      });
+        test('iexec storage init dropbox', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage init dropbox --token oops --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(true);
+          expect(res.isUpdated).toBe(false);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage init dropbox --token oops --raw`,
+          ).catch(e => e.message);
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(false);
+          expect(resAlreadyExists.error.message).toBe(
+            'dropbox storage is already initialized, use --force-update option to update your storage token',
+          );
+        });
 
-      test('iexec storage init unsupported', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(
-          `${iexecPath} storage init unsupported --token oops --raw`,
-        ).catch(e => e.message);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(false);
-        expect(res.error.message).toBe('"unsupported" not supported');
-      });
+        test('iexec storage init unsupported', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage init unsupported --token oops --raw`,
+          ).catch(e => e.message);
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(false);
+          expect(res.error.message).toBe('"unsupported" not supported');
+        });
 
-      test('iexec storage check', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(`${iexecPath} storage check --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(false);
-        await execAsync(`${iexecPath} storage init --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage check --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isInitilized).toBe(true);
-      });
+        test('iexec storage check', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(`${iexecPath} storage check --raw`);
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(false);
+          await execAsync(`${iexecPath} storage init --raw`);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage check --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isInitilized).toBe(true);
+        });
 
-      test('iexec storage check --user', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        const randomAddress = getRandomAddress();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(
-          `${iexecPath} storage check --user ${randomAddress} --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(false);
-        await execAsync(`${iexecPath} storage init --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage check --user ${randomAddress} --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isInitilized).toBe(false);
-      });
+        test('iexec storage check --user', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          const randomAddress = getRandomAddress();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage check --user ${randomAddress} --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(false);
+          await execAsync(`${iexecPath} storage init --raw`);
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage check --user ${randomAddress} --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isInitilized).toBe(false);
+        });
 
-      test('iexec storage check dropbox', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(`${iexecPath} storage check dropbox --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.isInitilized).toBe(false);
-        await execAsync(`${iexecPath} storage init dropbox --token oops --raw`);
-        const rawAlreadyExists = await execAsync(
-          `${iexecPath} storage check dropbox --raw`,
-        );
-        const resAlreadyExists = JSON.parse(rawAlreadyExists);
-        expect(resAlreadyExists.ok).toBe(true);
-        expect(resAlreadyExists.isInitilized).toBe(true);
-      });
+        test('iexec storage check dropbox', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage check dropbox --raw`,
+          );
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(true);
+          expect(res.isInitilized).toBe(false);
+          await execAsync(
+            `${iexecPath} storage init dropbox --token oops --raw`,
+          );
+          const rawAlreadyExists = await execAsync(
+            `${iexecPath} storage check dropbox --raw`,
+          );
+          const resAlreadyExists = JSON.parse(rawAlreadyExists);
+          expect(resAlreadyExists.ok).toBe(true);
+          expect(resAlreadyExists.isInitilized).toBe(true);
+        });
 
-      test('iexec storage check unsupported', async () => {
-        const { privateKey, publicKey, address } = getRandomWallet();
-        await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
-        const raw = await execAsync(
-          `${iexecPath} storage check unsupported --raw`,
-        ).catch(e => e.message);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(false);
-        expect(res.error.message).toBe('"unsupported" not supported');
+        test('iexec storage check unsupported', async () => {
+          const { privateKey, publicKey, address } = getRandomWallet();
+          await saveJSONToFile(
+            { privateKey, publicKey, address },
+            'wallet.json',
+          );
+          const raw = await execAsync(
+            `${iexecPath} storage check unsupported --raw`,
+          ).catch(e => e.message);
+          const res = JSON.parse(raw);
+          expect(res.ok).toBe(false);
+          expect(res.error.message).toBe('"unsupported" not supported');
+        });
       });
     }
   });
@@ -3265,14 +3554,12 @@ describe('[Common]', () => {
 
     test('no "native" overwites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
-      expect(chains.mainnet.native).toBeUndefined();
-      expect(chains.bellecour.native).toBeUndefined();
-      expect(chains.kovan.native).toBeUndefined();
       expect(chains.goerli.native).toBeUndefined();
+      expect(chains.mainnet.native).toBeUndefined();
+      // expect(chains.bellecour.native).toBeUndefined();
     });
 
-    // not deployed yet
-    test.skip('mainnet is not native', async () => {
+    test('mainnet is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
       );
@@ -3283,18 +3570,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).toBeDefined();
     });
 
-    test.skip('kovan is not native', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain kovan --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
-    });
-
-    test.skip('goerli is not native', async () => {
+    test('goerli is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
       );
@@ -3305,6 +3581,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).toBeDefined();
     });
 
+    // not deployed yet
     test.skip('bellecour is native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain bellecour --raw`,

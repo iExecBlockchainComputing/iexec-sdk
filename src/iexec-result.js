@@ -22,6 +22,7 @@ const {
   DEFAULT_DECRYPTED_RESULTS_NAME,
   publicKeyName,
   privateKeyName,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
@@ -211,8 +212,8 @@ pushSecret
         spinner,
       });
 
-      const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
+      const { contracts } = chain;
+      const sms = getPropertyFormChain(chain, 'sms');
 
       const { address } = await keystore.load();
       debug('address', address);
@@ -277,8 +278,8 @@ checkSecret
         [keyAddress] = await keystore.accounts();
         spinner.info(`Checking encryption key exists for wallet ${keyAddress}`);
       }
-      const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
+      const { contracts } = chain;
+      const sms = getPropertyFormChain(chain, 'sms');
       const secretExists = await secretMgtServ.checkWeb2SecretExists(
         contracts,
         sms,

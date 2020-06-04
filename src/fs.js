@@ -10,8 +10,8 @@ const templates = require('./templates');
 const debug = Debug('iexec:fs');
 
 const chainConfSchema = () => object({
-  host: string().required(),
   id: chainIdSchema().required(),
+  host: string(),
   hub: string(),
   sms: string(),
   resultProxy: string(),

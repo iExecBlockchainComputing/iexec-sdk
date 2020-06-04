@@ -6,8 +6,6 @@ const { signTypedDatav3 } = require('./utils');
 
 const debug = Debug('iexec:api-utils');
 
-const IEXEC_GATEWAY_URL = 'https://gateway.iex.ec';
-
 const makeBody = (method, body) => {
   if (method === 'POST' || method === 'PUT') {
     if (typeof body === 'object') {
@@ -144,5 +142,4 @@ module.exports = {
   jsonApi,
   downloadZipApi,
   getAuthorization,
-  IEXEC_GATEWAY_URL,
 };

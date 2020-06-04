@@ -16,7 +16,9 @@ const {
   info,
   isBytes32,
   prompt,
+  getPropertyFormChain,
 } = require('./cli-helper');
+const { checkRequestRequirements } = require('./request-helper');
 const {
   loadIExecConf,
   initOrderObj,
@@ -27,14 +29,15 @@ const {
 const { loadChain } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
-const templates = require('./templates');
 const { NULL_ADDRESS } = require('./utils');
-const { IEXEC_GATEWAY_URL } = require('./api-utils');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
 
-cli.name('iexec order').usage('<command> [options]');
+cli
+  .name('iexec order')
+  .usage('<command> [options]')
+  .storeOptionsAsProperties(false);
 
 const init = cli.command('init');
 addGlobalOptions(init);
@@ -47,21 +50,22 @@ init
   .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const initAll = !(
-        cmd.app
-        || cmd.dataset
-        || cmd.workerpool
-        || cmd.request
+        opts.app
+        || opts.dataset
+        || opts.workerpool
+        || opts.request
       );
 
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(opts.chain, keystore, { spinner });
       const success = {};
       const failed = [];
 
@@ -93,10 +97,10 @@ init
         }
       };
 
-      if (cmd.app || initAll) await initOrder('app');
-      if (cmd.dataset || initAll) await initOrder('dataset');
-      if (cmd.workerpool || initAll) await initOrder('workerpool');
-      if (cmd.request || initAll) await initOrder('request');
+      if (opts.app || initAll) await initOrder('app');
+      if (opts.dataset || initAll) await initOrder('dataset');
+      if (opts.workerpool || initAll) await initOrder('workerpool');
+      if (opts.request || initAll) await initOrder('request');
 
       if (failed.length === 0) {
         spinner.succeed(
@@ -111,7 +115,7 @@ init
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -124,22 +128,24 @@ sign
   .option(...option.signWorkerpoolOrder())
   .option(...option.signRequestOrder())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const signAll = !(
-        cmd.app
-        || cmd.dataset
-        || cmd.workerpool
-        || cmd.request
+        opts.app
+        || opts.dataset
+        || opts.workerpool
+        || opts.request
       );
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
-      const [chain, iexecConf, { address }] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+      const [chain, iexecConf] = await Promise.all([
+        loadChain(opts.chain, keystore, { spinner }),
         loadIExecConf(),
         keystore.load(),
       ]);
@@ -149,10 +155,14 @@ sign
       const signAppOrder = async () => {
         spinner.start('Signing apporder');
         try {
-          const orderObj = iexecConf.order.apporder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.apporder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
           }
+          const orderObj = await order.createApporder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
@@ -177,10 +187,14 @@ sign
       const signDatasetOrder = async () => {
         spinner.start('Signing datasetorder');
         try {
-          const orderObj = iexecConf.order.datasetorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.datasetorder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
           }
+          const orderObj = await order.createDatasetorder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedDataset(orderObj.dataset, {
             strict: true,
           });
@@ -206,12 +220,16 @@ sign
       const signWorkerpoolOrder = async () => {
         spinner.start('Signing workerpoolorder');
         try {
-          const orderObj = iexecConf.order.workerpoolorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.workerpoolorder;
+          if (!loadedOrder) {
             throw new Error(
               info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
             );
           }
+          const orderObj = await order.createWorkerpoolorder(
+            chain.contracts,
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
             strict: true,
           });
@@ -236,17 +254,37 @@ sign
       const signRequestOrder = async () => {
         spinner.start('Signing requestorder');
         try {
-          const orderObj = iexecConf.order.requestorder;
-          if (!orderObj) {
+          const loadedOrder = iexecConf.order.requestorder;
+          if (!loadedOrder) {
             throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
           }
+          const orderObj = await order.createRequestorder(
+            {
+              contracts: chain.contracts,
+              resultProxyURL: chain.resultProxy,
+            },
+            loadedOrder,
+          );
           await chain.contracts.checkDeployedApp(orderObj.app, {
             strict: true,
           });
+          if (!opts.skipRequestCheck) {
+            await checkRequestRequirements(
+              { contracts: chain.contracts, smsURL: chain.sms },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `Request requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipRequestCheck()[0]
+                } to skip request requirement check)`,
+              );
+            });
+          }
           const signedOrder = await order.signRequestorder(
             chain.contracts,
             orderObj,
-            address,
           );
           const { saved, fileName } = await saveSignedOrder(
             order.REQUEST_ORDER,
@@ -262,10 +300,10 @@ sign
         }
       };
 
-      if (cmd.app || signAll) await signAppOrder();
-      if (cmd.dataset || signAll) await signDatasetOrder();
-      if (cmd.workerpool || signAll) await signWorkerpoolOrder();
-      if (cmd.request || signAll) await signRequestOrder();
+      if (opts.app || signAll) await signAppOrder();
+      if (opts.dataset || signAll) await signDatasetOrder();
+      if (opts.workerpool || signAll) await signWorkerpoolOrder();
+      if (opts.request || signAll) await signRequestOrder();
 
       if (failed.length === 0) {
         spinner.succeed('Successfully signed and stored in "orders.json"', {
@@ -277,7 +315,7 @@ sign
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -287,6 +325,7 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.txGasPrice())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
@@ -295,18 +334,19 @@ fill
   .option(...option.fillRequestParams())
   .description(desc.fill(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
       ]);
 
-      const inputParams = cmd.params;
+      const inputParams = opts.params;
       const requestOnTheFly = inputParams !== undefined;
 
       const getOrderByHash = async (orderName, orderHash) => {
@@ -315,7 +355,7 @@ fill
             `Fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
           const orderRes = await order.fetchPublishedOrderByHash(
-            chain.iexecGateway || IEXEC_GATEWAY_URL,
+            getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
@@ -329,21 +369,21 @@ fill
         }
         throw Error(`Invalid ${orderName} hash`);
       };
-      const appOrder = cmd.app
-        ? await getOrderByHash(order.APP_ORDER, cmd.app)
+      const appOrder = opts.app
+        ? await getOrderByHash(order.APP_ORDER, opts.app)
         : signedOrders[chain.id].apporder;
-      const datasetOrder = cmd.dataset
-        ? await getOrderByHash(order.DATASET_ORDER, cmd.dataset)
+      const datasetOrder = opts.dataset
+        ? await getOrderByHash(order.DATASET_ORDER, opts.dataset)
         : signedOrders[chain.id].datasetorder;
-      const workerpoolOrder = cmd.workerpool
-        ? await getOrderByHash(order.WORKERPOOL_ORDER, cmd.workerpool)
+      const workerpoolOrder = opts.workerpool
+        ? await getOrderByHash(order.WORKERPOOL_ORDER, opts.workerpool)
         : signedOrders[chain.id].workerpoolorder;
       let requestOrderInput;
       if (requestOnTheFly) {
         requestOrderInput = undefined;
       } else {
-        requestOrderInput = cmd.request
-          ? await getOrderByHash(order.REQUEST_ORDER, cmd.request)
+        requestOrderInput = opts.request
+          ? await getOrderByHash(order.REQUEST_ORDER, opts.request)
           : signedOrders[chain.id].requestorder;
       }
 
@@ -357,19 +397,21 @@ fill
       if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
-        const { address } = await keystore.load();
-        const unsignedOrder = templates.createOrder(order.REQUEST_ORDER, {
-          app: appOrder.app,
-          appmaxprice: appOrder.appprice,
-          dataset: useDataset ? datasetOrder.dataset : NULL_ADDRESS,
-          datasetmaxprice: useDataset ? datasetOrder.datasetprice : '0',
-          workerpool: workerpoolOrder.workerpool,
-          workerpoolmaxprice: workerpoolOrder.workerpoolprice,
-          requester: address,
-          category: workerpoolOrder.category,
-          params: inputParams || ' ',
-        });
-        if (!cmd.force) {
+        await keystore.load();
+        const unsignedOrder = await order.createRequestorder(
+          { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+          {
+            app: appOrder.app,
+            appmaxprice: appOrder.appprice || undefined,
+            dataset: useDataset ? datasetOrder.dataset : undefined,
+            datasetmaxprice: useDataset ? datasetOrder.datasetprice : undefined,
+            workerpool: workerpoolOrder.workerpool || undefined,
+            workerpoolmaxprice: workerpoolOrder.workerpoolprice || undefined,
+            category: workerpoolOrder.category,
+            params: inputParams || undefined,
+          },
+        );
+        if (!opts.force) {
           await prompt.signGeneratedOrder(
             order.REQUEST_ORDER,
             pretty(unsignedOrder),
@@ -387,6 +429,21 @@ fill
         throw new Error('Missing requestorder');
       }
 
+      if (!opts.skipRequestCheck) {
+        await checkRequestRequirements(
+          { contracts: chain.contracts, smsURL: chain.sms },
+          requestOrder,
+        ).catch((e) => {
+          throw Error(
+            `Request requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipRequestCheck()[0]
+            } to skip request requirement check)`,
+          );
+        });
+      }
+
       await keystore.load();
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await order.matchOrders(
@@ -401,7 +458,7 @@ fill
         { raw: { dealid, volume: volume.toString(), txHash } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -414,22 +471,24 @@ publish
   .option(...option.publishWorkerpoolOrder())
   .option(...option.publishRequestOrder())
   .option(...option.force())
+  .option(...option.skipRequestCheck())
   .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -444,7 +503,7 @@ publish
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!cmd.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+          if (!opts.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
           spinner.start(`Publishing ${orderName}`);
 
           let orderHash;
@@ -452,34 +511,47 @@ publish
             case order.APP_ORDER:
               orderHash = await order.publishApporder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case order.DATASET_ORDER:
               orderHash = await order.publishDatasetorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               orderHash = await order.publishWorkerpoolorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case order.REQUEST_ORDER:
+              if (!opts.skipRequestCheck) {
+                await checkRequestRequirements(
+                  { contracts: chain.contracts, smsURL: chain.sms },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `Request requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipRequestCheck()[0]
+                    } to skip request requirement check)`,
+                  );
+                });
+              }
               orderHash = await order.publishRequestorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             default:
           }
-
           spinner.info(
             `${orderName} successfully published with orderHash ${orderHash}`,
           );
@@ -489,10 +561,10 @@ publish
         }
       };
 
-      if (cmd.app) await publishOrder(order.APP_ORDER);
-      if (cmd.dataset) await publishOrder(order.DATASET_ORDER);
-      if (cmd.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
-      if (cmd.request) await publishOrder(order.REQUEST_ORDER);
+      if (opts.app) await publishOrder(order.APP_ORDER);
+      if (opts.dataset) await publishOrder(order.DATASET_ORDER);
+      if (opts.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
+      if (opts.request) await publishOrder(order.REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully published', {
@@ -504,7 +576,7 @@ publish
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -520,19 +592,20 @@ unpublish
   .option(...option.force())
   .description(desc.unpublish(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, keystore, { spinner }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -559,7 +632,7 @@ unpublish
               orderName,
               orderToUnpublish,
             );
-            if (!cmd.force) {
+            if (!opts.force) {
               await prompt.unpublishFromJsonFile(
                 orderName,
                 pretty(orderToUnpublish),
@@ -573,28 +646,28 @@ unpublish
             case order.APP_ORDER:
               unpublished = await order.unpublishApporder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.DATASET_ORDER:
               unpublished = await order.unpublishDatasetorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.WORKERPOOL_ORDER:
               unpublished = await order.unpublishWorkerpoolorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case order.REQUEST_ORDER:
               unpublished = await order.unpublishRequestorder(
                 chain.contracts,
-                chain.iexecGateway || IEXEC_GATEWAY_URL,
+                getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
@@ -609,10 +682,10 @@ unpublish
         }
       };
 
-      if (cmd.app) await unpublishOrder(order.APP_ORDER, cmd.app);
-      if (cmd.dataset) await unpublishOrder(order.DATASET_ORDER, cmd.dataset);
-      if (cmd.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
-      if (cmd.request) await unpublishOrder(order.REQUEST_ORDER, cmd.request);
+      if (opts.app) await unpublishOrder(order.APP_ORDER, opts.app);
+      if (opts.dataset) await unpublishOrder(order.DATASET_ORDER, opts.dataset);
+      if (opts.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await unpublishOrder(order.REQUEST_ORDER, opts.request);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully unpublished', {
@@ -624,7 +697,7 @@ unpublish
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -641,19 +714,20 @@ cancel
   .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, keystore, { spinner, txOptions }),
         loadSignedOrders(),
         keystore.load(),
       ]);
@@ -668,7 +742,7 @@ cancel
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!cmd.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+          if (!opts.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
           spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
@@ -705,10 +779,10 @@ cancel
         }
       };
 
-      if (cmd.app) await cancelOrder(order.APP_ORDER);
-      if (cmd.dataset) await cancelOrder(order.DATASET_ORDER);
-      if (cmd.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
-      if (cmd.request) await cancelOrder(order.REQUEST_ORDER);
+      if (opts.app) await cancelOrder(order.APP_ORDER);
+      if (opts.dataset) await cancelOrder(order.DATASET_ORDER);
+      if (opts.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
+      if (opts.request) await cancelOrder(order.REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully canceled', {
@@ -720,7 +794,7 @@ cancel
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -735,15 +809,16 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      if (!(cmd.app || cmd.dataset || cmd.workerpool || cmd.request)) {
+      if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(opts.chain, Keystore({ isSigner: false }), {
         spinner,
       });
       const success = {};
@@ -774,15 +849,15 @@ show
           isBytes32(orderHash);
           spinner.start(info.showing(orderName));
           const orderToShow = await order.fetchPublishedOrderByHash(
-            chain.iexecGateway || IEXEC_GATEWAY_URL,
+            getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
           );
           let deals;
-          if (cmd.deals) {
+          if (opts.deals) {
             deals = await order.fetchDealsByOrderHash(
-              chain.iexecGateway || IEXEC_GATEWAY_URL,
+              getPropertyFormChain(chain, 'iexecGateway'),
               orderName,
               chain.id,
               orderHash,
@@ -803,17 +878,17 @@ show
             orderToShow,
             deals && { deals: { count: deals.count, lastDeals: deals.deals } },
           );
-          spinner.info(`${orderString}${cmd.deals ? dealsString : ''}`);
+          spinner.info(`${orderString}${opts.deals ? dealsString : ''}`);
           Object.assign(success, { [orderName]: raw });
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
         }
       };
 
-      if (cmd.app) await showOrder(order.APP_ORDER, cmd.app);
-      if (cmd.dataset) await showOrder(order.DATASET_ORDER, cmd.dataset);
-      if (cmd.workerpool) await showOrder(order.WORKERPOOL_ORDER, cmd.workerpool);
-      if (cmd.request) await showOrder(order.REQUEST_ORDER, cmd.request);
+      if (opts.app) await showOrder(order.APP_ORDER, opts.app);
+      if (opts.dataset) await showOrder(order.DATASET_ORDER, opts.dataset);
+      if (opts.workerpool) await showOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await showOrder(order.REQUEST_ORDER, opts.request);
       if (failed.length === 0) {
         spinner.succeed('Successfully found', {
           raw: success,
@@ -824,7 +899,7 @@ show
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
