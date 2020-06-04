@@ -1652,7 +1652,7 @@ describe('[Mainchain]', () => {
         expect(orderShowRes.apporder.order).toEqual({
           app: address,
           appprice: 0,
-          volume: 1,
+          volume: 1000000,
           tag: NULL_BYTES32,
           datasetrestrict: NULL_ADDRESS,
           workerpoolrestrict: NULL_ADDRESS,
@@ -1717,7 +1717,7 @@ describe('[Mainchain]', () => {
         expect(orderShowRes.datasetorder.order).toEqual({
           dataset: address,
           datasetprice: 0,
-          volume: 1,
+          volume: 1000000,
           tag: NULL_BYTES32,
           apprestrict: NULL_ADDRESS,
           workerpoolrestrict: NULL_ADDRESS,

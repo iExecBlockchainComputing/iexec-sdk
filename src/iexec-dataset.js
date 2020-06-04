@@ -712,7 +712,7 @@ publish
       const overrides = {
         dataset: address,
         datasetprice: opts.price,
-        volume: opts.volume,
+        volume: opts.volume || '1000000',
         tag: opts.tag,
         apprestrict: opts.appRestrict,
         workerpoolrestrict: opts.workerpoolRestrict,

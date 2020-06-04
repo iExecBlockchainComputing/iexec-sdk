@@ -285,7 +285,7 @@ publish
       const overrides = {
         app: address,
         appprice: opts.price,
-        volume: opts.volume,
+        volume: opts.volume || '1000000',
         tag: opts.tag,
         datasetrestrict: opts.datasetRestrict,
         workerpoolrestrict: opts.workerpoolRestrict,
