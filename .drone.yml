@@ -1,8 +1,8 @@
 matrix:
   NODE_TAG:
+    - 14
     - 12
     - 10
-    - 8
 
 pipeline:
   build:

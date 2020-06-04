@@ -165,6 +165,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [BREAKING] droped support for nodejs v8 added support for nodejs v14
 - [BREAKING] `iexec tee` subcommands removed and replaced
   - `iexec tee init` is replaced by `ìexec dataset init --encrypted`
   - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
