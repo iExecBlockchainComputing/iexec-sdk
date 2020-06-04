@@ -20,6 +20,9 @@
     "url": "https://github.com/iExecBlockchainComputing/iexec-sdk/issues"
   },
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-sdk#readme",
+  "peerDependencies": {
+    "@iexec/poco": "^5.1.0"
+  },
   "dependencies": {
     "aes-js": "3.1.2",
     "big.js": "^5.2.2",
