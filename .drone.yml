@@ -42,7 +42,7 @@ pipeline:
     when:
       ref: [refs/tags/v4*]
       matrix:
-        NODE_TAG: 8
+        NODE_TAG: 10
 
   dockerhub_v4:
     image: plugins/docker
@@ -54,7 +54,7 @@ pipeline:
     when:
       ref: [refs/tags/v4*]
       matrix:
-        NODE_TAG: 8
+        NODE_TAG: 10
 
   npm_v5-alpha:
     image: plugins/npm
@@ -65,7 +65,7 @@ pipeline:
     when:
       ref: [refs/tags/v5.0.0-alpha.*]
       matrix:
-        NODE_TAG: 8
+        NODE_TAG: 10
 
   dockerhub_v5-alpha:
     image: plugins/docker
@@ -77,7 +77,7 @@ pipeline:
     when:
       ref: [refs/tags/v5.0.0-alpha.*]
       matrix:
-        NODE_TAG: 8
+        NODE_TAG: 10
 
 services:
   token-chain:
