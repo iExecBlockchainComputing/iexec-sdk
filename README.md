@@ -911,13 +911,15 @@ const iexec = new IExec({
 
 - [wallet](#iexecwallet): manage your wallet, send RLC...
 - [account](#iexecaccount): manage your account, deposit, withdraw...
-- [orderbook](#iexecorderbook): explore the iexec Marketplace
-- [order](#iexecorder): manage any type of order, make deals to start offchain computation
-- [deal](#iexecdeal): find your deals
-- [task](#iexectask): follow the computation, download results or claim failed executions
 - [app](#iexecapp): deploy a new app, show an existing one
 - [dataset](#iexecdataset): deploy a new dataset, show an existing one
 - [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
+- [order](#iexecorder): manage any type of order, make deals to start offchain computation
+- [orderbook](#iexecorderbook): explore the iexec Marketplace
+- [deal](#iexecdeal): find your deals
+- [task](#iexectask): follow the computation, download results or claim failed executions
+- [result](#iexecresult): manage the results encryption
+- [storage](#iexecstorage): manage the remote storage
 - [network](#iexecnetwork): useful information about the chain
 
 ### iexec.wallet
@@ -2096,19 +2098,22 @@ const { isPushed } = await iexec.storage.pushStorageToken(defaultStorageToken);
 console.log('default storage initialized:', isPushed);
 ```
 
-#### checkResultEncryptionKeyExists
+#### checkStorageTokenExists
 
-iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
+iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **encryptionKeyExists: Boolean** >
 
 > check if an encryption key exists in the SMS
+>
+> _Options_:
+> - `provider`: string, storage provider name, default `"ipfs"`. supported `"ipfs"`|`"dropbox"`
 
 _Example:_
 
 ```js
-const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
+const isIpfsStorageInitialized = await iexec.result.checkStorageTokenExists(
   await iexec.wallet.getAddress(),
 );
-console.log('encryption key set:', isMyKeySet);
+console.log('ipfs storage initialized:', isIpfsStorageInitialized);
 ```
 
 ### iexec.network
