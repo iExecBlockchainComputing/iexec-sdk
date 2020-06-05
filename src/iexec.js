@@ -3,7 +3,6 @@
 require('core-js/stable');
 require('regenerator-runtime/runtime');
 const cli = require('commander');
-const pocoVersion = require('@iexec/poco/package.json').version;
 const {
   addGlobalOptions,
   addWalletCreateOptions,
@@ -164,6 +163,7 @@ async function main() {
             }),
           ),
         ]);
+        const { pocoVersion } = chain.contracts;
 
         const iexecAddresses = {
           'iExec PoCo version': pocoVersion,
