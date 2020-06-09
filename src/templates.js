@@ -1,3 +1,5 @@
+const { paramsKeyName } = require('./params-utils');
+
 const main = {
   description:
     'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
@@ -21,7 +23,9 @@ const app = {
 };
 
 const buyConf = {
-  params: '',
+  params: {
+    [paramsKeyName.IEXEC_ARGS]: '',
+  },
   tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
   trust: '0',
   callback: '0x0000000000000000000000000000000000000000',
@@ -38,7 +42,7 @@ const dataset = {
 const compatibleDapp = {
   name: 'Recomanded-dapp-for-MyDataset',
   addresses: {
-    42: '0x0000000000000000000000000000000000000000',
+    5: '0x0000000000000000000000000000000000000000',
   },
   buyConf,
 };
@@ -94,9 +98,9 @@ const order = {
     beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
     callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {
-      iexec_args: '',
-      iexec_input_files: [],
-      iexec_result_encryption: false, // todo remove from default
+      [paramsKeyName.IEXEC_ARGS]: '',
+      [paramsKeyName.IEXEC_INPUT_FILES]: [],
+      [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
     },
   },
 };

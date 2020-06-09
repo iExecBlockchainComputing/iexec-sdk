@@ -3,9 +3,7 @@
 const Debug = require('debug');
 const cli = require('commander');
 const fs = require('fs-extra');
-const {
-  mixed, object, array, string,
-} = require('yup');
+const { object, array, string } = require('yup');
 const sizeOf = require('image-size');
 const path = require('path');
 const {
@@ -23,6 +21,7 @@ const {
   IEXEC_FILE_NAME,
   DEPLOYED_FILE_NAME,
 } = require('./fs');
+const { paramsKeyName } = require('./params-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -58,7 +57,12 @@ const baseSchema = () => object({
 });
 
 const buyConfSchema = () => object({
-  params: mixed().required(),
+  params: object({
+    [paramsKeyName.IEXEC_ARGS]: string(),
+  })
+    .required()
+    .noUnknown()
+    .strict(),
   trust: uint256Schema(),
   tag: bytes32Schema(),
   callback: addressSchema(),
