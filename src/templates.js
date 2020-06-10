@@ -125,6 +125,9 @@ const chains = {
     goerli: {
       id: '5',
     },
+    viviani: {
+      id: '133',
+    },
     mainnet: {
       id: '1',
     },
