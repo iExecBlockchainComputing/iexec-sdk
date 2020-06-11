@@ -19,6 +19,7 @@ const {
 const { initIExecConf, initChainConf } = require('./fs');
 const { Keystore, createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
+const { getChainDefaults } = require('./config');
 const { addressSchema } = require('./validator');
 const { wrapCall } = require('./errorWrappers');
 const packageJSON = require('../package.json');
@@ -130,6 +131,12 @@ async function main() {
           Keystore({ isSigner: false }),
           { spinner },
         );
+
+        const host = chain.host === getChainDefaults(chain.id).host
+          ? 'default'
+          : chain.host;
+        spinner.info(`Ethereum host: ${host}`);
+
         spinner.start(info.checking('iExec contracts info'));
         const hubAddress = await addressSchema({
           ethProvider: chain.contracts.jsonRpcProvider,
@@ -178,6 +185,7 @@ async function main() {
         spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`, {
           raw: {
             pocoVersion,
+            host,
             hubAddress: hubAddress || chain.contracts.hubAddress,
             rlcAddress,
             appRegistryAddress,

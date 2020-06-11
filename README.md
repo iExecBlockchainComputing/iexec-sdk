@@ -78,26 +78,30 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-_NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [infura.io](https://infura.io/). A default Infura API key shared across all users is provided for convenience.
-As this key is subject to rate limits, **it's strongly recommended to use your own access to Infura** (or better your own node).
-When the limit rate is reached every try to access the blockchain results in `Web3ProviderCallError: daily request count exceeded, request rate limited`.
-You can register at https://infura.io/register and create a project to get an API key ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/)).
-Once you created your access, you can add an `host` key in the `chains.json` configuration file to target your node:
-
-```json
-{
-...
-    "goerli": {
-      "id": "5",
-      "host": "https://goerli.infura.io/v3/<YOUR-PROJECT-ID>"
-    },
-    "mainnet": {
-      "id": "1",
-      "host": "https://mainnet.infura.io/v3/<YOUR-PROJECT-ID>"
-    }
-  }
-}
-```
+> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [infura.io](https://infura.io/).
+>
+> A default Infura API key shared across all users is provided for convenience.
+> As this key is subject to rate limits, **it's strongly recommended to use your own access to Infura** (or better your own node).
+>
+> When the limit rate is reached every try to access the blockchain results in `Web3ProviderCallError: daily request count exceeded, request rate limited`.
+> You can register at https://infura.io/register and create a project to get an API key ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/)).
+>
+> Once you created your access, you can add an `host` key in the `chains.json` configuration file to target your node:
+>
+> ```json
+> {
+> ...
+>     "goerli": {
+>       "id": "5",
+>       "host": "https://goerli.infura.io/v3/<YOUR-PROJECT-ID>"
+>     },
+>     "mainnet": {
+>       "id": "1",
+>       "host": "https://mainnet.infura.io/v3/<YOUR-PROJECT-ID>"
+>     }
+>   }
+> }
+> ```
 
 ### SDK CLI for Dapp developpers
 

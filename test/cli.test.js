@@ -333,6 +333,8 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} info --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
+    expect(res.host).toBe(tokenChainUrl);
+    expect(res.pocoVersion).toBeDefined();
     expect(res.hubAddress).toBe(hubAddress);
     expect(res.appRegistryAddress).toBeDefined();
     expect(res.datasetRegistryAddress).toBeDefined();
@@ -1861,8 +1863,9 @@ describe('[Sidechain]', () => {
     const raw = await execAsync(`${iexecPath} info --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
+    expect(res.pocoVersion).toBeDefined();
+    expect(res.host).toBe(nativeChainUrl);
     expect(res.hubAddress).toBe(nativeHubAddress);
-    // expect(res.pocoVersion).toBeDefined();
     expect(res.appRegistryAddress).toBeDefined();
     expect(res.datasetRegistryAddress).toBeDefined();
     expect(res.workerpoolRegistryAddress).toBeDefined();
