@@ -8,17 +8,17 @@ const hostMap = {
 };
 
 const smsMap = {
-  1: 'https://mainnet-sms.iex.ec',
-  5: 'https://goerli-sms.iex.ec',
-  133: 'https://viviani-sms.iex.ec',
-  134: 'https://bellecour-sms.iex.ec',
+  1: 'https://sms.mainnet.iex.ec',
+  5: 'https://sms.goerli.iex.ec',
+  133: 'https://sms.viviani.iex.ec',
+  134: 'https://sms.bellecour.iex.ec',
 };
 
 const resultProxyMap = {
-  1: 'https://mainnet-result-proxy.iex.ec',
-  5: 'https://goerli-result-proxy.ec',
-  133: 'https://viviani-result-proxy.iex.ec',
-  134: 'https://bellecour-result-proxy.iex.ec',
+  1: 'https://result.mainnet.iex.ec',
+  5: 'https://result.goerli.iex.ec',
+  133: 'https://result.viviani.iex.ec',
+  134: 'https://result.bellecour.iex.ec',
 };
 
 const bridgeMap = {
