@@ -78,6 +78,27 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
+_NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [infura.io](https://infura.io/). A default Infura API key shared across all users is provided for convenience.
+As this key is subject to rate limits, **it's strongly recommended to use your own access to Infura** (or better your own node).
+When the limit rate is reached every try to access the blockchain results in `Web3ProviderCallError: daily request count exceeded, request rate limited`.
+You can register at https://infura.io/register and create a project to get an API key ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/)).
+Once you created your access, you can add an `host` key in the `chains.json` configuration file to target your node:
+
+```json
+{
+...
+    "goerli": {
+      "id": "5",
+      "host": "https://goerli.infura.io/v3/<YOUR-PROJECT-ID>"
+    },
+    "mainnet": {
+      "id": "1",
+      "host": "https://mainnet.infura.io/v3/<YOUR-PROJECT-ID>"
+    }
+  }
+}
+```
+
 ### SDK CLI for Dapp developpers
 
 First go through [Init project](#Init-project)
@@ -602,6 +623,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 The `chain.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec Secret Management Services. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
 
 `default` set the default chain used by the SDK cli.
+optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
 optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
 optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
 optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
@@ -2104,7 +2126,8 @@ iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )**
 
 > check if an encryption key exists in the SMS
 >
-> _Options_:
+> _options:_
+>
 > - `provider`: string, storage provider name, default `"ipfs"`. supported `"ipfs"`|`"dropbox"`
 
 _Example:_
