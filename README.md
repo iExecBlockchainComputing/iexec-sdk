@@ -102,6 +102,9 @@ iexec storage init # initialize your remote storage
 >   }
 > }
 > ```
+>
+> Check your current host:
+> `iexec info`
 
 ### SDK CLI for Dapp developpers
 
