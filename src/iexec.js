@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-require('core-js/stable');
-require('regenerator-runtime/runtime');
 const cli = require('commander');
 const {
   addGlobalOptions,
