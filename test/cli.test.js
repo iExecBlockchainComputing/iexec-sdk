@@ -3569,37 +3569,34 @@ describe('[Common]', () => {
     });
 
     test('mainnet is not native', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
-      );
+      const raw = await execAsync(`${iexecPath} info --chain mainnet --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.useNative).toBe(false);
     });
 
     test('goerli is not native', async () => {
-      const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
-      );
+      const raw = await execAsync(`${iexecPath} info --chain goerli --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.useNative).toBe(false);
+    });
+
+    test('viviani is native', async () => {
+      const raw = await execAsync(`${iexecPath} info --chain viviani --raw`);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.useNative).toBe(true);
     });
 
     // not deployed yet
     test.skip('bellecour is native', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show ${ADDRESS} --chain bellecour --raw`,
+        `${iexecPath} info ${ADDRESS} --chain bellecour --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).toBeUndefined();
+      expect(res.useNative).toBe(false);
     });
   });
 });
