@@ -81,7 +81,7 @@ iexec storage init # initialize your remote storage
 > _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [infura.io](https://infura.io/).
 >
 > A default Infura API key shared across all users is provided for convenience.
-> As this key is subject to rate limits, **it's strongly recommended to use your own access to Infura** (or better your own node).
+> As this key is subject to rate limits, **you must use your own access to Infura** (or better your own node).
 >
 > When the limit rate is reached every try to access the blockchain results in `Web3ProviderCallError: daily request count exceeded, request rate limited`.
 > You can register at https://infura.io/register and create a project to get an API key ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/)).
