@@ -248,7 +248,7 @@ beforeAll(async () => {
   await execAsync('mkdir test/out').catch(() => {});
   process.chdir('test');
 
-  const { chainId } = await tokenChainRPC.getNetwork();
+  const chainId = 65535;
   console.log('chainId', chainId);
   networkId = `${chainId}`;
   hubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';

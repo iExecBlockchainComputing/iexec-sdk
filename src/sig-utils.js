@@ -1,7 +1,12 @@
 const Debug = require('debug');
 const BN = require('bn.js');
 const { Buffer } = require('buffer');
-const { defaultAbiCoder, keccak256, joinSignature } = require('ethers').utils;
+const {
+  SigningKey,
+  defaultAbiCoder,
+  keccak256,
+  joinSignature,
+} = require('ethers').utils;
 const SignerProvider = require('ethjs-custom-signer');
 const { Wallet } = require('ethers');
 
@@ -155,11 +160,10 @@ const TypedDataUtils = {
   },
 };
 
-const signTypedData = async (privateKey, msgParams) => {
+const signTypedData = (privateKey, msgParams) => {
   try {
-    const wallet = new Wallet(privateKey);
     const messageHash = TypedDataUtils.sign(msgParams.data);
-    const hexSig = await wallet.signingKey.signDigest(messageHash);
+    const hexSig = new SigningKey(privateKey).signDigest(messageHash);
     const signature = joinSignature(hexSig);
     return signature;
   } catch (error) {
@@ -187,7 +191,7 @@ const signTransaction = wallet => async ({
   value,
 }) => {
   try {
-    const signed = await wallet.sign({
+    const signed = await wallet.signTransaction({
       gasPrice,
       to,
       data,
