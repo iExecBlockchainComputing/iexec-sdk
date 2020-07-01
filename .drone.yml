@@ -5,7 +5,7 @@ matrix:
     - 10
 
 pipeline:
-  build:
+  build_node_10:
     image: node:${NODE_TAG}
     pull: true
     commands:
@@ -16,6 +16,9 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
+    when:
+      matrix:
+        NODE_TAG: 10
 
   build_on_tag:
     image: node:${NODE_TAG}
@@ -30,29 +33,6 @@ pipeline:
       - npm test
     when:
       ref: [refs/tags/v*]
-
-  npm_v4:
-    image: plugins/npm
-    secrets: [npm_password]
-    username: sulliwane
-    email: sulliwane@gmail.com
-    tag: latest
-    when:
-      ref: [refs/tags/v4*]
-      matrix:
-        NODE_TAG: 10
-
-  dockerhub_v4:
-    image: plugins/docker
-    repo: iexechub/iexec-sdk
-    secrets: [docker_username, docker_password]
-    tags:
-      - latest
-      - ${DRONE_TAG##v}
-    when:
-      ref: [refs/tags/v4*]
-      matrix:
-        NODE_TAG: 10
 
   npm_v5-alpha:
     image: plugins/npm
