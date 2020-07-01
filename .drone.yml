@@ -79,11 +79,11 @@ pipeline:
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:v5.0.1-token
+    image: iexechub/poco-chaintest:v5.1.0-token
     pull: true
   native-chain:
-    image: iexechub/poco-chaintest:v5.0.1-native
+    image: iexechub/poco-chaintest:v5.1.0-native
     pull: true
   token-chain-1s:
-    image: iexechub/poco-chaintest:v5.0.1-token-1s
+    image: iexechub/poco-chaintest:v5.1.0-token-1s
     pull: true
