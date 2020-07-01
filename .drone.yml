@@ -16,8 +16,6 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
-    when:
-      branch: [master, next, v5-alpha]
 
   build_on_tag:
     image: node:${NODE_TAG}
