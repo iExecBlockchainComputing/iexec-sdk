@@ -7,11 +7,11 @@ const NodeRSA = require('node-rsa');
 const aesjs = require('aes-js');
 const {
   getAddress,
-  bigNumberify,
   randomBytes,
   formatEther,
   parseEther,
 } = require('ethers').utils;
+const { BigNumber } = require('ethers');
 const multiaddr = require('multiaddr');
 const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
@@ -27,7 +27,7 @@ const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
-const bnToEthersBn = bn => bigNumberify(bn.toString());
+const bnToEthersBn = bn => BigNumber.from(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
 const stringify = (val) => {
@@ -76,7 +76,7 @@ const parseRLC = (rlc) => {
 
 const formatEth = (wei) => {
   try {
-    return formatEther(bigNumberify(stringify(wei)));
+    return formatEther(BigNumber.from(stringify(wei)));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid wei');
@@ -206,7 +206,7 @@ const signTypedDatav3 = async (eth, address, typedData) => {
 };
 
 const getSalt = () => {
-  const hex = bigNumberify(randomBytes(32))
+  const hex = BigNumber.from(randomBytes(32))
     .toHexString()
     .substring(2);
   const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
@@ -418,7 +418,6 @@ module.exports = {
   getEventFromLogs,
   bnToEthersBn,
   ethersBnToBn,
-  ethersBigNumberify: bigNumberify,
   bnifyNestedEthersBn,
   stringifyNestedBn,
   multiaddrHexToHuman,

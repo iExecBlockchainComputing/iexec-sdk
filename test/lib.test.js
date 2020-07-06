@@ -269,7 +269,7 @@ const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
 beforeAll(async () => {
-  const { chainId } = await tokenChainRPC.getNetwork();
+  const chainId = 65535;
   console.log('chainId', chainId);
   networkId = `${chainId}`;
   hubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
@@ -841,7 +841,7 @@ describe('[getSignerFromPrivateKey]', () => {
     const amount = new BN(1000);
     const receiver = POOR_ADDRESS2;
     const nonceProvider = await (async (address) => {
-      const initNonce = ethers.utils.bigNumberify(
+      const initNonce = ethers.BigNumber.from(
         await tokenChainRPC1s.send('eth_getTransactionCount', [
           address,
           'latest',
@@ -849,7 +849,7 @@ describe('[getSignerFromPrivateKey]', () => {
       );
       let i = 0;
       const getNonce = () => {
-        const nonce = initNonce.add(ethers.utils.bigNumberify(i)).toHexString();
+        const nonce = initNonce.add(ethers.BigNumber.from(i)).toHexString();
         i += 1;
         return nonce;
       };

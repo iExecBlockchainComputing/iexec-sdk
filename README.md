@@ -392,15 +392,20 @@ iexec app count --user <userAddress> # count user total number of app
 ```bash
 iexec app run [appAddress] [options] # run an iExec application at market price (default run last deployed app)
 # OPTIONS
---dataset [address] # run with a dataset (specified address or user's last deployed dataset)
---workerpool [address] # run on a specific workerpool (specified address or user's last deployed workerpool)
---category <catid> # run in specified category
---params <string> # specify the params of the request
---tag <tag...> # specify tags (usage --tag tag1,tag2)
---trust <trust> # specify minimum trust
+--dataset <address|"deployed"> # dataset address, use "deployed" to use last deployed from "deployed.json"
+--workerpool <address|"deployed"> # workerpool address, use "deployed" to use last deployed from "deployed.json"
+--category <id> # id of the task category
+--tag <tag...> # specify tags (usage: --tag tee,gpu)
+--trust <integer> # trust level
 --beneficiary <address> # specify the beneficiary of the request (default user address)
 --callback <address> # specify the callback address of the request
---watch # watch execution status changes
+--args <string> # specify the arguments to pass to the app
+--input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--encrypt-result # encrypt the result archive with the beneficiary public key
+--storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
+--skip-request-check # skip request validity checks, this may result in task execution fail
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
+--watch # watch execution status changes
 ```
 
 ## dataset

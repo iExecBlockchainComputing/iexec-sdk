@@ -1,12 +1,10 @@
 const Debug = require('debug');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { Contract } = require('ethers');
-const { Interface } = require('ethers').utils;
+const { Contract, BigNumber } = require('ethers');
 const {
   ethersBnToBn,
   bnToEthersBn,
-  ethersBigNumberify,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   checksummedAddress,
@@ -197,7 +195,7 @@ const sendNativeToken = async (
       ethProvider: contracts.jsonRpcProvider,
     }).validate(to);
     const vValue = await uint256Schema().validate(value);
-    const hexValue = ethersBigNumberify(vValue).toHexString();
+    const hexValue = BigNumber.from(vValue).toHexString();
     const ethSigner = contracts.jsonRpcProvider.getSigner();
     const tx = await wrapSend(
       ethSigner.sendTransaction({
@@ -316,7 +314,7 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
       }
     }
     const gasPrice = contracts.txOptions && contracts.txOptions.gasPrice
-      ? ethersBnToBn(ethersBigNumberify(contracts.txOptions.gasPrice))
+      ? ethersBnToBn(BigNumber.from(contracts.txOptions.gasPrice))
       : ethersBnToBn(await contracts.jsonRpcProvider.getGasPrice());
     const gasLimit = new BN(21000);
     const txFee = gasPrice.mul(gasLimit);
@@ -451,7 +449,7 @@ const bridgeToSidechain = async (
         '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
       ],
     });
-    const erc20Interface = new Interface(erc20conctract.interface.abi);
+    const erc20Interface = erc20conctract.interface;
     let totalSpentPerDay = new BN(0);
     const processTransferLogs = async (logs, checkTimestamp = true) => {
       if (logs.length === 0) return;
@@ -466,9 +464,9 @@ const bridgeToSidechain = async (
       }
       if (!isInvalidTimestamp) {
         const parsedLog = erc20Interface.parseLog(logs[0]);
-        if (parsedLog.values.to === vBridgeAddress) {
+        if (parsedLog.args.to === vBridgeAddress) {
           totalSpentPerDay = totalSpentPerDay.add(
-            ethersBnToBn(parsedLog.values.value),
+            ethersBnToBn(parsedLog.args.value),
           );
         }
       }

@@ -5,7 +5,7 @@ matrix:
     - 10
 
 pipeline:
-  build:
+  build_node_10:
     image: node:${NODE_TAG}
     pull: true
     commands:
@@ -17,7 +17,8 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      branch: [master, next, v5-alpha]
+      matrix:
+        NODE_TAG: 10
 
   build_on_tag:
     image: node:${NODE_TAG}
@@ -32,29 +33,6 @@ pipeline:
       - npm test
     when:
       ref: [refs/tags/v*]
-
-  npm_v4:
-    image: plugins/npm
-    secrets: [npm_password]
-    username: sulliwane
-    email: sulliwane@gmail.com
-    tag: latest
-    when:
-      ref: [refs/tags/v4*]
-      matrix:
-        NODE_TAG: 10
-
-  dockerhub_v4:
-    image: plugins/docker
-    repo: iexechub/iexec-sdk
-    secrets: [docker_username, docker_password]
-    tags:
-      - latest
-      - ${DRONE_TAG##v}
-    when:
-      ref: [refs/tags/v4*]
-      matrix:
-        NODE_TAG: 10
 
   npm_v5-alpha:
     image: plugins/npm
@@ -81,11 +59,11 @@ pipeline:
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:v5.0.1-token
+    image: iexechub/poco-chaintest:v5.1.0-token
     pull: true
   native-chain:
-    image: iexechub/poco-chaintest:v5.0.1-native
+    image: iexechub/poco-chaintest:v5.1.0-native
     pull: true
   token-chain-1s:
-    image: iexechub/poco-chaintest:v5.0.1-token-1s
+    image: iexechub/poco-chaintest:v5.1.0-token-1s
     pull: true
