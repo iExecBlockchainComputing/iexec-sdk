@@ -848,12 +848,15 @@ describe('[getSignerFromPrivateKey]', () => {
         ]),
       );
       let i = 0;
+      const increaseNonce = () => {
+        i += 1;
+      };
       const getNonce = () => {
         const nonce = initNonce.add(ethers.BigNumber.from(i)).toHexString();
-        i += 1;
         return nonce;
       };
       return {
+        increaseNonce,
         getNonce,
       };
     })(ADDRESS);
@@ -877,32 +880,47 @@ describe('[getSignerFromPrivateKey]', () => {
     );
     const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
 
-    const resArray = await Promise.all([
-      iexec.workerpool.deployWorkerpool({
-        owner: ADDRESS,
-        description: `My workerpool${getId()}`,
-      }),
-      iexec.app.deployApp({
-        owner: ADDRESS,
-        name: `My app${getId()}`,
-        type: 'DOCKER',
-        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-        checksum:
-          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        mrenclave: '',
-      }),
-      iexec.dataset.deployDataset({
-        owner: ADDRESS,
-        name: `My dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      }),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.account.deposit(amount),
-    ]);
+    const promiseArray = [];
+
+    const PROPAGATION_TIME = 400;
+    promiseArray[0] = iexec.workerpool.deployWorkerpool({
+      owner: ADDRESS,
+      description: `My workerpool${getId()}`,
+    });
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[1] = iexec.app.deployApp({
+      owner: ADDRESS,
+      name: `My app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      mrenclave: '',
+    });
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[2] = iexec.dataset.deployDataset({
+      owner: ADDRESS,
+      name: `My dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    });
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[3] = iexec.wallet.sendETH(amount, receiver);
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[4] = iexec.wallet.sendETH(amount, receiver);
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[5] = iexec.wallet.sendETH(amount, receiver);
+    await sleep(PROPAGATION_TIME);
+    nonceProvider.increaseNonce();
+    promiseArray[6] = iexec.account.deposit(amount);
+
+    const resArray = await Promise.all(promiseArray);
 
     expect(resArray).toBeDefined();
     expect(resArray.length).toBe(7);
