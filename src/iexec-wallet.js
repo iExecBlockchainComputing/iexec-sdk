@@ -409,17 +409,17 @@ bridgeToSidechain
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
-      const brigeConf = getPropertyFormChain(chain, 'bridge');
-      const bridgeAddress = brigeConf && brigeConf.contract;
-      const bridgedNetworkId = brigeConf && brigeConf.bridgedNetworkId;
+      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = bridgeConf && bridgeConf.contract;
+      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
           `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!bridgedNetworkId) {
+      if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in "chain.json" for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {
@@ -452,8 +452,8 @@ bridgeToSidechain
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
           bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
         }`,
         {
           raw: {
@@ -491,17 +491,17 @@ bridgeToMainchain
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
-      const brigeConf = getPropertyFormChain(chain, 'bridge');
-      const bridgeAddress = brigeConf && brigeConf.contract;
-      const bridgedNetworkId = brigeConf && brigeConf.bridgedNetworkId;
+      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = bridgeConf && bridgeConf.contract;
+      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
           `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!bridgedNetworkId) {
+      if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in "chain.json" for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {
@@ -534,8 +534,8 @@ bridgeToMainchain
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
           bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
         }`,
         {
           raw: {

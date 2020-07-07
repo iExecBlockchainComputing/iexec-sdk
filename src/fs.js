@@ -19,7 +19,7 @@ const chainConfSchema = () => object({
   iexecGateway: string(),
   native: boolean(),
   bridge: object({
-    bridgedNetworkId: chainIdSchema().required(),
+    bridgedChainId: chainIdSchema().required(),
     contract: addressSchema().required(),
   })
     .notRequired()

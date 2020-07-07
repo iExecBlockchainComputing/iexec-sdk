@@ -640,7 +640,7 @@ optional key `hub` set the address of the hub used by the SDK cli on each chain 
 optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
 optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
 optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
-optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedNetworkId` set the reference to the briged network specified by `id`.
+optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainId` set the reference to the bridged network specified by `id`.
 optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
 
 ```json
@@ -657,7 +657,7 @@ optional key `native` specify whether or not the chain native token is RLC (over
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedNetworkId": "123456789"
+        "bridgedChainId": "123456789"
       }
     },
     "goerli": {

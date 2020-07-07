@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
 - `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] standardized Error messages format, capitalized first letter.
+- [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
 - standardized CLI messages format
 - fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods

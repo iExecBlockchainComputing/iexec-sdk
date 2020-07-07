@@ -90,18 +90,17 @@ class IExec {
     const isBridged = Object.getOwnPropertyNames(bridgedNetworkConf).length > 0
       || chainConfDefaults.bridge;
     if (isBridged) {
-      const bridgedNetworkId = bridgedNetworkConf.chainId !== undefined
+      const bridgedChainId = bridgedNetworkConf.chainId !== undefined
         ? bridgedNetworkConf.chainId
-        : chainConfDefaults.bridge
-            && chainConfDefaults.bridge.bridgedNetworkId;
-      if (!bridgedNetworkId) {
+        : chainConfDefaults.bridge && chainConfDefaults.bridge.bridgedChainId;
+      if (!bridgedChainId) {
         throw new errors.ValidationError(
           `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
-      const bridgedChainConfDefaults = getChainDefaults(bridgedNetworkId);
+      const bridgedChainConfDefaults = getChainDefaults(bridgedChainId);
       bridgedConf = {
-        chainId: bridgedNetworkId,
+        chainId: bridgedChainId,
         rpcURL:
           bridgedNetworkConf.rpcURL !== undefined
             ? bridgedNetworkConf.rpcURL
@@ -116,12 +115,12 @@ class IExec {
       };
       if (!bridgedConf.rpcURL) {
         throw new errors.ValidationError(
-          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedNetworkId}`,
+          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
       if (!bridgedConf.bridgeAddress) {
         throw new errors.ValidationError(
-          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedNetworkId}`,
+          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
     }

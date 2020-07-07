@@ -87,13 +87,13 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
     }
 
     let bridgeConf;
-    if (conf.bridge && conf.bridge.bridgedNetworkId) {
+    if (conf.bridge && conf.bridge.bridgedChainId) {
       const names = Object.keys(chainsConf.chains);
       names.forEach((n) => {
         const bridgeLoadedConf = chainsConf.chains[n];
         if (
           bridgeLoadedConf.id
-          && bridgeLoadedConf.id === conf.bridge.bridgedNetworkId
+          && bridgeLoadedConf.id === conf.bridge.bridgedChainId
         ) {
           const bridgeDefaultConf = getChainDefaults(bridgeLoadedConf.id);
           debug('bridgeLoadedConf', bridgeLoadedConf);
