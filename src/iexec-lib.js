@@ -29,7 +29,11 @@ const {
   sumTags,
   decryptResult,
 } = require('./utils');
-const { getSignerFromPrivateKey } = require('./signers');
+const {
+  EnhancedWallet,
+  EnhancedWeb3Signer,
+  getSignerFromPrivateKey,
+} = require('./signers');
 const { getChainDefaults } = require('./config');
 
 const utils = {
@@ -54,15 +58,24 @@ class IExec {
       hubAddress,
       isNative,
       bridgeAddress,
-      bridgedNetworkConf,
+      bridgedNetworkConf = {},
       resultProxyURL,
       smsURL,
       ipfsGatewayURL,
       iexecGatewayURL,
     } = {},
   ) {
-    const ethersProvider = ethProvider.provider; // TODO
-    const ethersSigner = ethProvider; // TODO
+    let ethersProvider;
+    let ethersSigner;
+    if (ethProvider instanceof EnhancedWallet) {
+      ethersProvider = ethProvider.provider;
+      ethersSigner = ethProvider;
+    } else {
+      const web3SignerProvider = new EnhancedWeb3Signer(ethProvider);
+      ethersProvider = web3SignerProvider.provider;
+      ethersSigner = web3SignerProvider;
+    }
+
     const contracts = new IExecContractsClient({
       chainId,
       provider: ethersProvider,
@@ -70,38 +83,60 @@ class IExec {
       hubAddress,
       isNative,
     });
-    let bridgedContracts;
-    if (bridgedNetworkConf) {
-      const bridgedChainId = bridgedNetworkConf.chainId;
-      if (!chainId) {
+
+    const chainConfDefaults = getChainDefaults(chainId);
+
+    let bridgedConf;
+    const isBridged = Object.getOwnPropertyNames(bridgedNetworkConf).length > 0
+      || chainConfDefaults.bridge;
+    if (isBridged) {
+      const bridgedNetworkId = bridgedNetworkConf.chainId !== undefined
+        ? bridgedNetworkConf.chainId
+        : chainConfDefaults.bridge
+            && chainConfDefaults.bridge.bridgedNetworkId;
+      if (!bridgedNetworkId) {
         throw new errors.ValidationError(
-          'Missing chainId in bridgedNetworkConf',
+          `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
-      const bridgedHubAddress = bridgedNetworkConf.hubAddress;
-      const bridgedRpcURL = bridgedNetworkConf.rpcURL;
-      if (!bridgedRpcURL) {
+      const bridgedChainConfDefaults = getChainDefaults(bridgedNetworkId);
+      bridgedConf = {
+        chainId: bridgedNetworkId,
+        rpcURL:
+          bridgedNetworkConf.rpcURL !== undefined
+            ? bridgedNetworkConf.rpcURL
+            : bridgedChainConfDefaults.host,
+        isNative: !contracts.isNative,
+        hubAddress: bridgedNetworkConf.hubAddress,
+        bridgeAddress:
+          bridgedNetworkConf.bridgeAddress !== undefined
+            ? bridgedNetworkConf.bridgeAddress
+            : bridgedChainConfDefaults.bridge
+              && bridgedChainConfDefaults.bridge.contract,
+      };
+      if (!bridgedConf.rpcURL) {
         throw new errors.ValidationError(
-          'Missing RpcURL in bridgedNetworkConf',
+          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedNetworkId}`,
         );
       }
-      const bridgedBridgeAddress = bridgedNetworkConf.bridgeAddress;
-      if (!bridgedBridgeAddress) {
+      if (!bridgedConf.bridgeAddress) {
         throw new errors.ValidationError(
-          'Missing bridgeAddress in bridgedNetworkConf',
+          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedNetworkId}`,
         );
       }
-      const bridgedIsNative = !contracts.isNative;
-      bridgedContracts = new IExecContractsClient({
-        chainId: bridgedChainId,
-        provider: getDefaultProvider(bridgedRpcURL),
-        isNative: bridgedIsNative,
-        hubAddress: bridgedHubAddress,
-      });
     }
 
+    const bridgedContracts = isBridged
+      ? new IExecContractsClient({
+        chainId: bridgedConf.chainId,
+        provider: getDefaultProvider(bridgedConf.rpcURL),
+        isNative: bridgedConf.isNative,
+        hubAddress: bridgedConf.hubAddress,
+      })
+      : undefined;
+
     const getSmsURL = () => {
-      const value = smsURL || getChainDefaults(chainId).sms;
+      const value = smsURL || chainConfDefaults.sms;
       if (value !== undefined) {
         return value;
       }
@@ -111,7 +146,7 @@ class IExec {
     };
 
     const getResultProxyURL = () => {
-      const value = resultProxyURL || getChainDefaults(chainId).resultProxy;
+      const value = resultProxyURL || chainConfDefaults.resultProxy;
       if (value !== undefined) {
         return value;
       }
@@ -121,7 +156,7 @@ class IExec {
     };
 
     const getIexecGatewayURL = () => {
-      const value = iexecGatewayURL || getChainDefaults(chainId).iexecGateway;
+      const value = iexecGatewayURL || chainConfDefaults.iexecGateway;
       if (value !== undefined) {
         return value;
       }
@@ -131,12 +166,23 @@ class IExec {
     };
 
     const getIpfsGatewayURL = () => {
-      const value = ipfsGatewayURL || getChainDefaults(chainId).ipfsGateway;
+      const value = ipfsGatewayURL || chainConfDefaults.ipfsGateway;
       if (value !== undefined) {
         return value;
       }
       throw Error(
         `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getBridgeAddress = () => {
+      const value = bridgeAddress
+        || (chainConfDefaults.bridge && chainConfDefaults.bridge.contract);
+      if (value !== undefined) {
+        return value;
+      }
+      throw Error(
+        `bridgeAddress option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -147,15 +193,13 @@ class IExec {
     this.wallet.sendETH = (weiAmount, to) => wallet.sendETH(contracts, weiAmount, to);
     this.wallet.sendRLC = (nRlcAmount, to) => wallet.sendRLC(contracts, nRlcAmount, to);
     this.wallet.sweep = to => wallet.sweep(contracts, to);
-    this.wallet.bridgeToSidechain = nRlcAmount => wallet.bridgeToSidechain(contracts, bridgeAddress, nRlcAmount, {
+    this.wallet.bridgeToSidechain = nRlcAmount => wallet.bridgeToSidechain(contracts, getBridgeAddress(), nRlcAmount, {
       bridgedContracts,
-      sidechainBridgeAddress:
-          bridgedNetworkConf && bridgedNetworkConf.bridgeAddress,
+      sidechainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
-    this.wallet.bridgeToMainchain = nRlcAmount => wallet.bridgeToMainchain(contracts, bridgeAddress, nRlcAmount, {
+    this.wallet.bridgeToMainchain = nRlcAmount => wallet.bridgeToMainchain(contracts, getBridgeAddress(), nRlcAmount, {
       bridgedContracts,
-      mainchainBridgeAddress:
-          bridgedNetworkConf && bridgedNetworkConf.bridgeAddress,
+      mainchainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
     this.account = {};
     this.account.checkBalance = address => account.checkBalance(contracts, address);

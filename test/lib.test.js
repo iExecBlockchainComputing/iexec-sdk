@@ -268,7 +268,7 @@ const getRandomAddress = () => getRandomWallet().address;
 const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
-beforeAll(async () => {
+beforeAll(() => {
   const chainId = 65535;
   console.log('chainId', chainId);
   networkId = `${chainId}`;
@@ -279,7 +279,7 @@ beforeAll(async () => {
 }, 15000);
 
 describe('[IExec]', () => {
-  test('sms required function throw if no smsURL configured', async () => {
+  test('sms required function throw if no smsURL configured', () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -301,7 +301,7 @@ describe('[IExec]', () => {
       ),
     );
   });
-  test('resultProxy required function throw if no resultProxyURL configured', async () => {
+  test('resultProxy required function throw if no resultProxyURL configured', () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -321,6 +321,144 @@ describe('[IExec]', () => {
         `resultProxyURL option not set and no default value for your chain ${networkId}`,
       ),
     );
+  });
+  test('bridge required function throw if no bridgeAddress configured', () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    expect(() => iexec.wallet.bridgeToSidechain(0)).toThrow(
+      Error(
+        `bridgeAddress option not set and no default value for your chain ${networkId}`,
+      ),
+    );
+  });
+  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            id: '123456',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        `Missing chainId in bridgedNetworkConf and no default value for your chain ${networkId}`,
+      ),
+    );
+  });
+  test('rpcURL not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            chainId: '123456',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        'Missing rpcURL in bridgedNetworkConf and no default value for bridged chain 123456',
+      ),
+    );
+  });
+  test('bridgeAddress not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            chainId: '123456',
+            rpcURL: 'http://localhost:8545',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        'Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain 123456',
+      ),
+    );
+  });
+  test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
+    const signer = utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: '5',
+      },
+      {
+        bridgedNetworkConf: {
+          id: '123456',
+        },
+      },
+    );
+    // relay on viviani
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  });
+  test('chainId set to known chain in bridgedNetworkConf use defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '133',
+        },
+      },
+    );
+    // relay on viviani
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
   });
 });
 

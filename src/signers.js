@@ -1,4 +1,7 @@
-const { Wallet, BigNumber, getDefaultProvider } = require('ethers');
+const {
+  Wallet, Signer, BigNumber, getDefaultProvider,
+} = require('ethers');
+const { Web3Provider } = require('ethers').providers;
 const { signTypedDataV3 } = require('./sig-utils');
 
 class EnhancedWallet extends Wallet {
@@ -43,14 +46,35 @@ class EnhancedWallet extends Wallet {
   }
 }
 
-const enhanceJsonRpcSigner = (jsonRpcSigner) => {
-  const ennhancedSigner = jsonRpcSigner;
-  ennhancedSigner.signTypedDataV3 = async typedData => ennhancedSigner.provider.send('eth_signTypedData_v3', [
-    await ennhancedSigner.getAddress(),
-    JSON.stringify(typedData),
-  ]);
-  return ennhancedSigner;
-};
+class EnhancedWeb3Signer extends Signer {
+  constructor(web3) {
+    super();
+    const web3Provider = new Web3Provider(web3);
+    this.provider = web3Provider;
+  }
+
+  signTypedDataV3(data) {
+    return new Promise(async (res, reject) => this.provider
+      .send('eth_signTypedData_v3', [
+        await this.getAddress(),
+        JSON.stringify(data),
+      ])
+      .then(res)
+      .catch(reject));
+  }
+
+  getAddress() {
+    return this.provider.getSigner().getAddress();
+  }
+
+  signMessage(message) {
+    return this.provider.getSigner().signMessage(message);
+  }
+
+  sendTransaction(tx) {
+    return this.provider.getSigner().sendTransaction(tx);
+  }
+}
 
 const getSignerFromPrivateKey = (
   host,
@@ -63,6 +87,6 @@ const getSignerFromPrivateKey = (
 
 module.exports = {
   EnhancedWallet,
+  EnhancedWeb3Signer,
   getSignerFromPrivateKey,
-  enhanceJsonRpcSigner,
 };
