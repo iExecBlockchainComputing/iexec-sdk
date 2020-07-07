@@ -2211,6 +2211,62 @@ _Example:_
 console.log(utils.NULL_BYTES32);
 ```
 
+#### parseEth
+
+utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
+
+> parse an ether amount and return the value in wei
+> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'
+> default unit 'wei'
+
+_Example:_
+
+```js
+console.log('5 gwei = ' + utils.parseEth('5 gwei') + 'wei');
+```
+
+#### formatEth
+
+utils.**formatEth (weiAmount: BN)** => etherAmount: String
+
+> return the display value of a wei amount in ether
+
+_Example:_
+
+```js
+console.log(
+  '500000000 wei = ' + utils.formatEth(new utils.BN('500000000')) + 'ether',
+);
+```
+
+#### parseRLC
+
+utils.**parseRLC (value: String|Number|BN [, defaultUnit: String])** => nRlcValue: BN
+
+> parse a RLC amount and return the value in nRLC
+> supported units: 'nRLC', 'RLC'
+> default unit 'nRLC'
+
+_Example:_
+
+```js
+console.log('5 RLC = ' + utils.parseEth('5 RLC') + 'nRLC');
+```
+
+#### formatRLC
+
+utils.**formatRLC (nRlcAmount: BN)** => RlcAmount: String
+
+> return the display value of a nRLC amount in RLC
+
+_Example:_
+
+```js
+console.log(
+  '500000000 nRLC = ' + utils.formatRLC(new utils.BN('500000000')) + 'RLC',
+);
+```
+
 #### encodeTag
 
 utils.**encodeTag ([...tag: String])** => tag: Bytes32

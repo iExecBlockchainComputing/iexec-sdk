@@ -5276,6 +5276,31 @@ describe('[lib utils]', () => {
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000000000000'))).toBe(true);
     });
+    test("parseEth('4.2 ether')", () => {
+      const res = utils.parseEth('4.2 ether');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test("parseEth('4.2 gwei')", () => {
+      const res = utils.parseEth('4.2 gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseEth('4.2', 'gwei')", () => {
+      const res = utils.parseEth('4.2', 'gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseEth('4.2 foo')", () => {
+      expect(() => utils.parseEth('4.2 foo')).toThrow(
+        Error('Invalid ether unit'),
+      );
+    });
+    test("parseEth('4.2 wei')", () => {
+      expect(() => utils.parseEth('4.2 wei')).toThrow(
+        Error('Invalid ether amount'),
+      );
+    });
   });
   describe('parseRLC', () => {
     test("parseRLC('4.2')", () => {
@@ -5292,6 +5317,31 @@ describe('[lib utils]', () => {
       const res = utils.parseRLC(new BN(42));
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000'))).toBe(true);
+    });
+    test("parseRLC('4.2 RLC')", () => {
+      const res = utils.parseRLC('4.2 RLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseRLC('42 nRLC')", () => {
+      const res = utils.parseRLC('42 nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+    test("parseRLC('42', 'nRLC')", () => {
+      const res = utils.parseRLC('42', 'nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+    test("parseRLC('4.2 nRLC')", () => {
+      expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
+        Error('Invalid token amount'),
+      );
+    });
+    test("parseRLC('4.2 foo')", () => {
+      expect(() => utils.parseRLC('4.2 foo')).toThrow(
+        Error('Invalid token unit'),
+      );
     });
   });
   describe('formatEth', () => {
@@ -5311,7 +5361,7 @@ describe('[lib utils]', () => {
   describe('formatRLC', () => {
     test("formatRLC('4200000000000000000')", () => {
       const res = utils.formatRLC('4200000000000000000');
-      expect(res).toBe('4200000000');
+      expect(res).toBe('4200000000.0');
     });
     test('formatRLC(42)', () => {
       const res = utils.formatRLC(42);
@@ -5319,7 +5369,7 @@ describe('[lib utils]', () => {
     });
     test("formatRLC(new BN('4200000000000000000'))", () => {
       const res = utils.formatRLC(new BN('4200000000000000000'));
-      expect(res).toBe('4200000000');
+      expect(res).toBe('4200000000.0');
     });
   });
   describe('encodeTag', () => {

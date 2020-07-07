@@ -22,7 +22,6 @@
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-sdk#readme",
   "dependencies": {
     "aes-js": "3.1.2",
-    "big.js": "^5.2.2",
     "bn.js": "^5.1.2",
     "buffer": "^5.5.0",
     "commander": "^5.1.0",

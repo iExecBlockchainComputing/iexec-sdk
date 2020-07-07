@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
 - added default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
 - `iexec.order.signRequestorder()`, `iexec.order.publishRequestorder()` and `iexec.order.matchOrder()` perfom advanced check on request (use option `{ checkRequest: false }` to disable)
+- support for units in `parseEth()` & `parseRLC()` methods
 
 ### Changed
 
