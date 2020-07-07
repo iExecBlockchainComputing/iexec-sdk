@@ -40,7 +40,7 @@ const {
 } = require('./fs');
 const { stringifyNestedBn } = require('./utils');
 const { Keystore } = require('./keystore');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:iexec-workerpool');
@@ -95,7 +95,7 @@ deploy
       const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, { spinner }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -103,7 +103,7 @@ deploy
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployWorkerpool(
         chain.contracts,
@@ -135,7 +135,7 @@ show
     );
     try {
       const [chain, [address], deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
         loadDeployedObj(objName),
       ]);
@@ -186,7 +186,7 @@ count
         Object.assign({}, walletOptions, { isSigner: false }),
       );
       const [chain, [address]] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
 
@@ -227,10 +227,11 @@ publish
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
+    const txOptions = computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         loadDeployedObj(objName),
       ]);
       const useDeployedObj = !objAddress;
@@ -268,7 +269,7 @@ publish
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       const signedOrder = await signWorkerpoolorder(
         chain.contracts,
         orderToSign,

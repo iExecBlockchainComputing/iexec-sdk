@@ -24,7 +24,7 @@ const {
   privateKeyName,
   getPropertyFormChain,
 } = require('./cli-helper');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const { getResultEncryptionKeyName } = require('./secrets-utils');
 const { saveTextToFile } = require('./fs');
@@ -208,14 +208,16 @@ pushSecret
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(Object.assign(walletOptions));
-      const chain = await loadChain(cmd.chain, keystore, {
-        spinner,
-      });
-
+      const [chain, [address]] = await Promise.all([
+        loadChain(cmd.chain, {
+          spinner,
+        }),
+        keystore.accounts(),
+      ]);
+      await connectKeystore(chain, keystore);
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
 
-      const { address } = await keystore.load();
       debug('address', address);
 
       let secretFilePath;
@@ -268,7 +270,7 @@ checkSecret
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, keystore, {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       let keyAddress;

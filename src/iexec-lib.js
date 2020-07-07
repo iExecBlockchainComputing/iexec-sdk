@@ -1,4 +1,5 @@
-const createIExecContracts = require('iexec-contracts-js-client');
+const IExecContractsClient = require('iexec-contracts-js-client');
+const { getDefaultProvider } = require('ethers');
 const wallet = require('./wallet');
 const account = require('./account');
 const hub = require('./hub');
@@ -28,7 +29,7 @@ const {
   sumTags,
   decryptResult,
 } = require('./utils');
-const { getSignerFromPrivateKey } = require('./sig-utils');
+const { getSignerFromPrivateKey } = require('./signers');
 const { getChainDefaults } = require('./config');
 
 const utils = {
@@ -60,9 +61,12 @@ class IExec {
       iexecGatewayURL,
     } = {},
   ) {
-    const contracts = createIExecContracts({
-      ethProvider,
+    const ethersProvider = ethProvider.provider; // TODO
+    const ethersSigner = ethProvider; // TODO
+    const contracts = new IExecContractsClient({
       chainId,
+      provider: ethersProvider,
+      signer: ethersSigner,
       hubAddress,
       isNative,
     });
@@ -88,12 +92,11 @@ class IExec {
         );
       }
       const bridgedIsNative = !contracts.isNative;
-      const bridgedProvider = bridgedRpcURL;
-      bridgedContracts = createIExecContracts({
+      bridgedContracts = new IExecContractsClient({
         chainId: bridgedChainId,
+        provider: getDefaultProvider(bridgedRpcURL),
         isNative: bridgedIsNative,
         hubAddress: bridgedHubAddress,
-        ethProvider: bridgedProvider,
       });
     }
 

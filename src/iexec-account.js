@@ -3,7 +3,7 @@
 const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { stringifyNestedBn, NULL_ADDRESS } = require('./utils');
 const {
   help,
@@ -38,11 +38,11 @@ deposit
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, keystore, {
+      const chain = await loadChain(cmd.chain, {
         spinner,
-        txOptions,
       });
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
+
       spinner.start(info.depositing());
       const depositRes = await account.deposit(chain.contracts, amount);
       spinner.succeed(info.deposited(depositRes.amount), {
@@ -67,11 +67,10 @@ withdraw
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, keystore, {
+      const chain = await loadChain(cmd.chain, {
         spinner,
-        txOptions,
       });
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
       const res = await account.withdraw(chain.contracts, amount);
       spinner.succeed(info.withdrawed(amount), {
@@ -117,7 +116,7 @@ show
       }
       if (!userAddress) throw Error('Missing address or wallet');
 
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(cmd.chain, { spinner });
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);

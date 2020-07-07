@@ -37,7 +37,7 @@ const checkWeb3SecretExists = async (
 ) => {
   try {
     const vResourceAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(resourceAddress);
     const res = await httpRequest('HEAD')({
       api: smsURL,
@@ -70,7 +70,7 @@ const checkWeb2SecretExists = async (
 ) => {
   try {
     const vOwnerAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(ownerAddress);
     const res = await httpRequest('HEAD')({
       api: smsURL,
@@ -104,7 +104,7 @@ const pushWeb3Secret = async (
 ) => {
   try {
     const vResourceAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(resourceAddress);
     const vSignerAddress = await getAddress(contracts);
     await stringSchema().validate(secretValue, { strict: true });
@@ -113,8 +113,9 @@ const pushWeb3Secret = async (
       secretValue,
     );
     const binaryChallenge = arrayify(challenge);
-    const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [vSignerAddress, data]);
-    const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
+    const auth = await wrapPersonalSign(
+      contracts.signer.signMessage(binaryChallenge),
+    );
     const res = await httpRequest('POST')({
       api: smsURL,
       endpoint: '/secrets/web3',
@@ -178,8 +179,9 @@ const pushWeb2Secret = async (
       secretValue,
     );
     const binaryChallenge = arrayify(challenge);
-    const personnalSign = data => contracts.jsonRpcProvider.send('personal_sign', [ownerAddress, data]);
-    const auth = await wrapPersonalSign(personnalSign(binaryChallenge));
+    const auth = await wrapPersonalSign(
+      contracts.signer.signMessage(binaryChallenge),
+    );
     const res = await httpRequest(update ? 'PUT' : 'POST')({
       api: smsURL,
       endpoint: '/secrets/web2',

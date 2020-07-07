@@ -56,17 +56,17 @@ const createObj = (objName = throwIfMissing()) => async (
 
 const deployApp = async (contracts, app) => createObj('app')(
   contracts,
-  await appSchema({ ethProvider: contracts.jsonRpcProvider }).validate(app),
+  await appSchema({ ethProvider: contracts.provider }).validate(app),
 );
 const deployDataset = async (contracts, dataset) => createObj('dataset')(
   contracts,
-  await datasetSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await datasetSchema({ ethProvider: contracts.provider }).validate(
     dataset,
   ),
 );
 const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool')(
   contracts,
-  await workerpoolSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await workerpoolSchema({ ethProvider: contracts.provider }).validate(
     workerpool,
   ),
 );
@@ -91,7 +91,7 @@ const checkDeployedApp = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('app')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );
@@ -101,7 +101,7 @@ const checkDeployedDataset = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('dataset')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );
@@ -111,7 +111,7 @@ const checkDeployedWorkerpool = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('workerpool')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );
@@ -122,7 +122,7 @@ const showObjByAddress = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const vAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(objAddress);
     const isDeployed = await checkDeployedObj(objName)(contracts, objAddress);
     if (!isDeployed) throw new ObjectNotFoundError(objName, objAddress, contracts.chainId);
@@ -142,7 +142,7 @@ const countObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const vAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(userAddress);
     const objCountBN = ethersBnToBn(
       await wrapCall(contracts.getUserObjCount(objName)(vAddress)),
@@ -159,7 +159,7 @@ const countUserApps = async (
   userAddress = throwIfMissing(),
 ) => countObj('app')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     userAddress,
   ),
 );
@@ -168,7 +168,7 @@ const countUserDatasets = async (
   userAddress = throwIfMissing(),
 ) => countObj('dataset')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     userAddress,
   ),
 );
@@ -177,7 +177,7 @@ const countUserWorkerpools = async (
   userAddress = throwIfMissing(),
 ) => countObj('workerpool')(
   contracts,
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     userAddress,
   ),
 );
@@ -190,7 +190,7 @@ const showObjByIndex = (objName = throwIfMissing()) => async (
   try {
     const vIndex = await uint256Schema().validate(objIndex);
     const vAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(userAddress);
     const totalObj = await countObj(objName)(contracts, userAddress);
     if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
@@ -229,7 +229,7 @@ const showApp = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress('app')(
     contracts,
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       appAddress,
     ),
   );
@@ -244,7 +244,7 @@ const showUserApp = async (
   const { obj, objAddress } = await showObjByIndex('app')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       userAddress,
     ),
   );
@@ -257,7 +257,7 @@ const showDataset = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress('dataset')(
     contracts,
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       datasetAddress,
     ),
   );
@@ -278,7 +278,7 @@ const showUserDataset = async (
   const { obj, objAddress } = await showObjByIndex('dataset')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       userAddress,
     ),
   );
@@ -297,7 +297,7 @@ const showWorkerpool = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress('workerpool')(
     contracts,
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       workerpoolAddress,
     ),
   );
@@ -313,7 +313,7 @@ const showUserWorkerpool = async (
   const { obj, objAddress } = await showObjByIndex('workerpool')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+    await addressSchema({ ethProvider: contracts.provider }).validate(
       userAddress,
     ),
   );
@@ -397,7 +397,7 @@ const getAppOwner = async (
 ) => getOwner(
   contracts,
   'app',
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );
@@ -408,7 +408,7 @@ const getDatasetOwner = async (
 ) => getOwner(
   contracts,
   'dataset',
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );
@@ -419,7 +419,7 @@ const getWorkerpoolOwner = async (
 ) => getOwner(
   contracts,
   'workerpool',
-  await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await addressSchema({ ethProvider: contracts.provider }).validate(
     address,
   ),
 );

@@ -1,8 +1,6 @@
-const INFURA_DEFAULT = 'f3e0664e01504f5ab2b4360853ce0dc7';
-
 const hostMap = {
-  1: `https://mainnet.infura.io/v3/${INFURA_DEFAULT}`,
-  5: `https://goerli.infura.io/v3/${INFURA_DEFAULT}`,
+  1: 'mainnet',
+  5: 'goerli',
   133: 'https://viviani.iex.ec',
   134: 'https://bellecour.iex.ec',
 };

@@ -18,6 +18,7 @@ const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
 );
 
 const info = {
+  missingConfFile: fileName => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
   checkBalance: currency => `Checking ${currency} balances...`,
   userAborted: () => 'Operation aborted by user.',
   creating: obj => `Creating ${obj}...`,
@@ -37,6 +38,7 @@ const info = {
   missingAddress: obj => `${obj} address not provided to CLI AND missing in "deployed.json"`,
   checking: obj => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
+  missingOrdersFile: fileName => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 

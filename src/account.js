@@ -19,7 +19,7 @@ const checkBalance = async (
 ) => {
   try {
     const vAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(address);
     const { stake, locked } = await wrapCall(contracts.checkBalance(vAddress));
     const balance = {

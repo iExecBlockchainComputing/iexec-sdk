@@ -18,7 +18,7 @@ const {
 } = require('./cli-helper');
 const { stringifyNestedBn } = require('./utils');
 const { Keystore } = require('./keystore');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const deal = require('./deal');
 const { obsDeal } = require('./iexecProcess');
 
@@ -37,10 +37,9 @@ show
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
-
       let result;
       if (cmd.watch) {
         const waitDealFinalState = () => new Promise((resolve, reject) => {
@@ -104,10 +103,8 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = computeTxOptions(cmd);
-      const [chain] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
-        keystore.load(),
-      ]);
+      const chain = await loadChain(cmd.chain, { spinner });
+      connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));
       const { claimed, transactions } = await deal.claim(
         chain.contracts,

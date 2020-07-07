@@ -26,7 +26,7 @@ const {
   info,
   getPropertyFormChain,
 } = require('./cli-helper');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { formatEth, NULL_ADDRESS } = require('./utils');
 
 const objName = 'wallet';
@@ -144,7 +144,7 @@ show
       }
       if (!userWalletAddress && !address) throw Error('Missing address or wallet');
 
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(cmd.chain, { spinner });
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
@@ -183,9 +183,9 @@ getEth
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
       spinner.start(`Requesting ETH from ${chain.name} faucets...`);
       const faucetsResponses = await wallet.getETH(chain.name, address);
@@ -220,9 +220,9 @@ getRlc
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
       spinner.start(`Requesting ${chain.name} faucet for nRLC...`);
       const faucetsResponses = await wallet.getRLC(chain.name, address);
@@ -261,10 +261,12 @@ sendETH
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
+
       const weiAmount = parseEther(amount).toString();
       if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
@@ -303,10 +305,11 @@ sendRLC
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
 
       if (!cmd.to) throw Error('Missing --to option');
 
@@ -348,10 +351,11 @@ sweep
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ETH and RLC')(
@@ -399,10 +403,11 @@ bridgeToSidechain
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
       const brigeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = brigeConf && brigeConf.contract;
@@ -480,10 +485,11 @@ bridgeToMainchain
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
       const brigeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = brigeConf && brigeConf.contract;

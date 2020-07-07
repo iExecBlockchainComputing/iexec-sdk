@@ -8,7 +8,6 @@ const {
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
-  signTypedDatav3,
   sumTags,
   findMissingBitsInTag,
   checkActiveBitInTag,
@@ -49,8 +48,12 @@ const {
   ValidationError,
 } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
-
-const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
+const {
+  wrapCall,
+  wrapSend,
+  wrapWait,
+  wrapSignTypedDataV3,
+} = require('./errorWrappers');
 
 const debug = Debug('iexec:order');
 
@@ -224,22 +227,22 @@ const computeOrderHash = async (
     switch (orderName) {
       case APP_ORDER:
         vOrder = await saltedApporderSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(order);
         break;
       case DATASET_ORDER:
         vOrder = await saltedDatasetorderSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(order);
         break;
       case WORKERPOOL_ORDER:
         vOrder = await saltedWorkerpoolorderSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(order);
         break;
       case REQUEST_ORDER:
         vOrder = await saltedRequestorderSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(order);
         break;
       default:
@@ -269,7 +272,7 @@ const hashApporder = async (
   contracts,
   APP_ORDER,
   await saltedApporderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(order),
 );
 const hashDatasetorder = async (
@@ -279,7 +282,7 @@ const hashDatasetorder = async (
   contracts,
   DATASET_ORDER,
   await saltedDatasetorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(order),
 );
 const hashWorkerpoolorder = async (
@@ -289,7 +292,7 @@ const hashWorkerpoolorder = async (
   contracts,
   WORKERPOOL_ORDER,
   await saltedWorkerpoolorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(order),
 );
 const hashRequestorder = async (
@@ -299,7 +302,7 @@ const hashRequestorder = async (
   contracts,
   REQUEST_ORDER,
   await saltedRequestorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(order),
 );
 
@@ -360,10 +363,8 @@ const signOrder = async (
     message,
   };
 
-  const sign = await signTypedDatav3(
-    contracts.jsonRpcProvider,
-    address,
-    typedData,
+  const sign = await wrapSignTypedDataV3(
+    contracts.signer.signTypedDataV3(typedData),
   );
   const signedOrder = { ...saltedOrderObj, sign };
   return signedOrder;
@@ -375,7 +376,7 @@ const signApporder = async (
 ) => signOrder(
   contracts,
   APP_ORDER,
-  await apporderSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
+  await apporderSchema({ ethProvider: contracts.provider }).validate(
     apporder,
   ),
 );
@@ -387,7 +388,7 @@ const signDatasetorder = async (
   contracts,
   DATASET_ORDER,
   await datasetorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(datasetorder),
 );
 
@@ -398,7 +399,7 @@ const signWorkerpoolorder = async (
   contracts,
   WORKERPOOL_ORDER,
   await workerpoolorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(workerpoolorder),
 );
 
@@ -409,7 +410,7 @@ const signRequestorder = async (
   contracts,
   REQUEST_ORDER,
   await requestorderSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(requestorder),
 );
 
@@ -493,7 +494,7 @@ const publishOrder = async (
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
       contracts.chainId,
       address,
-      contracts.jsonRpcProvider,
+      contracts.signer,
     );
     const response = await jsonApi.post({
       api: iexecGatewayURL,
@@ -573,7 +574,7 @@ const unpublishOrder = async (
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
       contracts.chainId,
       address,
-      contracts.jsonRpcProvider,
+      contracts.signer,
     );
     const response = await jsonApi.post({
       api: iexecGatewayURL,
@@ -1028,20 +1029,18 @@ const createApporder = async (
     requesterrestrict = NULL_ADDRESS,
   } = {},
 ) => ({
-  app: await addressSchema({ ethProvider: contracts.jsonRpcProvider }).validate(
-    app,
-  ),
+  app: await addressSchema({ ethProvider: contracts.provider }).validate(app),
   appprice: await uint256Schema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
   datasetrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(datasetrestrict),
   workerpoolrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(workerpoolrestrict),
   requesterrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(requesterrestrict),
 });
 
@@ -1058,19 +1057,19 @@ const createDatasetorder = async (
   } = {},
 ) => ({
   dataset: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(dataset),
   datasetprice: await uint256Schema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
   apprestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(apprestrict),
   workerpoolrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(workerpoolrestrict),
   requesterrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(requesterrestrict),
 });
 
@@ -1089,7 +1088,7 @@ const createWorkerpoolorder = async (
   } = {},
 ) => ({
   workerpool: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(workerpool),
   workerpoolprice: await uint256Schema().validate(workerpoolprice),
   volume: await uint256Schema().validate(volume),
@@ -1097,13 +1096,13 @@ const createWorkerpoolorder = async (
   trust: await uint256Schema().validate(trust),
   tag: await tagSchema().validate(tag),
   apprestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(apprestrict),
   datasetrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(datasetrestrict),
   requesterrestrict: await addressSchema({
-    ethProvider: contracts.jsonRpcProvider,
+    ethProvider: contracts.provider,
   }).validate(requesterrestrict),
 });
 
@@ -1129,22 +1128,22 @@ const createRequestorder = async (
   const requesterOrUser = requester || (await getAddress(contracts));
   return {
     app: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(app),
     appmaxprice: await uint256Schema().validate(appmaxprice),
     dataset: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(dataset),
     datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
     workerpool: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(workerpool),
     workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
     requester: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(requesterOrUser),
     beneficiary: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(beneficiary || requesterOrUser),
     volume: await uint256Schema().validate(volume),
     params: await createObjParams({
@@ -1153,7 +1152,7 @@ const createRequestorder = async (
       resultProxyURL,
     }),
     callback: await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(callback),
     category: await uint256Schema().validate(category),
     trust: await uint256Schema().validate(trust),

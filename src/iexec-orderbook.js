@@ -15,7 +15,6 @@ const {
   getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
-const { Keystore } = require('./keystore');
 const orderbook = require('./orderbook');
 
 const objName = 'orderbook';
@@ -34,7 +33,7 @@ orderbookApp
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       const { dataset, workerpool, requester } = cmd;
@@ -87,7 +86,7 @@ orderbookDataset
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       const { app, workerpool, requester } = cmd;
@@ -140,7 +139,7 @@ orderbookWorkerpool
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (address) isEthAddress(address, { strict: true });
@@ -191,7 +190,7 @@ orderbookRequester
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (address) isEthAddress(address, { strict: true });

@@ -13,7 +13,6 @@ const {
 } = require('ethers').utils;
 const { BigNumber } = require('ethers');
 const multiaddr = require('multiaddr');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
@@ -197,12 +196,6 @@ const secToDate = (secs) => {
   const t = new Date(1970, 0, 1);
   t.setSeconds(secs);
   return t;
-};
-
-const signTypedDatav3 = async (eth, address, typedData) => {
-  const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
-  const sign = await wrapSignTypedDataV3(signTDv3(typedData));
-  return sign;
 };
 
 const getSalt = () => {
@@ -429,7 +422,6 @@ module.exports = {
   NULL_BYTES,
   NULL_ADDRESS,
   NULL_BYTES32,
-  signTypedDatav3,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   encodeTag,

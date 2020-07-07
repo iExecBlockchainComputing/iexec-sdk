@@ -14,7 +14,7 @@ const {
   Spinner,
   getPropertyFormChain,
 } = require('./cli-helper');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const secretMgtServ = require('./sms.js');
 const resultProxyServ = require('./result-proxy.js');
 const { getStorageTokenKeyName } = require('./secrets-utils');
@@ -26,6 +26,7 @@ const initStorage = cli.command('init [provider]');
 addGlobalOptions(initStorage);
 addWalletLoadOptions(initStorage);
 initStorage
+  .option(...option.chain())
   .option(...option.forceUpdateSecret())
   .option(...option.storageToken())
   .description(desc.initStorage())
@@ -36,7 +37,7 @@ initStorage
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, { spinner }),
         keystore.accounts(),
       ]);
       const { contracts } = chain;
@@ -62,14 +63,14 @@ initStorage
 
       let token;
       if (providerName === 'default') {
-        await keystore.load();
+        await connectKeystore(chain, keystore);
         token = await resultProxyServ.login(contracts, resultProxyURL);
       } else {
         token = cmd.token
           || (await prompt.password(`Paste your ${provider} token`, {
             useMask: true,
           }));
-        await keystore.load();
+        await connectKeystore(chain, keystore);
       }
       const {
         isPushed,
@@ -100,6 +101,7 @@ const checkStorage = cli.command('check [provider]');
 addGlobalOptions(checkStorage);
 addWalletLoadOptions(checkStorage);
 checkStorage
+  .option(...option.chain())
   .option(...option.user())
   .description(desc.checkStorage())
   .action(async (provider, cmd) => {
@@ -109,7 +111,7 @@ checkStorage
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(cmd.chain, { spinner }),
         keystore.accounts(),
       ]);
       const { contracts } = chain;

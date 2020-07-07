@@ -48,7 +48,7 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const secretMgtServ = require('./sms');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:iexec-dataset');
@@ -125,7 +125,7 @@ deploy
       const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, { spinner }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -133,7 +133,7 @@ deploy
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployDataset(
         chain.contracts,
@@ -165,7 +165,7 @@ show
     );
     try {
       const [chain, [address], deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
         loadDeployedObj(objName),
       ]);
@@ -216,7 +216,7 @@ count
         Object.assign({}, walletOptions, { isSigner: false }),
       );
       const [chain, [address]] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
 
@@ -571,7 +571,7 @@ pushSecret
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, {
+        loadChain(opts.chain, {
           spinner,
         }),
         loadDeployedObj(objName),
@@ -580,7 +580,7 @@ pushSecret
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
 
-      const { address } = await keystore.load();
+      const [address] = await keystore.accounts();
       debug('address', address);
 
       const resourceAddress = datasetAddress || deployedObj[chain.id];
@@ -605,6 +605,7 @@ pushSecret
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
+      await connectKeystore(chain, keystore);
       const isPushed = await secretMgtServ.pushWeb3Secret(
         contracts,
         sms,
@@ -634,9 +635,8 @@ checkSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const keystore = Keystore({ isSigner: false });
       const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, {
+        loadChain(opts.chain, {
           spinner,
         }),
         loadDeployedObj(objName),
@@ -686,10 +686,11 @@ publish
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
+    const txOptions = computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         loadDeployedObj(objName),
       ]);
       const useDeployedObj = !objAddress;
@@ -722,7 +723,7 @@ publish
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       const signedOrder = await signDatasetorder(chain.contracts, orderToSign);
       const orderHash = await publishDatasetorder(
         chain.contracts,

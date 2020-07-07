@@ -12,6 +12,7 @@
           "_execs",
           "_hex",
           "_name",
+          "_options",
           "_subscribe"
         ]
       }

@@ -33,7 +33,7 @@ const fetchRequesterDeals = async (
 ) => {
   try {
     const vRequesterAddress = await addressSchema({
-      ethProvider: contracts.jsonRpcProvider,
+      ethProvider: contracts.provider,
     }).validate(requesterAddress);
     const vChainId = await chainIdSchema().validate(contracts.chainId);
     let vAppAddress;
@@ -41,17 +41,17 @@ const fetchRequesterDeals = async (
     let vWorkerpoolAddress;
     if (appAddress) {
       vAppAddress = await addressSchema({
-        ethProvider: contracts.jsonRpcProvider,
+        ethProvider: contracts.provider,
       }).validate(appAddress);
     }
     if (datasetAddress) {
       vDatasetAddress = await addressSchema({
-        ethProvider: contracts.jsonRpcProvider,
+        ethProvider: contracts.provider,
       }).validate(datasetAddress);
     }
     if (workerpoolAddress) {
       vWorkerpoolAddress = await addressSchema({
-        ethProvider: contracts.jsonRpcProvider,
+        ethProvider: contracts.provider,
       }).validate(workerpoolAddress);
     }
     const find = Object.assign(
@@ -217,7 +217,7 @@ const claim = async (
     initialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
     notInitialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
     const lastBlock = await wrapCall(
-      contracts.jsonRpcProvider.getBlock('latest'),
+      contracts.provider.getBlock('latest'),
     );
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
