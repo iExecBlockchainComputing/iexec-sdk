@@ -5,6 +5,7 @@ const path = require('path');
 const JSZip = require('jszip');
 const { utils, IExec, errors } = require('../src/iexec-lib');
 const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
+const { teePostComputeDefaults } = require('../src/secrets-utils');
 
 console.log('Node version:', process.version);
 
@@ -2568,8 +2569,8 @@ describe('[order]', () => {
       params: {
         iexec_result_storage_provider: 'ipfs',
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-        iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-        iexec_tee_post_compute_image: 'tee-post-compute-image',
+        iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+        iexec_tee_post_compute_image: teePostComputeDefaults.image,
       },
       requester: ADDRESS,
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -2965,7 +2966,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x7ecd981f4188dfc1456a4dac4d711fa07fc1280d938ce86cdcfb5da3f19d5ef8',
+      '0x27c2cd09e8c576692d9d77f388229f1cc8ab535695538551babaaa316b6df32c',
     );
   });
 

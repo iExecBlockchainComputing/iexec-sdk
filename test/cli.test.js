@@ -4,6 +4,7 @@ const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
+const { teePostComputeDefaults } = require('../src/secrets-utils');
 
 console.log('Node version:', process.version);
 
@@ -1122,7 +1123,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
+      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}`,
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
@@ -1170,7 +1171,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}',
+      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089"}`,
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
@@ -1221,7 +1222,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('1');
     expect(resDeal.deal.params).toBe(
-      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089","iexec_args":"test params"}',
+      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089","iexec_args":"test params"}`,
     );
     expect(resDeal.deal.callback).toBe(POOR_ADDRESS1);
     expect(resDeal.deal.requester).toBe(ADDRESS);
@@ -1274,7 +1275,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      '{"iexec_tee_post_compute_fingerprint":"abc|123|abc","iexec_tee_post_compute_image":"tee-post-compute-image","iexec_result_storage_provider":"dropbox","iexec_result_encryption":true,"iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_args":"command --help"}',
+      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"dropbox","iexec_result_encryption":true,"iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_args":"command --help"}`,
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
