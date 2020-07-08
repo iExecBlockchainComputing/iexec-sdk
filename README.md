@@ -78,14 +78,14 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers][https://github.com/ethers-io/ethers.js/] to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
 > Default API keys for backend services are provided for convenience.
-> As these keys are shared accross all users and are subject to rate limits, **you must use your own API keys** or better **your own node**).
+> As these keys are shared accross all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
 >
 > Get API keys for backend services:
 >
-> - [INFURA](https://infura.io/register)([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/))
+> - [INFURA](https://infura.io/register) ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/))
 > - [Etherscan](https://etherscan.io/apis)
 > - [Alchemy](https://alchemyapi.io/signup)
 >
@@ -120,7 +120,7 @@ iexec storage init # initialize your remote storage
 >       "goerli": {
 >         "id": "5",
 >         "host": "http://localhost:58545"
->       },
+>       }
 >    }
 > }
 > ```
@@ -2384,7 +2384,7 @@ utils.**getSignerFromPrivateKey ( host: 'goerli'|'mainnet'|Url, privateKey: Priv
 > - `providers: Object` specify the option for provider backend when connected to public blockchain (`host: 'goerli'|'mainnet'`).
 >   - `alchemy: String` [Alchemy](https://alchemyapi.io/) API Token
 >   - `etherscan: String` [Etherscan](https://etherscan.io/) API Token
->   - `infura: String|{ projectId, projectSecret }` [INFURA](https://infura.io/) Project ID or ProjectID and Project Secret
+>   - `infura: String|{ projectId: String, projectSecret: String }` [INFURA](https://infura.io/) Project ID or ProjectID and Project Secret
 >   - `quorum: Int` The number of backends that must agree (default: 2 for mainnet, 1 for testnets)
 > - `gasPrice: Uint256` specify the gasPrice to use for transactions
 > - `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
@@ -2394,7 +2394,7 @@ _Example:_
 ```js
 const { IExec, utils } = require('iexec');
 const ethProvider = utils.getSignerFromPrivateKey(
-  'https://localhost:8545',
+  'http://localhost:8545',
   '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
 );
 const iexec = new IExec({
