@@ -320,6 +320,7 @@ addGlobalOptions(run);
 addWalletLoadOptions(run);
 run
   .option(...option.chain())
+  .option(...option.txGasPrice())
   .option(...orderOption.dataset())
   .option(...orderOption.workerpool())
   .option(...orderOption.category())
