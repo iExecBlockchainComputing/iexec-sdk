@@ -131,6 +131,9 @@ const chains = {
     mainnet: {
       id: '1',
     },
+    bellecour: {
+      id: '134',
+    },
   },
 };
 

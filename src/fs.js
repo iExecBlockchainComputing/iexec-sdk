@@ -2,7 +2,9 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
-const { object, string, boolean } = require('yup');
+const {
+  object, string, number, boolean, lazy,
+} = require('yup');
 const { addressSchema, chainIdSchema } = require('./validator');
 const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
@@ -41,6 +43,30 @@ const chainsConfSchema = () => object({
       return true;
     })
     .required(),
+  providers: object({
+    alchemy: string().notRequired(),
+    etherscan: string().notRequired(),
+    infura: lazy((value) => {
+      switch (typeof value) {
+        case 'object':
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
+        default:
+          return string();
+      }
+    }),
+    quorum: number()
+      .integer()
+      .min(1)
+      .max(3)
+      .notRequired(),
+  })
+    .noUnknown(true, 'Unknown key "${unknown}" in providers')
+    .strict(),
 })
   .noUnknown(true, 'Unknown key "${unknown}"')
   .strict();

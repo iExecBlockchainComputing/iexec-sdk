@@ -3556,7 +3556,7 @@ describe('[Common]', () => {
     });
   });
 
-  describe('[mainchains/sidechains config]', () => {
+  describe('[chain.json]', () => {
     beforeAll(async () => {
       await execAsync(`${iexecPath} init --skip-wallet --force`);
     });
@@ -3565,7 +3565,7 @@ describe('[Common]', () => {
       const { chains } = await loadJSONFile('chain.json');
       expect(chains.goerli.native).toBeUndefined();
       expect(chains.mainnet.native).toBeUndefined();
-      // expect(chains.bellecour.native).toBeUndefined();
+      expect(chains.bellecour.native).toBeUndefined();
     });
 
     test('mainnet is not native', async () => {
@@ -3589,14 +3589,104 @@ describe('[Common]', () => {
       expect(res.useNative).toBe(true);
     });
 
-    // not deployed yet
-    test.skip('bellecour is native', async () => {
+    test('bellecour is native', async () => {
       const raw = await execAsync(
         `${iexecPath} info ${ADDRESS} --chain bellecour --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.useNative).toBe(false);
+      expect(res.useNative).toBe(true);
     });
+
+    test('providers config', async () => {
+      const chainJsonDefault = await loadJSONFile('chain.json');
+      const alchemyFailQuorumFail = {
+        alchemy: 'FAIL',
+        quorum: 3,
+      };
+      const alchemyFailQuorumPass = {
+        alchemy: 'FAIL',
+        quorum: 2,
+      };
+      const infuraFailQuorumFail = {
+        infura: 'FAIL',
+        quorum: 3,
+      };
+      const infuraFailQuorumPass = {
+        infura: 'FAIL',
+        quorum: 2,
+      };
+      const etherscanFailQuorumFail = {
+        etherscan: 'FAIL',
+        quorum: 3,
+      };
+      const etherscanFailQuorumPass = {
+        etherscan: 'FAIL',
+        quorum: 2,
+      };
+
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: alchemyFailQuorumFail,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).rejects.toThrow();
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: alchemyFailQuorumPass,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).resolves.toBeDefined();
+
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: etherscanFailQuorumFail,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).rejects.toThrow();
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: etherscanFailQuorumPass,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).resolves.toBeDefined();
+
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: infuraFailQuorumFail,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).rejects.toThrow();
+      await saveJSONToFile(
+        {
+          ...chainJsonDefault,
+          providers: infuraFailQuorumPass,
+        },
+        'chain.json',
+      );
+      await expect(
+        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+      ).resolves.toBeDefined();
+    }, 20000);
   });
 });

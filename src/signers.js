@@ -79,8 +79,8 @@ class EnhancedWeb3Signer extends Signer {
 const getSignerFromPrivateKey = (
   host,
   privateKey,
-  { gasPrice, getTransactionCount } = {},
-) => new EnhancedWallet(privateKey, getDefaultProvider(host), {
+  { gasPrice, getTransactionCount, providers } = {},
+) => new EnhancedWallet(privateKey, getDefaultProvider(host, providers), {
   gasPrice,
   getTransactionCount,
 });

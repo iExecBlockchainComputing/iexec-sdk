@@ -1104,6 +1104,145 @@ describe('[getSignerFromPrivateKey]', () => {
       ),
     ).toBe(true);
   }, 20000);
+  test('providers option', async () => {
+    const alchemyFailQuorumFail = {
+      alchemy: 'FAIL',
+      quorum: 3,
+    };
+    const alchemyFailQuorumPass = {
+      alchemy: 'FAIL',
+      quorum: 2,
+    };
+    const infuraFailQuorumFail = {
+      infura: 'FAIL',
+      quorum: 3,
+    };
+    const infuraFailQuorumPass = {
+      infura: 'FAIL',
+      quorum: 2,
+    };
+    const etherscanFailQuorumFail = {
+      etherscan: 'FAIL',
+      quorum: 3,
+    };
+    const etherscanFailQuorumPass = {
+      etherscan: 'FAIL',
+      quorum: 2,
+    };
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: alchemyFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: alchemyFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: etherscanFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: etherscanFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: infuraFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: infuraFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  }, 10000);
+  test('providers option ignored with RPC host', async () => {
+    const alchemyFailQuorumFail = {
+      alchemy: 'FAIL',
+      quorum: 3,
+    };
+    const infuraFailQuorumFail = {
+      infura: 'FAIL',
+      quorum: 3,
+    };
+    const etherscanFailQuorumFail = {
+      etherscan: 'FAIL',
+      quorum: 3,
+    };
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: alchemyFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: etherscanFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: infuraFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  }, 10000);
 });
 
 describe('[wallet]', () => {

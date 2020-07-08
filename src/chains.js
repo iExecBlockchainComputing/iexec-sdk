@@ -8,10 +8,14 @@ const { getChainDefaults } = require('./config');
 
 const debug = Debug('iexec:chains');
 
-const createChainFromConf = (chainName, chainConf, { bridgeConf } = {}) => {
+const createChainFromConf = (
+  chainName,
+  chainConf,
+  { bridgeConf, providersOptions } = {},
+) => {
   try {
     const chain = Object.assign({}, chainConf);
-    const provider = getDefaultProvider(chainConf.host);
+    const provider = getDefaultProvider(chainConf.host, providersOptions);
     chain.name = chainName;
     const contracts = new IExecContractsClient({
       provider,
@@ -22,7 +26,10 @@ const createChainFromConf = (chainName, chainConf, { bridgeConf } = {}) => {
     chain.contracts = contracts;
     if (bridgeConf) {
       chain.bridgedNetwork = Object.assign({}, bridgeConf);
-      const bridgeProvider = getDefaultProvider(bridgeConf.host);
+      const bridgeProvider = getDefaultProvider(
+        bridgeConf.host,
+        providersOptions,
+      );
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,
@@ -44,6 +51,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
+    const providersOptions = chainsConf.providers;
     let name;
     let loadedConf;
     if (chainName) {
@@ -110,6 +118,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
     debug('bridged chain', bridgeConf);
     const chain = createChainFromConf(name, conf, {
       bridgeConf,
+      providersOptions,
     });
     spinner.info(`Using chain [${name}]`);
     return chain;
