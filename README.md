@@ -2094,7 +2094,7 @@ const { address } = await iexec.workerpool.deployWorkerpool({
 console.log('deployed at', address);
 ```
 
-### Result
+### iexec.result
 
 #### pushResultEncryptionKey
 
@@ -2142,7 +2142,7 @@ const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
 console.log('encryption key set:', isMyKeySet);
 ```
 
-### Storage
+### iexec.storage
 
 #### defaultStorageLogin
 
