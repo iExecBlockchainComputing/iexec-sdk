@@ -509,6 +509,15 @@ describe('[objParamsSchema]', () => {
     });
   });
 
+  test('with isCallback in context, do not populate storage', async () => {
+    await expect(
+      objParamsSchema().validate({}, { context: { isCallback: true } }),
+    ).resolves.toEqual({
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
   test('strip enexpected key', async () => {
     await expect(
       objParamsSchema().validate(

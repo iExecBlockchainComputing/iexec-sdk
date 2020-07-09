@@ -1222,7 +1222,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('1');
     expect(resDeal.deal.params).toBe(
-      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"http://localhost:18089","iexec_args":"test params"}`,
+      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_args":"test params"}`,
     );
     expect(resDeal.deal.callback).toBe(POOR_ADDRESS1);
     expect(resDeal.deal.requester).toBe(ADDRESS);

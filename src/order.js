@@ -1149,6 +1149,9 @@ const createRequestorder = async (
     params: await createObjParams({
       params,
       tag: await tagSchema().validate(tag),
+      callback: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(callback),
       resultProxyURL,
     }),
     callback: await addressSchema({
