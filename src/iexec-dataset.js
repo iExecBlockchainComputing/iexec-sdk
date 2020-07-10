@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
+const { Buffer } = require('buffer');
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
