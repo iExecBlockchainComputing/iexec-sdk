@@ -182,11 +182,12 @@ getEth
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
         loadChain(cmd.chain, { spinner }),
       ]);
+      spinner.info(`Using wallet ${address}`);
       spinner.start(`Requesting ETH from ${chain.name} faucets...`);
       const faucetsResponses = await wallet.getETH(chain.name, address);
       const responsesString = faucetsResponses.reduce(
@@ -219,11 +220,12 @@ getRlc
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
         loadChain(cmd.chain, { spinner }),
       ]);
+      spinner.info(`Using wallet ${address}`);
       spinner.start(`Requesting ${chain.name} faucet for nRLC...`);
       const faucetsResponses = await wallet.getRLC(chain.name, address);
       const responsesString = faucetsResponses.reduce(
