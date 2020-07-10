@@ -2171,9 +2171,9 @@ console.log('default storage initialized:', isPushed);
 
 #### checkStorageTokenExists
 
-iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **encryptionKeyExists: Boolean** >
+iexec.**storage.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **storageInitialized: Boolean** >
 
-> check if an encryption key exists in the SMS
+> check if storage credential exists in the SMS
 >
 > _options:_
 >
@@ -2182,7 +2182,7 @@ iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )**
 _Example:_
 
 ```js
-const isIpfsStorageInitialized = await iexec.result.checkStorageTokenExists(
+const isIpfsStorageInitialized = await iexec.storage.checkStorageTokenExists(
   await iexec.wallet.getAddress(),
 );
 console.log('ipfs storage initialized:', isIpfsStorageInitialized);
