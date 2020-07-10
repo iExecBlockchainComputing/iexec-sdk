@@ -12,7 +12,7 @@ const DOMAIN = 'IEXEC_SMS_DOMAIN';
 
 const concatenateAndHash = (...hexaStringArray) => {
   const buffer = Buffer.concat(
-    hexaStringArray.map(hexString => arrayify(hexString)),
+    hexaStringArray.map(hexString => Buffer.from(arrayify(hexString))),
   );
   return keccak256(buffer);
 };
