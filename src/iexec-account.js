@@ -73,7 +73,7 @@ withdraw
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
       const res = await account.withdraw(chain.contracts, amount);
-      spinner.succeed(info.withdrawed(amount), {
+      spinner.succeed(info.withdrawn(amount), {
         raw: { amount: res.amount, txHash: res.txHash },
       });
     } catch (error) {
