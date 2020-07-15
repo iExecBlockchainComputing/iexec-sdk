@@ -55,7 +55,9 @@ const checkWeb3SecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    return { error: res.errorMessage };
+    throw Error(
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
+    );
   } catch (error) {
     debug('checkWeb3SecretExists()', error);
     throw error;
@@ -89,7 +91,9 @@ const checkWeb2SecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    return { error: res.errorMessage };
+    throw Error(
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
+    );
   } catch (error) {
     debug('checkWeb2SecretExists()', error);
     throw error;
