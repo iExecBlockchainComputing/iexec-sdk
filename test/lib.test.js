@@ -2966,7 +2966,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x27c2cd09e8c576692d9d77f388229f1cc8ab535695538551babaaa316b6df32c',
+      '0xe3cae4da9d73eaf1b548a20d91f474dd1dbdf5ab367a9836c3cd4b1965f8fe91',
     );
   });
 
