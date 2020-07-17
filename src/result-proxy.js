@@ -14,8 +14,7 @@ const login = async (
     const authorization = await getAuthorization(
       resultProxyURL,
       '/results/challenge',
-    )(contracts.chainId, userAddress, contracts.jsonRpcProvider);
-    debug(authorization);
+    )(contracts.chainId, userAddress, contracts.signer);
     const res = await httpRequest('POST')({
       api: resultProxyURL,
       endpoint: '/results/login',

@@ -35,22 +35,22 @@ const fetchAppOrderbook = async (
       { chainId: await chainIdSchema().validate(contracts.chainId) },
       {
         app: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(appAddress),
       },
       dataset && {
         dataset: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(dataset),
       },
       workerpool && {
         workerpool: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(workerpool),
       },
       requester && {
         requester: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(requester),
       },
       minVolume && {
@@ -93,22 +93,22 @@ const fetchDatasetOrderbook = async (
       { chainId: await chainIdSchema().validate(contracts.chainId) },
       {
         dataset: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(datasetAddress),
       },
       app && {
         app: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(app),
       },
       workerpool && {
         workerpool: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(workerpool),
       },
       requester && {
         requester: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(requester),
       },
       minVolume && {
@@ -157,7 +157,7 @@ const fetchWorkerpoolOrderbook = async (
       { category: await uint256Schema().validate(category) },
       workerpoolAddress && {
         workerpool: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(workerpoolAddress),
       },
       minTag && {
@@ -165,7 +165,7 @@ const fetchWorkerpoolOrderbook = async (
       },
       signerAddress && {
         signer: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(signerAddress),
       },
       minTrust && {
@@ -217,12 +217,12 @@ const fetchRequestOrderbook = async (
       { category: await uint256Schema().validate(category) },
       requesterAddress && {
         requester: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(requesterAddress),
       },
       beneficiaryAddress && {
         beneficiary: await addressSchema({
-          ethProvider: contracts.jsonRpcProvider,
+          ethProvider: contracts.provider,
         }).validate(beneficiaryAddress),
       },
       maxTag && {

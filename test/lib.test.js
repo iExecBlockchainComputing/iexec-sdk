@@ -5,6 +5,7 @@ const path = require('path');
 const JSZip = require('jszip');
 const { utils, IExec, errors } = require('../src/iexec-lib');
 const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
+const { teePostComputeDefaults } = require('../src/secrets-utils');
 
 console.log('Node version:', process.version);
 
@@ -268,7 +269,7 @@ const getRandomAddress = () => getRandomWallet().address;
 const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
-beforeAll(async () => {
+beforeAll(() => {
   const chainId = 65535;
   console.log('chainId', chainId);
   networkId = `${chainId}`;
@@ -279,7 +280,7 @@ beforeAll(async () => {
 }, 15000);
 
 describe('[IExec]', () => {
-  test('sms required function throw if no smsURL configured', async () => {
+  test('sms required function throw if no smsURL configured', () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -301,7 +302,7 @@ describe('[IExec]', () => {
       ),
     );
   });
-  test('resultProxy required function throw if no resultProxyURL configured', async () => {
+  test('resultProxy required function throw if no resultProxyURL configured', () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -321,6 +322,144 @@ describe('[IExec]', () => {
         `resultProxyURL option not set and no default value for your chain ${networkId}`,
       ),
     );
+  });
+  test('bridge required function throw if no bridgeAddress configured', () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    expect(() => iexec.wallet.bridgeToSidechain(0)).toThrow(
+      Error(
+        `bridgeAddress option not set and no default value for your chain ${networkId}`,
+      ),
+    );
+  });
+  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            id: '123456',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        `Missing chainId in bridgedNetworkConf and no default value for your chain ${networkId}`,
+      ),
+    );
+  });
+  test('rpcURL not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            chainId: '123456',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        'Missing rpcURL in bridgedNetworkConf and no default value for bridged chain 123456',
+      ),
+    );
+  });
+  test('bridgeAddress not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    expect(
+      () => new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          bridgedNetworkConf: {
+            chainId: '123456',
+            rpcURL: 'http://localhost:8545',
+          },
+        },
+      ),
+    ).toThrow(
+      Error(
+        'Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain 123456',
+      ),
+    );
+  });
+  test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
+    const signer = utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: '5',
+      },
+      {
+        bridgedNetworkConf: {
+          id: '123456',
+        },
+      },
+    );
+    // relay on viviani
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  });
+  test('chainId set to known chain in bridgedNetworkConf use defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '133',
+        },
+      },
+    );
+    // relay on viviani
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
   });
 });
 
@@ -837,7 +976,8 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
-  test('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
+  // skip until txSend queue is implemented
+  test.skip('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
     const amount = new BN(1000);
     const receiver = POOR_ADDRESS2;
     const nonceProvider = await (async (address) => {
@@ -965,6 +1105,145 @@ describe('[getSignerFromPrivateKey]', () => {
       ),
     ).toBe(true);
   }, 20000);
+  test('providers option', async () => {
+    const alchemyFailQuorumFail = {
+      alchemy: 'FAIL',
+      quorum: 3,
+    };
+    const alchemyFailQuorumPass = {
+      alchemy: 'FAIL',
+      quorum: 2,
+    };
+    const infuraFailQuorumFail = {
+      infura: 'FAIL',
+      quorum: 3,
+    };
+    const infuraFailQuorumPass = {
+      infura: 'FAIL',
+      quorum: 2,
+    };
+    const etherscanFailQuorumFail = {
+      etherscan: 'FAIL',
+      quorum: 3,
+    };
+    const etherscanFailQuorumPass = {
+      etherscan: 'FAIL',
+      quorum: 2,
+    };
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: alchemyFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: alchemyFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: etherscanFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: etherscanFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: infuraFailQuorumFail,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow();
+    await expect(
+      new IExec({
+        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          providers: infuraFailQuorumPass,
+        }),
+        chainId: '5',
+      }).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  }, 10000);
+  test('providers option ignored with RPC host', async () => {
+    const alchemyFailQuorumFail = {
+      alchemy: 'FAIL',
+      quorum: 3,
+    };
+    const infuraFailQuorumFail = {
+      infura: 'FAIL',
+      quorum: 3,
+    };
+    const etherscanFailQuorumFail = {
+      etherscan: 'FAIL',
+      quorum: 3,
+    };
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: alchemyFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: etherscanFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+    await expect(
+      new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenChainUrl,
+            PRIVATE_KEY,
+            {
+              providers: infuraFailQuorumFail,
+            },
+          ),
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+        },
+      ).wallet.checkBalances(utils.NULL_ADDRESS),
+    ).resolves.toBeDefined();
+  }, 10000);
 });
 
 describe('[wallet]', () => {
@@ -2290,8 +2569,8 @@ describe('[order]', () => {
       params: {
         iexec_result_storage_provider: 'ipfs',
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-        iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-        iexec_tee_post_compute_image: 'tee-post-compute-image',
+        iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+        iexec_tee_post_compute_image: teePostComputeDefaults.image,
       },
       requester: ADDRESS,
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -2687,7 +2966,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x7ecd981f4188dfc1456a4dac4d711fa07fc1280d938ce86cdcfb5da3f19d5ef8',
+      '0xe3cae4da9d73eaf1b548a20d91f474dd1dbdf5ab367a9836c3cd4b1965f8fe91',
     );
   });
 
@@ -5258,6 +5537,31 @@ describe('[lib utils]', () => {
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000000000000'))).toBe(true);
     });
+    test("parseEth('4.2 ether')", () => {
+      const res = utils.parseEth('4.2 ether');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+    test("parseEth('4.2 gwei')", () => {
+      const res = utils.parseEth('4.2 gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseEth('4.2', 'gwei')", () => {
+      const res = utils.parseEth('4.2', 'gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseEth('4.2 foo')", () => {
+      expect(() => utils.parseEth('4.2 foo')).toThrow(
+        Error('Invalid ether unit'),
+      );
+    });
+    test("parseEth('4.2 wei')", () => {
+      expect(() => utils.parseEth('4.2 wei')).toThrow(
+        Error('Invalid ether amount'),
+      );
+    });
   });
   describe('parseRLC', () => {
     test("parseRLC('4.2')", () => {
@@ -5274,6 +5578,31 @@ describe('[lib utils]', () => {
       const res = utils.parseRLC(new BN(42));
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000'))).toBe(true);
+    });
+    test("parseRLC('4.2 RLC')", () => {
+      const res = utils.parseRLC('4.2 RLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+    test("parseRLC('42 nRLC')", () => {
+      const res = utils.parseRLC('42 nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+    test("parseRLC('42', 'nRLC')", () => {
+      const res = utils.parseRLC('42', 'nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+    test("parseRLC('4.2 nRLC')", () => {
+      expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
+        Error('Invalid token amount'),
+      );
+    });
+    test("parseRLC('4.2 foo')", () => {
+      expect(() => utils.parseRLC('4.2 foo')).toThrow(
+        Error('Invalid token unit'),
+      );
     });
   });
   describe('formatEth', () => {
@@ -5293,7 +5622,7 @@ describe('[lib utils]', () => {
   describe('formatRLC', () => {
     test("formatRLC('4200000000000000000')", () => {
       const res = utils.formatRLC('4200000000000000000');
-      expect(res).toBe('4200000000');
+      expect(res).toBe('4200000000.0');
     });
     test('formatRLC(42)', () => {
       const res = utils.formatRLC(42);
@@ -5301,7 +5630,7 @@ describe('[lib utils]', () => {
     });
     test("formatRLC(new BN('4200000000000000000'))", () => {
       const res = utils.formatRLC(new BN('4200000000000000000'));
-      expect(res).toBe('4200000000');
+      expect(res).toBe('4200000000.0');
     });
   });
   describe('encodeTag', () => {

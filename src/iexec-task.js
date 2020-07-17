@@ -21,7 +21,7 @@ const {
   privateKeyName,
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const { stringifyNestedBn, decryptResult } = require('./utils');
 const taskModule = require('./task');
 const { obsTask } = require('./iexecProcess');
@@ -51,11 +51,11 @@ show
       const keystore = Keystore(
         Object.assign(walletOptions, !cmd.download && { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, keystore, {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (cmd.download) {
-        await keystore.load();
+        await connectKeystore(chain, keystore);
       }
 
       debug('cmd.watch', cmd.watch);
@@ -188,10 +188,9 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = computeTxOptions(cmd);
-      const [chain] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
-        keystore.load(),
-      ]);
+      const chain = await loadChain(cmd.chain, { spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+
       spinner.start(info.claiming(objName));
       const txHash = await taskModule.claim(chain.contracts, taskid);
       spinner.succeed('Task successfully claimed', { raw: { txHash } });

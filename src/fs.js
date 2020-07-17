@@ -2,9 +2,11 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
-const { object, string, boolean } = require('yup');
+const {
+  object, string, number, boolean, lazy,
+} = require('yup');
 const { addressSchema, chainIdSchema } = require('./validator');
-const { prompt } = require('./cli-helper');
+const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
 
 const debug = Debug('iexec:fs');
@@ -19,7 +21,7 @@ const chainConfSchema = () => object({
   iexecGateway: string(),
   native: boolean(),
   bridge: object({
-    bridgedNetworkId: chainIdSchema().required(),
+    bridgedChainId: chainIdSchema().required(),
     contract: addressSchema().required(),
   })
     .notRequired()
@@ -41,6 +43,30 @@ const chainsConfSchema = () => object({
       return true;
     })
     .required(),
+  providers: object({
+    alchemy: string().notRequired(),
+    etherscan: string().notRequired(),
+    infura: lazy((value) => {
+      switch (typeof value) {
+        case 'object':
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
+        default:
+          return string();
+      }
+    }),
+    quorum: number()
+      .integer()
+      .min(1)
+      .max(3)
+      .notRequired(),
+  })
+    .noUnknown(true, 'Unknown key "${unknown}" in providers')
+    .strict(),
 })
   .noUnknown(true, 'Unknown key "${unknown}"')
   .strict();
@@ -169,7 +195,9 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
     if (error.code === 'ENOENT') {
       if (options.retry) return options.retry();
       throw new Error(
-        `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+        options.loadErrorMessage
+          ? options.loadErrorMessage(fileName)
+          : info.missingConfFile(fileName),
       );
     }
     throw new Error(`${error} in ${fileName}`);
@@ -196,7 +224,10 @@ const loadDeployedConf = options => loadJSONAndRetry(
     options,
   ),
 );
-const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, options);
+const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, {
+  ...options,
+  loadErrorMessage: info.missingSignedOrders,
+});
 
 const initIExecConf = async (options) => {
   const iexecConf = Object.assign(templates.main);

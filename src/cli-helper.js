@@ -18,6 +18,7 @@ const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
 );
 
 const info = {
+  missingConfFile: fileName => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
   checkBalance: currency => `Checking ${currency} balances...`,
   userAborted: () => 'Operation aborted by user.',
   creating: obj => `Creating ${obj}...`,
@@ -30,13 +31,14 @@ const info = {
   claiming: obj => `Claiming ${obj}...`,
   deposited: amount => `Deposited ${amount} nRLC to your iExec account`,
   withdrawing: () => 'Making withdraw...',
-  withdrawed: amount => `Withdrawed ${amount} nRLC from your iExec account`,
+  withdrawn: amount => `${amount} nRLC withdrawn from your iExec account`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: filePath => `Downloaded task result to file ${filePath}`,
   missingAddress: obj => `${obj} address not provided to CLI AND missing in "deployed.json"`,
   checking: obj => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
+  missingOrdersFile: fileName => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 

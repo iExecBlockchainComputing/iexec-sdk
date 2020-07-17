@@ -54,7 +54,7 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
               && ethProvider.resolveName
               && typeof ethProvider.resolveName === 'function'
           ) {
-            const addressPromise = new Promise(async (resolve, reject) => {
+            const addressPromise = new Promise(async (resolve) => {
               try {
                 debug('resolving ENS', value);
                 const resolved = await wrapCall(
@@ -141,20 +141,27 @@ const objParamsSchema = () => object({
     string().url('${path} ${originalValue} is not a valid URL'),
   ),
   [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: boolean(),
-  [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string()
-    .default('ipfs')
-    .when('$isTee', {
+  [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
+    '$isCallback',
+    {
       is: true,
-      then: string().oneOf(
-        storageProviders(),
-        '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
-      ),
-      otherwise: string().oneOf(
-        ['ipfs'],
-        '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
-      ),
-    })
-    .required(),
+      then: string().notRequired(),
+      otherwise: string()
+        .default('ipfs')
+        .when('$isTee', {
+          is: true,
+          then: string().oneOf(
+            storageProviders(),
+            '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
+          ),
+          otherwise: string().oneOf(
+            ['ipfs'],
+            '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
+          ),
+        })
+        .required(),
+    },
+  ),
   [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
     'iexec_result_storage_provider',
     {

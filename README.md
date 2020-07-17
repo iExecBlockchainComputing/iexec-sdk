@@ -78,28 +78,50 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [infura.io](https://infura.io/).
+> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
-> A default Infura API key shared across all users is provided for convenience.
-> As this key is subject to rate limits, **you must use your own access to Infura** (or better your own node).
+> Default API keys for backend services are provided for convenience.
+> As these keys are shared accross all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
 >
-> When the limit rate is reached every try to access the blockchain results in `Web3ProviderCallError: daily request count exceeded, request rate limited`.
-> You can register at https://infura.io/register and create a project to get an API key ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/)).
+> Get API keys for backend services:
 >
-> Once you created your access, you can add an `host` key in the `chains.json` configuration file to target your node:
+> - [INFURA](https://infura.io/register) ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/))
+> - [Etherscan](https://etherscan.io/apis)
+> - [Alchemy](https://alchemyapi.io/signup)
+>
+> Once you created your access, you can add your API keys in the `chains.json` configuration file:
 >
 > ```json
 > {
-> ...
->     "goerli": {
->       "id": "5",
->       "host": "https://goerli.infura.io/v3/<YOUR-PROJECT-ID>"
->     },
->     "mainnet": {
->       "id": "1",
->       "host": "https://mainnet.infura.io/v3/<YOUR-PROJECT-ID>"
->     }
->   }
+>    "default": ...,
+>    "chains": { ... },
+>    "providers": {
+>      "infura": {
+>        "projectId": "INFURA_PROJECT_ID",
+>        "projectSecret": "INFURA_PROJECT_SECRET"
+>       },
+>     "etherscan": "ETHERSCAN_API_KEY",
+>     "alchemy": "ALCHEMY_API_KEY"
+>    }
+> }
+> ```
+>
+> If you run your own node, you can add an `host` key in the `chains.json` configuration file to target your node:
+>
+> ```json
+> {
+>    "default": ...,
+>    "chains": {
+>       ...
+>       "mainnet": {
+>         "id": "1",
+>         "host": "http://localhost:8545"
+>       },
+>       "goerli": {
+>         "id": "5",
+>         "host": "http://localhost:58545"
+>       }
+>    }
 > }
 > ```
 >
@@ -634,14 +656,20 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 
 The `chain.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec Secret Management Services. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
 
-`default` set the default chain used by the SDK cli.
-optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
-optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
-optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
-optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
-optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedNetworkId` set the reference to the briged network specified by `id`.
-optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+- `default` set the default chain used by the SDK cli.
+- `chains` set the available chains
+  - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
+  - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
+  - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
+  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainId` set the reference to the bridged network specified by `id`.
+  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+- optional key `providers` set the backends for public chains
+  - optional key `alchemy` set Alchemy API Token
+  - optional key `etherscan` set Etherscan API Token
+  - optional key `infura` set INFURA Project ID or ProjectID and Project Secret
+  - optional key `quorum` set minimum number of backends that must agree before forwarding blockchain responses
 
 ```json
 {
@@ -657,7 +685,7 @@ optional key `native` specify whether or not the chain native token is RLC (over
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedNetworkId": "123456789"
+        "bridgedChainId": "123456789"
       }
     },
     "goerli": {
@@ -669,13 +697,22 @@ optional key `native` specify whether or not the chain native token is RLC (over
     "bellecour": {
       "id": "134"
     }
+  },
+  "providers": {
+    "alchemy": "ALCHEMY_API_KEY",
+    "etherscan": "ETHERSCAN_API_KEY",
+    "infura": {
+      "projectId": "INFURA_PROJECT_ID",
+      "projectSecret": "INFURA_PROJECT_SECRET"
+    },
+    "quorum": 1
   }
 }
 ```
 
 ### deployed.json
 
-The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a commande without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
+The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a command without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
 
 ```json
 {
@@ -797,9 +834,9 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec400-gr9tv?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec400-qmbsd?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec400-xskmr?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/interesting-goodall-qjiyn?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec500-efz4v?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec500-tks5h?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
@@ -2057,7 +2094,7 @@ const { address } = await iexec.workerpool.deployWorkerpool({
 console.log('deployed at', address);
 ```
 
-### Result
+### iexec.result
 
 #### pushResultEncryptionKey
 
@@ -2105,7 +2142,7 @@ const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
 console.log('encryption key set:', isMyKeySet);
 ```
 
-### Storage
+### iexec.storage
 
 #### defaultStorageLogin
 
@@ -2134,9 +2171,9 @@ console.log('default storage initialized:', isPushed);
 
 #### checkStorageTokenExists
 
-iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **encryptionKeyExists: Boolean** >
+iexec.**storage.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **storageInitialized: Boolean** >
 
-> check if an encryption key exists in the SMS
+> check if storage credential exists in the SMS
 >
 > _options:_
 >
@@ -2145,7 +2182,7 @@ iexec.**result.checkStorageTokenExists ( userAddress: Address \[, options \] )**
 _Example:_
 
 ```js
-const isIpfsStorageInitialized = await iexec.result.checkStorageTokenExists(
+const isIpfsStorageInitialized = await iexec.storage.checkStorageTokenExists(
   await iexec.wallet.getAddress(),
 );
 console.log('ipfs storage initialized:', isIpfsStorageInitialized);
@@ -2209,6 +2246,62 @@ _Example:_
 
 ```js
 console.log(utils.NULL_BYTES32);
+```
+
+#### parseEth
+
+utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
+
+> parse an ether amount and return the value in wei
+> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'
+> default unit 'wei'
+
+_Example:_
+
+```js
+console.log('5 gwei = ' + utils.parseEth('5 gwei') + 'wei');
+```
+
+#### formatEth
+
+utils.**formatEth (weiAmount: BN)** => etherAmount: String
+
+> return the display value of a wei amount in ether
+
+_Example:_
+
+```js
+console.log(
+  '500000000 wei = ' + utils.formatEth(new utils.BN('500000000')) + 'ether',
+);
+```
+
+#### parseRLC
+
+utils.**parseRLC (value: String|Number|BN [, defaultUnit: String])** => nRlcValue: BN
+
+> parse a RLC amount and return the value in nRLC
+> supported units: 'nRLC', 'RLC'
+> default unit 'nRLC'
+
+_Example:_
+
+```js
+console.log('5 RLC = ' + utils.parseEth('5 RLC') + 'nRLC');
+```
+
+#### formatRLC
+
+utils.**formatRLC (nRlcAmount: BN)** => RlcAmount: String
+
+> return the display value of a nRLC amount in RLC
+
+_Example:_
+
+```js
+console.log(
+  '500000000 nRLC = ' + utils.formatRLC(new utils.BN('500000000')) + 'RLC',
+);
 ```
 
 #### encodeTag
@@ -2282,12 +2375,17 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### getSignerFromPrivateKey
 
-utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
+utils.**getSignerFromPrivateKey ( host: 'goerli'|'mainnet'|Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
 
 > Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
 >
 > _options:_
 >
+> - `providers: Object` specify the option for provider backend when connected to public blockchain (`host: 'goerli'|'mainnet'`).
+>   - `alchemy: String` [Alchemy](https://alchemyapi.io/) API Token
+>   - `etherscan: String` [Etherscan](https://etherscan.io/) API Token
+>   - `infura: String|{ projectId: String, projectSecret: String }` [INFURA](https://infura.io/) Project ID or ProjectID and Project Secret
+>   - `quorum: Int` The number of backends that must agree (default: 2 for mainnet, 1 for testnets)
 > - `gasPrice: Uint256` specify the gasPrice to use for transactions
 > - `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
 
@@ -2296,7 +2394,7 @@ _Example:_
 ```js
 const { IExec, utils } = require('iexec');
 const ethProvider = utils.getSignerFromPrivateKey(
-  'https://localhost:8545',
+  'http://localhost:8545',
   '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
 );
 const iexec = new IExec({

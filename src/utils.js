@@ -1,19 +1,17 @@
 const Debug = require('debug');
 const { Buffer } = require('buffer');
 const BN = require('bn.js');
-const Big = require('big.js');
 const JSZip = require('jszip');
 const NodeRSA = require('node-rsa');
 const aesjs = require('aes-js');
 const {
   getAddress,
   randomBytes,
-  formatEther,
-  parseEther,
+  formatUnits,
+  parseUnits,
 } = require('ethers').utils;
 const { BigNumber } = require('ethers');
 const multiaddr = require('multiaddr');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
@@ -53,37 +51,56 @@ const stringify = (val) => {
 
 const formatRLC = (nRLC) => {
   try {
-    Big.NE = -10;
-    Big.PE = 10;
-    return new Big(stringify(nRLC)).times(new Big(10).pow(-9)).toString();
+    return formatUnits(stringify(nRLC), 9);
   } catch (error) {
     debug('formatRLC()', error);
     throw Error('Invalid nRLC');
   }
 };
 
-const parseRLC = (rlc) => {
+const parseRLC = (value, defaultUnit = 'RLC') => {
+  const [amount, inputUnit] = stringify(value).split(' ');
+  const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
+  let pow;
+  if (unit === 'RLC') {
+    pow = 9;
+  } else if (unit === 'nRLC') {
+    pow = 0;
+  } else {
+    throw Error('Invalid token unit');
+  }
   try {
-    Big.NE = -10;
-    Big.PE = 18;
-    const rlcAmount = new Big(stringify(rlc));
-    return new BN(rlcAmount.times(new Big(10).pow(9)).toString());
+    return ethersBnToBn(parseUnits(amount, pow));
   } catch (error) {
     debug('parseRLC()', error);
-    throw Error('Invalid rlcString');
+    throw Error('Invalid token amount');
   }
 };
 
 const formatEth = (wei) => {
   try {
-    return formatEther(BigNumber.from(stringify(wei)));
+    return formatUnits(BigNumber.from(stringify(wei)));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid wei');
   }
 };
 
-const parseEth = ether => ethersBnToBn(parseEther(stringify(ether)));
+const parseEth = (value, defaultUnit = 'ether') => {
+  const [amount, inputUnit] = stringify(value).split(' ');
+  const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
+  if (
+    !['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'].includes(unit)
+  ) {
+    throw Error('Invalid ether unit');
+  }
+  try {
+    return ethersBnToBn(parseUnits(amount, unit));
+  } catch (error) {
+    debug('formatEth()', error);
+    throw Error('Invalid ether amount');
+  }
+};
 
 const truncateBnWeiToBnNRlc = (bnWei) => {
   const weiString = bnWei.toString();
@@ -197,12 +214,6 @@ const secToDate = (secs) => {
   const t = new Date(1970, 0, 1);
   t.setSeconds(secs);
   return t;
-};
-
-const signTypedDatav3 = async (eth, address, typedData) => {
-  const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
-  const sign = await wrapSignTypedDataV3(signTDv3(typedData));
-  return sign;
 };
 
 const getSalt = () => {
@@ -429,7 +440,6 @@ module.exports = {
   NULL_BYTES,
   NULL_ADDRESS,
   NULL_BYTES32,
-  signTypedDatav3,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   encodeTag,

@@ -15,7 +15,7 @@ const {
   option,
 } = require('./cli-helper');
 const { initIExecConf, initChainConf } = require('./fs');
-const { Keystore, createAndSave } = require('./keystore');
+const { createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
 const { getChainDefaults } = require('./config');
 const { addressSchema } = require('./validator');
@@ -124,11 +124,7 @@ async function main() {
       await checkUpdate(cmd);
       const spinner = Spinner(cmd);
       try {
-        const chain = await loadChain(
-          cmd.chain,
-          Keystore({ isSigner: false }),
-          { spinner },
-        );
+        const chain = await loadChain(cmd.chain, { spinner });
 
         const host = chain.host === getChainDefaults(chain.id).host
           ? 'default'
@@ -137,7 +133,7 @@ async function main() {
 
         spinner.start(info.checking('iExec contracts info'));
         const hubAddress = await addressSchema({
-          ethProvider: chain.contracts.jsonRpcProvider,
+          ethProvider: chain.contracts.provider,
         }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
         const useNative = !!chain.contracts.isNative;
         const rlcAddress = useNative

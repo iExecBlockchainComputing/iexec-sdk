@@ -11,7 +11,6 @@ const {
   loadEncryptedWalletConf,
 } = require('./fs');
 const { prompt, option, computeWalletLoadOptions } = require('./cli-helper');
-const sigUtils = require('./sig-utils');
 const { checksummedAddress, NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:keystore');
@@ -306,52 +305,9 @@ const Keystore = ({
     }
   };
 
-  const signTransaction = async (rawTx) => {
-    try {
-      await load();
-      const sign = await sigUtils.signTransaction(cachedWallet.signerWallet)(
-        rawTx,
-      );
-      return sign;
-    } catch (error) {
-      debug('signTransaction()', error);
-      throw error;
-    }
-  };
-
-  const signPersonalMessage = async (address, message) => {
-    try {
-      await load();
-      const sign = await sigUtils.signPersonalMessage(
-        cachedWallet.signerWallet,
-      )(address, message);
-      return sign;
-    } catch (error) {
-      debug('signPersonalMessage()', error);
-      throw error;
-    }
-  };
-
-  const signTypedDatav3 = async (address, typedData) => {
-    try {
-      await load();
-      const sign = await sigUtils.signTypedDatav3(cachedWallet.signerWallet)(
-        address,
-        typedData,
-      );
-      return sign;
-    } catch (error) {
-      debug('signTypedDatav3()', error);
-      throw error;
-    }
-  };
-
   return {
     load,
     accounts,
-    signTransaction,
-    signPersonalMessage,
-    signTypedDatav3,
   };
 };
 

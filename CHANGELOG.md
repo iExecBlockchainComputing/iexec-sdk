@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
 - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
 - added default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
 - `iexec.order.signRequestorder()`, `iexec.order.publishRequestorder()` and `iexec.order.matchOrder()` perfom advanced check on request (use option `{ checkRequest: false }` to disable)
+- support for units in `parseEth()` & `parseRLC()` methods
+- support for INFURA, Etherscan and Alchemy providers configuration
 
 ### Changed
 
@@ -33,6 +35,8 @@ All notable changes to this project will be documented in this file.
 - `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
 - `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] standardized Error messages format, capitalized first letter.
+- [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
+- access to the blockchain through ethers default provider
 - standardized CLI messages format
 - fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods

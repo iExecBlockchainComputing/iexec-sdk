@@ -1,5 +1,4 @@
 const Debug = require('debug');
-const BN = require('bn.js');
 const { Buffer } = require('buffer');
 const {
   SigningKey,
@@ -7,8 +6,6 @@ const {
   keccak256,
   joinSignature,
 } = require('ethers').utils;
-const SignerProvider = require('ethjs-custom-signer');
-const { Wallet } = require('ethers');
 
 const debug = Debug('iexec:sig-utils');
 
@@ -181,83 +178,18 @@ const hashEIP712 = (typedData) => {
   }
 };
 
-const accounts = wallet => async () => [wallet.address];
-const signTransaction = wallet => async ({
-  gasPrice,
-  to,
-  data,
-  gasLimit,
-  nonce,
-  value,
-}) => {
+const signTypedDataV3 = wallet => async (typedData) => {
   try {
-    const signed = await wallet.signTransaction({
-      gasPrice,
-      to,
-      data,
-      gasLimit,
-      nonce,
-      value,
-    });
-    return signed;
-  } catch (error) {
-    debug('signTransaction()', error);
-    throw error;
-  }
-};
-const signPersonalMessage = wallet => async (address, message) => {
-  try {
-    const sign = wallet.signMessage(message);
-    return sign;
-  } catch (error) {
-    debug('signPersonalMessage()', error);
-    throw error;
-  }
-};
-const signTypedDatav3 = wallet => async (address, typedData) => {
-  try {
-    const data = JSON.parse(typedData);
     const pk = Buffer.from(wallet.privateKey.substring(2), 'hex');
-    const sign = signTypedData(pk, {
-      data,
-    });
+    const sign = signTypedData(pk, { data: typedData });
     return sign;
   } catch (error) {
-    debug('signTypedDatav3()', error);
+    console.error('signTypedDataV3()', error);
     throw error;
   }
-};
-
-const getSignerFromPrivateKey = (
-  host,
-  privateKey,
-  { gasPrice, getTransactionCount } = {},
-) => {
-  const wallet = new Wallet(privateKey);
-  let gasPriceOption;
-  if (gasPrice !== undefined) {
-    const bnGasPrice = new BN(gasPrice);
-    if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
-    gasPriceOption = '0x'.concat(bnGasPrice.toString('hex'));
-  }
-  if (getTransactionCount !== undefined) {
-    if (typeof getTransactionCount !== 'function') throw Error('Invalid getTransactionCount, must be a function');
-  }
-  return new SignerProvider(host, {
-    accounts: accounts(wallet),
-    signTransaction: signTransaction(wallet),
-    signPersonalMessage: signPersonalMessage(wallet),
-    signTypedDatav3: signTypedDatav3(wallet),
-    gasPrice: gasPriceOption,
-    getTransactionCount,
-  });
 };
 
 module.exports = {
-  getSignerFromPrivateKey,
-  accounts,
-  signTransaction,
-  signPersonalMessage,
-  signTypedDatav3,
+  signTypedDataV3,
   hashEIP712,
 };

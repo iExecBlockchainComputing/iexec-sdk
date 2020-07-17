@@ -14,11 +14,11 @@ const main = {
 
 const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'VanityEth',
+  name: 'python-hello-world',
   type: 'DOCKER',
-  multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+  multiaddr: 'docker.io/iexechub/python-hello-world:1.0.0',
   checksum:
-    '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    '0xa28d8ae83ae586b4c8addd60413a8302798891411a8f87b5f0987050d0d73816',
   mrenclave: '',
 };
 
@@ -130,6 +130,9 @@ const chains = {
     },
     mainnet: {
       id: '1',
+    },
+    bellecour: {
+      id: '134',
     },
   },
 };

@@ -1,6 +1,7 @@
 const Debug = require('debug');
-const SignerProvider = require('ethjs-custom-signer');
-const createIExecContracts = require('iexec-contracts-js-client');
+const { getDefaultProvider } = require('ethers');
+const IExecContractsClient = require('iexec-contracts-js-client');
+const { EnhancedWallet } = require('./signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
 const { getChainDefaults } = require('./config');
@@ -10,42 +11,27 @@ const debug = Debug('iexec:chains');
 const createChainFromConf = (
   chainName,
   chainConf,
-  {
-    signTransaction,
-    accounts,
-    signTypedData,
-    signTypedDatav3,
-    signMessage,
-    signPersonalMessage,
-  },
-  { txOptions = {}, bridgeConf } = {},
+  { bridgeConf, providersOptions } = {},
 ) => {
   try {
     const chain = Object.assign({}, chainConf);
-    const signerOptions = Object.assign(
-      {},
-      {
-        signTransaction,
-        accounts,
-        signTypedData,
-        signTypedDatav3,
-        signMessage,
-        signPersonalMessage,
-      },
-      { gasPrice: txOptions.gasPrice },
-    );
-    const ethProvider = new SignerProvider(chainConf.host, signerOptions);
+    const provider = getDefaultProvider(chainConf.host, providersOptions);
     chain.name = chainName;
-    chain.contracts = createIExecContracts({
-      ethProvider,
+    const contracts = new IExecContractsClient({
+      provider,
       chainId: chain.id,
       hubAddress: chain.hub,
       isNative: chain.native,
     });
+    chain.contracts = contracts;
     if (bridgeConf) {
       chain.bridgedNetwork = Object.assign({}, bridgeConf);
-      chain.bridgedNetwork.contracts = createIExecContracts({
-        ethProvider: bridgeConf.host,
+      const bridgeProvider = getDefaultProvider(
+        bridgeConf.host,
+        providersOptions,
+      );
+      chain.bridgedNetwork.contracts = new IExecContractsClient({
+        provider: bridgeProvider,
         chainId: bridgeConf.id,
         hubAddress: bridgeConf.hub,
         isNative:
@@ -61,14 +47,11 @@ const createChainFromConf = (
   }
 };
 
-const loadChain = async (
-  chainName,
-  keystore,
-  { spinner = Spinner(), txOptions } = {},
-) => {
+const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
+    const providersOptions = chainsConf.providers;
     let name;
     let loadedConf;
     if (chainName) {
@@ -112,13 +95,13 @@ const loadChain = async (
     }
 
     let bridgeConf;
-    if (conf.bridge && conf.bridge.bridgedNetworkId) {
+    if (conf.bridge && conf.bridge.bridgedChainId) {
       const names = Object.keys(chainsConf.chains);
       names.forEach((n) => {
         const bridgeLoadedConf = chainsConf.chains[n];
         if (
           bridgeLoadedConf.id
-          && bridgeLoadedConf.id === conf.bridge.bridgedNetworkId
+          && bridgeLoadedConf.id === conf.bridge.bridgedChainId
         ) {
           const bridgeDefaultConf = getChainDefaults(bridgeLoadedConf.id);
           debug('bridgeLoadedConf', bridgeLoadedConf);
@@ -133,9 +116,9 @@ const loadChain = async (
       });
     }
     debug('bridged chain', bridgeConf);
-    const chain = createChainFromConf(name, conf, keystore, {
+    const chain = createChainFromConf(name, conf, {
       bridgeConf,
-      txOptions,
+      providersOptions,
     });
     spinner.info(`Using chain [${name}]`);
     return chain;
@@ -145,6 +128,14 @@ const loadChain = async (
   }
 };
 
+const connectKeystore = async (chain, keystore, { txOptions } = {}) => {
+  const { privateKey } = await keystore.load();
+  chain.contracts.setSigner(
+    new EnhancedWallet(privateKey, undefined, txOptions),
+  );
+};
+
 module.exports = {
   loadChain,
+  connectKeystore,
 };

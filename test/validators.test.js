@@ -1,5 +1,6 @@
 const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
+const { teePostComputeDefaults } = require('../src/secrets-utils');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -313,8 +314,8 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -336,8 +337,8 @@ describe('[objParamsSchema]', () => {
       ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'dropbox',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -366,8 +367,8 @@ describe('[objParamsSchema]', () => {
       iexec_args: 'test',
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -389,8 +390,8 @@ describe('[objParamsSchema]', () => {
       ],
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -437,8 +438,8 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -454,8 +455,8 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -471,8 +472,8 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -503,8 +504,17 @@ describe('[objParamsSchema]', () => {
       iexec_developer_logger: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('with isCallback in context, do not populate storage', async () => {
+    await expect(
+      objParamsSchema().validate({}, { context: { isCallback: true } }),
+    ).resolves.toEqual({
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -519,8 +529,8 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'abc|123|abc',
-      iexec_tee_post_compute_image: 'tee-post-compute-image',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 });

@@ -1,4 +1,4 @@
-const { NULL_BYTES32, checkActiveBitInTag } = require('./utils');
+const { NULL_BYTES32, NULL_ADDRESS, checkActiveBitInTag } = require('./utils');
 const {
   getStorageTokenKeyName,
   reservedSecretKeyName,
@@ -14,6 +14,7 @@ const {
 const createObjParams = async ({
   params = {},
   tag = NULL_BYTES32,
+  callback = NULL_ADDRESS,
   noCast = false,
   resultProxyURL,
 } = {}) => {
@@ -30,9 +31,10 @@ const createObjParams = async ({
     inputParams = params;
   }
   const isTee = checkActiveBitInTag(tag, 1);
+  const isCallback = callback !== NULL_ADDRESS;
   const objParams = await objParamsSchema().validate(inputParams, {
     strict: noCast,
-    context: { isTee, resultProxyURL },
+    context: { isTee, isCallback, resultProxyURL },
   });
   return objParams;
 };
@@ -48,6 +50,7 @@ const checkRequestRequirements = async (
   const params = await createObjParams({
     params: requestorder.params,
     tag: requestorder.tag,
+    callback: requestorder.callback,
     noCast: true,
   });
   // check encryption key

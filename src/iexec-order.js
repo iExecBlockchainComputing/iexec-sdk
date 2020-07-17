@@ -26,7 +26,7 @@ const {
   saveSignedOrder,
   loadSignedOrders,
 } = require('./fs');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const { Keystore } = require('./keystore');
 const order = require('./order');
 const { NULL_ADDRESS } = require('./utils');
@@ -62,10 +62,8 @@ init
       );
 
       const walletOptions = await computeWalletLoadOptions(opts);
-      const keystore = Keystore(
-        Object.assign(walletOptions, { isSigner: false }),
-      );
-      const chain = await loadChain(opts.chain, keystore, { spinner });
+
+      const chain = await loadChain(opts.chain, { spinner });
       const success = {};
       const failed = [];
 
@@ -75,6 +73,9 @@ init
           spinner.start(`Creating ${orderName}`);
           const overwrite = {};
           if (resourceName === 'request') {
+            const keystore = Keystore(
+              Object.assign(walletOptions, { isSigner: false }),
+            );
             const [address] = await keystore.accounts();
             overwrite.requester = address;
             overwrite.beneficiary = address;
@@ -145,17 +146,17 @@ sign
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         loadIExecConf(),
-        keystore.load(),
       ]);
+      await connectKeystore(chain, keystore);
       const success = {};
       const failed = [];
 
       const signAppOrder = async () => {
         spinner.start('Signing apporder');
         try {
-          const loadedOrder = iexecConf.order.apporder;
+          const loadedOrder = iexecConf.order && iexecConf.order.apporder;
           if (!loadedOrder) {
             throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
           }
@@ -187,7 +188,7 @@ sign
       const signDatasetOrder = async () => {
         spinner.start('Signing datasetorder');
         try {
-          const loadedOrder = iexecConf.order.datasetorder;
+          const loadedOrder = iexecConf.order && iexecConf.order.datasetorder;
           if (!loadedOrder) {
             throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
           }
@@ -220,7 +221,7 @@ sign
       const signWorkerpoolOrder = async () => {
         spinner.start('Signing workerpoolorder');
         try {
-          const loadedOrder = iexecConf.order.workerpoolorder;
+          const loadedOrder = iexecConf.order && iexecConf.order.workerpoolorder;
           if (!loadedOrder) {
             throw new Error(
               info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
@@ -254,7 +255,7 @@ sign
       const signRequestOrder = async () => {
         spinner.start('Signing requestorder');
         try {
-          const loadedOrder = iexecConf.order.requestorder;
+          const loadedOrder = iexecConf.order && iexecConf.order.requestorder;
           if (!loadedOrder) {
             throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
           }
@@ -342,7 +343,7 @@ fill
       const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, { spinner }),
         loadSignedOrders(),
       ]);
 
@@ -397,7 +398,7 @@ fill
       if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
-        await keystore.load();
+        await connectKeystore(chain, keystore, { txOptions });
         const unsignedOrder = await order.createRequestorder(
           { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
           {
@@ -444,7 +445,7 @@ fill
         });
       }
 
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await order.matchOrders(
         chain.contracts,
@@ -488,10 +489,10 @@ publish
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         loadSignedOrders(),
-        keystore.load(),
       ]);
+      await connectKeystore(chain, keystore);
       const success = {};
       const failed = [];
 
@@ -605,10 +606,10 @@ unpublish
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         loadSignedOrders(),
-        keystore.load(),
       ]);
+      await connectKeystore(chain, keystore);
       const success = {};
       const failed = [];
 
@@ -727,10 +728,10 @@ cancel
       const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, { spinner }),
         loadSignedOrders(),
-        keystore.load(),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       const success = {};
       const failed = [];
 
@@ -818,7 +819,7 @@ show
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const chain = await loadChain(opts.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       const success = {};
