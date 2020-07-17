@@ -45,6 +45,8 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
+- [BREAKING] `aes-256-cbc` dataset encryption is removed, only `scone` encryption is supported (use `iexec dataset encrypt --algorithm scone`)
+
 ## Unreleased V4
 
 ### Added

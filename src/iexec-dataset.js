@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const { Buffer } = require('buffer');
+// const { Buffer } = require('buffer');
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
-const { randomBytes, createCipheriv, pbkdf2 } = require('crypto');
+// const { randomBytes, createCipheriv, pbkdf2 } = require('crypto');
 const {
   help,
   addGlobalOptions,
@@ -251,6 +251,7 @@ encryptDataset
 
     const SCONE_IMAGE = 'iexechub/tee_data_encrypter';
 
+    /**
     const derivateKey = (password, salt) => new Promise((resolve, reject) => {
       pbkdf2(password, salt, 10000, 48, 'sha256', (err, derivedKey) => {
         if (err) reject(err);
@@ -287,6 +288,7 @@ encryptDataset
       const { key, iv } = await derivateKey(password, salt);
       return createCipheriv('aes-256-cbc', key, iv);
     };
+    */
 
     try {
       const {
@@ -317,6 +319,8 @@ encryptDataset
       debug('datasetFiles', datasetFiles);
 
       if (!opts.algorithm || opts.algorithm === 'aes-256-cbc') {
+        throw Error('Only option "--algorithm scone" is supported');
+        /**
         spinner.info('Using default encryption aes-256-cbc');
         const encryptDatasetFile = async (datasetFileName) => {
           spinner.info(`Encrypting ${datasetFileName}`);
@@ -394,6 +398,7 @@ encryptDataset
           await recursiveEncryptDatasets(filesNames, index + 1);
         };
         await recursiveEncryptDatasets(datasetFiles);
+        */
       } else if (opts.algorithm === 'scone') {
         spinner.info('Using SCONE');
         try {
@@ -495,40 +500,39 @@ encryptDataset
           const stats = await fs.lstat(
             path.join(originalDatasetFolderPath, filesNames[index]),
           );
-          if (stats.isDirectory()) {
-            folderName = filesNames[index];
-            await encryptDatasetFolder(folderName);
-          } else if (stats.isFile()) {
+          if (stats.isDirectory() || stats.isFile()) {
             const safeFolderName = 'dataset_'.concat(
               filesNames[index].replace(/[^\w\s.-_]/gi, ''),
             );
             spinner.info(
-              `Wrapping single file ${filesNames[index]} into folder ${safeFolderName}`,
+              `Wrapping dataset ${filesNames[index]} into folder ${safeFolderName}`,
             );
             await fs.mkdir(
               path.join(originalDatasetFolderPath, safeFolderName),
             );
-            await fs.copy(
-              path.join(originalDatasetFolderPath, filesNames[index]),
-              path.join(
-                originalDatasetFolderPath,
-                safeFolderName,
-                filesNames[index],
-              ),
-            );
-            folderName = safeFolderName;
-            await encryptDatasetFolder(folderName);
-            spinner.info(`Removing folder ${safeFolderName}`);
-            await fs.unlink(
-              path.join(
-                originalDatasetFolderPath,
-                safeFolderName,
-                filesNames[index],
-              ),
-            );
-            await fs.rmdir(
-              path.join(originalDatasetFolderPath, safeFolderName),
-            );
+            let encryptError;
+            try {
+              await fs.copy(
+                path.join(originalDatasetFolderPath, filesNames[index]),
+                path.join(
+                  originalDatasetFolderPath,
+                  safeFolderName,
+                  filesNames[index],
+                ),
+              );
+              folderName = safeFolderName;
+              await encryptDatasetFolder(folderName);
+            } catch (e) {
+              encryptError = e;
+            }
+            spinner.info(`Removing wrapping folder ${safeFolderName}`);
+            await fs
+              .remove(path.join(originalDatasetFolderPath, safeFolderName))
+              .catch(e => debug('remove error', e));
+            debug('encryptError', encryptError);
+            if (encryptError) {
+              throw encryptError;
+            }
           } else {
             throw Error('Datasets should be files or directories');
           }

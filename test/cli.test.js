@@ -2884,7 +2884,8 @@ describe('[Common]', () => {
       expect(await checkExists(filePath('out/encrypted/'))).toBe(true);
     });
 
-    test('iexec dataset encrypt', async () => {
+    // removed from v5
+    test.skip('iexec dataset encrypt', async () => {
       const raw = await execAsync(
         `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --raw`,
       );
@@ -2917,14 +2918,15 @@ describe('[Common]', () => {
 
     if (!DRONE) {
       // this test requires docker
-      test('openssl decrypt dataset', async () => expect(
+      test.skip('openssl decrypt dataset', async () => expect(
         execAsync(
           'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.secrets/datasets:/secrets -v $PWD/datasets/encrypted:/encrypted openssldecrypt dataset.txt',
         ),
       ).resolves.not.toBe(1));
     }
 
-    test('iexec dataset encrypt --force --algorithm aes-256-cbc', async () => {
+    // removed from v5
+    test.skip('iexec dataset encrypt --force --algorithm aes-256-cbc', async () => {
       await execAsync(
         'cp ./inputs/originalDataset/dataset.txt ./datasets/original/dataset.txt ',
       );
@@ -2969,11 +2971,18 @@ describe('[Common]', () => {
         ).toBe(true);
         expect(
           await checkExists(
-            filePath('.secrets/datasets/datasetFolder.scone.secret'),
+            filePath('.secrets/datasets/dataset_datasetFolder.scone.secret'),
           ),
         ).toBe(true);
         expect(
-          await checkExists(filePath('datasets/encrypted/datasetFolder.zip')),
+          await checkExists(
+            filePath('.secrets/datasets/dataset_dataset.txt.scone.secret'),
+          ),
+        ).toBe(true);
+        expect(
+          await checkExists(
+            filePath('datasets/encrypted/dataset_datasetFolder.zip'),
+          ),
         ).toBe(true);
         expect(
           await checkExists(

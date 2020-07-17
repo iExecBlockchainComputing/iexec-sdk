@@ -251,7 +251,7 @@ const option = {
   datasetEncryptionAlgorithm: () => [
     '--algorithm <algorithm>',
     `specify the encryption algorithm to use <${listOfChoices([
-      'aes-256-cbc',
+      // 'aes-256-cbc',
       'scone',
     ])}>`,
   ],

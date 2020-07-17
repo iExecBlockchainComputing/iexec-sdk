@@ -443,7 +443,6 @@ iexec dataset publish # publish an datasetorder to make your dataset publicly av
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
-iexec dataset encrypt # generate a key and encrypt the dataset files from ./datasets/original/
 iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
 iexec dataset push-secret [datasetAddress] # push the secret for the encrypted dataset
 iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
