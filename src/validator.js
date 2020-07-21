@@ -163,7 +163,7 @@ const objParamsSchema = () => object({
     },
   ),
   [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-    'iexec_result_storage_provider',
+    `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
     {
       is: 'ipfs',
       then: string()
