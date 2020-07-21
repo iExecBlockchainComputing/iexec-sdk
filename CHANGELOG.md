@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution
-- simplified order publication with commands `iexec app publish`, `iexec dataset publish` and `iexec workerpool publish`
+- simplified order management with commands `iexec app publish/unpublish`, `iexec dataset publish/unpublish` and `iexec workerpool publish/unpublish`
 - `iexec storage init [provider]` initialize the remote storage
 - `iexec storage check [provider]` check if the remote storage is initialized
 - `iexec.storage.defaultStorageLogin()` get an authorization token for default remote storage

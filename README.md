@@ -403,7 +403,9 @@ iexec account withdraw <amount> # withdraw the specified amount of RLC from your
 # --user <address>
 iexec app init # init the app template
 iexec app deploy # deploy the app on the blockchain
-iexec app publish # publish an apporder to make your app publicly available on the marketplace (use options to manage access)
+iexec app publish [address] # publish an apporder to make your app publicly available on the marketplace (use options to manage access)
+iexec app unpublish [address] # unpublish the last published apporder for specified app
+iexec app unpublish [address] --all # unpublish all the published apporders for specified app
 iexec app show [address|index] # show app details
 iexec app count # count your total number of app
 iexec app count --user <userAddress> # count user total number of app
@@ -440,6 +442,8 @@ iexec dataset init # init the dataset template
 iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
 iexec dataset deploy # deploy the dataset on the blockchain
 iexec dataset publish # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
+iexec dataset unpublish [address] # unpublish the last published datasetorder for specified dataset
+iexec dataset unpublish [address] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
@@ -457,6 +461,8 @@ iexec dataset check-secret [datasetAddress] # check if a secret exists for the d
 iexec workerpool init # init the workerpool template
 iexec workerpool deploy # deploy the workerpool on the blockchain
 iexec workerpool publish --price 100 # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
+iexec workerpool unpublish [address] # unpublish the last published workerpoolorder for specified workerpool
+iexec workerpool unpublish [address] --all # unpublish all the published workerpoolorders for specified workerpool
 iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool

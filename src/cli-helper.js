@@ -50,6 +50,7 @@ const desc = {
   deployObj: objName => `deploy a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
   publishObj: objName => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
+  unpublishObj: objName => `unpublish last published ${objName}order for from the marketplace`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
   fill: objName => `fill an ${objName} to execute a work`,
@@ -136,6 +137,7 @@ const option = {
     '--request [orderHash]',
     'unpublish a signed requestorder from iExec marketplace',
   ],
+  unpublishAllOrders: () => ['--all', 'unpublish all orders'],
   showAppOrder: () => ['--app [orderHash]', 'show an apporder'],
   showDatasetOrder: () => ['--dataset [orderHash]', 'show a datasetorder'],
   showWorkerpoolOrder: () => [
@@ -428,6 +430,11 @@ const prompt = {
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
+  unpublishOrder: (objName, address, all) => question(
+    `Do you want to unpublish ${
+      all ? 'all your' : 'your last'
+    } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`,
+  ),
   signGeneratedOrder: (orderName, order) => question(
     `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
   ),

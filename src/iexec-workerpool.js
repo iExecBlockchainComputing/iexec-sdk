@@ -31,6 +31,8 @@ const {
   createWorkerpoolorder,
   signWorkerpoolorder,
   publishWorkerpoolorder,
+  unpublishLastWorkerpoolorder,
+  unpublishAllWorkerpoolorders,
 } = require('./order');
 const {
   loadIExecConf,
@@ -285,6 +287,69 @@ publish
         {
           raw: {
             orderHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const unpublish = cli.command('unpublish [workerpoolAddress]');
+addGlobalOptions(unpublish);
+addWalletLoadOptions(unpublish);
+unpublish
+  .description(desc.unpublishObj(objName))
+  .option(...option.chain())
+  .option(...option.force())
+  .option(...option.unpublishAllOrders())
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
+    const keystore = Keystore(walletOptions);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+      const useDeployedObj = !objAddress;
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
+      if (!address) {
+        throw Error(
+          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
+        );
+      }
+      debug('useDeployedObj', useDeployedObj, 'address', address);
+      if (useDeployedObj) {
+        spinner.info(
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+        );
+      }
+      const all = !!opts.all;
+      if (!opts.force) {
+        await prompt.unpublishOrder(objName, address, all);
+      }
+      await connectKeystore(chain, keystore);
+      const unpublished = all
+        ? await unpublishAllWorkerpoolorders(
+          chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
+          address,
+        )
+        : await unpublishLastWorkerpoolorder(
+          chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
+          address,
+        );
+      spinner.succeed(
+        `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
+          all ? 's' : ''
+        }`,
+        {
+          raw: {
+            unpublished,
           },
         },
       );

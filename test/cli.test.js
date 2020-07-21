@@ -1635,7 +1635,7 @@ describe('[Mainchain]', () => {
   if (WITH_STACK) {
     describe('[with stack]', () => {
       // this test requires running local stack
-      test('[common] iexec app publish (from depoyed)', async () => {
+      test('[common] iexec app publish (from deployed)', async () => {
         await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} app init`);
@@ -1698,7 +1698,58 @@ describe('[Mainchain]', () => {
         });
       }, 15000);
 
-      test('[common] iexec dataset publish (from depoyed)', async () => {
+      test('[common] iexec app unpublish (from deployed)', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} app init`);
+        await setAppUniqueName();
+        await execAsync(`${iexecPath} app deploy --raw`);
+        await execAsync(`${iexecPath} app publish --force --raw`);
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} app publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(`${iexecPath} app unpublish --force --raw`);
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toBe(lastOrderHash);
+        await execAsync(`${iexecPath} app unpublish --force --raw`);
+        const rawErr = await execAsync(
+          `${iexecPath} app unpublish --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
+      }, 20000);
+
+      test('[common] iexec app unpublish [address] --all', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} app init`);
+        await setAppUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} app deploy --raw`),
+        );
+        const { orderHash } = JSON.parse(
+          await execAsync(`${iexecPath} app publish --force --raw`),
+        );
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} app publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(
+          `${iexecPath} app unpublish ${address} --all --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        const rawErr = await execAsync(
+          `${iexecPath} app unpublish --all --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
+      }, 20000);
+
+      test('[common] iexec dataset publish (from deployed)', async () => {
         await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} dataset init`);
@@ -1763,7 +1814,60 @@ describe('[Mainchain]', () => {
         });
       }, 15000);
 
-      test('[common] iexec workerpool publish (from depoyed)', async () => {
+      test('[common] iexec dataset unpublish (from deployed)', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} dataset init`);
+        await setDatasetUniqueName();
+        await execAsync(`${iexecPath} dataset deploy --raw`);
+        await execAsync(`${iexecPath} dataset publish --force --raw`);
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} dataset publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(
+          `${iexecPath} dataset unpublish --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toBe(lastOrderHash);
+        await execAsync(`${iexecPath} dataset unpublish --force --raw`);
+        const rawErr = await execAsync(
+          `${iexecPath} dataset unpublish --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
+      }, 20000);
+
+      test('[common] iexec dataset unpublish [address] --all', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} dataset init`);
+        await setDatasetUniqueName();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} dataset deploy --raw`),
+        );
+        const { orderHash } = JSON.parse(
+          await execAsync(`${iexecPath} dataset publish --force --raw`),
+        );
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} dataset publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(
+          `${iexecPath} dataset unpublish ${address} --all --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        const rawErr = await execAsync(
+          `${iexecPath} dataset unpublish --all --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
+      }, 20000);
+
+      test('[common] iexec workerpool publish (from deployed)', async () => {
         await setRichWallet();
         await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
         await execAsync(`${iexecPath} workerpool init`);
@@ -1831,6 +1935,59 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.workerpoolorder.order.sign,
           salt: orderShowRes.workerpoolorder.order.salt,
         });
+      }, 20000);
+
+      test('[common] iexec workerpool unpublish (from deployed)', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} workerpool init`);
+        await setWorkerpoolUniqueDescription();
+        await execAsync(`${iexecPath} workerpool deploy --raw`);
+        await execAsync(`${iexecPath} workerpool publish --force --raw`);
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} workerpool publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(
+          `${iexecPath} workerpool unpublish --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toBe(lastOrderHash);
+        await execAsync(`${iexecPath} workerpool unpublish --force --raw`);
+        const rawErr = await execAsync(
+          `${iexecPath} workerpool unpublish --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
+      }, 20000);
+
+      test('[common] iexec workerpool unpublish [address] --all', async () => {
+        await setRichWallet();
+        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
+        await execAsync(`${iexecPath} workerpool init`);
+        await setWorkerpoolUniqueDescription();
+        const { address } = JSON.parse(
+          await execAsync(`${iexecPath} workerpool deploy --raw`),
+        );
+        const { orderHash } = JSON.parse(
+          await execAsync(`${iexecPath} workerpool publish --force --raw`),
+        );
+        const lastOrderHash = JSON.parse(
+          await execAsync(`${iexecPath} workerpool publish --force --raw`),
+        ).orderHash;
+        const raw = await execAsync(
+          `${iexecPath} workerpool unpublish ${address} --all --force --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.unpublished).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        const rawErr = await execAsync(
+          `${iexecPath} workerpool unpublish --all --force --raw`,
+        ).catch(e => e.message);
+        const resErr = JSON.parse(rawErr);
+        expect(resErr.ok).toBe(false);
       }, 20000);
     });
   }
