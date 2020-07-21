@@ -4030,6 +4030,414 @@ describe('[order]', () => {
         ),
       );
     }, 10000);
+    // unpublishLast
+    test('order.unpublishLastApporder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const apporder = await deployAndGetApporder(iexec);
+      const orderHash = await iexec.order.publishApporder(apporder);
+      const lastApporder = await iexec.order.signApporder(apporder);
+      const lastOrderHash = await iexec.order.publishApporder(lastApporder);
+      const unpublishLastRes = await iexec.order.unpublishLastApporder(
+        apporder.app,
+      );
+      expect(unpublishLastRes).toBe(lastOrderHash);
+      const unpublishLast2Res = await iexec.order.unpublishLastApporder(
+        apporder.app,
+      );
+      expect(unpublishLast2Res).toBe(orderHash);
+      await expect(
+        iexec.order.unpublishLastApporder(apporder.app),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open apporder published by signer ${ADDRESS} for app ${apporder.app}`,
+        ),
+      );
+    });
+    test('order.unpublishLastDatasetorder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const datasetorder = await deployAndGetDatasetorder(iexec);
+      const orderHash = await iexec.order.publishDatasetorder(datasetorder);
+      const lastDatasetorder = await iexec.order.signDatasetorder(datasetorder);
+      const lastOrderHash = await iexec.order.publishDatasetorder(
+        lastDatasetorder,
+      );
+      const unpublishLastRes = await iexec.order.unpublishLastDatasetorder(
+        datasetorder.dataset,
+      );
+      expect(unpublishLastRes).toBe(lastOrderHash);
+      const unpublishLast2Res = await iexec.order.unpublishLastDatasetorder(
+        datasetorder.dataset,
+      );
+      expect(unpublishLast2Res).toBe(orderHash);
+      await expect(
+        iexec.order.unpublishLastDatasetorder(datasetorder.dataset),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open datasetorder published by signer ${ADDRESS} for dataset ${datasetorder.dataset}`,
+        ),
+      );
+    });
+    test('order.unpublishLastWorkerpoolorder()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      const orderHash = await iexec.order.publishWorkerpoolorder(
+        workerpoolorder,
+      );
+      const lastWorkerpoolorder = await iexec.order.signWorkerpoolorder(
+        workerpoolorder,
+      );
+      const lastOrderHash = await iexec.order.publishWorkerpoolorder(
+        lastWorkerpoolorder,
+      );
+      const unpublishLastRes = await iexec.order.unpublishLastWorkerpoolorder(
+        workerpoolorder.workerpool,
+      );
+      expect(unpublishLastRes).toBe(lastOrderHash);
+      const unpublishLast2Res = await iexec.order.unpublishLastWorkerpoolorder(
+        workerpoolorder.workerpool,
+      );
+      expect(unpublishLast2Res).toBe(orderHash);
+      await expect(
+        iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open workerpoolorder published by signer ${ADDRESS} for workerpool ${workerpoolorder.workerpool}`,
+        ),
+      );
+    });
+    test('order.unpublishLastRequestorder()', async () => {
+      const { privateKey, address } = getRandomWallet();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        privateKey,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+        },
+      );
+      const appDevSigner = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecAppDev = new IExec(
+        {
+          ethProvider: appDevSigner,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+        },
+      );
+      const apporder = await deployAndGetApporder(iexecAppDev);
+      await iexecAppDev.order.publishApporder(apporder);
+      const requestorder = await iexec.order
+        .createRequestorder({
+          requester: await iexec.wallet.getAddress(),
+          app: apporder.app,
+          appmaxprice: apporder.appprice,
+          dataset: utils.NULL_ADDRESS,
+          datasetmaxprice: 0,
+          workerpool: utils.NULL_ADDRESS,
+          workerpoolmaxprice: 0,
+          category: 1,
+          trust: 0,
+          volume: 1,
+        })
+        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+      const orderHash = await iexec.order.publishRequestorder(requestorder, {
+        checkRequest: false,
+      });
+      const lastRequestorder = await iexec.order.signRequestorder(
+        requestorder,
+        { checkRequest: false },
+      );
+      const lastOrderHash = await iexec.order.publishRequestorder(
+        lastRequestorder,
+        { checkRequest: false },
+      );
+      const unpublishLastRes = await iexec.order.unpublishLastRequestorder(
+        requestorder.requester,
+      );
+      expect(unpublishLastRes).toBe(lastOrderHash);
+      const unpublishLast2Res = await iexec.order.unpublishLastRequestorder(
+        requestorder.requester,
+      );
+      expect(unpublishLast2Res).toBe(orderHash);
+      await expect(
+        iexec.order.unpublishLastRequestorder(requestorder.requester),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open requestorder published by signer ${address} for requester ${requestorder.requester}`,
+        ),
+      );
+    }, 10000);
+    // unpublishAll
+    test('order.unpublishAllApporders()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const apporder = await deployAndGetApporder(iexec);
+      const orderHash = await iexec.order.publishApporder(apporder);
+      const lastApporder = await iexec.order.signApporder(apporder);
+      const lastOrderHash = await iexec.order.publishApporder(lastApporder);
+      const unpublishAllRes = await iexec.order.unpublishAllApporders(
+        apporder.app,
+      );
+      expect(unpublishAllRes).toEqual(
+        expect.arrayContaining([orderHash, lastOrderHash]),
+      );
+      expect(unpublishAllRes.length).toBe(2);
+      await expect(
+        iexec.order.unpublishAllApporders(apporder.app),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open apporder published by signer ${ADDRESS} for app ${apporder.app}`,
+        ),
+      );
+    });
+    test('order.unpublishAllDatasetorders()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const datasetorder = await deployAndGetDatasetorder(iexec);
+      const orderHash = await iexec.order.publishDatasetorder(datasetorder);
+      const lastDatasetorder = await iexec.order.signDatasetorder(datasetorder);
+      const lastOrderHash = await iexec.order.publishDatasetorder(
+        lastDatasetorder,
+      );
+      const unpublishAllRes = await iexec.order.unpublishAllDatasetorders(
+        datasetorder.dataset,
+      );
+      expect(unpublishAllRes).toEqual(
+        expect.arrayContaining([orderHash, lastOrderHash]),
+      );
+      expect(unpublishAllRes.length).toBe(2);
+      await expect(
+        iexec.order.unpublishAllDatasetorders(datasetorder.dataset),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open datasetorder published by signer ${ADDRESS} for dataset ${datasetorder.dataset}`,
+        ),
+      );
+    });
+    test('order.unpublishAllWorkerpoolorders()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      const orderHash = await iexec.order.publishWorkerpoolorder(
+        workerpoolorder,
+      );
+      const lastWorkerpoolorder = await iexec.order.signWorkerpoolorder(
+        workerpoolorder,
+      );
+      const lastOrderHash = await iexec.order.publishWorkerpoolorder(
+        lastWorkerpoolorder,
+      );
+      const unpublishAllRes = await iexec.order.unpublishAllWorkerpoolorders(
+        workerpoolorder.workerpool,
+      );
+      expect(unpublishAllRes).toEqual(
+        expect.arrayContaining([orderHash, lastOrderHash]),
+      );
+      expect(unpublishAllRes.length).toBe(2);
+      await expect(
+        iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open workerpoolorder published by signer ${ADDRESS} for workerpool ${workerpoolorder.workerpool}`,
+        ),
+      );
+    });
+    test('order.unpublishAllRequestorders()', async () => {
+      const { privateKey, address } = getRandomWallet();
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        privateKey,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+        },
+      );
+      const appDevSigner = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecAppDev = new IExec(
+        {
+          ethProvider: appDevSigner,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+        },
+      );
+      const apporder = await deployAndGetApporder(iexecAppDev);
+      await iexecAppDev.order.publishApporder(apporder);
+      const requestorder = await iexec.order
+        .createRequestorder({
+          requester: await iexec.wallet.getAddress(),
+          app: apporder.app,
+          appmaxprice: apporder.appprice,
+          dataset: utils.NULL_ADDRESS,
+          datasetmaxprice: 0,
+          workerpool: utils.NULL_ADDRESS,
+          workerpoolmaxprice: 0,
+          category: 1,
+          trust: 0,
+          volume: 1,
+        })
+        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+      const orderHash = await iexec.order.publishRequestorder(requestorder, {
+        checkRequest: false,
+      });
+      const lastRequestorder = await iexec.order.signRequestorder(
+        requestorder,
+        { checkRequest: false },
+      );
+      const lastOrderHash = await iexec.order.publishRequestorder(
+        lastRequestorder,
+        { checkRequest: false },
+      );
+      const unpublishAllRes = await iexec.order.unpublishAllRequestorders(
+        requestorder.requester,
+      );
+      expect(unpublishAllRes).toEqual(
+        expect.arrayContaining([orderHash, lastOrderHash]),
+      );
+      expect(unpublishAllRes.length).toBe(2);
+      await expect(
+        iexec.order.unpublishAllRequestorders(requestorder.requester),
+      ).rejects.toThrow(
+        Error(
+          `API error: no open requestorder published by signer ${address} for requester ${requestorder.requester}`,
+        ),
+      );
+    }, 10000);
   }
 });
 

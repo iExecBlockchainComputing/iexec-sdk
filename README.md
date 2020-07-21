@@ -1579,6 +1579,30 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
 ```
 
+#### unpublishLastApporder
+
+iexec.**order.unpublishApporder ( appAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedApporder for specified app signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastApporder(appAddess);
+```
+
+#### unpublishAllApporders
+
+iexec.**order.unpublishAllApporders ( appAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedApporder for specified app signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllApporders(appAddess);
+```
+
 #### cancelApporder
 
 iexec.**order.cancelApporder ( order: SignedApporder )** => Promise < **{ order: SignedApporder, txHash; TxHash }** >
@@ -1614,6 +1638,34 @@ _Example:_
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
+```
+
+#### unpublishLastDatasetorder
+
+iexec.**order.unpublishDatasetorder ( datasetAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedDatasetorder for specified dataset signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastDatasetorder(
+  datasetAddess,
+);
+```
+
+#### unpublishAllDatasetorders
+
+iexec.**order.unpublishAllDatasetorders ( datasetAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedDatasetorder for specified dataset signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllDatasetorders(
+  datasetAddess,
+);
 ```
 
 #### cancelDatasetorder
@@ -1657,6 +1709,34 @@ const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
 );
 ```
 
+#### unpublishLastWorkerpoolorder
+
+iexec.**order.unpublishWorkerpoolorder ( workerpoolAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedWorkerpoolorder for specified workerpool signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastWorkerpoolorder(
+  workerpoolAddess,
+);
+```
+
+#### unpublishAllWorkerpoolorders
+
+iexec.**order.unpublishAllWorkerpoolorders ( workerpoolAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedWorkerpoolorder for specified workerpool signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllWorkerpoolorders(
+  workerpoolAddess,
+);
+```
+
 #### cancelWorkerpoolorder
 
 iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **{ order: SignedWorkerpoolorder, txHash; TxHash }** >
@@ -1690,12 +1770,36 @@ console.log('order published with orderHash:', orderHash);
 
 iexec.**order.unpublishRequestorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
-> unpublish a SignedRequestorder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+> unpublish a SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
 
 _Example:_
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
+```
+
+#### unpublishLastRequestorder
+
+iexec.**order.unpublishRequestorder ( )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastRequestorder();
+```
+
+#### unpublishAllRequestorders
+
+iexec.**order.unpublishAllRequestorders ( )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllRequestorders();
 ```
 
 #### cancelRequestorder

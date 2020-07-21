@@ -113,6 +113,7 @@ const objDesc = {
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: '/apporders',
     dealField: 'appHash',
+    addressField: 'app',
   },
   [DATASET_ORDER]: {
     primaryType: 'DatasetOrder',
@@ -132,6 +133,7 @@ const objDesc = {
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: '/datasetorders',
     dealField: 'datasetHash',
+    addressField: 'dataset',
   },
   [WORKERPOOL_ORDER]: {
     primaryType: 'WorkerpoolOrder',
@@ -153,6 +155,7 @@ const objDesc = {
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: '/workerpoolorders',
     dealField: 'workerpoolHash',
+    addressField: 'workerpool',
   },
   [REQUEST_ORDER]: {
     primaryType: 'RequestOrder',
@@ -177,6 +180,7 @@ const objDesc = {
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: '/requestorders',
     dealField: 'requestHash',
+    addressField: 'requester',
   },
 };
 
@@ -560,20 +564,34 @@ const publishRequestorder = async (
   await signedRequestorderSchema().validate(signedRequestorder),
 );
 
+const UNPUBLISH_TARGET_ORDERHASH = 'unpublish_orderHash';
+const UNPUBLISH_TARGET_ALL_ORDERS = 'unpublish_all';
+const UNPUBLISH_TARGET_LAST_ORDER = 'unpublish_last';
+
 const unpublishOrder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
-  orderHash = throwIfMissing(),
+  { target = UNPUBLISH_TARGET_ORDERHASH, orderHash, address } = {},
 ) => {
   try {
     checkOrderName(orderName);
-    const address = await getAddress(contracts);
-    const body = { chainId, orderHash };
+    const body = { chainId, target };
+    if (target === UNPUBLISH_TARGET_ORDERHASH) {
+      if (!orderHash) throwIfMissing();
+      body.orderHash = orderHash;
+    } else if (
+      target === UNPUBLISH_TARGET_LAST_ORDER
+      || target === UNPUBLISH_TARGET_ALL_ORDERS
+    ) {
+      if (!address) throwIfMissing();
+      body[objDesc[orderName].addressField] = address;
+    }
+    const userAddress = await getAddress(contracts);
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
       contracts.chainId,
-      address,
+      userAddress,
       contracts.signer,
     );
     const response = await jsonApi.post({
@@ -587,7 +605,7 @@ const unpublishOrder = async (
     }
     throw new Error('An error occured while unpublishing order');
   } catch (error) {
-    debug('publishOrder()', error);
+    debug('unpublishOrder()', error);
     throw error;
   }
 };
@@ -601,7 +619,7 @@ const unpublishApporder = async (
   iexecGatewayURL,
   APP_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(apporderHash),
+  { orderHash: await bytes32Schema().validate(apporderHash) },
 );
 
 const unpublishDatasetorder = async (
@@ -613,7 +631,7 @@ const unpublishDatasetorder = async (
   iexecGatewayURL,
   DATASET_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(datasetorderHash),
+  { orderHash: await bytes32Schema().validate(datasetorderHash) },
 );
 
 const unpublishWorkerpoolorder = async (
@@ -625,7 +643,7 @@ const unpublishWorkerpoolorder = async (
   iexecGatewayURL,
   WORKERPOOL_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(workerpoolorderHash),
+  { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
 );
 
 const unpublishRequestorder = async (
@@ -637,7 +655,137 @@ const unpublishRequestorder = async (
   iexecGatewayURL,
   REQUEST_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(requestorderHash),
+  { orderHash: await bytes32Schema().validate(requestorderHash) },
+);
+
+const unpublishAllApporders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  APP_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress),
+  },
+);
+
+const unpublishAllDatasetorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  datasetAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  DATASET_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetAddress),
+  },
+);
+
+const unpublishAllWorkerpoolorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  workerpoolAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  WORKERPOOL_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolAddress),
+  },
+);
+
+const unpublishAllRequestorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  REQUEST_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await getAddress(contracts),
+  },
+);
+
+const unpublishLastApporder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  APP_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress),
+  },
+);
+
+const unpublishLastDatasetorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  datasetAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  DATASET_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetAddress),
+  },
+);
+
+const unpublishLastWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  workerpoolAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  WORKERPOOL_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolAddress),
+  },
+);
+
+const unpublishLastRequestorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  REQUEST_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await getAddress(contracts),
+  },
 );
 
 const fetchPublishedOrderByHash = async (
@@ -1190,6 +1338,14 @@ module.exports = {
   unpublishDatasetorder,
   unpublishWorkerpoolorder,
   unpublishRequestorder,
+  unpublishLastApporder,
+  unpublishLastDatasetorder,
+  unpublishLastWorkerpoolorder,
+  unpublishLastRequestorder,
+  unpublishAllApporders,
+  unpublishAllDatasetorders,
+  unpublishAllWorkerpoolorders,
+  unpublishAllRequestorders,
   matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,

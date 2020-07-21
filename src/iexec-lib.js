@@ -358,6 +358,30 @@ class IExec {
       getIexecGatewayURL(),
       requestorderHash,
     );
+    this.order.unpublishLastApporder = appAddress => order.unpublishLastApporder(contracts, getIexecGatewayURL(), appAddress);
+    this.order.unpublishLastDatasetorder = datasetAddress => order.unpublishLastDatasetorder(
+      contracts,
+      getIexecGatewayURL(),
+      datasetAddress,
+    );
+    this.order.unpublishLastWorkerpoolorder = workerpoolAddress => order.unpublishLastWorkerpoolorder(
+      contracts,
+      getIexecGatewayURL(),
+      workerpoolAddress,
+    );
+    this.order.unpublishLastRequestorder = () => order.unpublishLastRequestorder(contracts, getIexecGatewayURL());
+    this.order.unpublishAllApporders = appAddress => order.unpublishAllApporders(contracts, getIexecGatewayURL(), appAddress);
+    this.order.unpublishAllDatasetorders = datasetAddress => order.unpublishAllDatasetorders(
+      contracts,
+      getIexecGatewayURL(),
+      datasetAddress,
+    );
+    this.order.unpublishAllWorkerpoolorders = workerpoolAddress => order.unpublishAllWorkerpoolorders(
+      contracts,
+      getIexecGatewayURL(),
+      workerpoolAddress,
+    );
+    this.order.unpublishAllRequestorders = () => order.unpublishAllRequestorders(contracts, getIexecGatewayURL());
     this.order.matchOrders = async (
       {
         apporder,
