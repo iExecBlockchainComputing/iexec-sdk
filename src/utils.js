@@ -198,7 +198,7 @@ const secToDate = (secs) => {
   return t;
 };
 
-const API_URL = 'https://gateway.iex.ec/';
+const API_URL = 'https://v4.gateway.iex.ec/';
 
 const makeBody = (verb, body) => {
   if (verb === 'GET') return {};
