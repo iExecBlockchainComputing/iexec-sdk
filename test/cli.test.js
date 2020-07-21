@@ -2707,7 +2707,7 @@ describe('[Common]', () => {
       expect(chains.goerli.native).toBe(undefined);
     }, 10000);
 
-    test('mainnet is not native', async () => {
+    test.skip('mainnet is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
       );
@@ -2718,7 +2718,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).not.toBe(undefined);
     }, 10000);
 
-    test('kovan is not native', async () => {
+    test.skip('kovan is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain kovan --raw`,
       );
@@ -2729,7 +2729,7 @@ describe('[Common]', () => {
       expect(res.balance.ETH).not.toBe(undefined);
     }, 10000);
 
-    test('goerli is not native', async () => {
+    test.skip('goerli is not native', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`,
       );
