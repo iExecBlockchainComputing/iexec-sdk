@@ -165,13 +165,14 @@ show
       Object.assign({}, walletOptions, { isSigner: false }),
     );
     try {
-      const [chain, [address], deployedObj] = await Promise.all([
+      const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
-        loadDeployedObj(objName),
       ]);
-
-      const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+      const addressOrIndex = cliAddressOrIndex
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
@@ -568,27 +569,22 @@ pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
   .description(desc.pushDatasetSecret())
-  .action(async (datasetAddress, cmd) => {
+  .action(async (objAddress, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, {
-          spinner,
-        }),
-        loadDeployedObj(objName),
-      ]);
-
+      const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
-
       const [address] = await keystore.accounts();
       debug('address', address);
-
-      const resourceAddress = datasetAddress || deployedObj[chain.id];
+      const resourceAddress = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       debug('resourceAddress', resourceAddress);
       if (!resourceAddress) {
         throw Error(
@@ -635,18 +631,16 @@ addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (datasetAddress, cmd) => {
+  .action(async (objAddress, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, {
-          spinner,
-        }),
-        loadDeployedObj(objName),
-      ]);
-      const resourceAddress = datasetAddress || deployedObj[chain.id];
+      const chain = await loadChain(opts.chain, { spinner });
+      const resourceAddress = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       if (!resourceAddress) {
         throw Error(
           'Missing datasetAddress argument and no dataset found in "deployed.json"',
@@ -694,12 +688,12 @@ publish
     const txOptions = computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
-        loadDeployedObj(objName),
-      ]);
+      const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress || (deployedObj && deployedObj[chain.id]);
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       if (!address) {
         throw Error(
           `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,

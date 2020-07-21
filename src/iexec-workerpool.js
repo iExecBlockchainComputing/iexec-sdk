@@ -134,13 +134,14 @@ show
       Object.assign({}, walletOptions, { isSigner: false }),
     );
     try {
-      const [chain, [address], deployedObj] = await Promise.all([
+      const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
-        loadDeployedObj(objName),
       ]);
-
-      const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+      const addressOrIndex = cliAddressOrIndex
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
@@ -230,12 +231,12 @@ publish
     const txOptions = computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
-        loadDeployedObj(objName),
-      ]);
+      const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress || (deployedObj && deployedObj[chain.id]);
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       if (!address) {
         throw Error(
           `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,

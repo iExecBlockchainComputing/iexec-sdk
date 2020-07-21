@@ -178,13 +178,14 @@ show
       const keystore = Keystore(
         Object.assign({}, walletOptions, { isSigner: false }),
       );
-      const [chain, [address], deployedObj] = await Promise.all([
+      const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
-        loadDeployedObj(objName),
       ]);
-
-      const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+      const addressOrIndex = cliAddressOrIndex
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
@@ -261,12 +262,12 @@ publish
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
-        loadDeployedObj(objName),
-      ]);
+      const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress || (deployedObj && deployedObj[chain.id]);
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       if (!address) {
         throw Error(
           `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
@@ -345,22 +346,13 @@ run
     const txOptions = computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
-      const [
-        chain,
-        deployedApp,
-        deployedDataset,
-        deployedWorkerpool,
-      ] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
-        loadDeployedObj('app'),
-        loadDeployedObj('dataset'),
-        loadDeployedObj('workerpool'),
-      ]);
-
+      const chain = await loadChain(opts.chain, { spinner });
       const result = { deals: [] };
-
       const useDeployedApp = !appAddress;
-      const app = appAddress || (deployedApp && deployedApp[chain.id]);
+      const app = appAddress
+        || (await loadDeployedObj('app').then(
+          deployedApp => deployedApp && deployedApp[chain.id],
+        ));
       if (!app) {
         throw Error(
           `Missing appAddress and no app found in "deployed.json" for chain ${chain.id}`,
@@ -376,7 +368,11 @@ run
       const useDataset = opts.dataset !== undefined;
       const useDeployedDataset = useDataset && opts.dataset === 'deployed';
       const dataset = useDataset
-        && (useDeployedDataset ? deployedDataset[chain.id] : opts.dataset);
+        && (useDeployedDataset
+          ? await loadDeployedObj('dataset').then(
+            deployedDataset => deployedDataset && deployedDataset[chain.id],
+          )
+          : opts.dataset);
       if (useDataset && !dataset) {
         throw Error(
           `No dataset found in "deployed.json" for chain ${chain.id}`,
@@ -398,7 +394,9 @@ run
       const useDeployedWorkerpool = runOnWorkerpool && opts.workerpool === 'deployed';
       const workerpool = runOnWorkerpool
         && (useDeployedWorkerpool
-          ? deployedWorkerpool[chain.id]
+          ? await loadDeployedObj('workerpool').then(
+            deployedWorkerpool => deployedWorkerpool && deployedWorkerpool[chain.id],
+          )
           : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
         throw Error(
