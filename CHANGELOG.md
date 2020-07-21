@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.4] 2020-07-21
+
+### Added
+
+### Changed
+
+- gateway changed to support post v5
+
+### Removed
+
 ## [4.0.3] 2020-02-27
 
 ### Added
