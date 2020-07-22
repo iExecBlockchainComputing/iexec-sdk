@@ -7,57 +7,56 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution
-- simplified order management with commands `iexec app publish/unpublish`, `iexec dataset publish/unpublish` and `iexec workerpool publish/unpublish`
-- `iexec storage init [provider]` initialize the remote storage
-- `iexec storage check [provider]` check if the remote storage is initialized
-- `iexec.storage.defaultStorageLogin()` get an authorization token for default remote storage
-- `iexec.storage.pushStorageToken()` push a storage token to the SMS
-- `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
-- `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
-- `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficary result encryption key to the SMS
-- `iexec.result.updateResultEncryptionKey(rsaPubKey)` update the beneficary result encryption key in the SMS
-- `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
-- added default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
-- `iexec.order.signRequestorder()`, `iexec.order.publishRequestorder()` and `iexec.order.matchOrder()` perfom advanced check on request (use option `{ checkRequest: false }` to disable)
-- support for units in `parseEth()` & `parseRLC()` methods
 - support for INFURA, Etherscan and Alchemy providers configuration
+- simplified order management for deployed resources in cli
+  - `iexec app/dataset/workerpool publish`
+  - `iexec app/dataset/workerpool unpublish`
+- remote storage management
+  - support for `dropbox` storage
+  - `iexec storage init [provider]` initialize the remote storage
+  - `iexec storage check [provider]` check if the remote storage is initialized
+  - `iexec.storage.defaultStorageLogin()` get an authorization token for default remote storage
+  - `iexec.storage.pushStorageToken()` push a storage token to the SMS
+- dataset secret management in js lib
+  - `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
+  - `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
+- result encryption key management in js lib
+  - `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficary result encryption key to the SMS
+  - `iexec.result.updateResultEncryptionKey(rsaPubKey)` update the beneficary result encryption key in the SMS
+  - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
+  - `utils.decryptResult(encryptedResultFile, beneficiaryKey)` decrypt encrypted result with RSA beneficiary key
+- requestorder check to prevent runtime errors
+  - `iexec order sign`, `iexec order publish`, `iexec order fill` and `iexec app run` perform advanced check on request (use option `--skip-request-check` to disable)
+  - `iexec.order.signRequestorder()`, `iexec.order.publishRequestorder()` and `iexec.order.matchOrder()` perform advanced check on request (use option `{ checkRequest: false }` to disable)
+- `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
+- `--watch` option added to `iexec deal show <dealid>` allow to watch execution status changes
+- default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
+- support for units in `parseEth()` & `parseRLC()` methods
 
 ### Changed
 
 - [BREAKING] `iexec app show <index>` & `app.showUserApp(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec dataset show <index>` & `dataset.showUserDataset(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec workerpool show <index>` & `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
+- [BREAKING] `iexec task show` & `task.show(taskid)` returned `task.results` is an object previously was url or hexString
+- [BREAKING] `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
+- [BREAKING] `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
+- [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
 - [BREAKING] `iexec result generate-keys` is deprecated, use `iexec result generate-encryption-keypair`
 - [BREAKING] `iexec result push-secret` is deprecated, use `iexec result push-encryption-key`
 - [BREAKING] `iexec result check-secret` is deprecated, use `iexec result check-encryption-key` returned json key is now `isEncryptionKeySet` previously was `isKnownAddress`
-- [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
-- [BREAKING] `iexec task show` & `task.show(taskid)` returned task.results is an object previously was url or hexString
-- `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
-- `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] standardized Error messages format, capitalized first letter.
-- [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
 - access to the blockchain through ethers default provider
 - standardized CLI messages format
-- fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed mutation in order sign methods
+- fixed `iexec wallet sweep` & `wallet.sweep()`
 - fixed method name `iexec.order.publishWorkerpoolorder()`
 - fixed method name `iexec.order.unpublishWorkerpoolorder()`
 
 ### Removed
 
 - [BREAKING] `aes-256-cbc` dataset encryption is removed, only `scone` encryption is supported (use `iexec dataset encrypt --algorithm scone`)
-
-## Unreleased V4
-
-### Added
-
-- `utils.decryptResult(encryptedResultFile, beneficiaryKey)` decrypt encrypted result with RSA beneficiary key
-- `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
-- `--watch` option added to `iexec deal show <dealid>` allow to watch execution status changes
-
-### Changed
-
-### Removed
 
 ## [4.0.3] 2020-02-27
 
