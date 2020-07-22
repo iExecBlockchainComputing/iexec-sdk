@@ -1,34 +1,31 @@
 const Debug = require('debug');
-const fetch = require('cross-fetch');
 const { Buffer } = require('buffer');
-const qs = require('query-string');
 const BN = require('bn.js');
-const Big = require('big.js');
 const JSZip = require('jszip');
 const NodeRSA = require('node-rsa');
 const aesjs = require('aes-js');
 const {
   getAddress,
-  bigNumberify,
   randomBytes,
-  formatEther,
-  parseEther,
+  formatUnits,
+  parseUnits,
 } = require('ethers').utils;
+const { BigNumber } = require('ethers');
 const multiaddr = require('multiaddr');
-const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
 const { ValidationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
 
+const NULL_BYTES = '0x';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
+const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
 const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
-const bnToEthersBn = bn => bigNumberify(bn.toString());
+const bnToEthersBn = bn => BigNumber.from(bn.toString());
 const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
 
 const stringify = (val) => {
@@ -54,37 +51,56 @@ const stringify = (val) => {
 
 const formatRLC = (nRLC) => {
   try {
-    Big.NE = -10;
-    Big.PE = 10;
-    return new Big(stringify(nRLC)).times(new Big(10).pow(-9)).toString();
+    return formatUnits(stringify(nRLC), 9);
   } catch (error) {
     debug('formatRLC()', error);
     throw Error('Invalid nRLC');
   }
 };
 
-const parseRLC = (rlc) => {
+const parseRLC = (value, defaultUnit = 'RLC') => {
+  const [amount, inputUnit] = stringify(value).split(' ');
+  const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
+  let pow;
+  if (unit === 'RLC') {
+    pow = 9;
+  } else if (unit === 'nRLC') {
+    pow = 0;
+  } else {
+    throw Error('Invalid token unit');
+  }
   try {
-    Big.NE = -10;
-    Big.PE = 18;
-    const rlcAmount = new Big(stringify(rlc));
-    return new BN(rlcAmount.times(new Big(10).pow(9)).toString());
+    return ethersBnToBn(parseUnits(amount, pow));
   } catch (error) {
     debug('parseRLC()', error);
-    throw Error('Invalid rlcString');
+    throw Error('Invalid token amount');
   }
 };
 
 const formatEth = (wei) => {
   try {
-    return formatEther(bigNumberify(stringify(wei)));
+    return formatUnits(BigNumber.from(stringify(wei)));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid wei');
   }
 };
 
-const parseEth = ether => ethersBnToBn(parseEther(stringify(ether)));
+const parseEth = (value, defaultUnit = 'ether') => {
+  const [amount, inputUnit] = stringify(value).split(' ');
+  const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
+  if (
+    !['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'].includes(unit)
+  ) {
+    throw Error('Invalid ether unit');
+  }
+  try {
+    return ethersBnToBn(parseUnits(amount, unit));
+  } catch (error) {
+    debug('formatEth()', error);
+    throw Error('Invalid ether amount');
+  }
+};
 
 const truncateBnWeiToBnNRlc = (bnWei) => {
   const weiString = bnWei.toString();
@@ -181,17 +197,18 @@ const checkEvent = (eventName, events) => {
 };
 
 const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
-  let eventFound = {};
+  let eventFound;
   events.forEach((event) => {
     if (event.event === eventName) {
       eventFound = event;
     }
   });
-  if (!eventFound && strict) throw new Error(`Unknown event ${eventName}`);
+  if (!eventFound) {
+    if (strict) throw new Error(`Unknown event ${eventName}`);
+    return {};
+  }
   return eventFound;
 };
-
-const toUpperFirst = str => ''.concat(str[0].toUpperCase(), str.substr(1));
 
 const secToDate = (secs) => {
   const t = new Date(1970, 0, 1);
@@ -199,148 +216,11 @@ const secToDate = (secs) => {
   return t;
 };
 
-const API_URL = 'https://gateway.iex.ec/';
-
-const makeBody = (verb, body) => {
-  if (verb === 'GET') return {};
-  return { body: JSON.stringify(body) };
-};
-
-const makeQueryString = (verb, body) => {
-  if (verb === 'GET' && Object.keys(body).length !== 0) {
-    return '?'.concat(qs.stringify(body));
-  }
-  return '';
-};
-
-const httpRequest = verb => async (
-  endpoint,
-  body = {},
-  optionalHeaders = {},
-  api = API_URL,
-) => {
-  const baseURL = api;
-  const queryString = makeQueryString(verb, body);
-  const url = baseURL.concat(endpoint, queryString);
-  const headers = Object.assign(
-    {
-      Accept: 'application/json',
-      'content-type': 'application/json',
-    },
-    optionalHeaders,
-  );
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      makeBody(verb, body),
-    ),
-  );
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.indexOf('application/json') !== -1) {
-    const json = await response.json();
-    if (json.error) throw new Error(json.error);
-    if (response.status === 200 && json) return json;
-  } else {
-    throw new Error('The http response is not of JSON type');
-  }
-  throw new Error('API call error');
-};
-
-const download = verb => async (
-  endpoint,
-  body = {},
-  optionalHeaders = {},
-  api = API_URL,
-) => {
-  const baseURL = api;
-  const queryString = makeQueryString(verb, body);
-  const url = baseURL.concat(endpoint, queryString);
-  const headers = Object.assign(
-    {
-      Accept: ['application/zip'],
-      'content-type': 'application/json',
-    },
-    optionalHeaders,
-  );
-  const response = await fetch(
-    url,
-    Object.assign(
-      {
-        method: verb,
-        headers,
-      },
-      makeBody(verb, body),
-    ),
-  );
-  if (!response.ok) {
-    throw Error(
-      `API call error: ${response.status} ${
-        response.statusText ? response.statusText : ''
-      }`,
-    );
-  }
-  return response;
-};
-
-const signTypedDatav3 = async (eth, address, typedData) => {
-  const signTDv3 = td => eth.send('eth_signTypedData_v3', [address, JSON.stringify(td)]);
-  const sign = await wrapSignTypedDataV3(signTDv3(typedData));
-  return sign;
-};
-
-const getAuthorization = async (
-  chainId,
-  address,
-  ethProvider,
-  { apiUrl = API_URL, challengeEndpoint = 'challenge' } = {},
-) => {
-  try {
-    const challenge = await httpRequest('GET')(
-      challengeEndpoint,
-      {
-        chainId,
-        address,
-      },
-      {},
-      apiUrl,
-    );
-    debug('challenge', challenge);
-    const typedData = challenge.data || challenge;
-    debug('typedData', typedData);
-    const sign = await signTypedDatav3(ethProvider, address, typedData);
-    debug('sign', sign);
-    const hash = hashEIP712(typedData);
-    debug('hash', hash);
-    const separator = '_';
-    const authorization = hash
-      .concat(separator)
-      .concat(sign)
-      .concat(separator)
-      .concat(address);
-    debug('authorization', authorization);
-    return authorization;
-  } catch (error) {
-    debug('getAuthorization()', error);
-    throw Error('Failed to get authorization');
-  }
-};
-
-const http = {
-  get: httpRequest('GET'),
-  post: httpRequest('POST'),
-};
-
 const getSalt = () => {
-  const hex = bigNumberify(randomBytes(32))
+  const hex = BigNumber.from(randomBytes(32))
     .toHexString()
     .substring(2);
-  const salt = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    .substr(0, 66 - hex.length)
-    .concat(hex);
+  const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
   return salt;
 };
 
@@ -354,7 +234,7 @@ const TAG_MAP = {
 const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
   tags.forEach((tag) => {
-    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`unknown tag ${tag}`);
+    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`Unknown tag ${tag}`);
     binaryTags[TAG_MAP[tag] - 1] = true;
   });
   const binString = binaryTags.reduce(
@@ -362,9 +242,7 @@ const encodeTag = (tags) => {
     '',
   );
   const hex = new BN(binString, 2).toString('hex');
-  const encodedTag = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    .substr(0, 66 - hex.length)
-    .concat(hex);
+  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
   return encodedTag;
 };
 
@@ -376,7 +254,7 @@ const decodeTag = (tag) => {
     const current = binString.charAt(binString.length - i);
     if (current === '1') {
       const currentTag = TAG_MAP[i];
-      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`unknown bit ${i}`);
+      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`Unknown bit ${i} in tag`);
       tags.push(currentTag);
     }
   }
@@ -384,9 +262,54 @@ const decodeTag = (tag) => {
 };
 
 const sumTags = (tagArray) => {
-  const summedTags = [];
-  tagArray.forEach(hexTag => summedTags.push(...decodeTag(hexTag)));
-  return encodeTag(summedTags);
+  const binStringArray = tagArray.map((hexTag) => {
+    if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+    return new BN(hexTag.substr(2), 'hex').toString(2);
+  });
+  let summedTagsBinString = '';
+  for (let i = 1; i < 256; i += 1) {
+    let currentBit = '0';
+    binStringArray.forEach((binString) => {
+      if (binString.charAt(binString.length - i) === '1') {
+        currentBit = '1';
+      }
+    });
+    summedTagsBinString = currentBit + summedTagsBinString;
+  }
+  const hex = new BN(summedTagsBinString, 2).toString('hex');
+  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
+  return encodedTag;
+};
+
+const findMissingBitsInTag = (tag, requiredTag) => {
+  debug('requiredTag', requiredTag);
+  debug('tag', tag);
+  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof requiredTag !== 'string' || !requiredTag.match(bytes32Regex)) throw new ValidationError('requiredTag must be bytes32 hex string');
+  const tagBinString = new BN(tag.substr(2), 'hex').toString(2);
+  const requiredTagBinString = new BN(requiredTag.substr(2), 'hex').toString(2);
+  const missingBits = [];
+  for (let i = 1; i <= requiredTagBinString.length; i += 1) {
+    if (
+      requiredTagBinString.charAt(requiredTagBinString.length - i) === '1'
+      && tagBinString.charAt(tagBinString.length - i) !== '1'
+    ) {
+      missingBits.push(i);
+    }
+  }
+  return missingBits;
+};
+
+const checkActiveBitInTag = (tag, bit) => {
+  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
+  const binString = new BN(tag.substr(2), 'hex').toString(2);
+  return binString.charAt(binString.length - bit) === '1';
+};
+
+const tagBitToHuman = (bit) => {
+  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
+  return TAG_MAP[bit] || bit;
 };
 
 const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
@@ -476,7 +399,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
           // remove pkcs7 padding
           const lastChunk = chunks[chunks.length - 1];
           const padding = lastChunk[lastChunk.length - 1];
-          if (!padding || padding > 16 || padding > lastChunk.length) throw Error('invalid padding');
+          if (!padding || padding > 16 || padding > lastChunk.length) throw Error('Invalid padding');
           const unpaddedChunk = lastChunk.slice(0, lastChunk.length - padding);
           chunks[chunks.length - 1] = unpaddedChunk;
           resolve(Buffer.concat(chunks));
@@ -506,28 +429,27 @@ module.exports = {
   getEventFromLogs,
   bnToEthersBn,
   ethersBnToBn,
-  ethersBigNumberify: bigNumberify,
   bnifyNestedEthersBn,
   stringifyNestedBn,
   multiaddrHexToHuman,
   humanToMultiaddrBuffer,
   utf8ToBuffer,
   hexToBuffer,
-  toUpperFirst,
   secToDate,
-  getAuthorization,
-  http,
-  download,
   getSalt,
+  NULL_BYTES,
   NULL_ADDRESS,
   NULL_BYTES32,
-  signTypedDatav3,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   encodeTag,
   decodeTag,
   sumTags,
+  findMissingBitsInTag,
+  checkActiveBitInTag,
+  tagBitToHuman,
   bytes32Regex,
+  addressRegex,
   sleep,
   FETCH_INTERVAL,
 };

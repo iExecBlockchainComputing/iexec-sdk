@@ -3,19 +3,94 @@ const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
 const {
-  validateChainsConf,
-  validateWalletConf,
-  validateAccountConf,
-  validateDeployedConf,
-} = require('iexec-schema-validator');
-const { prompt } = require('./cli-helper');
+  object, string, number, boolean, lazy,
+} = require('yup');
+const { addressSchema, chainIdSchema } = require('./validator');
+const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
 
 const debug = Debug('iexec:fs');
 
+const chainConfSchema = () => object({
+  id: chainIdSchema().required(),
+  host: string(),
+  hub: string(),
+  sms: string(),
+  resultProxy: string(),
+  ipfsGateway: string(),
+  iexecGateway: string(),
+  native: boolean(),
+  bridge: object({
+    bridgedChainId: chainIdSchema().required(),
+    contract: addressSchema().required(),
+  })
+    .notRequired()
+    .strict(),
+})
+  .noUnknown(true, 'Unknown key "${unknown}"')
+  .strict();
+
+const chainsConfSchema = () => object({
+  default: string(),
+  chains: object()
+    .test(async (chains) => {
+      await Promise.all(
+        Object.entries({ ...chains }).map(async ([name, chain]) => {
+          await string().validate(name, { strict: true });
+          await chainConfSchema().validate(chain, { strict: true });
+        }),
+      );
+      return true;
+    })
+    .required(),
+  providers: object({
+    alchemy: string().notRequired(),
+    etherscan: string().notRequired(),
+    infura: lazy((value) => {
+      switch (typeof value) {
+        case 'object':
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
+        default:
+          return string();
+      }
+    }),
+    quorum: number()
+      .integer()
+      .min(1)
+      .max(3)
+      .notRequired(),
+  })
+    .noUnknown(true, 'Unknown key "${unknown}" in providers')
+    .strict(),
+})
+  .noUnknown(true, 'Unknown key "${unknown}"')
+  .strict();
+
+const deployedObjSchema = () => object().test(async (obj) => {
+  await Promise.all(
+    Object.entries({ ...obj }).map(async ([chainId, address]) => {
+      await chainIdSchema().validate(chainId, { strict: true });
+      await addressSchema().validate(address, { strict: true });
+    }),
+  );
+  return true;
+});
+
+const deployedConfSchema = () => object({
+  app: deployedObjSchema().notRequired(),
+  dataset: deployedObjSchema().notRequired(),
+  workerpool: deployedObjSchema().notRequired(),
+})
+  .noUnknown(true, 'Unknown key "${unknown}"')
+  .strict();
+
 const IEXEC_FILE_NAME = 'iexec.json';
 const CHAIN_FILE_NAME = 'chain.json';
-const ACCOUNT_FILE_NAME = 'account.json';
 const WALLET_FILE_NAME = 'wallet.json';
 const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
@@ -89,7 +164,6 @@ const saveWalletConf = (obj, options) => saveWallet(obj, WALLET_FILE_NAME, optio
 const saveEncryptedWalletConf = (obj, options) => saveWallet(obj, ENCRYPTED_WALLET_FILE_NAME, options);
 
 const saveIExecConf = (obj, options) => saveJSONToFile(IEXEC_FILE_NAME, obj, options);
-const saveAccountConf = (obj, options) => saveJSONToFile(ACCOUNT_FILE_NAME, obj, options);
 const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
 const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
 const saveSignedOrders = (obj, options) => saveJSONToFile(ORDERS_FILE_NAME, obj, options);
@@ -111,19 +185,19 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
   try {
     debug('options', options);
     const file = await loadJSONFile(fileName, options);
-
-    if (options.validate) {
-      options.validate(file);
+    if (options.validationSchema) {
+      await options.validationSchema().validate(file, { strict: true });
       debug('valid', fileName);
     }
     return file;
   } catch (error) {
     debug('loadJSONAndRetry', error);
-
     if (error.code === 'ENOENT') {
       if (options.retry) return options.retry();
       throw new Error(
-        `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+        options.loadErrorMessage
+          ? options.loadErrorMessage(fileName)
+          : info.missingConfFile(fileName),
       );
     }
     throw new Error(`${error} in ${fileName}`);
@@ -134,40 +208,26 @@ const loadChainConf = options => loadJSONAndRetry(
   CHAIN_FILE_NAME,
   Object.assign(
     {
-      validate: validateChainsConf,
+      validationSchema: chainsConfSchema,
     },
     options,
   ),
 );
-const loadAccountConf = options => loadJSONAndRetry(
-  ACCOUNT_FILE_NAME,
-  Object.assign(
-    {
-      validate: validateAccountConf,
-    },
-    options,
-  ),
-);
-const loadWalletConf = options => loadJSONFile(
-  options.fileName || WALLET_FILE_NAME,
-  Object.assign(
-    {
-      validate: validateWalletConf,
-    },
-    options,
-  ),
-);
+const loadWalletConf = options => loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
 const loadEncryptedWalletConf = options => loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
 const loadDeployedConf = options => loadJSONAndRetry(
   DEPLOYED_FILE_NAME,
   Object.assign(
     {
-      validate: validateDeployedConf,
+      validationSchema: deployedConfSchema,
     },
     options,
   ),
 );
-const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, options);
+const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, {
+  ...options,
+  loadErrorMessage: info.missingSignedOrders,
+});
 
 const initIExecConf = async (options) => {
   const iexecConf = Object.assign(templates.main);
@@ -289,7 +349,7 @@ const zipDirectory = async (dirPath, { force = false } = {}) => {
               await fs.readFile(path.join(dirPath, relativePath)),
             );
           } else {
-            throw Error(`cannot zip ${pathArray}`);
+            throw Error(`Cannot zip ${pathArray}`);
           }
         }),
       );
@@ -319,7 +379,6 @@ const zipDirectory = async (dirPath, { force = false } = {}) => {
 module.exports = {
   saveTextToFile,
   saveJSONToFile,
-  saveAccountConf,
   saveWalletConf,
   saveEncryptedWalletConf,
   saveDeployedConf,
@@ -329,7 +388,6 @@ module.exports = {
   loadJSONAndRetry,
   loadIExecConf,
   loadChainConf,
-  loadAccountConf,
   loadWalletConf,
   loadEncryptedWalletConf,
   loadDeployedConf,
@@ -344,7 +402,6 @@ module.exports = {
   zipDirectory,
   IEXEC_FILE_NAME,
   CHAIN_FILE_NAME,
-  ACCOUNT_FILE_NAME,
   WALLET_FILE_NAME,
   ENCRYPTED_WALLET_FILE_NAME,
   DEPLOYED_FILE_NAME,

@@ -24,11 +24,14 @@ const {
   prompt,
   pretty,
   info,
+  getPropertyFormChain,
 } = require('./cli-helper');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { formatEth, NULL_ADDRESS } = require('./utils');
 
 const objName = 'wallet';
+
+cli.name('iexec wallet').usage('<command> [options]');
 
 const create = cli.command('create');
 addGlobalOptions(create);
@@ -46,7 +49,7 @@ create
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `Your wallet address is ${res.address}\nwallet saved in "${
+        `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
         { raw: res },
@@ -74,7 +77,7 @@ importPk
         Object.assign({}, { force }, walletOptions),
       );
       spinner.succeed(
-        `Your wallet address is ${res.address}\nwallet saved in "${
+        `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
         { raw: res },
@@ -141,7 +144,7 @@ show
       }
       if (!userWalletAddress && !address) throw Error('Missing address or wallet');
 
-      const chain = await loadChain(cmd.chain, keystore, { spinner });
+      const chain = await loadChain(cmd.chain, { spinner });
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
@@ -179,12 +182,13 @@ getEth
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
-      spinner.start(`requesting ETH from ${chain.name} faucets...`);
+      spinner.info(`Using wallet ${address}`);
+      spinner.start(`Requesting ETH from ${chain.name} faucets...`);
       const faucetsResponses = await wallet.getETH(chain.name, address);
       const responsesString = faucetsResponses.reduce(
         (accu, curr) => accu.concat(
@@ -216,12 +220,13 @@ getRlc
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner }),
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
-      spinner.start(`requesting ${chain.name} faucet for nRLC...`);
+      spinner.info(`Using wallet ${address}`);
+      spinner.start(`Requesting ${chain.name} faucet for nRLC...`);
       const faucetsResponses = await wallet.getRLC(chain.name, address);
       const responsesString = faucetsResponses.reduce(
         (accu, curr) => accu.concat(
@@ -248,8 +253,8 @@ addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sendETH())
   .action(async (amount, cmd) => {
     await checkUpdate(cmd);
@@ -258,18 +263,20 @@ sendETH
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
+
       const weiAmount = parseEther(amount).toString();
-      if (!cmd.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
         await prompt.transferETH(amount, chain.name, cmd.to, chain.id);
       }
 
       const message = `${amount} ${chain.name} ETH from ${address} to ${cmd.to}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const txHash = await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
@@ -290,8 +297,8 @@ addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sendRLC())
   .action(async (nRlcAmount, cmd) => {
     await checkUpdate(cmd);
@@ -300,19 +307,20 @@ sendRLC
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
 
-      if (!cmd.to) throw Error('missing --to option');
+      if (!cmd.to) throw Error('Missing --to option');
 
       if (!cmd.force) {
         await prompt.transferRLC(nRlcAmount, chain.name, cmd.to, chain.id);
       }
 
       const message = `${nRlcAmount} ${chain.name} nRLC from ${address} to ${cmd.to}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
 
       const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, cmd.to);
 
@@ -335,8 +343,8 @@ addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sweep())
   .action(async (cmd) => {
     await checkUpdate(cmd);
@@ -345,11 +353,12 @@ sweep
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
-      if (!cmd.to) throw Error('missing --to option');
+      await connectKeystore(chain, keystore, { txOptions });
+      if (!cmd.to) throw Error('Missing --to option');
       if (!cmd.force) {
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ETH and RLC')(
           chain.name,
@@ -357,7 +366,7 @@ sweep
           chain.id,
         );
       }
-      spinner.start('sweeping wallet...');
+      spinner.start('Sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
         chain.contracts,
         cmd.to,
@@ -396,21 +405,23 @@ bridgeToSidechain
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
-      const bridgeAddress = chain.bridge && chain.bridge.contract;
-      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = bridgeConf && bridgeConf.contract;
+      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!bridgedNetworkId) {
+      if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {
@@ -428,7 +439,7 @@ bridgeToSidechain
         && chain.bridgedNetwork.bridge.contract
       );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const { sendTxHash, receiveTxHash } = await wallet.bridgeToSidechain(
         chain.contracts,
         bridgeAddress,
@@ -443,8 +454,8 @@ bridgeToSidechain
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
           bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
         }`,
         {
           raw: {
@@ -476,21 +487,23 @@ bridgeToMainchain
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [{ address }, chain] = await Promise.all([
-        keystore.load(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(cmd.chain, { spinner }),
       ]);
+      await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
-      const bridgeAddress = chain.bridge && chain.bridge.contract;
-      const bridgedNetworkId = chain.bridge && chain.bridge.bridgedNetworkId;
+      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeAddress = bridgeConf && bridgeConf.contract;
+      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in chain.json for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!bridgedNetworkId) {
+      if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedNetworkId in chain.json for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!cmd.force) {
@@ -508,7 +521,7 @@ bridgeToMainchain
         && chain.bridgedNetwork.bridge.contract
       );
       const message = `${nRlcAmount} ${chain.name} nRLC to ${bridgeAddress}`;
-      spinner.start(`sending ${message}...`);
+      spinner.start(`Sending ${message}...`);
       const { sendTxHash, receiveTxHash } = await wallet.bridgeToMainchain(
         chain.contracts,
         bridgeAddress,
@@ -523,8 +536,8 @@ bridgeToMainchain
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
           bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedNetworkId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedNetworkId}`
+            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
+            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
         }`,
         {
           raw: {

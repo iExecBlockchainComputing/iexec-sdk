@@ -1,9 +1,11 @@
 const BN = require('bn.js');
+const { getDefaultProvider } = require('ethers');
+const { teePostComputeDefaults } = require('../src/secrets-utils');
 const {
   // throwIfMissing,
   // stringSchema,
   uint256Schema,
-  // addressSchema,
+  addressSchema,
   // bytes32Schema,
   // apporderSchema,
   // signedApporderSchema,
@@ -14,6 +16,7 @@ const {
   // requestorderSchema,
   // signedRequestorderSchema,
   paramsSchema,
+  paramsInputFilesArraySchema,
   tagSchema,
   // chainIdSchema,
   // hexnumberSchema,
@@ -23,6 +26,7 @@ const {
   // datasetSchema,
   // categorySchema,
   // workerpoolSchema,
+  objParamsSchema,
   ValidationError,
 } = require('../src/validator');
 
@@ -198,22 +202,22 @@ describe('[uint256Schema]', () => {
   });
   test('throw with hex string', async () => {
     await expect(uint256Schema().validate('0x01')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('0x01 is not a valid uint256'),
     );
   });
   test('throw with negative int', async () => {
     await expect(uint256Schema().validate(-1)).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(uint256Schema().validate('-1')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with invalid string', async () => {
     await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
-      new ValidationError('this must be a number'),
+      new ValidationError('0xfg is not a valid uint256'),
     );
   });
 });
@@ -243,6 +247,291 @@ describe('[paramsSchema]', () => {
   });
   test('number', async () => {
     await expect(paramsSchema().validate(42)).resolves.toBe('42');
+  });
+});
+
+describe('[paramsInputFilesArraySchema]', () => {
+  test('array of URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate([
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ]),
+    ).resolves.toEqual([
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+    ]);
+  });
+  test('string comma separated list of URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate(
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf,https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ),
+    ).resolves.toEqual([
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+    ]);
+  });
+  test('empty string', async () => {
+    await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
+      new ValidationError('"" is not a valid URL'),
+    );
+  });
+  test('string invalid URL', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate('example.com/foo.txt'),
+    ).rejects.toThrow(
+      new ValidationError('"example.com/foo.txt" is not a valid URL'),
+    );
+  });
+  test('empty array', async () => {
+    await expect(paramsInputFilesArraySchema().validate([])).resolves.toEqual(
+      [],
+    );
+  });
+  test('undefined', async () => {
+    await expect(
+      paramsInputFilesArraySchema().validate(undefined),
+    ).resolves.toEqual(undefined);
+  });
+});
+
+describe('[objParamsSchema]', () => {
+  test('empty object', async () => {
+    await expect(objParamsSchema().validate({})).rejects.toThrow(
+      new ValidationError(
+        'iexec_result_storage_proxy is required field with "ipfs" storage',
+      ),
+    );
+  });
+
+  test('empty object with resultProxyURL in context', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {},
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('dropbox not supported for non-tee', async () => {
+    await expect(
+      objParamsSchema().validate({ iexec_result_storage_provider: 'dropbox' }),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_result_storage_provider "dropbox" is not supported for non TEE tasks use supported storage provider ipfs',
+      ),
+    );
+  });
+
+  test('dropbox supported with isTee context', async () => {
+    await expect(
+      objParamsSchema().validate(
+        { iexec_result_storage_provider: 'dropbox' },
+        { context: { isTee: true } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_storage_provider: 'dropbox',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('unsupported provider with isTee context', async () => {
+    await expect(
+      objParamsSchema().validate(
+        { iexec_result_storage_provider: 'foo' },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_result_storage_provider "foo" is not supported for TEE tasks use one of supported storage providers (ipfs, dropbox)',
+      ),
+    );
+  });
+
+  test('with iexec_args', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_args: 'test',
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_args: 'test',
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('with iexec_input_files', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_input_files: [
+            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+          ],
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_input_files: [
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ],
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('with iexec_input_files (bad url)', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_input_files: [
+            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+            'https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+          ],
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_input_files[1] https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf is not a valid URL',
+      ),
+    );
+  });
+
+  test('with custom tee config', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
+          iexec_tee_post_compute_image: 'custom-image',
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
+      iexec_tee_post_compute_image: 'custom-image',
+    });
+  });
+
+  test('with custom result-proxy', async () => {
+    await expect(
+      objParamsSchema().validate({
+        iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
+      }),
+    ).resolves.toEqual({
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('with encryption (true)', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_result_encryption: true,
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_encryption: true,
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test("with encryption ('true')", async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_result_encryption: 'true',
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_encryption: true,
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test("with encryption ('foo')", async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_result_encryption: 'foo',
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_result_encryption must be a `boolean` type, but the final value was: `"foo"`.',
+      ),
+    );
+  });
+
+  test('with logger (true)', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_developer_logger: true,
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_developer_logger: true,
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('with isCallback in context, do not populate storage', async () => {
+    await expect(
+      objParamsSchema().validate({}, { context: { isCallback: true } }),
+    ).resolves.toEqual({
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
+  });
+
+  test('strip enexpected key', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          foo: true,
+        },
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
+    ).resolves.toEqual({
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
+      iexec_tee_post_compute_image: teePostComputeDefaults.image,
+    });
   });
 });
 
@@ -281,13 +570,70 @@ describe('[tagSchema]', () => {
     );
   });
   test('unknown tag in array', async () => {
-    await expect(tagSchema().validate(['foo'])).rejects.toThrow(
-      new ValidationError('invalid tag: unknown tag foo'),
+    await expect(tagSchema().validate(['tee', 'foo'])).rejects.toThrow(
+      new ValidationError('tee,foo is not a valid tag. Unknown tag foo'),
     );
   });
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
-      new ValidationError('invalid tag: unknown tag foo'),
+      new ValidationError('foo is not a valid tag. Unknown tag foo'),
+    );
+  });
+});
+
+describe('[addressSchema]', () => {
+  test('address', async () => {
+    await expect(
+      addressSchema().validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address 0x stripped', async () => {
+    await expect(
+      addressSchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address (with ethProvider)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('invalid address', async () => {
+    await expect(
+      addressSchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375'),
+    ).rejects.toThrow(
+      new ValidationError(
+        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
+      ),
+    );
+  });
+  test('address undefined (throw)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(undefined),
+    ).rejects.toThrow(
+      new ValidationError('undefined is not a valid ethereum address'),
+    );
+  });
+  test('ens (resolve ENS with ethProvider)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        'rlc.iexec.eth',
+      ),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('invalid ens (throw when ethProvider is missing)', async () => {
+    await expect(
+      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+        'pierre.iexec.eth',
+      ),
+    ).rejects.toThrow(
+      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
+    );
+  });
+  test('ens (throw when ethProvider is missing)', async () => {
+    await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
+      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });

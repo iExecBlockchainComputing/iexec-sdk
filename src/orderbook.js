@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { http } = require('./utils');
+const { jsonApi } = require('./api-utils');
 const {
   addressSchema,
   chainIdSchema,
@@ -13,33 +13,64 @@ const {
 const debug = Debug('iexec:orderbook');
 
 const fetchAppOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   {
-    minVolume, skip, dataset, workerpool, requester,
+    minVolume, skip, dataset, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
+  debug({
+    minVolume,
+    skip,
+    dataset,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+  });
   try {
-    const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
-      { app: await addressSchema().validate(appAddress) },
+    const query = Object.assign(
+      {},
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
+      {
+        app: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(appAddress),
+      },
       dataset && {
-        dataset: await addressSchema().validate(dataset),
+        dataset: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(dataset),
       },
       workerpool && {
-        workerpool: await addressSchema().validate(workerpool),
+        workerpool: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(workerpool),
       },
       requester && {
-        requester: await addressSchema().validate(requester),
+        requester: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(requester),
       },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
+      },
+      minTag && {
+        minTag: await tagSchema().validate(minTag),
+      },
+      maxTag && {
+        maxTag: await tagSchema().validate(maxTag),
       },
       skip && {
         skip: await positiveIntSchema().validate(skip),
       },
     );
-    const response = await http.get('orderbook/app', body);
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/orderbook/app',
+      query,
+    });
     if (response.ok) return { count: response.count, appOrders: response.appOrderbook };
     throw Error('An error occured while getting orderbook');
   } catch (error) {
@@ -49,33 +80,55 @@ const fetchAppOrderbook = async (
 };
 
 const fetchDatasetOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
   {
-    minVolume, skip, app, workerpool, requester,
+    minVolume, skip, app, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
   try {
-    const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
-      { dataset: await addressSchema().validate(datasetAddress) },
+    const query = Object.assign(
+      {},
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
+      {
+        dataset: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(datasetAddress),
+      },
       app && {
-        app: await addressSchema().validate(app),
+        app: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(app),
       },
       workerpool && {
-        workerpool: await addressSchema().validate(workerpool),
+        workerpool: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(workerpool),
       },
       requester && {
-        requester: await addressSchema().validate(requester),
+        requester: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(requester),
       },
       minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
+      },
+      minTag && {
+        minTag: await tagSchema().validate(minTag),
+      },
+      maxTag && {
+        maxTag: await tagSchema().validate(maxTag),
       },
       skip && {
         skip: await positiveIntSchema().validate(skip),
       },
     );
-    const response = await http.get('orderbook/dataset', body);
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/orderbook/dataset',
+      query,
+    });
     if (response.ok) {
       return {
         count: response.count,
@@ -90,25 +143,30 @@ const fetchDatasetOrderbook = async (
 };
 
 const fetchWorkerpoolOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
     workerpoolAddress, minTag, signerAddress, minTrust, minVolume, skip,
   } = {},
 ) => {
   try {
-    const body = Object.assign(
+    const query = Object.assign(
       {},
-      { chainId: await chainIdSchema().validate(chainId) },
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
       { category: await uint256Schema().validate(category) },
       workerpoolAddress && {
-        workerpool: await addressSchema().validate(workerpoolAddress),
+        workerpool: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(workerpoolAddress),
       },
       minTag && {
         minTag: await tagSchema().validate(minTag),
       },
       signerAddress && {
-        signer: await addressSchema().validate(signerAddress),
+        signer: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(signerAddress),
       },
       minTrust && {
         minTrust: await positiveIntSchema().validate(minTrust),
@@ -120,7 +178,11 @@ const fetchWorkerpoolOrderbook = async (
         skip: await positiveIntSchema().validate(skip),
       },
     );
-    const response = await http.get('orderbook/workerpool', body);
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/orderbook/workerpool',
+      query,
+    });
     if (response.ok) {
       return {
         count: response.count,
@@ -136,7 +198,8 @@ const fetchWorkerpoolOrderbook = async (
 };
 
 const fetchRequestOrderbook = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
     requesterAddress,
@@ -148,14 +211,19 @@ const fetchRequestOrderbook = async (
   } = {},
 ) => {
   try {
-    const body = Object.assign(
-      { chainId: await chainIdSchema().validate(chainId) },
+    const query = Object.assign(
+      {},
+      { chainId: await chainIdSchema().validate(contracts.chainId) },
       { category: await uint256Schema().validate(category) },
       requesterAddress && {
-        requester: await addressSchema().validate(requesterAddress),
+        requester: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(requesterAddress),
       },
       beneficiaryAddress && {
-        beneficiary: await addressSchema().validate(beneficiaryAddress),
+        beneficiary: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(beneficiaryAddress),
       },
       maxTag && {
         maxTag: await tagSchema().validate(maxTag),
@@ -170,7 +238,11 @@ const fetchRequestOrderbook = async (
         skip: await positiveIntSchema().validate(skip),
       },
     );
-    const response = await http.get('orderbook/request', body);
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/orderbook/request',
+      query,
+    });
     if (response.ok) {
       return {
         count: response.count,

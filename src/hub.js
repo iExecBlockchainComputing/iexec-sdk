@@ -1,12 +1,13 @@
 const Debug = require('debug');
 const {
-  toUpperFirst,
   ethersBnToBn,
   checksummedAddress,
   bnifyNestedEthersBn,
   multiaddrHexToHuman,
   getEventFromLogs,
   hexToBuffer,
+  NULL_ADDRESS,
+  BN,
 } = require('./utils');
 const {
   addressSchema,
@@ -18,11 +19,21 @@ const {
   throwIfMissing,
   ValidationError,
 } = require('./validator');
+const { ObjectNotFoundError } = require('./errors');
 const { wrapCall, wrapSend } = require('./errorWrappers');
 
 const debug = Debug('iexec:hub');
 
 const RESOURCE_NAMES = ['app', 'dataset', 'workerpool'];
+
+const tokenIdToAddress = (tokenId) => {
+  const hexTokenId = tokenId.toHexString().substring(2);
+  const lowerCaseAddress = NULL_ADDRESS.substr(
+    0,
+    42 - hexTokenId.length,
+  ).concat(hexTokenId);
+  return checksummedAddress(lowerCaseAddress);
+};
 
 const createObj = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
@@ -30,14 +41,11 @@ const createObj = (objName = throwIfMissing()) => async (
 ) => {
   try {
     const txReceipt = await wrapSend(contracts.createObj(objName)(obj));
-    const event = getEventFromLogs(
-      'Create'.concat(toUpperFirst(objName)),
-      txReceipt.events,
-      {
-        strict: true,
-      },
-    );
-    const address = checksummedAddress(event.args[objName]);
+    const event = getEventFromLogs('Transfer', txReceipt.events, {
+      strict: true,
+    });
+    const { tokenId } = event.args;
+    const address = tokenIdToAddress(tokenId);
     const txHash = txReceipt.transactionHash;
     return { address, txHash };
   } catch (error) {
@@ -46,11 +54,66 @@ const createObj = (objName = throwIfMissing()) => async (
   }
 };
 
-const deployApp = async (contracts, app) => createObj('app')(contracts, await appSchema().validate(app));
-const deployDataset = async (contracts, dataset) => createObj('dataset')(contracts, await datasetSchema().validate(dataset));
+const deployApp = async (contracts, app) => createObj('app')(
+  contracts,
+  await appSchema({ ethProvider: contracts.provider }).validate(app),
+);
+const deployDataset = async (contracts, dataset) => createObj('dataset')(
+  contracts,
+  await datasetSchema({ ethProvider: contracts.provider }).validate(
+    dataset,
+  ),
+);
 const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool')(
   contracts,
-  await workerpoolSchema().validate(workerpool),
+  await workerpoolSchema({ ethProvider: contracts.provider }).validate(
+    workerpool,
+  ),
+);
+
+const checkDeployedObj = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const isDeployed = await wrapCall(
+      contracts.checkDeployedObj(objName)(address, { strict: false }),
+    );
+    return isDeployed;
+  } catch (error) {
+    debug('checkDeployedObj()', error);
+    throw error;
+  }
+};
+
+const checkDeployedApp = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => checkDeployedObj('app')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
+);
+
+const checkDeployedDataset = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => checkDeployedObj('dataset')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
+);
+
+const checkDeployedWorkerpool = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => checkDeployedObj('workerpool')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
 );
 
 const showObjByAddress = (objName = throwIfMissing()) => async (
@@ -58,15 +121,66 @@ const showObjByAddress = (objName = throwIfMissing()) => async (
   objAddress = throwIfMissing(),
 ) => {
   try {
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(objAddress);
+    const isDeployed = await checkDeployedObj(objName)(contracts, objAddress);
+    if (!isDeployed) throw new ObjectNotFoundError(objName, objAddress, contracts.chainId);
     const obj = bnifyNestedEthersBn(
-      await wrapCall(contracts.getObjProps(objName)(objAddress)),
+      await wrapCall(contracts.getObjProps(objName)(vAddress)),
     );
-    return { obj, objAddress };
+    return { obj, objAddress: vAddress };
   } catch (error) {
     debug('showObjByAddress()', error);
     throw error;
   }
 };
+
+const countObj = (objName = throwIfMissing()) => async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => {
+  try {
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(userAddress);
+    const objCountBN = ethersBnToBn(
+      await wrapCall(contracts.getUserObjCount(objName)(vAddress)),
+    );
+    return objCountBN;
+  } catch (error) {
+    debug('countObj()', error);
+    throw error;
+  }
+};
+
+const countUserApps = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('app')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    userAddress,
+  ),
+);
+const countUserDatasets = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('dataset')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    userAddress,
+  ),
+);
+const countUserWorkerpools = async (
+  contracts = throwIfMissing(),
+  userAddress = throwIfMissing(),
+) => countObj('workerpool')(
+  contracts,
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    userAddress,
+  ),
+);
 
 const showObjByIndex = (objName = throwIfMissing()) => async (
   contracts = throwIfMissing(),
@@ -74,9 +188,16 @@ const showObjByIndex = (objName = throwIfMissing()) => async (
   userAddress = throwIfMissing(),
 ) => {
   try {
-    const objAddress = await wrapCall(
-      contracts.getUserObjAddressByIndex(objName)(userAddress, objIndex),
+    const vIndex = await uint256Schema().validate(objIndex);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(userAddress);
+    const totalObj = await countObj(objName)(contracts, userAddress);
+    if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
+    const tokenId = await wrapCall(
+      contracts.getUserObjIdByIndex(objName)(vAddress, vIndex),
     );
+    const objAddress = tokenIdToAddress(tokenId);
     return showObjByAddress(objName)(contracts, objAddress);
   } catch (error) {
     debug('showObjByIndex()', error);
@@ -92,24 +213,27 @@ const cleanObj = (obj) => {
   return Object.entries(obj).reduce(reducer, {});
 };
 
+const cleanApp = obj => Object.assign(
+  cleanObj(obj),
+  obj.m_appMultiaddr && {
+    appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
+  },
+  obj.m_appMREnclave && {
+    appMREnclave: hexToBuffer(obj.m_appMREnclave).toString(),
+  },
+);
+
 const showApp = async (
   contracts = throwIfMissing(),
   appAddress = throwIfMissing(),
 ) => {
   const { obj, objAddress } = await showObjByAddress('app')(
     contracts,
-    await addressSchema().validate(appAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      appAddress,
+    ),
   );
-  const clean = Object.assign(
-    cleanObj(obj),
-    obj.m_appMultiaddr && {
-      appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
-    },
-    obj.m_appMREnclave && {
-      appMREnclave: hexToBuffer(obj.m_appMREnclave).toString(),
-    },
-  );
-  return { objAddress, app: clean };
+  return { objAddress, app: cleanApp(obj) };
 };
 
 const showUserApp = async (
@@ -120,15 +244,11 @@ const showUserApp = async (
   const { obj, objAddress } = await showObjByIndex('app')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema().validate(userAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      userAddress,
+    ),
   );
-  const clean = Object.assign(
-    cleanObj(obj),
-    obj.m_appMultiaddr && {
-      appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
-    },
-  );
-  return { objAddress, app: clean };
+  return { objAddress, app: cleanApp(obj) };
 };
 
 const showDataset = async (
@@ -137,7 +257,9 @@ const showDataset = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress('dataset')(
     contracts,
-    await addressSchema().validate(datasetAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      datasetAddress,
+    ),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -156,7 +278,9 @@ const showUserDataset = async (
   const { obj, objAddress } = await showObjByIndex('dataset')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema().validate(userAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      userAddress,
+    ),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -173,7 +297,9 @@ const showWorkerpool = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress('workerpool')(
     contracts,
-    await addressSchema().validate(workerpoolAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      workerpoolAddress,
+    ),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -187,42 +313,13 @@ const showUserWorkerpool = async (
   const { obj, objAddress } = await showObjByIndex('workerpool')(
     contracts,
     await uint256Schema().validate(index),
-    await addressSchema().validate(userAddress),
+    await addressSchema({ ethProvider: contracts.provider }).validate(
+      userAddress,
+    ),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
 };
-
-const countObj = (objName = throwIfMissing()) => async (
-  contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
-) => {
-  try {
-    const objCountBN = ethersBnToBn(
-      await wrapCall(contracts.getUserObjCount(objName)(userAddress)),
-    );
-    return objCountBN;
-  } catch (error) {
-    debug('countObj()', error);
-    throw error;
-  }
-};
-
-const countUserApps = async (
-  contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
-) => countObj('app')(contracts, await addressSchema().validate(userAddress));
-const countUserDatasets = async (
-  contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
-) => countObj('dataset')(contracts, await addressSchema().validate(userAddress));
-const countUserWorkerpools = async (
-  contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
-) => countObj('workerpool')(
-  contracts,
-  await addressSchema().validate(userAddress),
-);
 
 const createCategory = async (
   contracts = throwIfMissing(),
@@ -263,7 +360,7 @@ const showCategory = async (
 const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
-      await wrapCall(contracts.getHubContract().countCategory()),
+      await wrapCall(contracts.getIExecContract().countCategory()),
     );
     return countBN;
   } catch (error) {
@@ -274,54 +371,6 @@ const countCategory = async (contracts = throwIfMissing()) => {
 
 const checkResourceName = (type) => {
   if (!RESOURCE_NAMES.includes(type)) throw new ValidationError(`Invalid resource name ${type}`);
-};
-
-const checkDeployedApp = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
-  try {
-    const at = await addressSchema().validate(address);
-    const isDeployed = await wrapCall(
-      contracts.checkDeployedApp(at, { strict: false }),
-    );
-    return isDeployed;
-  } catch (error) {
-    debug('checkDeployedApp()', error);
-    throw error;
-  }
-};
-
-const checkDeployedDataset = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
-  try {
-    const at = await addressSchema().validate(address);
-    const isDeployed = await wrapCall(
-      contracts.checkDeployedDataset(at, { strict: false }),
-    );
-    return isDeployed;
-  } catch (error) {
-    debug('checkDeployedDataset()', error);
-    throw error;
-  }
-};
-
-const checkDeployedWorkerpool = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
-  try {
-    const at = await addressSchema().validate(address);
-    const isDeployed = await wrapCall(
-      contracts.checkDeployedWorkerpool(at, { strict: false }),
-    );
-    return isDeployed;
-  } catch (error) {
-    debug('checkDeployedApp()', error);
-    throw error;
-  }
 };
 
 const getOwner = async (
@@ -345,22 +394,40 @@ const getOwner = async (
 const getAppOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'app', await addressSchema().validate(address));
+) => getOwner(
+  contracts,
+  'app',
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
+);
 
 const getDatasetOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'dataset', await addressSchema().validate(address));
+) => getOwner(
+  contracts,
+  'dataset',
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
+);
 
 const getWorkerpoolOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-) => getOwner(contracts, 'workerpool', await addressSchema().validate(address));
+) => getOwner(
+  contracts,
+  'workerpool',
+  await addressSchema({ ethProvider: contracts.provider }).validate(
+    address,
+  ),
+);
 
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
-      await wrapCall(contracts.getHubContract().FINAL_DEADLINE_RATIO()),
+      await wrapCall(contracts.getIExecContract().final_deadline_ratio()),
     );
     return timeoutRatio;
   } catch (error) {

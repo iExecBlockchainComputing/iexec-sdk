@@ -17,10 +17,12 @@ const {
   info,
 } = require('./cli-helper');
 const { loadIExecConf, initObj } = require('./fs');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const { Keystore } = require('./keystore');
 
 const objName = 'category';
+
+cli.name('iexec category').usage('<command> [options]');
 
 const init = cli.command('init');
 addGlobalOptions(init);
@@ -56,14 +58,14 @@ create
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(cmd.chain, { spinner }),
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.creating('category'));
       const { catid, txHash } = await hub.createCategory(
         chain.contracts,
@@ -86,7 +88,7 @@ show
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       spinner.start(info.showing('category'));
@@ -110,7 +112,7 @@ count
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       spinner.start(info.counting('category'));

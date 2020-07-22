@@ -21,7 +21,7 @@ const {
   privateKeyName,
 } = require('./cli-helper');
 const { Keystore } = require('./keystore');
-const { loadChain } = require('./chains.js');
+const { loadChain, connectKeystore } = require('./chains.js');
 const { stringifyNestedBn, decryptResult } = require('./utils');
 const taskModule = require('./task');
 const { obsTask } = require('./iexecProcess');
@@ -29,6 +29,8 @@ const { fetchTaskResults } = require('./iexecProcess');
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
+
+cli.name('iexec task').usage('<command> [options]');
 
 const show = cli.command('show <taskid>');
 addGlobalOptions(show);
@@ -49,11 +51,11 @@ show
       const keystore = Keystore(
         Object.assign(walletOptions, !cmd.download && { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, keystore, {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (cmd.download) {
-        await keystore.load();
+        await connectKeystore(chain, keystore);
       }
 
       debug('cmd.watch', cmd.watch);
@@ -104,7 +106,7 @@ show
             const exists = await fs.pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
-                "Beneficiary secrets folder is missing did you forget to run 'iexec results generate-keys'?",
+                'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
             let beneficiaryKeyPath;
@@ -186,13 +188,12 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = computeTxOptions(cmd);
-      const [chain] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
-        keystore.load(),
-      ]);
+      const chain = await loadChain(cmd.chain, { spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+
       spinner.start(info.claiming(objName));
       const txHash = await taskModule.claim(chain.contracts, taskid);
-      spinner.succeed(`${objName} successfully claimed`, { raw: { txHash } });
+      spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, cmd);
     }

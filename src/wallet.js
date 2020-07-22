@@ -1,12 +1,10 @@
 const Debug = require('debug');
 const fetch = require('cross-fetch');
 const BN = require('bn.js');
-const { Contract } = require('ethers');
-const { Interface } = require('ethers').utils;
+const { Contract, BigNumber } = require('ethers');
 const {
   ethersBnToBn,
   bnToEthersBn,
-  ethersBigNumberify,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   checksummedAddress,
@@ -73,9 +71,8 @@ const ethFaucets = [
 ];
 
 const getAddress = async (contracts = throwIfMissing()) => {
-  const address = await wrapCall(
-    contracts.jsonRpcProvider.getSigner().getAddress(),
-  );
+  if (!contracts.signer) throw Error('Missing Signer');
+  const address = await wrapCall(contracts.signer.getAddress());
   return checksummedAddress(address);
 };
 
@@ -84,9 +81,11 @@ const checkBalances = async (
   address = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(address);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(address);
     const { isNative } = contracts;
-    const getETH = () => contracts.jsonRpcProvider.getBalance(vAddress);
+    const getETH = () => contracts.provider.getBalance(vAddress);
     const balances = {};
     if (isNative) {
       const weiBalance = await getETH();
@@ -191,12 +190,14 @@ const sendNativeToken = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(to);
     const vValue = await uint256Schema().validate(value);
-    const hexValue = ethersBigNumberify(vValue).toHexString();
-    const ethSigner = contracts.jsonRpcProvider.getSigner();
+    const hexValue = BigNumber.from(vValue).toHexString();
+    if (!contracts.signer) throw Error('Missing Signer');
     const tx = await wrapSend(
-      ethSigner.sendTransaction({
+      contracts.signer.sendTransaction({
         data: '0x',
         to: vAddress,
         value: hexValue,
@@ -217,7 +218,9 @@ const sendERC20 = async (
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
-  const vAddress = await addressSchema().validate(to);
+  const vAddress = await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(to);
   const vAmount = await uint256Schema().validate(nRlcAmount);
   try {
     const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
@@ -239,7 +242,9 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(to);
     const vValue = await uint256Schema().validate(value);
     if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     const txHash = await sendNativeToken(contracts, vValue, vAddress);
@@ -256,7 +261,9 @@ const sendRLC = async (
   to = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(to);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(to);
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) {
       debug('send native token');
@@ -275,9 +282,11 @@ const sendRLC = async (
 
 const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
-    const vAddressTo = await addressSchema().validate(to);
+    const vAddressTo = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(to);
     const userAddress = await getAddress(contracts);
-    const code = await contracts.jsonRpcProvider.getCode(vAddressTo);
+    const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
     }
@@ -303,9 +312,9 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         balances = await checkBalances(contracts, userAddress);
       }
     }
-    const gasPrice = new BN(
-      (await contracts.jsonRpcProvider.getGasPrice()).toString(),
-    );
+    const gasPrice = contracts.txOptions && contracts.txOptions.gasPrice
+      ? ethersBnToBn(BigNumber.from(contracts.txOptions.gasPrice))
+      : ethersBnToBn(await contracts.provider.getGasPrice());
     const gasLimit = new BN(21000);
     const txFee = gasPrice.mul(gasLimit);
     const sweepNative = balances.wei.sub(txFee);
@@ -344,9 +353,13 @@ const bridgeToSidechain = async (
   let sendTxHash;
   let receiveTxHash;
   try {
-    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vBridgeAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(bridgeAddress);
     const vSidechainBridgeAddress = sidechainBridgeAddress
-      ? await addressSchema().validate(sidechainBridgeAddress)
+      ? await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(sidechainBridgeAddress)
       : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
@@ -354,7 +367,7 @@ const bridgeToSidechain = async (
     const ercBridgeContract = new Contract(
       vBridgeAddress,
       foreignBridgeErcToNativeDesc.abi,
-      contracts.jsonRpcProvider,
+      contracts.provider,
     );
     const [minPerTx, maxPerTx, currentDay, dailyLimit] = await Promise.all([
       wrapCall(ercBridgeContract.minPerTx()),
@@ -376,11 +389,11 @@ const bridgeToSidechain = async (
     const dayStartTimestamp = currentDay.toNumber() * (60 * 60 * 24);
     debug('dayStartTimestamp', dayStartTimestamp);
     const currentBlockNumber = await wrapCall(
-      contracts.jsonRpcProvider.getBlockNumber(),
+      contracts.provider.getBlockNumber(),
     );
     debug('currentBlockNumber', currentBlockNumber);
     const currentBlock = await wrapCall(
-      contracts.jsonRpcProvider.getBlock(currentBlockNumber),
+      contracts.provider.getBlock(currentBlockNumber),
     );
     const findBlockNumberByTimestamp = async (
       lastTriedBlock,
@@ -389,7 +402,7 @@ const bridgeToSidechain = async (
     ) => {
       const triedBlockNumber = Math.max(lastTriedBlock.number - step, 0);
       const triedBlock = await wrapCall(
-        contracts.jsonRpcProvider.getBlock(triedBlockNumber),
+        contracts.provider.getBlock(triedBlockNumber),
       );
       const triedBlockTimestamp = triedBlock.timestamp;
       const remainingTime = triedBlockTimestamp - targetTimestamp;
@@ -427,7 +440,7 @@ const bridgeToSidechain = async (
     debug('startBlockNumber', startBlockNumber);
     const erc20Address = await contracts.fetchRLCAddress();
     const erc20conctract = contracts.getRLCContract({ at: erc20Address });
-    const transferLogs = await contracts.jsonRpcProvider.getLogs({
+    const transferLogs = await contracts.provider.getLogs({
       fromBlock: startBlockNumber,
       toBlock: 'latest',
       address: erc20Address,
@@ -435,24 +448,22 @@ const bridgeToSidechain = async (
         '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
       ],
     });
-    const erc20Interface = new Interface(erc20conctract.interface.abi);
+    const erc20Interface = erc20conctract.interface;
     let totalSpentPerDay = new BN(0);
     const processTransferLogs = async (logs, checkTimestamp = true) => {
       if (logs.length === 0) return;
       let isInvalidTimestamp = checkTimestamp;
       if (checkTimestamp) {
         const logTimestamp = (
-          await wrapCall(
-            contracts.jsonRpcProvider.getBlock(logs[0].blockNumber),
-          )
+          await wrapCall(contracts.provider.getBlock(logs[0].blockNumber))
         ).timestamp;
         isInvalidTimestamp = logTimestamp < dayStartTimestamp;
       }
       if (!isInvalidTimestamp) {
         const parsedLog = erc20Interface.parseLog(logs[0]);
-        if (parsedLog.values.to === vBridgeAddress) {
+        if (parsedLog.args.to === vBridgeAddress) {
           totalSpentPerDay = totalSpentPerDay.add(
-            ethersBnToBn(parsedLog.values.value),
+            ethersBnToBn(parsedLog.args.value),
           );
         }
       }
@@ -469,7 +480,7 @@ const bridgeToSidechain = async (
     }
 
     const sidechainBlockNumber = vSidechainBridgeAddress && bridgedContracts
-      ? await bridgedContracts.jsonRpcProvider.getBlockNumber()
+      ? await bridgedContracts.provider.getBlockNumber()
       : 0;
 
     sendTxHash = await sendRLC(contracts, vAmount, vBridgeAddress);
@@ -481,7 +492,7 @@ const bridgeToSidechain = async (
         const sidechainBridge = new Contract(
           vSidechainBridgeAddress,
           homeBridgeErcToNativeDesc.abi,
-          bridgedContracts.jsonRpcProvider,
+          bridgedContracts.provider,
         );
         const cleanListeners = () => sidechainBridge.removeAllListeners('AffirmationCompleted');
         try {
@@ -495,9 +506,7 @@ const bridgeToSidechain = async (
               }
             },
           );
-          bridgedContracts.jsonRpcProvider.resetEventsBlock(
-            sidechainBlockNumber,
-          );
+          bridgedContracts.provider.resetEventsBlock(sidechainBlockNumber);
           debug(`watching events from block ${sidechainBlockNumber}`);
         } catch (e) {
           cleanListeners();
@@ -524,9 +533,13 @@ const bridgeToMainchain = async (
   let sendTxHash;
   let receiveTxHash;
   try {
-    const vBridgeAddress = await addressSchema().validate(bridgeAddress);
+    const vBridgeAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(bridgeAddress);
     const vMainchainBridgeAddress = mainchainBridgeAddress
-      ? await addressSchema().validate(mainchainBridgeAddress)
+      ? await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(mainchainBridgeAddress)
       : undefined;
     const vAmount = await uint256Schema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
@@ -534,7 +547,7 @@ const bridgeToMainchain = async (
     const sidechainBridgeContract = new Contract(
       vBridgeAddress,
       homeBridgeErcToNativeDesc.abi,
-      contracts.jsonRpcProvider,
+      contracts.provider,
     );
 
     const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
@@ -588,7 +601,7 @@ const bridgeToMainchain = async (
     }
 
     const mainchainBlockNumber = vMainchainBridgeAddress && bridgedContracts
-      ? await wrapCall(bridgedContracts.jsonRpcProvider.getBlockNumber())
+      ? await wrapCall(bridgedContracts.provider.getBlockNumber())
       : 0;
 
     sendTxHash = await sendNativeToken(contracts, weiValue, vBridgeAddress);
@@ -600,7 +613,7 @@ const bridgeToMainchain = async (
         const mainchainBridge = new Contract(
           vMainchainBridgeAddress,
           foreignBridgeErcToNativeDesc.abi,
-          bridgedContracts.jsonRpcProvider,
+          bridgedContracts.provider,
         );
         const cleanListeners = () => mainchainBridge.removeAllListeners('RelayedMessage');
         try {
@@ -614,9 +627,7 @@ const bridgeToMainchain = async (
               }
             },
           );
-          bridgedContracts.jsonRpcProvider.resetEventsBlock(
-            mainchainBlockNumber,
-          );
+          bridgedContracts.provider.resetEventsBlock(mainchainBlockNumber);
           debug(`watching events from block ${mainchainBlockNumber}`);
         } catch (e) {
           cleanListeners();

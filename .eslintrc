@@ -7,15 +7,17 @@
       "error",
       {
         "allow": [
-          "_execs",
-          "_name",
           "_ethersType",
-          "_hex",
           "_eventName",
+          "_execs",
+          "_hex",
+          "_name",
+          "_options",
           "_subscribe"
         ]
       }
     ],
+    "no-template-curly-in-string": "off",
     "max-len": "off"
   }
 }

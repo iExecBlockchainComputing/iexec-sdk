@@ -35,3 +35,6 @@ test/results.zip
 test/datasets/
 test/.secrets/
 test/logo.png
+
+# sonar output
+.scannerwork

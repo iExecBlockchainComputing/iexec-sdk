@@ -12,12 +12,14 @@ const {
   pretty,
   info,
   isEthAddress,
+  getPropertyFormChain,
 } = require('./cli-helper');
 const { loadChain } = require('./chains');
-const { Keystore } = require('./keystore');
 const orderbook = require('./orderbook');
 
 const objName = 'orderbook';
+
+cli.name('iexec orderbook').usage('<command> [options]');
 
 const orderbookApp = cli.command('app <address>');
 addGlobalOptions(orderbookApp);
@@ -31,7 +33,7 @@ orderbookApp
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       const { dataset, workerpool, requester } = cmd;
@@ -42,7 +44,8 @@ orderbookApp
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchAppOrderbook(
-        chain.id,
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
         address,
         Object.assign({}, { dataset }, { workerpool }, { requester }),
       );
@@ -50,14 +53,14 @@ orderbookApp
         ? response.appOrders.map(e => ({
           orderHash: e.orderHash,
           app: e.order.app,
+          tag: e.order.tag,
           price: e.order.appprice,
           remaining: e.remaining,
-          publicationTimestamp: e.publicationTimestamp,
         }))
         : [];
 
       const successMessage = appOrders.length > 0
-        ? `Orderbook\napp orders details:${pretty(appOrders)}\n`
+        ? `Orderbook\nApp orders details:${pretty(appOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -65,7 +68,7 @@ orderbookApp
           appOrders: response.appOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -83,7 +86,7 @@ orderbookDataset
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       const { app, workerpool, requester } = cmd;
@@ -94,7 +97,8 @@ orderbookDataset
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchDatasetOrderbook(
-        chain.id,
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
         address,
         Object.assign({}, { app }, { workerpool }, { requester }),
       );
@@ -102,14 +106,15 @@ orderbookDataset
         ? response.datasetOrders.map(e => ({
           orderHash: e.orderHash,
           dataset: e.order.dataset,
+          tag: e.order.tag,
+          apprestrict: e.order.apprestrict,
           price: e.order.datasetprice,
           remaining: e.remaining,
-          publicationTimestamp: e.publicationTimestamp,
         }))
         : [];
 
       const successMessage = datasetOrders.length > 0
-        ? `Orderbook\ndataset orders details:${pretty(datasetOrders)}\n`
+        ? `Orderbook\nDataset orders details:${pretty(datasetOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -117,7 +122,7 @@ orderbookDataset
           datasetOrders: response.datasetOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -134,7 +139,7 @@ orderbookWorkerpool
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (address) isEthAddress(address, { strict: true });
@@ -142,7 +147,8 @@ orderbookWorkerpool
       const minTag = cmd.requireTag;
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchWorkerpoolOrderbook(
-        chain.id,
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
         { workerpoolAddress: address, minTag },
       );
@@ -151,15 +157,15 @@ orderbookWorkerpool
           orderHash: e.orderHash,
           workerpool: e.order.workerpool,
           category: e.order.category,
+          tag: e.order.tag,
           trust: e.order.trust,
           price: e.order.workerpoolprice,
           remaining: e.remaining,
-          publicationTimestamp: e.publicationTimestamp,
         }))
         : [];
 
       const successMessage = workerpoolOrders.length > 0
-        ? `Orderbook\nworkerpool orders details:${pretty(workerpoolOrders)}\n`
+        ? `Orderbook\nWorkerpool orders details:${pretty(workerpoolOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -168,7 +174,7 @@ orderbookWorkerpool
           workerpoolOrders: response.workerpoolOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }
@@ -184,7 +190,7 @@ orderbookRequester
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, Keystore({ isSigner: false }), {
+      const chain = await loadChain(cmd.chain, {
         spinner,
       });
       if (address) isEthAddress(address, { strict: true });
@@ -192,7 +198,8 @@ orderbookRequester
 
       spinner.start(info.showing(objName));
       const response = await orderbook.fetchRequestOrderbook(
-        chain.id,
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
         { requesterAddress: address },
       );
@@ -204,15 +211,15 @@ orderbookRequester
           dataset: e.order.dataset,
           beneficiary: e.order.beneficiary,
           category: e.order.category,
+          tag: e.order.tag,
           trust: e.order.trust,
           price: e.order.workerpoolmaxprice,
           remaining: e.remaining,
-          publicationTimestamp: e.publicationTimestamp,
         }))
         : [];
 
       const successMessage = requestOrders.length > 0
-        ? `Orderbook\nrequest orders details:${pretty(requestOrders)}\n`
+        ? `Orderbook\nRequest orders details:${pretty(requestOrders)}\n`
         : 'Empty orderbook';
 
       spinner.succeed(successMessage, {
@@ -220,7 +227,7 @@ orderbookRequester
           requestOrders: response.requestOrders,
         },
       });
-      spinner.info('trade in the browser at https://market.iex.ec');
+      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, cmd);
     }

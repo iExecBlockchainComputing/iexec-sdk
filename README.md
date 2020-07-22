@@ -1,6 +1,6 @@
 ![iExec SDK logo](./iexec_sdk_logo.jpg)
 
-# iExec SDK V4
+# iExec SDK V5
 
 [![Build Status](https://drone.iex.ec/api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
@@ -29,7 +29,7 @@ All three major OS are supported (linux, OSX, windows).
 
 #### Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%208.0.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%2010.12.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 
 ```bash
 npm -g install iexec # install the cli
@@ -74,8 +74,59 @@ required steps before following any other workflow.
 iexec init # create all required files
 iexec wallet getETH # ask faucet for ETH, this may require manual action
 iexec wallet getRLC # ask iExec faucet for RLC
-iexec wallet show
+iexec wallet show # show your wallet
+iexec storage init # initialize your remote storage
 ```
+
+> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+>
+> Default API keys for backend services are provided for convenience.
+> As these keys are shared accross all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
+>
+> Get API keys for backend services:
+>
+> - [INFURA](https://infura.io/register) ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/))
+> - [Etherscan](https://etherscan.io/apis)
+> - [Alchemy](https://alchemyapi.io/signup)
+>
+> Once you created your access, you can add your API keys in the `chains.json` configuration file:
+>
+> ```json
+> {
+>    "default": ...,
+>    "chains": { ... },
+>    "providers": {
+>      "infura": {
+>        "projectId": "INFURA_PROJECT_ID",
+>        "projectSecret": "INFURA_PROJECT_SECRET"
+>       },
+>     "etherscan": "ETHERSCAN_API_KEY",
+>     "alchemy": "ALCHEMY_API_KEY"
+>    }
+> }
+> ```
+>
+> If you run your own node, you can add an `host` key in the `chains.json` configuration file to target your node:
+>
+> ```json
+> {
+>    "default": ...,
+>    "chains": {
+>       ...
+>       "mainnet": {
+>         "id": "1",
+>         "host": "http://localhost:8545"
+>       },
+>       "goerli": {
+>         "id": "5",
+>         "host": "http://localhost:58545"
+>       }
+>    }
+> }
+> ```
+>
+> Check your current host:
+> `iexec info`
 
 ### SDK CLI for Dapp developpers
 
@@ -100,9 +151,7 @@ iexec app run [address] # run an application on iExec at market price
 
 ```bash
 iexec orderbook app <address> # check if you have valid sell orders for your app on the Marketplace
-iexec order init --app # reset apporder fields in iexec.json
-iexec order sign --app # sign your apporder
-iexec order publish --app # publish your apporder on the Marketplace and get an orderHash
+iexec app publish [address] # publish an apporder on the Marketplace and get an orderHash
 iexec order show --app [orderHash] # show your order on the Marketplace
 iexec order cancel --app <orderHash> # cancel your order
 ```
@@ -141,10 +190,7 @@ iexec dataset push-secret # Push the secret in the Secret Management Service (sm
 
 ```bash
 iexec orderbook dataset <address> # check if you have valid sell orders for your dataset on the Marketplace
-iexec order init --dataset # reset datasetorder fields in iexec.json
-vim iexec.json # edit your selling policy, set restrictions, price ...
-iexec order sign --dataset # sign your datasetorder
-iexec order publish --dataset #publish your datasetorder on the Marketplace and get an orderHash
+iexec dataset publish [address] --tag tee --app-restrict <address> # publish a datasetorder (restricted to specific app running in Trusted Execution Environment) on the Marketplace and get an orderHash
 iexec order show --dataset [orderHash] # show your order on the Marketplace
 iexec order cancel --dataset <orderHash> # cancel your order
 ```
@@ -166,10 +212,7 @@ iexec workerpool show # show details of deployed workerpool
 
 ```bash
 iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the Marketplace
-iexec order init --workerpool # reset workerpoolorder fields in iexec.json
-iexec order sign --workerpool # sign your workerpoolorder
-iexec order publish --workerpool # publish your workerpoolorder on the Marketplace and get an orderHash
-iexec order show --workerpool [orderHash] # show your order on the Marketplace
+iexec publish workerpool # publish a workerpoolorder on the Marketplace and get an orderHash
 iexec order cancel --workerpool <orderHash> # cancel your order
 ```
 
@@ -227,10 +270,10 @@ iexec task show <taskid> --download [fileName] # download the result of your COM
 #### Use results encryption
 
 ```bash
-iexec result generate-keys # generate private/public AES keypair for result encryption
-iexec result push-secret # share the public AES key with the secret management service, all your results will be encrypted with this key
+iexec result generate-encryption-keypair # generate private/public RSA keypair for result encryption
+iexec result push-encryption-key # share the public RSA key with the secret management service, all your results will be encrypted with this key
 # Go through the normal buy process  and download the result of the computation #
-iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private AES key
+iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private RSA key
 ```
 
 ### SDK CLI for workers
@@ -280,7 +323,7 @@ iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
-iexec info --chain kovan
+iexec info --chain goerli
 ```
 
 ## Global options
@@ -358,8 +401,11 @@ iexec account withdraw <amount> # withdraw the specified amount of RLC from your
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec app init # init new app
-iexec app deploy # deploy new app
+iexec app init # init the app template
+iexec app deploy # deploy the app on the blockchain
+iexec app publish [address] # publish an apporder to make your app publicly available on the marketplace (use options to manage access)
+iexec app unpublish [address] # unpublish the last published apporder for specified app
+iexec app unpublish [address] --all # unpublish all the published apporders for specified app
 iexec app show [address|index] # show app details
 iexec app count # count your total number of app
 iexec app count --user <userAddress> # count user total number of app
@@ -370,15 +416,20 @@ iexec app count --user <userAddress> # count user total number of app
 ```bash
 iexec app run [appAddress] [options] # run an iExec application at market price (default run last deployed app)
 # OPTIONS
---dataset [address] # run with a dataset (specified address or user's last deployed dataset)
---workerpool [address] # run on a specific workerpool (specified address or user's last deployed workerpool)
---category <catid> # run in specified category
---params <string> # specify the params of the request
---tag <tag...> # specify tags (usage --tag tag1,tag2)
---trust <trust> # specify minimum trust
+--dataset <address|"deployed"> # dataset address, use "deployed" to use last deployed from "deployed.json"
+--workerpool <address|"deployed"> # workerpool address, use "deployed" to use last deployed from "deployed.json"
+--category <id> # id of the task category
+--tag <tag...> # specify tags (usage: --tag tee,gpu)
+--trust <integer> # trust level
 --beneficiary <address> # specify the beneficiary of the request (default user address)
 --callback <address> # specify the callback address of the request
---watch # watch execution status changes
+--args <string> # specify the arguments to pass to the app
+--input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--encrypt-result # encrypt the result archive with the beneficiary public key
+--storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
+--skip-request-check # skip request validity checks, this may result in task execution fail
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
+--watch # watch execution status changes
 ```
 
 ## dataset
@@ -387,13 +438,15 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec dataset init # init new dataset
-iexec dataset init --encrypted # init new dataset and folders for dataset encryption
-iexec dataset deploy # deploy new dataset
+iexec dataset init # init the dataset template
+iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
+iexec dataset deploy # deploy the dataset on the blockchain
+iexec dataset publish # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
+iexec dataset unpublish [address] # unpublish the last published datasetorder for specified dataset
+iexec dataset unpublish [address] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
-iexec dataset encrypt # generate a key and encrypt the dataset files from ./datasets/original/
 iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
 iexec dataset push-secret [datasetAddress] # push the secret for the encrypted dataset
 iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
@@ -405,8 +458,11 @@ iexec dataset check-secret [datasetAddress] # check if a secret exists for the d
 # OPTIONS
 # --chain <chainName>
 # --user <address>
-iexec workerpool init # init new workerpool
-iexec workerpool deploy # deploy new workerpool
+iexec workerpool init # init the workerpool template
+iexec workerpool deploy # deploy the workerpool on the blockchain
+iexec workerpool publish --price 100 # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
+iexec workerpool unpublish [address] # unpublish the last published workerpoolorder for specified workerpool
+iexec workerpool unpublish [address] --all # unpublish all the published workerpoolorders for specified workerpool
 iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool
@@ -474,11 +530,23 @@ iexec task claim <taskid> # claim a task requested by the user if the final dead
 ```bash
 # OPTIONS
 # --chain <chainName>
-iexec result generate-beneficiary-keys # generate a beneficiary key pair to encrypt and decrypt the results
-iexec result push-secret # push the encryption key for the beneficiary
-iexec result push-secret --secret-file [secretPath] # specify a file path for reading the secret
+iexec result generate-encryption-keypair # generate a beneficiary keypair to encrypt and decrypt the results
+iexec result push-encryption-key # push the encryption key for the beneficiary
+iexec result push-encryption-key --force-update # push the encryption key for the beneficiary, update if exists
+iexec result push-encryption-key --secret-file [secretPath] # specify a file path for reading the secret
 iexec result decrypt [encryptedResultsPath] # decrypt encrypted results with beneficary key
-iexec result check-secret [userAddress] # check if a secret exists for the user
+iexec result check-encryption-key [userAddress] # check if a encryption key exists for the user
+```
+
+## storage
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec storage init # initialize the IPFS based default remote storage
+iexec storage init [provider] # initialize the specified remote storage (supported "default"|"dropbox")
+iexec storage check [provider] # check if the specified remote storage is initialized
+iexec storage check [provider] --user <address> # check if the remote storage of specified user is initialized
 ```
 
 ## category
@@ -486,7 +554,7 @@ iexec result check-secret [userAddress] # check if a secret exists for the user
 ```bash
 # OPTIONS
 # --chain <chainName>
-iexec category init # init new category
+iexec category init # init the category template
 iexec category create # create new category
 iexec category show <index> # show category details by index
 iexec category count # count total number of category
@@ -593,54 +661,63 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
 
 The `chain.json` file, located in every iExec project, describes the parameters used when communicating with ethereum nodes and iExec Secret Management Services. They are ordered by chain name, accessible by using the `--chain <chainName>` option for each command of the SDK.
 
-`default` set the default chain used by the SDK cli.
-optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-optional key `sms` set the url of Secret Management Service used by the SDK cli on each chain.
-optional key `ipfsGateway` set the url of IPFS gateway used by the SDK cli on each chain (overwrite default value).
-optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedNetworkId` set the reference to the briged network specified by `id`.
-optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+- `default` set the default chain used by the SDK cli.
+- `chains` set the available chains
+  - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
+  - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
+  - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
+  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainId` set the reference to the bridged network specified by `id`.
+  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+- optional key `providers` set the backends for public chains
+  - optional key `alchemy` set Alchemy API Token
+  - optional key `etherscan` set Etherscan API Token
+  - optional key `infura` set INFURA Project ID or ProjectID and Project Secret
+  - optional key `quorum` set minimum number of backends that must agree before forwarding blockchain responses
 
 ```json
 {
-  "default": "kovan",
+  "default": "goerli",
   "chains": {
     "development": {
       "host": "http://localhost:8545",
       "id": "1544020727674",
       "sms": "http://localhost:5000",
+      "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:8080",
       "native": true,
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedNetworkId": "123456789"
+        "bridgedChainId": "123456789"
       }
     },
-    "ropsten": {
-      "host": "https://ropsten.infura.io/v3/apiKey",
-      "id": "3"
-    },
-    "rinkeby": {
-      "host": "https://rinkeby.infura.io/v3/apiKey",
-      "id": "4"
-    },
-    "kovan": {
-      "host": "https://kovan.infura.io/v3/apiKey",
-      "id": "42",
-      "sms": "https://sms-kovan.iex.ec"
+    "goerli": {
+      "id": "5"
     },
     "mainnet": {
-      "host": "https://mainnet.infura.io/v3/apiKey ",
-      "id": "1",
-      "sms": "https://sms-mainnet.iex.ec"
+      "id": "1"
+    },
+    "bellecour": {
+      "id": "134"
     }
+  },
+  "providers": {
+    "alchemy": "ALCHEMY_API_KEY",
+    "etherscan": "ETHERSCAN_API_KEY",
+    "infura": {
+      "projectId": "INFURA_PROJECT_ID",
+      "projectSecret": "INFURA_PROJECT_SECRET"
+    },
+    "quorum": 1
   }
 }
 ```
 
 ### deployed.json
 
-The `deployed.json` file, located in iExec project, locally stores your last deployed resources address. These address are used when you run a commande without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
+The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a command without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
 
 ```json
 {
@@ -658,7 +735,7 @@ The `deployed.json` file, located in iExec project, locally stores your last dep
 
 ### orders.json
 
-The `orders.json` file, located in iExec project, locally stores your signed orders. This file is used when you publish an order on the Marketplace and when you fill orders without specified orders from the Marketplace.
+The `orders.json` file, located in iExec project, locally stores your latest signed orders. This file is used when you publish an order on the Marketplace and when you fill orders without specified orders from the Marketplace.
 
 ```json
 {
@@ -722,13 +799,13 @@ The `orders.json` file, located in iExec project, locally stores your signed ord
 
 ### ./secrets/
 
-This folder is created when running `iexec result generate-keys` or `ìexec dataset init --encrypted` and is intended to store credentials generated by the iexec SDK CLI.
+This folder is created when running `iexec result generate-encryption-keypair` or `ìexec dataset init --encrypted` and is intended to store credentials generated by the iexec SDK CLI.
 
 #### ./secrets/beneficiary/
 
 This folder store the keypair to use for result encryption and decryption.
-A keypair is generated when running `iexec result generate-keys`
-Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `ìexec result push-secret`
+A keypair is generated when running `iexec result generate-encryption-keypair`
+Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `ìexec result push-encryption-key`
 Private keys name follow the pattern _userAddress_\_key this should never be shared with third party, the private key is used by the SDK CLI to decrypt a result when running `ìexec result decrypt`.
 
 #### ./secrets/datasets/
@@ -762,9 +839,9 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec400-gr9tv?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec400-qmbsd?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec400-xskmr?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/interesting-goodall-qjiyn?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec500-efz4v?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec500-tks5h?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
@@ -794,12 +871,15 @@ npm install iexec
 
 **new Iexec ({ ethProvider: Web3SignerProvider, chainId: String } \[, options \])** => **IExec**
 
-_options:_
-
-- `hubAddress: Address` specify the address of iExec hub smart contract to use
-- `isNative: Boolean` true when the RLC is the chain native token
-- `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
-- `bridgedNetworkConf: { rpcURL: NodeRpcURL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+> _options:_
+>
+> - `hubAddress: Address` specify the address of iExec hub smart contract to use
+> - `smsURL: URL` specify the Secret Management System to use
+> - `resultProxyURL: URL` specify the result proxy to use for results remote storage
+> - `ipfsGatewayURL: URL` specify the IPFS gateway to use
+> - `isNative: Boolean` true when the RLC is the chain native token
+> - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
+> - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 
 ##### Basic configuration
 
@@ -810,11 +890,11 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '42', // id of the chain (42 for kovan)
+  chainId: '5', // id of the chain (5 for goerli)
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (mainnet) and '42' (kovan testnet)).
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain)).
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
@@ -843,7 +923,19 @@ const getIExec = async () => {
 };
 ```
 
-##### Native configuration
+##### Sidechain configuration
+
+###### Adding iExec sidechain to MetaMask
+
+Click `Custom RPC` in the MetaMask Networks dropdown and fill with the following values:
+
+- Network Name: Bellecour (iExec sidechain)
+- New RPC URL: https://bellecour.iex.ec
+- ChainID (optional): 134
+- Symbol (optional): xRLC
+- Block Explorer URL (optional): https://blockscout-bellecour.iex.ec
+
+###### Connecting iExec SDK to iExec sidechain
 
 If you intend to use iExec SDK on a RLC native chain (ie: RLC is the native token), you must use `isNative` option.
 _NB:_ Default values are provided on well known native networks such iExec test sidechain `133` and iExec mainnet sidechain `134`.
@@ -878,7 +970,7 @@ const bridgeAddress = '0x...'; // Address of the RLC bridge smart contract on ma
 const bridgedNetworkConf = {
   chainId: '134', // id of the bridged chain (134 for iExec sidechain)
   hubAddress: '0x...', // Address of theiExec hub smart contract on bridged chain
-  rpcURL: 'https://myNode.ethnode', // url of a public node of bridged chain
+  rpcURL: 'https://bellecour.iex.ec', // url of a public node of bridged chain
   bridgeAddress: '0x...'; // Address of the RLC bridge smart contract on bridged chain
 };
 
@@ -895,13 +987,15 @@ const iexec = new IExec({
 
 - [wallet](#iexecwallet): manage your wallet, send RLC...
 - [account](#iexecaccount): manage your account, deposit, withdraw...
-- [orderbook](#iexecorderbook): explore the iexec Marketplace
-- [order](#iexecorder): manage any type of order, make deals to start offchain computation
-- [deal](#iexecdeal): find your deals
-- [task](#iexectask): follow the computation, download results or claim failed executions
 - [app](#iexecapp): deploy a new app, show an existing one
 - [dataset](#iexecdataset): deploy a new dataset, show an existing one
 - [workerpool](#iexecworkerpool): deploy a new workerpool, show an existing one
+- [order](#iexecorder): manage any type of order, make deals to start offchain computation
+- [orderbook](#iexecorderbook): explore the iexec Marketplace
+- [deal](#iexecdeal): find your deals
+- [task](#iexectask): follow the computation, download results or claim failed executions
+- [result](#iexecresult): manage the results encryption
+- [storage](#iexecstorage): manage the remote storage
 - [network](#iexecnetwork): useful information about the chain
 
 ### iexec.wallet
@@ -1063,7 +1157,7 @@ console.log('tx:', txHash);
 
 #### fetchAppOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder , status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, appOrders: \[ { order: SignedApporder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified app
 >
@@ -1073,6 +1167,8 @@ iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, 
 > - workerpool: filter on order available for specified workerpool
 > - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
+> - minTag: filter on minimum tag required
+> - maxTag: filter on maximun tag accepted
 > - skip: skip first results
 
 _Example:_
@@ -1081,13 +1177,13 @@ _Example:_
 const res = await iexec.orderbook.fetchAppOrderbook(
   '0xdBDF1FE51fd3AF9aD94fb63824EbD977518d64b3',
 );
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.appOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchDatasetOrderbook
 
-iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
+iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, datasetOrders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
 
 > find the cheapest orders for the specified dataset
 >
@@ -1097,6 +1193,8 @@ iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, w
 > - workerpool: filter on order available for specified workerpool
 > - requester: filter on order available for specified requester
 > - minVolume: filter on minimum volume remaining
+> - minTag: filter on minimum tag required
+> - maxTag: filter on maximun tag accepted
 > - skip: skip first results
 
 _Example:_
@@ -1105,13 +1203,13 @@ _Example:_
 const res = await iexec.orderbook.fetchDatasetOrderbook(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
 );
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.datasetOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, status, remaining} \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, workerpoolOrders: \[ { order: SignedWorkerpoolorder, status, remaining} \] }** >
 
 > find the cheapest orders for computing resource in specified category.
 >
@@ -1119,7 +1217,7 @@ iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolA
 >
 > - workerpoolAddress: filter on specific workerpoolAddress
 > - signerAddress: filter on specific signer (ie:workerpool owner)
-> - minTag: filter on minimum tags required
+> - minTag: filter on minimum tag required
 > - minTrust: filter on minimum trust required
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results
@@ -1128,13 +1226,13 @@ _Example:_
 
 ```js
 const res = await iexec.orderbook.fetchWorkerpoolOrderbook('1');
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.workerpoolOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
 #### fetchRequestOrderbook
 
-iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorder, status, remaining} \] }** >
+iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, requestOrders: \[ { order: SignedRequestorder, status, remaining} \] }** >
 
 > find the best paying request orders for computing resource in specified category.
 >
@@ -1142,7 +1240,7 @@ iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddre
 >
 > - requesterAddress: filter on specific requesterAddress
 > - beneficiaryAddress: filter on specific beneficiaryAddress
-> - maxTag: filter on maximum tags required
+> - maxTag: filter on maximum tag accepted
 > - maxTrust: filter on maximum trust required
 > - minVolume: filter on minimum volume remaining
 > - skip: skip first results
@@ -1151,7 +1249,7 @@ _Example:_
 
 ```js
 const res = await iexec.orderbook.fetchRequestOrderbook('1');
-console.log('best order:', res.orders[0].order);
+console.log('best order:', res.requestOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
@@ -1225,9 +1323,22 @@ console.log('remaining:', res.remaining);
 
 #### createApporder
 
-iexec.**order.createApporder ( { app: Address, appprice: Uint256, volume: Uint256 \[, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
+iexec.**order.createApporder ( { app: Address \[, appprice: Uint256, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
 > create an apporder with specified params
+>
+> _mandatory values:_
+>
+> - `app`: address of the app
+>
+> _optional values:_
+>
+> - `appprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: required tags, default no tag required `[]`
+> - `datasetrestrict`: restrict usage to specific dataset address, default no restrict `NULL_ADDRESS`
+> - `workerpoolrestrict`: restrict usage to specific workerpool address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1251,11 +1362,36 @@ _Example:_
 const signedApporder = await iexec.order.signApporder(apporderToSign);
 ```
 
+#### hashApporder
+
+iexec.**order.hashApporder ( signedorder: SignerdApporder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashApporder(apporder);
+```
+
 #### createDatasetorder
 
-iexec.**order.createDatasetorder ( { dataset: Address, datasetprice: Uint256, volume: Uint256 \[, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
+iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: Uint256, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
 > create a datasetorder with specified params
+>
+> _mandatory values:_
+>
+> - `dataset`: address of the dataset
+>
+> _optional values:_
+>
+> - `datasetprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: required tags, default no tag required `[]`
+> - `apprestrict`: restrict usage to specific app address, default no restrict `NULL_ADDRESS`
+> - `workerpoolrestrict`: restrict usage to specific workerpool address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1281,11 +1417,38 @@ const signedDatasetorder = await iexec.order.signDatasetorder(
 );
 ```
 
+#### hashDatasetorder
+
+iexec.**order.hashDatasetorder ( signedorder: SignerdDatasetorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashDatasetorder(datasetorder);
+```
+
 #### createWorkerpoolorder
 
-iexec.**order.createWorkerpoolorder ( { workerpool: Address, workerpoolprice: Uint256, category: Uint256, volume: Uint256 \[, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
+iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: Uint256, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
 > create a workerpoolorder with specified params
+>
+> _mandatory values:_
+>
+> - `workerpool`: address of the workerpool
+> - `category`: id of the selected computation category
+>
+> _optional values:_
+>
+> - `workerpoolprice`: resource price per task, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `tag`: available tags, default no tag `[]`
+> - `trust`: available trust, default minimum trust `"0"`
+> - `apprestrict`: restrict usage to specific app address, default no restrict `NULL_ADDRESS`
+> - `datasetrestrict`: restrict usage to specific dataset address, default no restrict `NULL_ADDRESS`
+> - `requesterrestrict`: restrict usage to specific requester address, default no restrict `NULL_ADDRESS`
 
 _Example:_
 
@@ -1312,11 +1475,47 @@ const signedWorkerpoolorder = await iexec.order.signWorkerpoolorder(
 );
 ```
 
+#### hashWorkerpoolorder
+
+iexec.**order.hashWorkerpoolorder ( signedorder: SignerdWorkerpoolorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
+```
+
 #### createRequestorder
 
-iexec.**order.createRequestorder ( { app: Address, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, category: Uint256, volume: Uint256 \[, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
+iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
+>
+> _mandatory values:_
+>
+> - `app`: address of the app to run
+> - `category`: id of the selected computation category
+>
+> _optional values:_
+>
+> - `params`: object, map of execution params:
+>   - `iexec_args`: string arguments to pass to the application
+>   - `iexec_input_files`: array of url of input files for the application, default `[]`
+>   - `iexec_result_storage_provider`: selected storage provider `"ipfs"|"dropbox"`, default `"ipfs"`
+>   - `iexec_result_encryption`: boolean should encrypt the result default `false`
+> - `dataset`: address of the dataset to use, default no dataset `NULL_ADDRESS`
+> - `workerpool`: allow only specific workerpool, default all workerpools allowed `NULL_ADDRESS`
+> - `appmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the app, default 0 RLC `"0"`
+> - `workerpoolmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the workerpool, default 0 RLC `"0"`
+> - `datasetmaxprice`: max amount of nRLC allowed to spend per task from requester account to pay for the dataset, default 0 RLC `"0"`
+> - `volume`: number of tasks to execute, default `"1"`
+> - `requester`: address paying for the computation, default current wallet address
+> - `beneficiary`: address allowed to get the results, default `requester` or current wallet address
+> - `callback`: smart contract to call after each task execution, default no callback `NULL_ADDRESS`
+> - `tag`: required tags, default no tag required `[]`
+> - `trust`: minimum trust level to reach in the PoCo, default minimum trust `"0"`
 
 _Example:_
 
@@ -1325,7 +1524,6 @@ const requestorderToSign = await iexec.order.createRequestorder({
   app: '0xdBDF1FE51fd3AF9aD94fb63824EbD977518d64b3',
   appmaxprice: '0',
   workerpoolmaxprice: '1000000000',
-  requester: await iexec.wallet.getAddress(),
   category: '2',
   volume: '1',
   params: 'ETH USD 9 2019-09-03T08:37:00.000Z',
@@ -1334,9 +1532,13 @@ const requestorderToSign = await iexec.order.createRequestorder({
 
 #### signRequestorder
 
-iexec.**order.signRequestorder ( requestorderToSign: Requestorder )** => Promise < **SignedRequestorder** >
+iexec.**order.signRequestorder ( requestorderToSign: Requestorder \[, options: Object \] )** => Promise < **SignedRequestorder** >
 
 > sign a requestorder to produce a SignedRequestorder valid for the PoCo.
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1344,6 +1546,18 @@ _Example:_
 const SignedRequestorder = await iexec.order.signRequestorder(
   requestorderToSign,
 );
+```
+
+#### hashRequestorder
+
+iexec.**order.hashRequestorder ( signedorder: SignerdRequestorder )** => Promise < **orderHash: Bytes32** >
+
+> return the hash of the order
+
+_Example:_
+
+```js
+const hash = await iexec.order.hashRequestorder(requestorder);
 ```
 
 #### publishApporder
@@ -1369,6 +1583,30 @@ _Example:_
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
+```
+
+#### unpublishLastApporder
+
+iexec.**order.unpublishApporder ( appAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedApporder for specified app signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastApporder(appAddess);
+```
+
+#### unpublishAllApporders
+
+iexec.**order.unpublishAllApporders ( appAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedApporder for specified app signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllApporders(appAddess);
 ```
 
 #### cancelApporder
@@ -1406,6 +1644,34 @@ _Example:_
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
+```
+
+#### unpublishLastDatasetorder
+
+iexec.**order.unpublishDatasetorder ( datasetAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedDatasetorder for specified dataset signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastDatasetorder(
+  datasetAddess,
+);
+```
+
+#### unpublishAllDatasetorders
+
+iexec.**order.unpublishAllDatasetorders ( datasetAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedDatasetorder for specified dataset signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllDatasetorders(
+  datasetAddess,
+);
 ```
 
 #### cancelDatasetorder
@@ -1449,6 +1715,34 @@ const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
 );
 ```
 
+#### unpublishLastWorkerpoolorder
+
+iexec.**order.unpublishWorkerpoolorder ( workerpoolAddress: Address )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedWorkerpoolorder for specified workerpool signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastWorkerpoolorder(
+  workerpoolAddess,
+);
+```
+
+#### unpublishAllWorkerpoolorders
+
+iexec.**order.unpublishAllWorkerpoolorders ( workerpoolAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedWorkerpoolorder for specified workerpool signed by the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllWorkerpoolorders(
+  workerpoolAddess,
+);
+```
+
 #### cancelWorkerpoolorder
 
 iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **{ order: SignedWorkerpoolorder, txHash; TxHash }** >
@@ -1463,9 +1757,13 @@ await iexec.order.cancelWorkerpoolorder(signedWorkerpoolorder);
 
 #### publishRequestorder
 
-iexec.**order.publishRequestorder ( order: SignedRequestorder )** => Promise < **orderHash: Bytes32** >
+iexec.**order.publishRequestorder ( order: SignedRequestorder \[, options: Object \] )** => Promise < **orderHash: Bytes32** >
 
 > publish a SignedRequestorder on the offchain marketplace, the order will be available for other users
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1478,12 +1776,36 @@ console.log('order published with orderHash:', orderHash);
 
 iexec.**order.unpublishRequestorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
-> unpublish a SignedRequestorder from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+> unpublish a SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
 
 _Example:_
 
 ```js
 const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
+```
+
+#### unpublishLastRequestorder
+
+iexec.**order.unpublishRequestorder ( )** => Promise < **orderHash: Bytes32** >
+
+> unpublish the last pulished SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrderHash = await iexec.order.unpublishLastRequestorder();
+```
+
+#### unpublishAllRequestorders
+
+iexec.**order.unpublishAllRequestorders ( )** => Promise < **[ ...orderHash: Bytes32 ]** >
+
+> unpublish all SignedRequestorder of the user from the offchain marketplace, the order still valid but no longer displayed for other users (to invalidate an order on the blockchain, use cancel).
+
+_Example:_
+
+```js
+const unpublishedOrders = await iexec.order.unpublishAllRequestorders();
 ```
 
 #### cancelRequestorder
@@ -1500,9 +1822,13 @@ await iexec.order.cancelRequestorder(signedRequestorder);
 
 #### matchOrders
 
-iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
+iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} \[, options: Object \] )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
 
 > make a deal on-chain with compatible orders and trigger off-chain computation.
+>
+> _options:_
+>
+> - `checkRequest`: boolean, default `true`. Perform advanced checks on request and throw if request inconsistency is found (this may prevent creating always failing task).
 
 _Example:_
 
@@ -1612,7 +1938,7 @@ iexec.**deal.claim ( dealid: Bytes32 )** => Promise < **{ claimed : { ...\[ {\[i
 _Example:_
 
 ```js
-const { claimed, transcations } = await iexec.deal.claim(
+const { claimed, transactions } = await iexec.deal.claim(
   '0xe0ebfa1177a5997434fe14b5e88897950e07ff82e6976a024b07f30063249a1e',
 );
 Object.entries(claimed).forEach(e => {
@@ -1627,7 +1953,7 @@ transactions.forEach(e => {
 
 #### show
 
-iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status: Number(0|1|2|3|4), dealid: Bytes32, idx: BN, timeref: BN, contributionDeadline: BN, revealDeadline: BN, finalDeadline: BN, consensusValue: Bytes32, revealCounter: BN, winnerCounter: BN, contributors: [...Address], resultDigest: Bytes32, results: HexString, statusName: String('UNSET'|'ACTIVE'|'REVEALING'|'COMPLETED'|'FAILED'|'TIMEOUT'), taskTimedOut: Boolean }** >
+iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status: Number(0|1|2|3|4), dealid: Bytes32, idx: BN, timeref: BN, contributionDeadline: BN, revealDeadline: BN, finalDeadline: BN, consensusValue: Bytes32, revealCounter: BN, winnerCounter: BN, contributors: [...Address], resultDigest: Bytes32, results: { storage: String('none'|StorageProviderName) \[, location: String \]}, statusName: String('UNSET'|'ACTIVE'|'REVEALING'|'COMPLETED'|'FAILED'|'TIMEOUT'), taskTimedOut: Boolean }** >
 
 > show the details of a task.
 
@@ -1656,11 +1982,9 @@ await iexec.task.claim(
 
 #### fetchResults
 
-iexec.**task.fetchResults ( taskid: Bytes32 \[, { ipfsGatewayURL: URL }\] )** => Promise < **fetchResponse: Response** >
+iexec.**task.fetchResults ( taskid: Bytes32 )** => Promise < **fetchResponse: Response** >
 
-> download the specified task result.
->
-> _Optional_: overwrite the ipfs gateway to use for results stored on ipfs.
+> download the specified task result. only supported for IPFS stored results
 
 _Example:_
 
@@ -1677,9 +2001,9 @@ iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observab
 
 > return an observable with subscribe method to monitor the task status changes.
 >
-> - next is called with initial status and after every status update
-> - error is called once on error and stops the updates
-> - complete is called once on task completion or timeout/fail
+> - `next` is called with initial status and after every status update
+> - `error` is called once on error and stops the updates
+> - `complete` is called once on task completion or timeout/fail
 >
 > _Optional_: specify the dealid of the task, this prevent error to be called when task is not yet initialized (ACTIVE)
 >
@@ -1814,6 +2138,38 @@ const { address } = await iexec.dataset.deployDataset({
 console.log('deployed at', address);
 ```
 
+#### pushDatasetSecret
+
+iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
+
+> push the dataset secret to the SMS
+> pushed secret can't be ubdated
+
+_Example:_
+
+```js
+const pushed = await iexec.dataset.pushDatasetSecret(
+  datasetAddress,
+  'secretkey',
+);
+console.log('secret pushed:', pushed);
+```
+
+#### checkDatasetSecretExists
+
+iexec.**dataset.checkDatasetSecretExists ( datasetAddress: Address )** => Promise < **secretExists: Boolean** >
+
+> check if a the dataset secret exists in the SMS
+
+_Example:_
+
+```js
+const isSecretSet = await iexec.dataset.checkDatasetSecretExists(
+  datasetAddress,
+);
+console.log('secret exists:', isSecretSet);
+```
+
 ### iexec.workerpool
 
 #### show
@@ -1845,6 +2201,100 @@ const { address } = await iexec.workerpool.deployWorkerpool({
   description: 'My workerpool',
 });
 console.log('deployed at', address);
+```
+
+### iexec.result
+
+#### pushResultEncryptionKey
+
+iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
+
+> push an encryption public key to the SMS, this allow results encryption
+> _options:_
+>
+> - `forceUpdate: Boolean` update if exists
+
+_Example:_
+
+```js
+const { isPushed } = await iexec.result.pushResultEncryptionKey(
+  '-----BEGIN PUBLIC KEY-----
+  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0gKRKKNCLe1O+A8nRsOc
+  gnnvLwE+rpvmKnjOTzoR8ZBTaIjD1dqlhPyJ3kgUnKyCNqru9ayf0srUddwj+20N
+  zdLvhI03cYD+GFYM6rrGvaUekGZ43f309f3wOrQjNkTeGo+K+hloHL/gmuN/XML9
+  MST/01+mdCImPdG+dxk4RQAsFS7HE00VXsVjcLGeZ95AKILFJKLbCOJxxvsQ+L1g
+  rameEwTUF1Mb5TJnV44YZJiCKYFj6/6zrZ3+pdUjxBSN96iOyE2KiYeNuhEEJbjb
+  4rWl+TpWLmDkLIeyL3TpDTRedaXVx6h7DOOphX5vG63+5UIHol3vJwPbeODiFWH0
+  hpFcFVPoW3wQgEpSMhUabg59Hc0rnXfM5nrIRS+SHTzjD7jpbSisGzXKcuHMc69g
+  brEHGJsNnxr0A65PzN1RMJGq44lnjeTPZnjWjM7PnnfH72MiWmwVptB38QP5+tao
+  UJu9HvZdCr9ZzdHebO5mCWIBKEt9bLRa2LMgAYfWVg21ARfIzjvc9GCwuu+958GR
+  O/VhIFB71aaAxpGmK9bX5U5QN6Tpjn/ykRIBEyY0Y6CJUkc33KhVvxXSirIpcZCO
+  OY8MsmW8+J2ZJI1JA0DIR2LHingtFWlQprd7lt6AxzcYSizeWVTZzM7trbBExBGq
+  VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
+  -----END PUBLIC KEY-----',
+);
+console.log('encryption key pushed:', isPushed);
+```
+
+#### checkResultEncryptionKeyExists
+
+iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
+
+> check if an encryption key exists in the SMS
+
+_Example:_
+
+```js
+const isMyKeySet = await iexec.result.checkResultEncryptionKeyExists(
+  await iexec.wallet.getAddress(),
+);
+console.log('encryption key set:', isMyKeySet);
+```
+
+### iexec.storage
+
+#### defaultStorageLogin
+
+iexec.**storage.defaultStorageLogin ()** => Promise < **token: String** >
+
+> get an authorization token from the default IPFS based remote storage. [Share this token through the SMS](#pushStorageToken) to allows the worker to push your tasks results to the default remote storage.
+
+#### pushStorageToken
+
+iexec.**storage.pushStorageToken ( token: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
+
+> push a storage provider authorization token to the SMS, this allow results storage
+>
+> _options:_
+>
+> - `provider: String` specify storage provider (supported: `"default", "dropbox"`, )
+> - `forceUpdate: Boolean` update if exists
+
+_Example:_
+
+```js
+const defaultStorageToken = await iexec.storage.defaultStorageLogin();
+const { isPushed } = await iexec.storage.pushStorageToken(defaultStorageToken);
+console.log('default storage initialized:', isPushed);
+```
+
+#### checkStorageTokenExists
+
+iexec.**storage.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **storageInitialized: Boolean** >
+
+> check if storage credential exists in the SMS
+>
+> _options:_
+>
+> - `provider`: string, storage provider name, default `"ipfs"`. supported `"ipfs"`|`"dropbox"`
+
+_Example:_
+
+```js
+const isIpfsStorageInitialized = await iexec.storage.checkStorageTokenExists(
+  await iexec.wallet.getAddress(),
+);
+console.log('ipfs storage initialized:', isIpfsStorageInitialized);
 ```
 
 ### iexec.network
@@ -1907,6 +2357,62 @@ _Example:_
 console.log(utils.NULL_BYTES32);
 ```
 
+#### parseEth
+
+utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
+
+> parse an ether amount and return the value in wei
+> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'
+> default unit 'wei'
+
+_Example:_
+
+```js
+console.log('5 gwei = ' + utils.parseEth('5 gwei') + 'wei');
+```
+
+#### formatEth
+
+utils.**formatEth (weiAmount: BN)** => etherAmount: String
+
+> return the display value of a wei amount in ether
+
+_Example:_
+
+```js
+console.log(
+  '500000000 wei = ' + utils.formatEth(new utils.BN('500000000')) + 'ether',
+);
+```
+
+#### parseRLC
+
+utils.**parseRLC (value: String|Number|BN [, defaultUnit: String])** => nRlcValue: BN
+
+> parse a RLC amount and return the value in nRLC
+> supported units: 'nRLC', 'RLC'
+> default unit 'nRLC'
+
+_Example:_
+
+```js
+console.log('5 RLC = ' + utils.parseEth('5 RLC') + 'nRLC');
+```
+
+#### formatRLC
+
+utils.**formatRLC (nRlcAmount: BN)** => RlcAmount: String
+
+> return the display value of a nRLC amount in RLC
+
+_Example:_
+
+```js
+console.log(
+  '500000000 nRLC = ' + utils.formatRLC(new utils.BN('500000000')) + 'RLC',
+);
+```
+
 #### encodeTag
 
 utils.**encodeTag ([...tag: String])** => tag: Bytes32
@@ -1959,7 +2465,6 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
 > decrypt en encrypted result with the beneficiary RSA Key.
-> for encrypted result decryption see [utils.decryptResult](#decryptResult)
 
 _Example:_
 
@@ -1979,21 +2484,26 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### getSignerFromPrivateKey
 
-utils.**getSignerFromPrivateKey ( host: Url, privateKey: PrivateKey [, options ] )** => SignerProvider
+utils.**getSignerFromPrivateKey ( host: 'goerli'|'mainnet'|Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
 
-Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
-
-_options:_
-
-- `gasPrice: Uint256` specify the gasPrice to use for transactions
-- `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
+> Returns a web3 SignerProvider compliant with `IExec`. Use this only for server side implementation.
+>
+> _options:_
+>
+> - `providers: Object` specify the option for provider backend when connected to public blockchain (`host: 'goerli'|'mainnet'`).
+>   - `alchemy: String` [Alchemy](https://alchemyapi.io/) API Token
+>   - `etherscan: String` [Etherscan](https://etherscan.io/) API Token
+>   - `infura: String|{ projectId: String, projectSecret: String }` [INFURA](https://infura.io/) Project ID or ProjectID and Project Secret
+>   - `quorum: Int` The number of backends that must agree (default: 2 for mainnet, 1 for testnets)
+> - `gasPrice: Uint256` specify the gasPrice to use for transactions
+> - `getTransactionCount: function(address, block) => Promise < nonce: HexString >` specify the function to be called to get the nonce of an account. `block` may be an integer number, or the string `"latest"`, `"earliest"` or `"pending"`.
 
 _Example:_
 
 ```js
 const { IExec, utils } = require('iexec');
 const ethProvider = utils.getSignerFromPrivateKey(
-  'https://localhost:8545',
+  'http://localhost:8545',
   '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
 );
 const iexec = new IExec({
