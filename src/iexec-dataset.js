@@ -68,7 +68,6 @@ const defaultSecretName = 'dataset.secret';
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-
 init
   .option(...option.initDatasetFolders())
   .option(...option.datasetKeystoredir())
@@ -242,10 +241,10 @@ const encryptDataset = cli.command('encrypt');
 addGlobalOptions(encryptDataset);
 encryptDataset
   .option(...option.force())
+  .option(...option.datasetEncryptionAlgorithm())
   .option(...option.datasetKeystoredir())
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
-  .option(...option.datasetEncryptionAlgorithm())
   .description(desc.encryptDataset())
   .action(async (cmd) => {
     const opts = cmd.opts();

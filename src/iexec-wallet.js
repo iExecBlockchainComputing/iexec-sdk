@@ -253,8 +253,8 @@ addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sendETH())
   .action(async (amount, cmd) => {
     await checkUpdate(cmd);
@@ -297,8 +297,8 @@ addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sendRLC())
   .action(async (nRlcAmount, cmd) => {
     await checkUpdate(cmd);
@@ -343,8 +343,8 @@ addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
   .option(...option.txGasPrice())
-  .option(...option.to())
   .option(...option.force())
+  .option(...option.to())
   .description(desc.sweep())
   .action(async (cmd) => {
     await checkUpdate(cmd);

@@ -43,11 +43,11 @@ const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init
+  .option(...option.chain())
   .option(...option.initAppOrder())
   .option(...option.initDatasetOrder())
   .option(...option.initWorkerpoolOrder())
   .option(...option.initRequestOrder())
-  .option(...option.chain())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -124,13 +124,13 @@ const sign = cli.command('sign');
 addGlobalOptions(sign);
 addWalletLoadOptions(sign);
 sign
+  .option(...option.chain())
+  .option(...option.force())
   .option(...option.signAppOrder())
   .option(...option.signDatasetOrder())
   .option(...option.signWorkerpoolOrder())
   .option(...option.signRequestOrder())
-  .option(...option.force())
   .option(...option.skipRequestCheck())
-  .option(...option.chain())
   .description(desc.sign())
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -325,14 +325,14 @@ addGlobalOptions(fill);
 addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
-  .option(...option.force())
-  .option(...option.skipRequestCheck())
   .option(...option.txGasPrice())
+  .option(...option.force())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
   .option(...option.fillWorkerpoolOrder())
   .option(...option.fillRequestOrder())
   .option(...option.fillRequestParams())
+  .option(...option.skipRequestCheck())
   .description(desc.fill(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -467,13 +467,13 @@ const publish = cli.command('publish');
 addGlobalOptions(publish);
 addWalletLoadOptions(publish);
 publish
+  .option(...option.chain())
+  .option(...option.force())
   .option(...option.publishAppOrder())
   .option(...option.publishDatasetOrder())
   .option(...option.publishWorkerpoolOrder())
   .option(...option.publishRequestOrder())
-  .option(...option.force())
   .option(...option.skipRequestCheck())
-  .option(...option.chain())
   .description(desc.publish(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -585,12 +585,12 @@ const unpublish = cli.command('unpublish');
 addGlobalOptions(unpublish);
 addWalletLoadOptions(unpublish);
 unpublish
+  .option(...option.chain())
+  .option(...option.force())
   .option(...option.unpublishAppOrder())
   .option(...option.unpublishDatasetOrder())
   .option(...option.unpublishWorkerpoolOrder())
   .option(...option.unpublishRequestOrder())
-  .option(...option.chain())
-  .option(...option.force())
   .description(desc.unpublish(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -706,13 +706,13 @@ const cancel = cli.command('cancel');
 addGlobalOptions(cancel);
 addWalletLoadOptions(cancel);
 cancel
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
   .option(...option.cancelAppOrder())
   .option(...option.cancelDatasetOrder())
   .option(...option.cancelWorkerpoolOrder())
   .option(...option.cancelRequestOrder())
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.force())
   .description(desc.cancel(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -802,12 +802,12 @@ cancel
 const show = cli.command('show');
 addGlobalOptions(show);
 show
+  .option(...option.chain())
   .option(...option.showAppOrder())
   .option(...option.showDatasetOrder())
   .option(...option.showWorkerpoolOrder())
   .option(...option.showRequestOrder())
   .option(...option.showOrderDeals())
-  .option(...option.chain())
   .description(desc.showObj(objName, 'marketplace'))
   .action(async (cmd) => {
     const opts = cmd.opts();

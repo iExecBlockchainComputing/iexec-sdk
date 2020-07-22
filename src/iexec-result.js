@@ -199,8 +199,8 @@ addGlobalOptions(pushSecret);
 addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
-  .option(...option.secretPath())
   .option(...option.forceUpdateSecret())
+  .option(...option.secretPath())
   .description(desc.pushResultKey())
   .action(async (cmd) => {
     await checkUpdate(cmd);
