@@ -1,5 +1,6 @@
+const Debug = require('debug');
 const {
-  string, number, object, mixed,
+  string, number, object, mixed, boolean, array,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
 const {
@@ -8,16 +9,19 @@ const {
   encodeTag,
   bytes32Regex,
 } = require('./utils');
+const { paramsKeyName, storageProviders } = require('./params-utils');
+const { teePostComputeDefaults } = require('./secrets-utils');
 const { ValidationError } = require('./errors');
+const { wrapCall } = require('./errorWrappers');
 
-/* eslint no-template-curly-in-string: "off" */
+const debug = Debug('validators');
 
-const stringNumberSchema = () => string()
+const stringNumberSchema = ({ message } = {}) => string()
   .transform((value) => {
     const trimed = value.replace(/^0+/, '');
     return trimed.length > 0 ? trimed : '0';
   })
-  .matches(/^[0-9]*$/, '${path} must be a number');
+  .matches(/^[0-9]*$/, message || '${originalValue} is not a valid number');
 
 const integerSchema = () => number().integer();
 
@@ -31,48 +35,200 @@ const positiveStrictIntSchema = () => integerSchema()
 
 const hexnumberSchema = () => string()
   .lowercase()
-  .matches(/^(0x)([0-9a-f]{2})*$/, '${path} must be a hex number');
+  .matches(
+    /^(0x)([0-9a-f]{2})*$/,
+    '${originalValue} is not a valid hex number',
+  );
 
-const uint256Schema = () => stringNumberSchema();
+const uint256Schema = () => stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
-const chainIdSchema = () => stringNumberSchema();
+const chainIdSchema = () => stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
-const addressSchema = () => string()
+const addressSchema = ({ ethProvider } = {}) => mixed()
   .transform((value) => {
     try {
-      return getAddress(value.toLowerCase());
+      if (typeof value === 'string') {
+        if (value.match(/^.*\.eth$/)) {
+          if (
+            ethProvider
+              && ethProvider.resolveName
+              && typeof ethProvider.resolveName === 'function'
+          ) {
+            const addressPromise = new Promise(async (resolve) => {
+              try {
+                debug('resolving ENS', value);
+                const resolved = await wrapCall(
+                  ethProvider.resolveName(value),
+                );
+                debug('resolved ENS', resolved);
+                resolve(resolved);
+              } catch (error) {
+                debug('ENS resolution error', error);
+              }
+              resolve(null);
+            });
+            return addressPromise;
+          }
+          debug("no ethProvider ENS can't be resolved");
+        }
+        return getAddress(value.toLowerCase());
+      }
     } catch (e) {
-      return value;
+      debug('Error', e);
     }
+    return value;
   })
-  .test('is-address', '${path} is not a valid ethereum address', (value) => {
-    try {
-      getAddress(value);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  });
+  .test(
+    'resolve-ens',
+    'Unable to resolve ENS ${originalValue}',
+    async (value) => {
+      if (value === undefined) {
+        return true;
+      }
+      if (typeof value === 'string') {
+        if (value.match(/^.*\.eth$/)) {
+          return false;
+        }
+        return true;
+      }
+      try {
+        const address = await value;
+        if (!address) return false;
+        getAddress(address);
+        return true;
+      } catch (e) {
+        debug('resolve-ens', e);
+        return false;
+      }
+    },
+  )
+  .test(
+    'is-address',
+    '${originalValue} is not a valid ethereum address',
+    async (value) => {
+      const resolvedValue = typeof value === 'string' ? value : await value;
+      try {
+        getAddress(resolvedValue);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+  );
 
 const bytes32Schema = () => string()
   .lowercase()
-  .matches(bytes32Regex, '${path} must be a bytes32 hexstring');
+  .matches(bytes32Regex, '${originalValue} is not a bytes32 hexstring');
 
-const orderSignSchema = () => string().matches(/^(0x)([0-9a-f]{2})*/, '${path} must be a valid signature');
+const orderSignSchema = () => string().matches(
+  /^(0x)([0-9a-f]{2})*/,
+  '${originalValue} is not a valid signature',
+);
+
+const salted = () => ({
+  salt: bytes32Schema().required(),
+});
 
 const signed = () => ({
-  salt: bytes32Schema().required(),
   sign: orderSignSchema().required(),
 });
 
 const catidSchema = () => uint256Schema();
 
-const paramsSchema = () => string().transform((value, originalValue) => {
-  if (typeof originalValue === 'object') {
-    return JSON.stringify(originalValue);
-  }
-  return value;
-});
+const objParamsSchema = () => object({
+  [paramsKeyName.IEXEC_ARGS]: string(),
+  [paramsKeyName.IEXEC_INPUT_FILES]: array().of(
+    string().url('${path} ${originalValue} is not a valid URL'),
+  ),
+  [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: boolean(),
+  [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
+    '$isCallback',
+    {
+      is: true,
+      then: string().notRequired(),
+      otherwise: string()
+        .default('ipfs')
+        .when('$isTee', {
+          is: true,
+          then: string().oneOf(
+            storageProviders(),
+            '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
+          ),
+          otherwise: string().oneOf(
+            ['ipfs'],
+            '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
+          ),
+        })
+        .required(),
+    },
+  ),
+  [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
+    `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
+    {
+      is: 'ipfs',
+      then: string()
+        .when('$resultProxyURL', (resultProxyURL, schema) => schema.default(resultProxyURL))
+        .required('${path} is required field with "ipfs" storage'),
+      otherwise: string().notRequired(),
+    },
+  ),
+  [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(),
+  // workarond this should not be required in the future
+  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_IMAGE]: string()
+    .default(teePostComputeDefaults.image)
+    .required('${path} is required field for TEE tasks'),
+  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_FINGERPRINT]: string()
+    .default(teePostComputeDefaults.fingerprint)
+    .required('${path} is required field for TEE tasks'),
+}).noUnknown(true, 'Unknown key "${unknown}" in params');
+
+const paramsSchema = () => string()
+  .transform((value, originalValue) => {
+    if (typeof originalValue === 'object') {
+      return JSON.stringify(originalValue);
+    }
+    return value;
+  })
+  .test(
+    'is-json',
+    '${originalValue} is not a valid params, must be a json',
+    (value) => {
+      if (value === undefined) {
+        return true;
+      }
+      try {
+        JSON.parse(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+  );
+
+const paramsArgsSchema = () => string();
+
+const paramsInputFilesArraySchema = () => array()
+  .transform((value, originalValue) => {
+    if (Array.isArray(originalValue)) {
+      return originalValue;
+    }
+    if (typeof originalValue === 'string') {
+      return originalValue.split(',');
+    }
+    return value;
+  })
+  .of(
+    string()
+      .url('"${value}" is not a valid URL')
+      .required('"${value}" is not a valid URL'),
+  );
+
+const paramsEncryptResultSchema = () => boolean();
+
+const paramsStorageProviderSchema = () => string().oneOf(
+  storageProviders(),
+  '"${value}" is not a valid storage provider use one of ${values}',
+);
 
 const tagSchema = () => mixed()
   .transform((value) => {
@@ -81,7 +237,7 @@ const tagSchema = () => mixed()
         const bytes32Tag = encodeTag(value);
         return bytes32Tag;
       } catch (e) {
-        return `invalid tag: ${e.message}`;
+        return e.message;
       }
     }
     if (typeof value === 'string') {
@@ -91,96 +247,127 @@ const tagSchema = () => mixed()
         const bytes32Tag = encodeTag(value.split(','));
         return bytes32Tag;
       } catch (e) {
-        return `invalid tag: ${e.message}`;
+        return e.message;
       }
     }
-    return 'invalid tag';
+    return 'Invalid tag';
   })
-  .test('no-transform-error', '${value}', async (value) => {
-    if (value.substr(0, 2) !== '0x') return false;
-    return true;
-  })
-  .test('is-bytes32', '${path} must be a bytes32 hexstring', async (value) => {
-    const res = await bytes32Schema().validate(value);
-    return res;
-  });
+  .test(
+    'no-transform-error',
+    ({ originalValue, value }) => `${originalValue} is not a valid tag. ${value}`,
+    (value) => {
+      if (value.substr(0, 2) !== '0x') return false;
+      return true;
+    },
+  )
+  .test(
+    'is-bytes32',
+    '${originalValue} is not a valid bytes32 hexstring',
+    async (value) => {
+      const res = await bytes32Schema().validate(value);
+      return res;
+    },
+  );
 
-const apporderSchema = () => object(
+const apporderSchema = opt => object(
   {
-    app: addressSchema().required(),
+    app: addressSchema(opt).required(),
     appprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    datasetrestrict: addressSchema().required(),
-    workerpoolrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    datasetrestrict: addressSchema(opt).required(),
+    workerpoolrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
-  '${path} is not a valid signed apporder',
+  '${originalValue} is not a valid signed apporder',
 );
 
-const signedApporderSchema = () => apporderSchema().shape(signed(), '${path} is not a valid signed apporder');
+const saltedApporderSchema = opt => apporderSchema(opt).shape(
+  salted(),
+  '${originalValue} is not a valid salted apporder',
+);
 
-const datasetorderSchema = () => object(
+const signedApporderSchema = opt => saltedApporderSchema(opt).shape(
+  signed(),
+  '${originalValue} is not a valid signed apporder',
+);
+
+const datasetorderSchema = opt => object(
   {
-    dataset: addressSchema().required(),
+    dataset: addressSchema(opt).required(),
     datasetprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
-    apprestrict: addressSchema().required(),
-    workerpoolrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    apprestrict: addressSchema(opt).required(),
+    workerpoolrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
-  '${path} is not a valid signed datasetorder',
+  '${originalValue} is not a valid signed datasetorder',
 );
 
-const signedDatasetorderSchema = () => datasetorderSchema().shape(
+const saltedDatasetorderSchema = opt => datasetorderSchema(opt).shape(
+  salted(),
+  '${originalValue} is not a valid salted datasetorder',
+);
+
+const signedDatasetorderSchema = opt => saltedDatasetorderSchema(opt).shape(
   signed(),
-  '${path} is not a valid signed datasetorder',
+  '${originalValue} is not a valid signed datasetorder',
 );
 
-const workerpoolorderSchema = () => object(
+const workerpoolorderSchema = opt => object(
   {
-    workerpool: addressSchema().required(),
+    workerpool: addressSchema(opt).required(),
     workerpoolprice: uint256Schema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     category: catidSchema().required(),
     trust: uint256Schema().required(),
-    apprestrict: addressSchema().required(),
-    datasetrestrict: addressSchema().required(),
-    requesterrestrict: addressSchema().required(),
+    apprestrict: addressSchema(opt).required(),
+    datasetrestrict: addressSchema(opt).required(),
+    requesterrestrict: addressSchema(opt).required(),
   },
-  '${path} is not a valid signed workerpoolorder',
+  '${originalValue} is not a valid signed workerpoolorder',
 );
 
-const signedWorkerpoolorderSchema = () => workerpoolorderSchema().shape(
+const saltedWorkerpoolorderSchema = opt => workerpoolorderSchema(opt).shape(
+  salted(),
+  '${originalValue} is not a valid salted workerpoolorder',
+);
+
+const signedWorkerpoolorderSchema = opt => saltedWorkerpoolorderSchema(opt).shape(
   signed(),
-  '${path} is not a valid signed workerpoolorder',
+  '${originalValue} is not a valid salted workerpoolorder',
 );
 
-const requestorderSchema = () => object(
+const requestorderSchema = opt => object(
   {
-    app: addressSchema().required(),
+    app: addressSchema(opt).required(),
     appmaxprice: uint256Schema().required(),
-    dataset: addressSchema().required(),
+    dataset: addressSchema(opt).required(),
     datasetmaxprice: uint256Schema().required(),
-    workerpool: addressSchema().required(),
+    workerpool: addressSchema(opt).required(),
     workerpoolmaxprice: uint256Schema().required(),
-    requester: addressSchema().required(),
+    requester: addressSchema(opt).required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     category: catidSchema().required(),
     trust: uint256Schema().required(),
-    beneficiary: addressSchema().required(),
-    callback: addressSchema().required(),
+    beneficiary: addressSchema(opt).required(),
+    callback: addressSchema(opt).required(),
     params: paramsSchema(),
   },
-  '${path} is not a valid signed requestorder',
+  '${originalValue} is not a valid signed requestorder',
 );
 
-const signedRequestorderSchema = () => requestorderSchema().shape(
+const saltedRequestorderSchema = opt => requestorderSchema(opt).shape(
+  salted(),
+  '${originalValue} is not a valid salted requestorder',
+);
+
+const signedRequestorderSchema = opt => saltedRequestorderSchema(opt).shape(
   signed(),
-  '${path} is not a valid signed requestorder',
+  '${originalValue} is not a valid signed requestorder',
 );
 
 const multiaddressSchema = () => mixed().transform((value) => {
@@ -188,7 +375,7 @@ const multiaddressSchema = () => mixed().transform((value) => {
   if (typeof value === 'string') {
     return humanToMultiaddrBuffer(value, { strict: false });
   }
-  throw new ValidationError('invalid multiaddr');
+  throw new ValidationError('${originalValue} is not a valid multiaddr');
 });
 
 const mrenclaveSchema = () => mixed().transform((value) => {
@@ -196,26 +383,26 @@ const mrenclaveSchema = () => mixed().transform((value) => {
   return utf8ToBuffer(value);
 });
 
-const appSchema = () => object({
-  owner: addressSchema().required(),
+const appTypeSchema = () => string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
+
+const appSchema = opt => object({
+  owner: addressSchema(opt).required(),
   name: string().required(),
-  type: string()
-    .matches(/^(DOCKER){1}$/, '${path} is not a valid type')
-    .required(),
+  type: appTypeSchema().required(),
   multiaddr: multiaddressSchema().required(),
   checksum: bytes32Schema().required(),
   mrenclave: mrenclaveSchema().required(),
 });
 
-const datasetSchema = () => object({
-  owner: addressSchema().required(),
+const datasetSchema = opt => object({
+  owner: addressSchema(opt).required(),
   name: string().required(),
   multiaddr: multiaddressSchema().required(),
   checksum: bytes32Schema().required(),
 });
 
-const workerpoolSchema = () => object({
-  owner: addressSchema().required(),
+const workerpoolSchema = opt => object({
+  owner: addressSchema(opt).required(),
   description: string().required(),
 });
 
@@ -226,7 +413,7 @@ const categorySchema = () => object({
 });
 
 const throwIfMissing = () => {
-  throw new ValidationError('missing parameter');
+  throw new ValidationError('Missing parameter');
 };
 
 module.exports = {
@@ -236,20 +423,30 @@ module.exports = {
   addressSchema,
   bytes32Schema,
   apporderSchema,
+  saltedApporderSchema,
   signedApporderSchema,
   datasetorderSchema,
   signedDatasetorderSchema,
+  saltedDatasetorderSchema,
   workerpoolorderSchema,
+  saltedWorkerpoolorderSchema,
   signedWorkerpoolorderSchema,
   requestorderSchema,
+  saltedRequestorderSchema,
   signedRequestorderSchema,
   catidSchema,
   paramsSchema,
+  objParamsSchema,
+  paramsArgsSchema,
+  paramsInputFilesArraySchema,
+  paramsEncryptResultSchema,
+  paramsStorageProviderSchema,
   tagSchema,
   chainIdSchema,
   hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  appTypeSchema,
   appSchema,
   datasetSchema,
   categorySchema,

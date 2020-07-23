@@ -1,0 +1,35 @@
+version: '3.4'
+
+networks:
+  blockchain:
+  gateway:
+  resultproxy:
+
+services:
+  token-chaintest-v5:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:v5.1.0-token'
+    expose:
+      - '8545'
+    ports:
+      - 8545:8545
+    networks:
+      - blockchain
+
+  native-chaintest-v5:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:v5.1.0-native'
+    expose:
+      - '8545'
+    ports:
+      - 18545:8545
+    networks:
+      - blockchain
+
+  token-chaintest-v5-1s:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:v5.1.0-token-1s'
+    ports:
+      - 28545:8545
+    networks:
+      - blockchain

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
+// const { Buffer } = require('buffer');
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
-const { randomBytes, createCipheriv, pbkdf2 } = require('crypto');
+// const { randomBytes, createCipheriv, pbkdf2 } = require('crypto');
 const {
   help,
   addGlobalOptions,
@@ -16,13 +17,29 @@ const {
   handleError,
   desc,
   option,
+  orderOption,
   Spinner,
   pretty,
   info,
+  prompt,
   isEthAddress,
   spawnAsync,
+  getPropertyFormChain,
 } = require('./cli-helper');
-const hub = require('./hub');
+const {
+  checkDeployedDataset,
+  deployDataset,
+  countUserDatasets,
+  showDataset,
+  showUserDataset,
+} = require('./hub');
+const {
+  createDatasetorder,
+  signDatasetorder,
+  publishDatasetorder,
+  unpublishLastDatasetorder,
+  unpublishAllDatasetorders,
+} = require('./order');
 const {
   loadIExecConf,
   initObj,
@@ -34,19 +51,23 @@ const {
 } = require('./fs');
 const { Keystore } = require('./keystore');
 const secretMgtServ = require('./sms');
-const { loadChain } = require('./chains');
+const { loadChain, connectKeystore } = require('./chains');
 const { NULL_ADDRESS } = require('./utils');
 
 const debug = Debug('iexec:iexec-dataset');
 
 const objName = 'dataset';
 
+cli
+  .name('iexec dataset')
+  .usage('<command> [options]')
+  .storeOptionsAsProperties(false);
+
 const defaultSecretName = 'dataset.secret';
 
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-
 init
   .option(...option.initDatasetFolders())
   .option(...option.datasetKeystoredir())
@@ -54,10 +75,11 @@ init
   .option(...option.encryptedDatasetDir())
   .description(desc.initObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign({}, walletOptions, { isSigner: false }),
       );
@@ -65,12 +87,12 @@ init
       const { saved, fileName } = await initObj(objName, {
         overwrite: { owner: address },
       });
-      if (cmd.encrypted) {
+      if (opts.encrypted) {
         const {
           datasetSecretsFolderPath,
           originalDatasetFolderPath,
           encryptedDatasetFolderPath,
-        } = createEncFolderPaths(cmd);
+        } = createEncFolderPaths(opts);
         await Promise.all([
           fs.ensureDir(datasetSecretsFolderPath),
           fs.ensureDir(originalDatasetFolderPath),
@@ -85,7 +107,7 @@ init
         { raw: { dataset: saved } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -97,24 +119,25 @@ deploy
   .option(...option.txGasPrice())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner, txOptions }),
+        loadChain(opts.chain, { spinner }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in 'iexec.json'. Did you forget to run 'iexec ${objName} init'?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await keystore.load();
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
-      const { address, txHash } = await hub.deployDataset(
+      const { address, txHash } = await deployDataset(
         chain.contracts,
         iexecConf[objName],
       );
@@ -123,7 +146,7 @@ deploy
       });
       await saveDeployedObj(objName, chain.id, address);
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -135,23 +158,25 @@ show
   .option(...option.user())
   .description(desc.showObj(objName))
   .action(async (cliAddressOrIndex, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
       Object.assign({}, walletOptions, { isSigner: false }),
     );
     try {
-      const [chain, [address], deployedObj] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+      const [chain, [address]] = await Promise.all([
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
-        loadDeployedObj(objName),
       ]);
-
-      const addressOrIndex = cliAddressOrIndex || deployedObj[chain.id];
+      const addressOrIndex = cliAddressOrIndex
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
@@ -160,20 +185,20 @@ show
 
       let res;
       if (isAddress) {
-        res = await hub.showDataset(chain.contracts, addressOrIndex);
+        res = await showDataset(chain.contracts, addressOrIndex);
       } else {
-        res = await hub.showUserDataset(
+        res = await showUserDataset(
           chain.contracts,
           addressOrIndex,
           userAddress,
         );
       }
       const { dataset, objAddress } = res;
-      spinner.succeed(`${objName} ${objAddress} details:${pretty(dataset)}`, {
+      spinner.succeed(`Dataset ${objAddress} details:${pretty(dataset)}`, {
         raw: { address: objAddress, dataset },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -185,32 +210,30 @@ count
   .option(...option.user())
   .description(desc.countObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign({}, walletOptions, { isSigner: false }),
       );
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, keystore, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
 
-      const userAddress = cmd.user || (address !== NULL_ADDRESS && address);
+      const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
-      const objCountBN = await hub.countUserDatasets(
-        chain.contracts,
-        userAddress,
-      );
+      const objCountBN = await countUserDatasets(chain.contracts, userAddress);
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
         { raw: { count: objCountBN.toString() } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -218,17 +241,19 @@ const encryptDataset = cli.command('encrypt');
 addGlobalOptions(encryptDataset);
 encryptDataset
   .option(...option.force())
+  .option(...option.datasetEncryptionAlgorithm())
   .option(...option.datasetKeystoredir())
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
-  .option(...option.datasetEncryptionAlgorithm())
   .description(desc.encryptDataset())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
 
     const SCONE_IMAGE = 'iexechub/tee_data_encrypter';
 
+    /**
     const derivateKey = (password, salt) => new Promise((resolve, reject) => {
       pbkdf2(password, salt, 10000, 48, 'sha256', (err, derivedKey) => {
         if (err) reject(err);
@@ -265,13 +290,14 @@ encryptDataset
       const { key, iv } = await derivateKey(password, salt);
       return createCipheriv('aes-256-cbc', key, iv);
     };
+    */
 
     try {
       const {
         datasetSecretsFolderPath,
         originalDatasetFolderPath,
         encryptedDatasetFolderPath,
-      } = createEncFolderPaths(cmd);
+      } = createEncFolderPaths(opts);
 
       const [eDSF, eODF, eEDF] = await Promise.all([
         fs.pathExists(datasetSecretsFolderPath),
@@ -281,7 +307,7 @@ encryptDataset
 
       if (!eDSF || !eODF || !eEDF) {
         throw Error(
-          "Folders for dataset encryption are missing, did you forget to run 'iexec dataset init --encrypted'?",
+          'Folders for dataset encryption are missing, did you forget to run "iexec dataset init --encrypted"?',
         );
       }
 
@@ -294,7 +320,9 @@ encryptDataset
       const datasetFiles = await fs.readdir(originalDatasetFolderPath);
       debug('datasetFiles', datasetFiles);
 
-      if (!cmd.algorithm || cmd.algorithm === 'aes-256-cbc') {
+      if (!opts.algorithm || opts.algorithm === 'aes-256-cbc') {
+        throw Error('Only option "--algorithm scone" is supported');
+        /**
         spinner.info('Using default encryption aes-256-cbc');
         const encryptDatasetFile = async (datasetFileName) => {
           spinner.info(`Encrypting ${datasetFileName}`);
@@ -304,7 +332,7 @@ encryptDataset
           await saveTextToFile(
             `${datasetFileName}.secret`,
             password.toString('base64').concat('\n'),
-            { fileDir: datasetSecretsFolderPath, force: cmd.force },
+            { fileDir: datasetSecretsFolderPath, force: opts.force },
           );
           spinner.info(
             `Generated secret for ${datasetFileName} in ${path.join(
@@ -360,7 +388,7 @@ encryptDataset
             spinner.info(`Creating zip file from folder ${filesNames[index]}`);
             const { zipName, zipPath } = await zipDirectory(
               path.join(originalDatasetFolderPath, filesNames[index]),
-              { force: cmd.force },
+              { force: opts.force },
             );
             await encryptDatasetFile(zipName);
             await fs.unlink(zipPath);
@@ -372,7 +400,8 @@ encryptDataset
           await recursiveEncryptDatasets(filesNames, index + 1);
         };
         await recursiveEncryptDatasets(datasetFiles);
-      } else if (cmd.algorithm === 'scone') {
+        */
+      } else if (opts.algorithm === 'scone') {
         spinner.info('Using SCONE');
         try {
           await spawnAsync('docker', ['--version'], { spinner, quiet: true });
@@ -441,7 +470,7 @@ encryptDataset
             );
             await saveTextToFile(`${folder}.scone.secret`, secret, {
               fileDir: datasetSecretsFolderPath,
-              force: cmd.force,
+              force: opts.force,
             });
             spinner.info(
               `Generated secret for ${folder} in ${sconeSecretPath}`,
@@ -473,40 +502,39 @@ encryptDataset
           const stats = await fs.lstat(
             path.join(originalDatasetFolderPath, filesNames[index]),
           );
-          if (stats.isDirectory()) {
-            folderName = filesNames[index];
-            await encryptDatasetFolder(folderName);
-          } else if (stats.isFile()) {
+          if (stats.isDirectory() || stats.isFile()) {
             const safeFolderName = 'dataset_'.concat(
               filesNames[index].replace(/[^\w\s.-_]/gi, ''),
             );
             spinner.info(
-              `Wrapping single file ${filesNames[index]} into folder ${safeFolderName}`,
+              `Wrapping dataset ${filesNames[index]} into folder ${safeFolderName}`,
             );
             await fs.mkdir(
               path.join(originalDatasetFolderPath, safeFolderName),
             );
-            await fs.copy(
-              path.join(originalDatasetFolderPath, filesNames[index]),
-              path.join(
-                originalDatasetFolderPath,
-                safeFolderName,
-                filesNames[index],
-              ),
-            );
-            folderName = safeFolderName;
-            await encryptDatasetFolder(folderName);
-            spinner.info(`Removing folder ${safeFolderName}`);
-            await fs.unlink(
-              path.join(
-                originalDatasetFolderPath,
-                safeFolderName,
-                filesNames[index],
-              ),
-            );
-            await fs.rmdir(
-              path.join(originalDatasetFolderPath, safeFolderName),
-            );
+            let encryptError;
+            try {
+              await fs.copy(
+                path.join(originalDatasetFolderPath, filesNames[index]),
+                path.join(
+                  originalDatasetFolderPath,
+                  safeFolderName,
+                  filesNames[index],
+                ),
+              );
+              folderName = safeFolderName;
+              await encryptDatasetFolder(folderName);
+            } catch (e) {
+              encryptError = e;
+            }
+            spinner.info(`Removing wrapping folder ${safeFolderName}`);
+            await fs
+              .remove(path.join(originalDatasetFolderPath, safeFolderName))
+              .catch(e => debug('remove error', e));
+            debug('encryptError', encryptError);
+            if (encryptError) {
+              throw encryptError;
+            }
           } else {
             throw Error('Datasets should be files or directories');
           }
@@ -516,7 +544,7 @@ encryptDataset
       } else {
         throw Error(
           `Unsuported option ${option.datasetEncryptionAlgorithm()[0]} ${
-            cmd.algorithm
+            opts.algorithm
           }`,
         );
       }
@@ -531,7 +559,7 @@ encryptDataset
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -542,26 +570,22 @@ pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
   .description(desc.pushDatasetSecret())
-  .action(async (datasetAddress, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(cmd.chain, keystore, {
-          spinner,
-        }),
-        loadDeployedObj(objName),
-      ]);
-
-      const { contracts, sms } = chain;
-      if (!sms) throw Error(`Missing sms in "chain.json" for chain ${chain.id}`);
-
-      const { address } = await keystore.load();
+      const chain = await loadChain(opts.chain, { spinner });
+      const { contracts } = chain;
+      const sms = getPropertyFormChain(chain, 'sms');
+      const [address] = await keystore.accounts();
       debug('address', address);
-
-      const resourceAddress = datasetAddress || deployedObj[chain.id];
+      const resourceAddress = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       debug('resourceAddress', resourceAddress);
       if (!resourceAddress) {
         throw Error(
@@ -570,8 +594,8 @@ pushSecret
       }
 
       let secretFilePath;
-      if (cmd.secretPath) {
-        secretFilePath = cmd.secretPath;
+      if (opts.secretPath) {
+        secretFilePath = opts.secretPath;
       } else {
         const { datasetSecretsFolderPath } = createEncFolderPaths();
         secretFilePath = path.join(datasetSecretsFolderPath, defaultSecretName);
@@ -583,21 +607,22 @@ pushSecret
       const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
-      const res = await secretMgtServ.pushSecret(
+      await connectKeystore(chain, keystore);
+      const isPushed = await secretMgtServ.pushWeb3Secret(
         contracts,
         sms,
         resourceAddress,
         secretToPush,
       );
-      if (res.hash) {
-        spinner.succeed(`Secret successfully pushed (hash: ${res.hash})`, {
-          raw: res,
+      if (isPushed) {
+        spinner.succeed('Secret successfully pushed', {
+          raw: {},
         });
       } else {
         throw Error('Something went wrong');
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -607,41 +632,177 @@ addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (datasetAddress, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const keystore = Keystore({ isSigner: false });
-      const [chain, deployedObj] = await Promise.all([
-        loadChain(cmd.chain, keystore, {
-          spinner,
-        }),
-        loadDeployedObj(objName),
-      ]);
-      const resourceAddress = datasetAddress || deployedObj[chain.id];
+      const chain = await loadChain(opts.chain, { spinner });
+      const resourceAddress = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
       if (!resourceAddress) {
         throw Error(
           'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const { sms } = chain;
-      if (!sms) throw Error(`Missing sms in chain.json for chain ${chain.id}`);
-      const res = await secretMgtServ.checkSecret(sms, resourceAddress);
-      if (res.hash) {
-        spinner.succeed(
-          `Secret found for address ${resourceAddress} (hash: ${res.hash})`,
-          {
-            raw: Object.assign(res, { isKnownAddress: true }),
-          },
-        );
+      const sms = getPropertyFormChain(chain, 'sms');
+      const secretIsSet = await secretMgtServ.checkWeb3SecretExists(
+        chain.contracts,
+        sms,
+        resourceAddress,
+      );
+      if (secretIsSet) {
+        spinner.succeed(`Secret found for dataset ${resourceAddress}`, {
+          raw: { isSecretSet: true },
+        });
       } else {
-        spinner.succeed(`No secret found for address ${resourceAddress}`, {
-          raw: Object.assign(res, { isKnownAddress: false }),
+        spinner.succeed(`No secret found for dataset ${resourceAddress}`, {
+          raw: { isSecretSet: false },
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
+    }
+  });
+
+const publish = cli.command('publish [datasetAddress]');
+addGlobalOptions(publish);
+addWalletLoadOptions(publish);
+publish
+  .description(desc.publishObj(objName))
+  .option(...option.chain())
+  .option(...option.force())
+  .option(...orderOption.price())
+  .option(...orderOption.volume())
+  .option(...orderOption.tag())
+  .option(...orderOption.apprestrict())
+  // .option(...orderOption.workerpoolrestrict()) // not allowed by iExec marketplace
+  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
+    const txOptions = computeTxOptions(opts);
+    const keystore = Keystore(walletOptions);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+      const useDeployedObj = !objAddress;
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
+      if (!address) {
+        throw Error(
+          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
+        );
+      }
+      debug('useDeployedObj', useDeployedObj, 'address', address);
+      if (useDeployedObj) {
+        spinner.info(
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+        );
+      }
+      spinner.info(`Creating ${objName}order for ${objName} ${address}`);
+      if (!(await checkDeployedDataset(chain.contracts, address))) {
+        throw Error(`No ${objName} deployed at address ${address}`);
+      }
+      const overrides = {
+        dataset: address,
+        datasetprice: opts.price,
+        volume: opts.volume || '1000000',
+        tag: opts.tag,
+        apprestrict: opts.appRestrict,
+        workerpoolrestrict: opts.workerpoolRestrict,
+        requesterrestrict: opts.requesterRestrict,
+      };
+      const orderToSign = await createDatasetorder(chain.contracts, overrides);
+      if (!opts.force) {
+        await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
+      }
+      await connectKeystore(chain, keystore, { txOptions });
+      const signedOrder = await signDatasetorder(chain.contracts, orderToSign);
+      const orderHash = await publishDatasetorder(
+        chain.contracts,
+        getPropertyFormChain(chain, 'iexecGateway'),
+        signedOrder,
+      );
+      spinner.succeed(
+        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
+        {
+          raw: {
+            orderHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const unpublish = cli.command('unpublish [datasetAddress]');
+addGlobalOptions(unpublish);
+addWalletLoadOptions(unpublish);
+unpublish
+  .description(desc.unpublishObj(objName))
+  .option(...option.chain())
+  .option(...option.force())
+  .option(...option.unpublishAllOrders())
+  .action(async (objAddress, cmd) => {
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    const walletOptions = await computeWalletLoadOptions(opts);
+    const keystore = Keystore(walletOptions);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+      const useDeployedObj = !objAddress;
+      const address = objAddress
+        || (await loadDeployedObj(objName).then(
+          deployedObj => deployedObj && deployedObj[chain.id],
+        ));
+      if (!address) {
+        throw Error(
+          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
+        );
+      }
+      debug('useDeployedObj', useDeployedObj, 'address', address);
+      if (useDeployedObj) {
+        spinner.info(
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+        );
+      }
+      const all = !!opts.all;
+      if (!opts.force) {
+        await prompt.unpublishOrder(objName, address, all);
+      }
+      await connectKeystore(chain, keystore);
+      const unpublished = all
+        ? await unpublishAllDatasetorders(
+          chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
+          address,
+        )
+        : await unpublishLastDatasetorder(
+          chain.contracts,
+          getPropertyFormChain(chain, 'iexecGateway'),
+          address,
+        );
+      spinner.succeed(
+        `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
+          all ? 's' : ''
+        }`,
+        {
+          raw: {
+            unpublished,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
     }
   });
 

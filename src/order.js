@@ -4,27 +4,42 @@ const {
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
-  http,
   getSalt,
-  getAuthorization,
   NULL_ADDRESS,
+  NULL_BYTES,
   NULL_BYTES32,
-  signTypedDatav3,
+  sumTags,
+  findMissingBitsInTag,
+  checkActiveBitInTag,
+  tagBitToHuman,
 } = require('./utils');
+const { jsonApi, getAuthorization } = require('./api-utils');
 const { hashEIP712 } = require('./sig-utils');
+const { createObjParams } = require('./request-helper');
 const { getAddress } = require('./wallet');
-const { getAppOwner, getDatasetOwner, getWorkerpoolOwner } = require('./hub');
+const { checkBalance } = require('./account');
+const {
+  checkDeployedApp,
+  checkDeployedDataset,
+  checkDeployedWorkerpool,
+  getAppOwner,
+  getDatasetOwner,
+  getWorkerpoolOwner,
+} = require('./hub');
 const {
   addressSchema,
   apporderSchema,
   datasetorderSchema,
   workerpoolorderSchema,
   requestorderSchema,
+  saltedApporderSchema,
+  saltedDatasetorderSchema,
+  saltedWorkerpoolorderSchema,
+  saltedRequestorderSchema,
   signedApporderSchema,
   signedDatasetorderSchema,
   signedWorkerpoolorderSchema,
   signedRequestorderSchema,
-  paramsSchema,
   tagSchema,
   chainIdSchema,
   bytes32Schema,
@@ -33,8 +48,12 @@ const {
   ValidationError,
 } = require('./validator');
 const { ObjectNotFoundError } = require('./errors');
-
-const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
+const {
+  wrapCall,
+  wrapSend,
+  wrapWait,
+  wrapSignTypedDataV3,
+} = require('./errorWrappers');
 
 const debug = Debug('iexec:order');
 
@@ -63,7 +82,7 @@ const NULL_DATASETORDER = {
   workerpoolrestrict: NULL_ADDRESS,
   requesterrestrict: NULL_ADDRESS,
   salt: NULL_BYTES32,
-  sign: '0x',
+  sign: NULL_BYTES,
 };
 
 const objDesc = {
@@ -90,10 +109,11 @@ const objDesc = {
     ],
     contractPropName: 'app',
     ownerMethod: getAppOwner,
-    cancelMethod: 'cancelAppOrder',
+    cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
-    apiEndpoint: 'apporders',
+    apiEndpoint: '/apporders',
     dealField: 'appHash',
+    addressField: 'app',
   },
   [DATASET_ORDER]: {
     primaryType: 'DatasetOrder',
@@ -109,10 +129,11 @@ const objDesc = {
     ],
     contractPropName: 'dataset',
     ownerMethod: getDatasetOwner,
-    cancelMethod: 'cancelDatasetOrder',
+    cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
-    apiEndpoint: 'datasetorders',
+    apiEndpoint: '/datasetorders',
     dealField: 'datasetHash',
+    addressField: 'dataset',
   },
   [WORKERPOOL_ORDER]: {
     primaryType: 'WorkerpoolOrder',
@@ -130,10 +151,11 @@ const objDesc = {
     ],
     contractPropName: 'workerpool',
     ownerMethod: getWorkerpoolOwner,
-    cancelMethod: 'cancelWorkerpoolOrder',
+    cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
-    apiEndpoint: 'workerpoolorders',
+    apiEndpoint: '/workerpoolorders',
     dealField: 'workerpoolHash',
+    addressField: 'workerpool',
   },
   [REQUEST_ORDER]: {
     primaryType: 'RequestOrder',
@@ -154,10 +176,11 @@ const objDesc = {
       { name: 'params', type: 'string' },
       { name: 'salt', type: 'bytes32' },
     ],
-    cancelMethod: 'cancelRequestOrder',
+    cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
-    apiEndpoint: 'requestorders',
+    apiEndpoint: '/requestorders',
     dealField: 'requestHash',
+    addressField: 'requester',
   },
 };
 
@@ -173,12 +196,20 @@ const signedOrderToStruct = (orderName, orderObj) => {
   return signed;
 };
 
-const getEIP712Domain = (chainId, verifyingContract) => ({
-  name: 'iExecODB',
-  version: '3.0-alpha',
-  chainId,
-  verifyingContract,
-});
+const getEIP712Domain = async (contracts) => {
+  const iexecContract = await contracts.getIExecContract();
+  const {
+    name, version, chainId, verifyingContract,
+  } = await wrapCall(
+    iexecContract.domain(),
+  );
+  return {
+    name,
+    version,
+    chainId: chainId.toString(),
+    verifyingContract,
+  };
+};
 
 const getContractOwner = async (
   contracts = throwIfMissing(),
@@ -199,21 +230,28 @@ const computeOrderHash = async (
     let vOrder;
     switch (orderName) {
       case APP_ORDER:
-        vOrder = await signedApporderSchema().validate(order);
+        vOrder = await saltedApporderSchema({
+          ethProvider: contracts.provider,
+        }).validate(order);
         break;
       case DATASET_ORDER:
-        vOrder = await signedDatasetorderSchema().validate(order);
+        vOrder = await saltedDatasetorderSchema({
+          ethProvider: contracts.provider,
+        }).validate(order);
         break;
       case WORKERPOOL_ORDER:
-        vOrder = await signedWorkerpoolorderSchema().validate(order);
+        vOrder = await saltedWorkerpoolorderSchema({
+          ethProvider: contracts.provider,
+        }).validate(order);
         break;
       case REQUEST_ORDER:
-        vOrder = await signedRequestorderSchema().validate(order);
+        vOrder = await saltedRequestorderSchema({
+          ethProvider: contracts.provider,
+        }).validate(order);
         break;
       default:
     }
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
+    const domainObj = await getEIP712Domain(contracts);
     const types = {};
     types.EIP712Domain = objDesc.EIP712Domain.structMembers;
     types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
@@ -231,6 +269,47 @@ const computeOrderHash = async (
   }
 };
 
+const hashApporder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  APP_ORDER,
+  await saltedApporderSchema({
+    ethProvider: contracts.provider,
+  }).validate(order),
+);
+const hashDatasetorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  DATASET_ORDER,
+  await saltedDatasetorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(order),
+);
+const hashWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  WORKERPOOL_ORDER,
+  await saltedWorkerpoolorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(order),
+);
+const hashRequestorder = async (
+  contracts = throwIfMissing(),
+  order = throwIfMissing(),
+) => computeOrderHash(
+  contracts,
+  REQUEST_ORDER,
+  await saltedRequestorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(order),
+);
+
 const getRemainingVolume = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
@@ -240,11 +319,8 @@ const getRemainingVolume = async (
     checkOrderName(orderName);
     const initial = new BN(order.volume);
     const orderHash = await computeOrderHash(contracts, orderName, order);
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({
-      at: clerkAddress,
-    });
-    const cons = await wrapCall(clerkContract.viewConsumed(orderHash));
+    const iexecContract = contracts.getIExecContract();
+    const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
     const remain = initial.sub(consumed);
     return remain;
@@ -264,19 +340,17 @@ const signOrder = async (
     ? orderObj.requester
     : await getContractOwner(contracts, orderName, orderObj);
   const address = await getAddress(contracts);
-  if (signerAddress.toLowerCase() !== address.toLowerCase()) {
+  if (signerAddress !== address) {
     throw Error(
       `Invalid order signer, must be the ${
         orderName === REQUEST_ORDER ? 'requester' : 'resource owner'
       }`,
     );
   }
-
-  const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-  const domainObj = getEIP712Domain(contracts.chainId, clerkAddress);
+  const domainObj = await getEIP712Domain(contracts);
 
   const salt = getSalt();
-  const saltedOrderObj = Object.assign(orderObj, { salt });
+  const saltedOrderObj = { ...orderObj, salt };
 
   const order = objDesc[orderName].structMembers;
 
@@ -284,7 +358,7 @@ const signOrder = async (
   types.EIP712Domain = objDesc.EIP712Domain.structMembers;
   types[objDesc[orderName].primaryType] = order;
 
-  const message = orderObj;
+  const message = saltedOrderObj;
 
   const typedData = {
     types,
@@ -293,19 +367,23 @@ const signOrder = async (
     message,
   };
 
-  const sign = await signTypedDatav3(
-    contracts.jsonRpcProvider,
-    address,
-    typedData,
+  const sign = await wrapSignTypedDataV3(
+    contracts.signer.signTypedDataV3(typedData),
   );
-  const signedOrder = Object.assign(saltedOrderObj, { sign });
+  const signedOrder = { ...saltedOrderObj, sign };
   return signedOrder;
 };
 
 const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => signOrder(contracts, APP_ORDER, await apporderSchema().validate(apporder));
+) => signOrder(
+  contracts,
+  APP_ORDER,
+  await apporderSchema({ ethProvider: contracts.provider }).validate(
+    apporder,
+  ),
+);
 
 const signDatasetorder = async (
   contracts = throwIfMissing(),
@@ -313,7 +391,9 @@ const signDatasetorder = async (
 ) => signOrder(
   contracts,
   DATASET_ORDER,
-  await datasetorderSchema().validate(datasetorder),
+  await datasetorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(datasetorder),
 );
 
 const signWorkerpoolorder = async (
@@ -322,7 +402,9 @@ const signWorkerpoolorder = async (
 ) => signOrder(
   contracts,
   WORKERPOOL_ORDER,
-  await workerpoolorderSchema().validate(workerpoolorder),
+  await workerpoolorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(workerpoolorder),
 );
 
 const signRequestorder = async (
@@ -331,7 +413,9 @@ const signRequestorder = async (
 ) => signOrder(
   contracts,
   REQUEST_ORDER,
-  await requestorderSchema().validate(requestorder),
+  await requestorderSchema({
+    ethProvider: contracts.provider,
+  }).validate(requestorder),
 );
 
 const cancelOrder = async (
@@ -342,10 +426,18 @@ const cancelOrder = async (
   try {
     checkOrderName(orderName);
     const args = signedOrderToStruct(orderName, orderObj);
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContact = contracts.getClerkContract({ at: clerkAddress });
+    const remainingVolume = await getRemainingVolume(
+      contracts,
+      orderName,
+      orderObj,
+    );
+    if (remainingVolume.isZero()) throw Error(`${orderName} already canceled`);
+    const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      clerkContact[objDesc[orderName].cancelMethod](args, contracts.txOptions),
+      iexecContract[objDesc[orderName].cancelMethod](
+        [args, 1, NULL_BYTES],
+        contracts.txOptions,
+      ),
     );
     const txReceipt = await wrapWait(tx.wait());
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
@@ -394,6 +486,7 @@ const cancelRequestorder = async (
 
 const publishOrder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   signedOrder = throwIfMissing(),
@@ -401,14 +494,18 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/publish');
     const body = { chainId, order: signedOrder };
-    const authorization = await getAuthorization(
-      chainId,
+    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
+      contracts.chainId,
       address,
-      contracts.jsonRpcProvider,
+      contracts.signer,
     );
-    const response = await http.post(endpoint, body, { authorization });
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/publish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.saved && response.saved.orderHash) {
       return response.saved.orderHash;
     }
@@ -421,9 +518,11 @@ const publishOrder = async (
 
 const publishApporder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedApporder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   APP_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedApporderSchema().validate(signedApporder),
@@ -431,9 +530,11 @@ const publishApporder = async (
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   DATASET_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedDatasetorderSchema().validate(signedDatasetorder),
@@ -441,9 +542,11 @@ const publishDatasetorder = async (
 
 const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   WORKERPOOL_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
@@ -451,82 +554,242 @@ const publishWorkerpoolorder = async (
 
 const publishRequestorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
 ) => publishOrder(
   contracts,
+  iexecGatewayURL,
   REQUEST_ORDER,
   await chainIdSchema().validate(contracts.chainId),
   await signedRequestorderSchema().validate(signedRequestorder),
 );
 
+const UNPUBLISH_TARGET_ORDERHASH = 'unpublish_orderHash';
+const UNPUBLISH_TARGET_ALL_ORDERS = 'unpublish_all';
+const UNPUBLISH_TARGET_LAST_ORDER = 'unpublish_last';
+
 const unpublishOrder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
-  orderHash = throwIfMissing(),
+  { target = UNPUBLISH_TARGET_ORDERHASH, orderHash, address } = {},
 ) => {
   try {
     checkOrderName(orderName);
-    const address = await getAddress(contracts);
-    const endpoint = objDesc[orderName].apiEndpoint.concat('/unpublish');
-    const body = { chainId, orderHash };
-    const authorization = await getAuthorization(
-      chainId,
-      address,
-      contracts.jsonRpcProvider,
+    const body = { chainId, target };
+    if (target === UNPUBLISH_TARGET_ORDERHASH) {
+      if (!orderHash) throwIfMissing();
+      body.orderHash = orderHash;
+    } else if (
+      target === UNPUBLISH_TARGET_LAST_ORDER
+      || target === UNPUBLISH_TARGET_ALL_ORDERS
+    ) {
+      if (!address) throwIfMissing();
+      body[objDesc[orderName].addressField] = address;
+    }
+    const userAddress = await getAddress(contracts);
+    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
+      contracts.chainId,
+      userAddress,
+      contracts.signer,
     );
-    const response = await http.post(endpoint, body, { authorization });
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint.concat('/unpublish'),
+      body,
+      headers: { authorization },
+    });
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
     throw new Error('An error occured while unpublishing order');
   } catch (error) {
-    debug('publishOrder()', error);
+    debug('unpublishOrder()', error);
     throw error;
   }
 };
 
 const unpublishApporder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   apporderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   APP_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(apporderHash),
+  { orderHash: await bytes32Schema().validate(apporderHash) },
 );
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   DATASET_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(datasetorderHash),
+  { orderHash: await bytes32Schema().validate(datasetorderHash) },
 );
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   WORKERPOOL_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(workerpoolorderHash),
+  { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
 );
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   requestorderHash = throwIfMissing(),
 ) => unpublishOrder(
   contracts,
+  iexecGatewayURL,
   REQUEST_ORDER,
   await chainIdSchema().validate(contracts.chainId),
-  await bytes32Schema().validate(requestorderHash),
+  { orderHash: await bytes32Schema().validate(requestorderHash) },
+);
+
+const unpublishAllApporders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  APP_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress),
+  },
+);
+
+const unpublishAllDatasetorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  datasetAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  DATASET_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetAddress),
+  },
+);
+
+const unpublishAllWorkerpoolorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  workerpoolAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  WORKERPOOL_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolAddress),
+  },
+);
+
+const unpublishAllRequestorders = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  REQUEST_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_ALL_ORDERS,
+    address: await getAddress(contracts),
+  },
+);
+
+const unpublishLastApporder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  APP_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress),
+  },
+);
+
+const unpublishLastDatasetorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  datasetAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  DATASET_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetAddress),
+  },
+);
+
+const unpublishLastWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+  workerpoolAddress = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  WORKERPOOL_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolAddress),
+  },
+);
+
+const unpublishLastRequestorder = async (
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
+) => unpublishOrder(
+  contracts,
+  iexecGatewayURL,
+  REQUEST_ORDER,
+  await chainIdSchema().validate(contracts.chainId),
+  {
+    target: UNPUBLISH_TARGET_LAST_ORDER,
+    address: await getAddress(contracts),
+  },
 );
 
 const fetchPublishedOrderByHash = async (
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
@@ -545,13 +808,16 @@ const fetchPublishedOrderByHash = async (
       limit: 1,
       find: { orderHash: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: objDesc[orderName].apiEndpoint,
+      body,
+    });
     if (response.ok && response.orders) {
       if (response.orders[0]) return response.orders[0];
       throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
     }
-
-    throw Error('An error occured while getting order');
+    throw Error('An error occured while fetching order');
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);
     throw error;
@@ -559,6 +825,7 @@ const fetchPublishedOrderByHash = async (
 };
 
 const fetchDealsByOrderHash = async (
+  iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
@@ -568,7 +835,6 @@ const fetchDealsByOrderHash = async (
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const hashFiedName = objDesc[orderName].dealField;
-    const endpoint = 'deals';
     const body = {
       chainId: vChainId,
       sort: {
@@ -577,7 +843,11 @@ const fetchDealsByOrderHash = async (
       limit: 1,
       find: { [hashFiedName]: vOrderHash },
     };
-    const response = await http.post(endpoint, body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
     }
@@ -586,6 +856,19 @@ const fetchDealsByOrderHash = async (
     debug('fetchDealsByOrderHash()', error);
     throw error;
   }
+};
+
+const verifySign = async (
+  contracts = throwIfMissing(),
+  signer = throwIfMissing(),
+  orderHash = throwIfMissing(),
+  sign = throwIfMissing(),
+) => {
+  const iexecContract = contracts.getIExecContract();
+  const isValid = await wrapCall(
+    iexecContract.verifySignature(signer, orderHash, sign),
+  );
+  return !!isValid;
 };
 
 const matchOrders = async (
@@ -608,6 +891,243 @@ const matchOrders = async (
       signedRequestorderSchema().validate(requestOrder),
     ]);
 
+    // deployment checks
+    const checkAppDeployedAsync = async () => {
+      if (!(await checkDeployedApp(contracts, vAppOrder.app))) {
+        throw new Error(`No app deployed at address ${vAppOrder.app}`);
+      }
+    };
+    const checkDatasetDeployedAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
+          throw new Error(
+            `No dataset deployed at address ${vDatasetOrder.dataset}`,
+          );
+        }
+      }
+    };
+    const checkWorkerpoolDeployedAsync = async () => {
+      if (
+        !(await checkDeployedWorkerpool(contracts, vWorkerpoolOrder.workerpool))
+      ) {
+        throw new Error(
+          `No workerpool deployed at address ${vWorkerpoolOrder.workerpool}`,
+        );
+      }
+    };
+
+    await Promise.all([
+      checkAppDeployedAsync(),
+      checkDatasetDeployedAsync(),
+      checkWorkerpoolDeployedAsync(),
+    ]);
+
+    // signatures checks
+    const checkAppSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        await getAppOwner(contracts, vAppOrder.app),
+        await hashApporder(contracts, vAppOrder),
+        vAppOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('apporder invalid sign');
+      }
+    };
+    const checkDatasetSignAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        const isValid = await verifySign(
+          contracts,
+          await getDatasetOwner(contracts, vDatasetOrder.dataset),
+          await hashDatasetorder(contracts, vDatasetOrder),
+          vDatasetOrder.sign,
+        );
+        if (!isValid) {
+          throw new Error('datasetorder invalid sign');
+        }
+      }
+    };
+    const checkWorkerpoolSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        await getWorkerpoolOwner(contracts, vWorkerpoolOrder.workerpool),
+        await hashWorkerpoolorder(contracts, vWorkerpoolOrder),
+        vWorkerpoolOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('workerpoolorder invalid sign');
+      }
+    };
+    const checkRequestSignAsync = async () => {
+      const isValid = await verifySign(
+        contracts,
+        vRequestOrder.requester,
+        await hashRequestorder(contracts, vRequestOrder),
+        vRequestOrder.sign,
+      );
+      if (!isValid) {
+        throw new Error('requestorder invalid sign');
+      }
+    };
+
+    await Promise.all([
+      checkAppSignAsync(),
+      checkDatasetSignAsync(),
+      checkWorkerpoolSignAsync(),
+      checkRequestSignAsync(),
+    ]);
+
+    // address checks
+    if (vRequestOrder.app !== vAppOrder.app) {
+      throw new Error(
+        `app address mismatch between requestorder (${vRequestOrder.app}) and apporder (${vAppOrder.app})`,
+      );
+    }
+    if (
+      vRequestOrder.dataset !== NULL_ADDRESS
+      && vRequestOrder.dataset !== vDatasetOrder.dataset
+    ) {
+      throw new Error(
+        `dataset address mismatch between requestorder (${vRequestOrder.dataset}) and datasetorder (${vDatasetOrder.dataset})`,
+      );
+    }
+    if (
+      vRequestOrder.workerpool !== NULL_ADDRESS
+      && vRequestOrder.workerpool !== vWorkerpoolOrder.workerpool
+    ) {
+      throw new Error(
+        `workerpool address mismatch between requestorder (${vRequestOrder.workerpool}) and workerpoolorder (${vWorkerpoolOrder.workerpool})`,
+      );
+    }
+    // category check
+    const requestCat = new BN(vRequestOrder.category);
+    const workerpoolCat = new BN(vWorkerpoolOrder.category);
+    if (!workerpoolCat.eq(requestCat)) {
+      throw new Error(
+        `category mismatch between requestorder (${requestCat}) and workerpoolorder (${workerpoolCat})`,
+      );
+    }
+    // trust check
+    const requestTrust = new BN(vRequestOrder.trust);
+    const workerpoolTrust = new BN(vWorkerpoolOrder.trust);
+    if (workerpoolTrust.lt(requestTrust)) {
+      throw new Error(
+        `workerpoolorder trust is too low (expected ${requestTrust}, got ${workerpoolTrust})`,
+      );
+    }
+    // workerpool tag check
+    const workerpoolMissingTagBits = findMissingBitsInTag(
+      vWorkerpoolOrder.tag,
+      sumTags([vRequestOrder.tag, vAppOrder.tag, vDatasetOrder.tag]),
+    );
+    if (workerpoolMissingTagBits.length > 0) {
+      throw Error(
+        `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+      );
+    }
+    // app tag check
+    const teeAppRequired = checkActiveBitInTag(
+      sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
+      1,
+    );
+    if (teeAppRequired) {
+      if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
+        throw Error('Missing tag [tee] in apporder');
+      }
+    }
+    // price check
+    const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
+    const workerpoolMaxPrice = new BN(vRequestOrder.workerpoolmaxprice);
+    const appPrice = new BN(vAppOrder.appprice);
+    const appMaxPrice = new BN(vRequestOrder.appmaxprice);
+    const datasetPrice = new BN(vDatasetOrder.datasetprice);
+    const datasetMaxPrice = new BN(vRequestOrder.datasetmaxprice);
+    if (appMaxPrice.lt(appPrice)) {
+      throw new Error(
+        `appmaxprice too low (expected ${appPrice}, got ${appMaxPrice})`,
+      );
+    }
+    if (workerpoolMaxPrice.lt(workerpoolPrice)) {
+      throw new Error(
+        `workerpoolmaxprice too low (expected ${workerpoolPrice}, got ${workerpoolMaxPrice})`,
+      );
+    }
+    if (datasetMaxPrice.lt(datasetPrice)) {
+      throw new Error(
+        `datasetmaxprice too low (expected ${datasetPrice}, got ${datasetMaxPrice})`,
+      );
+    }
+
+    // volumes checks
+    const checkRequestVolumeAsync = async () => {
+      const requestVolume = await getRemainingVolume(
+        contracts,
+        REQUEST_ORDER,
+        vRequestOrder,
+      );
+      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+    };
+    const checkWorkerpoolVolumeAsync = async () => {
+      const workerpoolVolume = await getRemainingVolume(
+        contracts,
+        WORKERPOOL_ORDER,
+        vWorkerpoolOrder,
+      );
+      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+    };
+    const checkAppVolumeAsync = async () => {
+      const appVolume = await getRemainingVolume(
+        contracts,
+        APP_ORDER,
+        vAppOrder,
+      );
+      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+    };
+    const checkDatasetVolumeAsync = async () => {
+      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
+        const datasetVolume = await getRemainingVolume(
+          contracts,
+          DATASET_ORDER,
+          vDatasetOrder,
+        );
+        if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
+      }
+    };
+    // account stake check
+    const checkRequesterSolvabilityAsync = async () => {
+      const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
+      const { stake } = await checkBalance(contracts, vRequestOrder.requester);
+      if (stake.lt(costPerTask)) {
+        throw new Error(
+          `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+        );
+      }
+    };
+
+    // workerpool owner stake check
+    const checkWorkerpoolStakeAsync = async () => {
+      const workerpoolOwner = await getWorkerpoolOwner(
+        contracts,
+        vWorkerpoolOrder.workerpool,
+      );
+      const { stake } = await checkBalance(contracts, workerpoolOwner);
+      const requiredStake = workerpoolPrice.mul(new BN(30)).div(new BN(100));
+      if (stake.lt(requiredStake)) {
+        throw Error(
+          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
+        );
+      }
+    };
+
+    await Promise.all([
+      checkWorkerpoolVolumeAsync(),
+      checkRequestVolumeAsync(),
+      checkAppVolumeAsync(),
+      checkDatasetVolumeAsync(),
+      checkRequesterSolvabilityAsync(),
+      checkWorkerpoolStakeAsync(),
+    ]);
+
     const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
     const datasetOrderStruct = signedOrderToStruct(
       DATASET_ORDER,
@@ -621,11 +1141,9 @@ const matchOrders = async (
       REQUEST_ORDER,
       vRequestOrder,
     );
-
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      clerkContract.matchOrders(
+      iexecContract.matchOrders(
         appOrderStruct,
         datasetOrderStruct,
         workerpoolOrderStruct,
@@ -647,99 +1165,159 @@ const matchOrders = async (
   }
 };
 
-const createApporder = async ({
-  app = throwIfMissing(),
-  appprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  tag = NULL_BYTES32,
-  datasetrestrict = NULL_ADDRESS,
-  workerpoolrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  app: await addressSchema().validate(app),
+const createApporder = async (
+  contracts = throwIfMissing(),
+  {
+    app = throwIfMissing(),
+    appprice = '0',
+    volume = '1',
+    tag = NULL_BYTES32,
+    datasetrestrict = NULL_ADDRESS,
+    workerpoolrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  app: await addressSchema({ ethProvider: contracts.provider }).validate(app),
   appprice: await uint256Schema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
-  datasetrestrict: await addressSchema().validate(datasetrestrict),
-  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  datasetrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(datasetrestrict),
+  workerpoolrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(requesterrestrict),
 });
 
-const createDatasetorder = async ({
-  dataset = throwIfMissing(),
-  datasetprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  tag = NULL_BYTES32,
-  apprestrict = NULL_ADDRESS,
-  workerpoolrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  dataset: await addressSchema().validate(dataset),
+const createDatasetorder = async (
+  contracts = throwIfMissing(),
+  {
+    dataset = throwIfMissing(),
+    datasetprice = '0',
+    volume = '1',
+    tag = NULL_BYTES32,
+    apprestrict = NULL_ADDRESS,
+    workerpoolrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  dataset: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(dataset),
   datasetprice: await uint256Schema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
-  apprestrict: await addressSchema().validate(apprestrict),
-  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  apprestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(apprestrict),
+  workerpoolrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(requesterrestrict),
 });
 
-const createWorkerpoolorder = async ({
-  workerpool = throwIfMissing(),
-  workerpoolprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  category = throwIfMissing(),
-  trust = '0',
-  tag = NULL_BYTES32,
-  apprestrict = NULL_ADDRESS,
-  datasetrestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
-} = {}) => ({
-  workerpool: await addressSchema().validate(workerpool),
+const createWorkerpoolorder = async (
+  contracts = throwIfMissing(),
+  {
+    workerpool = throwIfMissing(),
+    category = throwIfMissing(),
+    workerpoolprice = '0',
+    volume = '1',
+    trust = '0',
+    tag = NULL_BYTES32,
+    apprestrict = NULL_ADDRESS,
+    datasetrestrict = NULL_ADDRESS,
+    requesterrestrict = NULL_ADDRESS,
+  } = {},
+) => ({
+  workerpool: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(workerpool),
   workerpoolprice: await uint256Schema().validate(workerpoolprice),
   volume: await uint256Schema().validate(volume),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
   tag: await tagSchema().validate(tag),
-  apprestrict: await addressSchema().validate(apprestrict),
-  datasetrestrict: await addressSchema().validate(datasetrestrict),
-  requesterrestrict: await addressSchema().validate(requesterrestrict),
+  apprestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(apprestrict),
+  datasetrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(datasetrestrict),
+  requesterrestrict: await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(requesterrestrict),
 });
 
-const createRequestorder = async ({
-  app = throwIfMissing(),
-  appmaxprice = throwIfMissing(),
-  workerpoolmaxprice = throwIfMissing(),
-  requester = throwIfMissing(),
-  volume = throwIfMissing(),
-  category = throwIfMissing(),
-  workerpool = NULL_ADDRESS,
-  dataset = NULL_ADDRESS,
-  datasetmaxprice = '0',
-  beneficiary,
-  params = '',
-  callback = NULL_ADDRESS,
-  trust = '0',
-  tag = NULL_BYTES32,
-} = {}) => ({
-  app: await addressSchema().validate(app),
-  appmaxprice: await uint256Schema().validate(appmaxprice),
-  dataset: await addressSchema().validate(dataset),
-  datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
-  workerpool: await addressSchema().validate(workerpool),
-  workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
-  requester: await addressSchema().validate(requester),
-  beneficiary: await addressSchema().validate(beneficiary || requester),
-  volume: await uint256Schema().validate(volume),
-  params: await paramsSchema().validate(params),
-  callback: await addressSchema().validate(callback),
-  category: await uint256Schema().validate(category),
-  trust: await uint256Schema().validate(trust),
-  tag: await tagSchema().validate(tag),
-});
+const createRequestorder = async (
+  { contracts = throwIfMissing(), resultProxyURL = throwIfMissing() } = {},
+  {
+    app = throwIfMissing(),
+    category = throwIfMissing(),
+    dataset = NULL_ADDRESS,
+    workerpool = NULL_ADDRESS,
+    appmaxprice = '0',
+    datasetmaxprice = '0',
+    workerpoolmaxprice = '0',
+    volume = '1',
+    requester,
+    beneficiary,
+    params = {},
+    callback = NULL_ADDRESS,
+    trust = '0',
+    tag = NULL_BYTES32,
+  } = {},
+) => {
+  const requesterOrUser = requester || (await getAddress(contracts));
+  return {
+    app: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(app),
+    appmaxprice: await uint256Schema().validate(appmaxprice),
+    dataset: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(dataset),
+    datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
+    workerpool: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpool),
+    workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
+    requester: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(requesterOrUser),
+    beneficiary: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(beneficiary || requesterOrUser),
+    volume: await uint256Schema().validate(volume),
+    params: await createObjParams({
+      params,
+      tag: await tagSchema().validate(tag),
+      callback: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(callback),
+      resultProxyURL,
+    }),
+    callback: await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(callback),
+    category: await uint256Schema().validate(category),
+    trust: await uint256Schema().validate(trust),
+    tag: await tagSchema().validate(tag),
+  };
+};
 
 module.exports = {
   computeOrderHash,
   getRemainingVolume,
+  hashApporder,
+  hashDatasetorder,
+  hashWorkerpoolorder,
+  hashRequestorder,
   createApporder,
   createDatasetorder,
   createWorkerpoolorder,
@@ -760,6 +1338,14 @@ module.exports = {
   unpublishDatasetorder,
   unpublishWorkerpoolorder,
   unpublishRequestorder,
+  unpublishLastApporder,
+  unpublishLastDatasetorder,
+  unpublishLastWorkerpoolorder,
+  unpublishLastRequestorder,
+  unpublishAllApporders,
+  unpublishAllDatasetorders,
+  unpublishAllWorkerpoolorders,
+  unpublishAllRequestorders,
   matchOrders,
   fetchPublishedOrderByHash,
   fetchDealsByOrderHash,

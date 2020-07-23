@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-require('core-js/stable');
-require('regenerator-runtime/runtime');
 const cli = require('commander');
 const {
   addGlobalOptions,
@@ -17,14 +15,15 @@ const {
   option,
 } = require('./cli-helper');
 const { initIExecConf, initChainConf } = require('./fs');
-const { Keystore, createAndSave } = require('./keystore');
+const { createAndSave } = require('./keystore');
 const { loadChain } = require('./chains');
-const { checksummedAddress } = require('./utils');
+const { getChainDefaults } = require('./config');
+const { addressSchema } = require('./validator');
 const { wrapCall } = require('./errorWrappers');
 const packageJSON = require('../package.json');
-const packagelockJSON = require('../package-lock.json');
 
 cli.description(packageJSON.description).version(packageJSON.version);
+cli.name('iexec').usage('[command] [options]');
 
 async function main() {
   const init = cli.command('init');
@@ -68,7 +67,7 @@ async function main() {
           spinner.info(
             `Your wallet address is ${
               walletRes.address
-            } wallet file saved in "${
+            } Wallet file saved in "${
               walletRes.fileName
             }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
           );
@@ -112,31 +111,31 @@ async function main() {
 
   cli.command('result', 'manage results encryption');
 
+  cli.command('storage', 'manage remote storage');
+
   cli.command('registry', 'interact with iExec registry');
 
   const infoCmd = cli.command('info');
   addGlobalOptions(infoCmd);
   infoCmd
     .option(...option.chain())
-    .option(...option.hub())
     .description(desc.info())
     .action(async (cmd) => {
       await checkUpdate(cmd);
       const spinner = Spinner(cmd);
       try {
-        const chain = await loadChain(
-          cmd.chain,
-          Keystore({ isSigner: false }),
-          { spinner },
-        );
-        const hubAddress = checksummedAddress(
-          cmd.hub || chain.hub || (await chain.contracts.fetchHubAddress()),
-        );
+        const chain = await loadChain(cmd.chain, { spinner });
+
+        const host = chain.host === getChainDefaults(chain.id).host
+          ? 'default'
+          : chain.host;
+        spinner.info(`Ethereum host: ${host}`);
 
         spinner.start(info.checking('iExec contracts info'));
-
+        const hubAddress = await addressSchema({
+          ethProvider: chain.contracts.provider,
+        }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
         const useNative = !!chain.contracts.isNative;
-
         const rlcAddress = useNative
           ? undefined
           : await wrapCall(
@@ -145,16 +144,10 @@ async function main() {
             }),
           );
         const [
-          clerkAddress,
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          wrapCall(
-            chain.contracts.fetchClerkAddress({
-              hub: hubAddress,
-            }),
-          ),
           wrapCall(
             chain.contracts.fetchAppRegistryAddress({
               hub: hubAddress,
@@ -171,19 +164,14 @@ async function main() {
             }),
           ),
         ]);
-
-        const pocoVersion = packagelockJSON
-          && packagelockJSON.dependencies
-          && packagelockJSON.dependencies['iexec-poco']
-          && packagelockJSON.dependencies['iexec-poco'].version;
+        const { pocoVersion } = chain.contracts;
 
         const iexecAddresses = {
           'iExec PoCo version': pocoVersion,
           ...((useNative && {
             'native RLC': true,
           }) || { 'RLC ERC20 address': rlcAddress }),
-          'hub address': hubAddress || chain.contracts.hubAddress,
-          'clerk address': clerkAddress,
+          'iExec contract address': hubAddress || chain.contracts.hubAddress,
           'app registry address': appRegistryAddress,
           'dataset registry address': datasetRegistryAddress,
           'workerpool registry address': workerpoolRegistryAddress,
@@ -191,6 +179,7 @@ async function main() {
         spinner.succeed(`iExec contracts addresses:${pretty(iexecAddresses)}`, {
           raw: {
             pocoVersion,
+            host,
             hubAddress: hubAddress || chain.contracts.hubAddress,
             rlcAddress,
             appRegistryAddress,

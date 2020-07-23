@@ -1,69 +1,56 @@
 const Debug = require('debug');
-const colors = require('colors/safe');
 const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
 const BN = require('bn.js');
 const path = require('path');
 const { spawn } = require('child_process');
-const checkForUpdate = require('update-check-es5');
+const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
+const { storageProviders } = require('./params-utils');
 const packageJSON = require('../package.json');
 
 const debug = Debug('help');
 
-const info = {
-  waitMiners: () => 'waiting for transaction to be mined...',
-  checkBalance: currency => `checking ${currency} balances...`,
-  topUp: currency => `Run "iexec wallet get${currency}" to ask faucets for ${currency}`,
-  userAborted: () => 'operation aborted by user.',
-  logging: () => 'logging into iExec...',
-  creating: obj => `creating ${obj}...`,
-  placing: obj => `placing ${obj}...`,
-  filling: obj => `filling ${obj}...`,
-  cancelling: obj => `cancelling ${obj}...`,
-  deploying: obj => `deploying ${obj}...`,
-  showing: obj => `showing ${obj}...`,
-  counting: obj => `counting ${obj}...`,
-  depositing: () => 'making deposit...',
-  watching: obj => `watching ${obj}...`,
-  claiming: obj => `claiming ${obj}...`,
-  deposited: amount => `deposited ${amount} nRLC to your iExec account`,
-  withdrawing: () => 'making withdraw...',
-  withdrawed: amount => `withdrawed ${amount} nRLC from your iExec account`,
-  downloading: () => 'downloading task result',
-  downloaded: filePath => `downloaded task result to file ${filePath}`,
-  claimed: (amount, address) => `claimed ${amount} nRLC from work ${address}`,
-  missingAddress: obj => `${obj} address not provided to CLI AND missing in deployed.json`,
-  checking: obj => `checking ${obj}...`,
-  tokenAndWalletDiffer: (tokenAddress, walletAddress) => `Your token address ${tokenAddress} and your wallet address ${walletAddress} differ, you should run "iexec account login" to sync them`,
-  valid: obj => `${obj} is valid`,
-  notValid: obj => `${obj} is NOT valid`,
-  teeInit: () => 'created TEE folders tree structure',
-  missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
-  orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
-};
+const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
+  (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
+  init,
+);
 
-const command = {
-  show: () => 'show',
-  deposit: () => 'deposit <amount>',
-  withdraw: () => 'withdraw <amount>',
-  fill: () => 'fill',
-  cancel: () => 'cancel',
-  sign: () => 'sign',
-  publish: () => 'publish',
-  unpublish: () => 'unpublish',
+const info = {
+  missingConfFile: fileName => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+  checkBalance: currency => `Checking ${currency} balances...`,
+  userAborted: () => 'Operation aborted by user.',
+  creating: obj => `Creating ${obj}...`,
+  filling: obj => `Filling ${obj}...`,
+  cancelling: obj => `Cancelling ${obj}...`,
+  deploying: obj => `Deploying ${obj}...`,
+  showing: obj => `Showing ${obj}...`,
+  counting: obj => `Counting ${obj}...`,
+  depositing: () => 'Making deposit...',
+  claiming: obj => `Claiming ${obj}...`,
+  deposited: amount => `Deposited ${amount} nRLC to your iExec account`,
+  withdrawing: () => 'Making withdraw...',
+  withdrawn: amount => `${amount} nRLC withdrawn from your iExec account`,
+  downloading: () => 'Downloading result',
+  decrypting: () => 'Decrypting result',
+  downloaded: filePath => `Downloaded task result to file ${filePath}`,
+  missingAddress: obj => `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  checking: obj => `Checking ${obj}...`,
+  missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
+  missingOrdersFile: fileName => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
+  orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
 const desc = {
   raw: () => 'use raw output',
-  hubAddress: () => 'interact with the iExec Hub at a custom smart contract address',
   chainName: () => 'chain name from "chain.json"',
   userAddress: () => 'custom user address',
   initObj: objName => `init a new ${objName}`,
   deployObj: objName => `deploy a new ${objName}`,
-  placeObj: objName => `place a new ${objName}`,
   createObj: objName => `deploy a new ${objName}`,
+  publishObj: objName => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
+  unpublishObj: objName => `unpublish last published ${objName}order for from the marketplace`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
   fill: objName => `fill an ${objName} to execute a work`,
@@ -71,7 +58,6 @@ const desc = {
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   claimObj: objName => `claim a ${objName} that is not COMPLETED`,
-  login: () => 'login into your iExec account',
   deposit: () => 'deposit RLC onto your iExec account',
   withdraw: () => 'withdraw RLC from your iExec account',
   getETH: () => 'apply for ETH from pre-registered faucets',
@@ -79,18 +65,13 @@ const desc = {
   sendETH: () => 'send ETH to an address',
   sendRLC: () => 'send nRLC to an address',
   sweep: () => 'send all ETH and RLC to an address',
-  encryptWallet: () => 'encrypt wallet.json into encrypted-wallet.json (v3 format wallet)',
-  decryptWallet: () => 'decrypt encrypted-wallet.json into wallet.json (clear format)',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
-  encryptedpush: () => 'encrypt work input data + upload it to file hosting service',
   decrypt: () => 'decrypt work result',
-  teeInit: () => 'init the TEE folders tree structure',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: objName => `cancel a signed ${objName}`,
   publish: objName => `publish a signed ${objName}`,
   unpublish: objName => `unpublish a signed ${objName}`,
-  pushSecret: () => 'push a secret to the secret management service',
   pushDatasetSecret: () => 'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () => 'push the public encryption key to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
@@ -100,13 +81,14 @@ const desc = {
   bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
   bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  initStorage: () => 'initialize the remote storage',
+  checkStorage: () => 'check if the remote storage is initialized',
 };
 
 const option = {
   quiet: () => ['--quiet', 'stop prompting updates'],
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
-  hub: () => ['--hub <address>', desc.hubAddress()],
   user: () => ['--user <address>', desc.userAddress()],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
@@ -155,6 +137,7 @@ const option = {
     '--request [orderHash]',
     'unpublish a signed requestorder from iExec marketplace',
   ],
+  unpublishAllOrders: () => ['--all', 'unpublish all orders'],
   showAppOrder: () => ['--app [orderHash]', 'show an apporder'],
   showDatasetOrder: () => ['--dataset [orderHash]', 'show a datasetorder'],
   showWorkerpoolOrder: () => [
@@ -180,35 +163,11 @@ const option = {
     'specify the requestorder from the marketplace to fill',
   ],
   fillRequestParams: () => [
-    '--params <string>',
-    'specify the params of the request (existing request order will be ignored)',
+    '--params <json>',
+    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
-  appRunParams: () => [
-    '--params <string>',
-    'specify the params of the request',
-  ],
-  appRunDataset: () => [
-    '--dataset [address]',
-    "run with a dataset (specified address or user's last deployed dataset)",
-  ],
-  appRunWorkerpool: () => [
-    '--workerpool [address]',
-    "run on a specific workerpool (specified address or user's last deployed workerpool)",
-  ],
-  appRunBeneficiary: () => [
-    '--beneficiary <address>',
-    'specify the beneficiary of the request (default user address)',
-  ],
-  appRunCallback: () => [
-    '--callback <address>',
-    'specify the callback address of the request',
-  ],
-  appRunCategory: () => ['--category <catid>', 'run in specified category'],
-  appRunTag: () => ['--tag <tag...>', 'specify tags (usage --tag tag1,tag2)'],
-  appRunTrust: () => ['--trust <trust>', 'specify minimum trust'],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
-  token: () => ['--token <address>', 'custom erc20 token contract address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
   forceCreate: () => [
     '--force',
@@ -219,11 +178,12 @@ const option = {
     '--show-private-key',
     'allow displaying walletprivate key',
   ],
-  watch: () => ['--watch', 'watch a work status changes'],
+  watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
     '--download [fileName]',
-    'download a work result data to local filesystem, if completed',
+    'download a task result data to local filesystem, if completed',
   ],
+  decrypt: () => ['--decrypt', 'decrypt an encrypted result'],
   category: () => ['--category <id>', 'specify the work category'],
   orderbookWorkerpool: () => [
     '--workerpool <address>',
@@ -237,11 +197,11 @@ const option = {
   orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
     '--require-tag <tag...>',
-    'specify minimum required tags (usage --require-tag tag1,tag2)',
+    'specify minimum required tags\n* usage: --require-tag tag1,tag2',
   ],
   password: () => [
     '--password <password>',
-    'password used to encrypt the wallet',
+    'password used to encrypt the wallet (unsafe)',
   ],
   unencrypted: () => [
     '--unencrypted',
@@ -249,7 +209,10 @@ const option = {
   ],
   keystoredir: () => [
     '--keystoredir <path>',
-    "specify the wallet directory <'global'|'local'|custom>",
+    `specify the wallet directory <${listOfChoices([
+      'global',
+      'local',
+    ])}|custom>`,
   ],
   walletAddress: () => [
     '--wallet-address <walletAddress>',
@@ -289,11 +252,96 @@ const option = {
   ],
   datasetEncryptionAlgorithm: () => [
     '--algorithm <algorithm>',
-    "specify the encryption algorithm to use <'aes-256-cbc'|'scone'>",
+    `specify the encryption algorithm to use <${listOfChoices([
+      // 'aes-256-cbc',
+      'scone',
+    ])}>`,
   ],
   txGasPrice: () => [
     '--gas-price <wei>',
     'set custom gas price for transactions (in wei)',
+  ],
+  forceUpdateSecret: () => ['--force-update', 'update if already exists'],
+  storageToken: () => [
+    '--token <token>',
+    'storage provider authorization token (unsafe)',
+  ],
+  skipRequestCheck: () => [
+    '--skip-request-check',
+    'skip request validity checks, this may result in task execution fail',
+  ],
+};
+
+const orderOption = {
+  app: () => [
+    `--app <${listOfChoices(['deployed'], 'address')}>`,
+    'app address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  dataset: () => [
+    `--dataset <${listOfChoices(['deployed'], 'address')}>`,
+    'dataset address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  workerpool: () => [
+    `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
+    'workerpool address, use "deployed" to use last deployed from "deployed.json"',
+  ],
+  price: () => ['--price <nRlcAmount>', 'price per task'],
+  appprice: () => ['--app-price <nRlcAmount>', 'app price per task'],
+  datasetprice: () => [
+    '--dataset-price <nRlcAmount>',
+    'dataset price per task',
+  ],
+  workerpoolprice: () => [
+    '--workerpool-price <nRlcAmount>',
+    'workerpool price per task',
+  ],
+  volume: () => ['--volume <volume>', 'number of run'],
+  tag: () => ['--tag <tag...>', 'specify tags\n* usage: --tag tag1,tag2'],
+  category: () => ['--category <id>', 'id of the task category'],
+  trust: () => ['--trust <integer>', 'trust level'],
+  apprestrict: () => [
+    '--app-restrict <address>',
+    'restrict usage to specific app',
+  ],
+  datasetrestrict: () => [
+    '--dataset-restrict <address>',
+    'restrict usage to specific dataset',
+  ],
+  workerpoolrestrict: () => [
+    '--workerpool-restrict <address>',
+    'restrict usage to specific workerpool',
+  ],
+  requesterrestrict: () => [
+    '--requester-restrict <address>',
+    'restrict usage to specific requester',
+  ],
+  beneficiary: () => [
+    '--beneficiary <address>',
+    'specify the beneficiary of the request (default user address)',
+  ],
+  callback: () => [
+    '--callback <address>',
+    'specify the callback address of the request',
+  ],
+  params: () => [
+    '--params <json>',
+    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+  ],
+  requestArgs: () => [
+    '--args <string>',
+    'specify the arguments to pass to the app',
+  ],
+  requestInputFiles: () => [
+    '--input-files <fileUrl...>',
+    'specify the URL of input files to be used by the app\n* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip',
+  ],
+  requestEncryptResult: () => [
+    '--encrypt-result',
+    'encrypt the result archive with the beneficiary public key',
+  ],
+  requestStorageProvider: () => [
+    `--storage-provider <${listOfChoices(storageProviders())}>`,
+    'specify the storage to use to store the result archive',
   ],
 };
 
@@ -317,7 +365,7 @@ const addWalletLoadOptions = (cli) => {
 
 const question = async (
   message,
-  { error = 'operation aborted by user', strict = true } = {},
+  { error = info.userAborted(), strict = true } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
@@ -333,13 +381,14 @@ const question = async (
 
 const promptPassword = async (
   message,
-  { error = 'operation aborted by user', strict = true } = {},
+  { error = info.userAborted(), strict = true, useMask = false } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
       type: 'password',
       name: 'pw',
       message,
+      mask: useMask ? '*' : undefined,
     },
   ]);
   if (answer.pw) return answer.pw;
@@ -360,11 +409,11 @@ const promptConfirmedPassword = async (
 };
 
 const prompt = {
-  password: message => promptPassword(message),
+  password: (message, options) => promptPassword(message, options),
   confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
   create: file => question(`You don't have a ${file} yet, create one?`),
-  overwrite: (file, options) => question(`${file} already exists, replace it with new one?`, options),
+  overwrite: (file, options) => question(`"${file}" already exists, replace it with new one?`, options),
   dirNotEmpty: (dir, options) => question(
     `Directory ${dir} is not empty, continue and replace content?`,
     options,
@@ -381,6 +430,11 @@ const prompt = {
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
+  unpublishOrder: (objName, address, all) => question(
+    `Do you want to unpublish ${
+      all ? 'all your' : 'your last'
+    } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`,
+  ),
   signGeneratedOrder: (orderName, order) => question(
     `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
   ),
@@ -464,36 +518,16 @@ const oraOptions = {
   },
 };
 
-const helpMessage = '\n  Links:\n\n    doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n    bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n    help: https://slack.iex.ec\n';
+const helpMessage = '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n';
 const outputHelpMessage = () => console.log(helpMessage);
-const helpCB = (mess) => {
-  const newMessage = mess.concat(helpMessage);
-  console.log(newMessage);
-  process.exit(1);
-};
 
-const help = (cli, { checkNoArgs = true, checkWrongArgs = true } = {}) => {
+const help = (cli) => {
   cli.on('--help', outputHelpMessage);
-
-  cli.parse(process.argv);
-  if (checkNoArgs && process.argv.length < 3) {
-    console.log('');
-    console.log(colors.red('Missing argument'));
-    console.log('');
-    cli.help(helpCB);
-  } else if (checkWrongArgs) {
-    if (!cli.commands.find(({ _name }) => _name === cli.rawArgs[2])) {
-      console.log('');
-      console.log(colors.red(`Unknown command "${cli._name} ${cli.args[0]}"`));
-      console.log('');
-      cli.help(helpCB);
-    }
-  }
+  cli.parse();
 };
 
-const Spinner = (cmd) => {
-  // debug('Spinner use raw', !!(cmd && cmd.raw));
-  if (cmd && cmd.raw) {
+const Spinner = (opts) => {
+  if (opts && opts.raw) {
     const nothing = () => {};
     const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify(Object.assign({ ok: true }, raw)));
     const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify(Object.assign({ ok: false }, raw)));
@@ -509,8 +543,8 @@ const Spinner = (cmd) => {
   return Ora(oraOptions);
 };
 
-const checkUpdate = async (cmd) => {
-  if (cmd && !cmd.quiet && !cmd.raw) {
+const checkUpdate = async (opts) => {
+  if (opts && !opts.quiet && !opts.raw) {
     const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
     const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
     const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
@@ -518,7 +552,7 @@ const checkUpdate = async (cmd) => {
     );
     if (update) {
       const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
-      const spin = Spinner(cmd);
+      const spin = Spinner(opts);
       spin.info(
         `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
       );
@@ -526,38 +560,38 @@ const checkUpdate = async (cmd) => {
   }
 };
 
-const computeWalletCreateOptions = async (cmd) => {
-  const spinner = Spinner(cmd);
+const computeWalletCreateOptions = async (opts) => {
+  const spinner = Spinner(opts);
   try {
     let pw;
-    if (cmd.password) {
-      pw = cmd.password;
+    if (opts.password) {
+      pw = opts.password;
       spinner.warn(
-        'option --password may be unsafe, make sure to know what you do',
+        'Option --password may be unsafe, make sure to know what you do',
       );
-    } else if (!cmd.unencrypted) {
+    } else if (!opts.unencrypted) {
       pw = await prompt.confimedPassword(
         'Please choose a password for wallet encryption',
       );
     }
-    if (!pw && !cmd.unencrypted) {
-      throw Error('missing wallet password');
+    if (!pw && !opts.unencrypted) {
+      throw Error('Missing wallet password');
     }
-    if (pw && cmd.unencrypted) {
-      spinner.warn('option --unencrypted will be ingnored');
+    if (pw && opts.unencrypted) {
+      spinner.warn('Option --unencrypted will be ingnored');
     }
-    if (cmd.unencrypted) {
+    if (opts.unencrypted) {
       spinner.warn(
-        'using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
+        'Using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
       );
     }
 
-    const global = (cmd.keystoredir && cmd.keystoredir === 'global') || !cmd.keystoredir;
-    const local = (cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const keystorePath = cmd.keystoredir
-      && cmd.keystoredir !== 'local'
-      && cmd.keystoredir !== 'global'
-      ? cmd.keystoredir
+    const global = (opts.keystoredir && opts.keystoredir === 'global') || !opts.keystoredir;
+    const local = (opts.keystoredir && opts.keystoredir === 'local') || false;
+    const keystorePath = opts.keystoredir
+      && opts.keystoredir !== 'local'
+      && opts.keystoredir !== 'global'
+      ? opts.keystoredir
       : false;
 
     return {
@@ -574,21 +608,21 @@ const computeWalletCreateOptions = async (cmd) => {
   }
 };
 
-const computeWalletLoadOptions = (cmd) => {
+const computeWalletLoadOptions = (opts) => {
   try {
-    const global = (cmd && cmd.keystoredir && cmd.keystoredir === 'global')
-      || !cmd
-      || !cmd.keystoredir;
-    const local = (cmd && cmd.keystoredir && cmd.keystoredir === 'local') || false;
-    const keystorePath = cmd
-      && cmd.keystoredir
-      && cmd.keystoredir !== 'local'
-      && cmd.keystoredir !== 'global'
-      ? cmd.keystoredir
+    const global = (opts && opts.keystoredir && opts.keystoredir === 'global')
+      || !opts
+      || !opts.keystoredir;
+    const local = (opts && opts.keystoredir && opts.keystoredir === 'local') || false;
+    const keystorePath = opts
+      && opts.keystoredir
+      && opts.keystoredir !== 'local'
+      && opts.keystoredir !== 'global'
+      ? opts.keystoredir
       : false;
-    const password = (cmd && cmd.password) || false;
-    const walletFileName = (cmd && cmd.walletFile) || false;
-    const walletAddress = (cmd && cmd.walletAddress) || false;
+    const password = (opts && opts.password) || false;
+    const walletFileName = (opts && opts.walletFile) || false;
+    const walletAddress = (opts && opts.walletAddress) || false;
     return {
       walletOptions: {
         global,
@@ -612,22 +646,22 @@ const datasetsFolderName = 'datasets';
 const originalDatasetFolderName = 'original';
 const encryptedDatasetFolderName = 'encrypted';
 
-const createEncFolderPaths = (cmd = {}) => {
+const createEncFolderPaths = (opts = {}) => {
   const absolutePath = relativeOrAbsolutePath => (path.isAbsolute(relativeOrAbsolutePath)
     ? relativeOrAbsolutePath
     : path.join(process.cwd(), relativeOrAbsolutePath));
 
-  const datasetSecretsFolderPath = cmd.datasetKeystoredir
-    ? absolutePath(cmd.datasetKeystoredir)
+  const datasetSecretsFolderPath = opts.datasetKeystoredir
+    ? absolutePath(opts.datasetKeystoredir)
     : path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
-  const beneficiarySecretsFolderPath = cmd.beneficiaryKeystoredir
-    ? absolutePath(cmd.beneficiaryKeystoredir)
+  const beneficiarySecretsFolderPath = opts.beneficiaryKeystoredir
+    ? absolutePath(opts.beneficiaryKeystoredir)
     : path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
-  const originalDatasetFolderPath = cmd.originalDatasetDir
-    ? absolutePath(cmd.originalDatasetDir)
+  const originalDatasetFolderPath = opts.originalDatasetDir
+    ? absolutePath(opts.originalDatasetDir)
     : path.join(process.cwd(), datasetsFolderName, originalDatasetFolderName);
-  const encryptedDatasetFolderPath = cmd.encryptedDatasetDir
-    ? absolutePath(cmd.encryptedDatasetDir)
+  const encryptedDatasetFolderPath = opts.encryptedDatasetDir
+    ? absolutePath(opts.encryptedDatasetDir)
     : path.join(process.cwd(), datasetsFolderName, encryptedDatasetFolderName);
 
   const paths = {
@@ -640,11 +674,16 @@ const createEncFolderPaths = (cmd = {}) => {
   return paths;
 };
 
-const computeTxOptions = (cmd) => {
+const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
+const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
+const publicKeyName = address => `${address}_key.pub`;
+const privateKeyName = address => `${address}_key`;
+
+const computeTxOptions = (opts) => {
   let gasPrice;
-  if (cmd.gasPrice) {
-    if (!/^\d+$/i.test(cmd.gasPrice)) throw Error('Invalid gas price value');
-    const bnGasPrice = new BN(cmd.gasPrice);
+  if (opts.gasPrice) {
+    if (!/^\d+$/i.test(opts.gasPrice)) throw Error('Invalid gas price value');
+    const bnGasPrice = new BN(opts.gasPrice);
     if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
@@ -652,17 +691,24 @@ const computeTxOptions = (cmd) => {
   return Object.assign({}, { gasPrice });
 };
 
-const handleError = (error, cli, cmd) => {
-  const spinner = Spinner(cmd);
+const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
+  const value = chain[property];
+  if (value === undefined && strict) throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
+  return value;
+};
+
+const handleError = (error, cli, opts) => {
+  debug('error', error);
+  const spinner = Spinner(opts);
   const lastCommandName = cli.rawArgs[2] || '';
   const commandName = cli._name
     .split('-')
     .join(' ')
     .concat(' ', lastCommandName);
-  if (!cmd || !cmd.raw) {
+  if (!opts || !opts.raw) {
     console.log('\n');
   }
-  spinner.fail(`command "${commandName}" failed with ${error}`, {
+  spinner.fail(`Command "${commandName}" failed with ${error}`, {
     raw: {
       command: commandName,
       error: { name: error.name, message: error.message },
@@ -718,6 +764,29 @@ const minBn = (bnArray) => {
   return min;
 };
 
+const renderTasksStatus = (tasksStatusMap) => {
+  const tasksArray = Object.values(tasksStatusMap);
+  const runningTasksArray = tasksArray.filter(
+    task => task.status !== 3 && !task.taskTimedOut,
+  );
+  const completedTasksArray = tasksArray.filter(task => task.status === 3);
+  const timedoutTasksArray = tasksArray.filter(task => task.taskTimedOut);
+  const completedMsg = `${completedTasksArray.length}/${tasksArray.length} tasks completed\n`;
+  const failedMsg = timedoutTasksArray.length > 0
+    ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed\n`
+    : '';
+  const statusMsg = runningTasksArray.length > 0
+    ? `${runningTasksArray.length}/${
+      tasksArray.length
+    } tasks running:${pretty(
+      runningTasksArray.map(
+        ({ idx, taskid, statusName }) => `Task idx ${idx} (${taskid}) status ${statusName}`,
+      ),
+    )}`
+    : '';
+  return `${completedMsg}${failedMsg}${statusMsg}`;
+};
+
 const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
   debug('spawnAsync bin', bin);
   debug('spawnAsync args', args);
@@ -757,9 +826,10 @@ module.exports = {
   Spinner,
   handleError,
   info,
-  command,
   desc,
   option,
+  orderOption,
+  getPropertyFormChain,
   addGlobalOptions,
   addWalletCreateOptions,
   addWalletLoadOptions,
@@ -767,6 +837,10 @@ module.exports = {
   computeWalletLoadOptions,
   computeTxOptions,
   createEncFolderPaths,
+  DEFAULT_ENCRYPTED_RESULTS_NAME,
+  DEFAULT_DECRYPTED_RESULTS_NAME,
+  publicKeyName,
+  privateKeyName,
   prompt,
   pretty,
   prettyRPC,
@@ -777,4 +851,5 @@ module.exports = {
   lba,
   lb,
   spawnAsync,
+  renderTasksStatus,
 };

@@ -1,9 +1,23 @@
-
 {
   "extends": "airbnb-base",
   "rules": {
+    "new-cap": 0,
     "no-console": 0,
-    "max-len": "off",
-    "no-underscore-dangle": ["error", { "allow": ["_execs", "_name"] }]
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_ethersType",
+          "_eventName",
+          "_execs",
+          "_hex",
+          "_name",
+          "_options",
+          "_subscribe"
+        ]
+      }
+    ],
+    "no-template-curly-in-string": "off",
+    "max-len": "off"
   }
 }

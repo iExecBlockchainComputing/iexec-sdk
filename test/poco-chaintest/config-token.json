@@ -1,0 +1,46 @@
+{
+  "categories": [
+    {
+      "name": "XS",
+      "description": {},
+      "workClockTimeRef": 300
+    },
+    {
+      "name": "S",
+      "description": {},
+      "workClockTimeRef": 1200
+    },
+    {
+      "name": "M",
+      "description": {},
+      "workClockTimeRef": 3600
+    },
+    {
+      "name": "L",
+      "description": {},
+      "workClockTimeRef": 10800
+    },
+    {
+      "name": "XL",
+      "description": {},
+      "workClockTimeRef": 36000
+    }
+  ],
+  "chains": {
+    "default": {
+      "_comment": "asset should be Token or Native",
+      "asset": "Token",
+      "token": null,
+      "v3": {
+        "Hub": null,
+        "AppRegistry": null,
+        "DatasetRegistry": null,
+        "WorkerpoolRegistry": null
+      },
+      "v5": {
+        "usefactory": true,
+        "salt": "0xbe1a000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  }
+}

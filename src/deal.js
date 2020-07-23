@@ -4,10 +4,10 @@ const {
   cleanRPC,
   bnifyNestedEthersBn,
   ethersBnToBn,
-  http,
   NULL_ADDRESS,
   BN,
 } = require('./utils');
+const { jsonApi } = require('./api-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -24,21 +24,36 @@ const { showCategory, getTimeoutRatio } = require('./hub');
 const debug = Debug('iexec:deal');
 
 const fetchRequesterDeals = async (
-  chainId = throwIfMissing(),
+  contracts = throwIfMissing(),
+  iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
   {
     appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
   } = {},
 ) => {
   try {
-    const vRequesterAddress = await addressSchema().validate(requesterAddress);
-    const vChainId = await chainIdSchema().validate(chainId);
+    const vRequesterAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(requesterAddress);
+    const vChainId = await chainIdSchema().validate(contracts.chainId);
     let vAppAddress;
     let vDatasetAddress;
     let vWorkerpoolAddress;
-    if (appAddress) vAppAddress = await addressSchema().validate(appAddress);
-    if (datasetAddress) vDatasetAddress = await addressSchema().validate(datasetAddress);
-    if (workerpoolAddress) vWorkerpoolAddress = await addressSchema().validate(workerpoolAddress);
+    if (appAddress) {
+      vAppAddress = await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(appAddress);
+    }
+    if (datasetAddress) {
+      vDatasetAddress = await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(datasetAddress);
+    }
+    if (workerpoolAddress) {
+      vWorkerpoolAddress = await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(workerpoolAddress);
+    }
     const find = Object.assign(
       { requester: vRequesterAddress },
       appAddress && { 'app.pointer': vAppAddress },
@@ -57,7 +72,11 @@ const fetchRequesterDeals = async (
       },
       find,
     };
-    const response = await http.post('deals', body);
+    const response = await jsonApi.post({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      body,
+    });
     if (response.ok && response.deals) {
       return {
         count: response.count,
@@ -112,10 +131,9 @@ const show = async (
   try {
     const vDealid = await bytes32Schema().validate(dealid);
     const { chainId } = contracts;
-    const clerkAddress = await wrapCall(contracts.fetchClerkAddress());
-    const clerkContract = contracts.getClerkContract({ at: clerkAddress });
+    const iexecContract = contracts.getIExecContract();
     const deal = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(clerkContract.viewDeal(vDealid))),
+      cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
     );
     const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
     if (!dealExists) {
@@ -154,9 +172,9 @@ const getTaskStatus = async (
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
+      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
     );
     return new BN(task.status).toNumber();
   } catch (error) {
@@ -199,11 +217,11 @@ const claim = async (
     initialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
     notInitialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
     const lastBlock = await wrapCall(
-      contracts.jsonRpcProvider.getBlock('latest'),
+      contracts.provider.getBlock('latest'),
     );
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     if (initialized.length > 0) {
       const EST_GAS_PER_CLAIM = new BN(55000);
       const maxClaimPerTx = blockGasLimit.div(EST_GAS_PER_CLAIM);
@@ -217,7 +235,7 @@ const claim = async (
           ({ taskid }) => taskid,
         );
         const tx = await wrapSend(
-          hubContract.claimArray(taskidToProcess, contracts.txOptions),
+          iexecContract.claimArray(taskidToProcess, contracts.txOptions),
         );
         debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
         await wrapWait(tx.wait());
@@ -246,7 +264,7 @@ const claim = async (
         const idxToProcess = notInitializedToProcess.map(({ idx }) => idx);
         const dealidArray = new Array(idxToProcess.length).fill(vDealid);
         const tx = await wrapSend(
-          hubContract.initializeAndClaimArray(
+          iexecContract.initializeAndClaimArray(
             dealidArray,
             idxToProcess,
             contracts.txOptions,

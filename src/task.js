@@ -5,6 +5,7 @@ const {
   bnifyNestedEthersBn,
   cleanRPC,
   NULL_BYTES32,
+  NULL_BYTES,
   sleep,
   FETCH_INTERVAL,
 } = require('./utils');
@@ -24,6 +25,20 @@ const TASK_STATUS_MAP = {
   timeout: 'TIMEOUT',
 };
 
+const decodeTaskResult = (results) => {
+  try {
+    if (results !== NULL_BYTES) {
+      const json = JSON.parse(
+        Buffer.from(results.substr(2), 'hex').toString('utf8'),
+      );
+      return json;
+    }
+  } catch (e) {
+    // nothing to do
+  }
+  return { storage: 'none' };
+};
+
 const show = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
@@ -31,9 +46,9 @@ const show = async (
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(hubContract.viewTask(vTaskId))),
+      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
     );
     if (task.dealid === NULL_BYTES32) {
       throw new ObjectNotFoundError('task', vTaskId, chainId);
@@ -42,14 +57,7 @@ const show = async (
     const now = Math.floor(Date.now() / 1000);
     const consensusTimeout = parseInt(task.finalDeadline, 10);
     const taskTimedOut = task.status !== 3 && now >= consensusTimeout;
-
-    const decodedResult = task.results
-      && Buffer.from(task.results.substr(2), 'hex').toString('utf8');
-    const displayResult = decodedResult
-      && (decodedResult.substr(0, 6) === '/ipfs/'
-        || decodedResult.substr(0, 4) === 'http')
-      ? decodedResult
-      : task.results;
+    const decodedResult = decodeTaskResult(task.results);
     return {
       taskid: vTaskId,
       ...task,
@@ -58,7 +66,7 @@ const show = async (
           ? TASK_STATUS_MAP.timeout
           : TASK_STATUS_MAP[task.status],
       taskTimedOut,
-      results: displayResult,
+      results: decodedResult,
     };
   } catch (error) {
     debug('show()', error);
@@ -111,9 +119,9 @@ const claim = async (
       );
     }
 
-    const hubContract = contracts.getHubContract();
+    const iexecContract = contracts.getIExecContract();
     const claimTx = await wrapSend(
-      hubContract.claim(taskid, contracts.txOptions),
+      iexecContract.claim(taskid, contracts.txOptions),
     );
 
     const claimTxReceipt = await wrapWait(claimTx.wait());
