@@ -4,6 +4,7 @@ const Debug = require('debug');
 const cli = require('commander');
 const semver = require('semver');
 const fs = require('fs-extra');
+const { Buffer } = require('buffer');
 const path = require('path');
 const { generateKeyPair } = require('crypto');
 const {
@@ -230,7 +231,8 @@ pushSecret
           publicKeyName(address),
         );
       }
-      const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
+      const publicKey = await fs.readFile(secretFilePath, 'utf8');
+      const secretToPush = Buffer.from(publicKey, 'utf8').toString('base64');
       debug('secretToPush', secretToPush);
       const {
         isPushed,
