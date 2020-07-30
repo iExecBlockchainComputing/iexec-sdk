@@ -313,9 +313,8 @@ const tagBitToHuman = (bit) => {
 };
 
 const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
-  const rootFolder = 'iexec_out';
-  const encKeyFile = 'encrypted_key';
-  const encResultsFile = 'result.zip.aes';
+  const encKeyFile = 'aes-key.rsa';
+  const encResultsFile = 'iexec_out.zip.aes';
 
   const zipBuffer = Buffer.from(encResultsZipBuffer);
   const keyBuffer = Buffer.from(beneficiaryKey);
@@ -331,7 +330,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   let encryptedResultsKeyArrayBuffer;
   try {
     encryptedResultsKeyArrayBuffer = await zip
-      .file(`${rootFolder}/${encKeyFile}`)
+      .file(encKeyFile)
       .async('arraybuffer');
   } catch (error) {
     throw Error(`Missing ${encKeyFile} file in zip input file`);
@@ -355,7 +354,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   try {
     const iv = await new Promise((resolve, reject) => {
       zip
-        .file(`${rootFolder}/${encResultsFile}`)
+        .file(encResultsFile)
         .nodeStream()
         .on('data', (data) => {
           try {
