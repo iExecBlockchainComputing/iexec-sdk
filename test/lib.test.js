@@ -6115,7 +6115,7 @@ describe('[lib utils]', () => {
       const encZip = await fs.readFile(
         path.join(
           process.cwd(),
-          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+          'test/inputs/encryptedResults/encryptedResults.zip',
         ),
       );
       const beneficiaryKey = await fs.readFile(
@@ -6130,15 +6130,16 @@ describe('[lib utils]', () => {
       resZip.forEach((relativePath, zipEntry) => {
         resContent.push(zipEntry);
       });
-      expect(resContent.length).toBe(2);
-      expect(resContent[0].name).toBe('volume.fspf');
-      expect(resContent[1].name).toBe('result.png');
+      expect(resContent.length).toBe(3);
+      expect(resContent[0].name).toBe('computed.json');
+      expect(resContent[1].name).toBe('volume.fspf');
+      expect(resContent[2].name).toBe('result.txt');
     });
     test('result.decryptResult() string key', async () => {
       const encZip = await fs.readFile(
         path.join(
           process.cwd(),
-          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+          'test/inputs/encryptedResults/encryptedResults.zip',
         ),
       );
       const beneficiaryKey = (
@@ -6155,15 +6156,16 @@ describe('[lib utils]', () => {
       resZip.forEach((relativePath, zipEntry) => {
         resContent.push(zipEntry);
       });
-      expect(resContent.length).toBe(2);
-      expect(resContent[0].name).toBe('volume.fspf');
-      expect(resContent[1].name).toBe('result.png');
+      expect(resContent.length).toBe(3);
+      expect(resContent[0].name).toBe('computed.json');
+      expect(resContent[1].name).toBe('volume.fspf');
+      expect(resContent[2].name).toBe('result.txt');
     });
     test('result.decryptResult() wrong key', async () => {
       const encZip = await fs.readFile(
         path.join(
           process.cwd(),
-          'test/inputs/encryptedResults/encryptedTeeRes.zip',
+          'test/inputs/encryptedResults/encryptedResults.zip',
         ),
       );
       const beneficiaryKey = await fs.readFile(
