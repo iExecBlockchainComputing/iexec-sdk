@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+### Changed
+
+- fixed result encryption v5 workflow
+
+### Removed
+
+## [5.0.0] 2020-07-22
+
+### Added
+
 - ENS resolution
 - support for INFURA, Etherscan and Alchemy providers configuration
 - simplified order management for deployed resources in cli
