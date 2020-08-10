@@ -8,6 +8,9 @@ const getMessage = (err) => {
   if (typeof err === 'string') {
     return err;
   }
+  if (err.error && err.error.message) {
+    return err.error.message;
+  }
   if (err.body && err.body.error && err.body.error.message) {
     return err.body.error.message;
   }

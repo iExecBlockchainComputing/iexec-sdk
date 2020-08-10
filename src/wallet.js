@@ -303,7 +303,7 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
           );
           Object.assign(res, { sendERC20TxHash });
         } catch (error) {
-          debug(error);
+          debug('error', error);
           errors.push(`Failed to transfert ERC20': ${error.message}`);
           throw Error(
             `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
