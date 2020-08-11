@@ -90,12 +90,21 @@ const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (
-    !['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'].includes(unit)
+    ![
+      'wei',
+      'kwei',
+      'mwei',
+      'gwei',
+      'szabo',
+      'finney',
+      'ether',
+      'eth',
+    ].includes(unit)
   ) {
     throw Error('Invalid ether unit');
   }
   try {
-    return ethersBnToBn(parseUnits(amount, unit));
+    return ethersBnToBn(parseUnits(amount, unit === 'eth' ? 'ether' : unit));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid ether amount');

@@ -2362,7 +2362,7 @@ console.log(utils.NULL_BYTES32);
 utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
 
 > parse an ether amount and return the value in wei
-> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'
+> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth')
 > default unit 'wei'
 
 _Example:_

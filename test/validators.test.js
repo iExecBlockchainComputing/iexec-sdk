@@ -5,6 +5,8 @@ const {
   // throwIfMissing,
   // stringSchema,
   uint256Schema,
+  weiAmountSchema,
+  nRlcAmountSchema,
   addressSchema,
   // bytes32Schema,
   // apporderSchema,
@@ -218,6 +220,197 @@ describe('[uint256Schema]', () => {
   test('throw with invalid string', async () => {
     await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
       new ValidationError('0xfg is not a valid uint256'),
+    );
+  });
+});
+
+describe('[nRlcAmountSchema]', () => {
+  test('int', async () => {
+    await expect(nRlcAmountSchema().validate(48)).resolves.toBe('48');
+  });
+  test('string int', async () => {
+    await expect(
+      nRlcAmountSchema().validate('00009007199254740990'),
+    ).resolves.toBe('9007199254740990');
+  });
+  test('defaultUnit RLC', async () => {
+    await expect(
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(48),
+    ).resolves.toBe('48000000000');
+  });
+  test('specified unit', async () => {
+    await expect(nRlcAmountSchema().validate('0048 RLC')).resolves.toBe(
+      '48000000000',
+    );
+  });
+  test('specified unit override defaultUnit', async () => {
+    await expect(
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate('48 nRLC'),
+    ).resolves.toBe('48');
+  });
+  test('valid decimal string', async () => {
+    await expect(nRlcAmountSchema().validate('00.48 RLC')).resolves.toBe(
+      '480000000',
+    );
+  });
+  test('valid decimal number', async () => {
+    await expect(
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(0.48),
+    ).resolves.toBe('480000000');
+  });
+  test('BN', async () => {
+    await expect(
+      nRlcAmountSchema().validate(new BN('9007199254740990')),
+    ).resolves.toBe('9007199254740990');
+  });
+  test('string int > MAX_SAFE_INTEGER', async () => {
+    await expect(nRlcAmountSchema().validate('9007199254740992')).resolves.toBe(
+      '9007199254740992',
+    );
+  });
+  test('int 0', async () => {
+    await expect(nRlcAmountSchema().validate(0)).resolves.toBe('0');
+  });
+  test('throw with invalid unit', async () => {
+    expect(() => nRlcAmountSchema().validate('48 rlc')).toThrow(
+      new ValidationError('48 rlc is not a valid amount'),
+    );
+  });
+  test('throw with invalid decimal string', async () => {
+    expect(() => nRlcAmountSchema().validate('0.48')).toThrow(
+      new ValidationError('0.48 is not a valid amount'),
+    );
+  });
+  test('throw with invalid decimal number', async () => {
+    expect(() => nRlcAmountSchema().validate(0.48)).toThrow(
+      new ValidationError('0.48 is not a valid amount'),
+    );
+  });
+  test('throw with hex string', async () => {
+    expect(() => nRlcAmountSchema().validate('0x01')).toThrow(
+      new ValidationError('0x01 is not a valid amount'),
+    );
+  });
+  test('throw with negative int', async () => {
+    await expect(nRlcAmountSchema().validate(-1)).rejects.toThrow(
+      new ValidationError('-1 is not a valid amount'),
+    );
+  });
+  test('throw with negative string int', async () => {
+    await expect(nRlcAmountSchema().validate('-1')).rejects.toThrow(
+      new ValidationError('-1 is not a valid amount'),
+    );
+  });
+});
+
+describe('[weiAmountSchema]', () => {
+  test('int', async () => {
+    await expect(weiAmountSchema().validate(48)).resolves.toBe('48');
+  });
+  test('string int', async () => {
+    await expect(
+      weiAmountSchema().validate('00009007199254740990'),
+    ).resolves.toBe('9007199254740990');
+  });
+  test('defaultUnit ether', async () => {
+    await expect(
+      weiAmountSchema({ defaultUnit: 'ether' }).validate(48),
+    ).resolves.toBe('48000000000000000000');
+  });
+  test('specified unit wei', async () => {
+    await expect(weiAmountSchema().validate('0048 wei')).resolves.toBe('48');
+  });
+  test('specified unit kwei', async () => {
+    await expect(weiAmountSchema().validate('0048 kwei')).resolves.toBe(
+      '48000',
+    );
+  });
+  test('specified unit mwei', async () => {
+    await expect(weiAmountSchema().validate('0048 mwei')).resolves.toBe(
+      '48000000',
+    );
+  });
+  test('specified unit gwei', async () => {
+    await expect(weiAmountSchema().validate('0048 gwei')).resolves.toBe(
+      '48000000000',
+    );
+  });
+  test('specified unit szabo', async () => {
+    await expect(weiAmountSchema().validate('0048 szabo')).resolves.toBe(
+      '48000000000000',
+    );
+  });
+  test('specified unit finney', async () => {
+    await expect(weiAmountSchema().validate('0048 finney')).resolves.toBe(
+      '48000000000000000',
+    );
+  });
+  test('specified unit ether', async () => {
+    await expect(weiAmountSchema().validate('0048 ether')).resolves.toBe(
+      '48000000000000000000',
+    );
+  });
+  test('specified unit eth', async () => {
+    await expect(weiAmountSchema().validate('0048 eth')).resolves.toBe(
+      '48000000000000000000',
+    );
+  });
+  test('specified unit override defaultUnit', async () => {
+    await expect(
+      weiAmountSchema({ defaultUnit: 'ethers' }).validate('48 wei'),
+    ).resolves.toBe('48');
+  });
+  test('valid decimal string', async () => {
+    await expect(weiAmountSchema().validate('00.48 ether')).resolves.toBe(
+      '480000000000000000',
+    );
+  });
+  test('valid decimal number', async () => {
+    await expect(
+      weiAmountSchema({ defaultUnit: 'ether' }).validate(0.48),
+    ).resolves.toBe('480000000000000000');
+  });
+  test('BN', async () => {
+    await expect(
+      weiAmountSchema().validate(new BN('9007199254740990')),
+    ).resolves.toBe('9007199254740990');
+  });
+  test('string int > MAX_SAFE_INTEGER', async () => {
+    await expect(weiAmountSchema().validate('9007199254740992')).resolves.toBe(
+      '9007199254740992',
+    );
+  });
+  test('int 0', async () => {
+    await expect(weiAmountSchema().validate(0)).resolves.toBe('0');
+  });
+  test('throw with invalid unit', async () => {
+    expect(() => weiAmountSchema().validate('48 ethereum')).toThrow(
+      new ValidationError('48 ethereum is not a valid amount'),
+    );
+  });
+  test('throw with invalid decimal string', async () => {
+    expect(() => weiAmountSchema().validate('0.48')).toThrow(
+      new ValidationError('0.48 is not a valid amount'),
+    );
+  });
+  test('throw with invalid decimal number', async () => {
+    expect(() => weiAmountSchema().validate(0.48)).toThrow(
+      new ValidationError('0.48 is not a valid amount'),
+    );
+  });
+  test('throw with hex string', async () => {
+    expect(() => weiAmountSchema().validate('0x01')).toThrow(
+      new ValidationError('0x01 is not a valid amount'),
+    );
+  });
+  test('throw with negative int', async () => {
+    await expect(weiAmountSchema().validate(-1)).rejects.toThrow(
+      new ValidationError('-1 is not a valid amount'),
+    );
+  });
+  test('throw with negative string int', async () => {
+    await expect(weiAmountSchema().validate('-1')).rejects.toThrow(
+      new ValidationError('-1 is not a valid amount'),
     );
   });
 });

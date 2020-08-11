@@ -8,6 +8,8 @@ const {
   utf8ToBuffer,
   encodeTag,
   bytes32Regex,
+  parseRLC,
+  parseEth,
 } = require('./utils');
 const { paramsKeyName, storageProviders } = require('./params-utils');
 const { teePostComputeDefaults } = require('./secrets-utils');
@@ -41,6 +43,34 @@ const hexnumberSchema = () => string()
   );
 
 const uint256Schema = () => stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
+
+const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
+  .transform((value) => {
+    const trimed = value.replace(/^0+/, '');
+    return trimed.length > 0 ? trimed : '0';
+  })
+  .transform((value, originalValue) => {
+    try {
+      return parseRLC(value, defaultUnit).toString();
+    } catch (e) {
+      throw new ValidationError(`${originalValue} is not a valid amount`);
+    }
+  })
+  .matches(/^[0-9]*$/, '${originalValue} is not a valid amount');
+
+const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) => string()
+  .transform((value) => {
+    const trimed = value.replace(/^0+/, '');
+    return trimed.length > 0 ? trimed : '0';
+  })
+  .transform((value, originalValue) => {
+    try {
+      return parseEth(value, defaultUnit).toString();
+    } catch (e) {
+      throw new ValidationError(`${originalValue} is not a valid amount`);
+    }
+  })
+  .matches(/^[0-9]*$/, '${originalValue} is not a valid amount');
 
 const chainIdSchema = () => stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
@@ -420,6 +450,8 @@ module.exports = {
   throwIfMissing,
   stringSchema: string,
   uint256Schema,
+  nRlcAmountSchema,
+  weiAmountSchema,
   addressSchema,
   bytes32Schema,
   apporderSchema,
