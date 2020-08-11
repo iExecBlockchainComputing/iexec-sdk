@@ -3002,6 +3002,17 @@ describe('[Common]', () => {
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('0');
     });
+    test('tx --gas-price "1.1 gwei"', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price "1.1 gwei" --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+      const tx = await tokenChainRPC.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('1100000000');
+    });
     test('tx --gas-price -1 (invalid gas-price)', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price -1 --raw`,
@@ -3009,6 +3020,25 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('Invalid gas price, must be positive');
+    });
+    test('tx --gas-price "0.1 wei" (invalid gas-price)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price "0.1 wei" --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('Invalid ether amount');
+    });
+    test('tx --gas-price "1 ethereum" (invalid gas-price)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price "1 ethereum" --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('Invalid ether unit');
     });
   });
 
