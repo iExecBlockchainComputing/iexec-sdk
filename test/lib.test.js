@@ -2472,17 +2472,54 @@ describe('[order]', () => {
         isNative: false,
       },
     );
+    const app = getRandomAddress();
     const order = await iexec.order.createApporder({
-      app: POOR_ADDRESS2,
+      app,
     });
     expect(order).toEqual({
-      app: '0x650ae1d365369129c326Cd15Bf91793b52B7cf59',
+      app,
       appprice: '0',
       datasetrestrict: '0x0000000000000000000000000000000000000000',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       volume: '1',
       workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+    });
+  });
+
+  test('order.createApporder() override defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const app = getRandomAddress();
+    const datasetrestrict = getRandomAddress();
+    const workerpoolrestrict = getRandomAddress();
+    const requesterrestrict = getRandomAddress();
+    const order = await iexec.order.createApporder({
+      app,
+      appprice: '1 RLC',
+      datasetrestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+      tag: 'tee',
+      volume: 100,
+    });
+    expect(order).toEqual({
+      app,
+      appprice: '1000000000',
+      datasetrestrict,
+      requesterrestrict,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      volume: '100',
+      workerpoolrestrict,
     });
   });
 
@@ -2498,17 +2535,54 @@ describe('[order]', () => {
         isNative: false,
       },
     );
+    const dataset = getRandomAddress();
     const order = await iexec.order.createDatasetorder({
-      dataset: POOR_ADDRESS2,
+      dataset,
     });
     expect(order).toEqual({
       apprestrict: '0x0000000000000000000000000000000000000000',
-      dataset: '0x650ae1d365369129c326Cd15Bf91793b52B7cf59',
+      dataset,
       datasetprice: '0',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       volume: '1',
       workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+    });
+  });
+
+  test('order.createDatasetorder() override defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const dataset = getRandomAddress();
+    const apprestrict = getRandomAddress();
+    const workerpoolrestrict = getRandomAddress();
+    const requesterrestrict = getRandomAddress();
+    const order = await iexec.order.createDatasetorder({
+      dataset,
+      datasetprice: '1 RLC',
+      apprestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+      tag: 'tee',
+      volume: 100,
+    });
+    expect(order).toEqual({
+      dataset,
+      datasetprice: '1000000000',
+      apprestrict,
+      requesterrestrict,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      volume: '100',
+      workerpoolrestrict,
     });
   });
 
@@ -2524,8 +2598,9 @@ describe('[order]', () => {
         isNative: false,
       },
     );
+    const workerpool = getRandomAddress();
     const order = await iexec.order.createWorkerpoolorder({
-      workerpool: POOR_ADDRESS2,
+      workerpool,
       category: 5,
     });
     expect(order).toEqual({
@@ -2536,8 +2611,48 @@ describe('[order]', () => {
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       trust: '0',
       volume: '1',
-      workerpool: '0x650ae1d365369129c326Cd15Bf91793b52B7cf59',
+      workerpool,
       workerpoolprice: '0',
+    });
+  });
+
+  test('order.createWorkerpoolorder() override defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const workerpool = getRandomAddress();
+    const apprestrict = getRandomAddress();
+    const datasetrestrict = getRandomAddress();
+    const requesterrestrict = getRandomAddress();
+    const order = await iexec.order.createWorkerpoolorder({
+      workerpool,
+      workerpoolprice: '0.1 RLC',
+      category: 5,
+      apprestrict,
+      datasetrestrict,
+      requesterrestrict,
+      tag: 'tee',
+      trust: '10',
+      volume: '100',
+    });
+    expect(order).toEqual({
+      apprestrict,
+      category: '5',
+      datasetrestrict,
+      requesterrestrict,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: '10',
+      volume: '100',
+      workerpool,
+      workerpoolprice: '100000000',
     });
   });
 
@@ -2554,12 +2669,13 @@ describe('[order]', () => {
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
+    const app = getRandomAddress();
     const order = await iexec.order.createRequestorder({
-      app: POOR_ADDRESS2,
+      app,
       category: 5,
     });
     expect(order).toEqual({
-      app: '0x650ae1d365369129c326Cd15Bf91793b52B7cf59',
+      app,
       appmaxprice: '0',
       beneficiary: ADDRESS,
       callback: '0x0000000000000000000000000000000000000000',
@@ -2578,6 +2694,65 @@ describe('[order]', () => {
       volume: '1',
       workerpool: '0x0000000000000000000000000000000000000000',
       workerpoolmaxprice: '0',
+    });
+  });
+
+  test('order.createRequestorder() override defaults', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const app = getRandomAddress();
+    const dataset = getRandomAddress();
+    const workerpool = getRandomAddress();
+    const callback = getRandomAddress();
+    const order = await iexec.order.createRequestorder({
+      app,
+      category: 5,
+      dataset,
+      workerpool,
+      callback,
+      appmaxprice: '1 nRLC',
+      datasetmaxprice: '100 nRLC',
+      workerpoolmaxprice: '0.1 RLC',
+      params: {
+        iexec_result_storage_provider: 'dropbox',
+        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
+        iexec_tee_post_compute_image: 'teePostComputeImage',
+        iexec_result_encryption: true,
+      },
+      tag: 'tee',
+      trust: '100',
+      volume: '5',
+    });
+    expect(order).toEqual({
+      app,
+      appmaxprice: '1',
+      beneficiary: ADDRESS,
+      callback,
+      category: '5',
+      dataset,
+      datasetmaxprice: '100',
+      params: {
+        iexec_result_storage_provider: 'dropbox',
+        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
+        iexec_tee_post_compute_image: 'teePostComputeImage',
+        iexec_result_encryption: true,
+      },
+      requester: ADDRESS,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: '100',
+      volume: '5',
+      workerpool,
+      workerpoolmaxprice: '100000000',
     });
   });
 
