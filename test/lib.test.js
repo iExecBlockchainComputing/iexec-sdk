@@ -1354,6 +1354,41 @@ describe('[wallet]', () => {
       true,
     );
   });
+  test('wallet.sendETH() specified unit', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    const txHash = await iexec.wallet.sendETH('0.5 gwei', POOR_ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(
+      finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei),
+    ).toBe(true);
+    expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
+    expect(
+      receiverFinalBalance.wei.eq(
+        receiverInitialBalance.wei.add(new BN('500000000')),
+      ),
+    ).toBe(true);
+    expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
+      true,
+    );
+  });
   test('wallet.sendETH() (throw on native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1395,6 +1430,42 @@ describe('[wallet]', () => {
     expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
     expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
     expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC.add(new BN(5))),
+    ).toBe(true);
+  });
+  test('wallet.sendRLC() specified unit', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    const txHash = await iexec.wallet.sendRLC('0.5 RLC', POOR_ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
+    expect(
+      finalBalance.nRLC.add(new BN('500000000')).eq(initialBalance.nRLC),
+    ).toBe(true);
+    expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC.eq(
+        receiverInitialBalance.nRLC.add(new BN('500000000')),
+      ),
+    ).toBe(true);
   });
   test('wallet.sendRLC() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
@@ -1430,6 +1501,47 @@ describe('[wallet]', () => {
     expect(
       receiverFinalBalance.wei
         .sub(new BN(5).mul(new BN(1000000000)))
+        .eq(receiverInitialBalance.wei),
+    ).toBe(true);
+  });
+  test('wallet.sendRLC() specified unit (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress: nativeHubAddress,
+        isNative: true,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    const txHash = await iexec.wallet.sendRLC('0.000005 RLC', POOR_ADDRESS3);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(
+      POOR_ADDRESS3,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC)).toBe(
+      true,
+    );
+    expect(
+      finalBalance.wei
+        .add(new BN(5000).mul(new BN(1000000000)))
+        .eq(initialBalance.wei),
+    ).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC
+        .sub(new BN(5000))
+        .eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+    expect(
+      receiverFinalBalance.wei
+        .sub(new BN(5000).mul(new BN(1000000000)))
         .eq(receiverInitialBalance.wei),
     ).toBe(true);
   });
