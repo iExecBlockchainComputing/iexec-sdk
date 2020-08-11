@@ -44,6 +44,7 @@ const {
   chainIdSchema,
   bytes32Schema,
   uint256Schema,
+  nRlcAmountSchema,
   throwIfMissing,
   ValidationError,
 } = require('./validator');
@@ -1178,7 +1179,7 @@ const createApporder = async (
   } = {},
 ) => ({
   app: await addressSchema({ ethProvider: contracts.provider }).validate(app),
-  appprice: await uint256Schema().validate(appprice),
+  appprice: await nRlcAmountSchema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
   datasetrestrict: await addressSchema({
@@ -1207,7 +1208,7 @@ const createDatasetorder = async (
   dataset: await addressSchema({
     ethProvider: contracts.provider,
   }).validate(dataset),
-  datasetprice: await uint256Schema().validate(datasetprice),
+  datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
   apprestrict: await addressSchema({
@@ -1238,7 +1239,7 @@ const createWorkerpoolorder = async (
   workerpool: await addressSchema({
     ethProvider: contracts.provider,
   }).validate(workerpool),
-  workerpoolprice: await uint256Schema().validate(workerpoolprice),
+  workerpoolprice: await nRlcAmountSchema().validate(workerpoolprice),
   volume: await uint256Schema().validate(volume),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
@@ -1278,15 +1279,15 @@ const createRequestorder = async (
     app: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(app),
-    appmaxprice: await uint256Schema().validate(appmaxprice),
+    appmaxprice: await nRlcAmountSchema().validate(appmaxprice),
     dataset: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(dataset),
-    datasetmaxprice: await uint256Schema().validate(datasetmaxprice),
+    datasetmaxprice: await nRlcAmountSchema().validate(datasetmaxprice),
     workerpool: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(workerpool),
-    workerpoolmaxprice: await uint256Schema().validate(workerpoolmaxprice),
+    workerpoolmaxprice: await nRlcAmountSchema().validate(workerpoolmaxprice),
     requester: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(requesterOrUser),

@@ -7,6 +7,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
+const { parseEth } = require('./utils');
 const { storageProviders } = require('./params-utils');
 const packageJSON = require('../package.json');
 
@@ -28,10 +29,11 @@ const info = {
   showing: obj => `Showing ${obj}...`,
   counting: obj => `Counting ${obj}...`,
   depositing: () => 'Making deposit...',
+  checkingSwapRate: () => 'Checking swap rate...',
   claiming: obj => `Claiming ${obj}...`,
-  deposited: amount => `Deposited ${amount} nRLC to your iExec account`,
+  deposited: amount => `Deposited ${amount} RLC to your iExec account`,
   withdrawing: () => 'Making withdraw...',
-  withdrawn: amount => `${amount} nRLC withdrawn from your iExec account`,
+  withdrawn: amount => `${amount} RLC withdrawn from your iExec account`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: filePath => `Downloaded task result to file ${filePath}`,
@@ -60,11 +62,11 @@ const desc = {
   claimObj: objName => `claim a ${objName} that is not COMPLETED`,
   deposit: () => 'deposit RLC onto your iExec account',
   withdraw: () => 'withdraw RLC from your iExec account',
-  getETH: () => 'apply for ETH from pre-registered faucets',
-  getRLC: () => 'apply for nRLC from iExec faucet',
-  sendETH: () => 'send ETH to an address',
-  sendRLC: () => 'send nRLC to an address',
-  sweep: () => 'send all ETH and RLC to an address',
+  getETH: () => 'apply for test ether from pre-registered faucets',
+  getRLC: () => 'apply for test RLC from iExec faucet',
+  sendETH: () => 'send ether to an address',
+  sendRLC: () => 'send RLC to an address (default unit nRLC)',
+  sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
@@ -78,8 +80,8 @@ const desc = {
   encryptDataset: () => 'generate a key and encrypt the datasets files from "./datasets/original"',
   generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficary key',
-  bridgeToSidechain: () => 'send nRLC from the mainchain to the sidechain',
-  bridgeToMainchain: () => 'send nRLC from the sidechain to the mainchain',
+  bridgeToSidechain: () => 'send RLC from the mainchain to the sidechain (default unit nRLC)',
+  bridgeToMainchain: () => 'send RLC from the sidechain to the mainchain (default unit nRLC)',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
@@ -365,13 +367,14 @@ const addWalletLoadOptions = (cli) => {
 
 const question = async (
   message,
-  { error = info.userAborted(), strict = true } = {},
+  { error = info.userAborted(), rejectDefault = false, strict = true } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'ok',
       message,
+      default: !rejectDefault,
     },
   ]);
   if (answer.ok) return true;
@@ -422,11 +425,9 @@ const prompt = {
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
-  fillOrder: (amount, orderID) => question(
-    `Do you want to spend ${amount} nRLC to fill order with ID ${orderID} and submit your work`,
-  ),
-  placeOrder: (volume, category, value) => question(
-    `Do you want to place a sell order for ${volume} work category ${category} at ${value} nRLC each`,
+  swapEthToRlc: (etherAmount, rlcAmount) => question(
+    `Do you want to spend ${etherAmount} ether from your wallet to received ${rlcAmount} RLC on your account?`,
+    { rejectDefault: true },
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
@@ -441,14 +442,11 @@ const prompt = {
   limitedVolume: (available, ask) => question(
     `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
   ),
-  limitedStake: (totalCost, stake, payableVolume) => question(
-    `total cost is ${totalCost} nRLC and you have ${stake} nRLC staked on your account. Your stake allows you to purchase ${payableVolume} work, do you want to continue?`,
-  ),
   unpublishFromJsonFile: (orderName, order) => question(`Do you want to unpublish the following ${orderName}? ${order}`),
 };
 
-prompt.transferETH = (...args) => prompt.transfer('ETH', ...args);
-prompt.transferRLC = (...args) => prompt.transfer('nRLC', ...args);
+prompt.transferETH = (...args) => prompt.transfer('ether', ...args);
+prompt.transferRLC = (...args) => prompt.transfer('RLC', ...args);
 prompt.sweep = currencies => (...args) => prompt.transfer(currencies, 'all wallet', ...args);
 
 const oraOptions = {
@@ -682,8 +680,7 @@ const privateKeyName = address => `${address}_key`;
 const computeTxOptions = (opts) => {
   let gasPrice;
   if (opts.gasPrice) {
-    if (!/^\d+$/i.test(opts.gasPrice)) throw Error('Invalid gas price value');
-    const bnGasPrice = new BN(opts.gasPrice);
+    const bnGasPrice = new BN(parseEth(opts.gasPrice, 'wei'));
     if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }

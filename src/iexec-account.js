@@ -4,7 +4,7 @@ const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
 const { loadChain, connectKeystore } = require('./chains');
-const { stringifyNestedBn, NULL_ADDRESS } = require('./utils');
+const { stringifyNestedBn, formatRLC, NULL_ADDRESS } = require('./utils');
 const {
   help,
   addGlobalOptions,
@@ -42,10 +42,9 @@ deposit
         spinner,
       });
       await connectKeystore(chain, keystore, { txOptions });
-
       spinner.start(info.depositing());
       const depositRes = await account.deposit(chain.contracts, amount);
-      spinner.succeed(info.deposited(depositRes.amount), {
+      spinner.succeed(info.deposited(formatRLC(depositRes.amount)), {
         raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
     } catch (error) {
@@ -73,7 +72,7 @@ withdraw
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
       const res = await account.withdraw(chain.contracts, amount);
-      spinner.succeed(info.withdrawn(amount), {
+      spinner.succeed(info.withdrawn(formatRLC(res.amount)), {
         raw: { amount: res.amount, txHash: res.txHash },
       });
     } catch (error) {
@@ -121,9 +120,15 @@ show
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);
       const cleanBalance = stringifyNestedBn(balances);
-      spinner.succeed(`Account balances:${pretty(cleanBalance)}`, {
-        raw: { balance: cleanBalance },
-      });
+      spinner.succeed(
+        `Account balances (RLC):${pretty({
+          stake: formatRLC(cleanBalance.stake),
+          locked: formatRLC(cleanBalance.locked),
+        })}`,
+        {
+          raw: { balance: cleanBalance },
+        },
+      );
     } catch (error) {
       handleError(error, cli, cmd);
     }

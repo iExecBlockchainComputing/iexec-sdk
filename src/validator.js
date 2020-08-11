@@ -302,14 +302,14 @@ const tagSchema = () => mixed()
 const apporderSchema = opt => object(
   {
     app: addressSchema(opt).required(),
-    appprice: uint256Schema().required(),
+    appprice: nRlcAmountSchema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     datasetrestrict: addressSchema(opt).required(),
     workerpoolrestrict: addressSchema(opt).required(),
     requesterrestrict: addressSchema(opt).required(),
   },
-  '${originalValue} is not a valid signed apporder',
+  '${originalValue} is not a valid apporder',
 );
 
 const saltedApporderSchema = opt => apporderSchema(opt).shape(
@@ -325,14 +325,14 @@ const signedApporderSchema = opt => saltedApporderSchema(opt).shape(
 const datasetorderSchema = opt => object(
   {
     dataset: addressSchema(opt).required(),
-    datasetprice: uint256Schema().required(),
+    datasetprice: nRlcAmountSchema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     apprestrict: addressSchema(opt).required(),
     workerpoolrestrict: addressSchema(opt).required(),
     requesterrestrict: addressSchema(opt).required(),
   },
-  '${originalValue} is not a valid signed datasetorder',
+  '${originalValue} is not a valid datasetorder',
 );
 
 const saltedDatasetorderSchema = opt => datasetorderSchema(opt).shape(
@@ -348,7 +348,7 @@ const signedDatasetorderSchema = opt => saltedDatasetorderSchema(opt).shape(
 const workerpoolorderSchema = opt => object(
   {
     workerpool: addressSchema(opt).required(),
-    workerpoolprice: uint256Schema().required(),
+    workerpoolprice: nRlcAmountSchema().required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
     category: catidSchema().required(),
@@ -357,7 +357,7 @@ const workerpoolorderSchema = opt => object(
     datasetrestrict: addressSchema(opt).required(),
     requesterrestrict: addressSchema(opt).required(),
   },
-  '${originalValue} is not a valid signed workerpoolorder',
+  '${originalValue} is not a valid workerpoolorder',
 );
 
 const saltedWorkerpoolorderSchema = opt => workerpoolorderSchema(opt).shape(
@@ -367,17 +367,17 @@ const saltedWorkerpoolorderSchema = opt => workerpoolorderSchema(opt).shape(
 
 const signedWorkerpoolorderSchema = opt => saltedWorkerpoolorderSchema(opt).shape(
   signed(),
-  '${originalValue} is not a valid salted workerpoolorder',
+  '${originalValue} is not a valid signed workerpoolorder',
 );
 
 const requestorderSchema = opt => object(
   {
     app: addressSchema(opt).required(),
-    appmaxprice: uint256Schema().required(),
+    appmaxprice: nRlcAmountSchema().required(),
     dataset: addressSchema(opt).required(),
-    datasetmaxprice: uint256Schema().required(),
+    datasetmaxprice: nRlcAmountSchema().required(),
     workerpool: addressSchema(opt).required(),
-    workerpoolmaxprice: uint256Schema().required(),
+    workerpoolmaxprice: nRlcAmountSchema().required(),
     requester: addressSchema(opt).required(),
     volume: uint256Schema().required(),
     tag: tagSchema().required(),
@@ -387,7 +387,7 @@ const requestorderSchema = opt => object(
     callback: addressSchema(opt).required(),
     params: paramsSchema(),
   },
-  '${originalValue} is not a valid signed requestorder',
+  '${originalValue} is not a valid requestorder',
 );
 
 const saltedRequestorderSchema = opt => requestorderSchema(opt).shape(
