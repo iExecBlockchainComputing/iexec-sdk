@@ -60,11 +60,11 @@ const desc = {
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
   claimObj: objName => `claim a ${objName} that is not COMPLETED`,
-  deposit: () => 'deposit RLC onto your iExec account',
-  withdraw: () => 'withdraw RLC from your iExec account',
+  deposit: () => 'deposit RLC onto your iExec account (default unit nRLC)',
+  withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
   getETH: () => 'apply for test ether from pre-registered faucets',
   getRLC: () => 'apply for test RLC from iExec faucet',
-  sendETH: () => 'send ether to an address',
+  sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
@@ -260,8 +260,8 @@ const option = {
     ])}>`,
   ],
   txGasPrice: () => [
-    '--gas-price <wei>',
-    'set custom gas price for transactions (in wei)',
+    '--gas-price <amount unit...>',
+    'set custom gas price for transactions (default unit wei)',
   ],
   forceUpdateSecret: () => ['--force-update', 'update if already exists'],
   storageToken: () => [
@@ -287,15 +287,21 @@ const orderOption = {
     `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
     'workerpool address, use "deployed" to use last deployed from "deployed.json"',
   ],
-  price: () => ['--price <nRlcAmount>', 'price per task'],
-  appprice: () => ['--app-price <nRlcAmount>', 'app price per task'],
+  price: () => [
+    '--price <amount unit...>',
+    'price per task (default unit nRLC)',
+  ],
+  appprice: () => [
+    '--app-price <amount unit...>',
+    'app price per task (default unit nRLC)',
+  ],
   datasetprice: () => [
-    '--dataset-price <nRlcAmount>',
-    'dataset price per task',
+    '--dataset-price <amount unit...>',
+    'dataset price per task (default unit nRLC)',
   ],
   workerpoolprice: () => [
-    '--workerpool-price <nRlcAmount>',
-    'workerpool price per task',
+    '--workerpool-price <amount unit...>',
+    'workerpool price per task (default unit nRLC)',
   ],
   volume: () => ['--volume <volume>', 'number of run'],
   tag: () => ['--tag <tag>', 'specify tags\n* usage: --tag tag1,tag2'],
@@ -680,7 +686,13 @@ const privateKeyName = address => `${address}_key`;
 const computeTxOptions = (opts) => {
   let gasPrice;
   if (opts.gasPrice) {
-    const bnGasPrice = new BN(parseEth(opts.gasPrice, 'wei'));
+    if (opts.gasPrice.length > 2) {
+      throw Error('Invalid gas price, too much values');
+    }
+    debug('opts.gasPrice', opts.gasPrice);
+    const value = opts.gasPrice[0];
+    const unit = opts.gasPrice.length === 1 ? 'wei' : opts.gasPrice[1];
+    const bnGasPrice = new BN(parseEth(value, unit));
     if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }

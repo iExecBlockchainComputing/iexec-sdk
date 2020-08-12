@@ -24,14 +24,14 @@ const objName = 'account';
 
 cli.name('iexec account').usage('<command> [options]');
 
-const deposit = cli.command('deposit <amount>');
+const deposit = cli.command('deposit <amount> [unit]');
 addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
   .option(...option.txGasPrice())
   .description(desc.deposit())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
@@ -43,7 +43,7 @@ deposit
       });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.depositing());
-      const depositRes = await account.deposit(chain.contracts, amount);
+      const depositRes = await account.deposit(chain.contracts, [amount, unit]);
       spinner.succeed(info.deposited(formatRLC(depositRes.amount)), {
         raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
@@ -52,14 +52,14 @@ deposit
     }
   });
 
-const withdraw = cli.command('withdraw <amount>');
+const withdraw = cli.command('withdraw <amount> [unit]');
 addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
   .option(...option.txGasPrice())
   .description(desc.withdraw())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
@@ -71,7 +71,7 @@ withdraw
       });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
-      const res = await account.withdraw(chain.contracts, amount);
+      const res = await account.withdraw(chain.contracts, [amount, unit]);
       spinner.succeed(info.withdrawn(formatRLC(res.amount)), {
         raw: { amount: res.amount, txHash: res.txHash },
       });

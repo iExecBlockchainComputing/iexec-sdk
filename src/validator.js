@@ -45,6 +45,18 @@ const hexnumberSchema = () => string()
 const uint256Schema = () => stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
 const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
+  .transform((value, originalValue) => {
+    if (Array.isArray(originalValue)) {
+      if (originalValue.length > 2) {
+        throw new ValidationError(`${originalValue} is not a valid amount`);
+      }
+      if (originalValue.length === 2 && originalValue[1]) {
+        return `${originalValue[0]} ${originalValue[1]}`;
+      }
+      return `${originalValue[0]}`;
+    }
+    return value;
+  })
   .transform((value) => {
     const trimed = value.replace(/^0+/, '');
     return trimed.length > 0 ? trimed : '0';
@@ -59,6 +71,18 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
   .matches(/^[0-9]*$/, '${originalValue} is not a valid amount');
 
 const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) => string()
+  .transform((value, originalValue) => {
+    if (Array.isArray(originalValue)) {
+      if (originalValue.length > 2) {
+        throw new ValidationError(`${originalValue} is not a valid amount`);
+      }
+      if (originalValue.length === 2 && originalValue[1]) {
+        return `${originalValue[0]} ${originalValue[1]}`;
+      }
+      return `${originalValue[0]}`;
+    }
+    return value;
+  })
   .transform((value) => {
     const trimed = value.replace(/^0+/, '');
     return trimed.length > 0 ? trimed : '0';

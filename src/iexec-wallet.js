@@ -257,7 +257,7 @@ getRlc
     }
   });
 
-const sendETH = cli.command('sendETH <amount>');
+const sendETH = cli.command('sendETH <amount> [unit]');
 addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
@@ -266,13 +266,13 @@ sendETH
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendETH())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const weiAmount = await weiAmountSchema({
         defaultUnit: 'ether',
-      }).validate(amount);
+      }).validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -308,7 +308,7 @@ sendETH
     }
   });
 
-const sendRLC = cli.command('sendRLC <nRlcAmount>');
+const sendRLC = cli.command('sendRLC <amount> [unit]');
 addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
@@ -317,11 +317,11 @@ sendRLC
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendRLC())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const nRlcAmount = await nRlcAmountSchema().validate(amount);
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -412,7 +412,7 @@ sweep
     }
   });
 
-const bridgeToSidechain = cli.command('bridge-to-sidechain <nRlcAmount>');
+const bridgeToSidechain = cli.command('bridge-to-sidechain <amount> [unit]');
 addGlobalOptions(bridgeToSidechain);
 addWalletLoadOptions(bridgeToSidechain);
 bridgeToSidechain
@@ -420,11 +420,11 @@ bridgeToSidechain
   .option(...option.txGasPrice())
   .option(...option.force())
   .description(desc.bridgeToSidechain())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const nRlcAmount = await nRlcAmountSchema().validate(amount);
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
@@ -497,7 +497,7 @@ bridgeToSidechain
     }
   });
 
-const bridgeToMainchain = cli.command('bridge-to-mainchain <nRlcAmount>');
+const bridgeToMainchain = cli.command('bridge-to-mainchain <amount> [unit]');
 addGlobalOptions(bridgeToMainchain);
 addWalletLoadOptions(bridgeToMainchain);
 bridgeToMainchain
@@ -505,11 +505,11 @@ bridgeToMainchain
   .option(...option.txGasPrice())
   .option(...option.force())
   .description(desc.bridgeToMainchain())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const nRlcAmount = await nRlcAmountSchema().validate(amount);
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
