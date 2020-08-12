@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 - fixed result encryption v5 workflow
 - messages amount use main units (RLC and ether)
+- [DEPRECATED] `iexec wallet show --raw` returned json key `balance.ETH` is deprecated, use `balance.ether` instead
 
 ### Removed
 
