@@ -301,7 +301,7 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('throw with invalid array', async () => {
     expect(() => nRlcAmountSchema().validate(['1', 'RLC', 'RLC'])).toThrow(
-      new ValidationError('1,RLC,RLC is not a valid amount'),
+      new ValidationError('1 RLC RLC is not a valid amount'),
     );
   });
   test('throw with negative int', async () => {
@@ -426,7 +426,7 @@ describe('[weiAmountSchema]', () => {
   });
   test('throw with invalid array', async () => {
     expect(() => weiAmountSchema().validate(['1', 'eth', 'eth'])).toThrow(
-      new ValidationError('1,eth,eth is not a valid amount'),
+      new ValidationError('1 eth eth is not a valid amount'),
     );
   });
   test('throw with negative int', async () => {
