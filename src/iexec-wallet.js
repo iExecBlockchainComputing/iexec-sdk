@@ -274,7 +274,7 @@ sendETH
         defaultUnit: 'ether',
       }).validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
@@ -323,7 +323,7 @@ sendRLC
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
@@ -373,7 +373,7 @@ sweep
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
@@ -426,7 +426,7 @@ bridgeToSidechain
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
@@ -511,7 +511,7 @@ bridgeToMainchain
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),

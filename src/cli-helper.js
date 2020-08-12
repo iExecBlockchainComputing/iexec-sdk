@@ -7,7 +7,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
-const { parseEth } = require('./utils');
+const { weiAmountSchema } = require('./validator');
 const { storageProviders } = require('./params-utils');
 const packageJSON = require('../package.json');
 
@@ -683,17 +683,13 @@ const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
 const publicKeyName = address => `${address}_key.pub`;
 const privateKeyName = address => `${address}_key`;
 
-const computeTxOptions = (opts) => {
+const computeTxOptions = async (opts) => {
   let gasPrice;
   if (opts.gasPrice) {
-    if (opts.gasPrice.length > 2) {
-      throw Error('Invalid gas price, too much values');
-    }
     debug('opts.gasPrice', opts.gasPrice);
-    const value = opts.gasPrice[0];
-    const unit = opts.gasPrice.length === 1 ? 'wei' : opts.gasPrice[1];
-    const bnGasPrice = new BN(parseEth(value, unit));
-    if (bnGasPrice.isNeg()) throw Error('Invalid gas price, must be positive');
+    const bnGasPrice = new BN(
+      await weiAmountSchema({ defaultUnit: 'wei' }).validate(opts.gasPrice),
+    );
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
   debug('gasPrice', gasPrice);

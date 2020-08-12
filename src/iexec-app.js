@@ -139,7 +139,7 @@ deploy
     const spinner = Spinner(opts);
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
-      const txOptions = computeTxOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -409,7 +409,7 @@ run
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
-    const txOptions = computeTxOptions(opts);
+    const txOptions = await computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });

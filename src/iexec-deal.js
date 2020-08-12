@@ -102,7 +102,7 @@ claim
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const chain = await loadChain(cmd.chain, { spinner });
       connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));

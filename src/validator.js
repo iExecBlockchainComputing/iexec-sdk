@@ -44,11 +44,15 @@ const hexnumberSchema = () => string()
 
 const uint256Schema = () => stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
+const amontErrorMessage = ({ originalValue }) => `${
+  Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
+} is not a valid amount`;
+
 const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
   .transform((value, originalValue) => {
     if (Array.isArray(originalValue)) {
       if (originalValue.length > 2) {
-        throw new ValidationError(`${originalValue} is not a valid amount`);
+        throw new ValidationError(amontErrorMessage({ originalValue }));
       }
       if (originalValue.length === 2 && originalValue[1]) {
         return `${originalValue[0]} ${originalValue[1]}`;
@@ -65,16 +69,16 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
     try {
       return parseRLC(value, defaultUnit).toString();
     } catch (e) {
-      throw new ValidationError(`${originalValue} is not a valid amount`);
+      throw new ValidationError(amontErrorMessage({ originalValue }));
     }
   })
-  .matches(/^[0-9]*$/, '${originalValue} is not a valid amount');
+  .matches(/^[0-9]*$/, amontErrorMessage);
 
 const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) => string()
   .transform((value, originalValue) => {
     if (Array.isArray(originalValue)) {
       if (originalValue.length > 2) {
-        throw new ValidationError(`${originalValue} is not a valid amount`);
+        throw new ValidationError(amontErrorMessage({ originalValue }));
       }
       if (originalValue.length === 2 && originalValue[1]) {
         return `${originalValue[0]} ${originalValue[1]}`;
@@ -91,10 +95,10 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) => string()
     try {
       return parseEth(value, defaultUnit).toString();
     } catch (e) {
-      throw new ValidationError(`${originalValue} is not a valid amount`);
+      throw new ValidationError(amontErrorMessage({ originalValue }));
     }
   })
-  .matches(/^[0-9]*$/, '${originalValue} is not a valid amount');
+  .matches(/^[0-9]*$/, amontErrorMessage);
 
 const chainIdSchema = () => stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
