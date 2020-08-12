@@ -2729,7 +2729,7 @@ describe('[order]', () => {
     });
   });
 
-  test('order.createApporder() override defaults', async () => {
+  test('order.createApporder() (override defaults)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -2792,7 +2792,7 @@ describe('[order]', () => {
     });
   });
 
-  test('order.createDatasetorder() override defaults', async () => {
+  test('order.createDatasetorder() (override defaults)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -2858,7 +2858,7 @@ describe('[order]', () => {
     });
   });
 
-  test('order.createWorkerpoolorder() override defaults', async () => {
+  test('order.createWorkerpoolorder() (override defaults)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -2939,7 +2939,7 @@ describe('[order]', () => {
     });
   });
 
-  test('order.createRequestorder() override defaults', async () => {
+  test('order.createRequestorder() (override defaults)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {

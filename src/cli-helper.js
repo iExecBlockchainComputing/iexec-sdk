@@ -198,7 +198,7 @@ const option = {
   orderbookApp: () => ['--app <address>', 'filter by app address'],
   orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
-    '--require-tag <tag...>',
+    '--require-tag <tag>',
     'specify minimum required tags\n* usage: --require-tag tag1,tag2',
   ],
   password: () => [
@@ -298,7 +298,7 @@ const orderOption = {
     'workerpool price per task',
   ],
   volume: () => ['--volume <volume>', 'number of run'],
-  tag: () => ['--tag <tag...>', 'specify tags\n* usage: --tag tag1,tag2'],
+  tag: () => ['--tag <tag>', 'specify tags\n* usage: --tag tag1,tag2'],
   category: () => ['--category <id>', 'id of the task category'],
   trust: () => ['--trust <integer>', 'trust level'],
   apprestrict: () => [
@@ -334,7 +334,7 @@ const orderOption = {
     'specify the arguments to pass to the app',
   ],
   requestInputFiles: () => [
-    '--input-files <fileUrl...>',
+    '--input-files <fileUrl>',
     'specify the URL of input files to be used by the app\n* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip',
   ],
   requestEncryptResult: () => [

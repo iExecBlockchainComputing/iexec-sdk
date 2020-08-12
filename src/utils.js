@@ -157,7 +157,7 @@ const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = hexToBuffer(hexString);
   try {
-    res = multiaddr(buffer).toString('utf8');
+    res = multiaddr(buffer).toString();
   } catch (error) {
     res = buffer.toString();
   }
@@ -167,7 +167,7 @@ const multiaddrHexToHuman = (hexString) => {
 const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
   let multiaddrBuffer;
   try {
-    multiaddrBuffer = multiaddr(str).buffer;
+    multiaddrBuffer = Buffer.from(multiaddr(str).bytes);
   } catch (error) {
     if (strict) throw error;
     multiaddrBuffer = utf8ToBuffer(str);
