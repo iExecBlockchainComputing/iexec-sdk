@@ -345,7 +345,7 @@ iexec info --chain goerli
 ### Transactions options
 
 ```bash
---gas-price <wei> # use the specified value (in wei or specified unit) for next transactions gas price (default use eth_gasPrice current value)
+--gas-price <amount> [unit] # use the specified value (in wei or specified unit) for next transactions gas price (default use eth_gasPrice current value)
 ```
 
 ## init
@@ -370,11 +370,11 @@ iexec wallet getETH # ask ETH from faucets
 iexec wallet getRLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
-iexec wallet sendETH <amount> --to <address> # send ether amount (in ether or specified unit) to the specified eth address
-iexec wallet sendRLC <nRlcAmount> --to <address>  # send RLC amount (in nRLC or specified unit) to the specified eth address
+iexec wallet sendETH <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
+iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC or specified unit) to the specified eth address
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
-iexec wallet bridge-to-sidechain <amount> # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
-iexec wallet bridge-to-mainchain <amount> # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
+iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
+iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
 ```
 
 The wallet files are stored in the Ethereum keystore.
@@ -391,8 +391,8 @@ The keystore location depends on your OS:
 # --chain <chainName>
 # --force
 iexec account show [address] # optional address to show other people's account
-iexec account deposit <amount> # deposit the specified amount of RLC (in nRLC or specified unit) from your wallet to your account
-iexec account withdraw <amount> # withdraw the specified amount of RLC  (in nRLC or specified unit) from your account to your wallet
+iexec account deposit <amount> [unit] # deposit the specified amount of RLC (in nRLC or specified unit) from your wallet to your account
+iexec account withdraw <amount> [unit] # withdraw the specified amount of RLC  (in nRLC or specified unit) from your account to your wallet
 ```
 
 ## app
@@ -441,9 +441,9 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 iexec dataset init # init the dataset template
 iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
 iexec dataset deploy # deploy the dataset on the blockchain
-iexec dataset publish # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
-iexec dataset unpublish [address] # unpublish the last published datasetorder for specified dataset
-iexec dataset unpublish [address] --all # unpublish all the published datasetorders for specified dataset
+iexec dataset publish [datasetAddress] # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
+iexec dataset unpublish [datasetAddress] # unpublish the last published datasetorder for specified dataset
+iexec dataset unpublish [datasetAddress] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
@@ -460,9 +460,9 @@ iexec dataset check-secret [datasetAddress] # check if a secret exists for the d
 # --user <address>
 iexec workerpool init # init the workerpool template
 iexec workerpool deploy # deploy the workerpool on the blockchain
-iexec workerpool publish --price '0.1 RLC' # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
-iexec workerpool unpublish [address] # unpublish the last published workerpoolorder for specified workerpool
-iexec workerpool unpublish [address] --all # unpublish all the published workerpoolorders for specified workerpool
+iexec workerpool publish [workerpoolAddress] --price <amount> [unit] # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
+iexec workerpool unpublish [workerpoolAddress] # unpublish the last published workerpoolorder for specified workerpool
+iexec workerpool unpublish [workerpoolAddress] --all # unpublish all the published workerpoolorders for specified workerpool
 iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool
