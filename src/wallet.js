@@ -8,10 +8,17 @@ const {
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   checksummedAddress,
+  formatRLC,
 } = require('./utils');
 const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
-const { addressSchema, uint256Schema, throwIfMissing } = require('./validator');
+const {
+  addressSchema,
+  uint256Schema,
+  nRlcAmountSchema,
+  weiAmountSchema,
+  throwIfMissing,
+} = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 const { BridgeError } = require('./errors');
 
@@ -221,7 +228,7 @@ const sendERC20 = async (
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
   }).validate(to);
-  const vAmount = await uint256Schema().validate(nRlcAmount);
+  const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
   try {
     const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const rlcContract = contracts.getRLCContract({ at: rlcAddress });
@@ -245,7 +252,7 @@ const sendETH = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
-    const vValue = await uint256Schema().validate(value);
+    const vValue = await weiAmountSchema().validate(value);
     if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     const txHash = await sendNativeToken(contracts, vValue, vAddress);
     return txHash;
@@ -264,7 +271,7 @@ const sendRLC = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
-    const vAmount = await uint256Schema().validate(nRlcAmount);
+    const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (contracts.isNative) {
       debug('send native token');
       const weiValue = bnNRlcToBnWei(new BN(vAmount)).toString();
@@ -361,7 +368,7 @@ const bridgeToSidechain = async (
         ethProvider: contracts.provider,
       }).validate(sidechainBridgeAddress)
       : undefined;
-    const vAmount = await uint256Schema().validate(nRlcAmount);
+    const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
 
     const ercBridgeContract = new Contract(
@@ -377,12 +384,16 @@ const bridgeToSidechain = async (
     ]);
     if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
       throw Error(
-        `Minimum amount allowed to bridge is ${minPerTx.toString()} nRLC`,
+        `Minimum amount allowed to bridge is ${formatRLC(
+          minPerTx.toString(),
+        )} RLC`,
       );
     }
     if (new BN(vAmount).gt(ethersBnToBn(maxPerTx))) {
       throw Error(
-        `Maximum amount allowed to bridge is ${maxPerTx.toString()} nRLC`,
+        `Maximum amount allowed to bridge is ${formatRLC(
+          maxPerTx.toString(),
+        )} RLC`,
       );
     }
     // check daily amount transfered to bridge
@@ -475,7 +486,9 @@ const bridgeToSidechain = async (
     const withinLimit = totalSpentPerDay.lt(ethersBnToBn(dailyLimit));
     if (!withinLimit) {
       throw Error(
-        `Amount to bridge would exceed bridge daily limit. ${totalSpentPerDay}/${dailyLimit} nRLC already bridged today.`,
+        `Amount to bridge would exceed bridge daily limit. ${formatRLC(
+          totalSpentPerDay,
+        )}/${formatRLC(dailyLimit)} RLC already bridged today.`,
       );
     }
 
@@ -541,7 +554,7 @@ const bridgeToMainchain = async (
         ethProvider: contracts.provider,
       }).validate(mainchainBridgeAddress)
       : undefined;
-    const vAmount = await uint256Schema().validate(nRlcAmount);
+    const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
 
     const sidechainBridgeContract = new Contract(
@@ -578,25 +591,25 @@ const bridgeToMainchain = async (
 
     if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
       throw Error(
-        `Minimum amount allowed to bridge is ${truncateBnWeiToBnNRlc(
-          ethersBnToBn(minPerTx),
-        )} nRLC`,
+        `Minimum amount allowed to bridge is ${formatRLC(
+          truncateBnWeiToBnNRlc(ethersBnToBn(minPerTx)),
+        )} RLC`,
       );
     }
     if (bnWeiValue.gt(ethersBnToBn(maxPerTx))) {
       throw Error(
-        `Maximum amount allowed to bridge is ${truncateBnWeiToBnNRlc(
-          ethersBnToBn(maxPerTx),
-        )} nRLC`,
+        `Maximum amount allowed to bridge is ${formatRLC(
+          truncateBnWeiToBnNRlc(ethersBnToBn(maxPerTx)),
+        )} RLC`,
       );
     }
     if (!withinLimit) {
       throw Error(
-        `Amount to bridge would exceed bridge daily limit. ${truncateBnWeiToBnNRlc(
-          ethersBnToBn(totalSpentPerDay),
-        )}/${truncateBnWeiToBnNRlc(
-          ethersBnToBn(dailyLimit),
-        )} nRLC already bridged today`,
+        `Amount to bridge would exceed bridge daily limit. ${formatRLC(
+          truncateBnWeiToBnNRlc(ethersBnToBn(totalSpentPerDay)),
+        )}/${formatRLC(
+          truncateBnWeiToBnNRlc(ethersBnToBn(dailyLimit)),
+        )} RLC already bridged today`,
       );
     }
 

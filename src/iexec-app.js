@@ -75,6 +75,7 @@ const {
   checkActiveBitInTag,
   BN,
   stringifyNestedBn,
+  formatRLC,
 } = require('./utils');
 const { paramsKeyName } = require('./params-utils');
 const {
@@ -138,7 +139,7 @@ deploy
     const spinner = Spinner(opts);
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
-      const txOptions = computeTxOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -408,7 +409,7 @@ run
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
-    const txOptions = computeTxOptions(opts);
+    const txOptions = await computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -760,7 +761,9 @@ run
       const { stake } = await checkBalance(chain.contracts, requester);
       if (totalCost.gt(stake)) {
         throw Error(
-          `Not enough RLC on your account (${totalCost} nRLC required). Run "iexec account deposit" to topup your account.`,
+          `Not enough RLC on your account (${formatRLC(
+            totalCost,
+          )} RLC required). Run "iexec account deposit" to topup your account.`,
         );
       }
 
@@ -768,32 +771,36 @@ run
 
       if (!opts.force) {
         await prompt.custom(
-          `Do you want to spend ${totalCost} nRLC to execute the following request: ${pretty(
-            {
-              app: `${requestorder.app} (${requestorder.appmaxprice} nRLC)`,
-              dataset:
-                requestorder.dataset !== NULL_ADDRESS
-                  ? `${requestorder.dataset} (${requestorder.datasetmaxprice} nRLC)`
-                  : undefined,
-              workerpool: `${requestorder.workerpool} (${requestorder.workerpoolmaxprice} nRLC)`,
-              params:
-                (requestorder.params && JSON.parse(requestorder.params))
-                || undefined,
-              category: requestorder.category,
-              tag:
-                requestorder.tag !== NULL_BYTES32
-                  ? requestorder.tag
-                  : undefined,
-              callback:
-                requestorder.callback !== NULL_ADDRESS
-                  ? requestorder.callback
-                  : undefined,
-              beneficiary:
-                requestorder.beneficiary !== requestorder.requester
-                  ? requestorder.beneficiary
-                  : undefined,
-            },
-          )}`,
+          `Do you want to spend ${formatRLC(
+            totalCost,
+          )} RLC to execute the following request: ${pretty({
+            app: `${requestorder.app} (${formatRLC(
+              requestorder.appmaxprice,
+            )} RLC)`,
+            dataset:
+              requestorder.dataset !== NULL_ADDRESS
+                ? `${requestorder.dataset} (${formatRLC(
+                  requestorder.datasetmaxprice,
+                )} RLC)`
+                : undefined,
+            workerpool: `${requestorder.workerpool} (${formatRLC(
+              requestorder.workerpoolmaxprice,
+            )} RLC)`,
+            params:
+              (requestorder.params && JSON.parse(requestorder.params))
+              || undefined,
+            category: requestorder.category,
+            tag:
+              requestorder.tag !== NULL_BYTES32 ? requestorder.tag : undefined,
+            callback:
+              requestorder.callback !== NULL_ADDRESS
+                ? requestorder.callback
+                : undefined,
+            beneficiary:
+              requestorder.beneficiary !== requestorder.requester
+                ? requestorder.beneficiary
+                : undefined,
+          })}`,
         );
       }
 

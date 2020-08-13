@@ -6,9 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- support for unit in amounts
+  - ether units: `ether` (`eth`), `finney`, `szabo`, `gwei`, `mwei`, `kwei`, `wei`
+  - RLC units: `RLC`, `nRLC`
+
 ### Changed
 
 - fixed result encryption v5 workflow
+- messages amount use main units (RLC and ether)
+- [DEPRECATED] `iexec wallet show --raw` returned json key `balance.ETH` is deprecated, use `balance.ether` instead
 
 ### Removed
 

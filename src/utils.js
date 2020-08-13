@@ -90,12 +90,21 @@ const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (
-    !['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'].includes(unit)
+    ![
+      'wei',
+      'kwei',
+      'mwei',
+      'gwei',
+      'szabo',
+      'finney',
+      'ether',
+      'eth',
+    ].includes(unit)
   ) {
     throw Error('Invalid ether unit');
   }
   try {
-    return ethersBnToBn(parseUnits(amount, unit));
+    return ethersBnToBn(parseUnits(amount, unit === 'eth' ? 'ether' : unit));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid ether amount');
@@ -148,7 +157,7 @@ const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = hexToBuffer(hexString);
   try {
-    res = multiaddr(buffer).toString('utf8');
+    res = multiaddr(buffer).toString();
   } catch (error) {
     res = buffer.toString();
   }
@@ -158,7 +167,7 @@ const multiaddrHexToHuman = (hexString) => {
 const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
   let multiaddrBuffer;
   try {
-    multiaddrBuffer = multiaddr(str).buffer;
+    multiaddrBuffer = Buffer.from(multiaddr(str).bytes);
   } catch (error) {
     if (strict) throw error;
     multiaddrBuffer = utf8ToBuffer(str);
