@@ -345,7 +345,7 @@ iexec info --chain goerli
 ### Transactions options
 
 ```bash
---gas-price <wei> # use the specified value for next transactions gas price (default use eth_gasPrice result)
+--gas-price <amount> [unit] # use the specified value (in wei or specified unit) for next transactions gas price (default use eth_gasPrice current value)
 ```
 
 ## init
@@ -370,11 +370,11 @@ iexec wallet getETH # ask ETH from faucets
 iexec wallet getRLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
-iexec wallet sendETH <amount> --to <address> # send ETH to the specified eth address
-iexec wallet sendRLC <nRlcAmount> --to <address>  # send RLC to the specified eth address
-iexec wallet sweep --to <address> # drain all ETH and RLC, sending them to the specified eth address
-iexec wallet bridge-to-sidechain <nRlcAmount> # send RLC from a mainchain to the bridged sidechain.
-iexec wallet bridge-to-mainchain <nRlcAmount> # send RLC from a sidechain to the bridged mainchain.
+iexec wallet sendETH <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
+iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC or specified unit) to the specified eth address
+iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
+iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
+iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
 ```
 
 The wallet files are stored in the Ethereum keystore.
@@ -391,8 +391,8 @@ The keystore location depends on your OS:
 # --chain <chainName>
 # --force
 iexec account show [address] # optional address to show other people's account
-iexec account deposit <amount> # deposit the specified amount of RLC from your wallet to your account
-iexec account withdraw <amount> # withdraw the specified amount of RLC from your account to your wallet
+iexec account deposit <amount> [unit] # deposit the specified amount of RLC (in nRLC or specified unit) from your wallet to your account
+iexec account withdraw <amount> [unit] # withdraw the specified amount of RLC  (in nRLC or specified unit) from your account to your wallet
 ```
 
 ## app
@@ -441,9 +441,9 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 iexec dataset init # init the dataset template
 iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
 iexec dataset deploy # deploy the dataset on the blockchain
-iexec dataset publish # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
-iexec dataset unpublish [address] # unpublish the last published datasetorder for specified dataset
-iexec dataset unpublish [address] --all # unpublish all the published datasetorders for specified dataset
+iexec dataset publish [datasetAddress] # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
+iexec dataset unpublish [datasetAddress] # unpublish the last published datasetorder for specified dataset
+iexec dataset unpublish [datasetAddress] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
@@ -460,9 +460,9 @@ iexec dataset check-secret [datasetAddress] # check if a secret exists for the d
 # --user <address>
 iexec workerpool init # init the workerpool template
 iexec workerpool deploy # deploy the workerpool on the blockchain
-iexec workerpool publish --price 100 # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
-iexec workerpool unpublish [address] # unpublish the last published workerpoolorder for specified workerpool
-iexec workerpool unpublish [address] --all # unpublish all the published workerpoolorders for specified workerpool
+iexec workerpool publish [workerpoolAddress] --price <amount> [unit] # publish an workerpoolorder to make your workerpool computing power publicly available on the marketplace
+iexec workerpool unpublish [workerpoolAddress] # unpublish the last published workerpoolorder for specified workerpool
+iexec workerpool unpublish [workerpoolAddress] --all # unpublish all the published workerpoolorders for specified workerpool
 iexec workerpool show [address|index] # show workerpool details
 iexec workerpool count # count your total number of workerpool
 iexec workerpool count --user <userAddress> # count user total number of workerpool
@@ -1029,7 +1029,7 @@ console.log('Eth wei:', balance.wei.toString());
 
 #### sendRLC
 
-iexec.**wallet.sendRLC ( nRlcAmount: Uint256, address: Address )** => Promise < **TxHash** >
+iexec.**wallet.sendRLC ( nRlcAmount: NRlcAmount, address: Address )** => Promise < **TxHash** >
 
 > send some nRLC (1 nRLC = 1\*10^-9 RLC) to the specified address
 
@@ -1042,7 +1042,7 @@ console.log('Transaction hash:', txHash);
 
 #### sendETH
 
-iexec.**wallet.sendETH ( weiAmount, address: Address )** => Promise < **TxHash** >
+iexec.**wallet.sendETH ( weiAmount: WeiAmount, address: Address )** => Promise < **TxHash** >
 
 > send some wei to the specified address
 
@@ -1067,7 +1067,7 @@ await sdk.wallet.sweep(toEthAddress);
 
 #### bridgeToSidechain
 
-iexec.**wallet.bridgeToSidechain ( address: Uint256 )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
+iexec.**wallet.bridgeToSidechain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
 
 > send some nRLC (1 nRLC = 1\*10^-9 RLC) to the sidechain.
 > RLC is send to the mainchain bridge smart contract on mainchain then credited on sidechain by the sidechain bridge smart contract
@@ -1088,7 +1088,7 @@ console.log(
 
 #### bridgeToMainchain
 
-iexec.**wallet.bridgeToMainchain ( address: Uint256 )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
+iexec.**wallet.bridgeToMainchain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
 
 > send some nRLC (1 nRLC = 1\*10^-9 RLC) to the mainchain.
 > RLC is send to the sidechain bridge smart contract on sidechain then credited on mainchain by the mainchain bridge smart contract
@@ -1125,7 +1125,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### deposit
 
-iexec.**account.deposit ( nRlcAmount: Uint256 )** => Promise < **{ amount: BN, txHash: TxHash }** >
+iexec.**account.deposit ( nRlcAmount: NRlcAmount )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
 > deposit some nRLC (1 nRLC = 1\*10^-9 RLC) from user wallet to user account
 >
@@ -1141,7 +1141,7 @@ console.log('tx:', txHash);
 
 #### withdraw
 
-iexec.**account.withdraw ( nRlcAmount: Uint256 )** => Promise < **{ amount: BN, txHash: TxHash }** >
+iexec.**account.withdraw ( nRlcAmount: NRlcAmount )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
 > withdraw some nRLC (1 nRLC = 1\*10^-9 RLC) from user account to user wallet
 
@@ -1323,7 +1323,7 @@ console.log('remaining:', res.remaining);
 
 #### createApporder
 
-iexec.**order.createApporder ( { app: Address \[, appprice: Uint256, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
+iexec.**order.createApporder ( { app: Address \[, appprice: NRlcAmount, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
 > create an apporder with specified params
 >
@@ -1376,7 +1376,7 @@ const hash = await iexec.order.hashApporder(apporder);
 
 #### createDatasetorder
 
-iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: Uint256, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
+iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: NRlcAmount, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
 > create a datasetorder with specified params
 >
@@ -1431,7 +1431,7 @@ const hash = await iexec.order.hashDatasetorder(datasetorder);
 
 #### createWorkerpoolorder
 
-iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: Uint256, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
+iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: NRlcAmount, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
 > create a workerpoolorder with specified params
 >
@@ -1489,7 +1489,7 @@ const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 
 #### createRequestorder
 
-iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: Uint256, workerpoolmaxprice: Uint256, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: Uint256, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
+iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
 >
@@ -2362,7 +2362,7 @@ console.log(utils.NULL_BYTES32);
 utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
 
 > parse an ether amount and return the value in wei
-> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether'
+> supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth')
 > default unit 'wei'
 
 _Example:_
@@ -2373,7 +2373,7 @@ console.log('5 gwei = ' + utils.parseEth('5 gwei') + 'wei');
 
 #### formatEth
 
-utils.**formatEth (weiAmount: BN)** => etherAmount: String
+utils.**formatEth (weiAmount: BN|Number|String)** => etherAmount: String
 
 > return the display value of a wei amount in ether
 
@@ -2381,7 +2381,7 @@ _Example:_
 
 ```js
 console.log(
-  '500000000 wei = ' + utils.formatEth(new utils.BN('500000000')) + 'ether',
+  '500000000 wei = ' + utils.formatEth('500000000')) + 'ether',
 );
 ```
 
@@ -2401,16 +2401,14 @@ console.log('5 RLC = ' + utils.parseEth('5 RLC') + 'nRLC');
 
 #### formatRLC
 
-utils.**formatRLC (nRlcAmount: BN)** => RlcAmount: String
+utils.**formatRLC (nRlcAmount: BN|Number|String)** => RlcAmount: String
 
 > return the display value of a nRLC amount in RLC
 
 _Example:_
 
 ```js
-console.log(
-  '500000000 nRLC = ' + utils.formatRLC(new utils.BN('500000000')) + 'RLC',
-);
+console.log('500000000 nRLC = ' + utils.formatRLC('500000000') + 'RLC');
 ```
 
 #### encodeTag
@@ -2547,6 +2545,30 @@ Accepted:
 - String
 - BN
 
+#### WeiAmount
+
+`WeiAmount` is a decimal string representation of a wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,000,000,000 wei).
+
+Accepted:
+
+- Number
+- String with optionnal unit (ex: `'1000000'`, `'0.01 ether'`)
+  - accepted units: `ether` (`eth`), `finney`, `szabo`, `gwei`, `mwei`, `kwei`, `wei`
+  - default unit: `wei`
+- BN
+
+#### NRlcAmount
+
+`NRlcAmount` is a decimal string representation of a nRLC (nano RLC) amount (nRLC is the smallest sub-division of RLC: 1 RLC = 1,000,000,000 RLC).
+
+Accepted:
+
+- Number
+- String with optionnal unit (ex: `'1000000'`, `'1000000 nRLC'`, `'0.01 RLC'`)
+  - accepted units: `RCL`, `nRLC`
+  - default unit: `nRLC`
+- BN
+
 #### Tag
 
 `Tag` is task tag representation. A Tag is the encoding of 256 flags under a bytes32.
@@ -2640,7 +2662,7 @@ Accepted:
 ```js
 {
   app: Address,
-  appprice: Uint256,
+  appprice: uint256S,
   volume: Uint256,
   tag: Bytes32,
   datasetrestrict: Address,
@@ -2658,7 +2680,7 @@ Accepted:
 ```js
 {
   dataset: Address,
-  datasetprice: Uint256,
+  datasetprice: NRlcAmount,
   volume: Uint256,
   tag: Bytes32,
   apprestrict: Address,
@@ -2674,7 +2696,7 @@ Accepted:
 ```js
 {
   dataset: Address,
-  datasetprice: Uint256,
+  datasetprice: uint256S,
   volume: Uint256,
   tag: Bytes32,
   apprestrict: Address,
@@ -2692,7 +2714,7 @@ Accepted:
 ```js
 {
   workerpool: Address,
-  workerpoolprice: Uint256,
+  workerpoolprice: NRlcAmount,
   volume: Uint256,
   tag: Bytes32,
   category: Uint256,
@@ -2730,11 +2752,11 @@ Accepted:
 ```js
 {
   app: Address,
-  appmaxprice: uint256S,
+  appmaxprice: NRlcAmount,
   dataset: Address,
-  datasetmaxprice: uint256,
+  datasetmaxprice: NRlcAmount,
   workerpool: Address,
-  workerpoolprice: Uint256,
+  workerpoolprice: NRlcAmount,
   requester: Address,
   volume: Uint256,
   tag: Bytes32,
@@ -2857,7 +2879,7 @@ If your program is not written in javascript, your last option to use the SDK wo
 Finally, you could choose to parse the SDK stdout/stderr to access more information. Use the global option --raw to get json formatted output. ex:
 
 - `iexec wallet show --raw &> out.txt`
-- `iexec wallet show --raw |& grep .`
+- `iexec wallet show --raw | jq .`
 
 Warning:
 

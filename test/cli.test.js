@@ -396,6 +396,47 @@ describe('[Mainchain]', () => {
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   }, 30000);
 
+  test('[mainchain] iexec account deposit 10 RLC', async () => {
+    const initialWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show --raw`),
+      ).balance.nRLC,
+    );
+    const initialAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show --raw`),
+      ).balance.stake,
+    );
+    const amount = '10';
+    const raw = await execAsync(
+      `${iexecPath} account deposit ${amount} RLC --raw`,
+    );
+    const res = JSON.parse(raw);
+    const bnAmount = new BN(amount).mul(new BN('1000000000'));
+    expect(res.ok).toBe(true);
+    expect(res.amount).toBe(bnAmount.toString());
+    expect(res.txHash).toBeDefined();
+    const finalWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show --raw`),
+      ).balance.nRLC,
+    );
+    const finalAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show --raw`),
+      ).balance.stake,
+    );
+    expect(initialWalletBalance.sub(bnAmount).eq(finalWalletBalance)).toBe(
+      true,
+    );
+    expect(initialAccountBalance.add(bnAmount).eq(finalAccountBalance)).toBe(
+      true,
+    );
+    const tx = await tokenChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  }, 30000);
+
   test('[mainchain] iexec account withdraw 500', async () => {
     const initialWalletBalance = new BN(
       JSON.parse(
@@ -416,6 +457,47 @@ describe('[Mainchain]', () => {
     expect(res.amount).toBe(amount);
     expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
+    const finalWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show --raw`),
+      ).balance.nRLC,
+    );
+    const finalAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show --raw`),
+      ).balance.stake,
+    );
+    expect(initialWalletBalance.add(bnAmount).eq(finalWalletBalance)).toBe(
+      true,
+    );
+    expect(initialAccountBalance.sub(bnAmount).eq(finalAccountBalance)).toBe(
+      true,
+    );
+    const tx = await tokenChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  }, 30000);
+
+  test('[mainchain] iexec account withdraw 5 RLC', async () => {
+    const initialWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show --raw`),
+      ).balance.nRLC,
+    );
+    const initialAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show --raw`),
+      ).balance.stake,
+    );
+    const amount = '5';
+    const raw = await execAsync(
+      `${iexecPath} account withdraw ${amount} RLC --raw`,
+    );
+    const res = JSON.parse(raw);
+    const bnAmount = new BN(amount).mul(new BN('1000000000'));
+    expect(res.ok).toBe(true);
+    expect(res.amount).toBe(bnAmount.toString());
+    expect(res.txHash).toBeDefined();
     const finalWalletBalance = new BN(
       JSON.parse(
         await execAsync(`${iexecPath} wallet show --raw`),
@@ -1603,7 +1685,7 @@ describe('[Mainchain]', () => {
   });
 
   // sendRLC
-  test('[mainchain] iexec wallet sendRLC', async () => {
+  test('[mainchain] iexec wallet sendRLC 1000000000', async () => {
     const raw = await execAsync(
       `${iexecPath} wallet sendRLC 1000000000 --to ${POOR_ADDRESS1} --force --raw`,
     );
@@ -1612,6 +1694,21 @@ describe('[Mainchain]', () => {
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
     expect(res.amount).toBe('1000000000');
+    expect(res.txHash).toBeDefined();
+    const tx = await tokenChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  });
+
+  test('[mainchain] iexec wallet sendRLC 0.5 RLC', async () => {
+    const raw = await execAsync(
+      `${iexecPath} wallet sendRLC 0.5 RLC --to ${POOR_ADDRESS1} --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.from).toBe(ADDRESS);
+    expect(res.to).toBe(POOR_ADDRESS1);
+    expect(res.amount).toBe('500000000');
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
@@ -1674,7 +1771,7 @@ describe('[Mainchain]', () => {
           await execAsync(`${iexecPath} app deploy --raw`),
         );
         const raw = await execAsync(
-          `${iexecPath} app publish ${address} --price 10 --volume 100 --tag tee --force --raw`,
+          `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee --force --raw`,
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
@@ -1686,7 +1783,7 @@ describe('[Mainchain]', () => {
         );
         expect(orderShowRes.apporder.order).toEqual({
           app: address,
-          appprice: 10,
+          appprice: 100000000,
           volume: 100,
           tag:
             '0x0000000000000000000000000000000000000000000000000000000000000001',
@@ -1790,7 +1887,7 @@ describe('[Mainchain]', () => {
           await execAsync(`${iexecPath} dataset deploy --raw`),
         );
         const raw = await execAsync(
-          `${iexecPath} dataset publish ${address} --price 10 --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
+          `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
@@ -1802,7 +1899,7 @@ describe('[Mainchain]', () => {
         );
         expect(orderShowRes.datasetorder.order).toEqual({
           dataset: address,
-          datasetprice: 10,
+          datasetprice: 100000000,
           volume: 100,
           tag:
             '0x0000000000000000000000000000000000000000000000000000000000000001',
@@ -1911,7 +2008,7 @@ describe('[Mainchain]', () => {
           await execAsync(`${iexecPath} workerpool deploy --raw`),
         );
         const raw = await execAsync(
-          `${iexecPath} workerpool publish ${address} --price 2 --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
+          `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
         );
         const res = JSON.parse(raw);
         expect(res.ok).toBe(true);
@@ -2047,7 +2144,7 @@ describe('[Sidechain]', () => {
     expect(res.ok).toBe(false);
   });
 
-  test('[sidechain] iexec wallet sendRLC', async () => {
+  test('[sidechain] iexec wallet sendRLC 1000000000', async () => {
     const raw = await execAsync(
       `${iexecPath} wallet sendRLC 1000000000 --to ${POOR_ADDRESS1} --force --raw`,
     );
@@ -2056,6 +2153,21 @@ describe('[Sidechain]', () => {
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
     expect(res.amount).toBe('1000000000');
+    expect(res.txHash).toBeDefined();
+    const tx = await nativeChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+  });
+
+  test('[sidechain] iexec wallet sendRLC 0.5 RLC', async () => {
+    const raw = await execAsync(
+      `${iexecPath} wallet sendRLC 0.5 RLC --to ${POOR_ADDRESS1} --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.from).toBe(ADDRESS);
+    expect(res.to).toBe(POOR_ADDRESS1);
+    expect(res.amount).toBe('500000000');
     expect(res.txHash).toBeDefined();
     const tx = await nativeChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
@@ -2101,6 +2213,47 @@ describe('[Sidechain]', () => {
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
   }, 30000);
 
+  test('[sidechain] iexec account deposit 5 RLC', async () => {
+    const initialWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+      ).balance.nRLC,
+    );
+    const initialAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+      ).balance.stake,
+    );
+    const amount = '5';
+    const raw = await execAsync(
+      `${iexecPath} account deposit ${amount} RLC --raw`,
+    );
+    const res = JSON.parse(raw);
+    const bnAmount = new BN(amount).mul(new BN('1000000000'));
+    expect(res.ok).toBe(true);
+    expect(res.amount).toBe(bnAmount.toString());
+    expect(res.txHash).toBeDefined();
+    const finalWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+      ).balance.nRLC,
+    );
+    const finalAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+      ).balance.stake,
+    );
+    expect(initialWalletBalance.sub(bnAmount).gte(finalWalletBalance)).toBe(
+      true,
+    );
+    expect(initialAccountBalance.add(bnAmount).eq(finalAccountBalance)).toBe(
+      true,
+    );
+    const tx = await nativeChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+  }, 30000);
+
   test('[sidechain] iexec account withdraw 500', async () => {
     const initialWalletBalance = new BN(
       JSON.parse(
@@ -2121,6 +2274,47 @@ describe('[Sidechain]', () => {
     expect(res.amount).toBe(amount);
     expect(res.txHash).toBeDefined();
     const bnAmount = new BN(amount);
+    const finalWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+      ).balance.nRLC,
+    );
+    const finalAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+      ).balance.stake,
+    );
+    expect(initialWalletBalance.add(bnAmount).gte(finalWalletBalance)).toBe(
+      true,
+    );
+    expect(initialAccountBalance.sub(bnAmount).eq(finalAccountBalance)).toBe(
+      true,
+    );
+    const tx = await nativeChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
+  }, 30000);
+
+  test('[sidechain] iexec account withdraw 2 RLC', async () => {
+    const initialWalletBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
+      ).balance.nRLC,
+    );
+    const initialAccountBalance = new BN(
+      JSON.parse(
+        await execAsync(`${iexecPath} account show ${ADDRESS} --raw`),
+      ).balance.stake,
+    );
+    const amount = '2';
+    const raw = await execAsync(
+      `${iexecPath} account withdraw ${amount} RLC --raw`,
+    );
+    const res = JSON.parse(raw);
+    const bnAmount = new BN(amount).mul(new BN('1000000000'));
+    expect(res.ok).toBe(true);
+    expect(res.amount).toBe(bnAmount.toString());
+    expect(res.txHash).toBeDefined();
     const finalWalletBalance = new BN(
       JSON.parse(
         await execAsync(`${iexecPath} wallet show ${ADDRESS} --raw`),
@@ -3002,6 +3196,17 @@ describe('[Common]', () => {
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('0');
     });
+    test('tx --gas-price 1.1 gwei', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price 1.1 gwei --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+      const tx = await tokenChainRPC.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('1100000000');
+    });
     test('tx --gas-price -1 (invalid gas-price)', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price -1 --raw`,
@@ -3009,6 +3214,25 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('-1 is not a valid amount');
+    });
+    test('tx --gas-price 0.1 wei (invalid gas-price)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price 0.1 wei --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('0.1 wei is not a valid amount');
+    });
+    test('tx --gas-price 1 ethereum (invalid gas-price)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account deposit 1 --gas-price 1 ethereum --raw`,
+      ).catch(e => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.txHash).toBeUndefined();
+      expect(res.error.message).toBe('1 ethereum is not a valid amount');
     });
   });
 

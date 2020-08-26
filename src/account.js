@@ -7,7 +7,11 @@ const {
   bnToEthersBn,
   NULL_BYTES,
 } = require('./utils');
-const { uint256Schema, addressSchema, throwIfMissing } = require('./validator');
+const {
+  nRlcAmountSchema,
+  addressSchema,
+  throwIfMissing,
+} = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
 const { getAddress, checkBalances } = require('./wallet');
 
@@ -38,10 +42,9 @@ const deposit = async (
   amount = throwIfMissing(),
 ) => {
   try {
-    const vAmount = await uint256Schema().validate(amount);
+    const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0))) throw Error('Deposit amount must be greather than 0');
     let txHash;
-
     const { nRLC } = await checkBalances(
       contracts,
       await getAddress(contracts),
@@ -94,7 +97,7 @@ const withdraw = async (
   amount = throwIfMissing(),
 ) => {
   try {
-    const vAmount = await uint256Schema().validate(amount);
+    const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0))) throw Error('Withdraw amount must be greather than 0');
     const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(

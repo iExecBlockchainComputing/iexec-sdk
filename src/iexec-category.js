@@ -54,7 +54,7 @@ create
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),

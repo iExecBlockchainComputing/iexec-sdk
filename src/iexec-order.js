@@ -340,7 +340,7 @@ fill
     const spinner = Spinner(opts);
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
-      const txOptions = computeTxOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -725,7 +725,7 @@ cancel
         );
       }
       const walletOptions = await computeWalletLoadOptions(opts);
-      const txOptions = computeTxOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
         loadChain(opts.chain, { spinner }),

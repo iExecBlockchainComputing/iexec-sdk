@@ -4,7 +4,7 @@ const cli = require('commander');
 const account = require('./account');
 const { Keystore } = require('./keystore');
 const { loadChain, connectKeystore } = require('./chains');
-const { stringifyNestedBn, NULL_ADDRESS } = require('./utils');
+const { stringifyNestedBn, formatRLC, NULL_ADDRESS } = require('./utils');
 const {
   help,
   addGlobalOptions,
@@ -24,28 +24,27 @@ const objName = 'account';
 
 cli.name('iexec account').usage('<command> [options]');
 
-const deposit = cli.command('deposit <amount>');
+const deposit = cli.command('deposit <amount> [unit]');
 addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
   .option(...option.txGasPrice())
   .description(desc.deposit())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(cmd.chain, {
         spinner,
       });
       await connectKeystore(chain, keystore, { txOptions });
-
       spinner.start(info.depositing());
-      const depositRes = await account.deposit(chain.contracts, amount);
-      spinner.succeed(info.deposited(depositRes.amount), {
+      const depositRes = await account.deposit(chain.contracts, [amount, unit]);
+      spinner.succeed(info.deposited(formatRLC(depositRes.amount)), {
         raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
     } catch (error) {
@@ -53,27 +52,27 @@ deposit
     }
   });
 
-const withdraw = cli.command('withdraw <amount>');
+const withdraw = cli.command('withdraw <amount> [unit]');
 addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
   .option(...option.txGasPrice())
   .description(desc.withdraw())
-  .action(async (amount, cmd) => {
+  .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
       const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = computeTxOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(cmd.chain, {
         spinner,
       });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
-      const res = await account.withdraw(chain.contracts, amount);
-      spinner.succeed(info.withdrawn(amount), {
+      const res = await account.withdraw(chain.contracts, [amount, unit]);
+      spinner.succeed(info.withdrawn(formatRLC(res.amount)), {
         raw: { amount: res.amount, txHash: res.txHash },
       });
     } catch (error) {
@@ -121,9 +120,15 @@ show
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);
       const cleanBalance = stringifyNestedBn(balances);
-      spinner.succeed(`Account balances:${pretty(cleanBalance)}`, {
-        raw: { balance: cleanBalance },
-      });
+      spinner.succeed(
+        `Account balances (RLC):${pretty({
+          stake: formatRLC(cleanBalance.stake),
+          locked: formatRLC(cleanBalance.locked),
+        })}`,
+        {
+          raw: { balance: cleanBalance },
+        },
+      );
     } catch (error) {
       handleError(error, cli, cmd);
     }
