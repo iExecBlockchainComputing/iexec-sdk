@@ -238,6 +238,9 @@ describe('[nRlcAmountSchema]', () => {
       nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(48),
     ).resolves.toBe('48000000000');
   });
+  test('0 unit', async () => {
+    await expect(nRlcAmountSchema().validate('0 nRLC')).resolves.toBe('0');
+  });
   test('specified unit', async () => {
     await expect(nRlcAmountSchema().validate('0048 RLC')).resolves.toBe(
       '48000000000',
@@ -329,6 +332,9 @@ describe('[weiAmountSchema]', () => {
     await expect(
       weiAmountSchema({ defaultUnit: 'ether' }).validate(48),
     ).resolves.toBe('48000000000000000000');
+  });
+  test('0 unit', async () => {
+    await expect(weiAmountSchema().validate('0 wei')).resolves.toBe('0');
   });
   test('specified unit wei', async () => {
     await expect(weiAmountSchema().validate('0048 wei')).resolves.toBe('48');

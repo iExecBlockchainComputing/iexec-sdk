@@ -62,8 +62,10 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) => string()
     return value;
   })
   .transform((value) => {
-    const trimed = value.replace(/^0+/, '');
-    return trimed.length > 0 ? trimed : '0';
+    const [amount, unit] = value.split(' ');
+    const trimed = amount.replace(/^0+/, '');
+    const trimedAmount = trimed.length > 0 ? trimed : '0';
+    return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
   })
   .transform((value, originalValue) => {
     try {
@@ -88,8 +90,10 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) => string()
     return value;
   })
   .transform((value) => {
-    const trimed = value.replace(/^0+/, '');
-    return trimed.length > 0 ? trimed : '0';
+    const [amount, unit] = value.split(' ');
+    const trimed = amount.replace(/^0+/, '');
+    const trimedAmount = trimed.length > 0 ? trimed : '0';
+    return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
   })
   .transform((value, originalValue) => {
     try {
