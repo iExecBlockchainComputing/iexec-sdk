@@ -157,7 +157,7 @@ const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = hexToBuffer(hexString);
   try {
-    res = multiaddr(buffer).toString();
+    res = multiaddr(new Uint8Array(buffer)).toString();
   } catch (error) {
     res = buffer.toString();
   }
