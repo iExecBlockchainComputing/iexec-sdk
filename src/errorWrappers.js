@@ -4,15 +4,22 @@ const {
   Web3ProviderSignMessageError,
 } = require('./errors');
 
+const PROCESSING_RESPONSE_ERROR = 'processing response error';
+
 const getMessage = (err) => {
   if (typeof err === 'string') {
     return err;
   }
-  if (err.error && err.error.message) {
-    return err.error.message;
-  }
-  if (err.body && err.body.error && err.body.error.message) {
-    return err.body.error.message;
+  if (err.reason) {
+    if (err.reason === PROCESSING_RESPONSE_ERROR) {
+      if (err.error && err.error.message) {
+        return `${PROCESSING_RESPONSE_ERROR}: ${err.error.message}`;
+      }
+      if (err.body && err.body.error && err.body.error.message) {
+        return `${PROCESSING_RESPONSE_ERROR}: ${err.body.error.message}`;
+      }
+    }
+    return err.reason;
   }
   return err.message;
 };
