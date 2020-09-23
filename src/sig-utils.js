@@ -184,7 +184,7 @@ const signTypedDataV3 = wallet => async (typedData) => {
     const sign = signTypedData(pk, { data: typedData });
     return sign;
   } catch (error) {
-    console.error('signTypedDataV3()', error);
+    debug('signTypedDataV3()', error);
     throw error;
   }
 };
