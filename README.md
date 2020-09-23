@@ -311,6 +311,7 @@ iexec account withdraw 1000 # withdraw RLC from your account to your wallet
   - [orderbook](#orderbook)
   - [deal](#deal)
   - [task](#task)
+  - [storage](#storage)
   - [result](#result)
   - [category](#category)
   - [registry](#registry)
@@ -1128,8 +1129,6 @@ console.log('Nano RLC locked:', balance.locked.toString());
 iexec.**account.deposit ( nRlcAmount: NRlcAmount )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
 > deposit some nRLC (1 nRLC = 1\*10^-9 RLC) from user wallet to user account
->
-> The deposit include 2 transaction (1st to approve the iexec clerk SC, 2nd for deposit)
 
 _Example:_
 
@@ -1149,7 +1148,7 @@ _Example:_
 
 ```js
 const { amount, txHash } = await iexec.account.withdraw('1000000000');
-console.log('Withdrawed:', amount);
+console.log('Withdrawn:', amount);
 console.log('tx:', txHash);
 ```
 
@@ -1822,7 +1821,7 @@ await iexec.order.cancelRequestorder(signedRequestorder);
 
 #### matchOrders
 
-iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} \[, options: Object \] )** => Promise < **{ dealid: Bytes32, volume: Uint256, txHash: TxHash }** >
+iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} \[, options: Object \] )** => Promise < **{ dealid: Bytes32, volume: BN, txHash: TxHash }** >
 
 > make a deal on-chain with compatible orders and trigger off-chain computation.
 >
@@ -1833,11 +1832,11 @@ iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedW
 _Example:_
 
 ```js
-const res = await iexec.order.matchOrders(
-  signedApporder,
-  signedDatasetorder,
-  signedRequestorder,
-);
+const res = await iexec.order.matchOrders({
+  apporder,
+  datasetorder,
+  workerpoolorder,
+});
 console.log('deal:', res.dealid);
 ```
 
@@ -2552,7 +2551,7 @@ Accepted:
 Accepted:
 
 - Number
-- String with optionnal unit (ex: `'1000000'`, `'0.01 ether'`)
+- String with optional unit (ex: `'1000000'`, `'0.01 ether'`)
   - accepted units: `ether` (`eth`), `finney`, `szabo`, `gwei`, `mwei`, `kwei`, `wei`
   - default unit: `wei`
 - BN
@@ -2564,7 +2563,7 @@ Accepted:
 Accepted:
 
 - Number
-- String with optionnal unit (ex: `'1000000'`, `'1000000 nRLC'`, `'0.01 RLC'`)
+- String with optional unit (ex: `'1000000'`, `'1000000 nRLC'`, `'0.01 RLC'`)
   - accepted units: `RCL`, `nRLC`
   - default unit: `nRLC`
 - BN
