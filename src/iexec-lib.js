@@ -7,6 +7,7 @@ const order = require('./order');
 const orderbook = require('./orderbook');
 const deal = require('./deal');
 const task = require('./task');
+const swap = require('./swap');
 const secretMgtServ = require('./sms');
 const {
   getStorageTokenKeyName,
@@ -205,6 +206,12 @@ class IExec {
     this.account.checkBridgedBalance = address => account.checkBalance(bridgedContracts, address);
     this.account.deposit = nRlcAmount => account.deposit(contracts, nRlcAmount);
     this.account.withdraw = nRlcAmount => account.withdraw(contracts, nRlcAmount);
+    this.account.estimateDepositRlcToReceive = weiToSpend => swap.estimateDepositRlcToReceive(contracts, weiToSpend);
+    this.account.estimateDepositEthToSpend = nRlcToReceive => swap.estimateDepositEthToSpend(contracts, nRlcToReceive);
+    this.account.depositEth = (weiToSpend, nRlcToReceive) => swap.depositEth(contracts, weiToSpend, nRlcToReceive);
+    this.account.estimateWithdrawRlcToSpend = weiToReceive => swap.estimateWithdrawRlcToSpend(contracts, weiToReceive);
+    this.account.estimateWithdrawEthToReceive = nRlcToSpend => swap.estimateWithdrawEthToReceive(contracts, nRlcToSpend);
+    this.account.withdrawEth = (nRlcToSpend, weiToReceive) => swap.withdrawEth(contracts, nRlcToSpend, weiToReceive);
     this.app = {};
     this.app.deployApp = app => hub.deployApp(contracts, app);
     this.app.showApp = address => hub.showApp(contracts, address);
@@ -404,6 +411,43 @@ class IExec {
           requestorder,
         ).then(() => requestorder)
         : requestorder,
+    );
+    this.order.estimateMatchOrderEthToSpend = ({
+      apporder,
+      datasetorder = order.NULL_DATASETORDER,
+      workerpoolorder,
+      requestorder,
+    }) => swap.estimateMatchOrderEthToSpend(
+      contracts,
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    );
+    this.order.matchOrdersWithEth = async (
+      {
+        apporder,
+        datasetorder = order.NULL_DATASETORDER,
+        workerpoolorder,
+        requestorder,
+      },
+      weiToSpend,
+      { checkRequest = true } = {},
+    ) => swap.matchOrdersWithEth(
+      contracts,
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      checkRequest === true
+        ? await checkRequestRequirements(
+          {
+            contracts,
+            smsURL: getSmsURL(),
+          },
+          requestorder,
+        ).then(() => requestorder)
+        : requestorder,
+      weiToSpend,
     );
     this.orderbook = {};
     this.orderbook.fetchApporder = apporderHash => order.fetchPublishedOrderByHash(

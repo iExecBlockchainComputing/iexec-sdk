@@ -1372,7 +1372,9 @@ const createRequestorder = async (
 
 module.exports = {
   computeOrderHash,
+  signedOrderToStruct,
   getRemainingVolume,
+  getMatchableVolume,
   hashApporder,
   hashDatasetorder,
   hashWorkerpoolorder,

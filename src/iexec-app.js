@@ -58,6 +58,7 @@ const {
   NULL_DATASETORDER,
   WORKERPOOL_ORDER,
 } = require('./order');
+const { estimateMatchOrderEthToSpend, matchOrdersWithEth } = require('./swap');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
@@ -76,6 +77,7 @@ const {
   BN,
   stringifyNestedBn,
   formatRLC,
+  formatEth,
 } = require('./utils');
 const { paramsKeyName } = require('./params-utils');
 const {
@@ -389,6 +391,7 @@ run
   .option(...option.chain())
   .option(...option.txGasPrice())
   .option(...option.force())
+  .option(...option.appRunWithEth())
   .option(...option.appRunWatch())
   .option(...orderOption.dataset())
   .option(...orderOption.workerpool())
@@ -753,27 +756,81 @@ run
 
       debug('requestorder', requestorder);
 
-      const totalCost = new BN(requestorder.appmaxprice)
-        .add(new BN(requestorder.datasetmaxprice))
-        .add(new BN(requestorder.workerpoolmaxprice))
-        .mul(new BN(requestorder.volume));
-
-      const { stake } = await checkBalance(chain.contracts, requester);
-      if (totalCost.gt(stake)) {
-        throw Error(
-          `Not enough RLC on your account (${formatRLC(
-            totalCost,
-          )} RLC required). Run "iexec account deposit" to topup your account.`,
-        );
-      }
-
       spinner.stop();
 
-      if (!opts.force) {
+      let matchResult;
+
+      if (!opts.useEth) {
+        const totalCost = new BN(requestorder.appmaxprice)
+          .add(new BN(requestorder.datasetmaxprice))
+          .add(new BN(requestorder.workerpoolmaxprice))
+          .mul(new BN(requestorder.volume));
+
+        const { stake } = await checkBalance(chain.contracts, requester);
+        if (totalCost.gt(stake)) {
+          throw Error(
+            `Not enough RLC on your account (${formatRLC(
+              totalCost,
+            )} RLC required). Run "iexec account deposit" to topup your account.`,
+          );
+        }
+        if (!opts.force) {
+          await prompt.custom(
+            `Do you want to spend ${formatRLC(
+              totalCost,
+            )} RLC to execute the following request: ${pretty({
+              app: `${requestorder.app} (${formatRLC(
+                requestorder.appmaxprice,
+              )} RLC)`,
+              dataset:
+                requestorder.dataset !== NULL_ADDRESS
+                  ? `${requestorder.dataset} (${formatRLC(
+                    requestorder.datasetmaxprice,
+                  )} RLC)`
+                  : undefined,
+              workerpool: `${requestorder.workerpool} (${formatRLC(
+                requestorder.workerpoolmaxprice,
+              )} RLC)`,
+              params:
+                (requestorder.params && JSON.parse(requestorder.params))
+                || undefined,
+              category: requestorder.category,
+              tag:
+                requestorder.tag !== NULL_BYTES32
+                  ? requestorder.tag
+                  : undefined,
+              callback:
+                requestorder.callback !== NULL_ADDRESS
+                  ? requestorder.callback
+                  : undefined,
+              beneficiary:
+                requestorder.beneficiary !== requestorder.requester
+                  ? requestorder.beneficiary
+                  : undefined,
+            })}`,
+          );
+        }
+        spinner.start('Submitting deal');
+        matchResult = await matchOrders(
+          chain.contracts,
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        );
+      } else {
+        const { weiToSpend, nRlcValue } = await estimateMatchOrderEthToSpend(
+          chain.contracts,
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        );
+
         await prompt.custom(
-          `Do you want to spend ${formatRLC(
-            totalCost,
-          )} RLC to execute the following request: ${pretty({
+          `Do you want to spend ${formatEth(
+            weiToSpend,
+          )} ether to execute the following request: ${pretty({
             app: `${requestorder.app} (${formatRLC(
               requestorder.appmaxprice,
             )} RLC)`,
@@ -801,17 +858,38 @@ run
                 ? requestorder.beneficiary
                 : undefined,
           })}`,
+          {
+            rejectDefault: true,
+          },
         );
+
+        spinner.start('Submitting deal');
+        if (nRlcValue.isZero()) {
+          matchResult = await matchOrders(
+            chain.contracts,
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          );
+        } else {
+          matchResult = await matchOrdersWithEth(
+            chain.contracts,
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+            weiToSpend,
+          );
+          spinner.info(
+            `Swapped ${formatEth(
+              matchResult.spentWei,
+            )} ether to pay ${formatRLC(matchResult.nRlcValue)} RLC`,
+          );
+        }
       }
 
-      spinner.start('Submitting deal');
-      const { dealid, volume, txHash } = await matchOrders(
-        chain.contracts,
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      );
+      const { dealid, volume, txHash } = matchResult;
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
 

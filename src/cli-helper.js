@@ -32,8 +32,10 @@ const info = {
   checkingSwapRate: () => 'Checking swap rate...',
   claiming: obj => `Claiming ${obj}...`,
   deposited: amount => `Deposited ${amount} RLC to your iExec account`,
+  depositedEth: (spentAmount, receivedAmount) => `Deposited ${receivedAmount} RLC to your iExec account swapped from ${spentAmount} ether`,
   withdrawing: () => 'Making withdraw...',
   withdrawn: amount => `${amount} RLC withdrawn from your iExec account`,
+  withdrawnEth: (spentAmount, receivedAmount) => `${receivedAmount} ether withdrawn from your iExec account swapped from ${spentAmount} RLC`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: filePath => `Downloaded task result to file ${filePath}`,
@@ -62,6 +64,8 @@ const desc = {
   claimObj: objName => `claim a ${objName} that is not COMPLETED`,
   deposit: () => 'deposit RLC onto your iExec account (default unit nRLC)',
   withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
+  depositEth: () => 'exchange ether for RLC and deposit onto your iExec account (default unit wei)',
+  withdrawEth: () => 'withdraw RLC from your iExec account and exchange for ether (default unit nRLC)',
   getETH: () => 'apply for test ether from pre-registered faucets',
   getRLC: () => 'apply for test RLC from iExec faucet',
   sendETH: () => 'send ether to an address (default unit ether)',
@@ -169,6 +173,7 @@ const option = {
     'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
+  appRunWithEth: () => ['--use-eth', 'pay run with ether'],
   to: () => ['--to <address>', 'receiver address'],
   skipWallet: () => ['--skip-wallet', 'skip creating a new wallet'],
   forceCreate: () => [
@@ -430,6 +435,14 @@ const prompt = {
   fileExists: (filePath, options) => question(`File ${filePath} already exists, continue and replace?`, options),
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
+  ),
+  depositEthToRlc: (etherAmount, rlcAmount) => question(
+    `Do you want to spend ${etherAmount} ether from your wallet to receive ${rlcAmount} RLC on your account?`,
+    { rejectDefault: true },
+  ),
+  withdrawRlcToEth: (rlcAmount, etherAmount) => question(
+    `Do you want to spend ${rlcAmount} RLC from your account to receive ${etherAmount} ether in your wallet?`,
+    { rejectDefault: true },
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),

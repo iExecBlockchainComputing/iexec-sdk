@@ -1954,6 +1954,50 @@ describe('[account]', () => {
       true,
     );
   });
+  test('account.estimateDepositEthToSpend() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.estimateDepositEthToSpend(5)).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
+  test('account.estimateDepositRlcToReceive() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.estimateDepositRlcToReceive(5)).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
+  test('account.depositEth() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.depositEth(5, 5)).rejects.toThrow(
+      Error('Ether/RLC swap is not enabled on current chain'),
+    );
+  });
   test('account.withdraw() (token)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2150,6 +2194,50 @@ describe('[account]', () => {
     );
     await expect(iexec.account.withdraw(0)).rejects.toThrow(
       Error('Withdraw amount must be greather than 0'),
+    );
+  });
+  test('account.estimateWithdrawRlcToSpend() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.estimateWithdrawRlcToSpend(5)).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
+  test('account.estimateWithdrawEthToReceive() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.estimateWithdrawEthToReceive(5)).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
+  test('account.withdrawEth() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(() => iexec.account.withdrawEth(5, 5)).rejects.toThrow(
+      Error('Ether/RLC swap is not enabled on current chain'),
     );
   });
 });
@@ -4124,6 +4212,94 @@ describe('[order]', () => {
       expect(res.dealid).toMatch(bytes32Regex);
     }, 60000);
   }
+
+  test('order.estimateMatchOrderEthToSpend() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const poolManagerSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      RICH_PRIVATE_KEY2,
+    );
+    const iexecPoolManager = new IExec(
+      {
+        ethProvider: poolManagerSigner,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+
+    const apporder = await deployAndGetApporder(iexec);
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexecPoolManager);
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    await expect(() => iexec.order.estimateMatchOrderEthToSpend({
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    })).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
+
+  test('order.matchOrdersWithEth() (swap not available)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const poolManagerSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      RICH_PRIVATE_KEY2,
+    );
+    const iexecPoolManager = new IExec(
+      {
+        ethProvider: poolManagerSigner,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+
+    const apporder = await deployAndGetApporder(iexec);
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexecPoolManager);
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    await expect(() => iexec.order.estimateMatchOrderEthToSpend({
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    })).rejects.toThrow(Error('Ether/RLC swap is not enabled on current chain'));
+  });
 
   if (WITH_STACK) {
     // this test requires running local stack
