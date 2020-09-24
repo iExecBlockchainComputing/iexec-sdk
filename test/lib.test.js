@@ -1625,7 +1625,7 @@ describe('[wallet]', () => {
     );
     await expect(iexec.wallet.sweep(POOR_ADDRESS3)).rejects.toThrow(
       Error(
-        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': sender doesn't have enough funds to send tx. The upfront cost is: 725180000000000 and the sender's account only has: ${initialBalance.wei.toString()}`,
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': processing response error: sender doesn't have enough funds to send tx. The upfront cost is: 725180000000000 and the sender's account only has: ${initialBalance.wei.toString()}`,
       ),
     );
     const finalBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);

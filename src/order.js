@@ -319,6 +319,9 @@ const getRemainingVolume = async (
   try {
     checkOrderName(orderName);
     const initial = new BN(order.volume);
+    if (initial.isZero()) {
+      return initial;
+    }
     const orderHash = await computeOrderHash(contracts, orderName, order);
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
@@ -872,7 +875,7 @@ const verifySign = async (
   return !!isValid;
 };
 
-const matchOrders = async (
+const getMatchableVolume = async (
   contracts = throwIfMissing(),
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
@@ -1036,6 +1039,7 @@ const matchOrders = async (
         throw Error('Missing tag [tee] in apporder');
       }
     }
+
     // price check
     const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
     const workerpoolMaxPrice = new BN(vRequestOrder.workerpoolmaxprice);
@@ -1059,41 +1063,117 @@ const matchOrders = async (
       );
     }
 
-    // volumes checks
-    const checkRequestVolumeAsync = async () => {
-      const requestVolume = await getRemainingVolume(
-        contracts,
-        REQUEST_ORDER,
-        vRequestOrder,
+    // workerpool owner stake check
+    const workerpoolOwner = await getWorkerpoolOwner(
+      contracts,
+      vWorkerpoolOrder.workerpool,
+    );
+    const { stake } = await checkBalance(contracts, workerpoolOwner);
+    const requiredStakePerTask = workerpoolPrice
+      .mul(new BN(30))
+      .div(new BN(100));
+    const workerpoolStakedVolume = requiredStakePerTask.isZero()
+      ? new BN(workerpoolOrder.volume)
+      : stake.div(requiredStakePerTask);
+    if (workerpoolStakedVolume.isZero()) {
+      throw Error(
+        `workerpool required stake (${requiredStakePerTask}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
-      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
-    };
-    const checkWorkerpoolVolumeAsync = async () => {
-      const workerpoolVolume = await getRemainingVolume(
-        contracts,
-        WORKERPOOL_ORDER,
-        vWorkerpoolOrder,
-      );
-      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
-    };
-    const checkAppVolumeAsync = async () => {
-      const appVolume = await getRemainingVolume(
-        contracts,
-        APP_ORDER,
-        vAppOrder,
-      );
-      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-    };
-    const checkDatasetVolumeAsync = async () => {
-      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
-        const datasetVolume = await getRemainingVolume(
-          contracts,
-          DATASET_ORDER,
-          vDatasetOrder,
-        );
-        if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
-      }
-    };
+    }
+
+    // check matchable volume
+    const volumes = await Promise.all(
+      vRequestOrder.dataset !== NULL_ADDRESS
+        ? [
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
+              return volume;
+            },
+          ),
+          getRemainingVolume(
+            contracts,
+            WORKERPOOL_ORDER,
+            vWorkerpoolOrder,
+          ).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+              return volume;
+            },
+          ),
+        ]
+        : [
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(
+            contracts,
+            WORKERPOOL_ORDER,
+            vWorkerpoolOrder,
+          ).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+              return volume;
+            },
+          ),
+        ],
+    );
+    return volumes.reduce(
+      (min, curr) => (curr.lt(min) ? curr : min),
+      workerpoolStakedVolume,
+    );
+  } catch (error) {
+    debug('getMatchableVolume()', error);
+    throw error;
+  }
+};
+
+const matchOrders = async (
+  contracts = throwIfMissing(),
+  appOrder = throwIfMissing(),
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder = throwIfMissing(),
+  requestOrder = throwIfMissing(),
+) => {
+  try {
+    const [
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+    ] = await Promise.all([
+      signedApporderSchema().validate(appOrder),
+      signedDatasetorderSchema().validate(datasetOrder),
+      signedWorkerpoolorderSchema().validate(workerpoolOrder),
+      signedRequestorderSchema().validate(requestOrder),
+    ]);
+
+    // check matchability
+    await getMatchableVolume(
+      contracts,
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+    );
+
+    const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
+    const appPrice = new BN(vAppOrder.appprice);
+    const datasetPrice = new BN(vDatasetOrder.datasetprice);
+
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
@@ -1105,29 +1185,7 @@ const matchOrders = async (
       }
     };
 
-    // workerpool owner stake check
-    const checkWorkerpoolStakeAsync = async () => {
-      const workerpoolOwner = await getWorkerpoolOwner(
-        contracts,
-        vWorkerpoolOrder.workerpool,
-      );
-      const { stake } = await checkBalance(contracts, workerpoolOwner);
-      const requiredStake = workerpoolPrice.mul(new BN(30)).div(new BN(100));
-      if (stake.lt(requiredStake)) {
-        throw Error(
-          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
-        );
-      }
-    };
-
-    await Promise.all([
-      checkWorkerpoolVolumeAsync(),
-      checkRequestVolumeAsync(),
-      checkAppVolumeAsync(),
-      checkDatasetVolumeAsync(),
-      checkRequesterSolvabilityAsync(),
-      checkWorkerpoolStakeAsync(),
-    ]);
+    await checkRequesterSolvabilityAsync();
 
     const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
     const datasetOrderStruct = signedOrderToStruct(

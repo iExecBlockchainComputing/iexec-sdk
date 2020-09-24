@@ -431,10 +431,6 @@ const prompt = {
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
-  swapEthToRlc: (etherAmount, rlcAmount) => question(
-    `Do you want to spend ${etherAmount} ether from your wallet to received ${rlcAmount} RLC on your account?`,
-    { rejectDefault: true },
-  ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
   unpublishOrder: (objName, address, all) => question(
@@ -760,15 +756,6 @@ const isBytes32 = (str, { strict = false } = {}) => {
   return true;
 };
 
-const minBn = (bnArray) => {
-  let min = new BN(bnArray[0]);
-  bnArray.map((e) => {
-    if (e.lt(min)) min = e;
-    return min;
-  });
-  return min;
-};
-
 const renderTasksStatus = (tasksStatusMap) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
@@ -851,7 +838,6 @@ module.exports = {
   prettyRPC,
   isEthAddress,
   isBytes32,
-  minBn,
   lbb,
   lba,
   lb,

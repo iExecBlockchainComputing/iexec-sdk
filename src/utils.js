@@ -58,17 +58,15 @@ const formatRLC = (nRLC) => {
   }
 };
 
+const isRlcUnit = str => ['nRLC', 'RLC'].includes(str);
+
 const parseRLC = (value, defaultUnit = 'RLC') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
-  let pow;
-  if (unit === 'RLC') {
-    pow = 9;
-  } else if (unit === 'nRLC') {
-    pow = 0;
-  } else {
+  if (!isRlcUnit(unit)) {
     throw Error('Invalid token unit');
   }
+  const pow = unit === 'RLC' ? 9 : 0;
   try {
     return ethersBnToBn(parseUnits(amount, pow));
   } catch (error) {
@@ -86,21 +84,14 @@ const formatEth = (wei) => {
   }
 };
 
+const isEthUnit = str => ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
+  str,
+);
+
 const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
-  if (
-    ![
-      'wei',
-      'kwei',
-      'mwei',
-      'gwei',
-      'szabo',
-      'finney',
-      'ether',
-      'eth',
-    ].includes(unit)
-  ) {
+  if (!isEthUnit(unit)) {
     throw Error('Invalid ether unit');
   }
   try {
@@ -157,7 +148,7 @@ const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = hexToBuffer(hexString);
   try {
-    res = multiaddr(buffer).toString();
+    res = multiaddr(new Uint8Array(buffer)).toString();
   } catch (error) {
     res = buffer.toString();
   }
@@ -410,6 +401,8 @@ const FETCH_INTERVAL = 5000;
 
 module.exports = {
   BN,
+  isRlcUnit,
+  isEthUnit,
   formatRLC,
   formatEth,
   parseRLC,
