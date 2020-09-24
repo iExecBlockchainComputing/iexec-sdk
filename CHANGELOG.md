@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Added
+
+### Changed
+
+- fixed amount validation error
+- fixed multiaddr format machine to human
+- update `Web3ProviderError` messages
+
+### Removed
+
 ## [5.0.1] 2020-08-26
 
 ### Added
