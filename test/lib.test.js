@@ -4883,7 +4883,7 @@ describe('[orderbook]', () => {
       const apporder = await deployAndGetApporder(iexec);
       const orderHash = await iexec.order.hashApporder(apporder);
       await expect(iexec.orderbook.fetchApporder(orderHash)).rejects.toThrow(
-        Error(`No apporder found for id ${orderHash} on chain ${networkId}`),
+        Error('API error: apporder not found'),
       );
       await iexec.order.publishApporder(apporder);
       const found = await iexec.orderbook.fetchApporder(orderHash);
@@ -4915,11 +4915,7 @@ describe('[orderbook]', () => {
       const orderHash = await iexec.order.hashDatasetorder(datasetorder);
       await expect(
         iexec.orderbook.fetchDatasetorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `No datasetorder found for id ${orderHash} on chain ${networkId}`,
-        ),
-      );
+      ).rejects.toThrow(Error('API error: datasetorder not found'));
       await iexec.order.publishDatasetorder(datasetorder);
       const found = await iexec.orderbook.fetchDatasetorder(orderHash);
       expect(found.order).toLooseEqual(datasetorder);
@@ -4950,11 +4946,7 @@ describe('[orderbook]', () => {
       const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
       await expect(
         iexec.orderbook.fetchWorkerpoolorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `No workerpoolorder found for id ${orderHash} on chain ${networkId}`,
-        ),
-      );
+      ).rejects.toThrow(Error('API error: workerpoolorder not found'));
       await iexec.order.publishWorkerpoolorder(workerpoolorder);
       const found = await iexec.orderbook.fetchWorkerpoolorder(orderHash);
       expect(found.order).toLooseEqual(workerpoolorder);
@@ -5001,11 +4993,7 @@ describe('[orderbook]', () => {
       const orderHash = await iexec.order.hashRequestorder(requestorder);
       await expect(
         iexec.orderbook.fetchRequestorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `No requestorder found for id ${orderHash} on chain ${networkId}`,
-        ),
-      );
+      ).rejects.toThrow(Error('API error: requestorder not found'));
       await iexec.order.publishRequestorder(requestorder, {
         checkRequest: false,
       });
@@ -6118,35 +6106,35 @@ describe('[deal]', () => {
         requesterAddress,
       );
       expect(res.count).toBe(resAfterMatch.count - 1);
-      const resAppFilterd = await iexec.deal.fetchRequesterDeals(
+      const resAppFiltered = await iexec.deal.fetchRequesterDeals(
         requesterAddress,
         {
           appAddress: apporder.app,
         },
       );
-      expect(resAppFilterd.count).toBe(1);
-      expect(resAppFilterd.deals[0].dealid).toBe(dealid);
-      expect(resAppFilterd.deals[0].app.pointer).toBe(apporder.app);
-      const resDatasetFilterd = await iexec.deal.fetchRequesterDeals(
+      expect(resAppFiltered.count).toBe(1);
+      expect(resAppFiltered.deals[0].dealid).toBe(dealid);
+      expect(resAppFiltered.deals[0].app.pointer).toBe(apporder.app);
+      const resDatasetFiltered = await iexec.deal.fetchRequesterDeals(
         requesterAddress,
         {
           datasetAddress: datasetorder.dataset,
         },
       );
-      expect(resDatasetFilterd.count).toBe(1);
-      expect(resDatasetFilterd.deals[0].dealid).toBe(dealid);
-      expect(resDatasetFilterd.deals[0].dataset.pointer).toBe(
+      expect(resDatasetFiltered.count).toBe(1);
+      expect(resDatasetFiltered.deals[0].dealid).toBe(dealid);
+      expect(resDatasetFiltered.deals[0].dataset.pointer).toBe(
         datasetorder.dataset,
       );
-      const resWorkerpoolFilterd = await iexec.deal.fetchRequesterDeals(
+      const resWorkerpoolFiltered = await iexec.deal.fetchRequesterDeals(
         requesterAddress,
         {
           workerpoolAddress: workerpoolorder.workerpool,
         },
       );
-      expect(resWorkerpoolFilterd.deals[0].dealid).toBe(dealid);
-      expect(resWorkerpoolFilterd.count).toBe(1);
-      expect(resWorkerpoolFilterd.deals[0].workerpool.pointer).toBe(
+      expect(resWorkerpoolFiltered.deals[0].dealid).toBe(dealid);
+      expect(resWorkerpoolFiltered.count).toBe(1);
+      expect(resWorkerpoolFiltered.deals[0].workerpool.pointer).toBe(
         workerpoolorder.workerpool,
       );
     }, 20000);

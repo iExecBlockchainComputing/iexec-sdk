@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { jsonApi } = require('./api-utils');
+const { jsonApi, wrapPaginableRequest } = require('./api-utils');
 const {
   addressSchema,
   chainIdSchema,
@@ -17,61 +17,46 @@ const fetchAppOrderbook = async (
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   {
-    minVolume, skip, dataset, workerpool, requester, minTag, maxTag,
+    minVolume, dataset, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
-  debug({
-    minVolume,
-    skip,
-    dataset,
-    workerpool,
-    requester,
-    minTag,
-    maxTag,
-  });
   try {
-    const query = Object.assign(
-      {},
-      { chainId: await chainIdSchema().validate(contracts.chainId) },
-      {
-        app: await addressSchema({
-          ethProvider: contracts.provider,
-        }).validate(appAddress),
-      },
-      dataset && {
+    const query = {
+      chainId: await chainIdSchema().validate(contracts.chainId),
+      app: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(appAddress),
+      ...(dataset && {
         dataset: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
-      },
-      workerpool && {
+      }),
+      ...(workerpool && {
         workerpool: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
-      },
-      requester && {
+      }),
+      ...(requester && {
         requester: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(requester),
-      },
-      minVolume && {
+      }),
+      ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
-      },
-      minTag && {
+      }),
+      ...(minTag && {
         minTag: await tagSchema().validate(minTag),
-      },
-      maxTag && {
+      }),
+      ...(maxTag && {
         maxTag: await tagSchema().validate(maxTag),
-      },
-      skip && {
-        skip: await positiveIntSchema().validate(skip),
-      },
-    );
-    const response = await jsonApi.get({
+      }),
+    };
+    const response = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
-      endpoint: '/orderbook/app',
+      endpoint: '/apporders',
       query,
     });
-    if (response.ok) return { count: response.count, appOrders: response.appOrderbook };
+    if (response.ok) return { count: response.count, appOrders: response.orders };
     throw Error('An error occured while getting orderbook');
   } catch (error) {
     debug('fetchAppOrderbook()', error);
@@ -84,55 +69,49 @@ const fetchDatasetOrderbook = async (
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
   {
-    minVolume, skip, app, workerpool, requester, minTag, maxTag,
+    minVolume, app, workerpool, requester, minTag, maxTag,
   } = {},
 ) => {
   try {
-    const query = Object.assign(
-      {},
-      { chainId: await chainIdSchema().validate(contracts.chainId) },
-      {
-        dataset: await addressSchema({
-          ethProvider: contracts.provider,
-        }).validate(datasetAddress),
-      },
-      app && {
+    const query = {
+      chainId: await chainIdSchema().validate(contracts.chainId),
+      dataset: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(datasetAddress),
+      ...(app && {
         app: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(app),
-      },
-      workerpool && {
+      }),
+      ...(workerpool && {
         workerpool: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
-      },
-      requester && {
+      }),
+      ...(requester && {
         requester: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(requester),
-      },
-      minVolume && {
+      }),
+      ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
-      },
-      minTag && {
+      }),
+      ...(minTag && {
         minTag: await tagSchema().validate(minTag),
-      },
-      maxTag && {
+      }),
+      ...(maxTag && {
         maxTag: await tagSchema().validate(maxTag),
-      },
-      skip && {
-        skip: await positiveIntSchema().validate(skip),
-      },
-    );
-    const response = await jsonApi.get({
+      }),
+    };
+    const response = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
-      endpoint: '/orderbook/dataset',
+      endpoint: '/datasetorders',
       query,
     });
     if (response.ok) {
       return {
-        count: response.count,
-        datasetOrders: response.datasetOrderbook,
+        ...response,
+        datasetOrders: response.orders,
       };
     }
     throw Error('An error occured while getting orderbook');
@@ -147,47 +126,42 @@ const fetchWorkerpoolOrderbook = async (
   iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
-    workerpoolAddress, minTag, signerAddress, minTrust, minVolume, skip,
+    workerpoolAddress, minTag, signerAddress, minTrust, minVolume,
   } = {},
 ) => {
   try {
-    const query = Object.assign(
-      {},
-      { chainId: await chainIdSchema().validate(contracts.chainId) },
-      { category: await uint256Schema().validate(category) },
-      workerpoolAddress && {
+    const query = {
+      chainId: await chainIdSchema().validate(contracts.chainId),
+      category: await uint256Schema().validate(category),
+      ...(workerpoolAddress && {
         workerpool: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(workerpoolAddress),
-      },
-      minTag && {
+      }),
+      ...(minTag && {
         minTag: await tagSchema().validate(minTag),
-      },
-      signerAddress && {
-        signer: await addressSchema({
+      }),
+      ...(signerAddress && {
+        workerpoolOwner: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(signerAddress),
-      },
-      minTrust && {
+      }),
+      ...(minTrust && {
         minTrust: await positiveIntSchema().validate(minTrust),
-      },
-      minVolume && {
+      }),
+      ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
-      },
-      skip && {
-        skip: await positiveIntSchema().validate(skip),
-      },
-    );
-    const response = await jsonApi.get({
+      }),
+    };
+    const response = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
-      endpoint: '/orderbook/workerpool',
+      endpoint: '/workerpoolorders',
       query,
     });
     if (response.ok) {
       return {
-        count: response.count,
-        openVolume: response.openVolume,
-        workerpoolOrders: response.workerpoolOrderbook,
+        ...response,
+        workerpoolOrders: response.orders,
       };
     }
     throw Error('An error occured while getting orderbook');
@@ -202,51 +176,42 @@ const fetchRequestOrderbook = async (
   iexecGatewayURL = throwIfMissing(),
   category = throwIfMissing(),
   {
-    requesterAddress,
-    beneficiaryAddress,
-    maxTag,
-    maxTrust,
-    minVolume,
-    skip,
+    requesterAddress, beneficiaryAddress, maxTag, maxTrust, minVolume,
   } = {},
 ) => {
   try {
-    const query = Object.assign(
-      {},
-      { chainId: await chainIdSchema().validate(contracts.chainId) },
-      { category: await uint256Schema().validate(category) },
-      requesterAddress && {
+    const query = {
+      chainId: await chainIdSchema().validate(contracts.chainId),
+      category: await uint256Schema().validate(category),
+      ...(requesterAddress && {
         requester: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(requesterAddress),
-      },
-      beneficiaryAddress && {
+      }),
+      ...(beneficiaryAddress && {
         beneficiary: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(beneficiaryAddress),
-      },
-      maxTag && {
+      }),
+      ...(maxTag && {
         maxTag: await tagSchema().validate(maxTag),
-      },
-      maxTrust && {
+      }),
+      ...(maxTrust && {
         maxTrust: await positiveIntSchema().validate(maxTrust),
-      },
-      minVolume && {
+      }),
+      ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
-      },
-      skip && {
-        skip: await positiveIntSchema().validate(skip),
-      },
-    );
-    const response = await jsonApi.get({
+      }),
+    };
+    const response = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
-      endpoint: '/orderbook/request',
+      endpoint: '/requestorders',
       query,
     });
     if (response.ok) {
       return {
-        count: response.count,
-        requestOrders: response.requestOrderbook,
+        ...response,
+        requestOrders: response.orders,
       };
     }
     throw Error('An error occured while getting orderbook');

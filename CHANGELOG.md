@@ -11,8 +11,12 @@ All notable changes to this project will be documented in this file.
 - fixed amount validation error
 - fixed multiaddr format machine to human
 - update `Web3ProviderError` messages
+- migrated to new market API
 
 ### Removed
+
+- undocumented option `beforeTimestamp` removed from `iexec.deal.fetchRequesterDeals()`
+- undocumented output value `openVolume` removed from `iexec.orderbook.fetchWorkerpoolOrderbook()` and `iexec orderbook workerpool`
 
 ## [5.0.1] 2020-08-26
 

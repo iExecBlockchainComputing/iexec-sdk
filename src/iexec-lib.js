@@ -242,9 +242,7 @@ class IExec {
     this.deal.computeTaskId = (dealid, taskIdx) => deal.computeTaskId(dealid, taskIdx);
     this.deal.fetchRequesterDeals = (
       requesterAddress,
-      {
-        appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
-      } = {},
+      { appAddress, datasetAddress, workerpoolAddress } = {},
     ) => deal.fetchRequesterDeals(
       contracts,
       getIexecGatewayURL(),
@@ -253,7 +251,6 @@ class IExec {
         appAddress,
         datasetAddress,
         workerpoolAddress,
-        beforeTimestamp,
       },
     );
     this.deal.claim = dealid => deal.claim(contracts, dealid);

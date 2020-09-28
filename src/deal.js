@@ -7,7 +7,7 @@ const {
   NULL_ADDRESS,
   BN,
 } = require('./utils');
-const { jsonApi } = require('./api-utils');
+const { jsonApi, wrapPaginableRequest } = require('./api-utils');
 const {
   chainIdSchema,
   addressSchema,
@@ -27,9 +27,7 @@ const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
-  {
-    appAddress, datasetAddress, workerpoolAddress, beforeTimestamp,
-  } = {},
+  { appAddress, datasetAddress, workerpoolAddress } = {},
 ) => {
   try {
     const vRequesterAddress = await addressSchema({
@@ -54,34 +52,24 @@ const fetchRequesterDeals = async (
         ethProvider: contracts.provider,
       }).validate(workerpoolAddress);
     }
-    const find = Object.assign(
-      { requester: vRequesterAddress },
-      appAddress && { 'app.pointer': vAppAddress },
-      datasetAddress && {
-        'dataset.pointer': vDatasetAddress,
-      },
-      workerpoolAddress && {
-        'workerpool.pointer': vWorkerpoolAddress,
-      },
-      beforeTimestamp && { blockTimestamp: { $lt: beforeTimestamp } },
-    );
-    const body = {
+    const query = {
       chainId: vChainId,
-      sort: {
-        blockTimestamp: -1,
-      },
-      find,
+      requester: vRequesterAddress,
+      ...(appAddress && { app: vAppAddress }),
+      ...(datasetAddress && {
+        dataset: vDatasetAddress,
+      }),
+      ...(workerpoolAddress && {
+        workerpool: vWorkerpoolAddress,
+      }),
     };
-    const response = await jsonApi.post({
+    const response = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
       endpoint: '/deals',
-      body,
+      query,
     });
     if (response.ok && response.deals) {
-      return {
-        count: response.count,
-        deals: response.deals,
-      };
+      return response;
     }
     throw Error('An error occured while getting deals');
   } catch (error) {
@@ -216,9 +204,7 @@ const claim = async (
     if (initialized.length === 0 && notInitialized.length === 0) throw Error('Nothing to claim');
     initialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
     notInitialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
-    const lastBlock = await wrapCall(
-      contracts.provider.getBlock('latest'),
-    );
+    const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
     const iexecContract = contracts.getIExecContract();
