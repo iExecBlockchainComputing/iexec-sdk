@@ -83,6 +83,7 @@ const desc = {
   bridgeToSidechain: () => 'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () => 'send RLC from the sidechain to the mainchain (default unit nRLC)',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
 };
@@ -275,17 +276,35 @@ const option = {
 };
 
 const orderOption = {
-  app: () => [
-    `--app <${listOfChoices(['deployed'], 'address')}>`,
-    'app address, use "deployed" to use last deployed from "deployed.json"',
+  app: ({ allowDeployed = true } = {}) => [
+    `--app <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `app address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
-  dataset: () => [
-    `--dataset <${listOfChoices(['deployed'], 'address')}>`,
-    'dataset address, use "deployed" to use last deployed from "deployed.json"',
+  dataset: ({ allowDeployed = true } = {}) => [
+    `--dataset <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `dataset address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
-  workerpool: () => [
-    `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
-    'workerpool address, use "deployed" to use last deployed from "deployed.json"',
+  workerpool: ({ allowDeployed = true } = {}) => [
+    `--workerpool <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `workerpool address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
   price: () => [
     '--price <amount unit...>',
