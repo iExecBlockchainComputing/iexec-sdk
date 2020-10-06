@@ -272,7 +272,7 @@ requestRun
         requestorder,
       );
       spinner.succeed(
-        `Successfully published requestorder with orderHash ${orderHash}\nRun "iexec orderbook requester ${requester} --category ${requestorder.category}" to show published requestorders`,
+        `Successfully published requestorder with orderHash ${orderHash}\nRun "iexec orderbook requester ${requester}" to show published requestorders`,
         {
           raw: {
             orderHash,

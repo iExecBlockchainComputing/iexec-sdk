@@ -283,7 +283,7 @@ publish
         signedOrder,
       );
       spinner.succeed(
-        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address} --category ${overrides.category}" to show published ${objName}orders`,
+        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
         {
           raw: {
             orderHash,

@@ -4078,6 +4078,6 @@ describe('[Common]', () => {
       await expect(
         execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
       ).resolves.toBeDefined();
-    }, 20000);
+    }, 120000);
   });
 });

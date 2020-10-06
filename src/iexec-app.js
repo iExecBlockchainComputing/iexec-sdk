@@ -559,7 +559,11 @@ run
           getPropertyFormChain(chain, 'iexecGateway'),
           app,
           {
+            requester,
+            ...(useDataset && { dataset }),
+            ...(runOnWorkerpool && { workerpool }),
             ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
+            maxTag: tag,
           },
         );
         const order = appOrders[0] && appOrders[0].order;
@@ -598,6 +602,9 @@ run
           dataset,
           {
             app,
+            requester,
+            ...(runOnWorkerpool && { workerpool }),
+            maxTag: tag,
           },
         );
         const order = datasetOrders[0] && datasetOrders[0].order;
@@ -652,9 +659,11 @@ run
           const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            catid,
             {
-              workerpoolAddress: workerpool,
+              category: catid,
+              app,
+              ...(useDataset && { dataset }),
+              ...(runOnWorkerpool && { workerpool }),
               minTag,
               minTrust: trust,
             },

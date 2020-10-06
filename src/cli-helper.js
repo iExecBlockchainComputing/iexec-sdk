@@ -188,16 +188,28 @@ const option = {
   ],
   decrypt: () => ['--decrypt', 'decrypt an encrypted result'],
   category: () => ['--category <id>', 'specify the work category'],
-  orderbookWorkerpool: () => [
+  filterAppSpecific: () => ['--app <address>', 'filter by app'],
+  filterDatasetSpecific: () => ['--dataset <address>', 'filter by dataset'],
+  filterBeneficiarySpecific: () => [
+    '--beneficiary <address>',
+    'filter by beneficiary',
+  ],
+  includeAppSpecific: () => [
+    '--app <address>',
+    'include private orders for specified app',
+  ],
+  includeDatasetSpecific: () => [
+    '--dataset <address>',
+    'include private orders for specified dataset',
+  ],
+  includeWorkerpoolSpecific: () => [
     '--workerpool <address>',
-    'filter by workerpool address',
+    'include private orders for specified workerpool',
   ],
-  orderbookRequester: () => [
+  includeRequesterSpecific: () => [
     '--requester <address>',
-    'filter by requester address',
+    'include private orders for specified requester',
   ],
-  orderbookApp: () => ['--app <address>', 'filter by app address'],
-  orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
     '--require-tag <tag>',
     'specify minimum required tags\n* usage: --require-tag tag1,tag2',
@@ -207,6 +219,9 @@ const option = {
     'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
   ],
   tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
+  minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
+  minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',

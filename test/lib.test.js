@@ -1178,7 +1178,7 @@ describe('[getSignerFromPrivateKey]', () => {
         chainId: '5',
       }).wallet.checkBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
-  }, 10000);
+  }, 120000);
   test('providers option ignored with RPC host', async () => {
     const alchemyFailQuorumFail = {
       alchemy: 'FAIL',
@@ -5003,7 +5003,7 @@ describe('[orderbook]', () => {
       expect(found.remaining).toBe(1);
       expect(found.publicationTimestamp).toBeDefined();
     });
-    test('orderbook.fetchAppOrderbook()', async () => {
+    test('orderbook.fetchAppOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
         PRIVATE_KEY,
@@ -5027,7 +5027,31 @@ describe('[orderbook]', () => {
       expect(res.count).toBe(0);
       expect(res.appOrders).toStrictEqual([]);
     });
-    test('orderbook.fetchDatasetOrderbook()', async () => {
+    test('orderbook.fetchAppOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const appAddress = getRandomAddress();
+      const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
+      expect(res.count).toBe(0);
+      expect(res.orders).toStrictEqual([]);
+    });
+    test('orderbook.fetchDatasetOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
         PRIVATE_KEY,
@@ -5051,7 +5075,31 @@ describe('[orderbook]', () => {
       expect(res.count).toBe(0);
       expect(res.datasetOrders).toStrictEqual([]);
     });
-    test('orderbook.fetchWorkerpoolOrderbook()', async () => {
+    test('orderbook.fetchDatasetOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const datasetAddress = getRandomAddress();
+      const res = await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
+      expect(res.count).toBe(0);
+      expect(res.orders).toStrictEqual([]);
+    });
+    test('orderbook.fetchWorkerpoolOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
         PRIVATE_KEY,
@@ -5074,7 +5122,32 @@ describe('[orderbook]', () => {
       expect(res.count).toBe(0);
       expect(res.workerpoolOrders).toStrictEqual([]);
     });
-    test('orderbook.fetchRequestOrderbook()', async () => {
+    test('orderbook.fetchWorkerpoolOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const res = await iexec.orderbook.fetchWorkerpoolOrderbook({
+        category: 2,
+      });
+      expect(res.count).toBe(0);
+      expect(res.orders).toStrictEqual([]);
+    });
+    test('orderbook.fetchRequestOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
         PRIVATE_KEY,
@@ -5096,6 +5169,29 @@ describe('[orderbook]', () => {
       const res = await iexec.orderbook.fetchRequestOrderbook(2);
       expect(res.count).toBe(0);
       expect(res.requestOrders).toStrictEqual([]);
+    });
+    test('orderbook.fetchRequestOrderbook()', async () => {
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainParityUrl,
+        PRIVATE_KEY,
+      );
+      const iexecGatewayURL = DRONE
+        ? 'http://token-gateway:3000'
+        : 'http://localhost:13000';
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+          chainId: networkId,
+        },
+        {
+          hubAddress,
+          isNative: false,
+          iexecGatewayURL,
+        },
+      );
+      const res = await iexec.orderbook.fetchRequestOrderbook({ category: 2 });
+      expect(res.count).toBe(0);
+      expect(res.orders).toStrictEqual([]);
     });
   }
 });

@@ -439,18 +439,64 @@ class IExec {
       datasetAddress,
       options,
     );
-    this.orderbook.fetchWorkerpoolOrderbook = (category, options = {}) => orderbook.fetchWorkerpoolOrderbook(
-      contracts,
-      getIexecGatewayURL(),
-      category,
-      options,
-    );
-    this.orderbook.fetchRequestOrderbook = (category, options = {}) => orderbook.fetchRequestOrderbook(
-      contracts,
-      getIexecGatewayURL(),
-      category,
-      options,
-    );
+    this.orderbook.fetchWorkerpoolOrderbook = (...args) => {
+      let options;
+      if (args[0] !== undefined && typeof args[0] !== 'object') {
+        console.warn(
+          '[iexec] orderbook.fetchWorkerpoolOrderbook(category, options) is deprecated, use category as an option of orderbook.fetchWorkerpoolOrderbook(options)',
+        );
+        options = args[1] || {};
+        [options.category] = args;
+      } else {
+        [options] = args;
+      }
+      if (options.workerpoolAddress) {
+        console.warn(
+          '[iexec] orderbook.fetchWorkerpoolOrderbook(options) workerpoolAddress option is deprecated, use workerpool',
+        );
+        options.workerpool = options.workerpoolAddress;
+      }
+      if (options.signerAddress) {
+        console.warn(
+          '[iexec] orderbook.fetchWorkerpoolOrderbook(options) signerAddress option is deprecated, use workerpoolOwner',
+        );
+        options.signerAddress = options.workerpoolOwner;
+      }
+      return orderbook.fetchWorkerpoolOrderbook(
+        contracts,
+        getIexecGatewayURL(),
+        options,
+      );
+    };
+    this.orderbook.fetchRequestOrderbook = (...args) => {
+      let options;
+      if (args[0] !== undefined && typeof args[0] !== 'object') {
+        console.warn(
+          '[iexec] orderbook.fetchRequestOrderbook(category, options) is deprecated, use category as an option of orderbook.fetchRequestOrderbook(options)',
+        );
+        options = args[1] || {};
+        [options.category] = args;
+      } else {
+        [options] = args;
+      }
+      if (options.requesterAddress) {
+        console.warn(
+          '[iexec] orderbook.fetchRequestOrderbook(options) requesterAddress option is deprecated, use requester',
+        );
+        options.requester = options.requesterAddress;
+      }
+      if (options.beneficiaryAddress) {
+        console.warn(
+          '[iexec] orderbook.fetchRequestOrderbook(options) beneficiaryAddress option is deprecated, use beneficiary',
+        );
+        options.beneficiary = options.beneficiaryAddress;
+      }
+      return orderbook.fetchRequestOrderbook(
+        contracts,
+        getIexecGatewayURL(),
+        options,
+      );
+    };
     this.task = {};
     this.task.show = taskid => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });

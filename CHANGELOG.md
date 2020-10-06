@@ -14,6 +14,15 @@ All notable changes to this project will be documented in this file.
 - fixed multiaddr format machine to human
 - update `Web3ProviderError` messages
 - migrated to new market API
+- `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal
+- `iexec orderbook requester [address]` `--category <catid>` is now optionnal
+- added orderbook filtering options
+- [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
+- [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchRequestOrderbook(options)`
+- [DEPRECATED] `iexec.orderbook.fetchAppOrderbook()` returned value `appOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchDatasetOrderbook()` returned value `datasetOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook()` returned value `workerpoolOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook()` returned value `requestOrders` is deprecated, use `orders`
 
 ### Removed
 

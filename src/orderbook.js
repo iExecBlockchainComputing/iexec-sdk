@@ -15,9 +15,9 @@ const debug = Debug('iexec:orderbook');
 const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  app = throwIfMissing(),
   {
-    minVolume, dataset, workerpool, requester, minTag, maxTag,
+    dataset, workerpool, requester, minTag, maxTag, minVolume,
   } = {},
 ) => {
   try {
@@ -25,7 +25,7 @@ const fetchAppOrderbook = async (
       chainId: await chainIdSchema().validate(contracts.chainId),
       app: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(appAddress),
+      }).validate(app),
       ...(dataset && {
         dataset: await addressSchema({
           ethProvider: contracts.provider,
@@ -56,7 +56,12 @@ const fetchAppOrderbook = async (
       endpoint: '/apporders',
       query,
     });
-    if (response.ok) return { count: response.count, appOrders: response.orders };
+    if (response.ok) {
+      return {
+        ...response,
+        appOrders: response.orders, // deprecated
+      };
+    }
     throw Error('An error occured while getting orderbook');
   } catch (error) {
     debug('fetchAppOrderbook()', error);
@@ -67,9 +72,9 @@ const fetchAppOrderbook = async (
 const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  datasetAddress = throwIfMissing(),
+  dataset = throwIfMissing(),
   {
-    minVolume, app, workerpool, requester, minTag, maxTag,
+    app, workerpool, requester, minTag, maxTag, minVolume,
   } = {},
 ) => {
   try {
@@ -77,7 +82,7 @@ const fetchDatasetOrderbook = async (
       chainId: await chainIdSchema().validate(contracts.chainId),
       dataset: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(datasetAddress),
+      }).validate(dataset),
       ...(app && {
         app: await addressSchema({
           ethProvider: contracts.provider,
@@ -111,7 +116,7 @@ const fetchDatasetOrderbook = async (
     if (response.ok) {
       return {
         ...response,
-        datasetOrders: response.orders,
+        datasetOrders: response.orders, // deprecated
       };
     }
     throw Error('An error occured while getting orderbook');
@@ -124,27 +129,47 @@ const fetchDatasetOrderbook = async (
 const fetchWorkerpoolOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  category = throwIfMissing(),
   {
-    workerpoolAddress, minTag, signerAddress, minTrust, minVolume,
+    category,
+    workerpool,
+    minTag,
+    maxTag,
+    workerpoolOwner,
+    minTrust,
+    minVolume,
+    app,
+    dataset,
   } = {},
 ) => {
   try {
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       category: await uint256Schema().validate(category),
-      ...(workerpoolAddress && {
+      ...(workerpool && {
         workerpool: await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(workerpoolAddress),
+        }).validate(workerpool),
+      }),
+      ...(app && {
+        app: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(app),
+      }),
+      ...(dataset && {
+        dataset: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(dataset),
       }),
       ...(minTag && {
         minTag: await tagSchema().validate(minTag),
       }),
-      ...(signerAddress && {
+      ...(maxTag && {
+        maxTag: await tagSchema().validate(maxTag),
+      }),
+      ...(workerpoolOwner && {
         workerpoolOwner: await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(signerAddress),
+        }).validate(workerpoolOwner),
       }),
       ...(minTrust && {
         minTrust: await positiveIntSchema().validate(minTrust),
@@ -161,7 +186,7 @@ const fetchWorkerpoolOrderbook = async (
     if (response.ok) {
       return {
         ...response,
-        workerpoolOrders: response.orders,
+        workerpoolOrders: response.orders, // deprecated
       };
     }
     throw Error('An error occured while getting orderbook');
@@ -174,24 +199,50 @@ const fetchWorkerpoolOrderbook = async (
 const fetchRequestOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  category = throwIfMissing(),
   {
-    requesterAddress, beneficiaryAddress, maxTag, maxTrust, minVolume,
+    category,
+    requester,
+    beneficiary,
+    app,
+    dataset,
+    workerpool,
+    minTag,
+    maxTag,
+    maxTrust,
+    minVolume,
   } = {},
 ) => {
   try {
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       category: await uint256Schema().validate(category),
-      ...(requesterAddress && {
+      ...(requester && {
         requester: await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(requesterAddress),
+        }).validate(requester),
       }),
-      ...(beneficiaryAddress && {
+      ...(beneficiary && {
         beneficiary: await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(beneficiaryAddress),
+        }).validate(beneficiary),
+      }),
+      ...(app && {
+        app: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(app),
+      }),
+      ...(dataset && {
+        dataset: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(dataset),
+      }),
+      ...(workerpool && {
+        workerpool: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(workerpool),
+      }),
+      ...(minTag !== undefined && {
+        minTag: await tagSchema().validate(minTag),
       }),
       ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
@@ -211,7 +262,7 @@ const fetchRequestOrderbook = async (
     if (response.ok) {
       return {
         ...response,
-        requestOrders: response.orders,
+        requestOrders: response.orders, // deprecated
       };
     }
     throw Error('An error occured while getting orderbook');
