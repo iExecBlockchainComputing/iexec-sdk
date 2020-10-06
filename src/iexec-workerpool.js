@@ -222,9 +222,9 @@ publish
   .option(...orderOption.volume())
   .option(...orderOption.tag())
   .option(...orderOption.trust())
-  // .option(...orderOption.apprestrict()) // not allowed by iExec marketplace
-  // .option(...orderOption.datasetrestrict()) // not allowed by iExec marketplace
-  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .option(...orderOption.apprestrict())
+  .option(...orderOption.datasetrestrict())
+  .option(...orderOption.requesterrestrict())
   .action(async (objAddress, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);
