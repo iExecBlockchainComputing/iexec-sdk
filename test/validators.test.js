@@ -784,6 +784,11 @@ describe('[tagSchema]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000101',
     );
   });
+  test('empty tag', async () => {
+    await expect(tagSchema().validate('')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+  });
   test('isolated tag', async () => {
     await expect(tagSchema().validate('gpu')).resolves.toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000100',

@@ -202,6 +202,11 @@ const option = {
     '--require-tag <tag>',
     'specify minimum required tags\n* usage: --require-tag tag1,tag2',
   ],
+  maxTag: () => [
+    '--max-tag <tag>',
+    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+  ],
+  tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',

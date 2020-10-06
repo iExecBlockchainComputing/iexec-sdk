@@ -44,10 +44,10 @@ const fetchAppOrderbook = async (
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
-      ...(minTag && {
+      ...(minTag !== undefined && {
         minTag: await tagSchema().validate(minTag),
       }),
-      ...(maxTag && {
+      ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
       }),
     };
@@ -96,10 +96,10 @@ const fetchDatasetOrderbook = async (
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
-      ...(minTag && {
+      ...(minTag !== undefined && {
         minTag: await tagSchema().validate(minTag),
       }),
-      ...(maxTag && {
+      ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
       }),
     };
@@ -193,10 +193,10 @@ const fetchRequestOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(beneficiaryAddress),
       }),
-      ...(maxTag && {
+      ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
       }),
-      ...(maxTrust && {
+      ...(maxTrust !== undefined && {
         maxTrust: await positiveIntSchema().validate(maxTrust),
       }),
       ...(minVolume && {

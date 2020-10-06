@@ -28,6 +28,9 @@ orderbookApp
   .option(...option.orderbookDataset())
   .option(...option.orderbookWorkerpool())
   .option(...option.orderbookRequester())
+  .option(...option.tag())
+  .option(...option.requiredTag())
+  .option(...option.maxTag())
   .description(desc.showObj('app orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -36,7 +39,9 @@ orderbookApp
       const chain = await loadChain(cmd.chain, {
         spinner,
       });
-      const { dataset, workerpool, requester } = cmd;
+      const {
+        dataset, workerpool, requester, tag, requireTag, maxTag,
+      } = cmd;
       if (address) isEthAddress(address, { strict: true });
       if (dataset) isEthAddress(dataset, { strict: true });
       if (workerpool) isEthAddress(workerpool, { strict: true });
@@ -47,7 +52,13 @@ orderbookApp
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         address,
-        Object.assign({}, { dataset }, { workerpool }, { requester }),
+        {
+          dataset,
+          workerpool,
+          requester,
+          minTag: tag !== undefined ? tag : requireTag,
+          maxTag: tag !== undefined ? tag : maxTag,
+        },
       );
       const appOrders = response.appOrders
         ? response.appOrders.map(e => ({
@@ -81,6 +92,9 @@ orderbookDataset
   .option(...option.orderbookApp())
   .option(...option.orderbookWorkerpool())
   .option(...option.orderbookRequester())
+  .option(...option.tag())
+  .option(...option.requiredTag())
+  .option(...option.maxTag())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -96,11 +110,18 @@ orderbookDataset
       if (requester) isEthAddress(requester, { strict: true });
 
       spinner.start(info.showing(objName));
+      const { tag, maxTag, requireTag } = cmd;
       const response = await orderbook.fetchDatasetOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         address,
-        Object.assign({}, { app }, { workerpool }, { requester }),
+        {
+          app,
+          workerpool,
+          requester,
+          minTag: tag !== undefined ? tag : requireTag,
+          maxTag: tag !== undefined ? tag : maxTag,
+        },
       );
       const datasetOrders = response.datasetOrders
         ? response.datasetOrders.map(e => ({
@@ -133,7 +154,9 @@ addGlobalOptions(orderbookWorkerpool);
 orderbookWorkerpool
   .option(...option.chain())
   .option(...option.category())
+  .option(...option.tag())
   .option(...option.requiredTag())
+  .option(...option.maxTag())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -144,13 +167,17 @@ orderbookWorkerpool
       });
       if (address) isEthAddress(address, { strict: true });
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
-      const minTag = cmd.requireTag;
       spinner.start(info.showing(objName));
+      const { tag, maxTag, requireTag } = cmd;
       const response = await orderbook.fetchWorkerpoolOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
-        { workerpoolAddress: address, minTag },
+        {
+          workerpoolAddress: address,
+          minTag: tag !== undefined ? tag : requireTag,
+          maxTag: tag !== undefined ? tag : maxTag,
+        },
       );
       const workerpoolOrders = response.workerpoolOrders
         ? response.workerpoolOrders.map(e => ({
@@ -184,6 +211,9 @@ addGlobalOptions(orderbookRequester);
 orderbookRequester
   .option(...option.chain())
   .option(...option.category())
+  .option(...option.tag())
+  .option(...option.requiredTag())
+  .option(...option.maxTag())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
@@ -196,11 +226,16 @@ orderbookRequester
       if (!cmd.category) throw Error(`Missing option ${option.category()[0]}`);
 
       spinner.start(info.showing(objName));
+      const { tag, maxTag, requireTag } = cmd;
       const response = await orderbook.fetchRequestOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         cmd.category,
-        { requesterAddress: address },
+        {
+          requesterAddress: address,
+          minTag: tag !== undefined ? tag : requireTag,
+          maxTag: tag !== undefined ? tag : maxTag,
+        },
       );
       const requestOrders = response.requestOrders
         ? response.requestOrders.map(e => ({

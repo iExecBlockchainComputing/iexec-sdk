@@ -234,6 +234,7 @@ const TAG_MAP = {
 const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
   tags.forEach((tag) => {
+    if (tag === '') return;
     if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`Unknown tag ${tag}`);
     binaryTags[TAG_MAP[tag] - 1] = true;
   });
