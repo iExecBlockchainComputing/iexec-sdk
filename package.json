@@ -10,6 +10,11 @@
   "bin": {
     "iexec": "./dist/iexec.js"
   },
+  "files": [
+    "dist/",
+    "src/",
+    "iexec_sdk_logo.jpg"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/iExecBlockchainComputing/iexec-sdk.git"
