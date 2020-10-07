@@ -484,6 +484,7 @@ const prompt = {
     `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
   ),
   unpublishFromJsonFile: (orderName, order) => question(`Do you want to unpublish the following ${orderName}? ${order}`),
+  more: () => question('Show more?', { rejectDefault: true, strict: false }),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ether', ...args);
@@ -795,6 +796,51 @@ const isBytes32 = (str, { strict = false } = {}) => {
   return true;
 };
 
+const displayPaginableRequest = async (
+  {
+    request,
+    processResponse = res => res,
+    fetchMessage = 'Fetching data',
+    emptyResultsMessage,
+    createResultsMessage = (callResults, initilResultsCount, totalCount) => `Results (${initilResultsCount + 1} to ${initilResultsCount
+        + callResults.length}${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(
+      callResults,
+    )}`,
+    spinner,
+    raw = false,
+  },
+  { results = [], count } = {},
+) => {
+  spinner.start(fetchMessage);
+  const res = await request;
+  const totalCount = count || res.count;
+  spinner.stop();
+  const callResults = processResponse(res);
+  if (callResults.length > 0) {
+    spinner.info(createResultsMessage(callResults, results.length, totalCount));
+    results.push(...callResults);
+    if (!raw && res.more && typeof res.more === 'function') {
+      const more = await prompt.more();
+      if (more) {
+        return displayPaginableRequest(
+          {
+            request: res.more(),
+            processResponse,
+            createResultsMessage,
+            spinner,
+          },
+          { results, count },
+        );
+      }
+      return { results, count: totalCount };
+    }
+  }
+  if (results.length === 0 && emptyResultsMessage) {
+    spinner.info(emptyResultsMessage);
+  }
+  return { results, count: totalCount };
+};
+
 const renderTasksStatus = (tasksStatusMap) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
@@ -882,4 +928,5 @@ module.exports = {
   lb,
   spawnAsync,
   renderTasksStatus,
+  displayPaginableRequest,
 };

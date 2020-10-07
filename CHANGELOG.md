@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- `iexec orderbook` tag filter options
+- `iexec orderbook` more filter options
+- `iexec orderbook` pagination
 
 ### Changed
 
@@ -16,7 +17,6 @@ All notable changes to this project will be documented in this file.
 - migrated to new market API
 - `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal
 - `iexec orderbook requester [address]` `--category <catid>` is now optionnal
-- added orderbook filtering options
 - [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
 - [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchRequestOrderbook(options)`
 - [DEPRECATED] `iexec.orderbook.fetchAppOrderbook()` returned value `appOrders` is deprecated, use `orders`
