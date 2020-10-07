@@ -77,7 +77,7 @@ requestRun
   .option(...orderOption.params())
   .option(...option.skipRequestCheck())
   .description(desc.requestRun())
-  .action(async (appAddress, cmd) => {
+  .action(async (app, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);
     const spinner = Spinner(opts);
@@ -86,7 +86,6 @@ requestRun
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
-      const app = appAddress;
       debug('app', app);
       if (!(await checkDeployedApp(chain.contracts, app))) {
         throw Error(`No app deployed at address ${app}`);

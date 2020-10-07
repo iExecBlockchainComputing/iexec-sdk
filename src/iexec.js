@@ -99,9 +99,7 @@ async function main() {
 
   cli.command('workerpool', 'manage iExec workerpools');
 
-  if (process.env.EXPERIMENTAL === 'true') {
-    cli.command('request', 'manage execution requests');
-  }
+  cli.command('request', 'manage execution requests');
 
   cli.command('category', 'manage iExec categories');
 
