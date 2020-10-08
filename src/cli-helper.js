@@ -777,7 +777,9 @@ const prettyRPC = (rpcObj) => {
 
 const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
-  const isAddress = isHexString && address.length === 42;
+  const isEns = typeof address === 'string'
+    && address.substr(address.length - 4, 4) === '.eth';
+  const isAddress = isEns || (isHexString && address.length === 42);
   if (!isAddress && strict) {
     throw Error(`Address ${address} is not a valid Ethereum address`);
   }
