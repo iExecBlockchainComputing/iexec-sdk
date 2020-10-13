@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 - fixed amount validation error
 - fixed multiaddr format machine to human
+- fixed requester stake too low error message for matching orders
 - update `Web3ProviderError` messages
 - migrated to new market API
 - `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal

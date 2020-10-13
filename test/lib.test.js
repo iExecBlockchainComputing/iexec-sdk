@@ -3980,6 +3980,43 @@ describe('[order]', () => {
       ),
     );
 
+    const apporder0nRlc = await iexec.order.signApporder({
+      ...apporderTemplate,
+      appprice: 0,
+      volume: 1000,
+    });
+    const datasetorder0nRlc = await iexec.order.signDatasetorder({
+      ...datasetorderTemplate,
+      datasetprice: 0,
+      volume: 1000,
+    });
+    const workerpoolorder2nRlc = await iexecPoolManager.order.signWorkerpoolorder(
+      { ...workerpoolorderTemplate, workerpoolprice: 2, volume: 1000 },
+    );
+    const requestorder6nRlc = await iexec.order.signRequestorder(
+      {
+        ...requestorderTemplate,
+        workerpoolmaxprice: 2,
+        volume: 3,
+      },
+      { checkRequest: false },
+    );
+    await expect(
+      iexec.order.matchOrders(
+        {
+          apporder: apporder0nRlc,
+          datasetorder: datasetorder0nRlc,
+          workerpoolorder: workerpoolorder2nRlc,
+          requestorder: requestorder6nRlc,
+        },
+        { checkRequest: false },
+      ),
+    ).rejects.toThrow(
+      Error(
+        "Total cost for 3 tasks (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume",
+      ),
+    );
+
     // workerpool owner stake check
     const workerpoolorder7nRlc = await iexecPoolManager.order.signWorkerpoolorder(
       { ...workerpoolorderTemplate, workerpoolprice: 7 },

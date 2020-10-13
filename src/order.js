@@ -1178,7 +1178,7 @@ const matchOrders = async (
     ]);
 
     // check matchability
-    await getMatchableVolume(
+    const matchableVolume = await getMatchableVolume(
       contracts,
       vAppOrder,
       vDatasetOrder,
@@ -1193,10 +1193,16 @@ const matchOrders = async (
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
+      const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
           `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+        );
+      }
+      if (stake.lt(totalCost)) {
+        throw new Error(
+          `Total cost for ${matchableVolume} tasks (${totalCost}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
         );
       }
     };
