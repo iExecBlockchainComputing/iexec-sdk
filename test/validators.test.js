@@ -851,7 +851,7 @@ describe('[addressSchema]', () => {
         'rlc.iexec.eth',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
-  });
+  }, 10000);
   test('invalid ens (throw when ethProvider is missing)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider() }).validate(
