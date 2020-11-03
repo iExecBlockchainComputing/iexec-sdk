@@ -3989,7 +3989,7 @@ describe('[Common]', () => {
       expect(res.useNative).toBe(true);
     });
 
-    test('providers config', async () => {
+    test.skip('providers config', async () => {
       const chainJsonDefault = await loadJSONFile('chain.json');
       const alchemyFailQuorumFail = {
         alchemy: 'FAIL',

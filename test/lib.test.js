@@ -1105,7 +1105,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ),
     ).toBe(true);
   }, 20000);
-  test('providers option', async () => {
+  test.skip('providers option', async () => {
     const alchemyFailQuorumFail = {
       alchemy: 'FAIL',
       quorum: 3,
