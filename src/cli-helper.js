@@ -821,9 +821,22 @@ const displayPaginableRequest = async (
   if (callResults.length > 0) {
     spinner.info(createResultsMessage(callResults, results.length, totalCount));
     results.push(...callResults);
-    if (!raw && res.more && typeof res.more === 'function') {
-      const more = await prompt.more();
-      if (more) {
+    if (res.more && typeof res.more === 'function') {
+      if (!raw) {
+        const more = await prompt.more();
+        if (more) {
+          return displayPaginableRequest(
+            {
+              request: res.more(),
+              processResponse,
+              createResultsMessage,
+              spinner,
+            },
+            { results, count },
+          );
+        }
+      } else if (results.length <= 80) {
+        // auto paginate get up to 100 results
         return displayPaginableRequest(
           {
             request: res.more(),
