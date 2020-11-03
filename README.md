@@ -243,7 +243,7 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec app run [address] [--dataset [address] --params <params> --category <id>] # run an iExec application at market price
+iexec app run [address] [--dataset [address] --args <args> --category <id>] # run an iExec application at market price
 ```
 
 see [app run available options](#app-run)
@@ -251,10 +251,7 @@ see [app run available options](#app-run)
 #### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec orderbook requester [address] --category <id> # check if you already have valid orders on the Marketplace
-iexec order init --request # reset requestorder fields in iexec.json
-iexec order sign --request # sign your requestorder
-iexec order publish --request # publish your requestorder on the Marketplace and get an orderHash
+iexec app request-execution [address] [--dataset [address] --args <args> --category <id>] # publish a requestorder on the Marketplace and get an orderHash
 iexec order show --app <orderHash> --deals # show your order on the Marketplace and check the deals
 ```
 
@@ -431,6 +428,29 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 --skip-request-check # skip request validity checks, this may result in task execution fail
 --params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
 --watch # watch execution status changes
+```
+
+### app request-execution
+
+```bash
+iexec app request-execution <appAddress> [options] # request an iExec application execution at limit price
+# OPTIONS
+--dataset <address> # dataset address
+--workerpool <address> # workerpool address
+--app-price <amount unit...> # app price per task (default unit nRLC)
+--dataset-price <amount unit...> # dataset price per task (default unit nRLC)
+--workerpool-price <amount unit...> # workerpool price per task (default unit nRLC)
+--category <id> # id of the task category
+--tag <tag...> # specify tags (usage: --tag tee,gpu)
+--trust <integer> # trust level
+--beneficiary <address> # specify the beneficiary of the request (default user address)
+--callback <address> # specify the callback address of the request
+--args <string> # specify the arguments to pass to the app
+--input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--encrypt-result # encrypt the result archive with the beneficiary public key
+--storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
+--skip-request-check # skip request validity checks, this may result in task execution fail
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
 ```
 
 ## dataset

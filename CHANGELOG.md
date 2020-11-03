@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - `iexec orderbook` more filter options
 - `iexec orderbook` pagination
+- `iexec app request-execution <appAddress>` publish a requestorder to run an app at limit price
 
 ### Changed
 
