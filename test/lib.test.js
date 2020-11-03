@@ -5087,7 +5087,21 @@ describe('[orderbook]', () => {
       const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
       expect(res.count).toBe(0);
       expect(res.orders).toStrictEqual([]);
-    });
+      const apporder = await deployAndGetApporder(iexec);
+      for (let i = 0; i < 22; i += 1) {
+        await iexec.order
+          .signApporder(apporder)
+          .then(o => iexec.order.publishApporder(o));
+      }
+      const res1 = await iexec.orderbook.fetchAppOrderbook(apporder.app);
+      expect(res1.count).toBe(22);
+      expect(res1.orders.length).toBe(20);
+      expect(res1.more).toBeDefined();
+      const res2 = await res1.more();
+      expect(res2.count).toBe(22);
+      expect(res2.orders.length).toBe(2);
+      expect(res2.more).toBeUndefined();
+    }, 30000);
     test('orderbook.fetchDatasetOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -5135,7 +5149,23 @@ describe('[orderbook]', () => {
       const res = await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
       expect(res.count).toBe(0);
       expect(res.orders).toStrictEqual([]);
-    });
+      const datasetorder = await deployAndGetDatasetorder(iexec);
+      for (let i = 0; i < 23; i += 1) {
+        await iexec.order
+          .signDatasetorder(datasetorder)
+          .then(o => iexec.order.publishDatasetorder(o));
+      }
+      const res1 = await iexec.orderbook.fetchDatasetOrderbook(
+        datasetorder.dataset,
+      );
+      expect(res1.count).toBe(23);
+      expect(res1.orders.length).toBe(20);
+      expect(res1.more).toBeDefined();
+      const res2 = await res1.more();
+      expect(res2.count).toBe(23);
+      expect(res2.orders.length).toBe(3);
+      expect(res2.more).toBeUndefined();
+    }, 30000);
     test('orderbook.fetchWorkerpoolOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -5183,7 +5213,23 @@ describe('[orderbook]', () => {
       });
       expect(res.count).toBe(0);
       expect(res.orders).toStrictEqual([]);
-    });
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      for (let i = 0; i < 24; i += 1) {
+        await iexec.order
+          .signWorkerpoolorder(workerpoolorder)
+          .then(o => iexec.order.publishWorkerpoolorder(o));
+      }
+      const res1 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolorder.workerpool,
+      });
+      expect(res1.count).toBe(24);
+      expect(res1.orders.length).toBe(20);
+      expect(res1.more).toBeDefined();
+      const res2 = await res1.more();
+      expect(res2.count).toBe(24);
+      expect(res2.orders.length).toBe(4);
+      expect(res2.more).toBeUndefined();
+    }, 30000);
     test('orderbook.fetchRequestOrderbook() (deprecated legacy)', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -5224,12 +5270,42 @@ describe('[orderbook]', () => {
           hubAddress,
           isNative: false,
           iexecGatewayURL,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+          smsURL: 'https://sms.iex.ec',
         },
       );
       const res = await iexec.orderbook.fetchRequestOrderbook({ category: 2 });
       expect(res.count).toBe(0);
       expect(res.orders).toStrictEqual([]);
-    });
+      const apporder = await deployAndGetApporder(iexec);
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      const requestorder = await getMatchableRequestorder(iexec, {
+        apporder,
+        workerpoolorder,
+      });
+      await iexec.order.publishApporder(apporder);
+      await iexec.order.publishWorkerpoolorder(workerpoolorder);
+      for (let i = 0; i < 25; i += 1) {
+        await iexec.order
+          .signRequestorder(
+            { ...requestorder, workerpool: utils.NULL_ADDRESS },
+            { checkRequest: false },
+          )
+          .then(o => iexec.order.publishRequestorder(o, {
+            checkRequest: false,
+          }));
+      }
+      const res1 = await iexec.orderbook.fetchRequestOrderbook({
+        requester: await iexec.wallet.getAddress(),
+      });
+      expect(res1.count).toBe(25);
+      expect(res1.orders.length).toBe(20);
+      expect(res1.more).toBeDefined();
+      const res2 = await res1.more();
+      expect(res2.count).toBe(25);
+      expect(res2.orders.length).toBe(5);
+      expect(res2.more).toBeUndefined();
+    }, 30000);
   }
 });
 
