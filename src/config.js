@@ -47,7 +47,7 @@ const getChainDefaults = chainId => ({
   sms: smsMap[chainId],
   resultProxy: resultProxyMap[chainId],
   ipfsGateway: ipfsGatewayMap[chainId] || 'https://ipfs.iex.ec',
-  iexecGateway: iexecGatewayMap[chainId] || 'https://v5.gateway.iex.ec',
+  iexecGateway: iexecGatewayMap[chainId] || 'https://v5.api.market.iex.ec',
   bridge: bridgeMap[chainId],
 });
 

@@ -48,7 +48,6 @@ const {
   throwIfMissing,
   ValidationError,
 } = require('./validator');
-const { ObjectNotFoundError } = require('./errors');
 const {
   wrapCall,
   wrapSend,
@@ -113,7 +112,7 @@ const objDesc = {
     cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: '/apporders',
-    dealField: 'appHash',
+    apiDealField: 'apporderHash',
     addressField: 'app',
   },
   [DATASET_ORDER]: {
@@ -133,7 +132,7 @@ const objDesc = {
     cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: '/datasetorders',
-    dealField: 'datasetHash',
+    apiDealField: 'datasetorderHash',
     addressField: 'dataset',
   },
   [WORKERPOOL_ORDER]: {
@@ -155,7 +154,7 @@ const objDesc = {
     cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: '/workerpoolorders',
-    dealField: 'workerpoolHash',
+    apiDealField: 'workerpoolorderHash',
     addressField: 'workerpool',
   },
   [REQUEST_ORDER]: {
@@ -180,7 +179,7 @@ const objDesc = {
     cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: '/requestorders',
-    dealField: 'requestHash',
+    apiDealField: 'requestorderHash',
     addressField: 'requester',
   },
 };
@@ -319,6 +318,9 @@ const getRemainingVolume = async (
   try {
     checkOrderName(orderName);
     const initial = new BN(order.volume);
+    if (initial.isZero()) {
+      return initial;
+    }
     const orderHash = await computeOrderHash(contracts, orderName, order);
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
@@ -495,20 +497,23 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const body = { chainId, order: signedOrder };
+    const body = { order: signedOrder };
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
-      contracts.chainId,
+      chainId,
       address,
       contracts.signer,
     );
     const response = await jsonApi.post({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint.concat('/publish'),
+      endpoint: objDesc[orderName].apiEndpoint,
+      query: {
+        chainId,
+      },
       body,
       headers: { authorization },
     });
-    if (response.ok && response.saved && response.saved.orderHash) {
-      return response.saved.orderHash;
+    if (response.ok && response.published && response.published.orderHash) {
+      return response.published.orderHash;
     }
     throw Error('An error occured while publishing order');
   } catch (error) {
@@ -578,7 +583,7 @@ const unpublishOrder = async (
 ) => {
   try {
     checkOrderName(orderName);
-    const body = { chainId, target };
+    const body = { target };
     if (target === UNPUBLISH_TARGET_ORDERHASH) {
       if (!orderHash) throwIfMissing();
       body.orderHash = orderHash;
@@ -595,9 +600,12 @@ const unpublishOrder = async (
       userAddress,
       contracts.signer,
     );
-    const response = await jsonApi.post({
+    const response = await jsonApi.put({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint.concat('/unpublish'),
+      endpoint: objDesc[orderName].apiEndpoint,
+      query: {
+        chainId,
+      },
       body,
       headers: { authorization },
     });
@@ -615,49 +623,61 @@ const unpublishApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   apporderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(apporderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(apporderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(datasetorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(datasetorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requestorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(requestorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(requestorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishAllApporders = async (
   contracts = throwIfMissing(),
@@ -728,66 +748,78 @@ const unpublishLastApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(appAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(appAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(datasetAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(datasetAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpoolAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(workerpoolAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await getAddress(contracts),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await getAddress(contracts),
+    },
+  );
+  return unpublished[0];
+};
 
 const fetchPublishedOrderByHash = async (
   iexecGatewayURL = throwIfMissing(),
@@ -801,24 +833,15 @@ const fetchPublishedOrderByHash = async (
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const endpoint = objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
-    const body = {
+    const query = {
       chainId: vChainId,
-      sort: {
-        publicationTimestamp: -1,
-      },
-      limit: 1,
-      find: { orderHash: vOrderHash },
     };
-    const response = await jsonApi.post({
+    const { ok, ...res } = await jsonApi.get({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint,
-      body,
+      endpoint: `${objDesc[orderName].apiEndpoint}/${vOrderHash}`,
+      query,
     });
-    if (response.ok && response.orders) {
-      if (response.orders[0]) return response.orders[0];
-      throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
-    }
-    throw Error('An error occured while fetching order');
+    return res;
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);
     throw error;
@@ -835,19 +858,15 @@ const fetchDealsByOrderHash = async (
     checkOrderName(orderName);
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
-    const hashFiedName = objDesc[orderName].dealField;
-    const body = {
+    const hashName = objDesc[orderName].apiDealField;
+    const query = {
       chainId: vChainId,
-      sort: {
-        publicationTimestamp: -1,
-      },
-      limit: 1,
-      find: { [hashFiedName]: vOrderHash },
+      [hashName]: vOrderHash,
     };
-    const response = await jsonApi.post({
+    const response = await jsonApi.get({
       api: iexecGatewayURL,
       endpoint: '/deals',
-      body,
+      query,
     });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
@@ -872,7 +891,7 @@ const verifySign = async (
   return !!isValid;
 };
 
-const matchOrders = async (
+const getMatchableVolume = async (
   contracts = throwIfMissing(),
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
@@ -1036,6 +1055,7 @@ const matchOrders = async (
         throw Error('Missing tag [tee] in apporder');
       }
     }
+
     // price check
     const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
     const workerpoolMaxPrice = new BN(vRequestOrder.workerpoolmaxprice);
@@ -1059,75 +1079,135 @@ const matchOrders = async (
       );
     }
 
-    // volumes checks
-    const checkRequestVolumeAsync = async () => {
-      const requestVolume = await getRemainingVolume(
-        contracts,
-        REQUEST_ORDER,
-        vRequestOrder,
+    // workerpool owner stake check
+    const workerpoolOwner = await getWorkerpoolOwner(
+      contracts,
+      vWorkerpoolOrder.workerpool,
+    );
+    const { stake } = await checkBalance(contracts, workerpoolOwner);
+    const requiredStakePerTask = workerpoolPrice
+      .mul(new BN(30))
+      .div(new BN(100));
+    const workerpoolStakedVolume = requiredStakePerTask.isZero()
+      ? new BN(workerpoolOrder.volume)
+      : stake.div(requiredStakePerTask);
+    if (workerpoolStakedVolume.isZero()) {
+      throw Error(
+        `workerpool required stake (${requiredStakePerTask}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
-      if (requestVolume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
-    };
-    const checkWorkerpoolVolumeAsync = async () => {
-      const workerpoolVolume = await getRemainingVolume(
-        contracts,
-        WORKERPOOL_ORDER,
-        vWorkerpoolOrder,
-      );
-      if (workerpoolVolume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
-    };
-    const checkAppVolumeAsync = async () => {
-      const appVolume = await getRemainingVolume(
-        contracts,
-        APP_ORDER,
-        vAppOrder,
-      );
-      if (appVolume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-    };
-    const checkDatasetVolumeAsync = async () => {
-      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
-        const datasetVolume = await getRemainingVolume(
-          contracts,
-          DATASET_ORDER,
-          vDatasetOrder,
-        );
-        if (datasetVolume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
-      }
-    };
+    }
+
+    // check matchable volume
+    const volumes = await Promise.all(
+      vRequestOrder.dataset !== NULL_ADDRESS
+        ? [
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
+              return volume;
+            },
+          ),
+          getRemainingVolume(
+            contracts,
+            WORKERPOOL_ORDER,
+            vWorkerpoolOrder,
+          ).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+              return volume;
+            },
+          ),
+        ]
+        : [
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(
+            contracts,
+            WORKERPOOL_ORDER,
+            vWorkerpoolOrder,
+          ).then((volume) => {
+            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
+            return volume;
+          }),
+          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
+              return volume;
+            },
+          ),
+        ],
+    );
+    return volumes.reduce(
+      (min, curr) => (curr.lt(min) ? curr : min),
+      workerpoolStakedVolume,
+    );
+  } catch (error) {
+    debug('getMatchableVolume()', error);
+    throw error;
+  }
+};
+
+const matchOrders = async (
+  contracts = throwIfMissing(),
+  appOrder = throwIfMissing(),
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder = throwIfMissing(),
+  requestOrder = throwIfMissing(),
+) => {
+  try {
+    const [
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+    ] = await Promise.all([
+      signedApporderSchema().validate(appOrder),
+      signedDatasetorderSchema().validate(datasetOrder),
+      signedWorkerpoolorderSchema().validate(workerpoolOrder),
+      signedRequestorderSchema().validate(requestOrder),
+    ]);
+
+    // check matchability
+    const matchableVolume = await getMatchableVolume(
+      contracts,
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+    );
+
+    const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
+    const appPrice = new BN(vAppOrder.appprice);
+    const datasetPrice = new BN(vDatasetOrder.datasetprice);
+
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
+      const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
           `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
         );
       }
-    };
-
-    // workerpool owner stake check
-    const checkWorkerpoolStakeAsync = async () => {
-      const workerpoolOwner = await getWorkerpoolOwner(
-        contracts,
-        vWorkerpoolOrder.workerpool,
-      );
-      const { stake } = await checkBalance(contracts, workerpoolOwner);
-      const requiredStake = workerpoolPrice.mul(new BN(30)).div(new BN(100));
-      if (stake.lt(requiredStake)) {
-        throw Error(
-          `workerpool required stake (${requiredStake}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
+      if (stake.lt(totalCost)) {
+        throw new Error(
+          `Total cost for ${matchableVolume} tasks (${totalCost}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
         );
       }
     };
 
-    await Promise.all([
-      checkWorkerpoolVolumeAsync(),
-      checkRequestVolumeAsync(),
-      checkAppVolumeAsync(),
-      checkDatasetVolumeAsync(),
-      checkRequesterSolvabilityAsync(),
-      checkWorkerpoolStakeAsync(),
-    ]);
+    await checkRequesterSolvabilityAsync();
 
     const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
     const datasetOrderStruct = signedOrderToStruct(
