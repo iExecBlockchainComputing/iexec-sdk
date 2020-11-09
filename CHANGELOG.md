@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## [5.1.0] 2020-11-09
 
 ### Added
 
@@ -12,11 +12,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- migrated to new market API
 - fixed amount validation error
 - fixed multiaddr format machine to human
 - fixed requester stake too low error message for matching orders
 - update `Web3ProviderError` messages
-- migrated to new market API
 - `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal
 - `iexec orderbook requester [address]` `--category <catid>` is now optionnal
 - [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
