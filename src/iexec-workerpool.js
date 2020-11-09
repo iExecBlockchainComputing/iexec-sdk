@@ -222,9 +222,9 @@ publish
   .option(...orderOption.volume())
   .option(...orderOption.tag())
   .option(...orderOption.trust())
-  // .option(...orderOption.apprestrict()) // not allowed by iExec marketplace
-  // .option(...orderOption.datasetrestrict()) // not allowed by iExec marketplace
-  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .option(...orderOption.apprestrict())
+  .option(...orderOption.datasetrestrict())
+  .option(...orderOption.requesterrestrict())
   .action(async (objAddress, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);
@@ -283,7 +283,7 @@ publish
         signedOrder,
       );
       spinner.succeed(
-        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address} --category ${overrides.category}" to show published ${objName}orders`,
+        `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
         {
           raw: {
             orderHash,

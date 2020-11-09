@@ -3989,7 +3989,7 @@ describe('[Common]', () => {
       expect(res.useNative).toBe(true);
     });
 
-    test('providers config', async () => {
+    test.skip('providers config', async () => {
       const chainJsonDefault = await loadJSONFile('chain.json');
       const alchemyFailQuorumFail = {
         alchemy: 'FAIL',
@@ -4078,6 +4078,6 @@ describe('[Common]', () => {
       await expect(
         execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
       ).resolves.toBeDefined();
-    }, 20000);
+    }, 120000);
   });
 });

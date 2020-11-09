@@ -48,7 +48,6 @@ const {
   throwIfMissing,
   ValidationError,
 } = require('./validator');
-const { ObjectNotFoundError } = require('./errors');
 const {
   wrapCall,
   wrapSend,
@@ -113,7 +112,7 @@ const objDesc = {
     cancelMethod: 'manageAppOrder',
     cancelEvent: 'ClosedAppOrder',
     apiEndpoint: '/apporders',
-    dealField: 'appHash',
+    apiDealField: 'apporderHash',
     addressField: 'app',
   },
   [DATASET_ORDER]: {
@@ -133,7 +132,7 @@ const objDesc = {
     cancelMethod: 'manageDatasetOrder',
     cancelEvent: 'ClosedDatasetOrder',
     apiEndpoint: '/datasetorders',
-    dealField: 'datasetHash',
+    apiDealField: 'datasetorderHash',
     addressField: 'dataset',
   },
   [WORKERPOOL_ORDER]: {
@@ -155,7 +154,7 @@ const objDesc = {
     cancelMethod: 'manageWorkerpoolOrder',
     cancelEvent: 'ClosedWorkerpoolOrder',
     apiEndpoint: '/workerpoolorders',
-    dealField: 'workerpoolHash',
+    apiDealField: 'workerpoolorderHash',
     addressField: 'workerpool',
   },
   [REQUEST_ORDER]: {
@@ -180,7 +179,7 @@ const objDesc = {
     cancelMethod: 'manageRequestOrder',
     cancelEvent: 'ClosedRequestOrder',
     apiEndpoint: '/requestorders',
-    dealField: 'requestHash',
+    apiDealField: 'requestorderHash',
     addressField: 'requester',
   },
 };
@@ -498,20 +497,23 @@ const publishOrder = async (
   try {
     checkOrderName(orderName);
     const address = await getAddress(contracts);
-    const body = { chainId, order: signedOrder };
+    const body = { order: signedOrder };
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
-      contracts.chainId,
+      chainId,
       address,
       contracts.signer,
     );
     const response = await jsonApi.post({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint.concat('/publish'),
+      endpoint: objDesc[orderName].apiEndpoint,
+      query: {
+        chainId,
+      },
       body,
       headers: { authorization },
     });
-    if (response.ok && response.saved && response.saved.orderHash) {
-      return response.saved.orderHash;
+    if (response.ok && response.published && response.published.orderHash) {
+      return response.published.orderHash;
     }
     throw Error('An error occured while publishing order');
   } catch (error) {
@@ -581,7 +583,7 @@ const unpublishOrder = async (
 ) => {
   try {
     checkOrderName(orderName);
-    const body = { chainId, target };
+    const body = { target };
     if (target === UNPUBLISH_TARGET_ORDERHASH) {
       if (!orderHash) throwIfMissing();
       body.orderHash = orderHash;
@@ -598,9 +600,12 @@ const unpublishOrder = async (
       userAddress,
       contracts.signer,
     );
-    const response = await jsonApi.post({
+    const response = await jsonApi.put({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint.concat('/unpublish'),
+      endpoint: objDesc[orderName].apiEndpoint,
+      query: {
+        chainId,
+      },
       body,
       headers: { authorization },
     });
@@ -618,49 +623,61 @@ const unpublishApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   apporderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(apporderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(apporderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(datasetorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(datasetorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(workerpoolorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requestorderHash = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  { orderHash: await bytes32Schema().validate(requestorderHash) },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    { orderHash: await bytes32Schema().validate(requestorderHash) },
+  );
+  return unpublished[0];
+};
 
 const unpublishAllApporders = async (
   contracts = throwIfMissing(),
@@ -731,66 +748,78 @@ const unpublishLastApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(appAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(appAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(datasetAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(datasetAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpoolAddress),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(workerpoolAddress),
+    },
+  );
+  return unpublished[0];
+};
 
 const unpublishLastRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_LAST_ORDER,
-    address: await getAddress(contracts),
-  },
-);
+) => {
+  const unpublished = await unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_LAST_ORDER,
+      address: await getAddress(contracts),
+    },
+  );
+  return unpublished[0];
+};
 
 const fetchPublishedOrderByHash = async (
   iexecGatewayURL = throwIfMissing(),
@@ -804,24 +833,15 @@ const fetchPublishedOrderByHash = async (
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const endpoint = objDesc[orderName].apiEndpoint;
     if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
-    const body = {
+    const query = {
       chainId: vChainId,
-      sort: {
-        publicationTimestamp: -1,
-      },
-      limit: 1,
-      find: { orderHash: vOrderHash },
     };
-    const response = await jsonApi.post({
+    const { ok, ...res } = await jsonApi.get({
       api: iexecGatewayURL,
-      endpoint: objDesc[orderName].apiEndpoint,
-      body,
+      endpoint: `${objDesc[orderName].apiEndpoint}/${vOrderHash}`,
+      query,
     });
-    if (response.ok && response.orders) {
-      if (response.orders[0]) return response.orders[0];
-      throw new ObjectNotFoundError(orderName, vOrderHash, chainId);
-    }
-    throw Error('An error occured while fetching order');
+    return res;
   } catch (error) {
     debug('fetchPublishedOrderByHash()', error);
     throw error;
@@ -838,19 +858,15 @@ const fetchDealsByOrderHash = async (
     checkOrderName(orderName);
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
-    const hashFiedName = objDesc[orderName].dealField;
-    const body = {
+    const hashName = objDesc[orderName].apiDealField;
+    const query = {
       chainId: vChainId,
-      sort: {
-        publicationTimestamp: -1,
-      },
-      limit: 1,
-      find: { [hashFiedName]: vOrderHash },
+      [hashName]: vOrderHash,
     };
-    const response = await jsonApi.post({
+    const response = await jsonApi.get({
       api: iexecGatewayURL,
       endpoint: '/deals',
-      body,
+      query,
     });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
@@ -1162,7 +1178,7 @@ const matchOrders = async (
     ]);
 
     // check matchability
-    await getMatchableVolume(
+    const matchableVolume = await getMatchableVolume(
       contracts,
       vAppOrder,
       vDatasetOrder,
@@ -1177,10 +1193,16 @@ const matchOrders = async (
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
+      const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
           `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+        );
+      }
+      if (stake.lt(totalCost)) {
+        throw new Error(
+          `Total cost for ${matchableVolume} tasks (${totalCost}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
         );
       }
     };

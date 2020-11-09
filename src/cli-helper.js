@@ -83,6 +83,7 @@ const desc = {
   bridgeToSidechain: () => 'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () => 'send RLC from the sidechain to the mainchain (default unit nRLC)',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
 };
@@ -187,20 +188,40 @@ const option = {
   ],
   decrypt: () => ['--decrypt', 'decrypt an encrypted result'],
   category: () => ['--category <id>', 'specify the work category'],
-  orderbookWorkerpool: () => [
+  filterAppSpecific: () => ['--app <address>', 'filter by app'],
+  filterDatasetSpecific: () => ['--dataset <address>', 'filter by dataset'],
+  filterBeneficiarySpecific: () => [
+    '--beneficiary <address>',
+    'filter by beneficiary',
+  ],
+  includeAppSpecific: () => [
+    '--app <address>',
+    'include private orders for specified app',
+  ],
+  includeDatasetSpecific: () => [
+    '--dataset <address>',
+    'include private orders for specified dataset',
+  ],
+  includeWorkerpoolSpecific: () => [
     '--workerpool <address>',
-    'filter by workerpool address',
+    'include private orders for specified workerpool',
   ],
-  orderbookRequester: () => [
+  includeRequesterSpecific: () => [
     '--requester <address>',
-    'filter by requester address',
+    'include private orders for specified requester',
   ],
-  orderbookApp: () => ['--app <address>', 'filter by app address'],
-  orderbookDataset: () => ['--dataset <address>', 'filter by dataset address'],
   requiredTag: () => [
     '--require-tag <tag>',
     'specify minimum required tags\n* usage: --require-tag tag1,tag2',
   ],
+  maxTag: () => [
+    '--max-tag <tag>',
+    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+  ],
+  tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
+  minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
+  minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
@@ -275,17 +296,35 @@ const option = {
 };
 
 const orderOption = {
-  app: () => [
-    `--app <${listOfChoices(['deployed'], 'address')}>`,
-    'app address, use "deployed" to use last deployed from "deployed.json"',
+  app: ({ allowDeployed = true } = {}) => [
+    `--app <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `app address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
-  dataset: () => [
-    `--dataset <${listOfChoices(['deployed'], 'address')}>`,
-    'dataset address, use "deployed" to use last deployed from "deployed.json"',
+  dataset: ({ allowDeployed = true } = {}) => [
+    `--dataset <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `dataset address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
-  workerpool: () => [
-    `--workerpool <${listOfChoices(['deployed'], 'address')}>`,
-    'workerpool address, use "deployed" to use last deployed from "deployed.json"',
+  workerpool: ({ allowDeployed = true } = {}) => [
+    `--workerpool <${
+      allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
+    }>`,
+    `workerpool address${
+      allowDeployed
+        ? ', use "deployed" to use last deployed from "deployed.json"'
+        : ''
+    }`,
   ],
   price: () => [
     '--price <amount unit...>',
@@ -445,6 +484,7 @@ const prompt = {
     `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
   ),
   unpublishFromJsonFile: (orderName, order) => question(`Do you want to unpublish the following ${orderName}? ${order}`),
+  more: () => question('Show more?', { rejectDefault: true, strict: false }),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ether', ...args);
@@ -737,7 +777,9 @@ const prettyRPC = (rpcObj) => {
 
 const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
-  const isAddress = isHexString && address.length === 42;
+  const isEns = typeof address === 'string'
+    && address.substr(address.length - 4, 4) === '.eth';
+  const isAddress = isEns || (isHexString && address.length === 42);
   if (!isAddress && strict) {
     throw Error(`Address ${address} is not a valid Ethereum address`);
   }
@@ -754,6 +796,64 @@ const isBytes32 = (str, { strict = false } = {}) => {
     return false;
   }
   return true;
+};
+
+const displayPaginableRequest = async (
+  {
+    request,
+    processResponse = res => res,
+    fetchMessage = 'Fetching data',
+    emptyResultsMessage,
+    createResultsMessage = (callResults, initilResultsCount, totalCount) => `Results (${initilResultsCount + 1} to ${initilResultsCount
+        + callResults.length}${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(
+      callResults,
+    )}`,
+    spinner,
+    raw = false,
+  },
+  { results = [], count } = {},
+) => {
+  spinner.start(fetchMessage);
+  const res = await request;
+  const totalCount = count || res.count;
+  spinner.stop();
+  const callResults = processResponse(res);
+  if (callResults.length > 0) {
+    spinner.info(createResultsMessage(callResults, results.length, totalCount));
+    results.push(...callResults);
+    if (res.more && typeof res.more === 'function') {
+      if (!raw) {
+        const more = await prompt.more();
+        if (more) {
+          return displayPaginableRequest(
+            {
+              request: res.more(),
+              processResponse,
+              createResultsMessage,
+              spinner,
+            },
+            { results, count },
+          );
+        }
+      } else if (results.length <= 80) {
+        // auto paginate get up to 100 results
+        return displayPaginableRequest(
+          {
+            request: res.more(),
+            processResponse,
+            createResultsMessage,
+            spinner,
+          },
+          { results, count },
+        );
+      }
+      return { results, count: totalCount };
+    }
+  }
+  if (results.length === 0 && emptyResultsMessage) {
+    spinner.info(emptyResultsMessage);
+  }
+  return { results, count: totalCount };
 };
 
 const renderTasksStatus = (tasksStatusMap) => {
@@ -843,4 +943,5 @@ module.exports = {
   lb,
   spawnAsync,
   renderTasksStatus,
+  displayPaginableRequest,
 };

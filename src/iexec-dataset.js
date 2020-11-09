@@ -679,8 +679,8 @@ publish
   .option(...orderOption.volume())
   .option(...orderOption.tag())
   .option(...orderOption.apprestrict())
-  // .option(...orderOption.workerpoolrestrict()) // not allowed by iExec marketplace
-  // .option(...orderOption.requesterrestrict()) // not allowed by iExec marketplace
+  .option(...orderOption.workerpoolrestrict())
+  .option(...orderOption.requesterrestrict())
   .action(async (objAddress, cmd) => {
     const opts = cmd.opts();
     await checkUpdate(opts);

@@ -243,7 +243,7 @@ iexec account show # make sure you have enough staked RCL to buy computation
 #### Buy computation at market price on the Marketplace
 
 ```bash
-iexec app run [address] [--dataset [address] --params <params> --category <id>] # run an iExec application at market price
+iexec app run [address] [--dataset [address] --args <args> --category <id>] # run an iExec application at market price
 ```
 
 see [app run available options](#app-run)
@@ -251,10 +251,7 @@ see [app run available options](#app-run)
 #### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec orderbook requester [address] --category <id> # check if you already have valid orders on the Marketplace
-iexec order init --request # reset requestorder fields in iexec.json
-iexec order sign --request # sign your requestorder
-iexec order publish --request # publish your requestorder on the Marketplace and get an orderHash
+iexec app request-execution [address] [--dataset [address] --args <args> --category <id>] # publish a requestorder on the Marketplace and get an orderHash
 iexec order show --app <orderHash> --deals # show your order on the Marketplace and check the deals
 ```
 
@@ -431,6 +428,29 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 --skip-request-check # skip request validity checks, this may result in task execution fail
 --params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
 --watch # watch execution status changes
+```
+
+### app request-execution
+
+```bash
+iexec app request-execution <appAddress> [options] # request an iExec application execution at limit price
+# OPTIONS
+--dataset <address> # dataset address
+--workerpool <address> # workerpool address
+--app-price <amount unit...> # app price per task (default unit nRLC)
+--dataset-price <amount unit...> # dataset price per task (default unit nRLC)
+--workerpool-price <amount unit...> # workerpool price per task (default unit nRLC)
+--category <id> # id of the task category
+--tag <tag...> # specify tags (usage: --tag tee,gpu)
+--trust <integer> # trust level
+--beneficiary <address> # specify the beneficiary of the request (default user address)
+--callback <address> # specify the callback address of the request
+--args <string> # specify the arguments to pass to the app
+--input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--encrypt-result # encrypt the result archive with the beneficiary public key
+--storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
+--skip-request-check # skip request validity checks, this may result in task execution fail
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
 ```
 
 ## dataset
@@ -1156,19 +1176,18 @@ console.log('tx:', txHash);
 
 #### fetchAppOrderbook
 
-iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, appOrders: \[ { order: SignedApporder , status, remaining} \] }** >
+iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minTag: Tag, maxTag: Tag, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
 > find the cheapest orders for the specified app
 >
 > _Optional_:
 >
-> - dataset: filter on order available for specified dataset
-> - workerpool: filter on order available for specified workerpool
-> - requester: filter on order available for specified requester
+> - dataset: include dataset specific orders
+> - workerpool: include workerpool specific orders
+> - requester: include requester specific orders
 > - minVolume: filter on minimum volume remaining
 > - minTag: filter on minimum tag required
 > - maxTag: filter on maximun tag accepted
-> - skip: skip first results
 
 _Example:_
 
@@ -1182,19 +1201,18 @@ console.log('total orders:', res.count);
 
 #### fetchDatasetOrderbook
 
-iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minVolume: Int, skip: Int } \] )** => Promise < **{ count, datasetOrders: \[ { order: SignedDatasetorder , status, remaining} \] }** >
+iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minTag: Tag, maxTag: Tag, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
 > find the cheapest orders for the specified dataset
 >
 > _Optional_:
 >
-> - app: filter on order available for specified app
-> - workerpool: filter on order available for specified workerpool
-> - requester: filter on order available for specified requester
+> - app: include app specific orders
+> - workerpool: include workerpool specific orders
+> - requester: include requester specific orders
 > - minVolume: filter on minimum volume remaining
 > - minTag: filter on minimum tag required
 > - maxTag: filter on maximun tag accepted
-> - skip: skip first results
 
 _Example:_
 
@@ -1208,18 +1226,22 @@ console.log('total orders:', res.count);
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchWorkerpoolOrderbook ( category: Uint256 \[, { workerpoolAddress: Address, signerAddress: Address, minTag: Tag, minTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, workerpoolOrders: \[ { order: SignedWorkerpoolorder, status, remaining} \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( \[, { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
-> find the cheapest orders for computing resource in specified category.
+> find the cheapest orders for computing resource.
 >
 > _Optional_:
 >
-> - workerpoolAddress: filter on specific workerpoolAddress
-> - signerAddress: filter on specific signer (ie:workerpool owner)
+> - workerpool: filter on specific workerpool
+> - category: filter on specific category
+> - app: include app specific orders
+> - dataset: include dataset specific orders
+> - requester: include requester specific orders
+> - workerpoolOwner: filter on specific workerpool owner
 > - minTag: filter on minimum tag required
+> - maxTag: filter on maximum tag offered
 > - minTrust: filter on minimum trust required
 > - minVolume: filter on minimum volume remaining
-> - skip: skip first results
 
 _Example:_
 
@@ -1231,18 +1253,22 @@ console.log('total orders:', res.count);
 
 #### fetchRequestOrderbook
 
-iexec.**orderbook.fetchRequestOrderbook ( category: Uint256 \[, { requesterAddress: Address, beneficiaryAddress: Address, maxTag: Tag, maxTrust: Int, minVolume: Int, skip: Int } \] )** => Promise < **{ count, requestOrders: \[ { order: SignedRequestorder, status, remaining} \] }** >
+iexec.**orderbook.fetchRequestOrderbook ( \[, { requester: Address, beneficiary: Address, category: Uint256, app: Address, dataset: Address, workerpool: Address, minTag: Tag, maxTag: Tag, maxTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
-> find the best paying request orders for computing resource in specified category.
+> find the best paying request orders for computing resource.
 >
 > _Optional_:
 >
-> - requesterAddress: filter on specific requesterAddress
-> - beneficiaryAddress: filter on specific beneficiaryAddress
+> - requester: filter on specific requester
+> - category: filter on specific category
+> - app: include app specific orders
+> - workerpool: include workerpool specific orders
+> - requester: include requester specific orders
+> - beneficiary: filter on specific beneficiary
+> - minTag: filter on minimum tag required
 > - maxTag: filter on maximum tag accepted
 > - maxTrust: filter on maximum trust required
 > - minVolume: filter on minimum volume remaining
-> - skip: skip first results
 
 _Example:_
 

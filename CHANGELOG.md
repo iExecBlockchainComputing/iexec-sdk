@@ -6,13 +6,30 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `iexec orderbook` more filter options
+- `iexec orderbook` pagination
+- `iexec app request-execution <appAddress>` publish a requestorder to run an app at limit price
+
 ### Changed
 
 - fixed amount validation error
 - fixed multiaddr format machine to human
+- fixed requester stake too low error message for matching orders
 - update `Web3ProviderError` messages
+- migrated to new market API
+- `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal
+- `iexec orderbook requester [address]` `--category <catid>` is now optionnal
+- [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
+- [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchRequestOrderbook(options)`
+- [DEPRECATED] `iexec.orderbook.fetchAppOrderbook()` returned value `appOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchDatasetOrderbook()` returned value `datasetOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook()` returned value `workerpoolOrders` is deprecated, use `orders`
+- [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook()` returned value `requestOrders` is deprecated, use `orders`
 
 ### Removed
+
+- undocumented option `beforeTimestamp` removed from `iexec.deal.fetchRequesterDeals()`
+- undocumented output value `openVolume` removed from `iexec.orderbook.fetchWorkerpoolOrderbook()` and `iexec orderbook workerpool`
 
 ## [5.0.1] 2020-08-26
 

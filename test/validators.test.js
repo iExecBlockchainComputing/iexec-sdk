@@ -784,6 +784,11 @@ describe('[tagSchema]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000101',
     );
   });
+  test('empty tag', async () => {
+    await expect(tagSchema().validate('')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    );
+  });
   test('isolated tag', async () => {
     await expect(tagSchema().validate('gpu')).resolves.toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000100',
@@ -846,7 +851,7 @@ describe('[addressSchema]', () => {
         'rlc.iexec.eth',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
-  });
+  }, 10000);
   test('invalid ens (throw when ethProvider is missing)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider() }).validate(

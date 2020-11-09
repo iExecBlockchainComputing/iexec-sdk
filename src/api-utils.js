@@ -85,12 +85,26 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
+const wrapPaginableRequest = request => async args => request(args).then(({ nextPage, ...rest }) => ({
+  ...rest,
+  ...(nextPage && {
+    more: () => wrapPaginableRequest(request)({
+      ...args,
+      query: { ...args.query, page: nextPage },
+    }),
+  }),
+}));
+
 const jsonApi = {
   get: args => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
   post: args => httpRequest('POST')({
+    ...args,
+    ...{ headers: { Accept: 'application/json', ...args.headers } },
+  }).then(responseToJson),
+  put: args => httpRequest('PUT')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
@@ -138,6 +152,7 @@ const getAuthorization = (api, endpoint = '/challenge') => async (
 };
 
 module.exports = {
+  wrapPaginableRequest,
   httpRequest,
   jsonApi,
   downloadZipApi,
