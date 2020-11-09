@@ -860,9 +860,9 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/interesting-goodall-qjiyn?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec500-efz4v?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec500-tks5h?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec-sdk-demo-iexec51x-0id5z?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec51x-v91x0?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec51x-zp5n0?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
