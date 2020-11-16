@@ -193,35 +193,35 @@ class IExec {
 
     this.wallet = {};
     this.wallet.getAddress = () => wallet.getAddress(contracts);
-    this.wallet.checkBalances = address => wallet.checkBalances(contracts, address);
-    this.wallet.checkBridgedBalances = address => wallet.checkBalances(bridgedContracts, address);
+    this.wallet.checkBalances = (address) => wallet.checkBalances(contracts, address);
+    this.wallet.checkBridgedBalances = (address) => wallet.checkBalances(bridgedContracts, address);
     this.wallet.sendETH = (weiAmount, to) => wallet.sendETH(contracts, weiAmount, to);
     this.wallet.sendRLC = (nRlcAmount, to) => wallet.sendRLC(contracts, nRlcAmount, to);
-    this.wallet.sweep = to => wallet.sweep(contracts, to);
-    this.wallet.bridgeToSidechain = nRlcAmount => wallet.bridgeToSidechain(contracts, getBridgeAddress(), nRlcAmount, {
+    this.wallet.sweep = (to) => wallet.sweep(contracts, to);
+    this.wallet.bridgeToSidechain = (nRlcAmount) => wallet.bridgeToSidechain(contracts, getBridgeAddress(), nRlcAmount, {
       bridgedContracts,
       sidechainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
-    this.wallet.bridgeToMainchain = nRlcAmount => wallet.bridgeToMainchain(contracts, getBridgeAddress(), nRlcAmount, {
+    this.wallet.bridgeToMainchain = (nRlcAmount) => wallet.bridgeToMainchain(contracts, getBridgeAddress(), nRlcAmount, {
       bridgedContracts,
       mainchainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
     this.account = {};
-    this.account.checkBalance = address => account.checkBalance(contracts, address);
-    this.account.checkBridgedBalance = address => account.checkBalance(bridgedContracts, address);
-    this.account.deposit = nRlcAmount => account.deposit(contracts, nRlcAmount);
-    this.account.withdraw = nRlcAmount => account.withdraw(contracts, nRlcAmount);
+    this.account.checkBalance = (address) => account.checkBalance(contracts, address);
+    this.account.checkBridgedBalance = (address) => account.checkBalance(bridgedContracts, address);
+    this.account.deposit = (nRlcAmount) => account.deposit(contracts, nRlcAmount);
+    this.account.withdraw = (nRlcAmount) => account.withdraw(contracts, nRlcAmount);
     this.app = {};
-    this.app.deployApp = app => hub.deployApp(contracts, app);
-    this.app.showApp = address => hub.showApp(contracts, address);
+    this.app.deployApp = (app) => hub.deployApp(contracts, app);
+    this.app.showApp = (address) => hub.showApp(contracts, address);
     this.app.showUserApp = (index, userAddress) => hub.showUserApp(contracts, index, userAddress);
-    this.app.countUserApps = address => hub.countUserApps(contracts, address);
+    this.app.countUserApps = (address) => hub.countUserApps(contracts, address);
     this.dataset = {};
-    this.dataset.deployDataset = dataset => hub.deployDataset(contracts, dataset);
-    this.dataset.showDataset = address => hub.showDataset(contracts, address);
+    this.dataset.deployDataset = (dataset) => hub.deployDataset(contracts, dataset);
+    this.dataset.showDataset = (address) => hub.showDataset(contracts, address);
     this.dataset.showUserDataset = (index, userAddress) => hub.showUserDataset(contracts, index, userAddress);
-    this.dataset.countUserDatasets = address => hub.countUserDatasets(contracts, address);
-    this.dataset.checkDatasetSecretExists = datasetAddress => secretMgtServ.checkWeb3SecretExists(
+    this.dataset.countUserDatasets = (address) => hub.countUserDatasets(contracts, address);
+    this.dataset.checkDatasetSecretExists = (datasetAddress) => secretMgtServ.checkWeb3SecretExists(
       contracts,
       getSmsURL(),
       datasetAddress,
@@ -233,18 +233,18 @@ class IExec {
       datasetSecret,
     );
     this.workerpool = {};
-    this.workerpool.deployWorkerpool = workerpool => hub.deployWorkerpool(contracts, workerpool);
-    this.workerpool.showWorkerpool = address => hub.showWorkerpool(contracts, address);
+    this.workerpool.deployWorkerpool = (workerpool) => hub.deployWorkerpool(contracts, workerpool);
+    this.workerpool.showWorkerpool = (address) => hub.showWorkerpool(contracts, address);
     this.workerpool.showUserWorkerpool = (index, userAddress) => hub.showUserWorkerpool(contracts, index, userAddress);
-    this.workerpool.countUserWorkerpools = address => hub.countUserWorkerpools(contracts, address);
+    this.workerpool.countUserWorkerpools = (address) => hub.countUserWorkerpools(contracts, address);
     this.hub = {};
-    this.hub.createCategory = category => hub.createCategory(contracts, category);
-    this.hub.showCategory = index => hub.showCategory(contracts, index);
+    this.hub.createCategory = (category) => hub.createCategory(contracts, category);
+    this.hub.showCategory = (index) => hub.showCategory(contracts, index);
     this.hub.countCategory = () => hub.countCategory(contracts);
     this.hub.getTimeoutRatio = () => hub.getTimeoutRatio(contracts);
     this.deal = {};
-    this.deal.show = dealid => deal.show(contracts, dealid);
-    this.deal.obsDeal = dealid => iexecProcess.obsDeal(contracts, dealid);
+    this.deal.show = (dealid) => deal.show(contracts, dealid);
+    this.deal.obsDeal = (dealid) => iexecProcess.obsDeal(contracts, dealid);
     this.deal.computeTaskId = (dealid, taskIdx) => deal.computeTaskId(dealid, taskIdx);
     this.deal.fetchRequesterDeals = (
       requesterAddress,
@@ -259,46 +259,46 @@ class IExec {
         workerpoolAddress,
       },
     );
-    this.deal.claim = dealid => deal.claim(contracts, dealid);
-    this.deal.fetchDealsByApporder = apporderHash => order.fetchDealsByOrderHash(
+    this.deal.claim = (dealid) => deal.claim(contracts, dealid);
+    this.deal.fetchDealsByApporder = (apporderHash) => order.fetchDealsByOrderHash(
       getIexecGatewayURL(),
       order.APP_ORDER,
       contracts.chainId,
       apporderHash,
     );
-    this.deal.fetchDealsByDatasetorder = datasetorderHash => order.fetchDealsByOrderHash(
+    this.deal.fetchDealsByDatasetorder = (datasetorderHash) => order.fetchDealsByOrderHash(
       getIexecGatewayURL(),
       order.DATASET_ORDER,
       contracts.chainId,
       datasetorderHash,
     );
-    this.deal.fetchDealsByWorkerpoolorder = workerpoolorderHash => order.fetchDealsByOrderHash(
+    this.deal.fetchDealsByWorkerpoolorder = (workerpoolorderHash) => order.fetchDealsByOrderHash(
       getIexecGatewayURL(),
       order.WORKERPOOL_ORDER,
       contracts.chainId,
       workerpoolorderHash,
     );
-    this.deal.fetchDealsByRequestorder = requestorderHash => order.fetchDealsByOrderHash(
+    this.deal.fetchDealsByRequestorder = (requestorderHash) => order.fetchDealsByOrderHash(
       getIexecGatewayURL(),
       order.REQUEST_ORDER,
       contracts.chainId,
       requestorderHash,
     );
     this.order = {};
-    this.order.createApporder = overwrite => order.createApporder(contracts, overwrite);
-    this.order.createDatasetorder = overwrite => order.createDatasetorder(contracts, overwrite);
-    this.order.createWorkerpoolorder = overwrite => order.createWorkerpoolorder(contracts, overwrite);
-    this.order.createRequestorder = overwrite => order.createRequestorder(
+    this.order.createApporder = (overwrite) => order.createApporder(contracts, overwrite);
+    this.order.createDatasetorder = (overwrite) => order.createDatasetorder(contracts, overwrite);
+    this.order.createWorkerpoolorder = (overwrite) => order.createWorkerpoolorder(contracts, overwrite);
+    this.order.createRequestorder = (overwrite) => order.createRequestorder(
       { contracts, resultProxyURL: getResultProxyURL() },
       overwrite,
     );
-    this.order.hashApporder = apporder => order.hashApporder(contracts, apporder);
-    this.order.hashDatasetorder = datasetorder => order.hashDatasetorder(contracts, datasetorder);
-    this.order.hashWorkerpoolorder = workerpoolorder => order.hashWorkerpoolorder(contracts, workerpoolorder);
-    this.order.hashRequestorder = requestorder => order.hashRequestorder(contracts, requestorder);
-    this.order.signApporder = apporder => order.signApporder(contracts, apporder);
-    this.order.signDatasetorder = datasetorder => order.signDatasetorder(contracts, datasetorder);
-    this.order.signWorkerpoolorder = workerpoolorder => order.signWorkerpoolorder(contracts, workerpoolorder);
+    this.order.hashApporder = (apporder) => order.hashApporder(contracts, apporder);
+    this.order.hashDatasetorder = (datasetorder) => order.hashDatasetorder(contracts, datasetorder);
+    this.order.hashWorkerpoolorder = (workerpoolorder) => order.hashWorkerpoolorder(contracts, workerpoolorder);
+    this.order.hashRequestorder = (requestorder) => order.hashRequestorder(contracts, requestorder);
+    this.order.signApporder = (apporder) => order.signApporder(contracts, apporder);
+    this.order.signDatasetorder = (datasetorder) => order.signDatasetorder(contracts, datasetorder);
+    this.order.signWorkerpoolorder = (workerpoolorder) => order.signWorkerpoolorder(contracts, workerpoolorder);
     this.order.signRequestorder = async (
       requestorder,
       { checkRequest = true } = {},
@@ -314,17 +314,17 @@ class IExec {
         ).then(() => requestorder)
         : requestorder,
     );
-    this.order.cancelApporder = signedApporder => order.cancelApporder(contracts, signedApporder);
-    this.order.cancelDatasetorder = signedDatasetorder => order.cancelDatasetorder(contracts, signedDatasetorder);
-    this.order.cancelWorkerpoolorder = signedWorkerpoolorder => order.cancelWorkerpoolorder(contracts, signedWorkerpoolorder);
-    this.order.cancelRequestorder = signedRequestorder => order.cancelRequestorder(contracts, signedRequestorder);
-    this.order.publishApporder = signedApporder => order.publishApporder(contracts, getIexecGatewayURL(), signedApporder);
-    this.order.publishDatasetorder = signedDatasetorder => order.publishDatasetorder(
+    this.order.cancelApporder = (signedApporder) => order.cancelApporder(contracts, signedApporder);
+    this.order.cancelDatasetorder = (signedDatasetorder) => order.cancelDatasetorder(contracts, signedDatasetorder);
+    this.order.cancelWorkerpoolorder = (signedWorkerpoolorder) => order.cancelWorkerpoolorder(contracts, signedWorkerpoolorder);
+    this.order.cancelRequestorder = (signedRequestorder) => order.cancelRequestorder(contracts, signedRequestorder);
+    this.order.publishApporder = (signedApporder) => order.publishApporder(contracts, getIexecGatewayURL(), signedApporder);
+    this.order.publishDatasetorder = (signedDatasetorder) => order.publishDatasetorder(
       contracts,
       getIexecGatewayURL(),
       signedDatasetorder,
     );
-    this.order.publishWorkerpoolorder = signedWorkerpoolorder => order.publishWorkerpoolorder(
+    this.order.publishWorkerpoolorder = (signedWorkerpoolorder) => order.publishWorkerpoolorder(
       contracts,
       getIexecGatewayURL(),
       signedWorkerpoolorder,
@@ -345,41 +345,41 @@ class IExec {
         ).then(() => signedRequestorder)
         : signedRequestorder,
     );
-    this.order.unpublishApporder = apporderHash => order.unpublishApporder(contracts, getIexecGatewayURL(), apporderHash);
-    this.order.unpublishDatasetorder = datasetorderHash => order.unpublishDatasetorder(
+    this.order.unpublishApporder = (apporderHash) => order.unpublishApporder(contracts, getIexecGatewayURL(), apporderHash);
+    this.order.unpublishDatasetorder = (datasetorderHash) => order.unpublishDatasetorder(
       contracts,
       getIexecGatewayURL(),
       datasetorderHash,
     );
-    this.order.unpublishWorkerpoolorder = workerpoolorderHash => order.unpublishWorkerpoolorder(
+    this.order.unpublishWorkerpoolorder = (workerpoolorderHash) => order.unpublishWorkerpoolorder(
       contracts,
       getIexecGatewayURL(),
       workerpoolorderHash,
     );
-    this.order.unpublishRequestorder = requestorderHash => order.unpublishRequestorder(
+    this.order.unpublishRequestorder = (requestorderHash) => order.unpublishRequestorder(
       contracts,
       getIexecGatewayURL(),
       requestorderHash,
     );
-    this.order.unpublishLastApporder = appAddress => order.unpublishLastApporder(contracts, getIexecGatewayURL(), appAddress);
-    this.order.unpublishLastDatasetorder = datasetAddress => order.unpublishLastDatasetorder(
+    this.order.unpublishLastApporder = (appAddress) => order.unpublishLastApporder(contracts, getIexecGatewayURL(), appAddress);
+    this.order.unpublishLastDatasetorder = (datasetAddress) => order.unpublishLastDatasetorder(
       contracts,
       getIexecGatewayURL(),
       datasetAddress,
     );
-    this.order.unpublishLastWorkerpoolorder = workerpoolAddress => order.unpublishLastWorkerpoolorder(
+    this.order.unpublishLastWorkerpoolorder = (workerpoolAddress) => order.unpublishLastWorkerpoolorder(
       contracts,
       getIexecGatewayURL(),
       workerpoolAddress,
     );
     this.order.unpublishLastRequestorder = () => order.unpublishLastRequestorder(contracts, getIexecGatewayURL());
-    this.order.unpublishAllApporders = appAddress => order.unpublishAllApporders(contracts, getIexecGatewayURL(), appAddress);
-    this.order.unpublishAllDatasetorders = datasetAddress => order.unpublishAllDatasetorders(
+    this.order.unpublishAllApporders = (appAddress) => order.unpublishAllApporders(contracts, getIexecGatewayURL(), appAddress);
+    this.order.unpublishAllDatasetorders = (datasetAddress) => order.unpublishAllDatasetorders(
       contracts,
       getIexecGatewayURL(),
       datasetAddress,
     );
-    this.order.unpublishAllWorkerpoolorders = workerpoolAddress => order.unpublishAllWorkerpoolorders(
+    this.order.unpublishAllWorkerpoolorders = (workerpoolAddress) => order.unpublishAllWorkerpoolorders(
       contracts,
       getIexecGatewayURL(),
       workerpoolAddress,
@@ -409,25 +409,25 @@ class IExec {
         : requestorder,
     );
     this.orderbook = {};
-    this.orderbook.fetchApporder = apporderHash => order.fetchPublishedOrderByHash(
+    this.orderbook.fetchApporder = (apporderHash) => order.fetchPublishedOrderByHash(
       getIexecGatewayURL(),
       order.APP_ORDER,
       contracts.chainId,
       apporderHash,
     );
-    this.orderbook.fetchDatasetorder = datasetorderHash => order.fetchPublishedOrderByHash(
+    this.orderbook.fetchDatasetorder = (datasetorderHash) => order.fetchPublishedOrderByHash(
       getIexecGatewayURL(),
       order.DATASET_ORDER,
       contracts.chainId,
       datasetorderHash,
     );
-    this.orderbook.fetchWorkerpoolorder = workerpoolorderHash => order.fetchPublishedOrderByHash(
+    this.orderbook.fetchWorkerpoolorder = (workerpoolorderHash) => order.fetchPublishedOrderByHash(
       getIexecGatewayURL(),
       order.WORKERPOOL_ORDER,
       contracts.chainId,
       workerpoolorderHash,
     );
-    this.orderbook.fetchRequestorder = requestorderHash => order.fetchPublishedOrderByHash(
+    this.orderbook.fetchRequestorder = (requestorderHash) => order.fetchPublishedOrderByHash(
       getIexecGatewayURL(),
       order.REQUEST_ORDER,
       contracts.chainId,
@@ -504,10 +504,10 @@ class IExec {
       );
     };
     this.task = {};
-    this.task.show = taskid => task.show(contracts, taskid);
+    this.task.show = (taskid) => task.show(contracts, taskid);
     this.task.obsTask = (taskid, { dealid } = {}) => iexecProcess.obsTask(contracts, taskid, { dealid });
-    this.task.claim = taskid => task.claim(contracts, taskid);
-    this.task.fetchResults = taskid => iexecProcess.fetchTaskResults(contracts, taskid, {
+    this.task.claim = (taskid) => task.claim(contracts, taskid);
+    this.task.fetchResults = (taskid) => iexecProcess.fetchTaskResults(contracts, taskid, {
       ipfsGatewayURL: getIpfsGatewayURL(),
     });
     this.task.waitForTaskStatusChange = (taskid, initialStatus) => {
@@ -517,7 +517,7 @@ class IExec {
       return task.waitForTaskStatusChange(contracts, taskid, initialStatus);
     };
     this.result = {};
-    this.result.checkResultEncryptionKeyExists = address => secretMgtServ.checkWeb2SecretExists(
+    this.result.checkResultEncryptionKeyExists = (address) => secretMgtServ.checkWeb2SecretExists(
       contracts,
       getSmsURL(),
       address,

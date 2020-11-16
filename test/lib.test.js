@@ -246,7 +246,7 @@ const getMatchableRequestorder = async (
       trust: workerpoolorder.trust,
       volume: workerpoolorder.volume,
     })
-    .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+    .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
   return requestorder;
 };
 
@@ -668,11 +668,12 @@ describe('[workflow]', () => {
       },
     });
     const signedorder = await iexec.order.signRequestorder(
-      Object.assign({}, order, {
+      {
+        ...order,
         params: {
           iexec_args: 'test',
         },
-      }),
+      },
       { checkRequest: false },
     );
     const totalPrice = new BN(order.appmaxprice)
@@ -786,7 +787,7 @@ describe('[workflow]', () => {
 
     const showTaskUnsetRes = await iexec.task
       .show(showDealRes.tasks[0])
-      .catch(e => e);
+      .catch((e) => e);
     expect(showTaskUnsetRes instanceof errors.ObjectNotFoundError).toBe(true);
     expect(showTaskUnsetRes.message).toBe(
       `No task found for id ${showDealRes.tasks[0]} on chain ${networkId}`,
@@ -3472,7 +3473,7 @@ describe('[order]', () => {
         volume: 1,
         category: 1,
       })
-      .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+      .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
     const res = await iexec.order.cancelRequestorder(order);
     expect(res.order).toEqual(order);
     expect(res.txHash).toMatch(bytes32Regex);
@@ -4270,7 +4271,7 @@ describe('[order]', () => {
           trust: 0,
           volume: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         checkRequest: false,
       });
@@ -4326,7 +4327,7 @@ describe('[order]', () => {
           appmaxprice: apporder.appprice,
           category: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       await expect(
         iexec.order.publishRequestorder(requestorder),
       ).rejects.toThrow(
@@ -4470,7 +4471,7 @@ describe('[order]', () => {
           trust: 0,
           volume: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         checkRequest: false,
       });
@@ -4662,7 +4663,7 @@ describe('[order]', () => {
           trust: 0,
           volume: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         checkRequest: false,
       });
@@ -4865,7 +4866,7 @@ describe('[order]', () => {
           trust: 0,
           volume: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         checkRequest: false,
       });
@@ -5026,7 +5027,7 @@ describe('[orderbook]', () => {
           trust: 0,
           volume: 1,
         })
-        .then(o => iexec.order.signRequestorder(o, { checkRequest: false }));
+        .then((o) => iexec.order.signRequestorder(o, { checkRequest: false }));
       const orderHash = await iexec.order.hashRequestorder(requestorder);
       await expect(
         iexec.orderbook.fetchRequestorder(orderHash),
@@ -5091,7 +5092,7 @@ describe('[orderbook]', () => {
       for (let i = 0; i < 22; i += 1) {
         await iexec.order
           .signApporder(apporder)
-          .then(o => iexec.order.publishApporder(o));
+          .then((o) => iexec.order.publishApporder(o));
       }
       const res1 = await iexec.orderbook.fetchAppOrderbook(apporder.app);
       expect(res1.count).toBe(22);
@@ -5153,7 +5154,7 @@ describe('[orderbook]', () => {
       for (let i = 0; i < 23; i += 1) {
         await iexec.order
           .signDatasetorder(datasetorder)
-          .then(o => iexec.order.publishDatasetorder(o));
+          .then((o) => iexec.order.publishDatasetorder(o));
       }
       const res1 = await iexec.orderbook.fetchDatasetOrderbook(
         datasetorder.dataset,
@@ -5217,7 +5218,7 @@ describe('[orderbook]', () => {
       for (let i = 0; i < 24; i += 1) {
         await iexec.order
           .signWorkerpoolorder(workerpoolorder)
-          .then(o => iexec.order.publishWorkerpoolorder(o));
+          .then((o) => iexec.order.publishWorkerpoolorder(o));
       }
       const res1 = await iexec.orderbook.fetchWorkerpoolOrderbook({
         workerpool: workerpoolorder.workerpool,
@@ -5291,7 +5292,7 @@ describe('[orderbook]', () => {
             { ...requestorder, workerpool: utils.NULL_ADDRESS },
             { checkRequest: false },
           )
-          .then(o => iexec.order.publishRequestorder(o, {
+          .then((o) => iexec.order.publishRequestorder(o, {
             checkRequest: false,
           }));
       }
@@ -6790,7 +6791,7 @@ describe('[lib utils]', () => {
       );
       const err = await utils
         .decryptResult(encZip, beneficiaryKey)
-        .catch(e => e);
+        .catch((e) => e);
       expect(err).toEqual(
         new Error('Failed to decrypt results key with beneficiary key'),
       );

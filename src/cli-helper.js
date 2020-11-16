@@ -19,28 +19,28 @@ const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
 );
 
 const info = {
-  missingConfFile: fileName => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
-  checkBalance: currency => `Checking ${currency} balances...`,
+  missingConfFile: (fileName) => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+  checkBalance: (currency) => `Checking ${currency} balances...`,
   userAborted: () => 'Operation aborted by user.',
-  creating: obj => `Creating ${obj}...`,
-  filling: obj => `Filling ${obj}...`,
-  cancelling: obj => `Cancelling ${obj}...`,
-  deploying: obj => `Deploying ${obj}...`,
-  showing: obj => `Showing ${obj}...`,
-  counting: obj => `Counting ${obj}...`,
+  creating: (obj) => `Creating ${obj}...`,
+  filling: (obj) => `Filling ${obj}...`,
+  cancelling: (obj) => `Cancelling ${obj}...`,
+  deploying: (obj) => `Deploying ${obj}...`,
+  showing: (obj) => `Showing ${obj}...`,
+  counting: (obj) => `Counting ${obj}...`,
   depositing: () => 'Making deposit...',
   checkingSwapRate: () => 'Checking swap rate...',
-  claiming: obj => `Claiming ${obj}...`,
-  deposited: amount => `Deposited ${amount} RLC to your iExec account`,
+  claiming: (obj) => `Claiming ${obj}...`,
+  deposited: (amount) => `Deposited ${amount} RLC to your iExec account`,
   withdrawing: () => 'Making withdraw...',
-  withdrawn: amount => `${amount} RLC withdrawn from your iExec account`,
+  withdrawn: (amount) => `${amount} RLC withdrawn from your iExec account`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
-  downloaded: filePath => `Downloaded task result to file ${filePath}`,
-  missingAddress: obj => `${obj} address not provided to CLI AND missing in "deployed.json"`,
-  checking: obj => `Checking ${obj}...`,
+  downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
+  missingAddress: (obj) => `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
-  missingOrdersFile: fileName => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
+  missingOrdersFile: (fileName) => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
   orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
@@ -48,18 +48,18 @@ const desc = {
   raw: () => 'use raw output',
   chainName: () => 'chain name from "chain.json"',
   userAddress: () => 'custom user address',
-  initObj: objName => `init a new ${objName}`,
-  deployObj: objName => `deploy a new ${objName}`,
-  createObj: objName => `deploy a new ${objName}`,
-  publishObj: objName => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
-  unpublishObj: objName => `unpublish last published ${objName}order for from the marketplace`,
+  initObj: (objName) => `init a new ${objName}`,
+  deployObj: (objName) => `deploy a new ${objName}`,
+  createObj: (objName) => `deploy a new ${objName}`,
+  publishObj: (objName) => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
+  unpublishObj: (objName) => `unpublish last published ${objName}order for from the marketplace`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
-  fill: objName => `fill an ${objName} to execute a work`,
-  cancel: objName => `cancel an ${objName}`,
+  fill: (objName) => `fill an ${objName} to execute a work`,
+  cancel: (objName) => `cancel an ${objName}`,
   showObj: (objName, owner = 'user') => `show ${owner} ${objName} details`,
   countObj: (objName, owner = 'user') => `get ${owner} ${objName} count`,
-  claimObj: objName => `claim a ${objName} that is not COMPLETED`,
+  claimObj: (objName) => `claim a ${objName} that is not COMPLETED`,
   deposit: () => 'deposit RLC onto your iExec account (default unit nRLC)',
   withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
   getETH: () => 'apply for test ether from pre-registered faucets',
@@ -71,9 +71,9 @@ const desc = {
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
-  cancelOrder: objName => `cancel a signed ${objName}`,
-  publish: objName => `publish a signed ${objName}`,
-  unpublish: objName => `unpublish a signed ${objName}`,
+  cancelOrder: (objName) => `cancel a signed ${objName}`,
+  publish: (objName) => `publish a signed ${objName}`,
+  unpublish: (objName) => `unpublish a signed ${objName}`,
   pushDatasetSecret: () => 'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () => 'push the public encryption key to the secret management service',
   checkSecret: () => 'check if a secret exists in the secret management service',
@@ -460,7 +460,7 @@ const prompt = {
   password: (message, options) => promptPassword(message, options),
   confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
   custom: question,
-  create: file => question(`You don't have a ${file} yet, create one?`),
+  create: (file) => question(`You don't have a ${file} yet, create one?`),
   overwrite: (file, options) => question(`"${file}" already exists, replace it with new one?`, options),
   dirNotEmpty: (dir, options) => question(
     `Directory ${dir} is not empty, continue and replace content?`,
@@ -489,7 +489,7 @@ const prompt = {
 
 prompt.transferETH = (...args) => prompt.transfer('ether', ...args);
 prompt.transferRLC = (...args) => prompt.transfer('RLC', ...args);
-prompt.sweep = currencies => (...args) => prompt.transfer(currencies, 'all wallet', ...args);
+prompt.sweep = (currencies) => (...args) => prompt.transfer(currencies, 'all wallet', ...args);
 
 const oraOptions = {
   color: 'yellow',
@@ -569,8 +569,8 @@ const help = (cli) => {
 const Spinner = (opts) => {
   if (opts && opts.raw) {
     const nothing = () => {};
-    const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify(Object.assign({ ok: true }, raw)));
-    const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify(Object.assign({ ok: false }, raw)));
+    const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify({ ok: true, ...raw }));
+    const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify({ ok: false, ...raw }));
     return {
       start: nothing,
       stop: nothing,
@@ -687,7 +687,7 @@ const originalDatasetFolderName = 'original';
 const encryptedDatasetFolderName = 'encrypted';
 
 const createEncFolderPaths = (opts = {}) => {
-  const absolutePath = relativeOrAbsolutePath => (path.isAbsolute(relativeOrAbsolutePath)
+  const absolutePath = (relativeOrAbsolutePath) => (path.isAbsolute(relativeOrAbsolutePath)
     ? relativeOrAbsolutePath
     : path.join(process.cwd(), relativeOrAbsolutePath));
 
@@ -716,8 +716,8 @@ const createEncFolderPaths = (opts = {}) => {
 
 const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
 const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
-const publicKeyName = address => `${address}_key.pub`;
-const privateKeyName = address => `${address}_key`;
+const publicKeyName = (address) => `${address}_key.pub`;
+const privateKeyName = (address) => `${address}_key`;
 
 const computeTxOptions = async (opts) => {
   let gasPrice;
@@ -729,7 +729,7 @@ const computeTxOptions = async (opts) => {
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
   debug('gasPrice', gasPrice);
-  return Object.assign({}, { gasPrice });
+  return { gasPrice };
 };
 
 const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
@@ -760,7 +760,7 @@ const handleError = (error, cli, opts) => {
 
 const lbb = (str = '') => `\n${str}`;
 const lba = (str = '') => `${str}\n`;
-const lb = str => lba(lbb(str));
+const lb = (str) => lba(lbb(str));
 
 const pretty = (obj, options) => lb(prettyjson.render(obj, options));
 
@@ -801,13 +801,12 @@ const isBytes32 = (str, { strict = false } = {}) => {
 const displayPaginableRequest = async (
   {
     request,
-    processResponse = res => res,
+    processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initilResultsCount, totalCount) => `Results (${initilResultsCount + 1} to ${initilResultsCount
-        + callResults.length}${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(
-      callResults,
-    )}`,
+    createResultsMessage = (callResults, initilResultsCount, totalCount) => `Results (${initilResultsCount + 1} to ${
+      initilResultsCount + callResults.length
+    }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
     spinner,
     raw = false,
   },
@@ -859,10 +858,10 @@ const displayPaginableRequest = async (
 const renderTasksStatus = (tasksStatusMap) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
-    task => task.status !== 3 && !task.taskTimedOut,
+    (task) => task.status !== 3 && !task.taskTimedOut,
   );
-  const completedTasksArray = tasksArray.filter(task => task.status === 3);
-  const timedoutTasksArray = tasksArray.filter(task => task.taskTimedOut);
+  const completedTasksArray = tasksArray.filter((task) => task.status === 3);
+  const timedoutTasksArray = tasksArray.filter((task) => task.taskTimedOut);
   const completedMsg = `${completedTasksArray.length}/${tasksArray.length} tasks completed\n`;
   const failedMsg = timedoutTasksArray.length > 0
     ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed\n`

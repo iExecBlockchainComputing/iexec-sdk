@@ -80,7 +80,7 @@ const TypedDataUtils = {
   encodeType(primaryType, types) {
     let result = '';
     let deps = this.findTypeDependencies(primaryType, types).filter(
-      dep => dep !== primaryType,
+      (dep) => dep !== primaryType,
     );
     deps = [primaryType].concat(deps.sort());
     deps.forEach((type) => {
@@ -89,7 +89,7 @@ const TypedDataUtils = {
         throw new Error(`No type definition specified: ${type}`);
       }
       result += `${type}(${types[type]
-        .map(obj => `${obj.type} ${obj.name}`)
+        .map((obj) => `${obj.type} ${obj.name}`)
         .join(',')})`;
     });
     return result;
@@ -126,10 +126,10 @@ const TypedDataUtils = {
       if (data[key]) sanitizedData[key] = data[key];
     });
     if (sanitizedData.types) {
-      sanitizedData.types = Object.assign(
-        { EIP712Domain: [] },
-        sanitizedData.types,
-      );
+      sanitizedData.types = {
+        EIP712Domain: [],
+        ...sanitizedData.types,
+      };
     }
     return sanitizedData;
   },
@@ -178,7 +178,7 @@ const hashEIP712 = (typedData) => {
   }
 };
 
-const signTypedDataV3 = wallet => async (typedData) => {
+const signTypedDataV3 = (wallet) => async (typedData) => {
   try {
     const pk = Buffer.from(wallet.privateKey.substring(2), 'hex');
     const sign = signTypedData(pk, { data: typedData });

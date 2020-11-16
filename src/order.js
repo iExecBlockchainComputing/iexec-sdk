@@ -1042,7 +1042,7 @@ const getMatchableVolume = async (
     );
     if (workerpoolMissingTagBits.length > 0) {
       throw Error(
-        `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+        `Missing tags [${workerpoolMissingTagBits.map((bit) => tagBitToHuman(bit))}] in workerpoolorder`,
       );
     }
     // app tag check
@@ -1101,10 +1101,12 @@ const getMatchableVolume = async (
     const volumes = await Promise.all(
       vRequestOrder.dataset !== NULL_ADDRESS
         ? [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-            return volume;
-          }),
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+              return volume;
+            },
+          ),
           getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
             (volume) => {
               if (volume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
@@ -1127,10 +1129,12 @@ const getMatchableVolume = async (
           ),
         ]
         : [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-            return volume;
-          }),
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+              return volume;
+            },
+          ),
           getRemainingVolume(
             contracts,
             WORKERPOOL_ORDER,

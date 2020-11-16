@@ -31,7 +31,7 @@ const makeHeaders = (method, headers, body) => {
   return { headers: { ...generatedHeaders, ...headers } };
 };
 
-const httpRequest = method => async ({
+const httpRequest = (method) => async ({
   api,
   endpoint,
   query = {},
@@ -85,7 +85,7 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
-const wrapPaginableRequest = request => async args => request(args).then(({ nextPage, ...rest }) => ({
+const wrapPaginableRequest = (request) => async (args) => request(args).then(({ nextPage, ...rest }) => ({
   ...rest,
   ...(nextPage && {
     more: () => wrapPaginableRequest(request)({
@@ -96,26 +96,26 @@ const wrapPaginableRequest = request => async args => request(args).then(({ next
 }));
 
 const jsonApi = {
-  get: args => httpRequest('GET')({
+  get: (args) => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
-  post: args => httpRequest('POST')({
+  post: (args) => httpRequest('POST')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
-  put: args => httpRequest('PUT')({
+  put: (args) => httpRequest('PUT')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
 };
 
 const downloadZipApi = {
-  get: args => httpRequest('GET')({
+  get: (args) => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
   }).then(checkResponseOk),
-  post: args => httpRequest('POST')({
+  post: (args) => httpRequest('POST')({
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
   }).then(checkResponseOk),

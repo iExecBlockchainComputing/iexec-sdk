@@ -39,7 +39,7 @@ const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 // UTILS
-const execAsync = cmd => new Promise((res, rej) => {
+const execAsync = (cmd) => new Promise((res, rej) => {
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       rej(Error(stdout + stderr));
@@ -67,9 +67,9 @@ const saveJSONToFile = async (json, fileName) => {
   await fs.writeFile(filePath, text);
 };
 
-const checkExists = async file => fs.pathExists(file);
+const checkExists = async (file) => fs.pathExists(file);
 
-const filePath = fileName => path.join(process.cwd(), fileName);
+const filePath = (fileName) => path.join(process.cwd(), fileName);
 
 const removeWallet = () => fs.remove('./wallet.json').catch(() => {});
 
@@ -91,7 +91,7 @@ const setPoorWallet1 = () => saveJSONToFile(
   'wallet.json',
 );
 
-const setTokenChain = options => saveJSONToFile(
+const setTokenChain = (options) => saveJSONToFile(
   {
     default: 'dev',
     chains: {
@@ -108,7 +108,7 @@ const setTokenChain = options => saveJSONToFile(
   'chain.json',
 );
 
-const setNativeChain = options => saveJSONToFile(
+const setNativeChain = (options) => saveJSONToFile(
   {
     default: 'dev',
     chains: {
@@ -126,7 +126,7 @@ const setNativeChain = options => saveJSONToFile(
   'chain.json',
 );
 
-const setTokenChainParity = options => saveJSONToFile(
+const setTokenChainParity = (options) => saveJSONToFile(
   {
     default: 'dev',
     chains: {
@@ -264,33 +264,33 @@ afterAll(() => {
 
 describe('[cli]', () => {
   test('iexec', async () => {
-    const out = await execAsync(`${iexecPath}`).catch(e => e);
+    const out = await execAsync(`${iexecPath}`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
       -1,
     );
   });
   test('invalid command', async () => {
-    const out = await execAsync(`${iexecPath} test`).catch(e => e);
+    const out = await execAsync(`${iexecPath} test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(
       out.message.indexOf("error: unknown command 'test'. See 'iexec --help'."),
     ).not.toBe(-1);
   });
   test('unknown option', async () => {
-    const out = await execAsync(`${iexecPath} --test`).catch(e => e);
+    const out = await execAsync(`${iexecPath} --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
   test('missing subcommand', async () => {
-    const out = await execAsync(`${iexecPath} app`).catch(e => e);
+    const out = await execAsync(`${iexecPath} app`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(
       out.message.indexOf('Usage: iexec app <command> [options]'),
     ).not.toBe(-1);
   });
   test('invalid subcommand', async () => {
-    const out = await execAsync(`${iexecPath} app test`).catch(e => e);
+    const out = await execAsync(`${iexecPath} app test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(
       out.message.indexOf(
@@ -299,7 +299,7 @@ describe('[cli]', () => {
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {
-    const out = await execAsync(`${iexecPath} app --test`).catch(e => e);
+    const out = await execAsync(`${iexecPath} app --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });
@@ -541,7 +541,7 @@ describe('[Mainchain]', () => {
   test('[common] iexec account show --wallet-address <address> (missing wallet file)', async () => {
     const raw = await execAsync(
       `${iexecPath} account show --wallet-address ${POOR_ADDRESS1} --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.error.message).toBe(
@@ -1159,7 +1159,7 @@ describe('[Mainchain]', () => {
     await execAsync('cp ./inputs/orders/emptyOrders.json orders.json');
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     await execAsync('mv orders.back orders.json');
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -1384,7 +1384,7 @@ describe('[Mainchain]', () => {
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
       `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.deals).toBeDefined();
@@ -1528,7 +1528,7 @@ describe('[Mainchain]', () => {
     const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
     const raw = await execAsync(
       `${iexecPath} deal show ${fakeDealId} --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.deal).toBeUndefined();
@@ -1537,7 +1537,7 @@ describe('[Mainchain]', () => {
   test('[mainchain] iexec task show (not initialized)', async () => {
     const raw = await execAsync(
       `${iexecPath} task show ${mainchainTaskid} --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.task).toBeUndefined();
@@ -1812,7 +1812,7 @@ describe('[Mainchain]', () => {
         await execAsync(`${iexecPath} app unpublish --force --raw`);
         const rawErr = await execAsync(
           `${iexecPath} app unpublish --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -1841,7 +1841,7 @@ describe('[Mainchain]', () => {
         );
         const rawErr = await execAsync(
           `${iexecPath} app unpublish --all --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -1930,7 +1930,7 @@ describe('[Mainchain]', () => {
         await execAsync(`${iexecPath} dataset unpublish --force --raw`);
         const rawErr = await execAsync(
           `${iexecPath} dataset unpublish --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -1959,7 +1959,7 @@ describe('[Mainchain]', () => {
         );
         const rawErr = await execAsync(
           `${iexecPath} dataset unpublish --all --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -2053,7 +2053,7 @@ describe('[Mainchain]', () => {
         await execAsync(`${iexecPath} workerpool unpublish --force --raw`);
         const rawErr = await execAsync(
           `${iexecPath} workerpool unpublish --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -2082,7 +2082,7 @@ describe('[Mainchain]', () => {
         );
         const rawErr = await execAsync(
           `${iexecPath} workerpool unpublish --all --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
       }, 20000);
@@ -2139,7 +2139,7 @@ describe('[Sidechain]', () => {
   test('[sidechain] iexec wallet sendETH', async () => {
     const raw = await execAsync(
       `${iexecPath} wallet sendETH 0.1 --to ${POOR_ADDRESS1} --force --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
   });
@@ -2626,7 +2626,7 @@ describe('[Sidechain]', () => {
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
-    ).catch(e => e);
+    ).catch((e) => e);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.apporder).toBeDefined();
@@ -2712,7 +2712,7 @@ describe('[Sidechain]', () => {
     const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
     const raw = await execAsync(
       `${iexecPath} deal show ${fakeDealId} --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.deal).toBeUndefined();
@@ -2721,7 +2721,7 @@ describe('[Sidechain]', () => {
   test('[sidechain] iexec task show (not initialized)', async () => {
     const raw = await execAsync(
       `${iexecPath} task show ${sidechainTaskid} --raw`,
-    ).catch(e => e.message);
+    ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
     expect(res.task).toBeUndefined();
@@ -3030,7 +3030,7 @@ describe('[Common]', () => {
     test('iexec wallet show --show-private-key --wallet-address <address> (wrong password)', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show --show-private-key --password fail --wallet-address ${ADDRESS} --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe('invalid password');
@@ -3042,7 +3042,7 @@ describe('[Common]', () => {
     test('iexec wallet show --wallet-address <address> (missing wallet file)', async () => {
       const raw = await execAsync(
         `${iexecPath}  wallet show --wallet-address ${POOR_ADDRESS1} --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe(
@@ -3158,7 +3158,7 @@ describe('[Common]', () => {
       await execAsync('rm wallet.json').catch(() => {});
       const raw = await execAsync(
         `${iexecPath} account withdraw 0 ${ADDRESS} --keystoredir ./null --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe(
@@ -3210,7 +3210,7 @@ describe('[Common]', () => {
     test('tx --gas-price -1 (invalid gas-price)', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price -1 --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.txHash).toBeUndefined();
@@ -3219,7 +3219,7 @@ describe('[Common]', () => {
     test('tx --gas-price 0.1 wei (invalid gas-price)', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price 0.1 wei --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.txHash).toBeUndefined();
@@ -3228,7 +3228,7 @@ describe('[Common]', () => {
     test('tx --gas-price 1 ethereum (invalid gas-price)', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price 1 ethereum --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.txHash).toBeUndefined();
@@ -3385,7 +3385,7 @@ describe('[Common]', () => {
           const resPushNotAllowed = JSON.parse(
             await execAsync(
               `${iexecPath} dataset push-secret ${randomAddress} --raw`,
-            ).catch(e => e.message),
+            ).catch((e) => e.message),
           );
           expect(resPushNotAllowed.ok).toBe(false);
           expect(resPushNotAllowed.error.message).toBe(
@@ -3402,7 +3402,7 @@ describe('[Common]', () => {
           expect(resPush.ok).toBe(true);
           const resAlreadyExists = JSON.parse(
             await execAsync(`${iexecPath} dataset push-secret --raw`).catch(
-              e => e.message,
+              (e) => e.message,
             ),
           );
           expect(resAlreadyExists.ok).toBe(false);
@@ -3451,7 +3451,7 @@ describe('[Common]', () => {
       test('iexec result generate-encryption-keypair (node version < v10.12.0)', async () => {
         const raw = await execAsync(
           `${iexecPath} result generate-encryption-keypair --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const res = JSON.parse(raw);
         expect(res.ok).toBe(false);
         expect(res.secretPath).toBeUndefined();
@@ -3467,7 +3467,7 @@ describe('[Common]', () => {
       test('iexec result generate-keys (v4 legacy name) (node version < v10.12.0)', async () => {
         const raw = await execAsync(
           `${iexecPath} result generate-keys --force --raw`,
-        ).catch(e => e.message);
+        ).catch((e) => e.message);
         const res = JSON.parse(raw);
         expect(res.ok).toBe(false);
         expect(res.secretPath).toBeUndefined();
@@ -3539,7 +3539,7 @@ describe('[Common]', () => {
           expect(res.isUpdated).toBe(false);
           const rawAlreadyExists = await execAsync(
             `${iexecPath} result push-encryption-key --raw`,
-          ).catch(e => e.message);
+          ).catch((e) => e.message);
           const resAlreadyExists = JSON.parse(rawAlreadyExists);
           expect(resAlreadyExists.ok).toBe(false);
         });
@@ -3662,7 +3662,7 @@ describe('[Common]', () => {
       );
       const raw = await execAsync(
         `${iexecPath} result decrypt inputs/encryptedResults/encryptedResults.zip --force --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.resultsPath).toBeUndefined();
@@ -3720,7 +3720,7 @@ describe('[Common]', () => {
           expect(res.isUpdated).toBe(false);
           const rawAlreadyExists = await execAsync(
             `${iexecPath} storage init --raw`,
-          ).catch(e => e.message);
+          ).catch((e) => e.message);
           const resAlreadyExists = JSON.parse(rawAlreadyExists);
           expect(resAlreadyExists.ok).toBe(false);
           expect(resAlreadyExists.error.message).toBe(
@@ -3765,7 +3765,7 @@ describe('[Common]', () => {
           expect(res.isUpdated).toBe(false);
           const rawAlreadyExists = await execAsync(
             `${iexecPath} storage init dropbox --token oops --raw`,
-          ).catch(e => e.message);
+          ).catch((e) => e.message);
           const resAlreadyExists = JSON.parse(rawAlreadyExists);
           expect(resAlreadyExists.ok).toBe(false);
           expect(resAlreadyExists.error.message).toBe(
@@ -3781,7 +3781,7 @@ describe('[Common]', () => {
           );
           const raw = await execAsync(
             `${iexecPath} storage init unsupported --token oops --raw`,
-          ).catch(e => e.message);
+          ).catch((e) => e.message);
           const res = JSON.parse(raw);
           expect(res.ok).toBe(false);
           expect(res.error.message).toBe('"unsupported" not supported');
@@ -3859,7 +3859,7 @@ describe('[Common]', () => {
           );
           const raw = await execAsync(
             `${iexecPath} storage check unsupported --raw`,
-          ).catch(e => e.message);
+          ).catch((e) => e.message);
           const res = JSON.parse(raw);
           expect(res.ok).toBe(false);
           expect(res.error.message).toBe('"unsupported" not supported');
@@ -3878,7 +3878,7 @@ describe('[Common]', () => {
     test('iexec registry validate app (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate app --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.fail.length).toBe(3);
@@ -3888,7 +3888,7 @@ describe('[Common]', () => {
     test('iexec registry validate dataset (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate dataset --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.fail.length).toBe(3);
@@ -3898,7 +3898,7 @@ describe('[Common]', () => {
     test('iexec registry validate workerpool (invalid iexec.json, missing deployed.json, missing logo)', async () => {
       const raw = await execAsync(
         `${iexecPath} registry validate workerpool --raw`,
-      ).catch(e => e.message);
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.fail.length).toBe(3);

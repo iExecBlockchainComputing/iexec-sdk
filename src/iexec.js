@@ -62,7 +62,7 @@ async function main() {
           spinner.info('Creating your wallet file');
           const walletOptions = await computeWalletCreateOptions(cmd);
           walletRes = await createAndSave(
-            Object.assign({}, { force }, walletOptions),
+            { force, ...walletOptions },
           );
           spinner.info(
             `Your wallet address is ${
@@ -74,13 +74,13 @@ async function main() {
           spinner.warn('You must backup your wallet file in a safe place!');
         }
 
-        const raw = Object.assign(
-          {},
-          walletRes && { walletAddress: walletRes.address },
-          walletRes && { walletFile: walletRes.fileName },
-          fileName && { configFile: fileName },
-          chainRes && { chainConfigFile: chainRes.fileName },
-        );
+        const raw = {
+
+          ...walletRes && { walletAddress: walletRes.address },
+          ...walletRes && { walletFile: walletRes.fileName },
+          ...fileName && { configFile: fileName },
+          ...chainRes && { chainConfigFile: chainRes.fileName },
+        };
         spinner.succeed('iExec project is ready\n', {
           raw,
         });

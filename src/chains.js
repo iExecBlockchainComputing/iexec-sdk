@@ -46,7 +46,7 @@ const createChainFromConf = (
     });
     chain.contracts = contracts;
     if (bridgeConf) {
-      chain.bridgedNetwork = Object.assign({}, bridgeConf);
+      chain.bridgedNetwork = { ...bridgeConf };
       const bridgeProvider = getDefaultProvider(
         bridgeConf.host,
         providersOptions,

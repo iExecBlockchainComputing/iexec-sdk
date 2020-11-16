@@ -131,8 +131,8 @@ const chains = {
   },
 };
 
-const createOrder = (orderName, overwrite = {}) => Object.assign({}, order[orderName], overwrite);
-const overwriteObject = (obj, overwrite = {}) => Object.assign({}, obj, overwrite);
+const createOrder = (orderName, overwrite = {}) => ({ ...order[orderName], ...overwrite });
+const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
 
 module.exports = {
   main,

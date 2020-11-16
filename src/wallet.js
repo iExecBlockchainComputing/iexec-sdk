@@ -28,14 +28,14 @@ const ethFaucets = [
   {
     chainName: 'ropsten',
     name: 'faucet.ropsten.be',
-    getETH: address => fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
-      .then(res => res.json())
+    getETH: (address) => fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
+      .then((res) => res.json())
       .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
-    getETH: address => fetch('https://ropsten.faucet.b9lab.com/tap', {
+    getETH: (address) => fetch('https://ropsten.faucet.b9lab.com/tap', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ const ethFaucets = [
       method: 'POST',
       body: JSON.stringify({ toWhom: address }),
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
@@ -132,19 +132,17 @@ const getETH = async (
 ) => {
   try {
     const vAddress = await addressSchema().validate(account);
-    const filteredFaucets = ethFaucets.filter(e => e.chainName === chainName);
+    const filteredFaucets = ethFaucets.filter((e) => e.chainName === chainName);
     if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
     const faucetsResponses = await Promise.all(
-      filteredFaucets.map(faucet => faucet.getETH(vAddress)),
+      filteredFaucets.map((faucet) => faucet.getETH(vAddress)),
     );
     const responses = filteredFaucets.reduce((accu, curr, index) => {
       accu.push(
-        Object.assign(
-          {
-            name: curr.name,
-          },
-          { response: faucetsResponses[index] },
-        ),
+        {
+          name: curr.name,
+          response: faucetsResponses[index],
+        },
       );
       return accu;
     }, []);
@@ -160,7 +158,7 @@ const rlcFaucets = [
     name: 'faucet.iex.ec',
     getRLC: (chainName, address) => fetch(
       `https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`,
-    ).then(res => res.json()),
+    ).then((res) => res.json()),
   },
 ];
 
@@ -171,16 +169,14 @@ const getRLC = async (
   try {
     const vAddress = await addressSchema().validate(account);
     const faucetsResponses = await Promise.all(
-      rlcFaucets.map(faucet => faucet.getRLC(chainName, vAddress)),
+      rlcFaucets.map((faucet) => faucet.getRLC(chainName, vAddress)),
     );
     const responses = rlcFaucets.reduce((accu, curr, index) => {
       accu.push(
-        Object.assign(
-          {
-            name: curr.name,
-          },
-          { response: faucetsResponses[index] },
-        ),
+        {
+          name: curr.name,
+          response: faucetsResponses[index],
+        },
       );
       return accu;
     }, []);
@@ -500,7 +496,7 @@ const bridgeToSidechain = async (
     debug('sendTxHash', sendTxHash);
 
     if (vSidechainBridgeAddress && bridgedContracts) {
-      const waitAffirmationCompleted = txHash => new Promise((resolve) => {
+      const waitAffirmationCompleted = (txHash) => new Promise((resolve) => {
         debug('waitAffirmationCompleted');
         const sidechainBridge = new Contract(
           vSidechainBridgeAddress,
@@ -580,7 +576,7 @@ const bridgeToMainchain = async (
       wrapCall(
         sidechainBridgeContract
           .getCurrentDay()
-          .then(currentDay => sidechainBridgeContract.totalSpentPerDay(currentDay)),
+          .then((currentDay) => sidechainBridgeContract.totalSpentPerDay(currentDay)),
       ),
     ]);
     debug('minPerTx', minPerTx.toString());
@@ -621,7 +617,7 @@ const bridgeToMainchain = async (
     debug('sendTxHash', sendTxHash);
 
     if (vMainchainBridgeAddress && bridgedContracts) {
-      const waitRelayedMessage = txHash => new Promise((resolve) => {
+      const waitRelayedMessage = (txHash) => new Promise((resolve) => {
         debug('waitRelayedMessage');
         const mainchainBridge = new Contract(
           vMainchainBridgeAddress,
