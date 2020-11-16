@@ -16,16 +16,16 @@ const CHAIN_ALIASES_MAP = {
 };
 
 const CHAIN_NAME_MAP = {
-  1: { id: 1, flavour: 'standard' },
-  mainnet: { id: 1, flavour: 'standard' },
-  5: { id: 5, flavour: 'standard' },
-  goerli: { id: 5, flavour: 'standard' },
-  133: { id: 133, flavour: 'standard' },
-  viviani: { id: 133, flavour: 'standard' },
-  134: { id: 134, flavour: 'standard' },
-  bellecour: { id: 134, flavour: 'standard' },
-  enterprise: { id: 1, flavour: 'enterprise' },
-  'enterprise-sidechain': { id: 133, flavour: 'enterprise' },
+  1: { id: '1', flavour: 'standard' },
+  mainnet: { id: '1', flavour: 'standard' },
+  5: { id: '5', flavour: 'standard' },
+  goerli: { id: '5', flavour: 'standard' },
+  133: { id: '133', flavour: 'standard' },
+  viviani: { id: '133', flavour: 'standard' },
+  134: { id: '134', flavour: 'standard' },
+  bellecour: { id: '134', flavour: 'standard' },
+  enterprise: { id: '1', flavour: 'enterprise' },
+  'enterprise-sidechain': { id: '133', flavour: 'enterprise' },
 };
 
 const createChainFromConf = (
@@ -118,8 +118,9 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
     }
 
     let bridgeConf;
-    const bridgedChainNameOrId = conf.bridge.bridgedChainName || conf.bridge.bridgedChainId;
-    if (conf.bridge && bridgedChainNameOrId) {
+    const bridgedChainNameOrId = conf.bridge
+      && (conf.bridge.bridgedChainName || conf.bridge.bridgedChainId);
+    if (bridgedChainNameOrId) {
       let bridgeLoadedConf;
       if (chainsConf.chains[bridgedChainNameOrId]) {
         bridgeLoadedConf = chainsConf.chains[bridgedChainNameOrId];
