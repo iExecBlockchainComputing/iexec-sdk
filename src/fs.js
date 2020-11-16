@@ -12,7 +12,7 @@ const templates = require('./templates');
 const debug = Debug('iexec:fs');
 
 const chainConfSchema = () => object({
-  id: chainIdSchema().required(),
+  id: chainIdSchema(),
   host: string(),
   hub: string(),
   sms: string(),
@@ -20,8 +20,14 @@ const chainConfSchema = () => object({
   ipfsGateway: string(),
   iexecGateway: string(),
   native: boolean(),
+  flavour: string().oneOf(['standard', 'enterprise']),
   bridge: object({
-    bridgedChainId: chainIdSchema().required(),
+    bridgedChainName: string().when('bridgedChainId', {
+      is: undefined,
+      then: string().required(),
+      otherwise: string(),
+    }), // replace bridgedChainId
+    bridgedChainId: chainIdSchema(),
     contract: addressSchema().required(),
   })
     .notRequired()

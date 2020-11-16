@@ -689,7 +689,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
-  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainId` set the reference to the bridged network specified by `id`.
+  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
 - optional key `providers` set the backends for public chains
   - optional key `alchemy` set Alchemy API Token
@@ -705,24 +705,35 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "host": "http://localhost:8545",
       "id": "1544020727674",
       "sms": "http://localhost:5000",
-      "resultProxy": "http://localhost:18089",
+      "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "native": true,
+      "native": false,
+      "flavour": "standard",
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainId": "123456789"
+        "bridgedChainName": "dev-sidechain"
       }
     },
-    "goerli": {
-      "id": "5"
+    "dev-sidecahin": {
+      "host": "http://localhost:18545",
+      "id": "123456",
+      "sms": "http://localhost:15000",
+      "resultProxy": "http://localhost:18089",
+      "ipfsGateway": "http://localhost:18080",
+      "native": true,
+      "flavour": "standard",
+      "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
+      "bridge": {
+        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
+        "bridgedChainName": "development"
+      }
     },
-    "mainnet": {
-      "id": "1"
-    },
-    "bellecour": {
-      "id": "134"
-    }
+    "goerli": {},
+    "mainnet": {},
+    "bellecour": {},
+    "enterprise": {},
+    "enterprise-sidechain": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",

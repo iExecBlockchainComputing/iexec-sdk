@@ -122,18 +122,12 @@ const chains = {
       hub: '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB',
       // native: true,
     },
-    goerli: {
-      id: '5',
-    },
-    viviani: {
-      id: '133',
-    },
-    mainnet: {
-      id: '1',
-    },
-    bellecour: {
-      id: '134',
-    },
+    goerli: {},
+    viviani: {},
+    mainnet: {},
+    bellecour: {},
+    enterprise: {},
+    'enterprise-sidechain': {},
   },
 };
 

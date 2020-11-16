@@ -53,7 +53,7 @@ const utils = {
 
 class IExec {
   constructor(
-    { ethProvider, chainId },
+    { ethProvider, chainId, flavour = 'standard' },
     {
       hubAddress,
       isNative,
@@ -82,9 +82,10 @@ class IExec {
       signer: ethersSigner,
       hubAddress,
       isNative,
+      flavour,
     });
 
-    const chainConfDefaults = getChainDefaults(chainId);
+    const chainConfDefaults = getChainDefaults({ id: chainId, flavour });
 
     let bridgedConf;
     const isBridged = Object.getOwnPropertyNames(bridgedNetworkConf).length > 0
@@ -98,14 +99,18 @@ class IExec {
           `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
-      const bridgedChainConfDefaults = getChainDefaults(bridgedChainId);
+      const bridgedChainConfDefaults = getChainDefaults({
+        id: bridgedChainId,
+        flavour,
+      });
       bridgedConf = {
         chainId: bridgedChainId,
         rpcURL:
           bridgedNetworkConf.rpcURL !== undefined
             ? bridgedNetworkConf.rpcURL
             : bridgedChainConfDefaults.host,
-        isNative: !contracts.isNative,
+        isNative:
+          flavour === 'standard' ? !contracts.isNative : contracts.isNative,
         hubAddress: bridgedNetworkConf.hubAddress,
         bridgeAddress:
           bridgedNetworkConf.bridgeAddress !== undefined
@@ -131,6 +136,7 @@ class IExec {
         provider: getDefaultProvider(bridgedConf.rpcURL),
         isNative: bridgedConf.isNative,
         hubAddress: bridgedConf.hubAddress,
+        flavour,
       })
       : undefined;
 

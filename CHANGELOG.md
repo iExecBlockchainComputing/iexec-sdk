@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added
+
+- iExec enterprise flavour support
+- `enterprise` and `enterprise-sidechain` values added to `--chain [chainName]` option enable connecting iExec enterprise
+- optional named argument `flavour` added to IExec constructor enables connecting iExec enterprise by passing `flavour: 'enterprise'`
+
+### Changed
+
+- `id` is no longer requred in `chain.json`
+- passing `chainId` to `--chain [chainName]` will support only the following values: `1` for `mainnet`, `5` for `goerli`, `134` for `bellecour`, `133` for `viviani`
+- [DEPRECATED] `bridge.bridgedChainId` in `chain.json` is deprecated and must me replaced by `bridge.bridgedChainName`
+
+### Removed
+
 ## [5.1.0] 2020-11-09
 
 ### Added
