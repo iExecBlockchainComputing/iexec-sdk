@@ -117,6 +117,7 @@ const setNativeChain = (options) => saveJSONToFile(
         host: nativeChainUrl,
         hub: hubAddress,
         native: true,
+        useGas: false,
         sms: 'http://localhost:5000',
         resultProxy: 'http://localhost:18089',
         ...options,

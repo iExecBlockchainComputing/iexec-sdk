@@ -691,6 +691,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+  - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction.
 - optional key `providers` set the backends for public chains
   - optional key `alchemy` set Alchemy API Token
   - optional key `etherscan` set Etherscan API Token
@@ -708,6 +709,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "native": false,
+      "useGas": true,
       "flavour": "standard",
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
@@ -722,6 +724,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
+      "useGas": false,
       "flavour": "standard",
       "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
       "bridge": {
@@ -910,6 +913,7 @@ npm install iexec
 > - `resultProxyURL: URL` specify the result proxy to use for results remote storage
 > - `ipfsGatewayURL: URL` specify the IPFS gateway to use
 > - `isNative: Boolean` true when the RLC is the chain native token
+> - `useGas: Boolean` false when the chain does NOT requires to spend gas to send a transaction
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 
@@ -1918,12 +1922,12 @@ const dealObservable = iexec.deal.obsDeal(
 );
 
 const unsubscribe = dealObservable.subscribe({
-  next: data =>
+  next: (data) =>
     console.log(
       data.message,
       `completed tasks ${data.completedTasksCount}/${data.tasksCount}`,
     ),
-  error: e => console.error(e),
+  error: (e) => console.error(e),
   complete: () => console.log('final state reached'),
 });
 // call unsubscribe() to unsubscribe from dealObservable
@@ -1977,10 +1981,10 @@ _Example:_
 const { claimed, transactions } = await iexec.deal.claim(
   '0xe0ebfa1177a5997434fe14b5e88897950e07ff82e6976a024b07f30063249a1e',
 );
-Object.entries(claimed).forEach(e => {
+Object.entries(claimed).forEach((e) => {
   console.log(`claimed task: idx ${e[0]} taskid ${e[1]}`);
 });
-transactions.forEach(e => {
+transactions.forEach((e) => {
   console.log(`transaction ${e.type} hash ${e.txHash}`);
 });
 ```
@@ -2060,7 +2064,7 @@ const taskObservable = iexec.task.obsTask(
 
 const unsubscribe = taskObservable.subscribe({
   next: ({ message, task }) => console.log(message, task.statusName),
-  error: e => console.error(e),
+  error: (e) => console.error(e),
   complete: () => console.log('final state reached'),
 });
 // call unsubscribe() to unsubscribe from taskObservable

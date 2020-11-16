@@ -1298,6 +1298,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1400,6 +1401,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     await expect(iexec.wallet.sendETH(10, POOR_ADDRESS3)).rejects.toThrow(
@@ -1478,6 +1480,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1515,6 +1518,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1703,6 +1707,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const iexec = new IExec(
@@ -1716,6 +1721,7 @@ describe('[wallet]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     await iexecRichman.wallet.sendRLC(20, POOR_ADDRESS2);
@@ -1875,6 +1881,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -1904,6 +1911,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -1937,6 +1945,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2056,6 +2065,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     await iexec.account.deposit(10);
@@ -2086,6 +2096,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     await iexec.account.deposit(10000);
@@ -2118,6 +2129,7 @@ describe('[account]', () => {
       {
         hubAddress: nativeHubAddress,
         isNative: true,
+        useGas: false,
       },
     );
     await iexec.account.deposit(10);

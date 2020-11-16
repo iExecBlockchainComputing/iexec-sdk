@@ -57,6 +57,7 @@ class IExec {
     {
       hubAddress,
       isNative,
+      useGas = true,
       bridgeAddress,
       bridgedNetworkConf = {},
       resultProxyURL,
@@ -81,6 +82,7 @@ class IExec {
       provider: ethersProvider,
       signer: ethersSigner,
       hubAddress,
+      useGas,
       isNative,
       flavour,
     });
@@ -134,8 +136,8 @@ class IExec {
       ? new IExecContractsClient({
         chainId: bridgedConf.chainId,
         provider: getDefaultProvider(bridgedConf.rpcURL),
-        isNative: bridgedConf.isNative,
         hubAddress: bridgedConf.hubAddress,
+        isNative: bridgedConf.isNative,
         flavour,
       })
       : undefined;

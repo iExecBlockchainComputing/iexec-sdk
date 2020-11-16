@@ -41,6 +41,7 @@ const createChainFromConf = (
       provider,
       chainId: chain.id,
       hubAddress: chain.hub,
+      useGas: chain.useGas,
       isNative: chain.native,
       flavour: chain.flavour,
     });
@@ -55,6 +56,7 @@ const createChainFromConf = (
         provider: bridgeProvider,
         chainId: bridgeConf.id,
         hubAddress: bridgeConf.hub,
+        useGas: bridgeConf.useGas,
         isNative: bridgeConf.native,
         flavour: bridgeConf.flavour,
       });

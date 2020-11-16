@@ -20,6 +20,7 @@ const chainConfSchema = () => object({
   ipfsGateway: string(),
   iexecGateway: string(),
   native: boolean(),
+  useGas: boolean().default(true),
   flavour: string().oneOf(['standard', 'enterprise']),
   bridge: object({
     bridgedChainName: string().when('bridgedChainId', {
