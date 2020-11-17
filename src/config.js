@@ -13,6 +13,12 @@ const hostMap = {
   },
 };
 
+const hubMap = {
+  enterprise: {
+    5: 'enterprise.v5.iexec.eth',
+  },
+};
+
 const smsMap = {
   standard: {
     1: 'https://sms.mainnet.iex.ec',
@@ -95,6 +101,7 @@ const iexecGatewayMap = {
 
 const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[flavour] && hostMap[flavour][id],
+  hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway:
