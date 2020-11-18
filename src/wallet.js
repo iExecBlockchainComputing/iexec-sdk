@@ -9,6 +9,7 @@ const {
   bnNRlcToBnWei,
   checksummedAddress,
   formatRLC,
+  NULL_BYTES,
 } = require('./utils');
 const foreignBridgeErcToNativeDesc = require('./abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('./abi/bridge/HomeBridgeErcToNative.json');
@@ -83,6 +84,38 @@ const getAddress = async (contracts = throwIfMissing()) => {
   return checksummedAddress(address);
 };
 
+const getRlcBalance = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  const vAddress = await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(address);
+  const { isNative } = contracts;
+  if (isNative) {
+    const weiBalance = await contracts.provider.getBalance(vAddress);
+    return truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance));
+  }
+  const rlcAddress = await contracts.fetchRLCAddress();
+  const nRlcBalance = await contracts
+    .getRLCContract({
+      at: rlcAddress,
+    })
+    .balanceOf(vAddress);
+  return ethersBnToBn(nRlcBalance);
+};
+
+const getEthBalance = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  const vAddress = await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(address);
+  const weiBalance = await contracts.provider.getBalance(vAddress);
+  return ethersBnToBn(weiBalance);
+};
+
 const checkBalances = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
@@ -91,33 +124,14 @@ const checkBalances = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(address);
-    const { isNative } = contracts;
-    const getETH = () => contracts.provider.getBalance(vAddress);
-    const balances = {};
-    if (isNative) {
-      const weiBalance = await getETH();
-      Object.assign(balances, {
-        wei: ethersBnToBn(weiBalance),
-        nRLC: truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance)),
-      });
-    } else {
-      const rlcAddress = await contracts.fetchRLCAddress();
-      const getRLC = () => contracts
-        .getRLCContract({
-          at: rlcAddress,
-        })
-        .balanceOf(vAddress)
-        .catch((error) => {
-          debug(error);
-          return 0;
-        });
-
-      const [weiBalance, rlcBalance] = await Promise.all([getETH(), getRLC()]);
-      Object.assign(balances, {
-        wei: ethersBnToBn(weiBalance),
-        nRLC: ethersBnToBn(rlcBalance),
-      });
-    }
+    const [weiBalance, rlcBalance] = await Promise.all([
+      getEthBalance(contracts, vAddress),
+      getRlcBalance(contracts, vAddress),
+    ]);
+    const balances = {
+      wei: weiBalance,
+      nRLC: rlcBalance,
+    };
     debug('balances', balances);
     return balances;
   } catch (error) {
@@ -138,12 +152,10 @@ const getETH = async (
       filteredFaucets.map((faucet) => faucet.getETH(vAddress)),
     );
     const responses = filteredFaucets.reduce((accu, curr, index) => {
-      accu.push(
-        {
-          name: curr.name,
-          response: faucetsResponses[index],
-        },
-      );
+      accu.push({
+        name: curr.name,
+        response: faucetsResponses[index],
+      });
       return accu;
     }, []);
     return responses;
@@ -172,12 +184,10 @@ const getRLC = async (
       rlcFaucets.map((faucet) => faucet.getRLC(chainName, vAddress)),
     );
     const responses = rlcFaucets.reduce((accu, curr, index) => {
-      accu.push(
-        {
-          name: curr.name,
-          response: faucetsResponses[index],
-        },
-      );
+      accu.push({
+        name: curr.name,
+        response: faucetsResponses[index],
+      });
       return accu;
     }, []);
     return responses;
@@ -241,16 +251,20 @@ const sendERC20 = async (
 
 const sendETH = async (
   contracts = throwIfMissing(),
-  value = throwIfMissing(),
+  amount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
-    const vValue = await weiAmountSchema().validate(value);
+    const vAmount = await weiAmountSchema().validate(amount);
     if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
-    const txHash = await sendNativeToken(contracts, vValue, vAddress);
+    const balance = await getEthBalance(contracts, await getAddress(contracts));
+    if (balance.lt(new BN(vAmount))) {
+      throw Error('Amount to send exceed wallet balance');
+    }
+    const txHash = await sendNativeToken(contracts, vAmount, vAddress);
     return txHash;
   } catch (error) {
     debug('sendETH()', error);
@@ -268,6 +282,10 @@ const sendRLC = async (
       ethProvider: contracts.provider,
     }).validate(to);
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+    const balance = await getRlcBalance(contracts, await getAddress(contracts));
+    if (balance.lt(new BN(vAmount))) {
+      throw Error('Amount to send exceed wallet balance');
+    }
     if (contracts.isNative) {
       debug('send native token');
       const weiValue = bnNRlcToBnWei(new BN(vAmount)).toString();
@@ -366,7 +384,10 @@ const bridgeToSidechain = async (
       : undefined;
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
-
+    const balance = await getRlcBalance(contracts, await getAddress(contracts));
+    if (balance.lt(new BN(vAmount))) {
+      throw Error('Amount to bridge exceed wallet balance');
+    }
     const ercBridgeContract = new Contract(
       vBridgeAddress,
       foreignBridgeErcToNativeDesc.abi,
@@ -552,7 +573,10 @@ const bridgeToMainchain = async (
       : undefined;
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
-
+    const balance = await getRlcBalance(contracts, await getAddress(contracts));
+    if (balance.lt(new BN(vAmount))) {
+      throw Error('Amount to bridge exceed wallet balance');
+    }
     const sidechainBridgeContract = new Contract(
       vBridgeAddress,
       homeBridgeErcToNativeDesc.abi,
@@ -654,6 +678,95 @@ const bridgeToMainchain = async (
   }
 };
 
+const isInWhitelist = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  { strict = true } = {},
+) => {
+  if (contracts.flavour !== 'enterprise') {
+    throw Error('Cannot check authorized eRLC holders on current chain');
+  }
+  const vAddress = await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(address);
+  try {
+    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
+    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
+    const isKYC = await wrapCall(eRlcContract.isKYC(vAddress));
+    if (!isKYC && strict) {
+      throw Error(`${vAddress} is not authorized to interact with eRLC`);
+    }
+    return isKYC;
+  } catch (error) {
+    debug('isInWhitelist()', error);
+    throw error;
+  }
+};
+
+const wrapEnterpriseRLC = async (
+  contracts = throwIfMissing(),
+  enterpriseContracts,
+  nRlcAmount = throwIfMissing(),
+) => {
+  if (contracts.flavour !== 'standard' || contracts.isNative) {
+    throw Error('Unable to wrap RLC into eRLC on current chain');
+  }
+  if (!enterpriseContracts) {
+    throw Error('Unable to find eRLC on current chain');
+  }
+  const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+  await isInWhitelist(enterpriseContracts, await getAddress(contracts), {
+    strict: true,
+  });
+  const balance = await getRlcBalance(contracts, await getAddress(contracts));
+  if (balance.lt(new BN(vAmount))) {
+    throw Error('Amount to wrap exceed wallet balance');
+  }
+  try {
+    const eRlcAddress = await wrapCall(enterpriseContracts.fetchRLCAddress());
+    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
+    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
+    const tx = await wrapSend(
+      rlcContract.approveAndCall(
+        eRlcAddress,
+        vAmount,
+        NULL_BYTES,
+        contracts.txOptions,
+      ),
+    );
+    await wrapWait(tx.wait());
+    return tx.hash;
+  } catch (error) {
+    debug('wrapEnterpriseRLC()', error);
+    throw error;
+  }
+};
+
+const unwrapEnterpriseRLC = async (
+  contracts = throwIfMissing(),
+  nRlcAmount = throwIfMissing(),
+) => {
+  if (contracts.flavour !== 'enterprise' || contracts.isNative) {
+    throw Error('Unable to unwrap eRLC into RLC on current chain');
+  }
+  const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+  await isInWhitelist(contracts, await getAddress(contracts), { strict: true });
+  const balance = await getRlcBalance(contracts, await getAddress(contracts));
+  if (balance.lt(new BN(vAmount))) {
+    throw Error('Amount to unwrap exceed wallet balance');
+  }
+  try {
+    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
+    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
+    const tx = await wrapSend(eRlcContract.withdraw(vAmount));
+    await wrapWait(tx.wait());
+    return tx.hash;
+  } catch (error) {
+    debug('unwrapEnterpriseRLC()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   bridgeToMainchain,
   bridgeToSidechain,
@@ -664,4 +777,6 @@ module.exports = {
   sendETH,
   sendRLC,
   sweep,
+  wrapEnterpriseRLC,
+  unwrapEnterpriseRLC,
 };

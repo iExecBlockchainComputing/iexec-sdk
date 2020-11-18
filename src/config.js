@@ -88,6 +88,10 @@ const bridgeMap = {
   },
 };
 
+const enterpriseEnabledMap = {
+  5: true,
+};
+
 const ipfsGatewayMap = {};
 
 const iexecGatewayMap = {
@@ -116,6 +120,9 @@ const getChainDefaults = ({ id, flavour }) => ({
   flavour,
 });
 
+const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
+
 module.exports = {
   getChainDefaults,
+  isEnterpriseEnabled,
 };

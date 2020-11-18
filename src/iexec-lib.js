@@ -34,7 +34,7 @@ const {
   EnhancedWeb3Signer,
   getSignerFromPrivateKey,
 } = require('./signers');
-const { getChainDefaults } = require('./config');
+const { getChainDefaults, isEnterpriseEnabled } = require('./config');
 
 const utils = {
   BN,
@@ -88,6 +88,24 @@ class IExec {
     });
 
     const chainConfDefaults = getChainDefaults({ id: chainId, flavour });
+
+    let enterpriseSwapConfDefaults;
+    const enterpriseSwapFlavour = flavour === 'enterprise' ? 'standard' : 'enterprise';
+    if (isEnterpriseEnabled(chainId)) {
+      enterpriseSwapConfDefaults = getChainDefaults({
+        id: chainId,
+        flavour: enterpriseSwapFlavour,
+      });
+    }
+    const enterpriseSwapContracts = enterpriseSwapConfDefaults
+      ? new IExecContractsClient({
+        chainId,
+        provider: getDefaultProvider(enterpriseSwapConfDefaults.rpcURL),
+        hubAddress: enterpriseSwapConfDefaults.hubAddress,
+        isNative: enterpriseSwapConfDefaults.isNative,
+        flavour: enterpriseSwapFlavour,
+      })
+      : undefined;
 
     let bridgedConf;
     const isBridged = Object.getOwnPropertyNames(bridgedNetworkConf).length > 0
@@ -208,6 +226,8 @@ class IExec {
       bridgedContracts,
       mainchainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
+    this.wallet.wrapEnterpriseRLC = (nRlcAmount) => wallet.wrapEnterpriseRLC(contracts, enterpriseSwapContracts, nRlcAmount);
+    this.wallet.unwrapEnterpriseRLC = (nRlcAmount) => wallet.unwrapEnterpriseRLC(contracts, nRlcAmount);
     this.account = {};
     this.account.checkBalance = (address) => account.checkBalance(contracts, address);
     this.account.checkBridgedBalance = (address) => account.checkBalance(bridgedContracts, address);

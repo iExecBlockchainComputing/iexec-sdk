@@ -82,6 +82,8 @@ const desc = {
   decryptResults: () => 'decrypt encrypted results with beneficary key',
   bridgeToSidechain: () => 'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () => 'send RLC from the sidechain to the mainchain (default unit nRLC)',
+  wrapEnterpriseRLC: () => 'wrap RLC into eRLC (default unit nRLC), the wallet must be authorized to interact with eRLC',
+  unwrapEnterpriseRLC: () => 'unwrap eRLC into RLC (default unit neRLC), the wallet must be authorized to interact with eRLC',
   appRun: () => 'run an iExec application at market price (default run last deployed app)',
   requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
@@ -469,6 +471,12 @@ const prompt = {
   fileExists: (filePath, options) => question(`File ${filePath} already exists, continue and replace?`, options),
   transfer: (currency, amount, chainName, to, chainId) => question(
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
+  ),
+  wrap: (amount, chainName, chainId) => question(
+    `Do you want to wrap ${amount} ${chainName} RLC into eRLC  [chainId: ${chainId}]`,
+  ),
+  unwrap: (amount, chainName, chainId) => question(
+    `Do you want to unwrap ${amount} ${chainName} eRLC into RLC  [chainId: ${chainId}]`,
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),

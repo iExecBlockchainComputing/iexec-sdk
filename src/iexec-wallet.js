@@ -575,4 +575,97 @@ bridgeToMainchain
     }
   });
 
+const wrapEnterpriseRLC = cli.command('wrap-enterprise-RLC <amount> [unit]');
+addGlobalOptions(wrapEnterpriseRLC);
+addWalletLoadOptions(wrapEnterpriseRLC);
+wrapEnterpriseRLC
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.wrapEnterpriseRLC())
+  .action(async (amount, unit, cmd) => {
+    await checkUpdate(cmd);
+    const spinner = Spinner(cmd);
+    try {
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const enterpriseContracts = chain.enterpriseSwapNetwork && chain.enterpriseSwapNetwork.contracts;
+      if (!enterpriseContracts) {
+        throw Error(
+          `No enterprise smart contracts found on current chain ${chain.id}`,
+        );
+      }
+      await connectKeystore(chain, keystore, { txOptions });
+      if (!cmd.force) {
+        await prompt.wrap(formatRLC(nRlcAmount), chain.name, chain.id);
+      }
+      const message = `${formatRLC(nRlcAmount)} ${chain.name} RLC into eRLC `;
+      spinner.start(`Wrapping ${message}...`);
+
+      const txHash = await wallet.wrapEnterpriseRLC(
+        chain.contracts,
+        enterpriseContracts,
+        nRlcAmount,
+      );
+      spinner.succeed(`Wrapped ${message}\n`, {
+        raw: {
+          amount: nRlcAmount,
+          txHash,
+        },
+      });
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const unwrapEnterpriseRLC = cli.command(
+  'unwrap-enterprise-RLC <amount> [unit]',
+);
+addGlobalOptions(unwrapEnterpriseRLC);
+addWalletLoadOptions(unwrapEnterpriseRLC);
+unwrapEnterpriseRLC
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.unwrapEnterpriseRLC())
+  .action(async (amount, unit, cmd) => {
+    await checkUpdate(cmd);
+    const spinner = Spinner(cmd);
+    try {
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const enterpriseContracts = chain.enterpriseSwapNetwork && chain.enterpriseSwapNetwork.contracts;
+      if (!enterpriseContracts) {
+        throw Error(
+          `No enterprise smart contracts found on current chain ${chain.id}`,
+        );
+      }
+      await connectKeystore(chain, keystore, { txOptions });
+      if (!cmd.force) {
+        await prompt.unwrap(formatRLC(nRlcAmount), chain.name, chain.id);
+      }
+      const message = `${formatRLC(nRlcAmount)} ${chain.name} eRLC into RLC `;
+      spinner.start(`Unwrapping ${message}...`);
+
+      const txHash = await wallet.unwrapEnterpriseRLC(
+        chain.contracts,
+        nRlcAmount,
+      );
+      spinner.succeed(`Unwrapped ${message}\n`, {
+        raw: {
+          amount: nRlcAmount,
+          txHash,
+        },
+      });
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
 help(cli);

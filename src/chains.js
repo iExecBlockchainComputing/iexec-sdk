@@ -4,7 +4,7 @@ const IExecContractsClient = require('iexec-contracts-js-client');
 const { EnhancedWallet } = require('./signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
-const { getChainDefaults } = require('./config');
+const { getChainDefaults, isEnterpriseEnabled } = require('./config');
 
 const debug = Debug('iexec:chains');
 
@@ -30,10 +30,25 @@ const CHAIN_NAME_MAP = {
   'enterprise-sidechain-testnet': { id: '133', flavour: 'enterprise' },
 };
 
+const ENTERPRISE_SWAP_MAP = {
+  1: 'enterprise',
+  mainnet: 'enterprise',
+  5: 'enterprise-testnet',
+  goerli: 'enterprise-testnet',
+  133: 'enterprise-sidechain-testnet',
+  viviani: 'enterprise-sidechain-testnet',
+  134: 'enterprise-sidechain',
+  bellecour: 'enterprise-sidechain',
+  enterprise: 'mainnet',
+  'enterprise-sidechain': 'bellecour',
+  'enterprise-testnet': 'goerli',
+  'enterprise-sidechain-testnet': 'viviani',
+};
+
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, providersOptions } = {},
+  { bridgeConf, enterpriseSwapConf, providersOptions } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -61,6 +76,17 @@ const createChainFromConf = (
         useGas: bridgeConf.useGas,
         isNative: bridgeConf.native,
         flavour: bridgeConf.flavour,
+      });
+    }
+    if (enterpriseSwapConf) {
+      chain.enterpriseSwapNetwork = { ...enterpriseSwapConf };
+      chain.enterpriseSwapNetwork.contracts = new IExecContractsClient({
+        provider,
+        chainId: enterpriseSwapConf.id,
+        hubAddress: enterpriseSwapConf.hub,
+        useGas: enterpriseSwapConf.useGas,
+        isNative: enterpriseSwapConf.native,
+        flavour: enterpriseSwapConf.flavour,
       });
     }
     return chain;
@@ -155,8 +181,41 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
       }
     }
     debug('bridged chain', bridgeConf);
+
+    let enterpriseSwapConf;
+    const enterpriseSwapChainName = ENTERPRISE_SWAP_MAP[chainName];
+    const enterpriseSwapFlavour = conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
+    if (isEnterpriseEnabled(conf.id) && enterpriseSwapChainName) {
+      let enterpriseSwapLoadedConf;
+      if (chainsConf.chains[enterpriseSwapChainName]) {
+        enterpriseSwapLoadedConf = chainsConf.chains[enterpriseSwapChainName];
+      }
+      const enterpriseSwapIdAndFlavour = {
+        ...CHAIN_NAME_MAP[enterpriseSwapChainName],
+        ...(enterpriseSwapLoadedConf
+          && enterpriseSwapLoadedConf.id && { id: enterpriseSwapLoadedConf.id }),
+        flavour: enterpriseSwapFlavour,
+      };
+      const enterpriseSwapDefaultConf = getChainDefaults(
+        enterpriseSwapIdAndFlavour,
+      );
+      debug('enterpriseSwapLoadedConf', enterpriseSwapLoadedConf);
+      debug('enterpriseSwapDefaultConf', defaultConf);
+      enterpriseSwapConf = {
+        ...enterpriseSwapIdAndFlavour,
+        ...enterpriseSwapDefaultConf,
+        ...enterpriseSwapLoadedConf,
+      };
+      if (!enterpriseSwapConf.host) {
+        throw Error(
+          `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
+        );
+      }
+    }
+    debug('enterprise swap chain', enterpriseSwapConf);
     const chain = createChainFromConf(name, conf, {
       bridgeConf,
+      enterpriseSwapConf,
       providersOptions,
     });
     spinner.info(`Using chain [${name}]`);

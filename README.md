@@ -373,6 +373,8 @@ iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC 
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
+iexec wallet wrap-enterprise-RLC <amount> [unit] # wrap RLC into eRLC (default unit nRLC), the wallet must be authorized to interact with eRLC.
+iexec wallet unwrap-enterprise-RLC <amount> [unit] # unwrap eRLC into RLC (default unit neRLC), the wallet must be authorized to interact with eRLC.
 ```
 
 The wallet files are stored in the Ethereum keystore.
@@ -904,7 +906,7 @@ npm install iexec
 
 #### IExec Constructor
 
-**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String } \[, options \])** => **IExec**
+**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
 
 > _options:_
 >
@@ -1141,6 +1143,36 @@ const { sendTxHash, receiveTxHash } = await sdk.wallet.bridgeToMainchain(
 console.log(
   `Sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainchain (tx: ${receiveTxHash})`,
 );
+```
+
+#### wrapEnterpriseRLC
+
+iexec.**wallet.wrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
+
+> wrap some nRLC (1 nRLC = 1\*10^-9 RLC) into neRLC (enterprise nRLC).
+> signer wallet must be authorized by the eRLC contract to perform wrap operation.
+> IExec constructor must be called with `flavour: 'standard'` (default).
+
+_Example:_
+
+```js
+const txHash = await sdk.wallet.wrapEnterpriseRLC('1000000000');
+console.log(`Wrapped 1000000000 nRLC into neRLC (tx: ${txHash})`);
+```
+
+#### unwrapEnterpriseRLC
+
+iexec.**wallet.unwrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
+
+> wrap some neRLC (1 neRLC = 1\*10^-9 eRLC) into nRLC.
+> signer wallet must be authorized by the eRLC contract to perform unwrap operation.
+> IExec constructor must be called with `flavour: 'enterprise'`.
+
+_Example:_
+
+```js
+const txHash = await sdk.wallet.unwrapEnterpriseRLC('1000000000');
+console.log(`Unwrapped 1000000000 neRLC into nRLC (tx: ${txHash})`);
 ```
 
 ### iexec.account
