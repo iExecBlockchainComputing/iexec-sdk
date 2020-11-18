@@ -373,8 +373,8 @@ iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC 
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
-iexec wallet wrap-enterprise-RLC <amount> [unit] # wrap RLC into eRLC (default unit nRLC), the wallet must be authorized to interact with eRLC.
-iexec wallet unwrap-enterprise-RLC <amount> [unit] # unwrap eRLC into RLC (default unit neRLC), the wallet must be authorized to interact with eRLC.
+iexec wallet swap-eRLC-for-RLC <amount> [unit] # swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC.
+iexec wallet swap-eRLC-for-RLC <amount> [unit] # swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC.
 ```
 
 The wallet files are stored in the Ethereum keystore.
