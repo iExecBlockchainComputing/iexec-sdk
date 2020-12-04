@@ -127,11 +127,14 @@ const chains = {
     mainnet: {},
     bellecour: {},
     enterprise: {},
-    'enterprise-sidechain': {},
+    'enterprise-testnet': {},
   },
 };
 
-const createOrder = (orderName, overwrite = {}) => ({ ...order[orderName], ...overwrite });
+const createOrder = (orderName, overwrite = {}) => ({
+  ...order[orderName],
+  ...overwrite,
+});
 const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
 
 module.exports = {

@@ -27,10 +27,8 @@ const smsMap = {
     134: 'https://sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://sms.mainnet.iex.ec',
-    5: 'https://sms.goerli.iex.ec',
-    133: 'https://sms.viviani.iex.ec',
-    134: 'https://sms.bellecour.iex.ec',
+    1: 'https://sms.enterprise.iex.ec',
+    5: 'https://sms.enterprise-testnet.iex.ec',
   },
 };
 
@@ -42,10 +40,8 @@ const resultProxyMap = {
     134: 'https://result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://result.mainnet.iex.ec',
-    5: 'https://result.goerli.iex.ec',
-    133: 'https://result.viviani.iex.ec',
-    134: 'https://result.bellecour.iex.ec',
+    1: 'https://result.enterprise.iex.ec',
+    5: 'https://result.enterprise-testnet.iex.ec',
   },
 };
 
@@ -68,24 +64,7 @@ const bridgeMap = {
       bridgedChainId: '1',
     },
   },
-  enterprise: {
-    1: {
-      contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
-      bridgedChainId: '134',
-    },
-    5: {
-      contract: '0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418',
-      bridgedChainId: '133',
-    },
-    133: {
-      contract: '0x63CBf84596d0Dc13fCE1d8FA4470dc208390998a',
-      bridgedChainId: '5',
-    },
-    134: {
-      contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
-      bridgedChainId: '1',
-    },
-  },
+  enterprise: {},
 };
 
 const enterpriseEnabledMap = {

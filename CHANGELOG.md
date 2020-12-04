@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - iExec enterprise flavour support
 - `iexec wallet swap-eRLC-for-RLC` and `wallet.wrapEnterpriseRLC()` enables to wrap RLC to eRLC (requires an authorized wallet)
 - `iexec wallet swap-eRLC-for-RLC` and `wallet.unwrapEnterpriseRLC()` enables to unwrap eRLC to RLC (requires an authorized wallet)
-- `enterprise` and `enterprise-sidechain` values added to `--chain [chainName]` option enable connecting iExec enterprise
+- `enterprise` value added to `--chain [chainName]` option enable connecting iExec enterprise
 - optional named argument `flavour` added to IExec constructor enables connecting iExec enterprise by passing `flavour: 'enterprise'`
 
 ### Changed

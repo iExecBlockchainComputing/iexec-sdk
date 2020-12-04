@@ -737,8 +737,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "goerli": {},
     "mainnet": {},
     "bellecour": {},
-    "enterprise": {},
-    "enterprise-sidechain": {}
+    "enterprise": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",

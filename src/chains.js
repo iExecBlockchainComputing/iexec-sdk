@@ -25,9 +25,7 @@ const CHAIN_NAME_MAP = {
   134: { id: '134', flavour: 'standard' },
   bellecour: { id: '134', flavour: 'standard' },
   enterprise: { id: '1', flavour: 'enterprise' },
-  'enterprise-sidechain': { id: '134', flavour: 'enterprise' },
   'enterprise-testnet': { id: '5', flavour: 'enterprise' },
-  'enterprise-sidechain-testnet': { id: '133', flavour: 'enterprise' },
 };
 
 const ENTERPRISE_SWAP_MAP = {
@@ -40,9 +38,7 @@ const ENTERPRISE_SWAP_MAP = {
   134: 'enterprise-sidechain',
   bellecour: 'enterprise-sidechain',
   enterprise: 'mainnet',
-  'enterprise-sidechain': 'bellecour',
   'enterprise-testnet': 'goerli',
-  'enterprise-sidechain-testnet': 'viviani',
 };
 
 const createChainFromConf = (
