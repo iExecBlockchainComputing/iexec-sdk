@@ -59,9 +59,6 @@ const tokenChainParityUrl = DRONE
 
 const chainGasPrice = '20000000000';
 // const nativeChainGasPrice = '0';
-let hubAddress;
-let nativeHubAddress;
-let networkId;
 
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 // const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
@@ -73,6 +70,17 @@ const POOR_ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 const RICH_PRIVATE_KEY2 = '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
 // const RICH_ADDRESS3 = '0xbC11Bf07a83c7e04daef3dd5C6F9a046F8c5fA7b';
 // const RICH_PRIVATE_KEY3 = '0xfb9d8a917d85d7d9a052745248ecbf6a2268110945004dd797e82e8d4c071e79';
+
+const chainId = 65535;
+const networkId = `${chainId}`;
+const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
+const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+
+console.log('chainId', chainId);
+console.log('hubAddress', hubAddress);
+console.log('nativeHubAddress', nativeHubAddress);
+console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
 
@@ -269,16 +277,6 @@ const getRandomAddress = () => getRandomWallet().address;
 const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
-beforeAll(() => {
-  const chainId = 65535;
-  console.log('chainId', chainId);
-  networkId = `${chainId}`;
-  hubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
-  nativeHubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
-  console.log('hubAddress', hubAddress);
-  console.log('nativeHubAddress', nativeHubAddress);
-}, 15000);
-
 describe('[IExec]', () => {
   test('sms required function throw if no smsURL configured', () => {
     const randomAddress = getRandomAddress();
@@ -3304,7 +3302,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x383723d2e610b846b811b08beadffc12b01e7a7cdcf5a750f0983f1371b08af4',
+      '0x364b7ef2ee48ec4b769b76cbacfa32418dc6d91f4d556df96a3390e07b772ed8',
     );
   });
 
@@ -3333,7 +3331,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x442d4287371cfa27bf7e83b6d20d87ee9964115716f119bae38ca374f91b757f',
+      '0xa67bdea49715c1a9c73200134e94d77795532e28c8ee00befc73c84d252c602c',
     );
   });
 
@@ -3363,7 +3361,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x3c7b015c660502bc4de2c2ac93e8204b8e0982270415174081fb452e6d571f7c',
+      '0xa8ae3bce37fce87397f55f65c8cc6c03a7cd9b687a15c08f21d535bdf144d268',
     );
   });
 
@@ -3396,7 +3394,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xe3cae4da9d73eaf1b548a20d91f474dd1dbdf5ab367a9836c3cd4b1965f8fe91',
+      '0xb7f314f7937a1103e5fe92e5e84886b1bc0b4e85134a850f25cc4e8362731fbd',
     );
   });
 
@@ -5291,7 +5289,9 @@ describe('[orderbook]', () => {
       expect(res.count).toBe(0);
       expect(res.orders).toStrictEqual([]);
       const apporder = await deployAndGetApporder(iexec);
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+        category: 2,
+      });
       const requestorder = await getMatchableRequestorder(iexec, {
         apporder,
         workerpoolorder,
@@ -5310,6 +5310,7 @@ describe('[orderbook]', () => {
       }
       const res1 = await iexec.orderbook.fetchRequestOrderbook({
         requester: await iexec.wallet.getAddress(),
+        category: 2,
       });
       expect(res1.count).toBe(25);
       expect(res1.orders.length).toBe(20);

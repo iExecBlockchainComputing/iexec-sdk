@@ -24,9 +24,6 @@ const tokenChainParityUrl = DRONE
   : 'http://localhost:9545';
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
-let hubAddress;
-let nativeHubAddress;
-let networkId;
 
 const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
 const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
@@ -37,6 +34,17 @@ const POOR_PRIVATE_KEY2 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4a
 const POOR_ADDRESS2 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
+const chainId = 65535;
+const networkId = `${chainId}`;
+const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
+const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+
+console.log('chainId', chainId);
+console.log('hubAddress', hubAddress);
+console.log('nativeHubAddress', nativeHubAddress);
+console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
 const execAsync = (cmd) => new Promise((res, rej) => {
@@ -249,14 +257,6 @@ beforeAll(async () => {
   await execAsync('rm test/wallet.json').catch(() => {});
   await execAsync('mkdir test/out').catch(() => {});
   process.chdir('test');
-
-  const chainId = 65535;
-  console.log('chainId', chainId);
-  networkId = `${chainId}`;
-  hubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
-  nativeHubAddress = '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB';
-  console.log('hubAddress', hubAddress);
-  console.log('nativeHubAddress', nativeHubAddress);
 }, 15000);
 
 afterAll(() => {
