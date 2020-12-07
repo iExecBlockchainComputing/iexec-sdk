@@ -84,6 +84,31 @@ const getAddress = async (contracts = throwIfMissing()) => {
   return checksummedAddress(address);
 };
 
+const isInWhitelist = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  { strict = true } = {},
+) => {
+  if (contracts.flavour !== 'enterprise') {
+    throw Error('Cannot check authorized eRLC holders on current chain');
+  }
+  const vAddress = await addressSchema({
+    ethProvider: contracts.provider,
+  }).validate(address);
+  try {
+    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
+    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
+    const isKYC = await wrapCall(eRlcContract.isKYC(vAddress));
+    if (!isKYC && strict) {
+      throw Error(`${vAddress} is not authorized to interact with eRLC`);
+    }
+    return isKYC;
+  } catch (error) {
+    debug('isInWhitelist()', error);
+    throw error;
+  }
+};
+
 const getRlcBalance = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
@@ -281,6 +306,12 @@ const sendRLC = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
+    if (contracts.flavour === 'enterprise') {
+      await isInWhitelist(contracts, await getAddress(contracts), {
+        strict: true,
+      });
+      await isInWhitelist(contracts, to, { strict: true });
+    }
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
@@ -310,6 +341,12 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
+    }
+    if (contracts.flavour === 'enterprise') {
+      await isInWhitelist(contracts, await getAddress(contracts), {
+        strict: true,
+      });
+      await isInWhitelist(contracts, to, { strict: true });
     }
     let balances = await checkBalances(contracts, userAddress);
     const res = {};
@@ -678,31 +715,6 @@ const bridgeToMainchain = async (
   }
 };
 
-const isInWhitelist = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-  { strict = true } = {},
-) => {
-  if (contracts.flavour !== 'enterprise') {
-    throw Error('Cannot check authorized eRLC holders on current chain');
-  }
-  const vAddress = await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(address);
-  try {
-    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
-    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
-    const isKYC = await wrapCall(eRlcContract.isKYC(vAddress));
-    if (!isKYC && strict) {
-      throw Error(`${vAddress} is not authorized to interact with eRLC`);
-    }
-    return isKYC;
-  } catch (error) {
-    debug('isInWhitelist()', error);
-    throw error;
-  }
-};
-
 const wrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   enterpriseContracts,
@@ -771,6 +783,7 @@ module.exports = {
   bridgeToMainchain,
   bridgeToSidechain,
   getAddress,
+  isInWhitelist,
   checkBalances,
   getETH,
   getRLC,
