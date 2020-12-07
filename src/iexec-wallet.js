@@ -575,7 +575,7 @@ bridgeToMainchain
     }
   });
 
-const wrapEnterpriseRLC = cli.command('swap-eRLC-for-RLC <amount> [unit]');
+const wrapEnterpriseRLC = cli.command('swap-RLC-for-eRLC <amount> [unit]');
 addGlobalOptions(wrapEnterpriseRLC);
 addWalletLoadOptions(wrapEnterpriseRLC);
 wrapEnterpriseRLC
