@@ -60,6 +60,7 @@ class IExec {
       useGas = true,
       bridgeAddress,
       bridgedNetworkConf = {},
+      enterpriseSwapConf = {},
       resultProxyURL,
       smsURL,
       ipfsGatewayURL,
@@ -89,20 +90,25 @@ class IExec {
 
     const chainConfDefaults = getChainDefaults({ id: chainId, flavour });
 
-    let enterpriseSwapConfDefaults;
+    let enterpriseConf;
+    const hasEnterpriseConf = enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
     const enterpriseSwapFlavour = flavour === 'enterprise' ? 'standard' : 'enterprise';
-    if (isEnterpriseEnabled(chainId)) {
-      enterpriseSwapConfDefaults = getChainDefaults({
+    if (hasEnterpriseConf) {
+      const enterpriseSwapConfDefaults = getChainDefaults({
         id: chainId,
         flavour: enterpriseSwapFlavour,
       });
+      enterpriseConf = {
+        ...enterpriseSwapConfDefaults,
+        ...enterpriseSwapConf,
+      };
     }
-    const enterpriseSwapContracts = enterpriseSwapConfDefaults
+    const enterpriseSwapContracts = hasEnterpriseConf
       ? new IExecContractsClient({
         chainId,
-        provider: getDefaultProvider(enterpriseSwapConfDefaults.rpcURL),
-        hubAddress: enterpriseSwapConfDefaults.hubAddress,
-        isNative: enterpriseSwapConfDefaults.isNative,
+        provider: ethersProvider,
+        hubAddress: enterpriseConf.hubAddress,
+        isNative: enterpriseConf.isNative,
         flavour: enterpriseSwapFlavour,
       })
       : undefined;

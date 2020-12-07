@@ -917,6 +917,7 @@ npm install iexec
 > - `useGas: Boolean` false when the chain does NOT requires to spend gas to send a transaction
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+> - `enterpriseSwapConf: { hubAddress: Address }` specify enterprise flavour binding
 
 ##### Basic configuration
 
