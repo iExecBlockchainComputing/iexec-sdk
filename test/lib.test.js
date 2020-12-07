@@ -595,7 +595,7 @@ describe('[workflow]', () => {
       },
     );
     const owner = await iexec.wallet.getAddress();
-    const datasetName = `My daatset${getId()}`;
+    const datasetName = `My dataset${getId()}`;
     const datasetDeployRes = await iexec.dataset.deployDataset({
       owner,
       name: datasetName,
@@ -1863,7 +1863,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
-  test.only('wallet.sweep() (token enterprise, receiver whitelisted)', async () => {
+  test('wallet.sweep() (token enterprise, receiver whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
     await grantKYC(
@@ -1932,7 +1932,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
-  test.only('wallet.sweep() (token enterprise, not whitelisted)', async () => {
+  test('wallet.sweep() (token enterprise, not whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
     await grantKYC(
@@ -1962,7 +1962,7 @@ describe('[wallet]', () => {
       ),
     );
   });
-  test.only('wallet.sweep() (token enterprise, receiver not whitelisted)', async () => {
+  test('wallet.sweep() (token enterprise, receiver not whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
     await grantKYC(
