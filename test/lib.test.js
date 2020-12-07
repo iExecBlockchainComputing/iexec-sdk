@@ -87,6 +87,7 @@ console.log('enterpriseHubAddress', enterpriseHubAddress);
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChainUrl1s);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
+const whitelistAdminWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
 
 // const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
 // const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
@@ -123,6 +124,50 @@ const initializeTask = async (wallet, hub, dealid, idx) => {
   );
   const initTx = await hubContract.initialize(dealid, idx);
   await initTx.wait();
+};
+
+const grantKYC = async (wallet, hub, address) => {
+  const iExecContract = new ethers.Contract(
+    hub,
+    [
+      {
+        inputs: [],
+        name: 'token',
+        outputs: [
+          {
+            internalType: 'address',
+            name: '',
+            type: 'address',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ],
+    wallet,
+  );
+  const eRlcAddress = await iExecContract.token();
+  const eRlcContract = new ethers.Contract(
+    eRlcAddress,
+    [
+      {
+        inputs: [
+          {
+            internalType: 'address[]',
+            name: 'accounts',
+            type: 'address[]',
+          },
+        ],
+        name: 'grantKYC',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    wallet,
+  );
+  const grantTx = await eRlcContract.grantKYC([address]);
+  await grantTx.wait();
 };
 
 let sequenceId = Date.now();
@@ -1548,6 +1593,75 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.wei),
     ).toBe(true);
   });
+  test('wallet.sendRLC() (token enterprise, receiver whitelisted)', async () => {
+    const randomAddress = getRandomAddress();
+    await grantKYC(whitelistAdminWallet, enterpriseHubAddress, randomAddress);
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverInitialBalance = await iexec.wallet.checkBalances(
+      randomAddress,
+    );
+    const txHash = await iexec.wallet.sendRLC(5, randomAddress);
+    const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const receiverFinalBalance = await iexec.wallet.checkBalances(
+      randomAddress,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC.sub(new BN(5)).eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+  });
+  test('wallet.sendRLC() (token enterprise, not whitelisted)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+
+    await expect(iexec.wallet.sendRLC(5, POOR_ADDRESS3)).rejects.toThrow(
+      Error(`${randomWallet.address} is not authorized to interact with eRLC`),
+    );
+  });
+  test('wallet.sendRLC() (token enterprise, receiver not whitelisted)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await expect(iexec.wallet.sendRLC(5, POOR_ADDRESS3)).rejects.toThrow(
+      Error(`${POOR_ADDRESS3} is not authorized to interact with eRLC`),
+    );
+  });
   test('wallet.sweep()', async () => {
     const iexecRichman = new IExec(
       {
@@ -1749,6 +1863,135 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+  test.only('wallet.sweep() (token enterprise, receiver whitelisted)', async () => {
+    const randomSenderWallet = getRandomWallet();
+    const randomReceiverWallet = getRandomWallet();
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomSenderWallet.address,
+    );
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomReceiverWallet.address,
+    );
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          randomSenderWallet.privateKey,
+        ),
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH(
+      '10000000000000000',
+      randomSenderWallet.address,
+    );
+    await iexecRichman.wallet.sendRLC(20, randomSenderWallet.address);
+    const initialBalance = await iexec.wallet.checkBalances(
+      randomSenderWallet.address,
+    );
+    const receiverInitialBalance = await iexec.wallet.checkBalances(
+      randomReceiverWallet.address,
+    );
+    const res = await iexec.wallet.sweep(randomReceiverWallet.address);
+    const finalBalance = await iexec.wallet.checkBalances(
+      randomSenderWallet.address,
+    );
+    const receiverFinalBalance = await iexec.wallet.checkBalances(
+      randomReceiverWallet.address,
+    );
+    expect(res.sendNativeTxHash).toMatch(bytes32Regex);
+    expect(res.sendERC20TxHash).toMatch(bytes32Regex);
+    expect(initialBalance.wei.gt(new BN(0))).toBe(true);
+    expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
+    expect(finalBalance.wei.eq(new BN(0))).toBe(true);
+    expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
+    expect(receiverFinalBalance.wei.gt(receiverInitialBalance.wei)).toBe(true);
+    expect(
+      receiverFinalBalance.nRLC
+        .sub(initialBalance.nRLC)
+        .eq(receiverInitialBalance.nRLC),
+    ).toBe(true);
+  });
+  test.only('wallet.sweep() (token enterprise, not whitelisted)', async () => {
+    const randomSenderWallet = getRandomWallet();
+    const randomReceiverWallet = getRandomWallet();
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomReceiverWallet.address,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          randomSenderWallet.privateKey,
+        ),
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await expect(
+      iexec.wallet.sweep(randomReceiverWallet.address),
+    ).rejects.toThrow(
+      Error(
+        `${randomSenderWallet.address} is not authorized to interact with eRLC`,
+      ),
+    );
+  });
+  test.only('wallet.sweep() (token enterprise, receiver not whitelisted)', async () => {
+    const randomSenderWallet = getRandomWallet();
+    const randomReceiverWallet = getRandomWallet();
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomSenderWallet.address,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          randomSenderWallet.privateKey,
+        ),
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await expect(
+      iexec.wallet.sweep(randomReceiverWallet.address),
+    ).rejects.toThrow(
+      Error(
+        `${randomReceiverWallet.address} is not authorized to interact with eRLC`,
+      ),
+    );
+  });
 });
 
 describe('[account]', () => {
@@ -1776,6 +2019,33 @@ describe('[account]', () => {
     );
     expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
   });
+
+  test('account.checkBalance() (enterprise)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    const initialBalance = await iexec.account.checkBalance(ADDRESS);
+    expect(initialBalance.stake).toBeInstanceOf(BN);
+    expect(initialBalance.locked).toBeInstanceOf(BN);
+    await iexec.account.deposit(5);
+    const finalBalance = await iexec.account.checkBalance(ADDRESS);
+    expect(finalBalance.stake).toBeInstanceOf(BN);
+    expect(finalBalance.locked).toBeInstanceOf(BN);
+    expect(finalBalance.stake.sub(new BN(5)).eq(initialBalance.stake)).toBe(
+      true,
+    );
+    expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
+  });
+
   test.skip('account.checkBridgedBalance()', async () => {
     throw Error('TODO');
   });
@@ -1962,6 +2232,58 @@ describe('[account]', () => {
       true,
     );
   });
+  test('account.deposit() (token enterprise)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.deposit(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.sub(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.deposit() (token enterprise, not whitelisted)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await expect(iexec.account.deposit(5)).rejects.toThrow(
+      Error(`${randomWallet.address} is not authorized to interact with eRLC`),
+    );
+  });
+
   test('account.withdraw() (token)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2161,6 +2483,58 @@ describe('[account]', () => {
     );
     await expect(iexec.account.withdraw(0)).rejects.toThrow(
       Error('Withdraw amount must be greather than 0'),
+    );
+  });
+  test('account.withdraw() (token enterprise)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await iexec.account.deposit(10);
+    const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletInitialBalance = await iexec.wallet.checkBalances(ADDRESS);
+    const res = await iexec.account.withdraw(5);
+    const accountFinalBalance = await iexec.account.checkBalance(ADDRESS);
+    const walletFinalBalance = await iexec.wallet.checkBalances(ADDRESS);
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.amount).toBe('5');
+    expect(
+      accountFinalBalance.stake.add(new BN(5)).eq(accountInitialBalance.stake),
+    ).toBe(true);
+    expect(
+      walletFinalBalance.nRLC.sub(new BN(5)).eq(walletInitialBalance.nRLC),
+    ).toBe(true);
+    expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+      true,
+    );
+  });
+  test('account.withdraw() (token enterprise, not whitelisted)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await expect(iexec.account.withdraw(5)).rejects.toThrow(
+      Error(`${randomWallet.address} is not authorized to interact with eRLC`),
     );
   });
 });
