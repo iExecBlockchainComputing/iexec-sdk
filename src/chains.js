@@ -155,7 +155,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
         if (alias && chainsConf.chains[alias]) {
           bridgeLoadedConf = chainsConf.chains[alias];
         }
-        if (!bridgeLoadedConf) throw Error(`Missing "${chainName}" chain in "chain.json"`);
+        if (!bridgeLoadedConf) throw Error(`Missing "${name}" chain in "chain.json"`);
       }
       const bridgedIdAndFlavour = {
         ...CHAIN_NAME_MAP[bridgedChainNameOrId],
@@ -179,7 +179,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
     debug('bridged chain', bridgeConf);
 
     let enterpriseSwapConf;
-    const enterpriseSwapChainName = ENTERPRISE_SWAP_MAP[chainName];
+    const enterpriseSwapChainName = ENTERPRISE_SWAP_MAP[name];
     const enterpriseSwapFlavour = conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
     if (isEnterpriseEnabled(conf.id) && enterpriseSwapChainName) {
       let enterpriseSwapLoadedConf;
