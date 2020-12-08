@@ -33,6 +33,11 @@ const chainConfSchema = () => object({
   })
     .notRequired()
     .strict(),
+  enterprise: object({
+    enterpriseSwapChainName: string().required(),
+  })
+    .notRequired()
+    .strict(),
 })
   .noUnknown(true, 'Unknown key "${unknown}"')
   .strict();

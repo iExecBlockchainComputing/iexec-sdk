@@ -179,9 +179,10 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
     debug('bridged chain', bridgeConf);
 
     let enterpriseSwapConf;
-    const enterpriseSwapChainName = ENTERPRISE_SWAP_MAP[name];
+    const enterpriseSwapChainName = (conf.enterprise && conf.enterprise.enterpriseSwapChainName)
+      || ENTERPRISE_SWAP_MAP[name];
     const enterpriseSwapFlavour = conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
-    if (isEnterpriseEnabled(conf.id) && enterpriseSwapChainName) {
+    if (isEnterpriseEnabled(conf.id) || enterpriseSwapChainName) {
       let enterpriseSwapLoadedConf;
       if (chainsConf.chains[enterpriseSwapChainName]) {
         enterpriseSwapLoadedConf = chainsConf.chains[enterpriseSwapChainName];

@@ -692,8 +692,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
-  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
-  - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction.
+  - optional key `enterprise` set the enterprise swap contract used by the SDK cli when working with enterprise enabled networks. `bridge.enterpriseSwapChainName` set the reference to the enterprise bound network.
+  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
+  - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
 - optional key `providers` set the backends for public chains
   - optional key `alchemy` set Alchemy API Token
   - optional key `etherscan` set Etherscan API Token
@@ -704,22 +705,23 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 {
   "default": "goerli",
   "chains": {
-    "development": {
+    "dev": {
       "host": "http://localhost:8545",
-      "id": "1544020727674",
+      "id": "65535",
       "sms": "http://localhost:5000",
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "native": false,
-      "useGas": true,
       "flavour": "standard",
-      "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "dev-sidechain"
+      },
+      "enterprise": {
+        "enterpriseSwapChainName": "dev-enterprise"
       }
     },
-    "dev-sidecahin": {
+    "dev-sidechain": {
       "host": "http://localhost:18545",
       "id": "123456",
       "sms": "http://localhost:15000",
@@ -728,10 +730,22 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "native": true,
       "useGas": false,
       "flavour": "standard",
-      "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "development"
+      }
+    },
+    "dev-enterprise": {
+      "host": "http://localhost:8545",
+      "id": "65535",
+      "sms": "http://localhost:5000",
+      "resultProxy": "http://localhost:8089",
+      "ipfsGateway": "http://localhost:8080",
+      "flavour": "enterprise",
+      "hub": "0xb80C02d24791fA92fA8983f15390274698A75D23",
+      "enterprise": {
+        "enterpriseSwapChainName": "dev"
       }
     },
     "goerli": {},
