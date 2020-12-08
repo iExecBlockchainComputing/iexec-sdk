@@ -2,7 +2,7 @@ const Debug = require('debug');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
+const { wrapSignTypedData } = require('./errorWrappers');
 
 const debug = Debug('iexec:api-utils');
 
@@ -136,7 +136,7 @@ const getAuthorization = (api, endpoint = '/challenge') => async (
       },
     });
     const typedData = challenge.data || challenge;
-    const sign = await wrapSignTypedDataV3(signer.signTypedDataV3(typedData));
+    const sign = await wrapSignTypedData(signer.signTypedDataV3(typedData));
     const hash = hashEIP712(typedData);
     const separator = '_';
     const authorization = hash

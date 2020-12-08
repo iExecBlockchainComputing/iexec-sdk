@@ -52,7 +52,7 @@ const {
   wrapCall,
   wrapSend,
   wrapWait,
-  wrapSignTypedDataV3,
+  wrapSignTypedData,
 } = require('./errorWrappers');
 
 const debug = Debug('iexec:order');
@@ -370,7 +370,7 @@ const signOrder = async (
     message,
   };
 
-  const sign = await wrapSignTypedDataV3(
+  const sign = await wrapSignTypedData(
     contracts.signer.signTypedDataV3(typedData),
   );
   const signedOrder = { ...saltedOrderObj, sign };
