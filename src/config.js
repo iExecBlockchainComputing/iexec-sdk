@@ -1,16 +1,8 @@
 const hostMap = {
-  standard: {
-    1: 'mainnet',
-    5: 'goerli',
-    133: 'https://viviani.iex.ec',
-    134: 'https://bellecour.iex.ec',
-  },
-  enterprise: {
-    1: 'mainnet',
-    5: 'goerli',
-    133: 'https://viviani.iex.ec',
-    134: 'https://bellecour.iex.ec',
-  },
+  1: 'mainnet',
+  5: 'goerli',
+  133: 'https://viviani.iex.ec',
+  134: 'https://bellecour.iex.ec',
 };
 
 const hubMap = {
@@ -21,27 +13,27 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: 'https://sms.mainnet.iex.ec',
-    5: 'https://sms.goerli.iex.ec',
-    133: 'https://sms.viviani.iex.ec',
-    134: 'https://sms.bellecour.iex.ec',
+    1: 'https://v5.sms.mainnet.iex.ec',
+    5: 'https://v5.sms.goerli.iex.ec',
+    133: 'https://v5.sms.viviani.iex.ec',
+    134: 'https://v5.sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://sms.enterprise.iex.ec',
-    5: 'https://sms.enterprise-testnet.iex.ec',
+    1: 'https://v5.sms.mainnet.enterprise.iex.ec', // TODO update domain
+    5: 'https://v5.sms.goerli.enterprise.iex.ec', // TODO update domain
   },
 };
 
 const resultProxyMap = {
   standard: {
-    1: 'https://result.mainnet.iex.ec',
-    5: 'https://result.goerli.iex.ec',
-    133: 'https://result.viviani.iex.ec',
-    134: 'https://result.bellecour.iex.ec',
+    1: 'https://v5.result.mainnet.iex.ec',
+    5: 'https://v5.result.goerli.iex.ec',
+    133: 'https://v5.result.viviani.iex.ec',
+    134: 'https://v5.result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://result.enterprise.iex.ec',
-    5: 'https://result.enterprise-testnet.iex.ec',
+    1: 'https://v5.result.mainnet.enterprise.iex.ec', // TODO update domain
+    5: 'https://v5.result.goerli.enterprise.iex.ec', // TODO update domain
   },
 };
 
@@ -78,12 +70,12 @@ const iexecGatewayMap = {
     default: 'https://v5.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v5.api.enterprise-market.iex.ec',
+    default: 'https://v5.api.market.enterprise.iex.ec', // TODO update domain
   },
 };
 
 const getChainDefaults = ({ id, flavour }) => ({
-  host: hostMap[flavour] && hostMap[flavour][id],
+  host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
