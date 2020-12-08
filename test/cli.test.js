@@ -116,6 +116,36 @@ const setTokenChain = (options) => saveJSONToFile(
   'chain.json',
 );
 
+const setTokenEnterpriseChain = (defaultChain = 'dev') => saveJSONToFile(
+  {
+    default: defaultChain,
+    chains: {
+      dev: {
+        id: networkId,
+        host: tokenChainUrl,
+        hub: hubAddress,
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
+        enterprise: {
+          enterpriseSwapChainName: 'dev-enterprise',
+        },
+      },
+      'dev-enterprise': {
+        id: networkId,
+        host: tokenChainUrl,
+        hub: enterpriseHubAddress,
+        flavour: 'enterprise',
+        sms: 'http://localhost:5000',
+        resultProxy: 'http://localhost:18089',
+        enterprise: {
+          enterpriseSwapChainName: 'dev',
+        },
+      },
+    },
+  },
+  'chain.json',
+);
+
 const setNativeChain = (options) => saveJSONToFile(
   {
     default: 'dev',
@@ -2886,6 +2916,84 @@ describe('[Sidechain]', () => {
     expect(res.sendNativeTxHash).toBeUndefined();
     expect(res.errors.length).toBe(1);
   }, 15000);
+});
+
+describe('[Enterprise]', () => {
+  beforeAll(async () => {
+    await execAsync(`${iexecPath} init --skip-wallet --force`);
+    await setRichWallet();
+    await setTokenEnterpriseChain();
+  });
+
+  afterAll(async () => {
+    await execAsync('rm wallet.json').catch(() => {});
+    await execAsync('rm iexec.json').catch(() => {});
+    await execAsync('rm chain.json').catch(() => {});
+  });
+
+  test('[token standard] iexec wallet swap-RLC-for-eRLC 10 RLC', async () => {
+    const standardInitialBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --raw`),
+    ).balance;
+    const enterpriseInitialBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
+    ).balance;
+    const raw = await execAsync(
+      `${iexecPath} wallet swap-RLC-for-eRLC 10 RLC --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.txHash).toBeDefined();
+    expect(res.amount).toBe('10000000000');
+    const standardFinalBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --raw`),
+    ).balance;
+    const enterpriseFinalBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
+    ).balance;
+    expect(
+      new BN(standardInitialBalance.nRLC)
+        .sub(new BN('10000000000'))
+        .eq(new BN(standardFinalBalance.nRLC)),
+    );
+    expect(
+      new BN(enterpriseInitialBalance.nRLC)
+        .add(new BN('10000000000'))
+        .eq(new BN(enterpriseFinalBalance.nRLC)),
+    );
+  });
+
+  test('[token enterprise] iexec wallet swap-eRLC-for-RLC 10 RLC', async () => {
+    const standardInitialBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --raw`),
+    ).balance;
+    const enterpriseInitialBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
+    ).balance;
+    const raw = await execAsync(
+      `${iexecPath} wallet swap-eRLC-for-RLC 10 RLC --chain dev-enterprise --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.txHash).toBeDefined();
+    expect(res.amount).toBe('10000000000');
+    const standardFinalBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --raw`),
+    ).balance;
+    const enterpriseFinalBalance = JSON.parse(
+      await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
+    ).balance;
+    expect(
+      new BN(standardInitialBalance.nRLC)
+        .sub(new BN('10000000000'))
+        .eq(new BN(standardFinalBalance.nRLC)),
+    );
+    expect(
+      new BN(enterpriseInitialBalance.nRLC)
+        .add(new BN('10000000000'))
+        .eq(new BN(enterpriseFinalBalance.nRLC)),
+    );
+  });
 });
 
 describe('[Common]', () => {
