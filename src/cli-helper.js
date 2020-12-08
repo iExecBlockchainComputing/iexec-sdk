@@ -473,10 +473,10 @@ const prompt = {
     `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
   ),
   wrap: (amount, chainName, chainId) => question(
-    `Do you want to wrap ${amount} ${chainName} RLC into eRLC  [chainId: ${chainId}]`,
+    `Do you want to swap ${amount} ${chainName} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`,
   ),
   unwrap: (amount, chainName, chainId) => question(
-    `Do you want to unwrap ${amount} ${chainName} eRLC into RLC  [chainId: ${chainId}]`,
+    `Do you want to swap ${amount} ${chainName} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`,
   ),
   cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
   publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
