@@ -33,10 +33,6 @@ const ENTERPRISE_SWAP_MAP = {
   mainnet: 'enterprise',
   5: 'enterprise-testnet',
   goerli: 'enterprise-testnet',
-  133: 'enterprise-sidechain-testnet',
-  viviani: 'enterprise-sidechain-testnet',
-  134: 'enterprise-sidechain',
-  bellecour: 'enterprise-sidechain',
   enterprise: 'mainnet',
   'enterprise-testnet': 'goerli',
 };
@@ -200,12 +196,13 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
       debug('enterpriseSwapDefaultConf', defaultConf);
       enterpriseSwapConf = {
         ...enterpriseSwapIdAndFlavour,
+        ...{ host: conf.host },
         ...enterpriseSwapDefaultConf,
         ...enterpriseSwapLoadedConf,
       };
       if (!enterpriseSwapConf.host) {
         throw Error(
-          `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
+          `Missing RPC host for enterprise bound chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
         );
       }
     }
