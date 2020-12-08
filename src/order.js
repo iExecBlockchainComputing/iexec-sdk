@@ -350,30 +350,22 @@ const signOrder = async (
       }`,
     );
   }
-  const domainObj = await getEIP712Domain(contracts);
-
   const salt = getSalt();
-  const saltedOrderObj = { ...orderObj, salt };
-
-  const order = objDesc[orderName].structMembers;
-
-  const types = {};
-  types.EIP712Domain = objDesc.EIP712Domain.structMembers;
-  types[objDesc[orderName].primaryType] = order;
-
-  const message = saltedOrderObj;
-
-  const typedData = {
-    types,
-    domain: domainObj,
-    primaryType: objDesc[orderName].primaryType,
-    message,
+  const saltedOrder = { ...orderObj, salt };
+  const domain = await getEIP712Domain(contracts);
+  const types = {
+    [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
   };
-
+  const { signer } = contracts;
   const sign = await wrapSignTypedData(
-    contracts.signer.signTypedDataV3(typedData),
+    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+    /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+    signer._signTypedData && typeof signer._signTypedData === 'function'
+      ? signer._signTypedData(domain, types, saltedOrder)
+      : signer.signTypedData(domain, types, saltedOrder),
   );
-  const signedOrder = { ...saltedOrderObj, sign };
+  const signedOrder = { ...saltedOrder, sign };
   return signedOrder;
 };
 

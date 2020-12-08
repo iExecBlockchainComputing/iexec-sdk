@@ -136,7 +136,16 @@ const getAuthorization = (api, endpoint = '/challenge') => async (
       },
     });
     const typedData = challenge.data || challenge;
-    const sign = await wrapSignTypedData(signer.signTypedDataV3(typedData));
+    const { domain, message } = typedData;
+    const { EIP712Domain, ...types } = typedData.types;
+    const sign = await wrapSignTypedData(
+      // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+      // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+      /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+      signer._signTypedData && typeof signer._signTypedData === 'function'
+        ? signer._signTypedData(domain, types, message)
+        : signer.signTypedData(domain, types, message),
+    );
     const hash = hashEIP712(typedData);
     const separator = '_';
     const authorization = hash

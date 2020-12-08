@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - passing `chainId` to `--chain [chainName]` will support only the following values: `1` for `mainnet`, `5` for `goerli`, `134` for `bellecour`, `133` for `viviani`
 - CLI `native` chain key no longer set default gasPrice to 0, use key `"useGas": false` to force default gasPrice to 0
 - lib `isNative` option no longer set default gasPrice to 0, use option `useGas: false` to force default gasPrice to 0
+- migrate EIP712 hash and sign to ethers implementation
 - [DEPRECATED] `bridge.bridgedChainId` in `chain.json` is deprecated and must me replaced by `bridge.bridgedChainName`
 
 ### Removed
