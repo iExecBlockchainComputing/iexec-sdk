@@ -283,29 +283,27 @@ describe('[nRlcAmountSchema]', () => {
     ).resolves.toBe('48000000000');
   });
   test('throw with invalid unit', async () => {
-    expect(() => nRlcAmountSchema().validate('48 rlc')).toThrow(
+    await expect(() => nRlcAmountSchema().validate('48 rlc')).rejects.toThrow(
       new ValidationError('48 rlc is not a valid amount'),
     );
   });
   test('throw with invalid decimal string', async () => {
-    expect(() => nRlcAmountSchema().validate('0.48')).toThrow(
+    await expect(() => nRlcAmountSchema().validate('0.48')).rejects.toThrow(
       new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with invalid decimal number', async () => {
-    expect(() => nRlcAmountSchema().validate(0.48)).toThrow(
+    await expect(() => nRlcAmountSchema().validate(0.48)).rejects.toThrow(
       new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with hex string', async () => {
-    expect(() => nRlcAmountSchema().validate('0x01')).toThrow(
+    await expect(() => nRlcAmountSchema().validate('0x01')).rejects.toThrow(
       new ValidationError('0x01 is not a valid amount'),
     );
   });
   test('throw with invalid array', async () => {
-    expect(() => nRlcAmountSchema().validate(['1', 'RLC', 'RLC'])).toThrow(
-      new ValidationError('1 RLC RLC is not a valid amount'),
-    );
+    await expect(() => nRlcAmountSchema().validate(['1', 'RLC', 'RLC'])).rejects.toThrow(new ValidationError('1 RLC RLC is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(nRlcAmountSchema().validate(-1)).rejects.toThrow(
@@ -411,29 +409,25 @@ describe('[weiAmountSchema]', () => {
     ).resolves.toBe('48000000000');
   });
   test('throw with invalid unit', async () => {
-    expect(() => weiAmountSchema().validate('48 ethereum')).toThrow(
-      new ValidationError('48 ethereum is not a valid amount'),
-    );
+    await expect(() => weiAmountSchema().validate('48 ethereum')).rejects.toThrow(new ValidationError('48 ethereum is not a valid amount'));
   });
   test('throw with invalid decimal string', async () => {
-    expect(() => weiAmountSchema().validate('0.48')).toThrow(
+    await expect(() => weiAmountSchema().validate('0.48')).rejects.toThrow(
       new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with invalid decimal number', async () => {
-    expect(() => weiAmountSchema().validate(0.48)).toThrow(
+    await expect(() => weiAmountSchema().validate(0.48)).rejects.toThrow(
       new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with hex string', async () => {
-    expect(() => weiAmountSchema().validate('0x01')).toThrow(
+    await expect(() => weiAmountSchema().validate('0x01')).rejects.toThrow(
       new ValidationError('0x01 is not a valid amount'),
     );
   });
   test('throw with invalid array', async () => {
-    expect(() => weiAmountSchema().validate(['1', 'eth', 'eth'])).toThrow(
-      new ValidationError('1 eth eth is not a valid amount'),
-    );
+    await expect(() => weiAmountSchema().validate(['1', 'eth', 'eth'])).rejects.toThrow(new ValidationError('1 eth eth is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(weiAmountSchema().validate(-1)).rejects.toThrow(

@@ -326,8 +326,12 @@ const tagSchema = () => mixed()
     'is-bytes32',
     '${originalValue} is not a valid bytes32 hexstring',
     async (value) => {
-      const res = await bytes32Schema().validate(value);
-      return res;
+      try {
+        await bytes32Schema().validate(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
     },
   );
 
