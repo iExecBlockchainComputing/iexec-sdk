@@ -19,8 +19,8 @@ const smsMap = {
     134: 'https://v5.sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v5.sms.mainnet.enterprise.iex.ec', // TODO update domain
-    5: 'https://v5.sms.goerli.enterprise.iex.ec', // TODO update domain
+    1: 'https://v5.sms-enterprise.mainnet.iex.ec',
+    5: 'https://v5.sms-enterprise.goerli.iex.ec',
   },
 };
 
@@ -32,8 +32,8 @@ const resultProxyMap = {
     134: 'https://v5.result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v5.result.mainnet.enterprise.iex.ec', // TODO update domain
-    5: 'https://v5.result.goerli.enterprise.iex.ec', // TODO update domain
+    1: 'https://v5.result-enterprise.mainnet.iex.ec',
+    5: 'https://v5.result-enterprise.goerli.iex.ec',
   },
 };
 
@@ -70,7 +70,7 @@ const iexecGatewayMap = {
     default: 'https://v5.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v5.api.market.enterprise.iex.ec', // TODO update domain
+    default: 'https://v5.api-enterprise.market.iex.ec', // TODO update domain
   },
 };
 
