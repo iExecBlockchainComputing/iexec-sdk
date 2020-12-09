@@ -56,6 +56,16 @@ class EnhancedWeb3Signer extends Signer {
     return this.provider.getSigner().signMessage(message);
   }
 
+  signTypedData(...args) {
+    const signer = this.provider.getSigner();
+    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+    /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+    return signer._signTypedData && typeof signer._signTypedData === 'function'
+      ? signer._signTypedData(...args)
+      : signer.signTypedData(...args);
+  }
+
   sendTransaction(tx) {
     return this.provider.getSigner().sendTransaction(tx);
   }
