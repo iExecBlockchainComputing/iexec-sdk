@@ -7,7 +7,8 @@ const hostMap = {
 
 const hubMap = {
   enterprise: {
-    5: 'enterprise.v5.iexec.eth',
+    1: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
+    5: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
   },
 };
 
@@ -60,6 +61,7 @@ const bridgeMap = {
 };
 
 const enterpriseEnabledMap = {
+  1: true,
   5: true,
 };
 
@@ -70,7 +72,7 @@ const iexecGatewayMap = {
     default: 'https://v5.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v5.api-enterprise.market.iex.ec', // TODO update domain
+    default: 'https://v5.api-enterprise.market.iex.ec',
   },
 };
 
