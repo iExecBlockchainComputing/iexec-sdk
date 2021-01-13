@@ -896,7 +896,6 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 ## These dapps are built on the top of iexec SDK
 
 - [Price feed DOracle](https://price-feed-doracle.iex.ec/): a decentralized price oracle for your favorite cryptos.
-- [Not safe for work](https://nsfw.app.iex.ec/): find if a picture is safe for work using an AI trained model protected by iExec TEE.
 
 ## How to use ?
 
