@@ -212,7 +212,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
       enterpriseSwapConf,
       providersOptions,
     });
-    spinner.info(`Using chain [${name}]`);
+    spinner.info(`Using chain ${name} [chainId: ${chain.id}]`);
     return chain;
   } catch (error) {
     debug('loadChain()', error);
