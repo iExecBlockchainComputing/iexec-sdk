@@ -592,21 +592,32 @@ wrapEnterpriseRLC
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
-      const enterpriseContracts = chain.enterpriseSwapNetwork && chain.enterpriseSwapNetwork.contracts;
-      if (!enterpriseContracts) {
+      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      if (!hasEnterpriseFlavour) {
         throw Error(
           `No enterprise smart contracts found on current chain ${chain.id}`,
         );
       }
-      await connectKeystore(chain, keystore, { txOptions });
+
+      const standardContracts = chain.contracts.flavour === 'standard'
+        ? chain.contracts
+        : chain.enterpriseSwapNetwork.contracts;
+
+      const enterpriseContracts = chain.contracts.flavour === 'standard'
+        ? chain.enterpriseSwapNetwork.contracts
+        : chain.contracts;
+
+      await connectKeystore({ contracts: standardContracts }, keystore, {
+        txOptions,
+      });
       if (!cmd.force) {
-        await prompt.wrap(formatRLC(nRlcAmount), chain.name, chain.id);
+        await prompt.wrap(formatRLC(nRlcAmount), chain.id);
       }
-      const message = `${formatRLC(nRlcAmount)} ${chain.name} RLC into eRLC `;
+      const message = `${formatRLC(nRlcAmount)} RLC into eRLC`;
       spinner.start(`Wrapping ${message}...`);
 
       const txHash = await wallet.wrapEnterpriseRLC(
-        chain.contracts,
+        standardContracts,
         enterpriseContracts,
         nRlcAmount,
       );
@@ -638,21 +649,28 @@ unwrapEnterpriseRLC
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
       const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
-      const enterpriseContracts = chain.enterpriseSwapNetwork && chain.enterpriseSwapNetwork.contracts;
-      if (!enterpriseContracts) {
+      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      if (!hasEnterpriseFlavour) {
         throw Error(
           `No enterprise smart contracts found on current chain ${chain.id}`,
         );
       }
-      await connectKeystore(chain, keystore, { txOptions });
+
+      const enterpriseContracts = chain.contracts.flavour === 'standard'
+        ? chain.enterpriseSwapNetwork.contracts
+        : chain.contracts;
+
+      await connectKeystore({ contracts: enterpriseContracts }, keystore, {
+        txOptions,
+      });
       if (!cmd.force) {
-        await prompt.unwrap(formatRLC(nRlcAmount), chain.name, chain.id);
+        await prompt.unwrap(formatRLC(nRlcAmount), chain.id);
       }
-      const message = `${formatRLC(nRlcAmount)} ${chain.name} eRLC into RLC `;
+      const message = `${formatRLC(nRlcAmount)} eRLC into RLC`;
       spinner.start(`Unwrapping ${message}...`);
 
       const txHash = await wallet.unwrapEnterpriseRLC(
-        chain.contracts,
+        enterpriseContracts,
         nRlcAmount,
       );
       spinner.succeed(`Unwrapped ${message}\n`, {

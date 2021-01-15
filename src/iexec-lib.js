@@ -107,6 +107,7 @@ class IExec {
       ? new IExecContractsClient({
         chainId,
         provider: ethersProvider,
+        signer: ethersSigner,
         hubAddress: enterpriseConf.hubAddress,
         isNative: enterpriseConf.isNative,
         flavour: enterpriseSwapFlavour,
@@ -217,6 +218,36 @@ class IExec {
       );
     };
 
+    const getStandardContracts = () => {
+      if (contracts.flavour === 'standard') {
+        return contracts;
+      }
+      if (
+        enterpriseSwapContracts
+        && enterpriseSwapContracts.flavour === 'standard'
+      ) {
+        return enterpriseSwapContracts;
+      }
+      throw Error(
+        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getEnterpriseContracts = () => {
+      if (contracts.flavour === 'enterprise') {
+        return contracts;
+      }
+      if (
+        enterpriseSwapContracts
+        && enterpriseSwapContracts.flavour === 'enterprise'
+      ) {
+        return enterpriseSwapContracts;
+      }
+      throw Error(
+        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
     this.wallet = {};
     this.wallet.getAddress = () => wallet.getAddress(contracts);
     this.wallet.checkBalances = (address) => wallet.checkBalances(contracts, address);
@@ -232,8 +263,12 @@ class IExec {
       bridgedContracts,
       mainchainBridgeAddress: bridgedConf && bridgedConf.bridgeAddress,
     });
-    this.wallet.wrapEnterpriseRLC = (nRlcAmount) => wallet.wrapEnterpriseRLC(contracts, enterpriseSwapContracts, nRlcAmount);
-    this.wallet.unwrapEnterpriseRLC = (nRlcAmount) => wallet.unwrapEnterpriseRLC(contracts, nRlcAmount);
+    this.wallet.wrapEnterpriseRLC = (nRlcAmount) => wallet.wrapEnterpriseRLC(
+      getStandardContracts(),
+      getEnterpriseContracts(),
+      nRlcAmount,
+    );
+    this.wallet.unwrapEnterpriseRLC = (nRlcAmount) => wallet.unwrapEnterpriseRLC(getEnterpriseContracts(), nRlcAmount);
     this.account = {};
     this.account.checkBalance = (address) => account.checkBalance(contracts, address);
     this.account.checkBridgedBalance = (address) => account.checkBalance(bridgedContracts, address);

@@ -2109,6 +2109,79 @@ describe('[wallet]', () => {
         .eq(enterpriseInitialBalance.nRLC),
     ).toBe(true);
   });
+  test('wallet.wrapEnterpriseRLC() (token standard -> enterprise) (init enterprise)', async () => {
+    const randomWallet = getRandomWallet();
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomWallet.address,
+    );
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
+    await iexecRichman.wallet.sendRLC('1 RLC', randomWallet.address);
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexecStandard = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        enterpriseSwapConf: {
+          hubAddress: enterpriseHubAddress,
+        },
+      },
+    );
+    const iexecEnterprise = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+        enterpriseSwapConf: {
+          hubAddress,
+        },
+      },
+    );
+    const standardInitialBalance = await iexecStandard.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const enterpriseInitialBalance = await iexecEnterprise.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const txHash = await iexecEnterprise.wallet.wrapEnterpriseRLC(5);
+    const standardFinalBalance = await iexecStandard.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const enterpriseFinalBalance = await iexecEnterprise.wallet.checkBalances(
+      randomWallet.address,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(
+      standardFinalBalance.nRLC.add(new BN(5)).eq(standardInitialBalance.nRLC),
+    ).toBe(true);
+    expect(
+      enterpriseFinalBalance.nRLC
+        .sub(new BN(5))
+        .eq(enterpriseInitialBalance.nRLC),
+    ).toBe(true);
+  });
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2167,6 +2240,80 @@ describe('[wallet]', () => {
       randomWallet.address,
     );
     const txHash = await iexecEnterprise.wallet.unwrapEnterpriseRLC(5);
+    const standardFinalBalance = await iexecStandard.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const enterpriseFinalBalance = await iexecEnterprise.wallet.checkBalances(
+      randomWallet.address,
+    );
+    expect(txHash).toMatch(bytes32Regex);
+    expect(
+      standardFinalBalance.nRLC.sub(new BN(5)).eq(standardInitialBalance.nRLC),
+    ).toBe(true);
+    expect(
+      enterpriseFinalBalance.nRLC
+        .add(new BN(5))
+        .eq(enterpriseInitialBalance.nRLC),
+    ).toBe(true);
+  });
+  test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard) (init standard)', async () => {
+    const randomWallet = getRandomWallet();
+    await grantKYC(
+      whitelistAdminWallet,
+      enterpriseHubAddress,
+      randomWallet.address,
+    );
+    const iexecRichman = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+      },
+    );
+    await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
+    await iexecRichman.wallet.sendRLC('1 RLC', randomWallet.address);
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexecStandard = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        enterpriseSwapConf: {
+          hubAddress: enterpriseHubAddress,
+        },
+      },
+    );
+    const iexecEnterprise = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+        flavour: 'enterprise',
+      },
+      {
+        hubAddress: enterpriseHubAddress,
+        isNative: false,
+        enterpriseSwapConf: {
+          hubAddress,
+        },
+      },
+    );
+    const standardInitialBalance = await iexecStandard.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const enterpriseInitialBalance = await iexecEnterprise.wallet.checkBalances(
+      randomWallet.address,
+    );
+    const txHash = await iexecStandard.wallet.unwrapEnterpriseRLC(5);
     const standardFinalBalance = await iexecStandard.wallet.checkBalances(
       randomWallet.address,
     );
@@ -2313,7 +2460,7 @@ describe('[wallet]', () => {
       Error(`${randomWallet.address} is not authorized to interact with eRLC`),
     );
   });
-  test('wallet.wrapEnterpriseRLC() (token standard -> enterprise, from enterprise wrong conf)', async () => {
+  test('wallet.wrapEnterpriseRLC() (token standard -> enterprise, missing conf)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainUrl,
@@ -2328,17 +2475,13 @@ describe('[wallet]', () => {
       {
         hubAddress: enterpriseHubAddress,
         isNative: false,
-        enterpriseSwapConf: {
-          hubAddress,
-        },
       },
     );
-
-    await expect(iexecEnterprise.wallet.wrapEnterpriseRLC(5)).rejects.toThrow(
-      'Unable to wrap RLC into eRLC on current chain',
+    expect(() => iexecEnterprise.wallet.wrapEnterpriseRLC(5)).toThrow(
+      `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
-  test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard, from standard wrong conf)', async () => {
+  test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard, missing conf)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainUrl,
@@ -2352,14 +2495,10 @@ describe('[wallet]', () => {
       {
         hubAddress,
         isNative: false,
-        enterpriseSwapConf: {
-          hubAddress: enterpriseHubAddress,
-        },
       },
     );
-
-    await expect(iexecStandard.wallet.unwrapEnterpriseRLC(5)).rejects.toThrow(
-      'Unable to unwrap eRLC into RLC on current chain',
+    expect(() => iexecStandard.wallet.unwrapEnterpriseRLC(5)).toThrow(
+      `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
 });

@@ -2939,12 +2939,15 @@ describe('[Enterprise]', () => {
       await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
     ).balance;
     const raw = await execAsync(
-      `${iexecPath} wallet swap-RLC-for-eRLC 10 RLC --force --raw`,
+      `${iexecPath} wallet swap-RLC-for-eRLC 6 RLC --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.txHash).toBeDefined();
-    expect(res.amount).toBe('10000000000');
+    expect(res.amount).toBe('6000000000');
+    await execAsync(
+      `${iexecPath} wallet swap-RLC-for-eRLC 4 RLC --chain dev-enterprise --force --raw`,
+    );
     const standardFinalBalance = JSON.parse(
       await execAsync(`${iexecPath} wallet show --raw`),
     ).balance;
@@ -2971,12 +2974,15 @@ describe('[Enterprise]', () => {
       await execAsync(`${iexecPath} wallet show --chain dev-enterprise --raw`),
     ).balance;
     const raw = await execAsync(
-      `${iexecPath} wallet swap-eRLC-for-RLC 10 RLC --chain dev-enterprise --force --raw`,
+      `${iexecPath} wallet swap-eRLC-for-RLC 6 RLC --chain dev-enterprise --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.txHash).toBeDefined();
-    expect(res.amount).toBe('10000000000');
+    expect(res.amount).toBe('6000000000');
+    await execAsync(
+      `${iexecPath} wallet swap-eRLC-for-RLC 4 RLC --force --raw`,
+    );
     const standardFinalBalance = JSON.parse(
       await execAsync(`${iexecPath} wallet show --raw`),
     ).balance;

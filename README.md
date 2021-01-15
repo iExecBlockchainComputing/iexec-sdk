@@ -373,7 +373,7 @@ iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC 
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
-iexec wallet swap-eRLC-for-RLC <amount> [unit] # swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC.
+iexec wallet swap-RLC-for-eRLC <amount> [unit] # swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC.
 iexec wallet swap-eRLC-for-RLC <amount> [unit] # swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC.
 ```
 
@@ -1164,7 +1164,6 @@ iexec.**wallet.wrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxH
 
 > wrap some nRLC (1 nRLC = 1\*10^-9 RLC) into neRLC (enterprise nRLC).
 > signer wallet must be authorized by the eRLC contract to perform wrap operation.
-> IExec constructor must be called with `flavour: 'standard'` (default).
 
 _Example:_
 
@@ -1179,7 +1178,6 @@ iexec.**wallet.unwrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapT
 
 > wrap some neRLC (1 neRLC = 1\*10^-9 eRLC) into nRLC.
 > signer wallet must be authorized by the eRLC contract to perform unwrap operation.
-> IExec constructor must be called with `flavour: 'enterprise'`.
 
 _Example:_
 
