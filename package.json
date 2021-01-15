@@ -35,7 +35,7 @@
     "ethers": "^5.0.26",
     "ethjs-custom-signer": "1.4.1",
     "fs-extra": "^9.0.1",
-    "iexec-contracts-js-client": "^5.2.0",
+    "iexec-contracts-js-client": "^5.2.1",
     "image-size": "0.9.3",
     "inquirer": "^7.3.3",
     "is-docker": "^2.1.1",

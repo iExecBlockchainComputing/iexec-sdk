@@ -6,10 +6,8 @@ const hostMap = {
 };
 
 const hubMap = {
-  enterprise: {
-    1: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-    5: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-  },
+  standard: {},
+  enterprise: {},
 };
 
 const smsMap = {
