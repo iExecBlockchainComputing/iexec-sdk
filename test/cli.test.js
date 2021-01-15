@@ -2964,7 +2964,7 @@ describe('[Enterprise]', () => {
         .add(new BN('10000000000'))
         .eq(new BN(enterpriseFinalBalance.nRLC)),
     );
-  });
+  }, 15000);
 
   test('[token enterprise] iexec wallet swap-eRLC-for-RLC 10 RLC', async () => {
     const standardInitialBalance = JSON.parse(
@@ -2999,7 +2999,7 @@ describe('[Enterprise]', () => {
         .add(new BN('10000000000'))
         .eq(new BN(enterpriseFinalBalance.nRLC)),
     );
-  });
+  }, 15000);
 });
 
 describe('[Common]', () => {
