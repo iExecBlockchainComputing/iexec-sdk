@@ -60,9 +60,7 @@ const deployApp = async (contracts, app) => createObj('app')(
 );
 const deployDataset = async (contracts, dataset) => createObj('dataset')(
   contracts,
-  await datasetSchema({ ethProvider: contracts.provider }).validate(
-    dataset,
-  ),
+  await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
 );
 const deployWorkerpool = async (contracts, workerpool) => createObj('workerpool')(
   contracts,
@@ -91,9 +89,7 @@ const checkDeployedApp = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('app')(
   contracts,
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const checkDeployedDataset = async (
@@ -101,9 +97,7 @@ const checkDeployedDataset = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('dataset')(
   contracts,
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const checkDeployedWorkerpool = async (
@@ -111,9 +105,7 @@ const checkDeployedWorkerpool = async (
   address = throwIfMissing(),
 ) => checkDeployedObj('workerpool')(
   contracts,
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const showObjByAddress = (objName = throwIfMissing()) => async (
@@ -213,7 +205,7 @@ const cleanObj = (obj) => {
   return Object.entries(obj).reduce(reducer, {});
 };
 
-const cleanApp = obj => Object.assign(
+const cleanApp = (obj) => Object.assign(
   cleanObj(obj),
   obj.m_appMultiaddr && {
     appMultiaddr: multiaddrHexToHuman(obj.m_appMultiaddr),
@@ -397,9 +389,7 @@ const getAppOwner = async (
 ) => getOwner(
   contracts,
   'app',
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const getDatasetOwner = async (
@@ -408,9 +398,7 @@ const getDatasetOwner = async (
 ) => getOwner(
   contracts,
   'dataset',
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const getWorkerpoolOwner = async (
@@ -419,9 +407,7 @@ const getWorkerpoolOwner = async (
 ) => getOwner(
   contracts,
   'workerpool',
-  await addressSchema({ ethProvider: contracts.provider }).validate(
-    address,
-  ),
+  await addressSchema({ ethProvider: contracts.provider }).validate(address),
 );
 
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {

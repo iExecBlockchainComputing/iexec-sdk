@@ -23,10 +23,10 @@ const NULL_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
-const isEthersBn = obj => !!(obj._ethersType && obj._ethersType === 'BigNumber');
+const isEthersBn = (obj) => !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
-const bnToEthersBn = bn => BigNumber.from(bn.toString());
-const ethersBnToBn = ethersBn => new BN(ethersBn.toString());
+const bnToEthersBn = (bn) => BigNumber.from(bn.toString());
+const ethersBnToBn = (ethersBn) => new BN(ethersBn.toString());
 
 const stringify = (val) => {
   try {
@@ -58,7 +58,7 @@ const formatRLC = (nRLC) => {
   }
 };
 
-const isRlcUnit = str => ['nRLC', 'RLC'].includes(str);
+const isRlcUnit = (str) => ['nRLC', 'RLC'].includes(str);
 
 const parseRLC = (value, defaultUnit = 'RLC') => {
   const [amount, inputUnit] = stringify(value).split(' ');
@@ -84,7 +84,7 @@ const formatEth = (wei) => {
   }
 };
 
-const isEthUnit = str => ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
+const isEthUnit = (str) => ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
   str,
 );
 
@@ -139,10 +139,10 @@ const stringifyNestedBn = (obj) => {
   return objOut;
 };
 
-const checksummedAddress = address => getAddress(address);
+const checksummedAddress = (address) => getAddress(address);
 
-const utf8ToBuffer = str => Buffer.from(str, 'utf8');
-const hexToBuffer = hexString => Buffer.from(hexString.substr(2), 'hex');
+const utf8ToBuffer = (str) => Buffer.from(str, 'utf8');
+const hexToBuffer = (hexString) => Buffer.from(hexString.substr(2), 'hex');
 
 const multiaddrHexToHuman = (hexString) => {
   let res;
@@ -173,7 +173,7 @@ const cleanRPC = (rpcObj) => {
       let value;
       if (
         Array.isArray(rpcObj[curr])
-        && !rpcObj[curr].find(e => typeof e === 'object')
+        && !rpcObj[curr].find((e) => typeof e === 'object')
       ) {
         value = rpcObj[curr];
       } else if (typeof rpcObj[curr] === 'object') {
@@ -217,9 +217,7 @@ const secToDate = (secs) => {
 };
 
 const getSalt = () => {
-  const hex = BigNumber.from(randomBytes(32))
-    .toHexString()
-    .substring(2);
+  const hex = BigNumber.from(randomBytes(32)).toHexString().substring(2);
   const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
   return salt;
 };
@@ -397,7 +395,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   }
 };
 
-const sleep = ms => new Promise(res => setTimeout(res, ms));
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 const FETCH_INTERVAL = 5000;
 
 module.exports = {

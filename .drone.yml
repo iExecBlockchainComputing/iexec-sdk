@@ -39,7 +39,8 @@ pipeline:
     secrets: [npm_password]
     username: sulliwane
     email: sulliwane@gmail.com
-    tag: latest
+    # tag: latest
+    tag: alpha
     when:
       ref: [refs/tags/v5*]
       matrix:
@@ -50,7 +51,7 @@ pipeline:
     repo: iexechub/iexec-sdk
     secrets: [docker_username, docker_password]
     tags:
-      - latest
+      # - latest
       - ${DRONE_TAG##v}
     when:
       ref: [refs/tags/v5*]
@@ -59,11 +60,11 @@ pipeline:
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:v5.1.0-token
+    image: iexechub/poco-chaintest:5.3.0-token
     pull: true
   native-chain:
-    image: iexechub/poco-chaintest:v5.1.0-native
+    image: iexechub/poco-chaintest:5.3.0-native
     pull: true
   token-chain-1s:
-    image: iexechub/poco-chaintest:v5.1.0-token-1s
+    image: iexechub/poco-chaintest:5.3.0-token-1s
     pull: true

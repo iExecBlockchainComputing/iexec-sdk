@@ -64,7 +64,7 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
   try {
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
-      Object.assign({}, walletOptions, { isSigner: false }),
+      { ...walletOptions, isSigner: false },
     );
     const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
@@ -133,7 +133,7 @@ show
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
-      Object.assign({}, walletOptions, { isSigner: false }),
+      { ...walletOptions, isSigner: false },
     );
     try {
       const [chain, [address]] = await Promise.all([
@@ -142,7 +142,7 @@ show
       ]);
       const addressOrIndex = cliAddressOrIndex
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
@@ -186,7 +186,7 @@ count
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign({}, walletOptions, { isSigner: false }),
+        { ...walletOptions, isSigner: false },
       );
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -237,7 +237,7 @@ publish
       const useDeployedObj = !objAddress;
       const address = objAddress
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(
@@ -314,7 +314,7 @@ unpublish
       const useDeployedObj = !objAddress;
       const address = objAddress
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(

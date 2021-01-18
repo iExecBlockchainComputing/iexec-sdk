@@ -12,7 +12,7 @@ const templates = require('./templates');
 const debug = Debug('iexec:fs');
 
 const chainConfSchema = () => object({
-  id: chainIdSchema().required(),
+  id: chainIdSchema(),
   host: string(),
   hub: string(),
   sms: string(),
@@ -20,9 +20,21 @@ const chainConfSchema = () => object({
   ipfsGateway: string(),
   iexecGateway: string(),
   native: boolean(),
+  useGas: boolean().default(true),
+  flavour: string().oneOf(['standard', 'enterprise']),
   bridge: object({
-    bridgedChainId: chainIdSchema().required(),
+    bridgedChainName: string().when('bridgedChainId', {
+      is: undefined,
+      then: string().required(),
+      otherwise: string(),
+    }), // replace bridgedChainId
+    bridgedChainId: chainIdSchema(),
     contract: addressSchema().required(),
+  })
+    .notRequired()
+    .strict(),
+  enterprise: object({
+    enterpriseSwapChainName: string().required(),
   })
     .notRequired()
     .strict(),
@@ -59,10 +71,7 @@ const chainsConfSchema = () => object({
           return string();
       }
     }),
-    quorum: number()
-      .integer()
-      .min(1)
-      .max(3)
+    quorum: number().integer().min(1).max(3)
       .notRequired(),
   })
     .noUnknown(true, 'Unknown key "${unknown}" in providers')
@@ -203,28 +212,18 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
     throw new Error(`${error} in ${fileName}`);
   }
 };
-const loadIExecConf = options => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainConf = options => loadJSONAndRetry(
-  CHAIN_FILE_NAME,
-  Object.assign(
-    {
-      validationSchema: chainsConfSchema,
-    },
-    options,
-  ),
-);
-const loadWalletConf = options => loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
-const loadEncryptedWalletConf = options => loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
-const loadDeployedConf = options => loadJSONAndRetry(
-  DEPLOYED_FILE_NAME,
-  Object.assign(
-    {
-      validationSchema: deployedConfSchema,
-    },
-    options,
-  ),
-);
-const loadSignedOrders = options => loadJSONAndRetry(ORDERS_FILE_NAME, {
+const loadIExecConf = (options) => loadJSONAndRetry(IEXEC_FILE_NAME, options);
+const loadChainConf = (options) => loadJSONAndRetry(CHAIN_FILE_NAME, {
+  validationSchema: chainsConfSchema,
+  ...options,
+});
+const loadWalletConf = (options) => loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
+const loadEncryptedWalletConf = (options) => loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
+const loadDeployedConf = (options) => loadJSONAndRetry(DEPLOYED_FILE_NAME, {
+  validationSchema: deployedConfSchema,
+  ...options,
+});
+const loadSignedOrders = (options) => loadJSONAndRetry(ORDERS_FILE_NAME, {
   ...options,
   loadErrorMessage: info.missingSignedOrders,
 });
@@ -323,6 +322,7 @@ const isEmptyDir = async (dirPath) => {
     if (!files.length) return true;
     return false;
   } catch (error) {
+    debug('isEmptyDir()', error);
     throw error;
   }
 };
@@ -336,7 +336,7 @@ const zipDirectory = async (dirPath, { force = false } = {}) => {
     const addFolder = async (zip, folderPath = '') => {
       debug('zip adding folder', folderPath);
       const folderContent = await fs.readdir(path.join(dirPath, folderPath));
-      const pathArray = folderContent.map(fileName => path.join(folderPath, fileName));
+      const pathArray = folderContent.map((fileName) => path.join(folderPath, fileName));
       await Promise.all(
         pathArray.map(async (relativePath) => {
           const stats = await fs.lstat(path.join(dirPath, relativePath));

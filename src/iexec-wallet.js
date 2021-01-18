@@ -45,9 +45,7 @@ create
     try {
       const force = cmd.force || false;
       const walletOptions = await computeWalletCreateOptions(cmd);
-      const res = await createAndSave(
-        Object.assign({}, { force }, walletOptions),
-      );
+      const res = await createAndSave({ force, ...walletOptions });
       spinner.succeed(
         `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
@@ -72,10 +70,10 @@ importPk
     try {
       const force = cmd.force || false;
       const walletOptions = await computeWalletCreateOptions(cmd);
-      const res = await importPrivateKeyAndSave(
-        privateKey,
-        Object.assign({}, { force }, walletOptions),
-      );
+      const res = await importPrivateKeyAndSave(privateKey, {
+        force,
+        ...walletOptions,
+      });
       spinner.succeed(
         `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
@@ -98,50 +96,47 @@ show
   .action(async (address, cmd) => {
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
-    try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const keystore = Keystore(
-        Object.assign(
-          {},
-          walletOptions,
-          (address || !cmd.showPrivateKey) && { isSigner: false },
-        ),
-      );
 
-      let userWallet;
-      let userWalletAddress;
-      let displayedWallet;
-      try {
-        if (!address) {
-          if (cmd.showPrivateKey) {
-            userWallet = await keystore.load();
-            userWalletAddress = userWallet.address;
-            displayedWallet = Object.assign(
-              {},
-              cmd.showPrivateKey ? { privateKey: userWallet.privateKey } : {},
-              { publicKey: userWallet.publicKey, address: userWallet.address },
-            );
-            // show user wallet
-            spinner.info(`Wallet file:${pretty(displayedWallet)}`);
-          } else {
-            try {
-              [userWalletAddress] = await keystore.accounts();
-              if (userWalletAddress && userWalletAddress !== NULL_ADDRESS) {
-                spinner.info(`Current wallet address ${userWalletAddress}`);
-                displayedWallet = { address: userWalletAddress };
-              } else {
-                throw Error('Wallet file not found');
-              }
-            } catch (error) {
-              throw Error(
-                `Failed to load wallet address from keystore: ${error.message}`,
-              );
+    const walletOptions = await computeWalletLoadOptions(cmd);
+    const keystore = Keystore({
+      ...walletOptions,
+      ...((address || !cmd.showPrivateKey) && { isSigner: false }),
+    });
+
+    let userWallet;
+    let userWalletAddress;
+    let displayedWallet;
+    try {
+      if (!address) {
+        if (cmd.showPrivateKey) {
+          userWallet = await keystore.load();
+          userWalletAddress = userWallet.address;
+          displayedWallet = {
+            ...(cmd.showPrivateKey
+              ? { privateKey: userWallet.privateKey }
+              : {}),
+            publicKey: userWallet.publicKey,
+            address: userWallet.address,
+          };
+          // show user wallet
+          spinner.info(`Wallet file:${pretty(displayedWallet)}`);
+        } else {
+          try {
+            [userWalletAddress] = await keystore.accounts();
+            if (userWalletAddress && userWalletAddress !== NULL_ADDRESS) {
+              spinner.info(`Current wallet address ${userWalletAddress}`);
+              displayedWallet = { address: userWalletAddress };
+            } else {
+              throw Error('Wallet file not found');
             }
+          } catch (error) {
+            throw Error(
+              `Failed to load wallet address from keystore: ${error.message}`,
+            );
           }
         }
-      } catch (error) {
-        throw error;
       }
+
       if (!userWalletAddress && !address) throw Error('Missing address or wallet');
 
       const chain = await loadChain(cmd.chain, { spinner });
@@ -161,19 +156,17 @@ show
           displayBalances,
         )}`,
         {
-          raw: Object.assign(
-            {
-              balance: {
-                ...displayBalances,
-                nRLC: balances.nRLC.toString(),
-                wei: chain.contracts.isNative
-                  ? undefined
-                  : balances.wei.toString(),
-                ETH: displayBalances.ether, // for legacy compatibility
-              },
+          raw: {
+            balance: {
+              ...displayBalances,
+              nRLC: balances.nRLC.toString(),
+              wei: chain.contracts.isNative
+                ? undefined
+                : balances.wei.toString(),
+              ETH: displayBalances.ether, // for legacy compatibility
             },
-            !address && displayedWallet && { wallet: displayedWallet },
-          ),
+            ...(!address && displayedWallet && { wallet: displayedWallet }),
+          },
         },
       );
     } catch (error) {
@@ -577,6 +570,115 @@ bridgeToMainchain
           },
         },
       );
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const wrapEnterpriseRLC = cli.command('swap-RLC-for-eRLC <amount> [unit]');
+addGlobalOptions(wrapEnterpriseRLC);
+addWalletLoadOptions(wrapEnterpriseRLC);
+wrapEnterpriseRLC
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.wrapEnterpriseRLC())
+  .action(async (amount, unit, cmd) => {
+    await checkUpdate(cmd);
+    const spinner = Spinner(cmd);
+    try {
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      if (!hasEnterpriseFlavour) {
+        throw Error(
+          `No enterprise smart contracts found on current chain ${chain.id}`,
+        );
+      }
+
+      const standardContracts = chain.contracts.flavour === 'standard'
+        ? chain.contracts
+        : chain.enterpriseSwapNetwork.contracts;
+
+      const enterpriseContracts = chain.contracts.flavour === 'standard'
+        ? chain.enterpriseSwapNetwork.contracts
+        : chain.contracts;
+
+      await connectKeystore({ contracts: standardContracts }, keystore, {
+        txOptions,
+      });
+      if (!cmd.force) {
+        await prompt.wrap(formatRLC(nRlcAmount), chain.id);
+      }
+      const message = `${formatRLC(nRlcAmount)} RLC into eRLC`;
+      spinner.start(`Wrapping ${message}...`);
+
+      const txHash = await wallet.wrapEnterpriseRLC(
+        standardContracts,
+        enterpriseContracts,
+        nRlcAmount,
+      );
+      spinner.succeed(`Wrapped ${message}\n`, {
+        raw: {
+          amount: nRlcAmount,
+          txHash,
+        },
+      });
+    } catch (error) {
+      handleError(error, cli, cmd);
+    }
+  });
+
+const unwrapEnterpriseRLC = cli.command('swap-eRLC-for-RLC <amount> [unit]');
+addGlobalOptions(unwrapEnterpriseRLC);
+addWalletLoadOptions(unwrapEnterpriseRLC);
+unwrapEnterpriseRLC
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.force())
+  .description(desc.unwrapEnterpriseRLC())
+  .action(async (amount, unit, cmd) => {
+    await checkUpdate(cmd);
+    const spinner = Spinner(cmd);
+    try {
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const walletOptions = await computeWalletLoadOptions(cmd);
+      const txOptions = await computeTxOptions(cmd);
+      const keystore = Keystore(walletOptions);
+      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      if (!hasEnterpriseFlavour) {
+        throw Error(
+          `No enterprise smart contracts found on current chain ${chain.id}`,
+        );
+      }
+
+      const enterpriseContracts = chain.contracts.flavour === 'standard'
+        ? chain.enterpriseSwapNetwork.contracts
+        : chain.contracts;
+
+      await connectKeystore({ contracts: enterpriseContracts }, keystore, {
+        txOptions,
+      });
+      if (!cmd.force) {
+        await prompt.unwrap(formatRLC(nRlcAmount), chain.id);
+      }
+      const message = `${formatRLC(nRlcAmount)} eRLC into RLC`;
+      spinner.start(`Unwrapping ${message}...`);
+
+      const txHash = await wallet.unwrapEnterpriseRLC(
+        enterpriseContracts,
+        nRlcAmount,
+      );
+      spinner.succeed(`Unwrapped ${message}\n`, {
+        raw: {
+          amount: nRlcAmount,
+          txHash,
+        },
+      });
     } catch (error) {
       handleError(error, cli, cmd);
     }

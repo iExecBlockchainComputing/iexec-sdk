@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added
+
+- iExec enterprise flavour support
+- `iexec wallet swap-eRLC-for-RLC` and `wallet.wrapEnterpriseRLC()` enables to wrap RLC to eRLC (requires an authorized wallet)
+- `iexec wallet swap-eRLC-for-RLC` and `wallet.unwrapEnterpriseRLC()` enables to unwrap eRLC to RLC (requires an authorized wallet)
+- `enterprise` value added to `--chain [chainName]` option enable connecting iExec enterprise
+- optional named argument `flavour` added to IExec constructor enables connecting iExec enterprise by passing `flavour: 'enterprise'`
+
+### Changed
+
+- `id` is no longer requred in `chain.json`
+- passing `chainId` to `--chain [chainName]` will support only the following values: `1` for `mainnet`, `5` for `goerli`, `134` for `bellecour`, `133` for `viviani`
+- CLI `native` chain key no longer set default gasPrice to 0, use key `"useGas": false` to force default gasPrice to 0
+- lib `isNative` option no longer set default gasPrice to 0, use option `useGas: false` to force default gasPrice to 0
+- migrate EIP712 hash and sign to ethers implementation
+- [DEPRECATED] `bridge.bridgedChainId` in `chain.json` is deprecated and must me replaced by `bridge.bridgedChainName`
+
+### Removed
+
 ## [5.1.0] 2020-11-09
 
 ### Added

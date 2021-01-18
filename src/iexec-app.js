@@ -112,7 +112,7 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
   try {
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
-      Object.assign({}, walletOptions, { isSigner: false }),
+      { ...walletOptions, isSigner: false },
     );
     const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
@@ -182,7 +182,7 @@ show
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign({}, walletOptions, { isSigner: false }),
+        { ...walletOptions, isSigner: false },
       );
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -190,7 +190,7 @@ show
       ]);
       const addressOrIndex = cliAddressOrIndex
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
@@ -228,7 +228,7 @@ count
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore(
-      Object.assign({}, walletOptions, { isSigner: false }),
+      { ...walletOptions, isSigner: false },
     );
     try {
       const [chain, [address]] = await Promise.all([
@@ -272,7 +272,7 @@ publish
       const useDeployedObj = !objAddress;
       const address = objAddress
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(
@@ -341,7 +341,7 @@ unpublish
       const useDeployedObj = !objAddress;
       const address = objAddress
         || (await loadDeployedObj(objName).then(
-          deployedObj => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(
@@ -420,7 +420,7 @@ run
       const useDeployedApp = !appAddress;
       const app = appAddress
         || (await loadDeployedObj('app').then(
-          deployedApp => deployedApp && deployedApp[chain.id],
+          (deployedApp) => deployedApp && deployedApp[chain.id],
         ));
       if (!app) {
         throw Error(
@@ -439,7 +439,7 @@ run
       const dataset = useDataset
         && (useDeployedDataset
           ? await loadDeployedObj('dataset').then(
-            deployedDataset => deployedDataset && deployedDataset[chain.id],
+            (deployedDataset) => deployedDataset && deployedDataset[chain.id],
           )
           : opts.dataset);
       if (useDataset && !dataset) {
@@ -464,7 +464,7 @@ run
       const workerpool = runOnWorkerpool
         && (useDeployedWorkerpool
           ? await loadDeployedObj('workerpool').then(
-            deployedWorkerpool => deployedWorkerpool && deployedWorkerpool[chain.id],
+            (deployedWorkerpool) => deployedWorkerpool && deployedWorkerpool[chain.id],
           )
           : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
@@ -552,7 +552,7 @@ run
             volume: 1,
             requesterrestrict: requester,
             tag,
-          }).then(o => signApporder(chain.contracts, o));
+          }).then((o) => signApporder(chain.contracts, o));
           return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
@@ -595,7 +595,7 @@ run
             volume: 1,
             requesterrestrict: requester,
             tag,
-          }).then(o => signDatasetorder(chain.contracts, o));
+          }).then((o) => signDatasetorder(chain.contracts, o));
           return order;
         }
         spinner.info('Fetching datasetorder from iExec Marketplace');
@@ -649,7 +649,7 @@ run
               tag: minTag,
               trust,
               category: category || 0,
-            }).then(o => signWorkerpoolorder(chain.contracts, o));
+            }).then((o) => signWorkerpoolorder(chain.contracts, o));
             return order;
           }
         }

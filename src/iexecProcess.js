@@ -93,7 +93,7 @@ const obsTask = (
         throw e;
       };
 
-      const waitStatusChangeOrTimeout = async initialStatus => taskModule
+      const waitStatusChangeOrTimeout = async (initialStatus) => taskModule
         .waitForTaskStatusChange(contracts, vTaskid, initialStatus)
         .catch(async (e) => {
           const task = await handleTaskNotFound(e);
@@ -183,10 +183,10 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new
           let complete = false;
           const tasksCount = tasksArray.length;
           const completedTasksCount = tasksArray.filter(
-            task => task.status === 3,
+            (task) => task.status === 3,
           ).length;
           const failedTasksCount = tasksArray.filter(
-            task => task.taskTimedOut === true,
+            (task) => task.taskTimedOut === true,
           ).length;
           let message;
           if (completedTasksCount === tasksCount) {
@@ -219,7 +219,7 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new
         },
         error: (e) => {
           safeObserver.error(e);
-          taskWatchers.map(unsub => unsub());
+          taskWatchers.map((unsub) => unsub());
         },
       }));
     } catch (e) {
@@ -229,7 +229,7 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new
 
   safeObserver.unsub = () => {
     // teardown callback
-    taskWatchers.map(unsub => unsub());
+    taskWatchers.map((unsub) => unsub());
   };
   startWatch();
   return safeObserver.unsubscribe.bind(safeObserver);

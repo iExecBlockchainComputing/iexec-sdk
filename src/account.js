@@ -13,7 +13,7 @@ const {
   throwIfMissing,
 } = require('./validator');
 const { wrapCall, wrapSend, wrapWait } = require('./errorWrappers');
-const { getAddress, checkBalances } = require('./wallet');
+const { getAddress, isInWhitelist, checkBalances } = require('./wallet');
 
 const debug = Debug('iexec:account');
 
@@ -44,6 +44,11 @@ const deposit = async (
   try {
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0))) throw Error('Deposit amount must be greather than 0');
+    if (contracts.flavour === 'enterprise') {
+      await isInWhitelist(contracts, await getAddress(contracts), {
+        strict: true,
+      });
+    }
     let txHash;
     const { nRLC } = await checkBalances(
       contracts,
@@ -99,6 +104,11 @@ const withdraw = async (
   try {
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0))) throw Error('Withdraw amount must be greather than 0');
+    if (contracts.flavour === 'enterprise') {
+      await isInWhitelist(contracts, await getAddress(contracts), {
+        strict: true,
+      });
+    }
     const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(
       contracts,

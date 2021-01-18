@@ -114,31 +114,44 @@ const category = {
 const chains = {
   default: 'goerli',
   chains: {
-    dev: {
-      id: '65535',
-      host: 'http://localhost:8545',
-      resultProxy: 'http://localhost:18089',
-      sms: 'http://localhost:5000',
-      hub: '0xC08e9Be37286B7Bbf04875369cf28C21b3F06FCB',
-      // native: true,
-    },
-    goerli: {
-      id: '5',
-    },
-    viviani: {
-      id: '133',
-    },
-    mainnet: {
-      id: '1',
-    },
-    bellecour: {
-      id: '134',
-    },
+    // dev: {
+    //   host: 'http://localhost:8545',
+    //   id: '65535',
+    //   sms: 'http://localhost:5000',
+    //   resultProxy: 'http://localhost:8089',
+    //   ipfsGateway: 'http://localhost:8080',
+    //   flavour: 'standard',
+    //   hub: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
+    //   enterprise: {
+    //     enterpriseSwapChainName: 'dev-enterprise',
+    //   },
+    // },
+    // 'dev-enterprise': {
+    //   host: 'http://localhost:8545',
+    //   id: '65535',
+    //   sms: 'http://localhost:5000',
+    //   resultProxy: 'http://localhost:8089',
+    //   ipfsGateway: 'http://localhost:8080',
+    //   flavour: 'enterprise',
+    //   hub: '0xb80C02d24791fA92fA8983f15390274698A75D23',
+    //   enterprise: {
+    //     enterpriseSwapChainName: 'dev',
+    //   },
+    // },
+    goerli: {},
+    viviani: {},
+    mainnet: {},
+    bellecour: {},
+    enterprise: {},
+    'enterprise-testnet': {},
   },
 };
 
-const createOrder = (orderName, overwrite = {}) => Object.assign({}, order[orderName], overwrite);
-const overwriteObject = (obj, overwrite = {}) => Object.assign({}, obj, overwrite);
+const createOrder = (orderName, overwrite = {}) => ({
+  ...order[orderName],
+  ...overwrite,
+});
+const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
 
 module.exports = {
   main,

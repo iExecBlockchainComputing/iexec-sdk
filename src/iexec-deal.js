@@ -54,7 +54,7 @@ show
             error: reject,
             complete: () => {
               const tasks = Object.values(stringifyNestedBn(dealState.tasks));
-              const failedTasks = tasks.filter(task => task.taskTimedOut);
+              const failedTasks = tasks.filter((task) => task.taskTimedOut);
               resolve({
                 tasksCount: dealState.tasksCount,
                 completedTasksCount: dealState.completedTasksCount,

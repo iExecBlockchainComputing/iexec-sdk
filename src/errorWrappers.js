@@ -50,7 +50,7 @@ const wrapSign = async (promise) => {
   }
 };
 
-const wrapSignTypedDataV3 = wrapSign;
+const wrapSignTypedData = wrapSign;
 
 const wrapPersonalSign = wrapSign;
 
@@ -59,5 +59,5 @@ module.exports = {
   wrapSend,
   wrapWait,
   wrapPersonalSign,
-  wrapSignTypedDataV3,
+  wrapSignTypedData,
 };

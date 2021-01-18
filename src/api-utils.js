@@ -2,7 +2,7 @@ const Debug = require('debug');
 const fetch = require('cross-fetch');
 const qs = require('query-string');
 const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedDataV3 } = require('./errorWrappers');
+const { wrapSignTypedData } = require('./errorWrappers');
 
 const debug = Debug('iexec:api-utils');
 
@@ -31,7 +31,7 @@ const makeHeaders = (method, headers, body) => {
   return { headers: { ...generatedHeaders, ...headers } };
 };
 
-const httpRequest = method => async ({
+const httpRequest = (method) => async ({
   api,
   endpoint,
   query = {},
@@ -85,7 +85,7 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
-const wrapPaginableRequest = request => async args => request(args).then(({ nextPage, ...rest }) => ({
+const wrapPaginableRequest = (request) => async (args) => request(args).then(({ nextPage, ...rest }) => ({
   ...rest,
   ...(nextPage && {
     more: () => wrapPaginableRequest(request)({
@@ -96,26 +96,26 @@ const wrapPaginableRequest = request => async args => request(args).then(({ next
 }));
 
 const jsonApi = {
-  get: args => httpRequest('GET')({
+  get: (args) => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
-  post: args => httpRequest('POST')({
+  post: (args) => httpRequest('POST')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
-  put: args => httpRequest('PUT')({
+  put: (args) => httpRequest('PUT')({
     ...args,
     ...{ headers: { Accept: 'application/json', ...args.headers } },
   }).then(responseToJson),
 };
 
 const downloadZipApi = {
-  get: args => httpRequest('GET')({
+  get: (args) => httpRequest('GET')({
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
   }).then(checkResponseOk),
-  post: args => httpRequest('POST')({
+  post: (args) => httpRequest('POST')({
     ...args,
     ...{ headers: { Accept: 'application/zip', ...args.headers } },
   }).then(checkResponseOk),
@@ -136,7 +136,16 @@ const getAuthorization = (api, endpoint = '/challenge') => async (
       },
     });
     const typedData = challenge.data || challenge;
-    const sign = await wrapSignTypedDataV3(signer.signTypedDataV3(typedData));
+    const { domain, message } = typedData;
+    const { EIP712Domain, ...types } = typedData.types;
+    const sign = await wrapSignTypedData(
+      // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+      // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+      /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+      signer._signTypedData && typeof signer._signTypedData === 'function'
+        ? signer._signTypedData(domain, types, message)
+        : signer.signTypedData(domain, types, message),
+    );
     const hash = hashEIP712(typedData);
     const separator = '_';
     const authorization = hash
