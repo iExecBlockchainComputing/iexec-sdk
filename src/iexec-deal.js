@@ -104,7 +104,7 @@ claim
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(cmd);
       const chain = await loadChain(cmd.chain, { spinner });
-      connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));
       const { claimed, transactions } = await deal.claim(
         chain.contracts,

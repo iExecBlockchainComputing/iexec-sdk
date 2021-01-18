@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - CLI `native` chain key no longer set default gasPrice to 0, use key `"useGas": false` to force default gasPrice to 0
 - lib `isNative` option no longer set default gasPrice to 0, use option `useGas: false` to force default gasPrice to 0
 - migrate EIP712 hash and sign to ethers implementation
+- fixed `iexec deal claim` fail due to missing signer
 - [DEPRECATED] `bridge.bridgedChainId` in `chain.json` is deprecated and must me replaced by `bridge.bridgedChainName`
 
 ### Removed
