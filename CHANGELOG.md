@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.0] 2021-01-22
+
 ### Added
 
 - iExec enterprise flavour support

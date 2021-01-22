@@ -39,8 +39,7 @@ pipeline:
     secrets: [npm_password]
     username: sulliwane
     email: sulliwane@gmail.com
-    # tag: latest
-    tag: alpha
+    tag: latest
     when:
       ref: [refs/tags/v5*]
       matrix:
@@ -51,7 +50,7 @@ pipeline:
     repo: iexechub/iexec-sdk
     secrets: [docker_username, docker_password]
     tags:
-      # - latest
+      - latest
       - ${DRONE_TAG##v}
     when:
       ref: [refs/tags/v5*]
