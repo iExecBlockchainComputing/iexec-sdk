@@ -8,7 +8,7 @@ networks:
 services:
   token-chaintest-v5:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.0-alpha.2-token'
+    image: 'iexechub/poco-chaintest:5.3.0-token'
     expose:
       - '8545'
     ports:
@@ -18,7 +18,7 @@ services:
 
   native-chaintest-v5:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.0-alpha.2-native'
+    image: 'iexechub/poco-chaintest:5.3.0-native'
     expose:
       - '8545'
     ports:
@@ -28,7 +28,7 @@ services:
 
   token-chaintest-v5-1s:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.0-alpha.2-token-1s'
+    image: 'iexechub/poco-chaintest:5.3.0-token-1s'
     ports:
       - 28545:8545
     networks:
