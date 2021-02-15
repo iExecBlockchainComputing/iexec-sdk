@@ -3184,6 +3184,16 @@ describe('[app]', () => {
 });
 
 describe('[dataset]', () => {
+  test('dataset.generateEncryptionKey()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    expect(typeof key).toBe('string');
+    expect(Buffer.from(key, 'base64').length).toBe(32);
+  });
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

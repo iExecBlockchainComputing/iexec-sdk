@@ -29,6 +29,7 @@ const {
   sumTags,
   decryptResult,
 } = require('./utils');
+const { generateEncryptionKey } = require('./encryption-utils');
 const {
   EnhancedWallet,
   EnhancedWeb3Signer,
@@ -280,6 +281,7 @@ class IExec {
     this.app.showUserApp = (index, userAddress) => hub.showUserApp(contracts, index, userAddress);
     this.app.countUserApps = (address) => hub.countUserApps(contracts, address);
     this.dataset = {};
+    this.dataset.generateEncryptionKey = () => generateEncryptionKey();
     this.dataset.deployDataset = (dataset) => hub.deployDataset(contracts, dataset);
     this.dataset.showDataset = (address) => hub.showDataset(contracts, address);
     this.dataset.showUserDataset = (index, userAddress) => hub.showUserDataset(contracts, index, userAddress);
