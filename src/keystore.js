@@ -108,7 +108,7 @@ const saveWallet = async (userWallet, options) => {
 
     const fileName = await saveEncryptedWalletConf(
       encryptedWallet,
-      Object.assign({}, options, { walletName }, { fileDir }),
+      { ...options, walletName, fileDir },
     );
     return { wallet: encryptedWallet, fileName, address: userWallet.address };
   }
@@ -122,7 +122,7 @@ const importPrivateKeyAndSave = async (privateKey, options) => {
   return saveWallet(wallet, options);
 };
 
-const createAndSave = async options => importPrivateKeyAndSave(Wallet.createRandom().privateKey, options);
+const createAndSave = async (options) => importPrivateKeyAndSave(Wallet.createRandom().privateKey, options);
 
 const Keystore = ({
   walletOptions = computeWalletLoadOptions().walletOptions,
@@ -161,7 +161,7 @@ const Keystore = ({
       throw error;
     }
     const sortedWallet = files
-      .filter(e => e.split('--')[2])
+      .filter((e) => e.split('--')[2])
       .sort(descSortWallet);
     return sortedWallet[0] || null;
   };
@@ -214,10 +214,10 @@ const Keystore = ({
     let pk;
     if (!fileName) {
       try {
-        const loadingOptions = Object.assign(
-          {},
-          { fileName: WALLET_FILE_NAME },
-        );
+        const loadingOptions = {
+
+          fileName: WALLET_FILE_NAME,
+        };
         const { privateKey } = await loadWalletConf(loadingOptions);
         pk = privateKey;
       } catch (error) {
@@ -232,7 +232,7 @@ const Keystore = ({
     // try encrypted
     if (!pk) {
       try {
-        const loadingOptions = Object.assign({}, { fileName }, { fileDir });
+        const loadingOptions = { fileName, fileDir };
         const encryptedWallet = await loadEncryptedWalletConf(loadingOptions);
         if (!password) {
           password = await prompt.password(
@@ -256,10 +256,10 @@ const Keystore = ({
     // try local unencrypted
     if (!fileName) {
       try {
-        const loadingOptions = Object.assign(
-          {},
-          { fileName: WALLET_FILE_NAME },
-        );
+        const loadingOptions = {
+
+          fileName: WALLET_FILE_NAME,
+        };
         const { address } = await loadWalletConf(loadingOptions);
         walletAddress = checksummedAddress(address);
       } catch (error) {
@@ -269,7 +269,7 @@ const Keystore = ({
     // try encrypted
     if (!walletAddress) {
       try {
-        const loadingOptions = Object.assign({}, { fileName }, { fileDir });
+        const loadingOptions = { fileName, fileDir };
         const { address } = await loadEncryptedWalletConf(loadingOptions);
         walletAddress = checksummedAddress(address);
       } catch (error) {

@@ -105,9 +105,9 @@ const computeTaskIdsArray = async (
   const vDealid = await bytes32Schema().validate(dealid);
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
   const vBotSize = await positiveStrictIntSchema().validate(botSize);
-  const tasksIdx = [...Array(vBotSize).keys()].map(n => n + vFirstTaskIdx);
+  const tasksIdx = [...Array(vBotSize).keys()].map((n) => n + vFirstTaskIdx);
   const taskids = await Promise.all(
-    tasksIdx.map(idx => computeTaskId(vDealid, idx)),
+    tasksIdx.map((idx) => computeTaskId(vDealid, idx)),
   );
   return taskids;
 };
@@ -231,7 +231,7 @@ const claim = async (
         });
         Object.assign(
           claimed,
-          ...initializedToProcess.map(e => ({ [e.idx]: e.taskid })),
+          ...initializedToProcess.map((e) => ({ [e.idx]: e.taskid })),
         );
         await processClaims();
       };
@@ -266,7 +266,7 @@ const claim = async (
         });
         Object.assign(
           claimed,
-          ...notInitializedToProcess.map(e => ({ [e.idx]: e.taskid })),
+          ...notInitializedToProcess.map((e) => ({ [e.idx]: e.taskid })),
         );
         await processInitAndClaims();
       };

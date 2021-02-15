@@ -66,8 +66,8 @@ orderbookApp
         },
       );
       const fetchMessage = info.showing(objName);
-      const processResponse = res => (res.orders
-        ? res.orders.map(e => ({
+      const processResponse = (res) => (res.orders
+        ? res.orders.map((e) => ({
           orderHash: e.orderHash,
           price: e.order.appprice,
           remaining: e.remaining,
@@ -82,9 +82,10 @@ orderbookApp
         callResults,
         initilResultsCount,
         totalCount,
-      ) => `Apporders details (${initilResultsCount + 1} to ${initilResultsCount
-          + callResults.length}${totalCount ? ` of ${totalCount}` : ''}):${pretty(
-        callResults.map(e => ({
+      ) => `Apporders details (${initilResultsCount + 1} to ${
+        initilResultsCount + callResults.length
+      }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
+        callResults.map((e) => ({
           orderHash: e.orderHash,
           price: e.price,
           remaining: e.remaining,
@@ -168,8 +169,8 @@ orderbookDataset
         },
       );
       const fetchMessage = info.showing(objName);
-      const processResponse = res => (res.orders
-        ? res.orders.map(e => ({
+      const processResponse = (res) => (res.orders
+        ? res.orders.map((e) => ({
           orderHash: e.orderHash,
           price: e.order.datasetprice,
           remaining: e.remaining,
@@ -184,11 +185,10 @@ orderbookDataset
         callResults,
         initilResultsCount,
         totalCount,
-      ) => `Datasetorders details (${initilResultsCount
-          + 1} to ${initilResultsCount + callResults.length}${
-        totalCount ? ` of ${totalCount}` : ''
-      }):${pretty(
-        callResults.map(e => ({
+      ) => `Datasetorders details (${initilResultsCount + 1} to ${
+        initilResultsCount + callResults.length
+      }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
+        callResults.map((e) => ({
           orderHash: e.orderHash,
           price: e.price,
           remaining: e.remaining,
@@ -278,8 +278,8 @@ orderbookWorkerpool
         },
       );
       const fetchMessage = info.showing(objName);
-      const processResponse = res => (res.orders
-        ? res.orders.map(e => ({
+      const processResponse = (res) => (res.orders
+        ? res.orders.map((e) => ({
           orderHash: e.orderHash,
           price: e.order.workerpoolprice,
           remaining: e.remaining,
@@ -296,11 +296,10 @@ orderbookWorkerpool
         callResults,
         initilResultsCount,
         totalCount,
-      ) => `Workerpoolorders details (${initilResultsCount
-          + 1} to ${initilResultsCount + callResults.length}${
-        totalCount ? ` of ${totalCount}` : ''
-      }):${pretty(
-        callResults.map(e => ({
+      ) => `Workerpoolorders details (${initilResultsCount + 1} to ${
+        initilResultsCount + callResults.length
+      }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
+        callResults.map((e) => ({
           orderHash: e.orderHash,
           price: e.price,
           remaining: e.remaining,
@@ -398,8 +397,8 @@ orderbookRequester
         },
       );
       const fetchMessage = info.showing(objName);
-      const processResponse = res => (res.orders
-        ? res.orders.map(e => ({
+      const processResponse = (res) => (res.orders
+        ? res.orders.map((e) => ({
           orderHash: e.orderHash,
           app: e.order.app,
           dataset: e.order.dataset,
@@ -417,11 +416,10 @@ orderbookRequester
         callResults,
         initilResultsCount,
         totalCount,
-      ) => `Requestorders details (${initilResultsCount
-          + 1} to ${initilResultsCount + callResults.length}${
-        totalCount ? ` of ${totalCount}` : ''
-      }):${pretty(
-        callResults.map(e => ({
+      ) => `Requestorders details (${initilResultsCount + 1} to ${
+        initilResultsCount + callResults.length
+      }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
+        callResults.map((e) => ({
           orderHash: e.orderHash,
           price: e.price,
           remaining: e.remaining,

@@ -16,7 +16,7 @@ const {
 const { jsonApi, getAuthorization } = require('./api-utils');
 const { hashEIP712 } = require('./sig-utils');
 const { createObjParams } = require('./request-helper');
-const { getAddress } = require('./wallet');
+const { getAddress, isInWhitelist } = require('./wallet');
 const { checkBalance } = require('./account');
 const {
   checkDeployedApp,
@@ -52,7 +52,7 @@ const {
   wrapCall,
   wrapSend,
   wrapWait,
-  wrapSignTypedDataV3,
+  wrapSignTypedData,
 } = require('./errorWrappers');
 
 const debug = Debug('iexec:order');
@@ -350,30 +350,22 @@ const signOrder = async (
       }`,
     );
   }
-  const domainObj = await getEIP712Domain(contracts);
-
   const salt = getSalt();
-  const saltedOrderObj = { ...orderObj, salt };
-
-  const order = objDesc[orderName].structMembers;
-
-  const types = {};
-  types.EIP712Domain = objDesc.EIP712Domain.structMembers;
-  types[objDesc[orderName].primaryType] = order;
-
-  const message = saltedOrderObj;
-
-  const typedData = {
-    types,
-    domain: domainObj,
-    primaryType: objDesc[orderName].primaryType,
-    message,
+  const saltedOrder = { ...orderObj, salt };
+  const domain = await getEIP712Domain(contracts);
+  const types = {
+    [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
   };
-
-  const sign = await wrapSignTypedDataV3(
-    contracts.signer.signTypedDataV3(typedData),
+  const { signer } = contracts;
+  const sign = await wrapSignTypedData(
+    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+    /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+    signer._signTypedData && typeof signer._signTypedData === 'function'
+      ? signer._signTypedData(domain, types, saltedOrder)
+      : signer.signTypedData(domain, types, saltedOrder),
   );
-  const signedOrder = { ...saltedOrderObj, sign };
+  const signedOrder = { ...saltedOrder, sign };
   return signedOrder;
 };
 
@@ -997,6 +989,64 @@ const getMatchableVolume = async (
       checkRequestSignAsync(),
     ]);
 
+    // enterprise KYC checks
+    if (contracts.flavour === 'enterprise') {
+      debug('check enterprise');
+      const checkRequesterInWhitelistAsync = async () => {
+        const isKYC = await isInWhitelist(contracts, vRequestOrder.requester, {
+          strict: false,
+        });
+        debug('requester in whitelist', isKYC);
+        if (!isKYC) {
+          throw new Error(
+            `requester ${vRequestOrder.requester} is not authorized to interact with eRLC`,
+          );
+        }
+      };
+      const checkAppOwnerInWhitelistAsync = async () => {
+        const owner = await getAppOwner(contracts, vAppOrder.app);
+        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
+        debug('app owner in whitelist', isKYC);
+        if (!isKYC) {
+          throw new Error(
+            `app owner ${owner} is not authorized to interact with eRLC`,
+          );
+        }
+      };
+      const checkDatasetOwnerInWhitelistAsync = async () => {
+        if (vDatasetOrder.dataset === NULL_ADDRESS) {
+          return;
+        }
+        const owner = await getDatasetOwner(contracts, vDatasetOrder.dataset);
+        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
+        debug('dataset owner in whitelist', isKYC);
+        if (!isKYC) {
+          throw new Error(
+            `dataset owner ${owner} is not authorized to interact with eRLC`,
+          );
+        }
+      };
+      const checkWorkerpoolOwnerInWhitelistAsync = async () => {
+        const owner = await getWorkerpoolOwner(
+          contracts,
+          vWorkerpoolOrder.workerpool,
+        );
+        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
+        debug('workerpool owner in whitelist', isKYC);
+        if (!isKYC) {
+          throw new Error(
+            `workerpool owner ${owner} is not authorized to interact with eRLC`,
+          );
+        }
+      };
+      await Promise.all([
+        checkRequesterInWhitelistAsync(),
+        checkAppOwnerInWhitelistAsync(),
+        checkDatasetOwnerInWhitelistAsync(),
+        checkWorkerpoolOwnerInWhitelistAsync(),
+      ]);
+    }
+
     // address checks
     if (vRequestOrder.app !== vAppOrder.app) {
       throw new Error(
@@ -1042,7 +1092,7 @@ const getMatchableVolume = async (
     );
     if (workerpoolMissingTagBits.length > 0) {
       throw Error(
-        `Missing tags [${workerpoolMissingTagBits.map(bit => tagBitToHuman(bit))}] in workerpoolorder`,
+        `Missing tags [${workerpoolMissingTagBits.map((bit) => tagBitToHuman(bit))}] in workerpoolorder`,
       );
     }
     // app tag check
@@ -1101,10 +1151,12 @@ const getMatchableVolume = async (
     const volumes = await Promise.all(
       vRequestOrder.dataset !== NULL_ADDRESS
         ? [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-            return volume;
-          }),
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+              return volume;
+            },
+          ),
           getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
             (volume) => {
               if (volume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
@@ -1127,10 +1179,12 @@ const getMatchableVolume = async (
           ),
         ]
         : [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
-            return volume;
-          }),
+          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+            (volume) => {
+              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+              return volume;
+            },
+          ),
           getRemainingVolume(
             contracts,
             WORKERPOOL_ORDER,

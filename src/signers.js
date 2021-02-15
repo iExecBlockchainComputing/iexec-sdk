@@ -2,7 +2,6 @@ const {
   Wallet, Signer, BigNumber, getDefaultProvider,
 } = require('ethers');
 const { Web3Provider } = require('ethers').providers;
-const { signTypedDataV3 } = require('./sig-utils');
 
 class EnhancedWallet extends Wallet {
   constructor(privateKey, provider, options = {}) {
@@ -31,10 +30,6 @@ class EnhancedWallet extends Wallet {
     return new EnhancedWallet(this.privateKey, provider, this._options);
   }
 
-  signTypedDataV3(data) {
-    return signTypedDataV3(this)(data);
-  }
-
   getGasPrice() {
     if (this._options.gasPrice === undefined) return super.getGasPrice();
     return BigNumber.from(this._options.gasPrice);
@@ -53,22 +48,22 @@ class EnhancedWeb3Signer extends Signer {
     this.provider = web3Provider;
   }
 
-  signTypedDataV3(data) {
-    return new Promise(async (res, reject) => this.provider
-      .send('eth_signTypedData_v3', [
-        await this.getAddress(),
-        JSON.stringify(data),
-      ])
-      .then(res)
-      .catch(reject));
-  }
-
   getAddress() {
     return this.provider.getSigner().getAddress();
   }
 
   signMessage(message) {
     return this.provider.getSigner().signMessage(message);
+  }
+
+  signTypedData(...args) {
+    const signer = this.provider.getSigner();
+    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+    /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
+    return signer._signTypedData && typeof signer._signTypedData === 'function'
+      ? signer._signTypedData(...args)
+      : signer.signTypedData(...args);
   }
 
   sendTransaction(tx) {

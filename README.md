@@ -373,6 +373,8 @@ iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC 
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
+iexec wallet swap-RLC-for-eRLC <amount> [unit] # swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC.
+iexec wallet swap-eRLC-for-RLC <amount> [unit] # swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC.
 ```
 
 The wallet files are stored in the Ethereum keystore.
@@ -689,8 +691,10 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
-  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainId` set the reference to the bridged network specified by `id`.
-  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value).
+  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
+  - optional key `enterprise` set the enterprise swap contract used by the SDK cli when working with enterprise enabled networks. `bridge.enterpriseSwapChainName` set the reference to the enterprise bound network.
+  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
+  - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
 - optional key `providers` set the backends for public chains
   - optional key `alchemy` set Alchemy API Token
   - optional key `etherscan` set Etherscan API Token
@@ -701,28 +705,53 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 {
   "default": "goerli",
   "chains": {
-    "development": {
+    "dev": {
       "host": "http://localhost:8545",
-      "id": "1544020727674",
+      "id": "65535",
       "sms": "http://localhost:5000",
-      "resultProxy": "http://localhost:18089",
+      "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "native": true,
-      "hub": "0x7C788C2B85E20B4Fa25bd579A6B1D0218D86BDd1",
+      "flavour": "standard",
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainId": "123456789"
+        "bridgedChainName": "dev-sidechain"
+      },
+      "enterprise": {
+        "enterpriseSwapChainName": "dev-enterprise"
       }
     },
-    "goerli": {
-      "id": "5"
+    "dev-sidechain": {
+      "host": "http://localhost:18545",
+      "id": "123456",
+      "sms": "http://localhost:15000",
+      "resultProxy": "http://localhost:18089",
+      "ipfsGateway": "http://localhost:18080",
+      "native": true,
+      "useGas": false,
+      "flavour": "standard",
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
+      "bridge": {
+        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
+        "bridgedChainName": "development"
+      }
     },
-    "mainnet": {
-      "id": "1"
+    "dev-enterprise": {
+      "host": "http://localhost:8545",
+      "id": "65535",
+      "sms": "http://localhost:5000",
+      "resultProxy": "http://localhost:8089",
+      "ipfsGateway": "http://localhost:8080",
+      "flavour": "enterprise",
+      "hub": "0xb80C02d24791fA92fA8983f15390274698A75D23",
+      "enterprise": {
+        "enterpriseSwapChainName": "dev"
+      }
     },
-    "bellecour": {
-      "id": "134"
-    }
+    "goerli": {},
+    "mainnet": {},
+    "bellecour": {},
+    "enterprise": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",
@@ -860,14 +889,13 @@ iExec SDK can be imported in your project as a library/module, and it's compatib
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec-sdk-demo-iexec51x-0id5z?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec51x-v91x0?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec51x-zp5n0?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec52x-uy8tc?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec52x-q9qbg?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec52x-4me7q?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
 - [Price feed DOracle](https://price-feed-doracle.iex.ec/): a decentralized price oracle for your favorite cryptos.
-- [Not safe for work](https://nsfw.app.iex.ec/): find if a picture is safe for work using an AI trained model protected by iExec TEE.
 
 ## How to use ?
 
@@ -890,7 +918,7 @@ npm install iexec
 
 #### IExec Constructor
 
-**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String } \[, options \])** => **IExec**
+**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
 
 > _options:_
 >
@@ -899,8 +927,10 @@ npm install iexec
 > - `resultProxyURL: URL` specify the result proxy to use for results remote storage
 > - `ipfsGatewayURL: URL` specify the IPFS gateway to use
 > - `isNative: Boolean` true when the RLC is the chain native token
+> - `useGas: Boolean` false when the chain does NOT requires to spend gas to send a transaction
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
+> - `enterpriseSwapConf: { hubAddress: Address }` specify enterprise flavour binding
 
 ##### Basic configuration
 
@@ -1126,6 +1156,34 @@ const { sendTxHash, receiveTxHash } = await sdk.wallet.bridgeToMainchain(
 console.log(
   `Sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainchain (tx: ${receiveTxHash})`,
 );
+```
+
+#### wrapEnterpriseRLC
+
+iexec.**wallet.wrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
+
+> wrap some nRLC (1 nRLC = 1\*10^-9 RLC) into neRLC (enterprise nRLC).
+> signer wallet must be authorized by the eRLC contract to perform wrap operation.
+
+_Example:_
+
+```js
+const txHash = await sdk.wallet.wrapEnterpriseRLC('1000000000');
+console.log(`Wrapped 1000000000 nRLC into neRLC (tx: ${txHash})`);
+```
+
+#### unwrapEnterpriseRLC
+
+iexec.**wallet.unwrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
+
+> wrap some neRLC (1 neRLC = 1\*10^-9 eRLC) into nRLC.
+> signer wallet must be authorized by the eRLC contract to perform unwrap operation.
+
+_Example:_
+
+```js
+const txHash = await sdk.wallet.unwrapEnterpriseRLC('1000000000');
+console.log(`Unwrapped 1000000000 neRLC into nRLC (tx: ${txHash})`);
 ```
 
 ### iexec.account
@@ -1907,12 +1965,12 @@ const dealObservable = iexec.deal.obsDeal(
 );
 
 const unsubscribe = dealObservable.subscribe({
-  next: data =>
+  next: (data) =>
     console.log(
       data.message,
       `completed tasks ${data.completedTasksCount}/${data.tasksCount}`,
     ),
-  error: e => console.error(e),
+  error: (e) => console.error(e),
   complete: () => console.log('final state reached'),
 });
 // call unsubscribe() to unsubscribe from dealObservable
@@ -1966,10 +2024,10 @@ _Example:_
 const { claimed, transactions } = await iexec.deal.claim(
   '0xe0ebfa1177a5997434fe14b5e88897950e07ff82e6976a024b07f30063249a1e',
 );
-Object.entries(claimed).forEach(e => {
+Object.entries(claimed).forEach((e) => {
   console.log(`claimed task: idx ${e[0]} taskid ${e[1]}`);
 });
-transactions.forEach(e => {
+transactions.forEach((e) => {
   console.log(`transaction ${e.type} hash ${e.txHash}`);
 });
 ```
@@ -2049,7 +2107,7 @@ const taskObservable = iexec.task.obsTask(
 
 const unsubscribe = taskObservable.subscribe({
   next: ({ message, task }) => console.log(message, task.statusName),
-  error: e => console.error(e),
+  error: (e) => console.error(e),
   complete: () => console.log('final state reached'),
 });
 // call unsubscribe() to unsubscribe from taskObservable

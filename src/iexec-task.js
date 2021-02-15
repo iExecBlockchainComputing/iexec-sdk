@@ -74,7 +74,7 @@ show
                 `${info.showing(objName)}\nTask status ${task.statusName}`,
               );
             },
-            error: e => reject(e),
+            error: (e) => reject(e),
             complete: () => {
               resolve(taskState);
             },
@@ -153,11 +153,11 @@ show
       const claimable = taskResult.status < 3 && !!taskResult.taskTimedOut;
 
       const cleanTask = stringifyNestedBn(taskResult);
-      const raw = Object.assign(
-        { task: cleanTask },
-        { claimable },
-        { resultPath },
-      );
+      const raw = {
+        task: cleanTask,
+        claimable,
+        resultPath,
+      };
       spinner.succeed(`Task ${taskid} details: ${pretty(cleanTask)}`, {
         raw,
       });

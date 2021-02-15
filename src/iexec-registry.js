@@ -44,10 +44,7 @@ const addressListSchema = () => object().test(async (value) => {
 
 const baseSchema = () => object({
   type: string(),
-  description: string()
-    .min(150)
-    .max(2000)
-    .required(),
+  description: string().min(150).max(2000).required(),
   logo: string().required(),
   social: object({
     website: string(),
@@ -206,7 +203,7 @@ validate.description(desc.validateRessource()).action(async (objName, cmd) => {
       );
     } else {
       spinner.fail(`Invalid files: ${pretty(failed)}`, {
-        raw: Object.assign({}, { validated }, { fail: failed }),
+        raw: { validated, fail: failed },
       });
     }
   } catch (error) {

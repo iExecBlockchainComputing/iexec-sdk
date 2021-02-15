@@ -62,7 +62,7 @@ async function main() {
           spinner.info('Creating your wallet file');
           const walletOptions = await computeWalletCreateOptions(cmd);
           walletRes = await createAndSave(
-            Object.assign({}, { force }, walletOptions),
+            { force, ...walletOptions },
           );
           spinner.info(
             `Your wallet address is ${
@@ -74,13 +74,13 @@ async function main() {
           spinner.warn('You must backup your wallet file in a safe place!');
         }
 
-        const raw = Object.assign(
-          {},
-          walletRes && { walletAddress: walletRes.address },
-          walletRes && { walletFile: walletRes.fileName },
-          fileName && { configFile: fileName },
-          chainRes && { chainConfigFile: chainRes.fileName },
-        );
+        const raw = {
+
+          ...walletRes && { walletAddress: walletRes.address },
+          ...walletRes && { walletFile: walletRes.fileName },
+          ...fileName && { configFile: fileName },
+          ...chainRes && { chainConfigFile: chainRes.fileName },
+        };
         spinner.succeed('iExec project is ready\n', {
           raw,
         });
@@ -126,7 +126,8 @@ async function main() {
       try {
         const chain = await loadChain(cmd.chain, { spinner });
 
-        const host = chain.host === getChainDefaults(chain.id).host
+        const host = chain.host
+          === getChainDefaults({ id: chain.id, flavour: chain.flavour }).host
           ? 'default'
           : chain.host;
         spinner.info(`Ethereum host: ${host}`);
@@ -136,6 +137,7 @@ async function main() {
           ethProvider: chain.contracts.provider,
         }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
         const useNative = !!chain.contracts.isNative;
+        const { flavour } = chain.contracts;
         const rlcAddress = useNative
           ? undefined
           : await wrapCall(
@@ -167,7 +169,7 @@ async function main() {
         const { pocoVersion } = chain.contracts;
 
         const iexecAddresses = {
-          'iExec PoCo version': pocoVersion,
+          'iExec PoCo version': `${pocoVersion} ${flavour}`,
           ...((useNative && {
             'native RLC': true,
           }) || { 'RLC ERC20 address': rlcAddress }),
@@ -186,6 +188,7 @@ async function main() {
             datasetRegistryAddress,
             workerpoolRegistryAddress,
             useNative,
+            flavour,
           },
         });
       } catch (error) {

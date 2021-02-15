@@ -326,12 +326,16 @@ const tagSchema = () => mixed()
     'is-bytes32',
     '${originalValue} is not a valid bytes32 hexstring',
     async (value) => {
-      const res = await bytes32Schema().validate(value);
-      return res;
+      try {
+        await bytes32Schema().validate(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
     },
   );
 
-const apporderSchema = opt => object(
+const apporderSchema = (opt) => object(
   {
     app: addressSchema(opt).required(),
     appprice: nRlcAmountSchema().required(),
@@ -344,17 +348,17 @@ const apporderSchema = opt => object(
   '${originalValue} is not a valid apporder',
 );
 
-const saltedApporderSchema = opt => apporderSchema(opt).shape(
+const saltedApporderSchema = (opt) => apporderSchema(opt).shape(
   salted(),
   '${originalValue} is not a valid salted apporder',
 );
 
-const signedApporderSchema = opt => saltedApporderSchema(opt).shape(
+const signedApporderSchema = (opt) => saltedApporderSchema(opt).shape(
   signed(),
   '${originalValue} is not a valid signed apporder',
 );
 
-const datasetorderSchema = opt => object(
+const datasetorderSchema = (opt) => object(
   {
     dataset: addressSchema(opt).required(),
     datasetprice: nRlcAmountSchema().required(),
@@ -367,17 +371,17 @@ const datasetorderSchema = opt => object(
   '${originalValue} is not a valid datasetorder',
 );
 
-const saltedDatasetorderSchema = opt => datasetorderSchema(opt).shape(
+const saltedDatasetorderSchema = (opt) => datasetorderSchema(opt).shape(
   salted(),
   '${originalValue} is not a valid salted datasetorder',
 );
 
-const signedDatasetorderSchema = opt => saltedDatasetorderSchema(opt).shape(
+const signedDatasetorderSchema = (opt) => saltedDatasetorderSchema(opt).shape(
   signed(),
   '${originalValue} is not a valid signed datasetorder',
 );
 
-const workerpoolorderSchema = opt => object(
+const workerpoolorderSchema = (opt) => object(
   {
     workerpool: addressSchema(opt).required(),
     workerpoolprice: nRlcAmountSchema().required(),
@@ -392,17 +396,17 @@ const workerpoolorderSchema = opt => object(
   '${originalValue} is not a valid workerpoolorder',
 );
 
-const saltedWorkerpoolorderSchema = opt => workerpoolorderSchema(opt).shape(
+const saltedWorkerpoolorderSchema = (opt) => workerpoolorderSchema(opt).shape(
   salted(),
   '${originalValue} is not a valid salted workerpoolorder',
 );
 
-const signedWorkerpoolorderSchema = opt => saltedWorkerpoolorderSchema(opt).shape(
+const signedWorkerpoolorderSchema = (opt) => saltedWorkerpoolorderSchema(opt).shape(
   signed(),
   '${originalValue} is not a valid signed workerpoolorder',
 );
 
-const requestorderSchema = opt => object(
+const requestorderSchema = (opt) => object(
   {
     app: addressSchema(opt).required(),
     appmaxprice: nRlcAmountSchema().required(),
@@ -422,12 +426,12 @@ const requestorderSchema = opt => object(
   '${originalValue} is not a valid requestorder',
 );
 
-const saltedRequestorderSchema = opt => requestorderSchema(opt).shape(
+const saltedRequestorderSchema = (opt) => requestorderSchema(opt).shape(
   salted(),
   '${originalValue} is not a valid salted requestorder',
 );
 
-const signedRequestorderSchema = opt => saltedRequestorderSchema(opt).shape(
+const signedRequestorderSchema = (opt) => saltedRequestorderSchema(opt).shape(
   signed(),
   '${originalValue} is not a valid signed requestorder',
 );
@@ -447,7 +451,7 @@ const mrenclaveSchema = () => mixed().transform((value) => {
 
 const appTypeSchema = () => string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
-const appSchema = opt => object({
+const appSchema = (opt) => object({
   owner: addressSchema(opt).required(),
   name: string().required(),
   type: appTypeSchema().required(),
@@ -456,14 +460,14 @@ const appSchema = opt => object({
   mrenclave: mrenclaveSchema().required(),
 });
 
-const datasetSchema = opt => object({
+const datasetSchema = (opt) => object({
   owner: addressSchema(opt).required(),
   name: string().required(),
   multiaddr: multiaddressSchema().required(),
   checksum: bytes32Schema().required(),
 });
 
-const workerpoolSchema = opt => object({
+const workerpoolSchema = (opt) => object({
   owner: addressSchema(opt).required(),
   description: string().required(),
 });

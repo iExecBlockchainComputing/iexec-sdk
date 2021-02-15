@@ -112,7 +112,7 @@ init
         );
       } else {
         spinner.fail(`Failed to init: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
@@ -312,7 +312,7 @@ sign
         });
       } else {
         spinner.fail(`Failed to sign: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
@@ -573,7 +573,7 @@ publish
         });
       } else {
         spinner.fail(`Failed to publish: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
@@ -694,7 +694,7 @@ unpublish
         });
       } else {
         spinner.fail(`Failed to unpublish: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
@@ -791,7 +791,7 @@ cancel
         });
       } else {
         spinner.fail(`Failed to cancel: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
@@ -874,11 +874,11 @@ show
               deals.deals,
             )}`
             : '\nDeals count: 0';
-          const raw = Object.assign(
-            {},
-            orderToShow,
-            deals && { deals: { count: deals.count, lastDeals: deals.deals } },
-          );
+          const raw = {
+
+            ...orderToShow,
+            ...deals && { deals: { count: deals.count, lastDeals: deals.deals } },
+          };
           spinner.info(`${orderString}${opts.deals ? dealsString : ''}`);
           Object.assign(success, { [orderName]: raw });
         } catch (error) {
@@ -896,7 +896,7 @@ show
         });
       } else {
         spinner.fail(`Failed to show: ${pretty(failed)}`, {
-          raw: Object.assign({}, success, { fail: failed }),
+          raw: { ...success, fail: failed },
         });
       }
     } catch (error) {
