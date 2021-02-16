@@ -2221,6 +2221,20 @@ const { address } = await iexec.dataset.deployDataset({
 console.log('deployed at', address);
 ```
 
+#### generateEncryptionKey
+
+iexec.**dataset.generateEncryptionKey ()** => String
+
+> generate an encryption key to encrypt a dataset
+> Note: The key is a base64 encoded 256 bits string
+
+_Example:_
+
+```js
+const encryptionKey = iexec.dataset.generateEncryptionKey();
+console.log('encryption key:', encryptionKey);
+```
+
 #### pushDatasetSecret
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
@@ -2233,7 +2247,7 @@ _Example:_
 ```js
 const pushed = await iexec.dataset.pushDatasetSecret(
   datasetAddress,
-  'secretkey',
+  encryptionKey,
 );
 console.log('secret pushed:', pushed);
 ```
