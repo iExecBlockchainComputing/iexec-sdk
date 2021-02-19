@@ -2226,7 +2226,7 @@ console.log('deployed at', address);
 iexec.**dataset.generateEncryptionKey ()** => String
 
 > generate an encryption key to encrypt a dataset
-> Note: The key is a base64 encoded 256 bits string
+> _NB_: This method returns a base64 encoded 256 bits key
 
 _Example:_
 
@@ -2235,12 +2235,36 @@ const encryptionKey = iexec.dataset.generateEncryptionKey();
 console.log('encryption key:', encryptionKey);
 ```
 
+#### encrypt
+
+iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Promise < **encryptedDataset: Buffer** >
+
+> encrypt the dataset file with the specified key using AES-256-CBC.
+> _NB_:
+>
+> - the supplied key must be 256 bits base64 encoded
+> - DO NOT leak the key and DO NOT use the same key for encrypting different datasets
+
+_Example:_
+
+```js
+const datasetFile = await readDatasetAsArrayBuffer(); // somehow load the dataset file
+
+const encryptionKey = iexec.dataset.generateEncryptionKey(); // DO NOT leak this key
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
+```
+
 #### pushDatasetSecret
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
 
-> push the dataset secret to the SMS
-> pushed secret can't be ubdated
+> push the dataset's key to the SMS
+> pushed secrets CAN NOT be updated
 
 _Example:_
 
@@ -2557,7 +2581,7 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### decryptResult
 
-utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
+utils.**decryptResult ( encryptedZipFile: ArrayBuffer|Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
 > decrypt en encrypted result with the beneficiary RSA Key.
 

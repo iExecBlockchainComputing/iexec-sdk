@@ -3,6 +3,8 @@ const BN = require('bn.js');
 const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
+const { execAsync } = require('./test-utils');
+
 const { utils, IExec, errors } = require('../src/iexec-lib');
 const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
@@ -83,7 +85,6 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChainUrl1s);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
@@ -3194,6 +3195,50 @@ describe('[dataset]', () => {
     expect(typeof key).toBe('string');
     expect(Buffer.from(key, 'base64').length).toBe(32);
   });
+  test('dataset.encrypt()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const encryptedBytes = await iexec.dataset.encrypt(
+      await fs.readFile(path.join(process.cwd(), 'test/inputs/files/text.zip')),
+      key,
+    );
+    expect(encryptedBytes).toBeInstanceOf(Buffer);
+    expect(encryptedBytes.length).toBe(224);
+  });
+  if (!DRONE) {
+    test('dataset.encrypt() (check decrypt)', async () => {
+      const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+      const iexec = new IExec({
+        ethProvider: signer,
+        chainId: '1',
+      });
+      const key = iexec.dataset.generateEncryptionKey();
+      const encryptedBytes = await iexec.dataset.encrypt(
+        await fs.readFile(
+          path.join(process.cwd(), 'test/inputs/files/text.zip'),
+        ),
+        key,
+      );
+      await fs.writeFile(
+        path.join(process.cwd(), 'test/out/dataset.enc'),
+        encryptedBytes,
+      );
+      await expect(
+        execAsync(
+          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/test/out:/host openssldecrypt dataset.enc dataset.zip ${key}`,
+        ),
+      ).resolves.toBeDefined();
+      await expect(
+        execAsync(
+          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/test/out:/host openssldecrypt dataset.enc dataset.zip ${'BeW1SatJkSjVhwCC/neRUOI4ykI9vxRuWiUxPsrEQv4='}`,
+        ),
+      ).rejects.toBeInstanceOf(Error);
+    }, 30000);
+  }
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

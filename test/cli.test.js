@@ -1,9 +1,9 @@
-const { exec } = require('child_process');
 const semver = require('semver');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
+const { execAsync } = require('./test-utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
 
 console.log('Node version:', process.version);
@@ -47,14 +47,6 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-const execAsync = (cmd) => new Promise((res, rej) => {
-  exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      rej(Error(stdout + stderr));
-    }
-    res(stdout + stderr);
-  });
-});
 
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
