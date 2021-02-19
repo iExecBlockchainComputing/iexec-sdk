@@ -1,5 +1,7 @@
 const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
+const fs = require('fs-extra');
+const path = require('path');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
 const {
   // throwIfMissing,
@@ -29,6 +31,8 @@ const {
   // categorySchema,
   // workerpoolSchema,
   objParamsSchema,
+  base64Encoded256bitsKeySchema,
+  zipBufferSchema,
   ValidationError,
 } = require('../src/validator');
 
@@ -858,6 +862,68 @@ describe('[addressSchema]', () => {
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
       new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
+    );
+  });
+});
+
+describe('[base64Encoded256bitsKeySchema]', () => {
+  test('valid key', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        'm7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=',
+      ),
+    ).resolves.toBe('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=');
+  });
+  test('invalid base64', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94',
+      ),
+    ).rejects.toThrow(
+      'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94 is not a valid encryption key (must be base64 encoded 256 bits key)',
+    );
+  });
+  test('invalid key length', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate('UtmonCp7SKOWuOPpXyikHQ=='),
+    ).rejects.toThrow(
+      'UtmonCp7SKOWuOPpXyikHQ== is not a valid encryption key (must be base64 encoded 256 bits key)',
+    );
+  });
+  test('buffer is not valid', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        Buffer.from('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=', 'base64'),
+      ),
+    ).rejects.toThrow();
+  });
+});
+
+describe('[zipBufferSchema]', () => {
+  test('zip file', async () => {
+    const zipFileBuffer = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    );
+    await expect(
+      zipBufferSchema().validate(zipFileBuffer),
+    ).resolves.toBeInstanceOf(Buffer);
+  });
+  test('other file', async () => {
+    const fileBuffer = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.txt'),
+    );
+    await expect(zipBufferSchema().validate(fileBuffer)).rejects.toThrow(
+      'Provided file is not a zip file',
+    );
+  });
+  test('text', async () => {
+    await expect(zipBufferSchema().validate('foo')).rejects.toThrow(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  });
+  test('number', async () => {
+    await expect(zipBufferSchema().validate(42)).rejects.toThrow(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
     );
   });
 });

@@ -3,6 +3,7 @@ const {
   string, number, object, mixed, boolean, array,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
+const JSZip = require('jszip');
 const {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -116,19 +117,29 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
               && ethProvider.resolveName
               && typeof ethProvider.resolveName === 'function'
           ) {
-            const addressPromise = new Promise(async (resolve) => {
-              try {
-                debug('resolving ENS', value);
-                const resolved = await wrapCall(
-                  ethProvider.resolveName(value),
-                );
+            debug('resolving ENS', value);
+            const addressPromise = wrapCall(ethProvider.resolveName(value))
+              .then((resolved) => {
                 debug('resolved ENS', resolved);
-                resolve(resolved);
-              } catch (error) {
+                return resolved;
+              })
+              .catch((error) => {
                 debug('ENS resolution error', error);
-              }
-              resolve(null);
-            });
+                return null;
+              });
+              // const addressPromise = new Promise(async (resolve) => {
+              //   try {
+              //     debug('resolving ENS', value);
+              //     const resolved = await wrapCall(
+              //       ethProvider.resolveName(value),
+              //     );
+              //     debug('resolved ENS', resolved);
+              //     resolve(resolved);
+              //   } catch (error) {
+              //     debug('ENS resolution error', error);
+              //   }
+              //   resolve(null);
+              // });
             return addressPromise;
           }
           debug("no ethProvider ENS can't be resolved");
@@ -478,6 +489,53 @@ const categorySchema = () => object({
   workClockTimeRef: uint256Schema().required(),
 });
 
+const zipBufferSchema = () => mixed()
+  .transform((value) => {
+    try {
+      if (typeof value === 'string') {
+        throw Error('unsupported string');
+      }
+      const buffer = Buffer.from(value);
+      return buffer;
+    } catch (e) {
+      throw new ValidationError(
+        'Invalid file buffer, must be ArrayBuffer or Buffer',
+      );
+    }
+  })
+  .test('is-zip-bytes', 'Provided file is not a zip file', async (value) => {
+    try {
+      const isZip = await new Promise((resolve, reject) => {
+        JSZip.loadAsync(value)
+          .then(() => {
+            resolve(true);
+          })
+          .catch((e) => reject(e));
+      });
+      return isZip;
+    } catch (e) {
+      debug('is-zip-bytes', e);
+      return false;
+    }
+  });
+
+const base64Encoded256bitsKeySchema = () => string().test(
+  'is-base64-256bits-key',
+  '${originalValue} is not a valid encryption key (must be base64 encoded 256 bits key)',
+  async (value) => {
+    try {
+      const keyBuffer = Buffer.from(value, 'base64');
+      if (keyBuffer.length !== 32) {
+        throw Error('Invalid key length');
+      }
+      return true;
+    } catch (e) {
+      debug('is-base64-256bits-key', e);
+      return false;
+    }
+  },
+);
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -519,5 +577,7 @@ module.exports = {
   datasetSchema,
   categorySchema,
   workerpoolSchema,
+  base64Encoded256bitsKeySchema,
+  zipBufferSchema,
   ValidationError,
 };
