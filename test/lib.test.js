@@ -3223,20 +3223,20 @@ describe('[dataset]', () => {
         ),
         key,
       );
-      await fs.writeFile(
-        path.join(process.cwd(), 'test/out/dataset.enc'),
-        encryptedBytes,
-      );
+      const outDir = path.join(process.cwd(), 'test/out');
+      await fs
+        .ensureDir(outDir)
+        .then(() => fs.writeFile(path.join(outDir, 'dataset.enc'), encryptedBytes));
       await expect(
         execAsync(
-          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/test/out:/host openssldecrypt dataset.enc dataset.zip ${key}`,
-        ),
-      ).resolves.toBeDefined();
-      await expect(
-        execAsync(
-          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/test/out:/host openssldecrypt dataset.enc dataset.zip ${'BeW1SatJkSjVhwCC/neRUOI4ykI9vxRuWiUxPsrEQv4='}`,
+          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v ${outDir}:/host openssldecrypt dataset.enc datasetBadDecrypt.zip BeW1SatJkSjVhwCC/neRUOI4ykI9vxRuWiUxPsrEQv4=`,
         ),
       ).rejects.toBeInstanceOf(Error);
+      await expect(
+        execAsync(
+          `docker build test/inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v ${outDir}:/host openssldecrypt dataset.enc dataset.zip ${key}`,
+        ),
+      ).resolves.toBeDefined();
     }, 30000);
   }
   test('dataset.deployDataset()', async () => {

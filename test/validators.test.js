@@ -32,7 +32,7 @@ const {
   // workerpoolSchema,
   objParamsSchema,
   base64Encoded256bitsKeySchema,
-  zipBufferSchema,
+  fileBufferSchema,
   ValidationError,
 } = require('../src/validator');
 
@@ -899,30 +899,22 @@ describe('[base64Encoded256bitsKeySchema]', () => {
   });
 });
 
-describe('[zipBufferSchema]', () => {
-  test('zip file', async () => {
-    const zipFileBuffer = await fs.readFile(
+describe('[fileBufferSchema]', () => {
+  test('file', async () => {
+    const fileBuffer = await fs.readFile(
       path.join(process.cwd(), 'test/inputs/files/text.zip'),
     );
     await expect(
-      zipBufferSchema().validate(zipFileBuffer),
+      fileBufferSchema().validate(fileBuffer),
     ).resolves.toBeInstanceOf(Buffer);
   });
-  test('other file', async () => {
-    const fileBuffer = await fs.readFile(
-      path.join(process.cwd(), 'test/inputs/files/text.txt'),
-    );
-    await expect(zipBufferSchema().validate(fileBuffer)).rejects.toThrow(
-      'Provided file is not a zip file',
-    );
-  });
   test('text', async () => {
-    await expect(zipBufferSchema().validate('foo')).rejects.toThrow(
+    await expect(fileBufferSchema().validate('foo')).rejects.toThrow(
       'Invalid file buffer, must be ArrayBuffer or Buffer',
     );
   });
   test('number', async () => {
-    await expect(zipBufferSchema().validate(42)).rejects.toThrow(
+    await expect(fileBufferSchema().validate(42)).rejects.toThrow(
       'Invalid file buffer, must be ArrayBuffer or Buffer',
     );
   });

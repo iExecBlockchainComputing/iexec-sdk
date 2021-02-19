@@ -3,7 +3,7 @@ const { randomBytes } = require('ethers').utils;
 const aesjs = require('aes-js');
 const {
   base64Encoded256bitsKeySchema,
-  zipBufferSchema,
+  fileBufferSchema,
   throwIfMissing,
 } = require('./validator');
 
@@ -17,7 +17,7 @@ const encryptAes256Cbc = async (
     await base64Encoded256bitsKeySchema().validate(base64Key),
     'base64',
   );
-  const fileBuffer = await zipBufferSchema().validate(datasetFileBytes);
+  const fileBuffer = await fileBufferSchema().validate(datasetFileBytes);
 
   const ivBuffer = Buffer.from(randomBytes(16));
 

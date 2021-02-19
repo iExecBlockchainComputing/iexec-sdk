@@ -3,7 +3,6 @@ const {
   string, number, object, mixed, boolean, array,
 } = require('yup');
 const { getAddress } = require('ethers').utils;
-const JSZip = require('jszip');
 const {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -489,35 +488,19 @@ const categorySchema = () => object({
   workClockTimeRef: uint256Schema().required(),
 });
 
-const zipBufferSchema = () => mixed()
-  .transform((value) => {
-    try {
-      if (typeof value === 'string') {
-        throw Error('unsupported string');
-      }
-      const buffer = Buffer.from(value);
-      return buffer;
-    } catch (e) {
-      throw new ValidationError(
-        'Invalid file buffer, must be ArrayBuffer or Buffer',
-      );
+const fileBufferSchema = () => mixed().transform((value) => {
+  try {
+    if (typeof value === 'string') {
+      throw Error('unsupported string');
     }
-  })
-  .test('is-zip-bytes', 'Provided file is not a zip file', async (value) => {
-    try {
-      const isZip = await new Promise((resolve, reject) => {
-        JSZip.loadAsync(value)
-          .then(() => {
-            resolve(true);
-          })
-          .catch((e) => reject(e));
-      });
-      return isZip;
-    } catch (e) {
-      debug('is-zip-bytes', e);
-      return false;
-    }
-  });
+    const buffer = Buffer.from(value);
+    return buffer;
+  } catch (e) {
+    throw new ValidationError(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  }
+});
 
 const base64Encoded256bitsKeySchema = () => string().test(
   'is-base64-256bits-key',
@@ -578,6 +561,6 @@ module.exports = {
   categorySchema,
   workerpoolSchema,
   base64Encoded256bitsKeySchema,
-  zipBufferSchema,
+  fileBufferSchema,
   ValidationError,
 };
