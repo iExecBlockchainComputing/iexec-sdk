@@ -105,10 +105,12 @@ const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 const ORDERS_FILE_NAME = 'orders.json';
 
-const saveTextToFile = async (
+const saveToFile = async (
   fileName,
   text,
-  { force = false, strict = true, fileDir } = {},
+  {
+    force = false, strict = true, fileDir, format,
+  } = {},
 ) => {
   try {
     let filePath;
@@ -123,7 +125,7 @@ const saveTextToFile = async (
       return filePath;
     }
     const fd = await fs.open(filePath, 'wx');
-    await fs.write(fd, text, 0, 'utf8');
+    await fs.write(fd, text, 0, format);
     await fs.close(fd);
     return filePath;
   } catch (error) {
@@ -141,6 +143,25 @@ const saveTextToFile = async (
       }
       return '';
     }
+    debug('saveToFile()', error);
+    throw error;
+  }
+};
+
+const saveTextToFile = async (
+  fileName,
+  text,
+  { force = false, strict = true, fileDir } = {},
+) => {
+  try {
+    const filePath = await saveToFile(fileName, text, {
+      format: 'utf8',
+      force,
+      strict,
+      fileDir,
+    });
+    return filePath;
+  } catch (error) {
     debug('saveTextToFile()', error);
     throw error;
   }
@@ -377,6 +398,7 @@ const zipDirectory = async (dirPath, { force = false } = {}) => {
 };
 
 module.exports = {
+  saveToFile,
   saveTextToFile,
   saveJSONToFile,
   saveWalletConf,
