@@ -4,7 +4,6 @@ const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
 const BN = require('bn.js');
 const path = require('path');
-const { spawn } = require('child_process');
 const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
 const { weiAmountSchema } = require('./validator');
@@ -274,13 +273,6 @@ const option = {
   originalDatasetDir: () => [
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
-  ],
-  datasetEncryptionAlgorithm: () => [
-    '--algorithm <algorithm>',
-    `specify the encryption algorithm to use <${listOfChoices([
-      // 'aes-256-cbc',
-      'scone',
-    ])}>`,
   ],
   txGasPrice: () => [
     '--gas-price <amount unit...>',
@@ -886,39 +878,6 @@ const renderTasksStatus = (tasksStatusMap) => {
   return `${completedMsg}${failedMsg}${statusMsg}`;
 };
 
-const spawnAsync = (bin, args, options = { spinner: Spinner() }) => new Promise((resolve, reject) => {
-  debug('spawnAsync bin', bin);
-  debug('spawnAsync args', args);
-  let errorMessage = '';
-  const proc = args ? spawn(bin, args) : spawn(bin);
-
-  proc.stdout.on('data', (data) => {
-    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-    debug('spawnAsync stdout', inlineData);
-    if (!options.quiet) options.spinner.info(inlineData);
-  });
-  proc.stderr.on('data', (data) => {
-    const inlineData = data.toString().replace(/(\r\n|\n|\r)/gm, ' ');
-    debug('spawnAsync stderr', inlineData);
-    if (!options.quiet) options.spinner.info(inlineData);
-    errorMessage = errorMessage.concat(inlineData, '\n');
-  });
-  proc.on('close', (code) => {
-    debug('spawnAsync close', code);
-    if (code !== 0) reject(errorMessage || 'process errored');
-    resolve();
-  });
-  proc.on('exit', (code) => {
-    debug('spawnAsync exit', code);
-    if (code !== 0) reject(errorMessage || 'process errored');
-    resolve();
-  });
-  proc.on('error', () => {
-    debug('spawnAsync error');
-    reject(errorMessage || 'process errored');
-  });
-});
-
 module.exports = {
   help,
   checkUpdate,
@@ -948,7 +907,6 @@ module.exports = {
   lbb,
   lba,
   lb,
-  spawnAsync,
   renderTasksStatus,
   displayPaginableRequest,
 };
