@@ -126,19 +126,6 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
                 debug('ENS resolution error', error);
                 return null;
               });
-              // const addressPromise = new Promise(async (resolve) => {
-              //   try {
-              //     debug('resolving ENS', value);
-              //     const resolved = await wrapCall(
-              //       ethProvider.resolveName(value),
-              //     );
-              //     debug('resolved ENS', resolved);
-              //     resolve(resolved);
-              //   } catch (error) {
-              //     debug('ENS resolution error', error);
-              //   }
-              //   resolve(null);
-              // });
             return addressPromise;
           }
           debug("no ethProvider ENS can't be resolved");
