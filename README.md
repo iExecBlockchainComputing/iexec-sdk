@@ -2205,30 +2205,12 @@ const { dataset } = await iexec.dataset.showDataset(
 console.log('dataset:', dataset);
 ```
 
-#### deploy
-
-iexec.**dataset.deployDataset ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
-
-> deploy a dataset on the blockchain.
-
-_Example:_
-
-```js
-const { address } = await iexec.dataset.deployDataset({
-  owner: await iexec.wallet.getAddress(),
-  name: 'My dataset',
-  multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-  checksum:
-    '0x0000000000000000000000000000000000000000000000000000000000000000',
-});
-console.log('deployed at', address);
-```
-
 #### generateEncryptionKey
 
 iexec.**dataset.generateEncryptionKey ()** => String
 
 > generate an encryption key to encrypt a dataset
+>
 > _NB_: This method returns a base64 encoded 256 bits key
 
 _Example:_
@@ -2242,7 +2224,8 @@ console.log('encryption key:', encryptionKey);
 
 iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Promise < **encryptedDataset: Buffer** >
 
-> encrypt the dataset file with the specified key using AES-256-CBC.
+> encrypt the dataset file with the specified key using AES-256-CBC
+>
 > _NB_:
 >
 > - the supplied key must be 256 bits base64 encoded
@@ -2262,12 +2245,55 @@ const encryptedDataset = await iexec.dataset.encrypt(
 const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
 ```
 
+#### computeChecksum
+
+iexec.**dataset.computeChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
+
+> compute the encrypted dataset file's checksum required for dataset deployment
+>
+> - :warning: the dataset checksum is the encrypted file checksum, use this method on the encrypted file but DO NOT use it on the original dataset file
+>
+> _NB_:
+>
+> - the dataset checksum is the sha256sum of the encrypted dataset file
+> - the checksum is used in the computation workflow to ensure the dataset's integrity
+
+_Example:_
+
+```js
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const checksum = await iexec.dataset.computeChecksum(encryptedDataset);
+```
+
+#### deploy
+
+iexec.**dataset.deployDataset ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
+
+> deploy a dataset on the blockchain.
+
+_Example:_
+
+```js
+const { address } = await iexec.dataset.deployDataset({
+  owner: await iexec.wallet.getAddress(),
+  name: 'My dataset',
+  multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+  checksum:
+    '0x0000000000000000000000000000000000000000000000000000000000000000',
+});
+console.log('deployed at', address);
+```
+
 #### pushDatasetSecret
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
 
 > push the dataset's key to the SMS
-> pushed secrets CAN NOT be updated
+> :warning: pushed secrets CAN NOT be updated
 
 _Example:_
 
