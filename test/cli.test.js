@@ -5,6 +5,7 @@ const path = require('path');
 const BN = require('bn.js');
 const { execAsync } = require('./test-utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { bytes32Regex } = require('../src/utils');
 
 console.log('Node version:', process.version);
 
@@ -3386,6 +3387,14 @@ describe('[Common]', () => {
       expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
       expect(res.encryptedFiles).toBeDefined();
       expect(res.encryptedFiles.length).toBe(2);
+      expect(res.encryptedFiles[0].original).toBeDefined();
+      expect(res.encryptedFiles[0].encrypted).toBeDefined();
+      expect(res.encryptedFiles[0].key).toBeDefined();
+      expect(res.encryptedFiles[0].checksum).toMatch(bytes32Regex);
+      expect(res.encryptedFiles[1].original).toBeDefined();
+      expect(res.encryptedFiles[1].encrypted).toBeDefined();
+      expect(res.encryptedFiles[1].key).toBeDefined();
+      expect(res.encryptedFiles[1].checksum).toMatch(bytes32Regex);
       expect(await checkExists(filePath('.secrets/datasets/dataset.key'))).toBe(
         true,
       );

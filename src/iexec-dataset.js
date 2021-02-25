@@ -50,7 +50,11 @@ const { Keystore } = require('./keystore');
 const secretMgtServ = require('./sms');
 const { loadChain, connectKeystore } = require('./chains');
 const { NULL_ADDRESS } = require('./utils');
-const { generateAes256Key, encryptAes256Cbc } = require('./encryption-utils');
+const {
+  generateAes256Key,
+  encryptAes256Cbc,
+  sha256Sum,
+} = require('./encryption-utils');
 
 const debug = Debug('iexec:iexec-dataset');
 
@@ -278,6 +282,7 @@ encryptDataset
         );
         const fileBuffer = await fs.readFile(originalFilePath);
         const encryptedFileBuffer = await encryptAes256Cbc(fileBuffer, key);
+        const encryptedFileChecksum = await sha256Sum(encryptedFileBuffer);
 
         const keyFilePath = await saveTextToFile(
           `${datasetFileName}.key`,
@@ -306,10 +311,13 @@ encryptDataset
         spinner.info(
           `Generated encrypted dataset for ${datasetFileName} in ${encryptedFilePath}`,
         );
+        spinner.info(`Dataset checksum is ${encryptedFileChecksum}\n`);
+
         return {
           original: originalFilePath,
           encrypted: encryptedFilePath,
           key: keyFilePath,
+          checksum: encryptedFileChecksum,
         };
       };
 
@@ -324,7 +332,7 @@ encryptDataset
         );
         if (!stats.isFile()) {
           spinner.info(
-            `Datasets must be single file, skipping ${filesNames[index]}.`,
+            `Datasets must be single file, skipping ${filesNames[index]}\n`,
           );
         } else {
           const paths = await encryptDatasetFile(filesNames[index]);

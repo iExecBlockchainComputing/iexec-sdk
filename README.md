@@ -160,11 +160,11 @@ iexec order cancel --app <orderHash> # cancel your order
 
 First go through [Init project](#Init-project)
 
-#### Encrypt your dataset (optional)
+#### Encrypt your dataset
 
 ```bash
 cp 'myAwsomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
-iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it
+iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it, also output the encrypted file checksum to use for deployment.
 cat ./.secrets/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
 cat ./datasets/encrypted/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
@@ -178,7 +178,7 @@ iexec dataset deploy # deploy dataset on Ethereum
 iexec dataset show # show details of deployed dataset
 ```
 
-### Securely share the dataset secret key (Encrypted datasets only)
+### Securely share the dataset secret key
 
 **Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
 
@@ -463,16 +463,16 @@ iexec app request-execution <appAddress> [options] # request an iExec applicatio
 # --user <address>
 iexec dataset init # init the dataset template
 iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
+iexec dataset encrypt # for each dataset file in ./datasets/original/ generate a 256 bits key and encrypt the dataset using AES-256-CBC and compute the encrypted file's sha256 checksum
 iexec dataset deploy # deploy the dataset on the blockchain
+iexec dataset push-secret [datasetAddress] # push the key for the encrypted dataset
+iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 iexec dataset publish [datasetAddress] # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
 iexec dataset unpublish [datasetAddress] # unpublish the last published datasetorder for specified dataset
 iexec dataset unpublish [datasetAddress] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
-iexec dataset encrypt # for each dataset file in ./datasets/original/ generate a 256 bits key and encrypt the dataset using AES-256-CBC
-iexec dataset push-secret [datasetAddress] # push the key for the encrypted dataset
-iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 ```
 
 ## workerpool
