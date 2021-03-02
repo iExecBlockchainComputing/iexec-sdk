@@ -5,9 +5,13 @@ const path = require('path');
 const JSZip = require('jszip');
 const { execAsync } = require('./test-utils');
 
-const { utils, IExec, errors } = require('../src/iexec-lib');
-const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { utils, IExec, errors } = require('../src/lib/index');
+const {
+  sleep,
+  bytes32Regex,
+  addressRegex,
+} = require('../src/common/utils/utils');
+const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 
 console.log('Node version:', process.version);
 

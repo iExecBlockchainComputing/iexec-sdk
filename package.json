@@ -2,13 +2,13 @@
   "name": "iexec",
   "version": "5.2.0",
   "description": "iExec SDK",
-  "main": "dist/iexec-lib.js",
+  "main": "dist/lib/iexec-lib.js",
   "scripts": {
     "test": "jest --coverage --runInBand --detectOpenHandles --forceExit",
     "build": "./node_modules/.bin/babel src --out-dir dist --copy-files"
   },
   "bin": {
-    "iexec": "./dist/iexec.js"
+    "iexec": "./dist/cli/cmd/iexec.js"
   },
   "files": [
     "dist/",

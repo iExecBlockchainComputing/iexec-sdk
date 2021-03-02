@@ -2,7 +2,7 @@ const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -34,7 +34,7 @@ const {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
   ValidationError,
-} = require('../src/validator');
+} = require('../src/common/utils/validator');
 
 // TESTS
 describe('[positiveIntSchema]', () => {

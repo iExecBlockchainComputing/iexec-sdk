@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
 const { execAsync } = require('./test-utils');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
-const { bytes32Regex } = require('../src/utils');
+const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
+const { bytes32Regex } = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
 
@@ -13,7 +13,7 @@ jest.setTimeout(10000);
 
 // CONFIG
 const { DRONE, WITH_STACK } = process.env;
-const iexecPath = DRONE ? 'iexec' : 'node ../src/iexec.js';
+const iexecPath = DRONE ? 'iexec' : 'node ../src/cli/cmd/iexec.js';
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
   : 'http://localhost:8545';
