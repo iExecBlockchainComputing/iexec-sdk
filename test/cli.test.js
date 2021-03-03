@@ -1,9 +1,9 @@
-const { exec } = require('child_process');
 const semver = require('semver');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
+const { execAsync } = require('./test-utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
 
 console.log('Node version:', process.version);
@@ -47,14 +47,6 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-const execAsync = (cmd) => new Promise((res, rej) => {
-  exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      rej(Error(stdout + stderr));
-    }
-    res(stdout + stderr);
-  });
-});
 
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
@@ -3380,54 +3372,9 @@ describe('[Common]', () => {
       expect(await checkExists(filePath('out/encrypted/'))).toBe(true);
     });
 
-    // removed from v5
-    test.skip('iexec dataset encrypt', async () => {
+    test('iexec dataset encrypt', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.encryptedDatasetFolderPath).toBeDefined();
-      expect(res.secretPath).toBeDefined();
-      expect(
-        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
-      ).not.toBe(-1);
-      expect(res.secretPath.indexOf('.secrets/datasets')).not.toBe(-1);
-      expect(
-        await checkExists(filePath('.secrets/datasets/dataset.secret')),
-      ).toBe(true);
-      expect(
-        await checkExists(
-          filePath('.secrets/datasets/datasetFolder.zip.secret'),
-        ),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('datasets/encrypted/datasetFolder.zip.enc')),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
-      ).toBe(true);
-    });
-
-    if (!DRONE) {
-      // this test requires docker
-      test.skip('openssl decrypt dataset', async () => expect(
-        execAsync(
-          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.secrets/datasets:/secrets -v $PWD/datasets/encrypted:/encrypted openssldecrypt dataset.txt',
-        ),
-      ).resolves.not.toBe(1));
-    }
-
-    // removed from v5
-    test.skip('iexec dataset encrypt --force --algorithm aes-256-cbc', async () => {
-      await execAsync(
-        'cp ./inputs/originalDataset/dataset.txt ./datasets/original/dataset.txt ',
-      );
-      const raw = await execAsync(
-        `${iexecPath} dataset encrypt --force --algorithm aes-256-cbc --raw`,
+        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -3437,55 +3384,32 @@ describe('[Common]', () => {
         res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
       expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+      expect(res.encryptedFiles).toBeDefined();
+      expect(res.encryptedFiles.length).toBe(2);
+      expect(await checkExists(filePath('.secrets/datasets/dataset.key'))).toBe(
+        true,
+      );
       expect(
-        await checkExists(filePath('.secrets/datasets/dataset.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.txt.key')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.zip.key')),
       ).toBe(true);
       expect(
         await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
       ).toBe(true);
-    });
+      expect(
+        await checkExists(filePath('datasets/encrypted/dataset.zip.enc')),
+      ).toBe(true);
+    }, 15000);
 
     if (!DRONE) {
       // this test requires docker
-      test('iexec dataset encrypt --algorithm scone', async () => {
-        const raw = await execAsync(
-          `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.encryptedDatasetFolderPath).toBeDefined();
-        expect(res.secretPath).toBeDefined();
-        expect(
-          res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
-        ).not.toBe(-1);
-        expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
-        expect(
-          await checkExists(filePath('.secrets/datasets/dataset.secret')),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('.secrets/datasets/dataset_datasetFolder.scone.secret'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('.secrets/datasets/dataset_dataset.txt.scone.secret'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('datasets/encrypted/dataset_datasetFolder.zip'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('datasets/encrypted/dataset_dataset.txt.zip'),
-          ),
-        ).toBe(true);
-      }, 15000);
+      test('openssl decrypt datasets', async () => expect(
+        execAsync(
+          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD:/host openssldecrypt datasets/encrypted/dataset.txt.enc out/decrypted.txt $(cat .secrets/datasets/dataset.txt.key)',
+        ),
+      ).resolves.not.toBe(1));
     }
 
     if (WITH_STACK) {
