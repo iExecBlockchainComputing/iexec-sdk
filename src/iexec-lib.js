@@ -287,7 +287,7 @@ class IExec {
     this.dataset = {};
     this.dataset.generateEncryptionKey = () => generateAes256Key();
     this.dataset.encrypt = (datasetFile, encryptionKey) => encryptAes256Cbc(datasetFile, encryptionKey);
-    this.dataset.computeChecksum = (encryptedFile) => sha256Sum(encryptedFile);
+    this.dataset.computeEncryptedFileChecksum = (encryptedFile) => sha256Sum(encryptedFile);
     this.dataset.deployDataset = (dataset) => hub.deployDataset(contracts, dataset);
     this.dataset.showDataset = (address) => hub.showDataset(contracts, address);
     this.dataset.showUserDataset = (index, userAddress) => hub.showUserDataset(contracts, index, userAddress);

@@ -2245,9 +2245,9 @@ const encryptedDataset = await iexec.dataset.encrypt(
 const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
 ```
 
-#### computeChecksum
+#### computeEncryptedFileChecksum
 
-iexec.**dataset.computeChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
+iexec.**dataset.computeEncryptedFileChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
 
 > compute the encrypted dataset file's checksum required for dataset deployment
 >
@@ -2266,7 +2266,9 @@ const encryptedDataset = await iexec.dataset.encrypt(
   encryptionKey,
 );
 
-const checksum = await iexec.dataset.computeChecksum(encryptedDataset);
+const checksum = await iexec.dataset.computeEncryptedFileChecksum(
+  encryptedDataset,
+);
 ```
 
 #### deploy
