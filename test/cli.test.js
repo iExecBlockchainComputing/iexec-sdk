@@ -3410,7 +3410,7 @@ describe('[Common]', () => {
       expect(
         await checkExists(filePath('datasets/encrypted/dataset.zip.enc')),
       ).toBe(true);
-    }, 15000);
+    });
 
     if (!DRONE) {
       // this test requires docker
