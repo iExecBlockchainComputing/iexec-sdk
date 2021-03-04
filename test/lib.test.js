@@ -3239,6 +3239,28 @@ describe('[dataset]', () => {
       ).resolves.toBeDefined();
     }, 30000);
   }
+  test('dataset.computeEncryptedFileChecksum()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const fileBytes = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    );
+
+    const originalFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(fileBytes);
+    expect(originalFileChecksum).toBe(
+      '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515',
+    );
+
+    const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
+    const encryptedFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(
+      encryptedFileBytes,
+    );
+    expect(encryptedFileChecksum).toMatch(bytes32Regex);
+  });
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

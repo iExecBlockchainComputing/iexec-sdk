@@ -1,5 +1,5 @@
 const { Buffer } = require('buffer');
-const { randomBytes } = require('ethers').utils;
+const { randomBytes, sha256 } = require('ethers').utils;
 const aesjs = require('aes-js');
 const {
   base64Encoded256bitsKeySchema,
@@ -10,14 +10,14 @@ const {
 const generateAes256Key = () => Buffer.from(randomBytes(32)).toString('base64');
 
 const encryptAes256Cbc = async (
-  datasetFileBytes = throwIfMissing(),
+  fileBytes = throwIfMissing(),
   base64Key = throwIfMissing(),
 ) => {
   const keyBuffer = Buffer.from(
     await base64Encoded256bitsKeySchema().validate(base64Key),
     'base64',
   );
-  const fileBuffer = await fileBufferSchema().validate(datasetFileBytes);
+  const fileBuffer = await fileBufferSchema().validate(fileBytes);
 
   const ivBuffer = Buffer.from(randomBytes(16));
 
@@ -38,7 +38,13 @@ const encryptAes256Cbc = async (
   return ivEncryptedFileBuffer;
 };
 
+const sha256Sum = async (fileBytes = throwIfMissing()) => {
+  const fileBuffer = await fileBufferSchema().validate(fileBytes);
+  return sha256(fileBuffer);
+};
+
 module.exports = {
   generateAes256Key,
   encryptAes256Cbc,
+  sha256Sum,
 };
