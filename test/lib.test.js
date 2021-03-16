@@ -5,9 +5,13 @@ const path = require('path');
 const JSZip = require('jszip');
 const { execAsync } = require('./test-utils');
 
-const { utils, IExec, errors } = require('../src/iexec-lib');
-const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { utils, IExec, errors } = require('../src/lib/iexec-lib');
+const {
+  sleep,
+  bytes32Regex,
+  addressRegex,
+} = require('../src/common/utils/utils');
+const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 
 console.log('Node version:', process.version);
 
@@ -58,6 +62,15 @@ const tokenChainUrl1s = DRONE
 const tokenChainParityUrl = DRONE
   ? 'http://token-chain-parity:8545'
   : 'http://localhost:9545';
+// secret management service
+const smsURL = DRONE ? 'http://token-sms:15000' : 'http://localhost:5000';
+const smsHttpsURL = DRONE
+  ? 'https://token-sms:15443'
+  : 'https://localhost:5443';
+// result proxy
+const resultProxyURL = DRONE
+  ? 'http://token-result-proxy:18089'
+  : 'http://localhost:18089';
 
 const chainGasPrice = '20000000000';
 // const nativeChainGasPrice = '0';
@@ -3374,170 +3387,161 @@ describe('[dataset]', () => {
       iexec.dataset.showUserDataset(count, userAddress),
     ).rejects.toThrow(Error('dataset not deployed'));
   });
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('dataset.pushDatasetSecret()', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      const pushRes = await iexec.dataset.pushDatasetSecret(
-        datasetAddress,
-        'oops',
-      );
-      expect(pushRes).toBe(true);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`,
-        ),
-      );
+
+  test('dataset.pushDatasetSecret()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (not deployed)', async () => {
-      const randomAddress = getRandomAddress();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(
-        iexec.dataset.pushDatasetSecret(randomAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
-        ),
-      );
+    const datasetAddress = datasetDeployRes.address;
+    const pushRes = await iexec.dataset.pushDatasetSecret(
+      datasetAddress,
+      'oops',
+    );
+    expect(pushRes).toBe(true);
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(`Secret already exists for ${datasetAddress} and can't be updated`),
+    );
+  });
+  test('dataset.pushDatasetSecret() (not deployed)', async () => {
+    const randomAddress = getRandomAddress();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    await expect(
+      iexec.dataset.pushDatasetSecret(randomAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(
+        `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+      ),
+    );
+  });
+  test('dataset.pushDatasetSecret() (invalid owner)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: POOR_ADDRESS2,
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (invalid owner)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: POOR_ADDRESS2,
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
-        ),
-      );
+    const datasetAddress = datasetDeployRes.address;
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(
+        `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
+      ),
+    );
+  });
+  test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(Error(`SMS at ${smsURL} didn't answered`));
+    const datasetAddress = datasetDeployRes.address;
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(Error(`SMS at ${smsHttpsURL} didn't answered`));
+  });
+  test('dataset.checkDatasetSecretExists()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.checkDatasetSecretExists()', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
-        datasetAddress,
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.dataset.pushDatasetSecret(datasetAddress, 'oops');
-      const withSecretRes = await iexec.dataset.checkDatasetSecretExists(
-        datasetAddress,
-      );
-      expect(withSecretRes).toBe(true);
-    });
-  }
+    const datasetAddress = datasetDeployRes.address;
+    const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddress,
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.dataset.pushDatasetSecret(datasetAddress, 'oops');
+    const withSecretRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddress,
+    );
+    expect(withSecretRes).toBe(true);
+  });
 });
 
 describe('[workerpool]', () => {
@@ -4088,144 +4092,129 @@ describe('[order]', () => {
     });
   });
 
-  if (WITH_STACK) {
-    // this test requires
-    test('order.signRequestorder() (checkRequest default storage)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-      });
-
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
-        ),
-      );
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+  test('order.signRequestorder() (checkRequest default storage)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
     });
 
-    test('order.signRequestorder() (checkRequest dropbox storage)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-        tag: ['tee'],
-        params: {
-          iexec_result_storage_provider: 'dropbox',
-        },
-      });
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+      ),
+    );
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
+    });
+  });
 
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
-        ),
-      );
-
-      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+  test('order.signRequestorder() (checkRequest dropbox storage)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
+      tag: ['tee'],
+      params: {
+        iexec_result_storage_provider: 'dropbox',
+      },
     });
 
-    test('order.signRequestorder() (checkRequest with encryption)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-        params: { iexec_result_encryption: true },
-      });
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
-        ),
-      );
-      await iexec.result.pushResultEncryptionKey('oops');
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
+      ),
+    );
+
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
     });
-  }
+  });
+
+  test('order.signRequestorder() (checkRequest with encryption)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
+      params: { iexec_result_encryption: true },
+    });
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
+      ),
+    );
+    await iexec.result.pushResultEncryptionKey('oops');
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
+    });
+  });
 
   test('order.hashApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -5801,105 +5790,95 @@ describe('[order]', () => {
     expect(res.dealid).toMatch(bytes32Regex);
   }, 60000);
 
-  if (WITH_STACK) {
-    // this test requires running local stack
-    test('order.matchOrders() (checkRequest)', async () => {
-      const randomWallet = getRandomWallet();
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
+  test('order.matchOrders() (checkRequest)', async () => {
+    const randomWallet = getRandomWallet();
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const iexecRich = new IExec(
+      {
+        ethProvider: richSigner,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+        resultProxyURL,
+      },
+    );
+    await iexecRich.wallet.sendETH('20000000000000000', randomWallet.address);
 
-      const richSigner = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        PRIVATE_KEY,
-      );
-      const iexecRich = new IExec(
-        {
-          ethProvider: richSigner,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-          resultProxyURL,
-        },
-      );
-      await iexecRich.wallet.sendETH('20000000000000000', randomWallet.address);
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+        resultProxyURL,
+      },
+    );
+    const resourcesProviderSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      RICH_PRIVATE_KEY2,
+    );
+    const iexecResourcesProvider = new IExec(
+      {
+        ethProvider: resourcesProviderSigner,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
 
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        randomWallet.privateKey,
-      );
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-          resultProxyURL,
-        },
-      );
-      const resourcesProviderSigner = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        RICH_PRIVATE_KEY2,
-      );
-      const iexecResourcesProvider = new IExec(
-        {
-          ethProvider: resourcesProviderSigner,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-        },
-      );
+    const apporder = await deployAndGetApporder(iexecResourcesProvider);
+    const datasetorder = await deployAndGetDatasetorder(iexecResourcesProvider);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(
+      iexecResourcesProvider,
+    );
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider);
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-      );
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
-
-      await expect(
-        iexec.order.matchOrders({
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
-        }),
-      ).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
-        ),
-      );
-
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      const res = await iexec.order.matchOrders({
+    await expect(
+      iexec.order.matchOrders({
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-      });
-      expect(res.txHash).toMatch(bytes32Regex);
-      expect(res.volume).toBeInstanceOf(BN);
-      expect(res.volume.eq(new BN(1))).toBe(true);
-      expect(res.dealid).toMatch(bytes32Regex);
-    }, 60000);
-  }
+      }),
+    ).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+      ),
+    );
+
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    const res = await iexec.order.matchOrders({
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    });
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.volume).toBeInstanceOf(BN);
+    expect(res.volume.eq(new BN(1))).toBe(true);
+    expect(res.dealid).toMatch(bytes32Regex);
+  }, 60000);
 
   if (WITH_STACK) {
     // this test requires running local stack
@@ -6023,10 +6002,6 @@ describe('[order]', () => {
       const iexecGatewayURL = DRONE
         ? 'http://token-gateway:3000'
         : 'http://localhost:13000';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
       const iexec = new IExec(
         {
           ethProvider: signer,
@@ -7093,7 +7068,7 @@ describe('[observables]', () => {
     let unsubObsTaskBeforeNext;
     let unsubObsTaskAfterInit;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
         unsubObsTaskWithDealid = iexec.task
           .obsTask(taskid, { dealid })
@@ -7104,8 +7079,9 @@ describe('[observables]', () => {
             error: () => reject(Error('obsTask with dealid should not call error')),
             complete: () => reject(Error('obsTask with dealid should not call complete')),
           });
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsTaskBeforeNext = iexec.task
           .obsTask(taskid, { dealid })
           .subscribe({
@@ -7122,21 +7098,26 @@ describe('[observables]', () => {
               Error('obsTask unsub before next should not call complete'),
             ),
           });
-        await sleep(10000);
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: () => reject(Error('obsTask after init should not call complete')),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
+            next: (value) => {
+              obsTaskAfterInitValues.push(value);
+            },
+            error: () => reject(Error('obsTask after init should not call error')),
+            complete: () => reject(Error('obsTask after init should not call complete')),
+          });
+          sleep(5000).then(resolve);
         });
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+            .then(resolve)
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7180,7 +7161,7 @@ describe('[observables]', () => {
     expect(obsTaskAfterInitValues[0].task.status).toBe(1);
     expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
     expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 40000);
 
   test('task.obsTask() (task timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7256,17 +7237,18 @@ describe('[observables]', () => {
           complete: () => reject(Error('obsTask before init should not call complete')),
         });
       }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: resolve,
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task.obsTask(taskid).subscribe({
+            next: (value) => {
+              obsTaskAfterInitValues.push(value);
+            },
+            error: () => reject(Error('obsTask after init should not call error')),
+            complete: resolve,
+          });
         });
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsTaskBeforeComplete = iexec.task
           .obsTask(taskid, { dealid })
           .subscribe({
@@ -7276,8 +7258,7 @@ describe('[observables]', () => {
             error: () => reject(Error('obsTask unsubscribed should nol call complete')),
             complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
           });
-        await sleep(1000);
-        resolve();
+        sleep(1000).then(resolve);
       }),
       sleep(1000).then(() => {
         unsubObsTaskBeforeComplete();
@@ -7345,7 +7326,7 @@ describe('[observables]', () => {
     expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
     expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
     expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 40000);
 
   test('deal.obsDeal()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7385,7 +7366,7 @@ describe('[observables]', () => {
     let unsubObsDeal;
     let unsubObsDealBeforeNext;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
         unsubObsDeal = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
@@ -7394,8 +7375,9 @@ describe('[observables]', () => {
           error: () => reject(Error('obsDeal should not call error')),
           complete: () => reject(Error('obsDeal should not call complete')),
         });
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsDealBeforeNext = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
             obsDealUnsubBeforeNextValues.push(value);
@@ -7408,13 +7390,20 @@ describe('[observables]', () => {
           error: () => reject(Error('obsDeal unsub before next should not call error')),
           complete: () => reject(Error('obsDeal unsub before next should not call complete')),
         });
-        await sleep(10000);
+        sleep(10000).then(resolve);
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(6000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(6000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7496,7 +7485,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeNextValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
-  }, 30000);
+  }, 40000);
 
   test('deal.obsDeal() (deal timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7559,7 +7548,7 @@ describe('[observables]', () => {
           complete: () => reject(Error('obsDeal with wrong dealid should not call complete')),
         });
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
             unsubObsDealBeforeComplete();
@@ -7572,14 +7561,20 @@ describe('[observables]', () => {
             Error('obsDeal unsub before complete should not call complete'),
           ),
         });
-        await sleep(10000);
-        resolve();
+        sleep(10000).then(resolve);
       }),
-      sleep(5000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(1000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(1000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7681,330 +7676,309 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
-  }, 50000);
+  }, 60000);
 });
 
 describe('[result]', () => {
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('result.pushResultEncryptionKey()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.result.pushResultEncryptionKey('oops');
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.result.pushResultEncryptionKey('oops'),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
-        ),
-      );
+  test('result.pushResultEncryptionKey()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
     });
-    test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
-        forceUpdate: true,
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
-        forceUpdate: true,
-      });
-      expect(pushSameRes.isPushed).toBe(true);
-      expect(pushSameRes.isUpdated).toBe(true);
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
     });
-    test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(
-        iexec.result.pushResultEncryptionKey('oops'),
-      ).rejects.toThrow(Error(`SMS at ${smsURL} didn't answered`));
-    });
-    test('result.checkResultEncryptionKeyExists()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-        randomWallet.address,
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.result.pushResultEncryptionKey('oops');
-      const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-        randomWallet.address,
-      );
-      expect(withSecretRes).toBe(true);
-    });
-  }
+    expect(pushSameRes.isPushed).toBe(true);
+    expect(pushSameRes.isUpdated).toBe(true);
+  });
+  test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+  test('result.checkResultEncryptionKeyExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.result.pushResultEncryptionKey('oops');
+    const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withSecretRes).toBe(true);
+  });
 });
 
 describe('[storage]', () => {
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('storage.defaultStorageLogin()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-        },
-      );
-      const token = await iexec.storage.defaultStorageLogin();
-      expect(typeof token).toBe('string');
-      expect(token.split('.').length).toBe(3);
-      const token2 = await iexec.storage.defaultStorageLogin();
-      expect(token2).toBe(token);
+  test('storage.defaultStorageLogin()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+      },
+    );
+    const token = await iexec.storage.defaultStorageLogin();
+    expect(typeof token).toBe('string');
+    expect(token.split('.').length).toBe(3);
+    const token2 = await iexec.storage.defaultStorageLogin();
+    expect(token2).toBe(token);
+  });
+  test('storage.pushStorageToken()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (provider: "default")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'default',
     });
-    test('storage.pushStorageToken()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops');
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'default' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (provider: "dropbox")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'dropbox',
     });
-    test('storage.pushStorageToken() (provider: "default")', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'default',
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'default' }),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
     });
-    test('storage.pushStorageToken() (provider: "dropbox")', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'dropbox',
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const updateRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
     });
-    test('storage.pushStorageToken() (forceUpdate)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        forceUpdate: true,
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      const updateRes = await iexec.storage.pushStorageToken('oops', {
-        forceUpdate: true,
-      });
-      expect(updateRes.isPushed).toBe(true);
-      expect(updateRes.isUpdated).toBe(true);
-    });
-    test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        Error(`SMS at ${smsURL} didn't answered`),
-      );
-    });
-    test('storage.checkStorageTokenExists()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-        { provider: 'dropbox' },
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
-      const withSecretRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-        { provider: 'dropbox' },
-      );
-      expect(withSecretRes).toBe(true);
-      const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-      );
-      expect(unsetProviderRes).toBe(false);
-      expect(() => iexec.storage.checkStorageTokenExists(randomWallet.address, {
-        provider: 'test',
-      })).toThrow(Error('"test" not supported'));
-    });
-  }
+    expect(updateRes.isPushed).toBe(true);
+    expect(updateRes.isUpdated).toBe(true);
+  });
+  test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+  test('storage.checkStorageTokenExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+        chainId: networkId,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const withSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withSecretRes).toBe(true);
+    const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+    );
+    expect(unsetProviderRes).toBe(false);
+    expect(() => iexec.storage.checkStorageTokenExists(randomWallet.address, {
+      provider: 'test',
+    })).toThrow(Error('"test" not supported'));
+  });
 });
 
 describe('[deal]', () => {

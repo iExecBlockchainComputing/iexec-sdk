@@ -13,6 +13,7 @@
           "_hex",
           "_name",
           "_options",
+          "_signTypedData",
           "_subscribe"
         ]
       }
