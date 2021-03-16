@@ -9,6 +9,8 @@ pipeline:
     image: node:${NODE_TAG}
     pull: true
     commands:
+      - apt update
+      - apt install xxd
       - node -v
       - npm -v
       - npm install
@@ -24,6 +26,8 @@ pipeline:
     image: node:${NODE_TAG}
     pull: true
     commands:
+      - apt update
+      - apt install xxd
       - node -v
       - npm -v
       - npm install

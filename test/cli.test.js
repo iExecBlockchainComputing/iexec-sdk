@@ -55,22 +55,20 @@ const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
 const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
 const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
 
+const filePath = (fileName) => path.join(process.cwd(), fileName);
+
 const loadJSONFile = async (fileName) => {
-  const filePath = path.join(process.cwd(), fileName);
-  const fileJSON = await fs.readFile(filePath, 'utf8');
+  const fileJSON = await fs.readFile(filePath(fileName), 'utf8');
   const file = JSON.parse(fileJSON);
   return file;
 };
 
 const saveJSONToFile = async (json, fileName) => {
-  const filePath = path.join(process.cwd(), fileName);
   const text = JSON.stringify(json, null, 2);
-  await fs.writeFile(filePath, text);
+  await fs.writeFile(filePath(fileName), text);
 };
 
 const checkExists = async (file) => fs.pathExists(file);
-
-const filePath = (fileName) => path.join(process.cwd(), fileName);
 
 const removeWallet = () => fs.remove('./wallet.json').catch(() => {});
 
@@ -3410,16 +3408,25 @@ describe('[Common]', () => {
       expect(
         await checkExists(filePath('datasets/encrypted/dataset.zip.enc')),
       ).toBe(true);
-    });
 
-    if (!DRONE) {
-      // this test requires docker
-      test('openssl decrypt datasets', async () => expect(
+      // decrypt with openssl
+      const decryptedFilePath = 'out/decrypted';
+      await expect(
         execAsync(
-          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD:/host openssldecrypt datasets/encrypted/dataset.txt.enc out/decrypted.txt $(cat .secrets/datasets/dataset.txt.key)',
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
         ),
-      ).resolves.not.toBe(1));
-    }
+      ).rejects.toBeInstanceOf(Error);
+      await expect(
+        execAsync(
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[0].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
+        ),
+      ).resolves.toBeDefined();
+      await expect(
+        execAsync(
+          `tail -c+17 "${res.encryptedFiles[1].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[1].encrypted}" | xxd -p -c 16)`,
+        ),
+      ).resolves.toBeDefined();
+    });
 
     if (WITH_STACK) {
       // this test requires nexus.iex.ec image
