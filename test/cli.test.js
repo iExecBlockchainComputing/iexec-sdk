@@ -1,10 +1,11 @@
-const { exec } = require('child_process');
 const semver = require('semver');
 const ethers = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
+const { execAsync } = require('./test-utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { bytes32Regex } = require('../src/utils');
 
 console.log('Node version:', process.version);
 
@@ -47,14 +48,6 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-const execAsync = (cmd) => new Promise((res, rej) => {
-  exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      rej(Error(stdout + stderr));
-    }
-    res(stdout + stderr);
-  });
-});
 
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
@@ -62,22 +55,20 @@ const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
 const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
 const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
 
+const filePath = (fileName) => path.join(process.cwd(), fileName);
+
 const loadJSONFile = async (fileName) => {
-  const filePath = path.join(process.cwd(), fileName);
-  const fileJSON = await fs.readFile(filePath, 'utf8');
+  const fileJSON = await fs.readFile(filePath(fileName), 'utf8');
   const file = JSON.parse(fileJSON);
   return file;
 };
 
 const saveJSONToFile = async (json, fileName) => {
-  const filePath = path.join(process.cwd(), fileName);
   const text = JSON.stringify(json, null, 2);
-  await fs.writeFile(filePath, text);
+  await fs.writeFile(filePath(fileName), text);
 };
 
 const checkExists = async (file) => fs.pathExists(file);
-
-const filePath = (fileName) => path.join(process.cwd(), fileName);
 
 const removeWallet = () => fs.remove('./wallet.json').catch(() => {});
 
@@ -3380,54 +3371,9 @@ describe('[Common]', () => {
       expect(await checkExists(filePath('out/encrypted/'))).toBe(true);
     });
 
-    // removed from v5
-    test.skip('iexec dataset encrypt', async () => {
+    test('iexec dataset encrypt', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.encryptedDatasetFolderPath).toBeDefined();
-      expect(res.secretPath).toBeDefined();
-      expect(
-        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
-      ).not.toBe(-1);
-      expect(res.secretPath.indexOf('.secrets/datasets')).not.toBe(-1);
-      expect(
-        await checkExists(filePath('.secrets/datasets/dataset.secret')),
-      ).toBe(true);
-      expect(
-        await checkExists(
-          filePath('.secrets/datasets/datasetFolder.zip.secret'),
-        ),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('datasets/encrypted/datasetFolder.zip.enc')),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
-      ).toBe(true);
-      expect(
-        await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
-      ).toBe(true);
-    });
-
-    if (!DRONE) {
-      // this test requires docker
-      test.skip('openssl decrypt dataset', async () => expect(
-        execAsync(
-          'docker build inputs/opensslDecryptDataset/ -t openssldecrypt && docker run --rm -v $PWD/.secrets/datasets:/secrets -v $PWD/datasets/encrypted:/encrypted openssldecrypt dataset.txt',
-        ),
-      ).resolves.not.toBe(1));
-    }
-
-    // removed from v5
-    test.skip('iexec dataset encrypt --force --algorithm aes-256-cbc', async () => {
-      await execAsync(
-        'cp ./inputs/originalDataset/dataset.txt ./datasets/original/dataset.txt ',
-      );
-      const raw = await execAsync(
-        `${iexecPath} dataset encrypt --force --algorithm aes-256-cbc --raw`,
+        `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -3437,56 +3383,50 @@ describe('[Common]', () => {
         res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
       expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
+      expect(res.encryptedFiles).toBeDefined();
+      expect(res.encryptedFiles.length).toBe(2);
+      expect(res.encryptedFiles[0].original).toBeDefined();
+      expect(res.encryptedFiles[0].encrypted).toBeDefined();
+      expect(res.encryptedFiles[0].key).toBeDefined();
+      expect(res.encryptedFiles[0].checksum).toMatch(bytes32Regex);
+      expect(res.encryptedFiles[1].original).toBeDefined();
+      expect(res.encryptedFiles[1].encrypted).toBeDefined();
+      expect(res.encryptedFiles[1].key).toBeDefined();
+      expect(res.encryptedFiles[1].checksum).toMatch(bytes32Regex);
+      expect(await checkExists(filePath('.secrets/datasets/dataset.key'))).toBe(
+        true,
+      );
       expect(
-        await checkExists(filePath('.secrets/datasets/dataset.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.txt.key')),
       ).toBe(true);
       expect(
-        await checkExists(filePath('.secrets/datasets/dataset.txt.secret')),
+        await checkExists(filePath('.secrets/datasets/dataset.zip.key')),
       ).toBe(true);
       expect(
         await checkExists(filePath('datasets/encrypted/dataset.txt.enc')),
       ).toBe(true);
-    });
+      expect(
+        await checkExists(filePath('datasets/encrypted/dataset.zip.enc')),
+      ).toBe(true);
 
-    if (!DRONE) {
-      // this test requires docker
-      test('iexec dataset encrypt --algorithm scone', async () => {
-        const raw = await execAsync(
-          `${iexecPath} dataset encrypt --original-dataset-dir inputs/originalDataset --algorithm scone --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.encryptedDatasetFolderPath).toBeDefined();
-        expect(res.secretPath).toBeDefined();
-        expect(
-          res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
-        ).not.toBe(-1);
-        expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
-        expect(
-          await checkExists(filePath('.secrets/datasets/dataset.secret')),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('.secrets/datasets/dataset_datasetFolder.scone.secret'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('.secrets/datasets/dataset_dataset.txt.scone.secret'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('datasets/encrypted/dataset_datasetFolder.zip'),
-          ),
-        ).toBe(true);
-        expect(
-          await checkExists(
-            filePath('datasets/encrypted/dataset_dataset.txt.zip'),
-          ),
-        ).toBe(true);
-      }, 15000);
-    }
+      // decrypt with openssl
+      const decryptedFilePath = 'out/decrypted';
+      await expect(
+        execAsync(
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
+        ),
+      ).rejects.toBeInstanceOf(Error);
+      await expect(
+        execAsync(
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[0].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
+        ),
+      ).resolves.toBeDefined();
+      await expect(
+        execAsync(
+          `tail -c+17 "${res.encryptedFiles[1].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[1].encrypted}" | xxd -p -c 16)`,
+        ),
+      ).resolves.toBeDefined();
+    });
 
     if (WITH_STACK) {
       // this test requires nexus.iex.ec image

@@ -116,19 +116,16 @@ const addressSchema = ({ ethProvider } = {}) => mixed()
               && ethProvider.resolveName
               && typeof ethProvider.resolveName === 'function'
           ) {
-            const addressPromise = new Promise(async (resolve) => {
-              try {
-                debug('resolving ENS', value);
-                const resolved = await wrapCall(
-                  ethProvider.resolveName(value),
-                );
+            debug('resolving ENS', value);
+            const addressPromise = wrapCall(ethProvider.resolveName(value))
+              .then((resolved) => {
                 debug('resolved ENS', resolved);
-                resolve(resolved);
-              } catch (error) {
+                return resolved;
+              })
+              .catch((error) => {
                 debug('ENS resolution error', error);
-              }
-              resolve(null);
-            });
+                return null;
+              });
             return addressPromise;
           }
           debug("no ethProvider ENS can't be resolved");
@@ -478,6 +475,37 @@ const categorySchema = () => object({
   workClockTimeRef: uint256Schema().required(),
 });
 
+const fileBufferSchema = () => mixed().transform((value) => {
+  try {
+    if (typeof value === 'string') {
+      throw Error('unsupported string');
+    }
+    const buffer = Buffer.from(value);
+    return buffer;
+  } catch (e) {
+    throw new ValidationError(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  }
+});
+
+const base64Encoded256bitsKeySchema = () => string().test(
+  'is-base64-256bits-key',
+  '${originalValue} is not a valid encryption key (must be base64 encoded 256 bits key)',
+  async (value) => {
+    try {
+      const keyBuffer = Buffer.from(value, 'base64');
+      if (keyBuffer.length !== 32) {
+        throw Error('Invalid key length');
+      }
+      return true;
+    } catch (e) {
+      debug('is-base64-256bits-key', e);
+      return false;
+    }
+  },
+);
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -519,5 +547,7 @@ module.exports = {
   datasetSchema,
   categorySchema,
   workerpoolSchema,
+  base64Encoded256bitsKeySchema,
+  fileBufferSchema,
   ValidationError,
 };

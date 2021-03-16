@@ -160,11 +160,11 @@ iexec order cancel --app <orderHash> # cancel your order
 
 First go through [Init project](#Init-project)
 
-#### Encrypt your dataset (optional)
+#### Encrypt your dataset
 
 ```bash
 cp 'myAwsomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
-iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it
+iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it, also output the encrypted file checksum to use for deployment.
 cat ./.secrets/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
 cat ./datasets/encrypted/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
@@ -178,7 +178,7 @@ iexec dataset deploy # deploy dataset on Ethereum
 iexec dataset show # show details of deployed dataset
 ```
 
-### Securely share the dataset secret key (Encrypted datasets only)
+### Securely share the dataset secret key
 
 **Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
 
@@ -463,16 +463,16 @@ iexec app request-execution <appAddress> [options] # request an iExec applicatio
 # --user <address>
 iexec dataset init # init the dataset template
 iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
+iexec dataset encrypt # for each dataset file in ./datasets/original/ generate a 256 bits key and encrypt the dataset using AES-256-CBC and compute the encrypted file's sha256 checksum
 iexec dataset deploy # deploy the dataset on the blockchain
+iexec dataset push-secret [datasetAddress] # push the key for the encrypted dataset
+iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 iexec dataset publish [datasetAddress] # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
 iexec dataset unpublish [datasetAddress] # unpublish the last published datasetorder for specified dataset
 iexec dataset unpublish [datasetAddress] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
-iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
-iexec dataset push-secret [datasetAddress] # push the secret for the encrypted dataset
-iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 ```
 
 ## workerpool
@@ -853,16 +853,16 @@ This folder is created when running `iexec result generate-encryption-keypair` o
 
 #### ./secrets/beneficiary/
 
-This folder store the keypair to use for result encryption and decryption.
+This folder stores the keypair to use for result encryption and decryption.
 A keypair is generated when running `iexec result generate-encryption-keypair`
 Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `ìexec result push-encryption-key`
 Private keys name follow the pattern _userAddress_\_key this should never be shared with third party, the private key is used by the SDK CLI to decrypt a result when running `ìexec result decrypt`.
 
 #### ./secrets/datasets/
 
-This folder store the secret used for dataset encryption.
-A secret is generated when running `iexec dataset encrypt`
-The secret file is named after the dataset file, last secret generated is also stored in `./secrets/datasets/dataset.secret` to be used as default secret to share with workers when running `iexec dataset push-secret`.
+This folder stores the AES keys used for dataset encryption.
+A key is generated for each dataset file when running `iexec dataset encrypt`.
+The key file is named after the dataset file name, last key generated is also stored in `./secrets/datasets/dataset.key` to be used as default secret to share with workers when running `iexec dataset push-secret`.
 
 ### ./datasets/
 
@@ -874,7 +874,10 @@ Paste your original dataset files in this folder and run `iexec dataset encrypt`
 
 #### ./datasets/encrypted/
 
-Encrypted dataset files ends in this folder when you run `iexec dataset encrypt`.
+This folder stores the encrypted datasets files.
+An encrypted dataset file is created for each dataset file when running `iexec dataset encrypt`.
+The encrypted dataset file is named after the dataset file name.
+The encrypted dataset files must be upload on a public file system and referenced in multriaddr when running `iexec dataset deploy`.
 
 # iExec SDK Library API
 
@@ -2202,6 +2205,72 @@ const { dataset } = await iexec.dataset.showDataset(
 console.log('dataset:', dataset);
 ```
 
+#### generateEncryptionKey
+
+iexec.**dataset.generateEncryptionKey ()** => String
+
+> generate an encryption key to encrypt a dataset
+>
+> _NB_: This method returns a base64 encoded 256 bits key
+
+_Example:_
+
+```js
+const encryptionKey = iexec.dataset.generateEncryptionKey();
+console.log('encryption key:', encryptionKey);
+```
+
+#### encrypt
+
+iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Promise < **encryptedDataset: Buffer** >
+
+> encrypt the dataset file with the specified key using AES-256-CBC
+>
+> _NB_:
+>
+> - the supplied key must be 256 bits base64 encoded
+> - DO NOT leak the key and DO NOT use the same key for encrypting different datasets
+
+_Example:_
+
+```js
+const datasetFile = await readDatasetAsArrayBuffer(); // somehow load the dataset file
+
+const encryptionKey = iexec.dataset.generateEncryptionKey(); // DO NOT leak this key
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
+```
+
+#### computeEncryptedFileChecksum
+
+iexec.**dataset.computeEncryptedFileChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
+
+> compute the encrypted dataset file's checksum required for dataset deployment
+>
+> - :warning: the dataset checksum is the encrypted file checksum, use this method on the encrypted file but DO NOT use it on the original dataset file
+>
+> _NB_:
+>
+> - the dataset checksum is the sha256sum of the encrypted dataset file
+> - the checksum is used in the computation workflow to ensure the dataset's integrity
+
+_Example:_
+
+```js
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const checksum = await iexec.dataset.computeEncryptedFileChecksum(
+  encryptedDataset,
+);
+```
+
 #### deploy
 
 iexec.**dataset.deployDataset ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
@@ -2225,15 +2294,15 @@ console.log('deployed at', address);
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
 
-> push the dataset secret to the SMS
-> pushed secret can't be ubdated
+> push the dataset's key to the SMS
+> :warning: pushed secrets CAN NOT be updated
 
 _Example:_
 
 ```js
 const pushed = await iexec.dataset.pushDatasetSecret(
   datasetAddress,
-  'secretkey',
+  encryptionKey,
 );
 console.log('secret pushed:', pushed);
 ```
@@ -2543,7 +2612,7 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### decryptResult
 
-utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
+utils.**decryptResult ( encryptedZipFile: ArrayBuffer|Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
 > decrypt en encrypted result with the beneficiary RSA Key.
 

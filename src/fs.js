@@ -1,7 +1,6 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
-const JSZip = require('jszip');
 const {
   object, string, number, boolean, lazy,
 } = require('yup');
@@ -105,10 +104,12 @@ const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
 const DEPLOYED_FILE_NAME = 'deployed.json';
 const ORDERS_FILE_NAME = 'orders.json';
 
-const saveTextToFile = async (
+const saveToFile = async (
   fileName,
   text,
-  { force = false, strict = true, fileDir } = {},
+  {
+    force = false, strict = true, fileDir, format,
+  } = {},
 ) => {
   try {
     let filePath;
@@ -123,7 +124,7 @@ const saveTextToFile = async (
       return filePath;
     }
     const fd = await fs.open(filePath, 'wx');
-    await fs.write(fd, text, 0, 'utf8');
+    await fs.write(fd, text, 0, format);
     await fs.close(fd);
     return filePath;
   } catch (error) {
@@ -141,6 +142,25 @@ const saveTextToFile = async (
       }
       return '';
     }
+    debug('saveToFile()', error);
+    throw error;
+  }
+};
+
+const saveTextToFile = async (
+  fileName,
+  text,
+  { force = false, strict = true, fileDir } = {},
+) => {
+  try {
+    const filePath = await saveToFile(fileName, text, {
+      format: 'utf8',
+      force,
+      strict,
+      fileDir,
+    });
+    return filePath;
+  } catch (error) {
     debug('saveTextToFile()', error);
     throw error;
   }
@@ -327,56 +347,8 @@ const isEmptyDir = async (dirPath) => {
   }
 };
 
-const zipDirectory = async (dirPath, { force = false } = {}) => {
-  const zipPath = `${dirPath}.zip`;
-  const zipName = path.parse(zipPath).base;
-  debug(`zip directory ${dirPath} in ${zipPath}`);
-  if ((await fs.exists(zipPath)) && !force) throw Error(`File ${zipPath} already exists`);
-  try {
-    const addFolder = async (zip, folderPath = '') => {
-      debug('zip adding folder', folderPath);
-      const folderContent = await fs.readdir(path.join(dirPath, folderPath));
-      const pathArray = folderContent.map((fileName) => path.join(folderPath, fileName));
-      await Promise.all(
-        pathArray.map(async (relativePath) => {
-          const stats = await fs.lstat(path.join(dirPath, relativePath));
-          if (stats.isDirectory()) {
-            await addFolder(zip, relativePath);
-          } else if (stats.isFile()) {
-            debug('zip adding file', relativePath);
-            zip.file(
-              relativePath,
-              await fs.readFile(path.join(dirPath, relativePath)),
-            );
-          } else {
-            throw Error(`Cannot zip ${pathArray}`);
-          }
-        }),
-      );
-    };
-    const zip = new JSZip();
-    await addFolder(zip);
-    debug('zip in memory');
-    await new Promise((resolve, reject) => {
-      zip
-        .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
-        .pipe(fs.createWriteStream(zipPath))
-        .on('finish', () => {
-          resolve();
-        })
-        .on('error', (error) => {
-          reject(error);
-        });
-    });
-    debug(`zip ${zipPath} created`);
-    return { zipPath, zipName };
-  } catch (error) {
-    debug('zipDirectory()', error);
-    throw Error(`Failed to create ${zipPath} from ${dirPath}`);
-  }
-};
-
 module.exports = {
+  saveToFile,
   saveTextToFile,
   saveJSONToFile,
   saveWalletConf,
@@ -399,7 +371,6 @@ module.exports = {
   initChainConf,
   initOrderObj,
   isEmptyDir,
-  zipDirectory,
   IEXEC_FILE_NAME,
   CHAIN_FILE_NAME,
   WALLET_FILE_NAME,

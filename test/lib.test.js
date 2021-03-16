@@ -3,6 +3,8 @@ const BN = require('bn.js');
 const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
+const { execAsync } = require('./test-utils');
+
 const { utils, IExec, errors } = require('../src/iexec-lib');
 const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
 const { teePostComputeDefaults } = require('../src/secrets-utils');
@@ -83,7 +85,6 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChainUrl1s);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
@@ -3184,6 +3185,72 @@ describe('[app]', () => {
 });
 
 describe('[dataset]', () => {
+  test('dataset.generateEncryptionKey()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    expect(typeof key).toBe('string');
+    expect(Buffer.from(key, 'base64').length).toBe(32);
+  });
+  test('dataset.encrypt()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const encryptedBytes = await iexec.dataset.encrypt(
+      await fs.readFile(path.join(process.cwd(), 'test/inputs/files/text.zip')),
+      key,
+    );
+    expect(encryptedBytes).toBeInstanceOf(Buffer);
+    expect(encryptedBytes.length).toBe(224);
+
+    // decrypt with openssl
+    const outDirPath = path.join(process.cwd(), 'test/out');
+    await fs
+      .ensureDir(outDirPath)
+      .then(() => fs.writeFile(path.join(outDirPath, 'dataset.enc'), encryptedBytes));
+    const encryptedFilePath = path.join(outDirPath, 'dataset.enc');
+    const decryptedFilePath = path.join(outDirPath, 'decrypted.zip');
+    await expect(
+      execAsync(
+        `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${iexec.dataset.generateEncryptionKey()}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+      ),
+    ).rejects.toBeInstanceOf(Error);
+    await expect(
+      execAsync(
+        `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+      ),
+    ).resolves.toBeDefined();
+  });
+  test('dataset.computeEncryptedFileChecksum()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const fileBytes = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    );
+
+    const originalFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(
+      fileBytes,
+    );
+    expect(originalFileChecksum).toBe(
+      '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515',
+    );
+
+    const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
+    const encryptedFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(
+      encryptedFileBytes,
+    );
+    expect(encryptedFileChecksum).toMatch(bytes32Regex);
+  });
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

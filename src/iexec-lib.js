@@ -30,6 +30,11 @@ const {
   decryptResult,
 } = require('./utils');
 const {
+  generateAes256Key,
+  encryptAes256Cbc,
+  sha256Sum,
+} = require('./encryption-utils');
+const {
   EnhancedWallet,
   EnhancedWeb3Signer,
   getSignerFromPrivateKey,
@@ -280,6 +285,9 @@ class IExec {
     this.app.showUserApp = (index, userAddress) => hub.showUserApp(contracts, index, userAddress);
     this.app.countUserApps = (address) => hub.countUserApps(contracts, address);
     this.dataset = {};
+    this.dataset.generateEncryptionKey = () => generateAes256Key();
+    this.dataset.encrypt = (datasetFile, encryptionKey) => encryptAes256Cbc(datasetFile, encryptionKey);
+    this.dataset.computeEncryptedFileChecksum = (encryptedFile) => sha256Sum(encryptedFile);
     this.dataset.deployDataset = (dataset) => hub.deployDataset(contracts, dataset);
     this.dataset.showDataset = (address) => hub.showDataset(contracts, address);
     this.dataset.showUserDataset = (index, userAddress) => hub.showUserDataset(contracts, index, userAddress);
