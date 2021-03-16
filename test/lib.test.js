@@ -7068,7 +7068,7 @@ describe('[observables]', () => {
     let unsubObsTaskBeforeNext;
     let unsubObsTaskAfterInit;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
         unsubObsTaskWithDealid = iexec.task
           .obsTask(taskid, { dealid })
@@ -7079,8 +7079,9 @@ describe('[observables]', () => {
             error: () => reject(Error('obsTask with dealid should not call error')),
             complete: () => reject(Error('obsTask with dealid should not call complete')),
           });
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsTaskBeforeNext = iexec.task
           .obsTask(taskid, { dealid })
           .subscribe({
@@ -7097,21 +7098,26 @@ describe('[observables]', () => {
               Error('obsTask unsub before next should not call complete'),
             ),
           });
-        await sleep(10000);
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: () => reject(Error('obsTask after init should not call complete')),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
+            next: (value) => {
+              obsTaskAfterInitValues.push(value);
+            },
+            error: () => reject(Error('obsTask after init should not call error')),
+            complete: () => reject(Error('obsTask after init should not call complete')),
+          });
+          sleep(5000).then(resolve);
         });
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+            .then(resolve)
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7155,7 +7161,7 @@ describe('[observables]', () => {
     expect(obsTaskAfterInitValues[0].task.status).toBe(1);
     expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
     expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 40000);
 
   test('task.obsTask() (task timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7231,17 +7237,18 @@ describe('[observables]', () => {
           complete: () => reject(Error('obsTask before init should not call complete')),
         });
       }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: resolve,
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task.obsTask(taskid).subscribe({
+            next: (value) => {
+              obsTaskAfterInitValues.push(value);
+            },
+            error: () => reject(Error('obsTask after init should not call error')),
+            complete: resolve,
+          });
         });
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsTaskBeforeComplete = iexec.task
           .obsTask(taskid, { dealid })
           .subscribe({
@@ -7251,8 +7258,7 @@ describe('[observables]', () => {
             error: () => reject(Error('obsTask unsubscribed should nol call complete')),
             complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
           });
-        await sleep(1000);
-        resolve();
+        sleep(1000).then(resolve);
       }),
       sleep(1000).then(() => {
         unsubObsTaskBeforeComplete();
@@ -7320,7 +7326,7 @@ describe('[observables]', () => {
     expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
     expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
     expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 40000);
 
   test('deal.obsDeal()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7360,7 +7366,7 @@ describe('[observables]', () => {
     let unsubObsDeal;
     let unsubObsDealBeforeNext;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
         unsubObsDeal = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
@@ -7369,8 +7375,9 @@ describe('[observables]', () => {
           error: () => reject(Error('obsDeal should not call error')),
           complete: () => reject(Error('obsDeal should not call complete')),
         });
+        sleep(10000).then(resolve);
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsDealBeforeNext = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
             obsDealUnsubBeforeNextValues.push(value);
@@ -7383,13 +7390,20 @@ describe('[observables]', () => {
           error: () => reject(Error('obsDeal unsub before next should not call error')),
           complete: () => reject(Error('obsDeal unsub before next should not call complete')),
         });
-        await sleep(10000);
+        sleep(10000).then(resolve);
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(6000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(6000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7471,7 +7485,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeNextValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
-  }, 30000);
+  }, 40000);
 
   test('deal.obsDeal() (deal timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7534,7 +7548,7 @@ describe('[observables]', () => {
           complete: () => reject(Error('obsDeal with wrong dealid should not call complete')),
         });
       }),
-      new Promise(async (resolve, reject) => {
+      new Promise((resolve, reject) => {
         unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
           next: (value) => {
             unsubObsDealBeforeComplete();
@@ -7547,14 +7561,20 @@ describe('[observables]', () => {
             Error('obsDeal unsub before complete should not call complete'),
           ),
         });
-        await sleep(10000);
-        resolve();
+        sleep(10000).then(resolve);
       }),
-      sleep(5000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(1000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(1000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7656,7 +7676,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
-  }, 50000);
+  }, 60000);
 });
 
 describe('[result]', () => {
