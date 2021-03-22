@@ -1287,7 +1287,7 @@ console.log('total orders:', res.count);
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchWorkerpoolOrderbook ( \[, { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( \[ { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
 > find the cheapest orders for computing resource.
 >
@@ -1307,7 +1307,7 @@ iexec.**orderbook.fetchWorkerpoolOrderbook ( \[, { workerpool: Address, workerpo
 _Example:_
 
 ```js
-const res = await iexec.orderbook.fetchWorkerpoolOrderbook('1');
+const res = await iexec.orderbook.fetchWorkerpoolOrderbook();
 console.log('best order:', res.workerpoolOrders[0].order);
 console.log('total orders:', res.count);
 ```
@@ -1575,7 +1575,7 @@ const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 
 #### createRequestorder
 
-iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
+iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: Object, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
 >
