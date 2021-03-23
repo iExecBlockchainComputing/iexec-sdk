@@ -71,7 +71,7 @@ const deposit = async (
             contracts.txOptions,
           ),
       );
-      const txReceipt = await wrapWait(tx.wait());
+      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEvent('Approval', txReceipt.events)) throw Error('Approval not confirmed');
       if (!checkEvent('Transfer', txReceipt.events)) throw Error('Transfer not confirmed');
       txHash = tx.hash;
@@ -86,7 +86,7 @@ const deposit = async (
             (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
         }),
       );
-      const txReceipt = await wrapWait(tx.wait());
+      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEvent('Transfer', txReceipt.events)) throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
@@ -118,7 +118,7 @@ const withdraw = async (
     const tx = await wrapSend(
       iexecContract.withdraw(vAmount, contracts.txOptions),
     );
-    const txReceipt = await wrapWait(tx.wait());
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEvent('Transfer', txReceipt.events)) throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {

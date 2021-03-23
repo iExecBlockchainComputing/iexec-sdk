@@ -128,7 +128,7 @@ const claim = async (
       iexecContract.claim(taskid, contracts.txOptions),
     );
 
-    const claimTxReceipt = await wrapWait(claimTx.wait());
+    const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));
     if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;

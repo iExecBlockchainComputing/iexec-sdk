@@ -68,6 +68,7 @@ class IExec {
       hubAddress,
       isNative,
       useGas = true,
+      confirms,
       bridgeAddress,
       bridgedNetworkConf = {},
       enterpriseSwapConf = {},
@@ -94,6 +95,7 @@ class IExec {
       signer: ethersSigner,
       hubAddress,
       useGas,
+      confirms,
       isNative,
       flavour,
     });
@@ -119,6 +121,7 @@ class IExec {
         provider: ethersProvider,
         signer: ethersSigner,
         hubAddress: enterpriseConf.hubAddress,
+        confirms,
         isNative: enterpriseConf.isNative,
         flavour: enterpriseSwapFlavour,
       })
@@ -172,6 +175,7 @@ class IExec {
         chainId: bridgedConf.chainId,
         provider: getDefaultProvider(bridgedConf.rpcURL),
         hubAddress: bridgedConf.hubAddress,
+        confirms,
         isNative: bridgedConf.isNative,
         flavour,
       })

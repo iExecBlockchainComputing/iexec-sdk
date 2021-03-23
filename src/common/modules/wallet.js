@@ -243,7 +243,7 @@ const sendNativeToken = async (
           (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
       }),
     );
-    await wrapWait(tx.wait());
+    await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
   } catch (error) {
     debug('sendNativeToken()', error);
@@ -266,7 +266,7 @@ const sendERC20 = async (
     const tx = await wrapSend(
       rlcContract.transfer(vAddress, vAmount, contracts.txOptions),
     );
-    await wrapWait(tx.wait());
+    await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
   } catch (error) {
     debug('sendERC20()', error);
@@ -746,7 +746,7 @@ const wrapEnterpriseRLC = async (
         contracts.txOptions,
       ),
     );
-    await wrapWait(tx.wait());
+    await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
   } catch (error) {
     debug('wrapEnterpriseRLC()', error);
@@ -771,7 +771,7 @@ const unwrapEnterpriseRLC = async (
     const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
     const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
     const tx = await wrapSend(eRlcContract.withdraw(vAmount));
-    await wrapWait(tx.wait());
+    await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
   } catch (error) {
     debug('unwrapEnterpriseRLC()', error);

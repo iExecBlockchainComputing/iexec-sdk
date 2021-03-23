@@ -434,7 +434,7 @@ const cancelOrder = async (
         contracts.txOptions,
       ),
     );
-    const txReceipt = await wrapWait(tx.wait());
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return { order: orderObj, txHash: tx.hash };
   } catch (error) {
@@ -1286,7 +1286,7 @@ const matchOrders = async (
         contracts.txOptions,
       ),
     );
-    const txReceipt = await wrapWait(tx.wait());
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const matchEvent = 'OrdersMatched';
     if (!checkEvent(matchEvent, txReceipt.events)) throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(

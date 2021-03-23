@@ -931,6 +931,7 @@ npm install iexec
 > - `ipfsGatewayURL: URL` specify the IPFS gateway to use
 > - `isNative: Boolean` true when the RLC is the chain native token
 > - `useGas: Boolean` false when the chain does NOT requires to spend gas to send a transaction
+> - `confirms: Number` confirmations number to wait for each transaction (must be positive, default 1)
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 > - `enterpriseSwapConf: { hubAddress: Address }` specify enterprise flavour binding

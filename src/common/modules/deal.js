@@ -224,7 +224,7 @@ const claim = async (
           iexecContract.claimArray(taskidToProcess, contracts.txOptions),
         );
         debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
-        await wrapWait(tx.wait());
+        await wrapWait(tx.wait(contracts.confirms));
         transactions.push({
           txHash: tx.hash,
           type: 'claimArray',
@@ -259,7 +259,7 @@ const claim = async (
         debug(
           `initializeAndClaimArray ${tx.hash} (${notInitializedToProcess.length} tasks)`,
         );
-        await wrapWait(tx.wait());
+        await wrapWait(tx.wait(contracts.confirms));
         transactions.push({
           txHash: tx.hash,
           type: 'initializeAndClaimArray',
