@@ -246,7 +246,7 @@ const encodeTag = (tags) => {
 };
 
 const decodeTag = (tag) => {
-  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   const tags = [];
   for (let i = 1; i < binString.length + 1; i += 1) {
@@ -283,8 +283,8 @@ const sumTags = (tagArray) => {
 const findMissingBitsInTag = (tag, requiredTag) => {
   debug('requiredTag', requiredTag);
   debug('tag', tag);
-  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
-  if (typeof requiredTag !== 'string' || !requiredTag.match(bytes32Regex)) throw new ValidationError('requiredTag must be bytes32 hex string');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag)) throw new ValidationError('requiredTag must be bytes32 hex string');
   const tagBinString = new BN(tag.substr(2), 'hex').toString(2);
   const requiredTagBinString = new BN(requiredTag.substr(2), 'hex').toString(2);
   const missingBits = [];
@@ -300,7 +300,7 @@ const findMissingBitsInTag = (tag, requiredTag) => {
 };
 
 const checkActiveBitInTag = (tag, bit) => {
-  if (typeof tag !== 'string' || !tag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
   if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   return binString.charAt(binString.length - bit) === '1';
