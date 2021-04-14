@@ -2,7 +2,6 @@ matrix:
   NODE_TAG:
     - 14
     - 12
-    - 10
 
 pipeline:
   test_commit:
@@ -20,7 +19,7 @@ pipeline:
       - npm test
     when:
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
   test_tag:
     image: node:${NODE_TAG}
@@ -47,7 +46,7 @@ pipeline:
     when:
       ref: [refs/tags/v6*]
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
   dockerhub_v6_alpha:
     image: plugins/docker
@@ -59,7 +58,7 @@ pipeline:
     when:
       ref: [refs/tags/v6*]
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
 services:
   token-chain:

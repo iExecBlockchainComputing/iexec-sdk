@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 - [BREAKING] `--algorithm` option is removed from `iexec dataset encrypt`
+- [BREAKING] drop nodejs v10 support
 
 ## [5.2.0] 2021-01-22
 
