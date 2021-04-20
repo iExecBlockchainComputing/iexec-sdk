@@ -15,7 +15,7 @@ const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 
 console.log('Node version:', process.version);
 
-jest.setTimeout(10000);
+jest.setTimeout(15000);
 
 // compare object with nested number or string number
 expect.extend({
@@ -5788,7 +5788,7 @@ describe('[order]', () => {
     expect(res.volume).toBeInstanceOf(BN);
     expect(res.volume.eq(new BN(1))).toBe(true);
     expect(res.dealid).toMatch(bytes32Regex);
-  }, 60000);
+  }, 80000);
 
   test('order.matchOrders() (checkRequest)', async () => {
     const randomWallet = getRandomWallet();

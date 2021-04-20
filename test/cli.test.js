@@ -9,7 +9,7 @@ const { bytes32Regex } = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
 
-jest.setTimeout(10000);
+jest.setTimeout(15000);
 
 // CONFIG
 const { DRONE, WITH_STACK } = process.env;
@@ -3501,7 +3501,7 @@ describe('[Common]', () => {
       const resRandomDataset = JSON.parse(rawRandomDataset);
       expect(resRandomDataset.ok).toBe(true);
       expect(resRandomDataset.isSecretSet).toBe(false);
-    }, 15000);
+    }, 20000);
   });
 
   describe('[result]', () => {
