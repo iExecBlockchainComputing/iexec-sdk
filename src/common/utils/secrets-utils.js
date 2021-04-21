@@ -22,9 +22,9 @@ const getStorageTokenKeyName = (provider) => {
 const getResultEncryptionKeyName = () => reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY;
 
 const teePostComputeDefaults = {
-  image: 'iexechub/tee-worker-post-compute:1.0.0',
+  image: 'iexechub/tee-worker-post-compute:1.1.0-SNAPSHOT-88eb9c5',
   fingerprint:
-    '76bfdee97e692b729e989694f3a566cf0e1de95fc456ff5ee88c75b1cb865e33|1eb627c1c94bbca03178b099b13fb4d1|13076027fc67accba753a3ed2edf03227dfd013b450d68833a5589ec44132100',
+    '56fe4d3da17a83a1c0eaf67e7ca78a0c90e8907135edaf10fadda1903f8a8390|dafddc9bd314a1513f3f129aa290a97c|13076027fc67accba753a3ed2edf03227dfd013b450d68833a5589ec44132100',
 };
 
 module.exports = {

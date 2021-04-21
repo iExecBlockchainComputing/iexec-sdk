@@ -4333,7 +4333,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xb7f314f7937a1103e5fe92e5e84886b1bc0b4e85134a850f25cc4e8362731fbd',
+      '0x67d9bf5307688104777882b56a4eb778fe6c90d9482b263f876d1bf777c3ba8f',
     );
   });
 
