@@ -263,6 +263,7 @@ addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendETH())
@@ -278,7 +279,7 @@ sendETH
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!cmd.to) throw Error('Missing --to option');
@@ -314,6 +315,7 @@ addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendRLC())
@@ -327,7 +329,7 @@ sendRLC
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       if (!cmd.to) throw Error('Missing --to option');
       await connectKeystore(chain, keystore, { txOptions });
@@ -365,6 +367,7 @@ addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
   .description(desc.sweep())
@@ -377,7 +380,7 @@ sweep
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!cmd.to) throw Error('Missing --to option');
@@ -418,6 +421,7 @@ addWalletLoadOptions(bridgeToSidechain);
 bridgeToSidechain
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToSidechain())
   .action(async (amount, unit, cmd) => {
@@ -430,7 +434,7 @@ bridgeToSidechain
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
@@ -503,6 +507,7 @@ addWalletLoadOptions(bridgeToMainchain);
 bridgeToMainchain
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToMainchain())
   .action(async (amount, unit, cmd) => {
@@ -515,7 +520,7 @@ bridgeToMainchain
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
@@ -588,6 +593,7 @@ addWalletLoadOptions(wrapEnterpriseRLC);
 wrapEnterpriseRLC
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.wrapEnterpriseRLC())
   .action(async (amount, unit, cmd) => {
@@ -598,7 +604,9 @@ wrapEnterpriseRLC
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const [chain] = await Promise.all([
+        loadChain(cmd.chain, { txOptions, spinner }),
+      ]);
       const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(
@@ -645,6 +653,7 @@ addWalletLoadOptions(unwrapEnterpriseRLC);
 unwrapEnterpriseRLC
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.unwrapEnterpriseRLC())
   .action(async (amount, unit, cmd) => {
@@ -655,7 +664,9 @@ unwrapEnterpriseRLC
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const [chain] = await Promise.all([loadChain(cmd.chain, { spinner })]);
+      const [chain] = await Promise.all([
+        loadChain(cmd.chain, { txOptions, spinner }),
+      ]);
       const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(

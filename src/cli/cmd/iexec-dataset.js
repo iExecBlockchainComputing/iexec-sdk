@@ -117,6 +117,7 @@ addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -127,7 +128,7 @@ deploy
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -486,7 +487,6 @@ publish
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
-    const txOptions = await computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -523,7 +523,7 @@ publish
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       const signedOrder = await signDatasetorder(chain.contracts, orderToSign);
       const orderHash = await publishDatasetorder(
         chain.contracts,

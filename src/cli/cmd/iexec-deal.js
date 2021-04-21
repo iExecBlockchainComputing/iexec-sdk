@@ -37,9 +37,7 @@ show
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { spinner });
       let result;
       if (cmd.watch) {
         const waitDealFinalState = () => new Promise((resolve, reject) => {
@@ -95,6 +93,7 @@ addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (dealid, cmd) => {
     await checkUpdate(cmd);
@@ -103,7 +102,7 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(cmd);
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(cmd.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));
       const { claimed, transactions } = await deal.claim(

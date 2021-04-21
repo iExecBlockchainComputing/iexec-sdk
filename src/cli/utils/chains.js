@@ -43,7 +43,9 @@ const ENTERPRISE_SWAP_MAP = {
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, enterpriseSwapConf, providersOptions } = {},
+  {
+    bridgeConf, enterpriseSwapConf, providersOptions, txOptions = {},
+  } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -56,6 +58,7 @@ const createChainFromConf = (
       useGas: chain.useGas,
       isNative: chain.native,
       flavour: chain.flavour,
+      confirms: txOptions.confirms,
     });
     chain.contracts = contracts;
     if (bridgeConf) {
@@ -71,6 +74,7 @@ const createChainFromConf = (
         useGas: bridgeConf.useGas,
         isNative: bridgeConf.native,
         flavour: bridgeConf.flavour,
+        confirms: txOptions.confirms,
       });
     }
     if (enterpriseSwapConf) {
@@ -82,6 +86,7 @@ const createChainFromConf = (
         useGas: enterpriseSwapConf.useGas,
         isNative: enterpriseSwapConf.native,
         flavour: enterpriseSwapConf.flavour,
+        confirms: txOptions.confirms,
       });
     }
     return chain;
@@ -91,7 +96,10 @@ const createChainFromConf = (
   }
 };
 
-const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
+const loadChain = async (
+  chainName,
+  { txOptions, spinner = Spinner() } = {},
+) => {
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
@@ -214,6 +222,7 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
       bridgeConf,
       enterpriseSwapConf,
       providersOptions,
+      txOptions,
     });
     spinner.info(`Using chain ${name} [chainId: ${chain.id}]`);
     return chain;
@@ -223,10 +232,11 @@ const loadChain = async (chainName, { spinner = Spinner() } = {}) => {
   }
 };
 
-const connectKeystore = async (chain, keystore, { txOptions } = {}) => {
+const connectKeystore = async (chain, keystore, { txOptions = {} } = {}) => {
   const { privateKey } = await keystore.load();
+  const keystoreOptions = { gasPrice: txOptions.gasPrice };
   chain.contracts.setSigner(
-    new EnhancedWallet(privateKey, undefined, txOptions),
+    new EnhancedWallet(privateKey, undefined, keystoreOptions),
   );
 };
 

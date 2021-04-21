@@ -34,6 +34,7 @@ addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.deposit())
   .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
@@ -42,9 +43,7 @@ deposit
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.depositing());
       const depositRes = await account.deposit(chain.contracts, [amount, unit]);
@@ -62,6 +61,7 @@ addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.withdraw())
   .action(async (amount, unit, cmd) => {
     await checkUpdate(cmd);
@@ -70,9 +70,7 @@ withdraw
       const walletOptions = await computeWalletLoadOptions(cmd);
       const txOptions = await computeTxOptions(cmd);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
       const res = await account.withdraw(chain.contracts, [amount, unit]);

@@ -7,7 +7,10 @@ const path = require('path');
 const checkForUpdate = require('update-check');
 const isDocker = require('is-docker');
 const packageJSON = require('../../../package.json');
-const { weiAmountSchema } = require('../../common/utils/validator');
+const {
+  weiAmountSchema,
+  positiveStrictIntSchema,
+} = require('../../common/utils/validator');
 const { storageProviders } = require('../../common/utils/params-utils');
 
 const debug = Debug('help');
@@ -277,6 +280,10 @@ const option = {
   txGasPrice: () => [
     '--gas-price <amount unit...>',
     'set custom gas price for transactions (default unit wei)',
+  ],
+  txConfirms: () => [
+    '--confirms <blockCount>',
+    'set custom block count to wait for transactions confirmation (default 1 block)',
   ],
   forceUpdateSecret: () => ['--force-update', 'update if already exists'],
   storageToken: () => [
@@ -721,15 +728,28 @@ const privateKeyName = (address) => `${address}_key`;
 
 const computeTxOptions = async (opts) => {
   let gasPrice;
+  let confirms;
   if (opts.gasPrice) {
     debug('opts.gasPrice', opts.gasPrice);
     const bnGasPrice = new BN(
-      await weiAmountSchema({ defaultUnit: 'wei' }).validate(opts.gasPrice),
+      await weiAmountSchema({ defaultUnit: 'wei' })
+        .label('gas-price')
+        .validate(opts.gasPrice),
     );
     gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
   }
   debug('gasPrice', gasPrice);
-  return { gasPrice };
+  if (opts.confirms !== undefined) {
+    debug('opts.confirms', opts.confirms);
+    confirms = await positiveStrictIntSchema()
+      .label('confirms')
+      .validate(opts.confirms, {
+        message: 'invalid confirms',
+      });
+  }
+  debug('confirms', confirms);
+
+  return { gasPrice, confirms };
 };
 
 const getPropertyFormChain = (chain, property, { strict = true } = {}) => {

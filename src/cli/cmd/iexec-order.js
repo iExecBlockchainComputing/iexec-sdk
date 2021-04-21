@@ -328,6 +328,7 @@ addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.fillAppOrder())
   .option(...option.fillDatasetOrder())
@@ -345,7 +346,7 @@ fill
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
         loadSignedOrders(),
       ]);
 
@@ -710,6 +711,7 @@ addWalletLoadOptions(cancel);
 cancel
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.cancelAppOrder())
   .option(...option.cancelDatasetOrder())
@@ -730,7 +732,7 @@ cancel
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
         loadSignedOrders(),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
@@ -821,9 +823,7 @@ show
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const chain = await loadChain(opts.chain, {
-        spinner,
-      });
+      const chain = await loadChain(opts.chain, { spinner });
       const success = {};
       const failed = [];
 

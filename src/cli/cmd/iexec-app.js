@@ -135,6 +135,7 @@ addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.deployObj(objName))
   .action(async (cmd) => {
     const opts = cmd.opts();
@@ -145,7 +146,7 @@ deploy
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
-        loadChain(opts.chain, { spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
@@ -387,6 +388,7 @@ addWalletLoadOptions(run);
 run
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.appRunWatch())
   .option(...orderOption.dataset())
@@ -411,7 +413,7 @@ run
     const txOptions = await computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
-      const chain = await loadChain(opts.chain, { spinner });
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
       const result = { deals: [] };
       const useDeployedApp = !appAddress;
       const app = appAddress
@@ -881,7 +883,6 @@ addGlobalOptions(requestRun);
 addWalletLoadOptions(requestRun);
 requestRun
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.force())
   .option(...orderOption.dataset({ allowDeployed: false }))
   .option(...orderOption.workerpool({ allowDeployed: false }))
@@ -906,7 +907,6 @@ requestRun
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
-    const txOptions = await computeTxOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -994,7 +994,7 @@ requestRun
       debug('beneficiary', beneficiary);
 
       spinner.info('Creating requestorder');
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       const requestorderToSign = await createRequestorder(
         { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
         {

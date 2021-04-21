@@ -48,6 +48,7 @@ addWalletLoadOptions(create);
 create
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
     await checkUpdate(cmd);
@@ -58,7 +59,7 @@ create
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(cmd.chain, { txOptions, spinner }),
       ]);
       if (!iexecConf[objName]) {
         throw Error(
@@ -88,9 +89,7 @@ show
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { spinner });
       spinner.start(info.showing('category'));
       const category = await hub.showCategory(chain.contracts, index);
       category.workClockTimeRef = category.workClockTimeRef.toString();
@@ -112,9 +111,7 @@ count
     await checkUpdate(cmd);
     const spinner = Spinner(cmd);
     try {
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { spinner });
       spinner.start(info.counting('category'));
       const countBN = await hub.countCategory(chain.contracts);
       spinner.succeed(`iExec hub has a total of ${countBN} category`, {

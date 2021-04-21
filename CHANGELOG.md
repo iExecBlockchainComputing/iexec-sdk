@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - client-side (in browser) dataset encryption is now possible.
+- confirms option allows to set the number of block to wait for transaction confirmation.
 
 ### Changed
 

@@ -56,9 +56,7 @@ show
       const keystore = Keystore(
         Object.assign(walletOptions, !cmd.download && { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, {
-        spinner,
-      });
+      const chain = await loadChain(cmd.chain, { spinner });
       if (cmd.download) {
         await connectKeystore(chain, keystore);
       }
@@ -185,6 +183,7 @@ addWalletLoadOptions(claim);
 claim
   .option(...option.chain())
   .option(...option.txGasPrice())
+  .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
     await checkUpdate(cmd);
@@ -193,7 +192,7 @@ claim
       const walletOptions = await computeWalletLoadOptions(cmd);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(cmd);
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(cmd.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
 
       spinner.start(info.claiming(objName));
