@@ -12,14 +12,14 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: 'https://v5.sms.mainnet.iex.ec',
-    5: 'https://v5.sms.goerli.iex.ec',
-    133: 'https://v5.sms.viviani.iex.ec',
-    134: 'https://v5.sms.bellecour.iex.ec',
+    1: 'https://v6.sms.mainnet.iex.ec',
+    5: 'https://v6.sms.goerli.iex.ec',
+    133: 'https://v6.sms.viviani.iex.ec',
+    134: 'https://v6.sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v5.sms-enterprise.mainnet.iex.ec',
-    5: 'https://v5.sms-enterprise.goerli.iex.ec',
+    1: 'https://v6.sms-enterprise.mainnet.iex.ec',
+    5: 'https://v6.sms-enterprise.goerli.iex.ec',
   },
 };
 
