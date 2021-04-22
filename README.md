@@ -922,7 +922,7 @@ npm install iexec
 
 #### IExec Constructor
 
-**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
+**new Iexec ({ ethProvider: Web3SignerProvider, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
 
 > _options:_
 >
@@ -946,11 +946,10 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '5', // id of the chain (5 for goerli)
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain)).
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain), '133' (iExec test sidechain)).
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
@@ -974,7 +973,6 @@ const getIExec = async () => {
   }
   return new IExec({
     ethProvider: ethProvider,
-    chainId: ethProvider.networkVersion,
   });
 };
 ```
@@ -1003,8 +1001,7 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec(
   {
-    ethProvider: ethProvider, // an eth signer provider like MetaMask
-    chainId: '134', // id of the chain (134 for iExec sidechain)
+    ethProvider: ethProvider, // an eth signer provider like MetaMask connected to https://bellecour.iex.ec
   },
   {
     isNative: true, // iExec sidechain use RLC as native token
@@ -1032,7 +1029,6 @@ const bridgedNetworkConf = {
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '1', // id of the chain (1 for mainnet)
 }, {
   bridgeAddress,
   bridgedNetworkConf
@@ -2453,28 +2449,17 @@ console.log('ipfs storage initialized:', isIpfsStorageInitialized);
 
 ### iexec.network
 
-#### id
+#### getNetwork
 
-iexec.**network.id** => **String**
+iexec.**network.getNetwork()** => Promise< **{ chainId: String, isSidechain: Boolean }** >
 
-> current chain Id
-
-_Example:_
-
-```js
-console.log('current chain:', iexec.network.id);
-```
-
-#### isSidechain
-
-iexec.**network.isSidechain** => **Boolean**
-
-> current is a sidechain
+> get information about the connected network
 
 _Example:_
 
 ```js
-console.log('current chain is a sidechain:', iexec.network.isSidechain);
+const { chainId, isSidechain } = await iexec.network.getNetwork();
+console.log('current chain', chainId, '(sidechain:', isSidechain, ')');
 ```
 
 ### Utils
@@ -2660,7 +2645,6 @@ const ethProvider = utils.getSignerFromPrivateKey(
 );
 const iexec = new IExec({
   ethProvider,
-  chainId: '42',
 });
 ```
 
