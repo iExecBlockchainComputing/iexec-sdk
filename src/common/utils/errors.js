@@ -13,6 +13,13 @@ const getPropsToCopy = (error) => {
   return propsToCopy;
 };
 
+class ConfigurationError extends Error {
+  constructor(...args) {
+    super(...args);
+    this.name = this.constructor.name;
+  }
+}
+
 class Web3ProviderError extends Error {
   constructor(message, originalError) {
     super(message);
@@ -70,6 +77,7 @@ class BridgeError extends Error {
 }
 
 module.exports = {
+  ConfigurationError,
   ObjectNotFoundError,
   ValidationError,
   Web3ProviderError,
