@@ -86,13 +86,12 @@ const RICH_PRIVATE_KEY2 = '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37
 // const RICH_ADDRESS3 = '0xbC11Bf07a83c7e04daef3dd5C6F9a046F8c5fA7b';
 // const RICH_PRIVATE_KEY3 = '0xfb9d8a917d85d7d9a052745248ecbf6a2268110945004dd797e82e8d4c071e79';
 
-const chainId = 65535;
-const networkId = `${chainId}`;
+const networkId = 65535;
 const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
 const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 
-console.log('chainId', chainId);
+// console.log('chainId', chainId);
 console.log('hubAddress', hubAddress);
 console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
@@ -381,7 +380,7 @@ const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
 describe('[IExec]', () => {
-  test('sms required function throw if no smsURL configured', () => {
+  test('sms required function throw if no smsURL configured', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -390,20 +389,21 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.dataset.checkDatasetSecretExists(randomAddress)).toThrow(
+    await expect(
+      iexec.dataset.checkDatasetSecretExists(randomAddress),
+    ).rejects.toThrow(
       Error(
         `smsURL option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('resultProxy required function throw if no resultProxyURL configured', () => {
+  test('resultProxy required function throw if no resultProxyURL configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -411,20 +411,19 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.storage.defaultStorageLogin()).toThrow(
+    await expect(iexec.storage.defaultStorageLogin()).rejects.toThrow(
       Error(
         `resultProxyURL option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('bridge required function throw if no bridgeAddress configured', () => {
+  test('bridge required function throw if no bridgeAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -432,39 +431,38 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.wallet.bridgeToSidechain(0)).toThrow(
+    await expect(iexec.wallet.bridgeToSidechain(0)).rejects.toThrow(
       Error(
         `bridgeAddress option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', () => {
+  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          id: '123456',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            id: '123456',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         `Missing chainId in bridgedNetworkConf and no default value for your chain ${networkId}`,
       ),
@@ -475,21 +473,21 @@ describe('[IExec]', () => {
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '123456',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            chainId: '123456',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         'Missing rpcURL in bridgedNetworkConf and no default value for bridged chain 123456',
       ),
@@ -500,22 +498,22 @@ describe('[IExec]', () => {
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '123456',
+          rpcURL: 'http://localhost:8545',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            chainId: '123456',
-            rpcURL: 'http://localhost:8545',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         'Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain 123456',
       ),
@@ -534,7 +532,7 @@ describe('[IExec]', () => {
         },
       },
     );
-    // relay on viviani
+    // rely on viviani
     await expect(
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
@@ -547,7 +545,6 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -575,7 +572,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -597,7 +593,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -645,7 +640,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -691,7 +685,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -747,7 +740,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -803,7 +795,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -962,7 +953,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1002,7 +992,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1045,7 +1034,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1107,7 +1095,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1304,7 +1291,6 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: alchemyFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -1321,7 +1307,6 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: etherscanFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -1338,7 +1323,6 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: infuraFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -1354,7 +1338,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1369,7 +1352,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1394,7 +1376,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1431,7 +1412,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1462,7 +1442,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1497,7 +1476,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1514,7 +1492,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1543,7 +1520,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1576,7 +1552,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1614,7 +1589,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1658,7 +1632,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1690,7 +1664,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1708,7 +1682,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1724,7 +1698,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1737,7 +1710,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1772,7 +1744,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1785,7 +1756,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1820,7 +1790,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1833,7 +1802,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1872,7 +1840,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1886,7 +1853,6 @@ describe('[wallet]', () => {
           nativeChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1937,7 +1903,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1951,7 +1917,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2004,7 +1970,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2034,7 +2000,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2060,7 +2026,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2076,7 +2041,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2089,7 +2053,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2133,7 +2097,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2149,7 +2112,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2162,7 +2124,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2206,7 +2168,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2223,7 +2185,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2236,7 +2197,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2280,7 +2241,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2297,7 +2258,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2310,7 +2270,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2354,7 +2314,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2370,7 +2329,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2394,7 +2352,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2411,7 +2369,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2436,7 +2394,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2459,7 +2416,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2483,7 +2440,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2491,7 +2448,7 @@ describe('[wallet]', () => {
         isNative: false,
       },
     );
-    expect(() => iexecEnterprise.wallet.wrapEnterpriseRLC(5)).toThrow(
+    await expect(iexecEnterprise.wallet.wrapEnterpriseRLC(5)).rejects.toThrow(
       `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
@@ -2504,14 +2461,13 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexecStandard.wallet.unwrapEnterpriseRLC(5)).toThrow(
+    await expect(iexecStandard.wallet.unwrapEnterpriseRLC(5)).rejects.toThrow(
       `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
@@ -2523,7 +2479,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2548,7 +2503,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2577,7 +2532,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2606,7 +2560,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2639,7 +2592,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2667,7 +2619,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2697,7 +2648,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2731,7 +2681,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2760,7 +2709,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2794,7 +2743,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2812,7 +2761,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2842,7 +2790,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2874,7 +2821,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2903,7 +2849,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2934,7 +2879,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2967,7 +2911,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2997,7 +2940,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3013,7 +2955,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -3048,7 +2990,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -3068,7 +3010,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3097,7 +3038,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3134,7 +3074,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3163,7 +3102,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3269,7 +3207,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3296,7 +3233,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3329,7 +3265,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3356,7 +3291,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3396,7 +3330,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3432,7 +3365,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3456,7 +3388,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3488,7 +3419,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3516,7 +3446,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3550,7 +3479,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3574,7 +3502,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3610,7 +3537,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3636,7 +3562,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3672,7 +3597,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3699,7 +3623,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3735,7 +3658,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3762,7 +3684,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3798,7 +3719,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3828,7 +3748,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3868,7 +3787,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3909,7 +3827,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3968,7 +3885,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4002,7 +3918,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4034,7 +3949,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4067,7 +3981,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4100,7 +4013,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4140,7 +4052,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4183,7 +4094,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4221,7 +4131,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4241,7 +4150,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x364b7ef2ee48ec4b769b76cbacfa32418dc6d91f4d556df96a3390e07b772ed8',
+      '0x20a9ac876315f0b68a393fddd78e85e4e5e43e53d29261df1801f3f8bdcf8fc7',
     );
   });
 
@@ -4250,7 +4159,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4270,7 +4178,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xa67bdea49715c1a9c73200134e94d77795532e28c8ee00befc73c84d252c602c',
+      '0x5c8b2f93f33ee23fb9047c43b41784ac5f5aacd2cdc374461791ebf1967a3b4f',
     );
   });
 
@@ -4279,7 +4187,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4300,7 +4207,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xa8ae3bce37fce87397f55f65c8cc6c03a7cd9b687a15c08f21d535bdf144d268',
+      '0x84579fe94e633bcf677aa104894c889cd8d68974273e22e3531793168bd2aa63',
     );
   });
 
@@ -4309,7 +4216,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4333,7 +4239,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x67d9bf5307688104777882b56a4eb778fe6c90d9482b263f876d1bf777c3ba8f',
+      '0x74e193412729d18d1c6752c3e96c909b9f4d715556ac6a098c1866a6a5dd51dd',
     );
   });
 
@@ -4342,7 +4248,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4363,7 +4268,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4384,7 +4288,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4405,7 +4308,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4436,7 +4338,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4451,7 +4352,6 @@ describe('[order]', () => {
     const iexecPoolManager = new IExec(
       {
         ethProvider: poolManagerSigner,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -5041,7 +4941,7 @@ describe('[order]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -5062,7 +4962,7 @@ describe('[order]', () => {
     const iexecRequester = new IExec(
       {
         ethProvider: requesterSigner,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -5078,7 +4978,7 @@ describe('[order]', () => {
     const iexecPoolManager = new IExec(
       {
         ethProvider: poolManagerSigner,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -5093,7 +4993,7 @@ describe('[order]', () => {
     const iexecAppDev = new IExec(
       {
         ethProvider: appDevSigner,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -5108,7 +5008,7 @@ describe('[order]', () => {
     const iexecDatasetDev = new IExec(
       {
         ethProvider: datasetDevSigner,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -5799,7 +5699,6 @@ describe('[order]', () => {
     const iexecRich = new IExec(
       {
         ethProvider: richSigner,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -5817,7 +5716,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -5833,7 +5731,6 @@ describe('[order]', () => {
     const iexecResourcesProvider = new IExec(
       {
         ethProvider: resourcesProviderSigner,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -5893,7 +5790,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5916,7 +5812,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5939,7 +5834,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5964,7 +5858,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6005,7 +5898,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6022,7 +5914,6 @@ describe('[order]', () => {
       const iexecAppOwner = new IExec(
         {
           ethProvider: appOwnerSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6065,7 +5956,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6094,7 +5984,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6125,7 +6014,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6160,7 +6048,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6210,7 +6097,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6249,7 +6135,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6290,7 +6175,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6336,7 +6220,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6352,7 +6235,6 @@ describe('[order]', () => {
       const iexecAppDev = new IExec(
         {
           ethProvider: appDevSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6416,7 +6298,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6454,7 +6335,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6494,7 +6374,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6539,7 +6418,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6555,7 +6433,6 @@ describe('[order]', () => {
       const iexecAppDev = new IExec(
         {
           ethProvider: appDevSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6623,7 +6500,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6654,7 +6530,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6685,7 +6560,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6716,7 +6590,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6765,7 +6638,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6789,7 +6661,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6827,7 +6698,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6851,7 +6721,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6891,7 +6760,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6914,7 +6782,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6955,7 +6822,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6978,7 +6844,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -7032,7 +6897,6 @@ describe('[observables]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7070,46 +6934,59 @@ describe('[observables]', () => {
 
     await Promise.all([
       new Promise((resolve, reject) => {
-        unsubObsTaskWithDealid = iexec.task
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskWithDealidValues.push(value);
-            },
-            error: () => reject(Error('obsTask with dealid should not call error')),
-            complete: () => reject(Error('obsTask with dealid should not call complete')),
-          });
-        sleep(10000).then(resolve);
+          .then((obs) => {
+            unsubObsTaskWithDealid = obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () => reject(Error('obsTask with dealid should not call error')),
+              complete: () => reject(Error('obsTask with dealid should not call complete')),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        unsubObsTaskBeforeNext = iexec.task
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskUnsubBeforeNextValues.push(value);
-              try {
-                unsubObsTaskBeforeNext();
-              } catch (e) {
-                reject(e);
-              }
-            },
-            error: () => reject(Error('obsTask unsub before next should not call error')),
-            complete: () => reject(
-              Error('obsTask unsub before next should not call complete'),
-            ),
-          });
-        sleep(10000).then(resolve);
+          .then((obs) => {
+            unsubObsTaskBeforeNext = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeNextValues.push(value);
+                try {
+                  unsubObsTaskBeforeNext();
+                } catch (e) {
+                  reject(e);
+                }
+              },
+              error: () => reject(
+                Error('obsTask unsub before next should not call error'),
+              ),
+              complete: () => reject(
+                Error('obsTask unsub before next should not call complete'),
+              ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
         sleep(5000).then(() => {
-          unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
-            next: (value) => {
-              obsTaskAfterInitValues.push(value);
-            },
-            error: () => reject(Error('obsTask after init should not call error')),
-            complete: () => reject(Error('obsTask after init should not call complete')),
-          });
-          sleep(5000).then(resolve);
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              unsubObsTaskAfterInit = obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () => reject(Error('obsTask after init should not call error')),
+                complete: () => reject(Error('obsTask after init should not call complete')),
+              });
+              sleep(5000).then(resolve);
+            })
+            .catch(reject);
         });
       }),
       new Promise((resolve, reject) => {
@@ -7168,7 +7045,6 @@ describe('[observables]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7211,54 +7087,79 @@ describe('[observables]', () => {
       obsTaskAfterInitComplete,
     ] = await Promise.all([
       new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid, { dealid }).subscribe({
-          next: (value) => {
-            obsTaskWithDealidValues.push(value);
-          },
-          error: () => reject(Error('obsTask with dealid should not call error')),
-          complete: resolve,
-        });
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () => reject(Error('obsTask with dealid should not call error')),
+              complete: resolve,
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid, { dealid: utils.NULL_BYTES32 }).subscribe({
-          next: (value) => {
-            obsTaskWithWrongDealidValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsTask with wrong dealid should not call complete')),
-        });
+        iexec.task
+          .obsTask(taskid, { dealid: utils.NULL_BYTES32 })
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithWrongDealidValues.push(value);
+              },
+              error: resolve,
+              complete: () => reject(
+                Error('obsTask with wrong dealid should not call complete'),
+              ),
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskBeforeInitValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsTask before init should not call complete')),
-        });
+        iexec.task
+          .obsTask(taskid)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskBeforeInitValues.push(value);
+              },
+              error: resolve,
+              complete: () => reject(Error('obsTask before init should not call complete')),
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
         sleep(5000).then(() => {
-          iexec.task.obsTask(taskid).subscribe({
-            next: (value) => {
-              obsTaskAfterInitValues.push(value);
-            },
-            error: () => reject(Error('obsTask after init should not call error')),
-            complete: resolve,
-          });
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () => reject(Error('obsTask after init should not call error')),
+                complete: resolve,
+              });
+            })
+            .catch(reject);
         });
       }),
       new Promise((resolve, reject) => {
-        unsubObsTaskBeforeComplete = iexec.task
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskUnsubBeforeCompleteValues.push(value);
-            },
-            error: () => reject(Error('obsTask unsubscribed should nol call complete')),
-            complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
-          });
-        sleep(1000).then(resolve);
+          .then((obs) => {
+            unsubObsTaskBeforeComplete = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeCompleteValues.push(value);
+              },
+              error: () => reject(Error('obsTask unsubscribed should nol call complete')),
+              complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
+            });
+            sleep(1000).then(resolve);
+          })
+          .catch(reject);
       }),
       sleep(1000).then(() => {
         unsubObsTaskBeforeComplete();
@@ -7333,7 +7234,6 @@ describe('[observables]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7368,29 +7268,43 @@ describe('[observables]', () => {
 
     await Promise.all([
       new Promise((resolve, reject) => {
-        unsubObsDeal = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealValues.push(value);
-          },
-          error: () => reject(Error('obsDeal should not call error')),
-          complete: () => reject(Error('obsDeal should not call complete')),
-        });
-        sleep(10000).then(resolve);
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDeal = obs.subscribe({
+              next: (value) => {
+                obsDealValues.push(value);
+              },
+              error: () => reject(Error('obsDeal should not call error')),
+              complete: () => reject(Error('obsDeal should not call complete')),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        unsubObsDealBeforeNext = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealUnsubBeforeNextValues.push(value);
-            try {
-              unsubObsDealBeforeNext();
-            } catch (e) {
-              reject(e);
-            }
-          },
-          error: () => reject(Error('obsDeal unsub before next should not call error')),
-          complete: () => reject(Error('obsDeal unsub before next should not call complete')),
-        });
-        sleep(10000).then(resolve);
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDealBeforeNext = obs.subscribe({
+              next: (value) => {
+                obsDealUnsubBeforeNextValues.push(value);
+                try {
+                  unsubObsDealBeforeNext();
+                } catch (e) {
+                  reject(e);
+                }
+              },
+              error: () => reject(
+                Error('obsDeal unsub before next should not call error'),
+              ),
+              complete: () => reject(
+                Error('obsDeal unsub before next should not call complete'),
+              ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
         sleep(1000).then(() => {
@@ -7492,7 +7406,6 @@ describe('[observables]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7531,37 +7444,56 @@ describe('[observables]', () => {
       obsDealUnsubBeforeComplete,
     ] = await Promise.all([
       new Promise((resolve, reject) => {
-        iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealCompleteValues.push(value);
-          },
-          error: () => reject(Error('obsDeal should not call error')),
-          complete: resolve,
-        });
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsDealCompleteValues.push(value);
+              },
+              error: () => reject(Error('obsDeal should not call error')),
+              complete: resolve,
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        iexec.deal.obsDeal(utils.NULL_BYTES32).subscribe({
-          next: (value) => {
-            obsDealWithWrongDealidValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsDeal with wrong dealid should not call complete')),
-        });
+        iexec.deal
+          .obsDeal(utils.NULL_BYTES32)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsDealWithWrongDealidValues.push(value);
+              },
+              error: resolve,
+              complete: () => reject(
+                Error('obsDeal with wrong dealid should not call complete'),
+              ),
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            unsubObsDealBeforeComplete();
-            obsDealUnsubBeforeCompleteValues.push(value);
-          },
-          error: () => reject(
-            Error('obsDeal unsub before complete should not call error'),
-          ),
-          complete: () => reject(
-            Error('obsDeal unsub before complete should not call complete'),
-          ),
-        });
-        sleep(10000).then(resolve);
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDealBeforeComplete = obs.subscribe({
+              next: (value) => {
+                unsubObsDealBeforeComplete();
+                obsDealUnsubBeforeCompleteValues.push(value);
+              },
+              error: () => reject(
+                Error('obsDeal unsub before complete should not call error'),
+              ),
+              complete: () => reject(
+                Error(
+                  'obsDeal unsub before complete should not call complete',
+                ),
+              ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
         sleep(5000).then(() => {
@@ -7689,7 +7621,6 @@ describe('[result]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7715,7 +7646,6 @@ describe('[result]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7743,7 +7673,6 @@ describe('[result]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7764,7 +7693,6 @@ describe('[result]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7794,7 +7722,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7817,7 +7744,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7843,7 +7769,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7873,7 +7798,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7903,7 +7827,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7931,7 +7854,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7952,7 +7874,6 @@ describe('[storage]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7975,9 +7896,11 @@ describe('[storage]', () => {
       randomWallet.address,
     );
     expect(unsetProviderRes).toBe(false);
-    expect(() => iexec.storage.checkStorageTokenExists(randomWallet.address, {
-      provider: 'test',
-    })).toThrow(Error('"test" not supported'));
+    await expect(
+      iexec.storage.checkStorageTokenExists(randomWallet.address, {
+        provider: 'test',
+      }),
+    ).rejects.toThrow(Error('"test" not supported'));
   });
 });
 
@@ -7995,7 +7918,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8074,7 +7996,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8120,7 +8041,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8168,7 +8088,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8218,7 +8137,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,

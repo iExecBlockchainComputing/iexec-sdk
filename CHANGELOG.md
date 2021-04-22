@@ -14,10 +14,14 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
 - [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
 - [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.
+- [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
+- [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
+- `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
 
 ### Removed
 
 - [BREAKING] `--algorithm` option is removed from `iexec dataset encrypt`
+- [BREAKING] removed `iexec.network.id` and `iexec.network.isSidechain`, use `iexec.network.getNetwork() => Promise<{chainId: String, isSidechain: Boolean}>`
 - [BREAKING] drop nodejs v10 support
 
 ## [5.2.0] 2021-01-22

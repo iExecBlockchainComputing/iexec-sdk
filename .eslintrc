@@ -14,7 +14,13 @@
           "_name",
           "_options",
           "_signTypedData",
-          "_subscribe"
+          "_subscribe",
+          "_chainId",
+          "_contracts",
+          "_bridgedContracts",
+          "_enterpriseSwapContracts",
+          "_chainConfDefaults",
+          "_bridgedConf"
         ]
       }
     ],
