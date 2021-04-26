@@ -665,6 +665,7 @@ run
               app,
               ...(useDataset && { dataset }),
               ...(runOnWorkerpool && { workerpool }),
+              requester,
               minTag,
               minTrust: trust,
             },

@@ -139,6 +139,7 @@ const fetchWorkerpoolOrderbook = async (
     minVolume,
     app,
     dataset,
+    requester,
   } = {},
 ) => {
   try {
@@ -159,6 +160,11 @@ const fetchWorkerpoolOrderbook = async (
         dataset: await addressSchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
+      }),
+      ...(requester && {
+        requester: await addressSchema({
+          ethProvider: contracts.provider,
+        }).validate(requester),
       }),
       ...(minTag && {
         minTag: await tagSchema().validate(minTag),
