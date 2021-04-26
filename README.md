@@ -922,7 +922,7 @@ npm install iexec
 
 #### IExec Constructor
 
-**new Iexec ({ ethProvider: Web3SignerProvider, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
+**new IExec ({ ethProvider: Web3SignerProvider, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
 
 > _options:_
 >
