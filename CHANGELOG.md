@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
 - [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
 - `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
+- fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 
 ### Removed
 
