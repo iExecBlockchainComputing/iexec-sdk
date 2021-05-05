@@ -65,19 +65,22 @@ const buyConfSchema = () => object({
   callback: addressSchema(),
 });
 
-const dappSchema = () => object().shape({
-  license: string().required(),
-  author: string().required(),
-  app: object({
-    owner: addressSchema().required(),
-    name: string().required(),
-    type: appTypeSchema().required(),
-    multiaddr: string().required(),
-    checksum: bytes32Schema().required(),
-    mrenclave: string(),
-  }).required(),
-  buyConf: buyConfSchema().required(),
-});
+const dappSchema = () => baseSchema()
+  .shape({
+    license: string().required(),
+    author: string().required(),
+    app: object({
+      owner: addressSchema().required(),
+      name: string().required(),
+      type: appTypeSchema().required(),
+      multiaddr: string().required(),
+      checksum: bytes32Schema().required(),
+      mrenclave: string(),
+    }).required(),
+    buyConf: buyConfSchema().required(),
+  })
+  .noUnknown()
+  .strict();
 
 const datasetCompatibleDappSchema = () => object({
   name: string().required(),

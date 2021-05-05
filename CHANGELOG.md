@@ -23,7 +23,16 @@ All notable changes to this project will be documented in this file.
 
 - [BREAKING] `--algorithm` option is removed from `iexec dataset encrypt`
 - [BREAKING] removed `iexec.network.id` and `iexec.network.isSidechain`, use `iexec.network.getNetwork() => Promise<{chainId: String, isSidechain: Boolean}>`
-- [BREAKING] drop nodejs v10 support
+
+## [5.3.0] 2021-05-05
+
+### changed
+
+- fixed `iexec registry validate app`
+
+### Removed
+
+- [BREAKING] drop support for Node 10
 
 ## [5.2.0] 2021-01-22
 
