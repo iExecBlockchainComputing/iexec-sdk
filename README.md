@@ -29,7 +29,7 @@ All three major OS are supported (linux, OSX, windows).
 
 #### Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=%2010.12.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=12.0.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 
 ```bash
 npm -g install iexec # install the cli
