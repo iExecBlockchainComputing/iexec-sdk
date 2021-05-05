@@ -11,7 +11,7 @@ const {
   computeWalletCreateOptions,
   checkUpdate,
   handleError,
-  help,
+  finalizeCli,
   Spinner,
   info,
   pretty,
@@ -33,8 +33,7 @@ async function main() {
     .option(...option.force())
     .option(...option.skipWallet())
     .description(desc.initObj('project'))
-    .action(async (cmd) => {
-      const opts = cmd.opts();
+    .action(async (opts, cmd) => {
       await checkUpdate(opts);
       const spinner = Spinner(opts);
       try {
@@ -118,8 +117,7 @@ async function main() {
   infoCmd
     .option(...option.chain())
     .description(desc.info())
-    .action(async (cmd) => {
-      const opts = cmd.opts();
+    .action(async (opts, cmd) => {
       await checkUpdate(opts);
       const spinner = Spinner(opts);
       try {
@@ -195,7 +193,7 @@ async function main() {
       }
     });
 
-  help(cli);
+  finalizeCli(cli);
 }
 
 main();

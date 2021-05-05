@@ -15,6 +15,14 @@ const { storageProviders } = require('../../common/utils/params-utils');
 
 const debug = Debug('help');
 
+const finalizeCli = (cli) => {
+  cli.addHelpText(
+    'afterAll',
+    '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n',
+  );
+  cli.parse();
+};
+
 const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
   (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
   init,
@@ -565,14 +573,6 @@ const oraOptions = {
   },
 };
 
-const helpMessage = '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n';
-const outputHelpMessage = () => console.log(helpMessage);
-
-const help = (cli) => {
-  cli.on('--help', outputHelpMessage);
-  cli.parse();
-};
-
 const Spinner = (opts) => {
   if (opts && opts.raw) {
     const nothing = () => {};
@@ -899,7 +899,7 @@ const renderTasksStatus = (tasksStatusMap) => {
 };
 
 module.exports = {
-  help,
+  finalizeCli,
   checkUpdate,
   Spinner,
   handleError,

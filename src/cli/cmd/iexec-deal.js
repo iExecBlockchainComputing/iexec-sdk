@@ -5,7 +5,7 @@ const deal = require('../../common/modules/deal');
 const { obsDeal } = require('../../common/modules/iexecProcess');
 const { stringifyNestedBn } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -33,8 +33,7 @@ show
   .option(...option.chain())
   .option(...option.watch())
   .description(desc.showObj(objName))
-  .action(async (dealid, cmd) => {
-    const opts = cmd.opts();
+  .action(async (dealid, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -96,8 +95,7 @@ claim
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
-  .action(async (dealid, cmd) => {
-    const opts = cmd.opts();
+  .action(async (dealid, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -122,4 +120,4 @@ claim
     }
   });
 
-help(cli);
+finalizeCli(cli);

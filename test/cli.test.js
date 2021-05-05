@@ -314,7 +314,9 @@ describe('[cli]', () => {
   test('unknown option', async () => {
     const out = await execAsync(`${iexecPath} --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
-    expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
+    expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
+      -1,
+    );
   });
   test('missing subcommand', async () => {
     const out = await execAsync(`${iexecPath} app`).catch((e) => e);
@@ -333,7 +335,7 @@ describe('[cli]', () => {
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {
-    const out = await execAsync(`${iexecPath} app --test`).catch((e) => e);
+    const out = await execAsync(`${iexecPath} app show --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
   });

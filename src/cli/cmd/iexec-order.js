@@ -4,7 +4,7 @@ const cli = require('commander');
 const order = require('../../common/modules/order');
 const { NULL_ADDRESS } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -51,8 +51,7 @@ init
   .option(...option.initWorkerpoolOrder())
   .option(...option.initRequestOrder())
   .description(desc.initObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -134,8 +133,7 @@ sign
   .option(...option.signRequestOrder())
   .option(...option.skipRequestCheck())
   .description(desc.sign())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -337,8 +335,7 @@ fill
   .option(...option.fillRequestParams())
   .option(...option.skipRequestCheck())
   .description(desc.fill(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -478,8 +475,7 @@ publish
   .option(...option.publishRequestOrder())
   .option(...option.skipRequestCheck())
   .description(desc.publish(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -595,8 +591,7 @@ unpublish
   .option(...option.unpublishWorkerpoolOrder())
   .option(...option.unpublishRequestOrder())
   .description(desc.unpublish(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -718,8 +713,7 @@ cancel
   .option(...option.cancelWorkerpoolOrder())
   .option(...option.cancelRequestOrder())
   .description(desc.cancel(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -813,8 +807,7 @@ show
   .option(...option.showRequestOrder())
   .option(...option.showOrderDeals())
   .description(desc.showObj(objName, 'marketplace'))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -907,4 +900,4 @@ show
     }
   });
 
-help(cli);
+finalizeCli(cli);

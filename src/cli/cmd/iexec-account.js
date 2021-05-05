@@ -10,7 +10,7 @@ const {
   NULL_ADDRESS,
 } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -36,8 +36,7 @@ deposit
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deposit())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -64,8 +63,7 @@ withdraw
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.withdraw())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -90,8 +88,7 @@ addWalletLoadOptions(show);
 show
   .option(...option.chain())
   .description(desc.showObj('iExec', objName))
-  .action(async (address, cmd) => {
-    const opts = cmd.opts();
+  .action(async (address, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -137,4 +134,4 @@ show
     }
   });
 
-help(cli);
+finalizeCli(cli);

@@ -14,7 +14,7 @@ const {
   decryptResult,
 } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -48,8 +48,7 @@ show
   .option(...option.beneficiaryKeystoredir())
   .option(...option.beneficiaryKeyFile())
   .description(desc.showObj(objName))
-  .action(async (taskid, cmd) => {
-    const opts = cmd.opts();
+  .action(async (taskid, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -186,8 +185,7 @@ claim
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
-  .action(async (taskid, cmd) => {
-    const opts = cmd.opts();
+  .action(async (taskid, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -205,4 +203,4 @@ claim
     }
   });
 
-help(cli);
+finalizeCli(cli);

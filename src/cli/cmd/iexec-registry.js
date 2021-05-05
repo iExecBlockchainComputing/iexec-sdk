@@ -15,7 +15,7 @@ const {
   uint256Schema,
 } = require('../../common/utils/validator');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   checkUpdate,
   handleError,
@@ -139,80 +139,81 @@ const objectMap = {
 
 const validate = cli.command('validate <object>');
 addGlobalOptions(validate);
-validate.description(desc.validateRessource()).action(async (objName, cmd) => {
-  const opts = cmd.opts();
-  await checkUpdate(opts);
-  const spinner = Spinner(opts);
-  try {
-    if (!objectNames.includes(objName)) {
-      throw Error(
-        `Unknown object "${objName}". Must be one of [${objectNames}]`,
-      );
-    }
-    const objectName = objectMap[objName].name;
-    // validate iexec.json
-    const iexecConf = await loadIExecConf();
-    const validated = [];
-    const failed = [];
+validate
+  .description(desc.validateRessource())
+  .action(async (objName, opts, cmd) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      await objectMap[objName]
-        .validationSchema()
-        .validate(iexecConf, { strict: true });
-      validated.push(IEXEC_FILE_NAME);
-    } catch (confError) {
-      failed.push(`${IEXEC_FILE_NAME}: ${confError.message}`);
-    }
-    // validate logo file
-    const logoPath = path.join(process.cwd(), iexecConf.logo);
-    let logoFile;
-    try {
-      logoFile = await fs.readFile(logoPath);
-      const logoSize = sizeOf(logoFile);
-      debug('logoSize', logoSize);
-      if (!(logoSize.width === LOGO_SIDE && logoSize.height === LOGO_SIDE)) {
+      if (!objectNames.includes(objName)) {
         throw Error(
-          `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`,
+          `Unknown object "${objName}". Must be one of [${objectNames}]`,
         );
       }
-      const logoExt = path.extname(iexecConf.logo).substr(1);
-      if (!(logoSize.type === logoExt)) {
-        throw Error(`Extension mismatch: ${logoSize.type} =/= ${logoExt}`);
+      const objectName = objectMap[objName].name;
+      // validate iexec.json
+      const iexecConf = await loadIExecConf();
+      const validated = [];
+      const failed = [];
+      try {
+        await objectMap[objName]
+          .validationSchema()
+          .validate(iexecConf, { strict: true });
+        validated.push(IEXEC_FILE_NAME);
+      } catch (confError) {
+        failed.push(`${IEXEC_FILE_NAME}: ${confError.message}`);
       }
-      validated.push(iexecConf.logo);
-    } catch (logoError) {
-      const errorMessage = logoError.code === 'ENOENT'
-        ? `Missing "${iexecConf.logo}" logo image file`
-        : logoError.message;
-      failed.push(`${iexecConf.logo}: ${errorMessage}`);
-    }
+      // validate logo file
+      const logoPath = path.join(process.cwd(), iexecConf.logo);
+      let logoFile;
+      try {
+        logoFile = await fs.readFile(logoPath);
+        const logoSize = sizeOf(logoFile);
+        debug('logoSize', logoSize);
+        if (!(logoSize.width === LOGO_SIDE && logoSize.height === LOGO_SIDE)) {
+          throw Error(
+            `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`,
+          );
+        }
+        const logoExt = path.extname(iexecConf.logo).substr(1);
+        if (!(logoSize.type === logoExt)) {
+          throw Error(`Extension mismatch: ${logoSize.type} =/= ${logoExt}`);
+        }
+        validated.push(iexecConf.logo);
+      } catch (logoError) {
+        const errorMessage = logoError.code === 'ENOENT'
+          ? `Missing "${iexecConf.logo}" logo image file`
+          : logoError.message;
+        failed.push(`${iexecConf.logo}: ${errorMessage}`);
+      }
 
-    // validate deployed.json
-    try {
-      const deployedObj = await loadDeployedConf();
-      if (!(objectName in deployedObj)) {
-        throw Error(
-          `Missing ${objectName} field. You should run "iexec ${objName} deploy"`,
+      // validate deployed.json
+      try {
+        const deployedObj = await loadDeployedConf();
+        if (!(objectName in deployedObj)) {
+          throw Error(
+            `Missing ${objectName} field. You should run "iexec ${objName} deploy"`,
+          );
+        }
+        validated.push(DEPLOYED_FILE_NAME);
+      } catch (confError) {
+        failed.push(`${DEPLOYED_FILE_NAME}: ${confError.message}`);
+      }
+      if (failed.length === 0) {
+        spinner.succeed(
+          `${objName} description is valid. You can now submit it to the ${objName} registry: ${objectMap[objName].registry}`,
+          {
+            raw: { validated },
+          },
         );
+      } else {
+        spinner.fail(`Invalid files: ${pretty(failed)}`, {
+          raw: { validated, fail: failed },
+        });
       }
-      validated.push(DEPLOYED_FILE_NAME);
-    } catch (confError) {
-      failed.push(`${DEPLOYED_FILE_NAME}: ${confError.message}`);
+    } catch (error) {
+      handleError(error, cli, opts);
     }
-    if (failed.length === 0) {
-      spinner.succeed(
-        `${objName} description is valid. You can now submit it to the ${objName} registry: ${objectMap[objName].registry}`,
-        {
-          raw: { validated },
-        },
-      );
-    } else {
-      spinner.fail(`Invalid files: ${pretty(failed)}`, {
-        raw: { validated, fail: failed },
-      });
-    }
-  } catch (error) {
-    handleError(error, cli, opts);
-  }
-});
+  });
 
-help(cli);
+finalizeCli(cli);

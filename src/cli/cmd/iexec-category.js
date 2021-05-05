@@ -9,7 +9,7 @@ const {
   computeTxOptions,
   checkUpdate,
   handleError,
-  help,
+  finalizeCli,
   desc,
   option,
   Spinner,
@@ -26,8 +26,7 @@ cli.name('iexec category').usage('<command> [options]');
 
 const init = cli.command('init');
 addGlobalOptions(init);
-init.description(desc.initObj(objName)).action(async (cmd) => {
-  const opts = cmd.opts();
+init.description(desc.initObj(objName)).action(async (opts, cmd) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
@@ -51,8 +50,7 @@ create
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.createObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -87,8 +85,7 @@ addGlobalOptions(show);
 show
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
-  .action(async (index, cmd) => {
-    const opts = cmd.opts();
+  .action(async (index, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -110,8 +107,7 @@ addGlobalOptions(count);
 count
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -126,4 +122,4 @@ count
     }
   });
 
-help(cli);
+finalizeCli(cli);

@@ -18,7 +18,7 @@ const {
 } = require('../../common/modules/order');
 const { NULL_ADDRESS, stringifyNestedBn } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -56,8 +56,7 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init.description(desc.initObj(objName)).action(async (cmd) => {
-  const opts = cmd.opts();
+init.description(desc.initObj(objName)).action(async (opts, cmd) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
@@ -86,8 +85,7 @@ deploy
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -125,8 +123,7 @@ show
   .option(...option.chain())
   .option(...option.user())
   .description(desc.showObj(objName))
-  .action(async (cliAddressOrIndex, cmd) => {
-    const opts = cmd.opts();
+  .action(async (cliAddressOrIndex, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -175,8 +172,7 @@ count
   .option(...option.chain())
   .option(...option.user())
   .description(desc.countObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -219,8 +215,7 @@ publish
   .option(...orderOption.apprestrict())
   .option(...orderOption.datasetrestrict())
   .option(...orderOption.requesterrestrict())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -296,8 +291,7 @@ unpublish
   .option(...option.chain())
   .option(...option.force())
   .option(...option.unpublishAllOrders())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -351,4 +345,4 @@ unpublish
     }
   });
 
-help(cli);
+finalizeCli(cli);

@@ -13,7 +13,7 @@ const {
 } = require('../../common/utils/secrets-utils');
 const secretMgtServ = require('../../common/modules/sms');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -47,8 +47,7 @@ generateKeys
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -130,8 +129,7 @@ decryptResults
   .option(...option.beneficiaryKeystoredir())
   .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
-  .action(async (encryptedResultsPath, cmd) => {
-    const opts = cmd.opts();
+  .action(async (encryptedResultsPath, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -207,8 +205,7 @@ pushSecret
   .option(...option.forceUpdateSecret())
   .option(...option.secretPath())
   .description(desc.pushResultKey())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -269,8 +266,7 @@ addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (address, cmd) => {
-    const opts = cmd.opts();
+  .action(async (address, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -310,4 +306,4 @@ checkSecret
     }
   });
 
-help(cli);
+finalizeCli(cli);

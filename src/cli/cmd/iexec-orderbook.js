@@ -4,7 +4,7 @@ const cli = require('commander');
 const orderbook = require('../../common/modules/orderbook');
 const { NULL_BYTES32, NULL_ADDRESS } = require('../../common/utils/utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   checkUpdate,
   handleError,
@@ -34,8 +34,7 @@ orderbookApp
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('app orderbook', 'marketplace'))
-  .action(async (app, cmd) => {
-    const opts = cmd.opts();
+  .action(async (app, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -138,8 +137,7 @@ orderbookDataset
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
-  .action(async (dataset, cmd) => {
-    const opts = cmd.opts();
+  .action(async (dataset, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -244,8 +242,7 @@ orderbookWorkerpool
   .option(...option.includeDatasetSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
-  .action(async (workerpool, cmd) => {
-    const opts = cmd.opts();
+  .action(async (workerpool, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -362,8 +359,7 @@ orderbookRequester
   .option(...option.filterBeneficiarySpecific())
   .option(...option.includeWorkerpoolSpecific())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
-  .action(async (address, cmd) => {
-    const opts = cmd.opts();
+  .action(async (address, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -463,4 +459,4 @@ orderbookRequester
     }
   });
 
-help(cli);
+finalizeCli(cli);

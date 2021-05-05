@@ -5,7 +5,7 @@ const secretMgtServ = require('../../common/modules/sms');
 const resultProxyServ = require('../../common/modules/result-proxy');
 const { getStorageTokenKeyName } = require('../../common/utils/secrets-utils');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -30,8 +30,7 @@ initStorage
   .option(...option.forceUpdateSecret())
   .option(...option.storageToken())
   .description(desc.initStorage())
-  .action(async (provider, cmd) => {
-    const opts = cmd.opts();
+  .action(async (provider, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -105,8 +104,7 @@ checkStorage
   .option(...option.chain())
   .option(...option.user())
   .description(desc.checkStorage())
-  .action(async (provider, cmd) => {
-    const opts = cmd.opts();
+  .action(async (provider, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -144,4 +142,4 @@ checkStorage
     }
   });
 
-help(cli);
+finalizeCli(cli);

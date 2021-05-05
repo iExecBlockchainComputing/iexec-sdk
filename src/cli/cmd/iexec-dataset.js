@@ -37,7 +37,7 @@ const {
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const {
-  help,
+  finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -76,8 +76,7 @@ init
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
   .description(desc.initObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -119,8 +118,7 @@ deploy
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -158,8 +156,7 @@ show
   .option(...option.chain())
   .option(...option.user())
   .description(desc.showObj(objName))
-  .action(async (cliAddressOrIndex, cmd) => {
-    const opts = cmd.opts();
+  .action(async (cliAddressOrIndex, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -208,8 +205,7 @@ count
   .option(...option.chain())
   .option(...option.user())
   .description(desc.countObj(objName))
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -242,8 +238,7 @@ encryptDataset
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
   .description(desc.encryptDataset())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
 
@@ -368,8 +363,7 @@ pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
   .description(desc.pushDatasetSecret())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -433,8 +427,7 @@ addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -482,8 +475,7 @@ publish
   .option(...orderOption.apprestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -551,8 +543,7 @@ unpublish
   .option(...option.chain())
   .option(...option.force())
   .option(...option.unpublishAllOrders())
-  .action(async (objAddress, cmd) => {
-    const opts = cmd.opts();
+  .action(async (objAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -606,4 +597,4 @@ unpublish
     }
   });
 
-help(cli);
+finalizeCli(cli);

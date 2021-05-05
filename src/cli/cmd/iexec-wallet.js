@@ -25,7 +25,7 @@ const {
   computeTxOptions,
   checkUpdate,
   handleError,
-  help,
+  finalizeCli,
   Spinner,
   option,
   desc,
@@ -46,8 +46,7 @@ addWalletCreateOptions(create);
 create
   .option(...option.forceCreate())
   .description(desc.createWallet())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -72,8 +71,7 @@ addWalletCreateOptions(importPk);
 importPk
   .option(...option.forceCreate())
   .description(desc.importWallet())
-  .action(async (privateKey, cmd) => {
-    const opts = cmd.opts();
+  .action(async (privateKey, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -102,8 +100,7 @@ show
   .option(...option.chain())
   .option(...option.showPrivateKey())
   .description(desc.showObj(objName, 'address'))
-  .action(async (address, cmd) => {
-    const opts = cmd.opts();
+  .action(async (address, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
 
@@ -190,8 +187,7 @@ addWalletLoadOptions(getEth);
 getEth
   .option(...option.chain())
   .description(desc.getETH())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -229,8 +225,7 @@ addWalletLoadOptions(getRlc);
 getRlc
   .option(...option.chain())
   .description(desc.getRLC())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -272,8 +267,7 @@ sendETH
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendETH())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -325,8 +319,7 @@ sendRLC
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendRLC())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -378,8 +371,7 @@ sweep
   .option(...option.force())
   .option(...option.to())
   .description(desc.sweep())
-  .action(async (cmd) => {
-    const opts = cmd.opts();
+  .action(async (opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -432,8 +424,7 @@ bridgeToSidechain
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToSidechain())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -519,8 +510,7 @@ bridgeToMainchain
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToMainchain())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -606,8 +596,7 @@ wrapEnterpriseRLC
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.wrapEnterpriseRLC())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -667,8 +656,7 @@ unwrapEnterpriseRLC
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.unwrapEnterpriseRLC())
-  .action(async (amount, unit, cmd) => {
-    const opts = cmd.opts();
+  .action(async (amount, unit, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -714,4 +702,4 @@ unwrapEnterpriseRLC
     }
   });
 
-help(cli);
+finalizeCli(cli);
