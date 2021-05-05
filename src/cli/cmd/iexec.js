@@ -34,10 +34,11 @@ async function main() {
     .option(...option.skipWallet())
     .description(desc.initObj('project'))
     .action(async (cmd) => {
-      await checkUpdate(cmd);
-      const spinner = Spinner(cmd);
+      const opts = cmd.opts();
+      await checkUpdate(opts);
+      const spinner = Spinner(opts);
       try {
-        const force = cmd.force || cmd.raw;
+        const force = opts.force || opts.raw;
         const { saved, fileName } = await initIExecConf({
           force,
           strict: false,
@@ -58,9 +59,9 @@ async function main() {
         }
 
         let walletRes;
-        if (!cmd.skipWallet) {
+        if (!opts.skipWallet) {
           spinner.info('Creating your wallet file');
-          const walletOptions = await computeWalletCreateOptions(cmd);
+          const walletOptions = await computeWalletCreateOptions(opts);
           walletRes = await createAndSave({ force, ...walletOptions });
           spinner.info(
             `Your wallet address is ${
@@ -82,7 +83,7 @@ async function main() {
           raw,
         });
       } catch (error) {
-        handleError(error, cli, cmd);
+        handleError(error, cli, opts);
       }
     });
 
@@ -118,10 +119,11 @@ async function main() {
     .option(...option.chain())
     .description(desc.info())
     .action(async (cmd) => {
-      await checkUpdate(cmd);
-      const spinner = Spinner(cmd);
+      const opts = cmd.opts();
+      await checkUpdate(opts);
+      const spinner = Spinner(opts);
       try {
-        const chain = await loadChain(cmd.chain, { spinner });
+        const chain = await loadChain(opts.chain, { spinner });
 
         const host = chain.host
           === getChainDefaults({ id: chain.id, flavour: chain.flavour }).host
@@ -189,7 +191,7 @@ async function main() {
           },
         });
       } catch (error) {
-        handleError(error, cli, cmd);
+        handleError(error, cli, opts);
       }
     });
 

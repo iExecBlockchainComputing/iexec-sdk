@@ -49,25 +49,26 @@ show
   .option(...option.beneficiaryKeyFile())
   .description(desc.showObj(objName))
   .action(async (taskid, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, !cmd.download && { isSigner: false }),
+        Object.assign(walletOptions, !opts.download && { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, { spinner });
-      if (cmd.download) {
+      const chain = await loadChain(opts.chain, { spinner });
+      if (opts.download) {
         await connectKeystore(chain, keystore);
       }
 
-      debug('cmd.watch', cmd.watch);
-      debug('cmd.download', cmd.download);
+      debug('opts.watch', opts.watch);
+      debug('opts.download', opts.download);
 
       spinner.start(info.showing(objName));
 
       let taskFinalState;
-      if (cmd.watch) {
+      if (opts.watch) {
         taskFinalState = await new Promise((resolve, reject) => {
           let taskState;
           obsTask(chain.contracts, taskid).subscribe({
@@ -87,9 +88,9 @@ show
       const taskResult = taskFinalState || (await taskModule.show(chain.contracts, taskid));
       spinner.info(`Task status ${taskResult.statusName}`);
       let resultPath;
-      if (cmd.download) {
+      if (opts.download) {
         if (taskResult.status === 3) {
-          const resultFileName = cmd.download !== true ? cmd.download : taskid;
+          const resultFileName = opts.download !== true ? opts.download : taskid;
 
           resultPath = path.join(
             process.cwd(),
@@ -103,9 +104,9 @@ show
           const res = await fetchTaskResults(chain.contracts, taskid, {
             ipfsGatewayURL: chain.ipfsGateway,
           });
-          if (cmd.decrypt) {
+          if (opts.decrypt) {
             spinner.start(info.decrypting());
-            const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+            const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
             const exists = await fs.pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
@@ -113,10 +114,10 @@ show
               );
             }
             let beneficiaryKeyPath;
-            if (cmd.beneficiaryKeyFile) {
+            if (opts.beneficiaryKeyFile) {
               beneficiaryKeyPath = path.join(
                 beneficiarySecretsFolderPath,
-                cmd.beneficiaryKeyFile,
+                opts.beneficiaryKeyFile,
               );
             } else {
               const [address] = await keystore.accounts();
@@ -173,7 +174,7 @@ show
         );
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -186,20 +187,21 @@ claim
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (taskid, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
-      const txOptions = await computeTxOptions(cmd);
-      const chain = await loadChain(cmd.chain, { txOptions, spinner });
+      const txOptions = await computeTxOptions(opts);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
 
       spinner.start(info.claiming(objName));
       const txHash = await taskModule.claim(chain.contracts, taskid);
       spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

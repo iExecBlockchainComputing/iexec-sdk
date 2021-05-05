@@ -47,11 +47,12 @@ create
   .option(...option.forceCreate())
   .description(desc.createWallet())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const force = cmd.force || false;
-      const walletOptions = await computeWalletCreateOptions(cmd);
+      const force = opts.force || false;
+      const walletOptions = await computeWalletCreateOptions(opts);
       const res = await createAndSave({ force, ...walletOptions });
       spinner.succeed(
         `Your wallet address is ${res.address}\nWallet saved in "${
@@ -61,7 +62,7 @@ create
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -72,11 +73,12 @@ importPk
   .option(...option.forceCreate())
   .description(desc.importWallet())
   .action(async (privateKey, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const force = cmd.force || false;
-      const walletOptions = await computeWalletCreateOptions(cmd);
+      const force = opts.force || false;
+      const walletOptions = await computeWalletCreateOptions(opts);
       const res = await importPrivateKeyAndSave(privateKey, {
         force,
         ...walletOptions,
@@ -89,7 +91,7 @@ importPk
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -101,13 +103,14 @@ show
   .option(...option.showPrivateKey())
   .description(desc.showObj(objName, 'address'))
   .action(async (address, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
 
-    const walletOptions = await computeWalletLoadOptions(cmd);
+    const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore({
       ...walletOptions,
-      ...((address || !cmd.showPrivateKey) && { isSigner: false }),
+      ...((address || !opts.showPrivateKey) && { isSigner: false }),
     });
 
     let userWallet;
@@ -115,11 +118,11 @@ show
     let displayedWallet;
     try {
       if (!address) {
-        if (cmd.showPrivateKey) {
+        if (opts.showPrivateKey) {
           userWallet = await keystore.load();
           userWalletAddress = userWallet.address;
           displayedWallet = {
-            ...(cmd.showPrivateKey
+            ...(opts.showPrivateKey
               ? { privateKey: userWallet.privateKey }
               : {}),
             publicKey: userWallet.publicKey,
@@ -146,7 +149,7 @@ show
 
       if (!userWalletAddress && !address) throw Error('Missing address or wallet');
 
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(opts.chain, { spinner });
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
@@ -177,7 +180,7 @@ show
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -188,14 +191,15 @@ getEth
   .option(...option.chain())
   .description(desc.getETH())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(opts.chain, { spinner }),
       ]);
       spinner.info(`Using wallet ${address}`);
       spinner.start(`Requesting test ether from ${chain.name} faucets...`);
@@ -215,7 +219,7 @@ getEth
         raw: { faucetsResponses },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -226,14 +230,15 @@ getRlc
   .option(...option.chain())
   .description(desc.getRLC())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { spinner }),
+        loadChain(opts.chain, { spinner }),
       ]);
       spinner.info(`Using wallet ${address}`);
       spinner.start(`Requesting ${chain.name} faucet for test RLC...`);
@@ -253,7 +258,7 @@ getRlc
         raw: { faucetsResponses },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -268,44 +273,45 @@ sendETH
   .option(...option.to())
   .description(desc.sendETH())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const weiAmount = await weiAmountSchema({
         defaultUnit: 'ether',
       }).validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (!cmd.to) throw Error('Missing --to option');
-      if (!cmd.force) {
+      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.force) {
         await prompt.transferETH(
           formatEth(weiAmount),
           chain.name,
-          cmd.to,
+          opts.to,
           chain.id,
         );
       }
       const message = `${formatEth(weiAmount)} ${
         chain.name
-      } ether from ${address} to ${cmd.to}`;
+      } ether from ${address} to ${opts.to}`;
       spinner.start(`Sending ${message}...`);
-      const txHash = await wallet.sendETH(chain.contracts, weiAmount, cmd.to);
+      const txHash = await wallet.sendETH(chain.contracts, weiAmount, opts.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
           amount,
           from: address,
-          to: cmd.to,
+          to: opts.to,
           txHash,
         },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -320,44 +326,45 @@ sendRLC
   .option(...option.to())
   .description(desc.sendRLC())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      if (!cmd.to) throw Error('Missing --to option');
+      if (!opts.to) throw Error('Missing --to option');
       await connectKeystore(chain, keystore, { txOptions });
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.transferRLC(
           formatRLC(nRlcAmount),
           chain.name,
-          cmd.to,
+          opts.to,
           chain.id,
         );
       }
       const message = `${formatRLC(nRlcAmount)} ${
         chain.name
-      } RLC from ${address} to ${cmd.to}`;
+      } RLC from ${address} to ${opts.to}`;
       spinner.start(`Sending ${message}...`);
 
-      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, cmd.to);
+      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, opts.to);
 
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
           amount: nRlcAmount,
           from: address,
-          to: cmd.to,
+          to: opts.to,
           txHash,
         },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -372,38 +379,39 @@ sweep
   .option(...option.to())
   .description(desc.sweep())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (!cmd.to) throw Error('Missing --to option');
-      if (!cmd.force) {
+      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.force) {
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ether and RLC')(
           chain.name,
-          cmd.to,
+          opts.to,
           chain.id,
         );
       }
       spinner.start('Sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
         chain.contracts,
-        cmd.to,
+        opts.to,
       );
       spinner.succeed(
-        `Wallet swept from ${address} to ${cmd.to}\n${
+        `Wallet swept from ${address} to ${opts.to}\n${
           errors ? `Errors: ${errors}` : ''
         }`,
         {
           raw: {
             from: address,
-            to: cmd.to,
+            to: opts.to,
             sendNativeTxHash,
             sendERC20TxHash,
             errors,
@@ -411,7 +419,7 @@ sweep
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -425,16 +433,17 @@ bridgeToSidechain
   .option(...option.force())
   .description(desc.bridgeToSidechain())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
@@ -451,7 +460,7 @@ bridgeToSidechain
           `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.transferRLC(
           formatRLC(nRlcAmount),
           chain.name,
@@ -497,7 +506,7 @@ bridgeToSidechain
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -511,16 +520,17 @@ bridgeToMainchain
   .option(...option.force())
   .description(desc.bridgeToMainchain())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [[address], chain] = await Promise.all([
         keystore.accounts(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
@@ -537,7 +547,7 @@ bridgeToMainchain
           `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.transferRLC(
           formatRLC(nRlcAmount),
           chain.name,
@@ -583,7 +593,7 @@ bridgeToMainchain
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -597,15 +607,16 @@ wrapEnterpriseRLC
   .option(...option.force())
   .description(desc.wrapEnterpriseRLC())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain] = await Promise.all([
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
@@ -625,7 +636,7 @@ wrapEnterpriseRLC
       await connectKeystore({ contracts: standardContracts }, keystore, {
         txOptions,
       });
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.wrap(formatRLC(nRlcAmount), chain.id);
       }
       const message = `${formatRLC(nRlcAmount)} RLC into eRLC`;
@@ -643,7 +654,7 @@ wrapEnterpriseRLC
         },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -657,15 +668,16 @@ unwrapEnterpriseRLC
   .option(...option.force())
   .description(desc.unwrapEnterpriseRLC())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain] = await Promise.all([
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
@@ -681,7 +693,7 @@ unwrapEnterpriseRLC
       await connectKeystore({ contracts: enterpriseContracts }, keystore, {
         txOptions,
       });
-      if (!cmd.force) {
+      if (!opts.force) {
         await prompt.unwrap(formatRLC(nRlcAmount), chain.id);
       }
       const message = `${formatRLC(nRlcAmount)} eRLC into RLC`;
@@ -698,7 +710,7 @@ unwrapEnterpriseRLC
         },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

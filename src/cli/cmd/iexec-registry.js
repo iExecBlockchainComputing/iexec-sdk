@@ -140,8 +140,9 @@ const objectMap = {
 const validate = cli.command('validate <object>');
 addGlobalOptions(validate);
 validate.description(desc.validateRessource()).action(async (objName, cmd) => {
-  await checkUpdate(cmd);
-  const spinner = Spinner(cmd);
+  const opts = cmd.opts();
+  await checkUpdate(opts);
+  const spinner = Spinner(opts);
   try {
     if (!objectNames.includes(objName)) {
       throw Error(
@@ -210,7 +211,7 @@ validate.description(desc.validateRessource()).action(async (objName, cmd) => {
       });
     }
   } catch (error) {
-    handleError(error, cli, cmd);
+    handleError(error, cli, opts);
   }
 });
 

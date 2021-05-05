@@ -34,12 +34,13 @@ show
   .option(...option.watch())
   .description(desc.showObj(objName))
   .action(async (dealid, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(opts.chain, { spinner });
       let result;
-      if (cmd.watch) {
+      if (opts.watch) {
         const waitDealFinalState = () => new Promise((resolve, reject) => {
           let dealState;
           obsDeal(chain.contracts, dealid).subscribe({
@@ -83,7 +84,7 @@ show
         raw: result,
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -96,13 +97,14 @@ claim
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (dealid, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
-      const txOptions = await computeTxOptions(cmd);
-      const chain = await loadChain(cmd.chain, { txOptions, spinner });
+      const txOptions = await computeTxOptions(opts);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));
       const { claimed, transactions } = await deal.claim(
@@ -116,7 +118,7 @@ claim
         { raw: { claimed, transactions } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

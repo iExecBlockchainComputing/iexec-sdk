@@ -37,13 +37,14 @@ deposit
   .option(...option.txConfirms())
   .description(desc.deposit())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, { txOptions, spinner });
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.depositing());
       const depositRes = await account.deposit(chain.contracts, [amount, unit]);
@@ -51,7 +52,7 @@ deposit
         raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -64,13 +65,14 @@ withdraw
   .option(...option.txConfirms())
   .description(desc.withdraw())
   .action(async (amount, unit, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
-      const chain = await loadChain(cmd.chain, { txOptions, spinner });
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
       const res = await account.withdraw(chain.contracts, [amount, unit]);
@@ -78,7 +80,7 @@ withdraw
         raw: { amount: res.amount, txHash: res.txHash },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -89,10 +91,11 @@ show
   .option(...option.chain())
   .description(desc.showObj('iExec', objName))
   .action(async (address, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
 
       let userAddress;
@@ -115,7 +118,7 @@ show
       }
       if (!userAddress) throw Error('Missing address or wallet');
 
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(opts.chain, { spinner });
 
       spinner.start(info.checkBalance('iExec account'));
       const balances = await account.checkBalance(chain.contracts, userAddress);
@@ -130,7 +133,7 @@ show
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

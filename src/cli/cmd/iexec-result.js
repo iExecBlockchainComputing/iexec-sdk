@@ -48,8 +48,9 @@ generateKeys
   .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
       const nodeMinVersion = 'v10.12.0';
       if (semver.gt(nodeMinVersion, process.version)) {
@@ -57,13 +58,13 @@ generateKeys
           `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
         );
       }
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
       const [address] = await keystore.accounts();
 
-      const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+      const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
       await fs.ensureDir(beneficiarySecretsFolderPath);
 
       spinner.info(`Generate encryption keypair for wallet address ${address}`);
@@ -98,7 +99,7 @@ generateKeys
       const priKeyFileName = privateKeyName(address);
       const pubKeyFileName = publicKeyName(address);
       await saveTextToFile(priKeyFileName, privateKey, {
-        force: cmd.force,
+        force: opts.force,
         fileDir: beneficiarySecretsFolderPath,
       });
       await saveTextToFile(pubKeyFileName, publicKey, {
@@ -117,7 +118,7 @@ generateKeys
         },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -130,10 +131,11 @@ decryptResults
   .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
   .action(async (encryptedResultsPath, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const { beneficiarySecretsFolderPath } = createEncFolderPaths(cmd);
+      const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
       const exists = await fs.pathExists(beneficiarySecretsFolderPath);
 
       if (!exists) {
@@ -144,19 +146,19 @@ decryptResults
 
       const inputFile = encryptedResultsPath
         || path.join(process.cwd(), DEFAULT_ENCRYPTED_RESULTS_NAME);
-      const outputFile = cmd.decryptedResultsPath
+      const outputFile = opts.decryptedResultsPath
         || path.join(process.cwd(), DEFAULT_DECRYPTED_RESULTS_NAME);
 
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
 
       let beneficiaryKeyPath;
-      if (cmd.beneficiaryKeyFile) {
+      if (opts.beneficiaryKeyFile) {
         beneficiaryKeyPath = path.join(
           beneficiarySecretsFolderPath,
-          cmd.beneficiaryKeyFile,
+          opts.beneficiaryKeyFile,
         );
       } else {
         const [address] = await keystore.accounts();
@@ -178,7 +180,7 @@ decryptResults
       }
 
       const outputExists = await fs.exists(outputFile);
-      if (outputExists && !cmd.force) await prompt.fileExists(outputFile);
+      if (outputExists && !opts.force) await prompt.fileExists(outputFile);
 
       spinner.start('Decrypting results');
       const encResultsZip = await fs.readFile(inputFile);
@@ -193,7 +195,7 @@ decryptResults
         },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -206,13 +208,14 @@ pushSecret
   .option(...option.secretPath())
   .description(desc.pushResultKey())
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, {
+        loadChain(opts.chain, {
           spinner,
         }),
         keystore.accounts(),
@@ -224,8 +227,8 @@ pushSecret
       debug('address', address);
 
       let secretFilePath;
-      if (cmd.secretPath) {
-        secretFilePath = cmd.secretPath;
+      if (opts.secretPath) {
+        secretFilePath = opts.secretPath;
       } else {
         const { beneficiarySecretsFolderPath } = createEncFolderPaths();
         secretFilePath = path.join(
@@ -244,7 +247,7 @@ pushSecret
         sms,
         getResultEncryptionKeyName(),
         secretToPush,
-        { forceUpdate: !!cmd.forceUpdate },
+        { forceUpdate: !!opts.forceUpdate },
       );
       if (isPushed) {
         spinner.succeed('Encryption key successfully pushed', {
@@ -254,7 +257,7 @@ pushSecret
         throw Error('Something went wrong');
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -267,14 +270,15 @@ checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
   .action(async (address, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
-      const chain = await loadChain(cmd.chain, {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       let keyAddress;
@@ -302,7 +306,7 @@ checkSecret
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

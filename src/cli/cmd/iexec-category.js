@@ -27,8 +27,9 @@ cli.name('iexec category').usage('<command> [options]');
 const init = cli.command('init');
 addGlobalOptions(init);
 init.description(desc.initObj(objName)).action(async (cmd) => {
-  await checkUpdate(cmd);
-  const spinner = Spinner(cmd);
+  const opts = cmd.opts();
+  await checkUpdate(opts);
+  const spinner = Spinner(opts);
   try {
     const { saved, fileName } = await initObj(objName);
     spinner.succeed(
@@ -38,7 +39,7 @@ init.description(desc.initObj(objName)).action(async (cmd) => {
       { raw: { category: saved } },
     );
   } catch (error) {
-    handleError(error, cli, cmd);
+    handleError(error, cli, opts);
   }
 });
 
@@ -51,15 +52,16 @@ create
   .option(...option.txConfirms())
   .description(desc.createObj(objName))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
-      const txOptions = await computeTxOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([
         loadIExecConf(),
-        loadChain(cmd.chain, { txOptions, spinner }),
+        loadChain(opts.chain, { txOptions, spinner }),
       ]);
       if (!iexecConf[objName]) {
         throw Error(
@@ -76,7 +78,7 @@ create
         raw: { catid: catid.toString(), txHash },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -86,10 +88,11 @@ show
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
   .action(async (index, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(opts.chain, { spinner });
       spinner.start(info.showing('category'));
       const category = await hub.showCategory(chain.contracts, index);
       category.workClockTimeRef = category.workClockTimeRef.toString();
@@ -98,7 +101,7 @@ show
         { raw: { index, category } },
       );
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -108,17 +111,18 @@ count
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
   .action(async (cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, { spinner });
+      const chain = await loadChain(opts.chain, { spinner });
       spinner.start(info.counting('category'));
       const countBN = await hub.countCategory(chain.contracts);
       spinner.succeed(`iExec hub has a total of ${countBN} category`, {
         raw: { count: countBN.toString() },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

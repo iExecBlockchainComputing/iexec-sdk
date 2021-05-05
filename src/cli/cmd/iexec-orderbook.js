@@ -35,10 +35,11 @@ orderbookApp
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('app orderbook', 'marketplace'))
   .action(async (app, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       const {
@@ -50,7 +51,7 @@ orderbookApp
         maxTag,
         minVolume,
         raw,
-      } = cmd;
+      } = opts;
 
       const request = orderbook.fetchAppOrderbook(
         chain.contracts,
@@ -121,7 +122,7 @@ orderbookApp
       });
       spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -138,10 +139,11 @@ orderbookDataset
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (dataset, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       const {
@@ -153,7 +155,7 @@ orderbookDataset
         maxTag,
         requireTag,
         raw,
-      } = cmd;
+      } = opts;
 
       const request = orderbook.fetchDatasetOrderbook(
         chain.contracts,
@@ -224,7 +226,7 @@ orderbookDataset
       });
       spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -243,10 +245,11 @@ orderbookWorkerpool
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
   .action(async (workerpool, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       const {
@@ -260,7 +263,7 @@ orderbookWorkerpool
         minVolume,
         minTrust,
         raw,
-      } = cmd;
+      } = opts;
 
       const request = orderbook.fetchWorkerpoolOrderbook(
         chain.contracts,
@@ -340,7 +343,7 @@ orderbookWorkerpool
       });
       spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -360,10 +363,11 @@ orderbookRequester
   .option(...option.includeWorkerpoolSpecific())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
   .action(async (address, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const chain = await loadChain(cmd.chain, {
+      const chain = await loadChain(opts.chain, {
         spinner,
       });
       const {
@@ -378,7 +382,7 @@ orderbookRequester
         maxTrust,
         minVolume,
         raw,
-      } = cmd;
+      } = opts;
 
       const request = orderbook.fetchRequestOrderbook(
         chain.contracts,
@@ -455,7 +459,7 @@ orderbookRequester
       });
       spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 

@@ -31,13 +31,14 @@ initStorage
   .option(...option.storageToken())
   .description(desc.initStorage())
   .action(async (provider, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
       const { contracts } = chain;
@@ -53,7 +54,7 @@ initStorage
         address,
         tokenKeyName,
       );
-      if (tokenExists && !cmd.forceUpdate) {
+      if (tokenExists && !opts.forceUpdate) {
         throw Error(
           `${providerName} storage is already initialized, use ${
             option.forceUpdateSecret()[0]
@@ -66,7 +67,7 @@ initStorage
         await connectKeystore(chain, keystore);
         token = await resultProxyServ.login(contracts, resultProxyURL);
       } else {
-        token = cmd.token
+        token = opts.token
           || (await prompt.password(`Paste your ${provider} token`, {
             useMask: true,
           }));
@@ -80,7 +81,7 @@ initStorage
         smsURL,
         tokenKeyName,
         token,
-        { forceUpdate: !!cmd.forceUpdate },
+        { forceUpdate: !!opts.forceUpdate },
       );
       if (isPushed) {
         spinner.info(
@@ -93,7 +94,7 @@ initStorage
         raw: { isInitilized: isPushed, isUpdated },
       });
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
@@ -105,20 +106,21 @@ checkStorage
   .option(...option.user())
   .description(desc.checkStorage())
   .action(async (provider, cmd) => {
-    await checkUpdate(cmd);
-    const spinner = Spinner(cmd);
+    const opts = cmd.opts();
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(cmd);
+      const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
-        loadChain(cmd.chain, { spinner }),
+        loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
       const { contracts } = chain;
       const smsURL = getPropertyFormChain(chain, 'sms');
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
-      const userAdress = cmd.user || address;
+      const userAdress = opts.user || address;
       spinner.info(
         `Checking ${providerName} storage token for user ${userAdress}`,
       );
@@ -138,7 +140,7 @@ checkStorage
         });
       }
     } catch (error) {
-      handleError(error, cli, cmd);
+      handleError(error, cli, opts);
     }
   });
 
