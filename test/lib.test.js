@@ -7113,7 +7113,7 @@ describe('[observables]', () => {
     expect(obsTaskAfterInitValues[0].task.status).toBe(1);
     expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
     expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 60000);
 
   test('task.obsTask() (task timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7278,7 +7278,7 @@ describe('[observables]', () => {
     expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
     expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
     expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
-  }, 30000);
+  }, 60000);
 
   test('deal.obsDeal()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7429,7 +7429,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeNextValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
-  }, 30000);
+  }, 60000);
 
   test('deal.obsDeal() (deal timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
@@ -7614,7 +7614,7 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
-  }, 50000);
+  }, 60000);
 });
 
 describe('[result]', () => {
