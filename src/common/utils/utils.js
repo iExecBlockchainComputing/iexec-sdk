@@ -11,7 +11,7 @@ const {
   parseUnits,
 } = require('ethers').utils;
 const { BigNumber } = require('ethers');
-const multiaddr = require('multiaddr');
+const { multiaddr } = require('multiaddr');
 const { ValidationError } = require('./errors');
 
 const debug = Debug('iexec:utils');

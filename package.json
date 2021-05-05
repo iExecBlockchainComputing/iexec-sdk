@@ -40,7 +40,7 @@
     "inquirer": "^8.0.0",
     "is-docker": "^2.1.1",
     "jszip": "^3.3.0",
-    "multiaddr": "^8.1.2",
+    "multiaddr": "^9.0.1",
     "node-rsa": "^1.1.1",
     "ora": "^5.2.0",
     "prettyjson": "1.2.1",
