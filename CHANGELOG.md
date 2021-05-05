@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.0]
+
+### changed
+
+- fixed `iexec registry validate app`
+
+### Removed
+
+- [BREAKING] Drop support for Node 10
+
 ## [5.2.0] 2021-01-22
 
 ### Added

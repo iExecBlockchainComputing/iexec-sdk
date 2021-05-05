@@ -2,10 +2,9 @@ matrix:
   NODE_TAG:
     - 14
     - 12
-    - 10
 
 pipeline:
-  build_node_10:
+  build_node_12:
     image: node:${NODE_TAG}
     pull: true
     commands:
@@ -18,7 +17,7 @@ pipeline:
       - npm test
     when:
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
   build_on_tag:
     image: node:${NODE_TAG}
@@ -43,7 +42,7 @@ pipeline:
     when:
       ref: [refs/tags/v5*]
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
   dockerhub_v5:
     image: plugins/docker
@@ -55,7 +54,7 @@ pipeline:
     when:
       ref: [refs/tags/v5*]
       matrix:
-        NODE_TAG: 10
+        NODE_TAG: 12
 
 services:
   token-chain:
