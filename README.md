@@ -882,15 +882,6 @@ The encrypted dataset files must be upload on a public file system and reference
 
 # iExec SDK Library API
 
-**[Work In Progress]** Although we'll try to avoid any API change, the Lib API may still evolve based on beta-testers feedback.
-
-iExec SDK can be imported in your project as a library/module, and it's compatible with old JS engines:
-
-- \>= Node v8
-- \>= Firefox v22
-- \>= Chrome v28
-- \>= IE 9
-
 ## Test iexec in codesandbox
 
 - [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec52x-uy8tc?fontsize=14&hidenavigation=1&theme=dark)
