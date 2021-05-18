@@ -899,9 +899,9 @@ requestRun
   .action(async (app, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
-    const keystore = Keystore(walletOptions);
     try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { spinner });
       debug('app', app);
       if (!(await checkDeployedApp(chain.contracts, app))) {
