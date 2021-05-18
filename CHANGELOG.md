@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
 - `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
+- fix `iexec app run` `--gas-price` option
 
 ### Removed
 
