@@ -402,10 +402,10 @@ run
   .action(async (appAddress, opts, cmd) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
-    const txOptions = await computeTxOptions(opts);
-    const keystore = Keystore(walletOptions);
     try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       const result = { deals: [] };
       const useDeployedApp = !appAddress;
