@@ -4239,7 +4239,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x74e193412729d18d1c6752c3e96c909b9f4d715556ac6a098c1866a6a5dd51dd',
+      '0x03a16475e3233d4e1d9c8cf724e39cac186c6eeee3f0945500c13df3d6f5f8dd',
     );
   });
 
