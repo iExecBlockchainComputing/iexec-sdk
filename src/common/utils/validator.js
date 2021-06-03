@@ -441,10 +441,65 @@ const multiaddressSchema = () => mixed().transform((value) => {
   throw new ValidationError('${originalValue} is not a valid multiaddr');
 });
 
-const mrenclaveSchema = () => mixed().transform((value) => {
-  if (value instanceof Uint8Array) return value;
-  return utf8ToBuffer(value);
-});
+const objMrenclaveSchema = () => object({
+  provider: string().required(),
+  version: string().required(),
+  entrypoint: string().required(),
+  heapSize: positiveIntSchema().required(),
+  fingerprint: string().required(),
+}).noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
+
+const mrenclaveSchema = () => mixed()
+  .transform((value) => {
+    if (value instanceof Uint8Array) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      return utf8ToBuffer(value);
+    }
+    if (typeof value === 'object') {
+      return utf8ToBuffer(JSON.stringify(value));
+    }
+    return utf8ToBuffer('');
+  })
+  .test(
+    'is-valid-mrenclave',
+    '${path} is not a valid mrenclave',
+    async (value, { originalValue, createError }) => {
+      let stringValue;
+      let objValue;
+      if (originalValue instanceof Uint8Array) {
+        try {
+          stringValue = Buffer.from(originalValue).toString();
+        } catch (e) {
+          return false;
+        }
+      } else if (typeof originalValue === 'string') {
+        stringValue = originalValue;
+      } else if (originalValue && typeof originalValue === 'object') {
+        objValue = originalValue;
+      } else if (originalValue !== undefined) {
+        return false;
+      }
+      try {
+        if (stringValue !== undefined && stringValue !== '') {
+          objValue = JSON.parse(stringValue);
+        }
+        if (objValue) {
+          await objMrenclaveSchema().validate(objValue, {
+            stripUnknown: false,
+          });
+        }
+        return true;
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          return createError({ message: e.message });
+        }
+        return false;
+      }
+    },
+  )
+  .default(() => utf8ToBuffer(''));
 
 const appTypeSchema = () => string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
@@ -542,6 +597,7 @@ module.exports = {
   hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  mrenclaveSchema,
   appTypeSchema,
   appSchema,
   datasetSchema,
