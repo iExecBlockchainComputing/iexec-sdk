@@ -385,11 +385,13 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.wallet).toBeDefined();
-    expect(res.balance.ETH).toBeDefined();
-    expect(res.balance.ETH).not.toBe('0');
+    expect(res.balance.ether).toBeDefined();
+    expect(res.balance.ether).not.toBe('0');
     expect(res.balance.nRLC).toBeDefined();
     expect(res.balance.nRLC).not.toBe('0');
-    expect(res.balance.ETH.replace('.', '').indexOf(res.balance.nRLC)).toBe(-1);
+    expect(res.balance.ether.replace('.', '').indexOf(res.balance.nRLC)).toBe(
+      -1,
+    );
   });
 
   // ACCOUNT
@@ -2179,7 +2181,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.balance.nRLC.substr(0, 2)).not.toBe('0');
-    expect(res.balance.ETH).toBeUndefined();
+    expect(res.balance.ether).toBeUndefined();
   });
 
   test('[sidechain] iexec wallet sendETH', async () => {
@@ -3123,7 +3125,7 @@ describe('[Common]', () => {
       expect(res.wallet.address).toBe(ADDRESS);
       expect(res.wallet.publicKey).toBeUndefined();
       expect(res.wallet.privateKey).toBeUndefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
     });
 
@@ -3138,7 +3140,7 @@ describe('[Common]', () => {
       expect(res.wallet.address).toBe(ADDRESS);
       expect(res.wallet.publicKey).toBe(PUBLIC_KEY);
       expect(res.wallet.privateKey).toBe(PRIVATE_KEY);
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
     });
 
@@ -3153,7 +3155,7 @@ describe('[Common]', () => {
       expect(res.wallet.address).toBe(ADDRESS);
       expect(res.wallet.publicKey).toBeUndefined();
       expect(res.wallet.privateKey).toBeUndefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
     });
 
@@ -3263,9 +3265,9 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.balance).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
-      expect(res.balance.ETH).not.toBe('0');
+      expect(res.balance.ether).not.toBe('0');
       expect(res.balance.nRLC).not.toBe('0');
       expect(res.wallet).toBeUndefined();
     });
@@ -3280,7 +3282,7 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.balance).toBeDefined();
-      expect(res.balance.ETH).toBeDefined();
+      expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
     });
 

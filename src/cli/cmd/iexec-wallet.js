@@ -170,7 +170,6 @@ show
               wei: chain.contracts.isNative
                 ? undefined
                 : balances.wei.toString(),
-              ETH: displayBalances.ether, // for legacy compatibility
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
           },

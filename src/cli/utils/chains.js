@@ -151,8 +151,7 @@ const loadChain = async (
     }
 
     let bridgeConf;
-    const bridgedChainNameOrId = conf.bridge
-      && (conf.bridge.bridgedChainName || conf.bridge.bridgedChainId);
+    const bridgedChainNameOrId = conf.bridge && conf.bridge.bridgedChainName;
     if (bridgedChainNameOrId) {
       let bridgeLoadedConf;
       if (chainsConf.chains[bridgedChainNameOrId]) {

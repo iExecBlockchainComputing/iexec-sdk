@@ -51,16 +51,13 @@ const fetchAppOrderbook = async (
         maxTag: await tagSchema().validate(maxTag),
       }),
     };
-    const response = await wrapPaginableRequest(jsonApi.get)({
+    const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
       endpoint: '/apporders',
       query,
     });
-    if (response.ok) {
-      return {
-        ...response,
-        appOrders: response.orders, // deprecated
-      };
+    if (ok) {
+      return response;
     }
     throw Error('An error occured while getting orderbook');
   } catch (error) {
@@ -108,16 +105,13 @@ const fetchDatasetOrderbook = async (
         maxTag: await tagSchema().validate(maxTag),
       }),
     };
-    const response = await wrapPaginableRequest(jsonApi.get)({
+    const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
       endpoint: '/datasetorders',
       query,
     });
-    if (response.ok) {
-      return {
-        ...response,
-        datasetOrders: response.orders, // deprecated
-      };
+    if (ok) {
+      return response;
     }
     throw Error('An error occured while getting orderbook');
   } catch (error) {
@@ -184,16 +178,13 @@ const fetchWorkerpoolOrderbook = async (
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
     };
-    const response = await wrapPaginableRequest(jsonApi.get)({
+    const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
       endpoint: '/workerpoolorders',
       query,
     });
-    if (response.ok) {
-      return {
-        ...response,
-        workerpoolOrders: response.orders, // deprecated
-      };
+    if (ok) {
+      return response;
     }
     throw Error('An error occured while getting orderbook');
   } catch (error) {
@@ -260,16 +251,13 @@ const fetchRequestOrderbook = async (
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
     };
-    const response = await wrapPaginableRequest(jsonApi.get)({
+    const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
       endpoint: '/requestorders',
       query,
     });
-    if (response.ok) {
-      return {
-        ...response,
-        requestOrders: response.orders, // deprecated
-      };
+    if (ok) {
+      return response;
     }
     throw Error('An error occured while getting orderbook');
   } catch (error) {
