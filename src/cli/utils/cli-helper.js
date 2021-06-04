@@ -105,6 +105,7 @@ const option = {
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   user: () => ['--user <address>', desc.userAddress()],
+  initTee: () => ['--tee', 'use the Trused Execution Environment template'],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
   initWorkerpoolOrder: () => ['--workerpool', 'init a workerpool sell order'],

@@ -15,6 +15,7 @@ const {
   paramsEncryptResultSchema,
   nRlcAmountSchema,
 } = require('../../common/utils/validator');
+const { teeApp } = require('../utils/templates');
 const {
   deployApp,
   showApp,
@@ -107,6 +108,7 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
+init.option(...option.initTee());
 init.description(desc.initObj(objName)).action(async (opts, cmd) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
@@ -115,7 +117,7 @@ init.description(desc.initObj(objName)).action(async (opts, cmd) => {
     const keystore = Keystore({ ...walletOptions, isSigner: false });
     const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
-      overwrite: { owner: address },
+      overwrite: { ...(opts.tee && teeApp), owner: address },
     });
     spinner.succeed(
       `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
