@@ -252,7 +252,6 @@ const deployAndGetApporder = async (
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    mrenclave: 'abc|123|test',
   });
   const app = appDeployRes.address;
   const apporder = await iexec.order
@@ -608,7 +607,6 @@ describe('[workflow]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     });
     expect(appDeployRes.address).toBeDefined();
     expect(appDeployRes.txHash).toBeDefined();
@@ -624,7 +622,7 @@ describe('[workflow]', () => {
     expect(appShowRes.app.appChecksum).toBe(
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     );
-    expect(appShowRes.app.appMREnclave).toBe('abc|123|test');
+    expect(appShowRes.app.appMREnclave).toBe('');
 
     const order = await iexec.order.createApporder({
       app: appDeployRes.address,
@@ -3023,7 +3021,6 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     };
     const res = await iexec.app.deployApp(app);
     expect(res.txHash).toMatch(bytes32Regex);
@@ -3051,7 +3048,14 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
+      mrenclave: {
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: 'python /app/app.py',
+        heapSize: 1073741824,
+        fingerprint:
+          'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      },
     };
     const { address } = await iexec.app.deployApp(app);
 
@@ -3063,7 +3067,7 @@ describe('[app]', () => {
     expect(res.app.appType).toBe(app.type);
     expect(res.app.appMultiaddr).toBe(app.multiaddr);
     expect(res.app.appChecksum).toBe(app.checksum);
-    expect(res.app.appMREnclave).toBe(app.mrenclave);
+    expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
 
     await expect(iexec.app.showApp(utils.NULL_ADDRESS)).rejects.toThrow(
       new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
@@ -3088,7 +3092,6 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     };
     const resBeforeDeploy = await iexec.app.countUserApps(userAddress);
     await iexec.app.deployApp(app);
@@ -3116,7 +3119,14 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
+      mrenclave: {
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: 'python /app/app.py',
+        heapSize: 1073741824,
+        fingerprint:
+          'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      },
     };
     const { address } = await iexec.app.deployApp(app);
     const count = await iexec.app.countUserApps(userAddress);
@@ -3128,7 +3138,7 @@ describe('[app]', () => {
     expect(res.app.appType).toBe(app.type);
     expect(res.app.appMultiaddr).toBe(app.multiaddr);
     expect(res.app.appChecksum).toBe(app.checksum);
-    expect(res.app.appMREnclave).toBe(app.mrenclave);
+    expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
     await expect(iexec.app.showUserApp(count, userAddress)).rejects.toThrow(
       Error('app not deployed'),
     );
@@ -3898,7 +3908,6 @@ describe('[order]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     });
     const order = await iexec.order.createApporder({
       app: address,
