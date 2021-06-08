@@ -595,6 +595,16 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.app).toBeDefined();
     expect(res.app.owner).not.toBe(ADDRESS);
+    expect(res.app.mrenclave).toBeUndefined();
+  });
+
+  test('[common] iexec app init --tee)', async () => {
+    await removeWallet();
+    const raw = await execAsync(`${iexecPath} app init --tee --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.app).toBeDefined();
+    expect(res.app.mrenclave).toBeDefined();
   });
 
   test('[common] iexec app init (+ wallet)', async () => {
@@ -3363,10 +3373,8 @@ describe('[Common]', () => {
       await setRichWallet();
     });
 
-    test('iexec dataset init --encrypted', async () => {
-      const raw = await execAsync(
-        `${iexecPath} dataset init --encrypted --raw`,
-      );
+    test('iexec dataset init --tee', async () => {
+      const raw = await execAsync(`${iexecPath} dataset init --tee --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(await checkExists(filePath('.secrets/datasets/'))).toBe(true);

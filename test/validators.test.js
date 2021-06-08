@@ -26,6 +26,7 @@ const {
   // hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  mrenclaveSchema,
   // appSchema,
   // datasetSchema,
   // categorySchema,
@@ -916,6 +917,166 @@ describe('[fileBufferSchema]', () => {
   test('number', async () => {
     await expect(fileBufferSchema().validate(42)).rejects.toThrow(
       'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  });
+});
+
+describe('[mrenclaveSchema]', () => {
+  test('valid obj', async () => {
+    const obj = {
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
+      Buffer.from(JSON.stringify(obj), 'utf8'),
+    );
+  });
+  test('valid string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    });
+    await expect(mrenclaveSchema().validate(str)).resolves.toEqual(
+      Buffer.from(str, 'utf8'),
+    );
+  });
+  test('valid bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: '/app/helloworld',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).resolves.toEqual(bytes);
+  });
+  test('allow empty string', async () => {
+    await expect(mrenclaveSchema().validate('')).resolves.toEqual(
+      Buffer.from([]),
+    );
+  });
+  test('allow undefined', async () => {
+    await expect(mrenclaveSchema().validate(undefined)).resolves.toEqual(
+      Buffer.from([]),
+    );
+    await expect(
+      mrenclaveSchema().required().validate(undefined),
+    ).resolves.toEqual(Buffer.from([]));
+  });
+  test('allow empty bytes', async () => {
+    await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
+      Buffer.from([]),
+    );
+  });
+  test('throw with null', async () => {
+    await expect(mrenclaveSchema().validate(null)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw with number', async () => {
+    await expect(mrenclaveSchema().validate(42)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw with boolean', async () => {
+    await expect(mrenclaveSchema().validate(false)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in obj', async () => {
+    const obj = {
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      foo: 'bar',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in JSON string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      foo: 'bar',
+    });
+    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in decoded bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: '/app/helloworld',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+        foo: 'bar',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when a key is missing in obj', async () => {
+    const obj = {
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('provider is a required field'),
+    );
+  });
+  test('throw when a key is missing in JSON string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    });
+    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
+      new ValidationError('version is a required field'),
+    );
+  });
+  test('throw when a key is missing in decoded bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
+      new ValidationError('entrypoint is a required field'),
     );
   });
 });

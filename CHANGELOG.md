@@ -8,17 +8,20 @@ All notable changes to this project will be documented in this file.
 
 - client-side (in browser) dataset encryption is now possible.
 - confirms option allows to set the number of block to wait for transaction confirmation.
+- `iexec app init --tee` init the TEE app template
 
 ### Changed
 
 - [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
 - [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
 - [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.
+- [BREAKING] app `mrenclave` format changed from string to object previously deployed TEE apps must be rebuilt and redeployed with v6 workflow
 - [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
 - [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
 - `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
+- removed `mrenclave` from app default template
 
 ### Removed
 

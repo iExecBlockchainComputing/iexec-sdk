@@ -72,6 +72,7 @@ addGlobalOptions(init);
 addWalletLoadOptions(init);
 init
   .option(...option.initDatasetFolders())
+  .option(...option.initTee())
   .option(...option.datasetKeystoredir())
   .option(...option.originalDatasetDir())
   .option(...option.encryptedDatasetDir())
@@ -86,7 +87,7 @@ init
       const { saved, fileName } = await initObj(objName, {
         overwrite: { owner: address },
       });
-      if (opts.encrypted) {
+      if (opts.encrypted || opts.tee) {
         const {
           datasetSecretsFolderPath,
           originalDatasetFolderPath,
