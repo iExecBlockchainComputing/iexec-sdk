@@ -51,7 +51,7 @@ init
   .option(...option.initWorkerpoolOrder())
   .option(...option.initRequestOrder())
   .description(desc.initObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -133,7 +133,7 @@ sign
   .option(...option.signRequestOrder())
   .option(...option.skipRequestCheck())
   .description(desc.sign())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -335,7 +335,7 @@ fill
   .option(...option.fillRequestParams())
   .option(...option.skipRequestCheck())
   .description(desc.fill(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -475,7 +475,7 @@ publish
   .option(...option.publishRequestOrder())
   .option(...option.skipRequestCheck())
   .description(desc.publish(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -591,7 +591,7 @@ unpublish
   .option(...option.unpublishWorkerpoolOrder())
   .option(...option.unpublishRequestOrder())
   .description(desc.unpublish(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -713,7 +713,7 @@ cancel
   .option(...option.cancelWorkerpoolOrder())
   .option(...option.cancelRequestOrder())
   .description(desc.cancel(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -807,7 +807,7 @@ show
   .option(...option.showRequestOrder())
   .option(...option.showOrderDeals())
   .description(desc.showObj(objName, 'marketplace'))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

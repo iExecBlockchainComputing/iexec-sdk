@@ -33,7 +33,7 @@ show
   .option(...option.chain())
   .option(...option.watch())
   .description(desc.showObj(objName))
-  .action(async (dealid, opts, cmd) => {
+  .action(async (dealid, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -95,7 +95,7 @@ claim
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
-  .action(async (dealid, opts, cmd) => {
+  .action(async (dealid, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

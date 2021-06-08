@@ -34,7 +34,7 @@ orderbookApp
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('app orderbook', 'marketplace'))
-  .action(async (app, opts, cmd) => {
+  .action(async (app, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -137,7 +137,7 @@ orderbookDataset
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
-  .action(async (dataset, opts, cmd) => {
+  .action(async (dataset, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -242,7 +242,7 @@ orderbookWorkerpool
   .option(...option.includeDatasetSpecific())
   .option(...option.includeRequesterSpecific())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
-  .action(async (workerpool, opts, cmd) => {
+  .action(async (workerpool, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -359,7 +359,7 @@ orderbookRequester
   .option(...option.filterBeneficiarySpecific())
   .option(...option.includeWorkerpoolSpecific())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
-  .action(async (address, opts, cmd) => {
+  .action(async (address, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

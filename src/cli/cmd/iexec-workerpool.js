@@ -56,7 +56,7 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init.description(desc.initObj(objName)).action(async (opts, cmd) => {
+init.description(desc.initObj(objName)).action(async (opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
@@ -85,7 +85,7 @@ deploy
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -123,7 +123,7 @@ show
   .option(...option.chain())
   .option(...option.user())
   .description(desc.showObj(objName))
-  .action(async (cliAddressOrIndex, opts, cmd) => {
+  .action(async (cliAddressOrIndex, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -172,7 +172,7 @@ count
   .option(...option.chain())
   .option(...option.user())
   .description(desc.countObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -215,7 +215,7 @@ publish
   .option(...orderOption.apprestrict())
   .option(...orderOption.datasetrestrict())
   .option(...orderOption.requesterrestrict())
-  .action(async (objAddress, opts, cmd) => {
+  .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -291,7 +291,7 @@ unpublish
   .option(...option.chain())
   .option(...option.force())
   .option(...option.unpublishAllOrders())
-  .action(async (objAddress, opts, cmd) => {
+  .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);

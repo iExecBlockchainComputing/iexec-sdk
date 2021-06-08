@@ -47,7 +47,7 @@ generateKeys
   .option(...option.force())
   .option(...option.beneficiaryKeystoredir())
   .description(desc.generateKeys())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -129,7 +129,7 @@ decryptResults
   .option(...option.beneficiaryKeystoredir())
   .option(...option.beneficiaryKeyFile())
   .description(desc.decryptResults())
-  .action(async (encryptedResultsPath, opts, cmd) => {
+  .action(async (encryptedResultsPath, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -205,7 +205,7 @@ pushSecret
   .option(...option.forceUpdateSecret())
   .option(...option.secretPath())
   .description(desc.pushResultKey())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -266,7 +266,7 @@ addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (address, opts, cmd) => {
+  .action(async (address, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
