@@ -30,7 +30,7 @@ initStorage
   .option(...option.forceUpdateSecret())
   .option(...option.storageToken())
   .description(desc.initStorage())
-  .action(async (provider, opts, cmd) => {
+  .action(async (provider, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -104,7 +104,7 @@ checkStorage
   .option(...option.chain())
   .option(...option.user())
   .description(desc.checkStorage())
-  .action(async (provider, opts, cmd) => {
+  .action(async (provider, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

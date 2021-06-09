@@ -33,7 +33,7 @@ async function main() {
     .option(...option.force())
     .option(...option.skipWallet())
     .description(desc.initObj('project'))
-    .action(async (opts, cmd) => {
+    .action(async (opts) => {
       await checkUpdate(opts);
       const spinner = Spinner(opts);
       try {
@@ -117,7 +117,7 @@ async function main() {
   infoCmd
     .option(...option.chain())
     .description(desc.info())
-    .action(async (opts, cmd) => {
+    .action(async (opts) => {
       await checkUpdate(opts);
       const spinner = Spinner(opts);
       try {

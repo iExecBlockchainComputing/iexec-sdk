@@ -26,7 +26,7 @@ cli.name('iexec category').usage('<command> [options]');
 
 const init = cli.command('init');
 addGlobalOptions(init);
-init.description(desc.initObj(objName)).action(async (opts, cmd) => {
+init.description(desc.initObj(objName)).action(async (opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
@@ -50,7 +50,7 @@ create
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.createObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -85,7 +85,7 @@ addGlobalOptions(show);
 show
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
-  .action(async (index, opts, cmd) => {
+  .action(async (index, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -107,7 +107,7 @@ addGlobalOptions(count);
 count
   .option(...option.chain())
   .description(desc.showObj(objName, 'hub'))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

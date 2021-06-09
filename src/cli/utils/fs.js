@@ -25,12 +25,7 @@ const chainConfSchema = () => object({
   useGas: boolean().default(true),
   flavour: string().oneOf(['standard', 'enterprise']),
   bridge: object({
-    bridgedChainName: string().when('bridgedChainId', {
-      is: undefined,
-      then: string().required(),
-      otherwise: string(),
-    }), // replace bridgedChainId
-    bridgedChainId: chainIdSchema(),
+    bridgedChainName: string().required(),
     contract: addressSchema().required(),
   })
     .notRequired()

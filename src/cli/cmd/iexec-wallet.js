@@ -46,7 +46,7 @@ addWalletCreateOptions(create);
 create
   .option(...option.forceCreate())
   .description(desc.createWallet())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -71,7 +71,7 @@ addWalletCreateOptions(importPk);
 importPk
   .option(...option.forceCreate())
   .description(desc.importWallet())
-  .action(async (privateKey, opts, cmd) => {
+  .action(async (privateKey, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -100,7 +100,7 @@ show
   .option(...option.chain())
   .option(...option.showPrivateKey())
   .description(desc.showObj(objName, 'address'))
-  .action(async (address, opts, cmd) => {
+  .action(async (address, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
 
@@ -170,7 +170,6 @@ show
               wei: chain.contracts.isNative
                 ? undefined
                 : balances.wei.toString(),
-              ETH: displayBalances.ether, // for legacy compatibility
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
           },
@@ -187,7 +186,7 @@ addWalletLoadOptions(getEth);
 getEth
   .option(...option.chain())
   .description(desc.getETH())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -225,7 +224,7 @@ addWalletLoadOptions(getRlc);
 getRlc
   .option(...option.chain())
   .description(desc.getRLC())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -267,7 +266,7 @@ sendETH
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendETH())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -319,7 +318,7 @@ sendRLC
   .option(...option.force())
   .option(...option.to())
   .description(desc.sendRLC())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -371,7 +370,7 @@ sweep
   .option(...option.force())
   .option(...option.to())
   .description(desc.sweep())
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -424,7 +423,7 @@ bridgeToSidechain
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToSidechain())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -510,7 +509,7 @@ bridgeToMainchain
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.bridgeToMainchain())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -596,7 +595,7 @@ wrapEnterpriseRLC
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.wrapEnterpriseRLC())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -656,7 +655,7 @@ unwrapEnterpriseRLC
   .option(...option.txConfirms())
   .option(...option.force())
   .description(desc.unwrapEnterpriseRLC())
-  .action(async (amount, unit, opts, cmd) => {
+  .action(async (amount, unit, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

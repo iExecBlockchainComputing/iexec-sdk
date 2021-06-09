@@ -109,7 +109,7 @@ const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init.option(...option.initTee());
-init.description(desc.initObj(objName)).action(async (opts, cmd) => {
+init.description(desc.initObj(objName)).action(async (opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
@@ -138,7 +138,7 @@ deploy
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -176,7 +176,7 @@ show
   .option(...option.chain())
   .option(...option.user())
   .description(desc.showObj(objName))
-  .action(async (cliAddressOrIndex, opts, cmd) => {
+  .action(async (cliAddressOrIndex, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -220,7 +220,7 @@ count
   .option(...option.chain())
   .option(...option.user())
   .description(desc.countObj(objName))
-  .action(async (opts, cmd) => {
+  .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -256,7 +256,7 @@ publish
   .option(...orderOption.datasetrestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
-  .action(async (objAddress, opts, cmd) => {
+  .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -324,7 +324,7 @@ unpublish
   .option(...option.chain())
   .option(...option.force())
   .option(...option.unpublishAllOrders())
-  .action(async (objAddress, opts, cmd) => {
+  .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     const walletOptions = await computeWalletLoadOptions(opts);
@@ -401,7 +401,7 @@ run
   .option(...orderOption.params())
   .option(...option.skipRequestCheck())
   .description(desc.appRun())
-  .action(async (appAddress, opts, cmd) => {
+  .action(async (appAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -898,7 +898,7 @@ requestRun
   .option(...orderOption.params())
   .option(...option.skipRequestCheck())
   .description(desc.requestRun())
-  .action(async (app, opts, cmd) => {
+  .action(async (app, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {

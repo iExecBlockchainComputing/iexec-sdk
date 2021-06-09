@@ -48,7 +48,7 @@ show
   .option(...option.beneficiaryKeystoredir())
   .option(...option.beneficiaryKeyFile())
   .description(desc.showObj(objName))
-  .action(async (taskid, opts, cmd) => {
+  .action(async (taskid, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -185,7 +185,7 @@ claim
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
-  .action(async (taskid, opts, cmd) => {
+  .action(async (taskid, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
