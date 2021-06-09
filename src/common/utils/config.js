@@ -25,14 +25,14 @@ const smsMap = {
 
 const resultProxyMap = {
   standard: {
-    1: 'https://v5.result.mainnet.iex.ec',
-    5: 'https://v5.result.goerli.iex.ec',
-    133: 'https://v5.result.viviani.iex.ec',
-    134: 'https://v5.result.bellecour.iex.ec',
+    1: 'https://v6.result.mainnet.iex.ec',
+    5: 'https://v6.result.goerli.iex.ec',
+    133: 'https://v6.result.viviani.iex.ec',
+    134: 'https://v6.result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v5.result-enterprise.mainnet.iex.ec',
-    5: 'https://v5.result-enterprise.goerli.iex.ec',
+    1: 'https://v6.result-enterprise.mainnet.iex.ec',
+    5: 'https://v6.result-enterprise.goerli.iex.ec',
   },
 };
 
@@ -67,10 +67,10 @@ const ipfsGatewayMap = {};
 
 const iexecGatewayMap = {
   standard: {
-    default: 'https://v5.api.market.iex.ec',
+    default: 'https://v6.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v5.api-enterprise.market.iex.ec',
+    default: 'https://v6.api-enterprise.market.iex.ec',
   },
 };
 
@@ -86,7 +86,7 @@ const getChainDefaults = ({ id, flavour }) => ({
   iexecGateway:
     (iexecGatewayMap[flavour]
       && (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default))
-    || 'https://v5.api.market.iex.ec',
+    || 'https://v6.api.market.iex.ec',
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
 });
