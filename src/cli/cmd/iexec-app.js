@@ -550,7 +550,7 @@ run
         }
         spinner.info('Fetching apporder from iExec Marketplace');
         const teeAppRequired = checkActiveBitInTag(tag, 1);
-        const { appOrders } = await fetchAppOrderbook(
+        const { orders } = await fetchAppOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
           app,
@@ -562,7 +562,7 @@ run
             maxTag: tag,
           },
         );
-        const order = appOrders[0] && appOrders[0].order;
+        const order = orders[0] && orders[0].order;
         if (!order) throw Error(`No order available for app ${app}`);
         return order;
       };
@@ -592,7 +592,7 @@ run
           return order;
         }
         spinner.info('Fetching datasetorder from iExec Marketplace');
-        const { datasetOrders } = await fetchDatasetOrderbook(
+        const { orders } = await fetchDatasetOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
           dataset,
@@ -603,7 +603,7 @@ run
             maxTag: tag,
           },
         );
-        const order = datasetOrders[0] && datasetOrders[0].order;
+        const order = orders[0] && orders[0].order;
         if (!order) throw Error(`No order available for dataset ${dataset}`);
         return order;
       };
@@ -652,7 +652,7 @@ run
           { strict = false } = {},
         ) => {
           debug('try category', catid, 'strict', strict);
-          const { workerpoolOrders } = await fetchWorkerpoolOrderbook(
+          const { orders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
             {
@@ -667,7 +667,7 @@ run
           );
 
           const getFirstOpen = async (i = 0) => {
-            const order = workerpoolOrders[i] && workerpoolOrders[i].order;
+            const order = orders[i] && orders[i].order;
             if (order) {
               const workerpoolVolume = await getRemainingVolume(
                 chain.contracts,
