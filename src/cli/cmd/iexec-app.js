@@ -854,7 +854,9 @@ run
         );
         if (failedTasks.length === 0) {
           spinner.succeed(
-            `App run successful:\n${renderTasksStatus(dealFinalState.tasks)}`,
+            `App run successful:\n${renderTasksStatus(dealFinalState.tasks, {
+              detailed: true,
+            })}`,
             {
               raw: result,
             },
@@ -862,7 +864,9 @@ run
         } else {
           result.failedTasks = failedTasks;
           spinner.fail(
-            `App run failed:\n${renderTasksStatus(dealFinalState.tasks)}`,
+            `App run failed:\n${renderTasksStatus(dealFinalState.tasks, {
+              detailed: true,
+            })}`,
             {
               raw: result,
             },

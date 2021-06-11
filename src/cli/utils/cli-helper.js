@@ -876,16 +876,34 @@ const displayPaginableRequest = async (
   return { results, count: totalCount };
 };
 
-const renderTasksStatus = (tasksStatusMap) => {
+const renderTasksStatus = (tasksStatusMap, { detailed = false } = {}) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
     (task) => task.status !== 3 && !task.taskTimedOut,
   );
   const completedTasksArray = tasksArray.filter((task) => task.status === 3);
   const timedoutTasksArray = tasksArray.filter((task) => task.taskTimedOut);
-  const completedMsg = `${completedTasksArray.length}/${tasksArray.length} tasks completed\n`;
+  const completedMsg = completedTasksArray.length > 0
+    ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${
+      detailed
+        ? `:${pretty(
+          completedTasksArray.map(
+            ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+          ),
+        )}`
+        : '\n'
+    }`
+    : '';
   const failedMsg = timedoutTasksArray.length > 0
-    ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed\n`
+    ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${
+      detailed
+        ? `:${pretty(
+          timedoutTasksArray.map(
+            ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+          ),
+        )}`
+        : '\n'
+    }`
     : '';
   const statusMsg = runningTasksArray.length > 0
     ? `${runningTasksArray.length}/${

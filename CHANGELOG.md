@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
 - removed `mrenclave` from app default template
+- `iexec appr run --watch` and `iexec deal show --watch` added tasks status details
 
 ### Removed
 

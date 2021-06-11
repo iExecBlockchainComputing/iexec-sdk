@@ -69,7 +69,9 @@ show
         const dealStatus = result.failedTasksCount > 0 ? 'TIMEOUT' : 'COMPLETED';
         spinner.stop();
         spinner.info(
-          `Deal status ${dealStatus}\n${renderTasksStatus(result.tasks)}`,
+          `Deal status ${dealStatus}\n${renderTasksStatus(result.tasks, {
+            detailed: true,
+          })}`,
         );
       } else {
         spinner.start(info.showing(objName));
