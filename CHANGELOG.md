@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 
 - [BREAKING] `--algorithm` option is removed from `iexec dataset encrypt`
 - [BREAKING] removed `iexec.network.id` and `iexec.network.isSidechain`, use `iexec.network.getNetwork() => Promise<{chainId: String, isSidechain: Boolean}>`
+- [BREAKING] tee post-compute configuration responsibility has been transferred to the SMS and is no longer supported by requestorder. any custom `iexec_tee_post_compute_image` and `iexec_tee_post_compute_fingerprint` will be silently removed from `requestorder.params`.
 - [BREAKING] drop previously deprecated `iexec wallet show --raw` returned json key `balance.ETH`, use `balance.ether` instead
 - [BREAKING] drop previously deprecated `bridge.bridgedChainId` in `chain.json` use `bridge.bridgedChainName` instead
 - [BREAKING] drop previously deprecated `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`

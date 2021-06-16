@@ -2906,8 +2906,6 @@ Accepted:
     iexec_result_encryption: Boolean, // must encrypt the result with beneficary key default false
     iexec_result_storage_provider: String, // storage provider ('ipfs' | 'dropbox') defaut 'ipfs'
     iexec_result_storage_proxy: String, // url of storage-proxy to use (defaut to iExec's storage proxy)
-    iexec_tee_post_compute_image: String, // post-compute image to use (defaut to iExec's image)
-    iexec_tee_post_compute_fingerprint: String, // post-compute fingerprint
     iexec_developer_logger: Boolean, // enable app logging default false
   },
 }
@@ -2938,8 +2936,6 @@ Accepted:
     iexec_result_encryption: Boolean, // must encrypt the result with beneficary key default false
     iexec_result_storage_provider: String, // storage provider ('ipfs' | 'dropbox') defaut 'ipfs'
     iexec_result_storage_proxy: String, // url of storage-proxy to use (defaut to iExec's storage proxy)
-    iexec_tee_post_compute_image: String, // post-compute image to use (defaut to iExec's image)
-    iexec_tee_post_compute_fingerprint: String, // post-compute fingerprint
     iexec_developer_logger: Boolean, // enable app logging default false
   },
   salt: Bytes32, // random salt

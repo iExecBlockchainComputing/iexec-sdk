@@ -2,7 +2,6 @@ const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
-const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -538,8 +537,6 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -561,8 +558,6 @@ describe('[objParamsSchema]', () => {
       ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'dropbox',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -591,8 +586,6 @@ describe('[objParamsSchema]', () => {
       iexec_args: 'test',
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -614,8 +607,6 @@ describe('[objParamsSchema]', () => {
       ],
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -637,23 +628,6 @@ describe('[objParamsSchema]', () => {
     );
   });
 
-  test('with custom tee config', async () => {
-    await expect(
-      objParamsSchema().validate(
-        {
-          iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
-          iexec_tee_post_compute_image: 'custom-image',
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
-    ).resolves.toEqual({
-      iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
-      iexec_tee_post_compute_image: 'custom-image',
-    });
-  });
-
   test('with custom result-proxy', async () => {
     await expect(
       objParamsSchema().validate({
@@ -662,8 +636,6 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -679,8 +651,6 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -696,8 +666,6 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -728,33 +696,28 @@ describe('[objParamsSchema]', () => {
       iexec_developer_logger: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
   test('with isCallback in context, do not populate storage', async () => {
     await expect(
       objParamsSchema().validate({}, { context: { isCallback: true } }),
-    ).resolves.toEqual({
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
-    });
+    ).resolves.toEqual({});
   });
 
-  test('strip enexpected key', async () => {
+  test('strip unexpected key', async () => {
     await expect(
       objParamsSchema().validate(
         {
           foo: true,
+          iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
+          iexec_tee_post_compute_image: 'custom-image', // removed in in v6
         },
         { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
       ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 });

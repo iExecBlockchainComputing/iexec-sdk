@@ -12,7 +12,6 @@ const {
   parseEth,
 } = require('./utils');
 const { paramsKeyName, storageProviders } = require('./params-utils');
-const { teePostComputeDefaults } = require('./secrets-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
 
@@ -232,13 +231,6 @@ const objParamsSchema = () => object({
     },
   ),
   [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(),
-  // workarond this should not be required in the future
-  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_IMAGE]: string()
-    .default(teePostComputeDefaults.image)
-    .required('${path} is required field for TEE tasks'),
-  [paramsKeyName.IEXEC_TEE_POST_COMPUTE_FINGERPRINT]: string()
-    .default(teePostComputeDefaults.fingerprint)
-    .required('${path} is required field for TEE tasks'),
 }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
 const paramsSchema = () => string()
