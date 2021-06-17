@@ -6,14 +6,8 @@ const {
   cleanRPC,
   NULL_BYTES32,
   NULL_BYTES,
-  sleep,
-  FETCH_INTERVAL,
 } = require('../utils/utils');
-const {
-  bytes32Schema,
-  uint256Schema,
-  throwIfMissing,
-} = require('../utils/validator');
+const { bytes32Schema, throwIfMissing } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 
@@ -78,26 +72,6 @@ const show = async (
   }
 };
 
-const waitForTaskStatusChange = async (
-  contracts = throwIfMissing(),
-  taskid = throwIfMissing(),
-  prevStatus = throwIfMissing(),
-) => {
-  try {
-    const vTaskId = await bytes32Schema().validate(taskid);
-    const vPrevStatus = await uint256Schema().validate(prevStatus);
-    const task = await show(contracts, vTaskId);
-    if (task.status.toString() !== vPrevStatus || task.taskTimedOut) {
-      return task;
-    }
-    await sleep(FETCH_INTERVAL);
-    return waitForTaskStatusChange(contracts, vTaskId, task.status);
-  } catch (error) {
-    debug('waitForTaskStatusChange()', error);
-    throw error;
-  }
-};
-
 const claim = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
@@ -141,6 +115,5 @@ const claim = async (
 module.exports = {
   TASK_STATUS_MAP,
   show,
-  waitForTaskStatusChange,
   claim,
 };

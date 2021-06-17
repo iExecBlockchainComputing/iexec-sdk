@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const dealModule = require('./deal');
 const taskModule = require('./task');
-const { sleep, FETCH_INTERVAL } = require('../utils/utils');
+const { FETCH_INTERVAL } = require('../utils/utils');
 const { downloadZipApi } = require('../utils/api-utils');
 const { bytes32Schema, throwIfMissing } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
@@ -65,52 +65,42 @@ const obsTask = (
   taskid = throwIfMissing(),
   { dealid } = {},
 ) => new Observable((observer) => {
-  let stop = false;
   const safeObserver = new SafeObserver(observer);
 
-  const startWatch = async () => {
+  let task;
+  let interval;
+  let abort = false;
+
+  const handleTaskNotFound = async (e) => {
+    const vDealid = await bytes32Schema().validate(dealid);
+    if (e instanceof ObjectNotFoundError && vDealid) {
+      const vTaskid = await bytes32Schema().validate(taskid);
+      const deal = await dealModule.show(contracts, vDealid);
+      const now = Math.floor(Date.now() / 1000);
+      const deadlineReached = now >= deal.finalTime.toNumber();
+      return {
+        taskid: vTaskid,
+        dealid: vDealid,
+        status: 0,
+        statusName: deadlineReached
+          ? taskModule.TASK_STATUS_MAP.timeout
+          : taskModule.TASK_STATUS_MAP[0],
+        taskTimedOut: deadlineReached,
+      };
+    }
+    throw e;
+  };
+
+  const checkTaskEnded = ({ status, taskTimedOut } = {}) => taskTimedOut || status === 3 || status === 4;
+
+  const fetchTaskAndNotify = async () => {
     try {
       const vTaskid = await bytes32Schema().validate(taskid);
-      const vDealid = await bytes32Schema().validate(dealid);
-      debug('vTaskid', vTaskid);
-      debug('vDealid', vDealid);
-
-      const handleTaskNotFound = async (e) => {
-        if (e instanceof ObjectNotFoundError && vDealid) {
-          const deal = await dealModule.show(contracts, vDealid);
-          const now = Math.floor(Date.now() / 1000);
-          const deadlineReached = now >= deal.finalTime.toNumber();
-          return {
-            taskid: vTaskid,
-            dealid: vDealid,
-            status: 0,
-            statusName: deadlineReached
-              ? taskModule.TASK_STATUS_MAP.timeout
-              : taskModule.TASK_STATUS_MAP[0],
-            taskTimedOut: deadlineReached,
-          };
-        }
-        throw e;
-      };
-
-      const waitStatusChangeOrTimeout = async (initialStatus) => taskModule
-        .waitForTaskStatusChange(contracts, vTaskid, initialStatus)
-        .catch(async (e) => {
-          const task = await handleTaskNotFound(e);
-          if (
-            task.status === initialStatus
-                && !task.taskTimedOut
-                && !stop
-          ) {
-            await sleep(FETCH_INTERVAL);
-            return waitStatusChangeOrTimeout(task.status);
-          }
-          return task;
-        });
-
-      const watchTask = async (initialStatus = '') => {
-        const task = await waitStatusChangeOrTimeout(initialStatus);
-        debug('task', task);
+      const newTask = await taskModule
+        .show(contracts, vTaskid)
+        .catch(handleTaskNotFound);
+      if (!task || newTask.status !== task.status || newTask.taskTimedOut) {
+        task = newTask;
         if (task.status === 3) {
           safeObserver.next({
             message: obsTaskMessages.TASK_COMPLETED,
@@ -139,19 +129,24 @@ const obsTask = (
           message: obsTaskMessages.TASK_UPDATED,
           task,
         });
-        if (!stop) await watchTask(task.status);
-      };
-      await watchTask();
+      }
     } catch (e) {
       safeObserver.error(e);
     }
   };
 
+  fetchTaskAndNotify().then(() => {
+    if (!abort && !checkTaskEnded(task)) {
+      interval = setInterval(fetchTaskAndNotify, FETCH_INTERVAL);
+    }
+  });
+
   safeObserver.unsub = () => {
-    // teardown callback
-    stop = true;
+    abort = true;
+    if (interval) {
+      clearInterval(interval);
+    }
   };
-  startWatch();
   return safeObserver.unsubscribe.bind(safeObserver);
 });
 
@@ -228,7 +223,6 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) => new
   };
 
   safeObserver.unsub = () => {
-    // teardown callback
     taskWatchers.map((unsub) => unsub());
   };
   startWatch();
