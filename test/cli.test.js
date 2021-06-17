@@ -4,7 +4,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const BN = require('bn.js');
 const { execAsync } = require('./test-utils');
-const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 const { bytes32Regex } = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
@@ -1253,7 +1252,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${resultProxyURL}"}`,
+      `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${resultProxyURL}"}`,
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
@@ -1301,7 +1300,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${resultProxyURL}"}`,
+      `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${resultProxyURL}"}`,
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);
@@ -1351,9 +1350,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.pointer).toBe(mainchainWorkerpool);
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('1');
-    expect(resDeal.deal.params).toBe(
-      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_args":"test params"}`,
-    );
+    expect(resDeal.deal.params).toBe('{"iexec_args":"test params"}');
     expect(resDeal.deal.callback).toBe(POOR_ADDRESS1);
     expect(resDeal.deal.requester).toBe(ADDRESS);
     expect(resDeal.deal.beneficiary).toBe(NULL_ADDRESS);
@@ -1405,7 +1402,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.workerpool.price).toBe('0');
     expect(resDeal.deal.category).toBe('0');
     expect(resDeal.deal.params).toBe(
-      `{"iexec_tee_post_compute_fingerprint":"${teePostComputeDefaults.fingerprint}","iexec_tee_post_compute_image":"${teePostComputeDefaults.image}","iexec_result_storage_provider":"dropbox","iexec_result_encryption":true,"iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_args":"command --help"}`,
+      '{"iexec_args":"command --help","iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_result_storage_provider":"dropbox","iexec_result_encryption":true}',
     );
     expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
     expect(resDeal.deal.requester).toBe(ADDRESS);

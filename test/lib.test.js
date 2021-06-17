@@ -11,7 +11,6 @@ const {
   bytes32Regex,
   addressRegex,
 } = require('../src/common/utils/utils');
-const { teePostComputeDefaults } = require('../src/common/utils/secrets-utils');
 
 console.log('Node version:', process.version);
 
@@ -3820,8 +3819,6 @@ describe('[order]', () => {
       params: {
         iexec_result_storage_provider: 'ipfs',
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-        iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-        iexec_tee_post_compute_image: teePostComputeDefaults.image,
       },
       requester: ADDRESS,
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -3859,8 +3856,6 @@ describe('[order]', () => {
       workerpoolmaxprice: '0.1 RLC',
       params: {
         iexec_result_storage_provider: 'dropbox',
-        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
-        iexec_tee_post_compute_image: 'teePostComputeImage',
         iexec_result_encryption: true,
       },
       tag: 'tee',
@@ -3877,8 +3872,6 @@ describe('[order]', () => {
       datasetmaxprice: '100',
       params: {
         iexec_result_storage_provider: 'dropbox',
-        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
-        iexec_tee_post_compute_image: 'teePostComputeImage',
         iexec_result_encryption: true,
       },
       requester: ADDRESS,
@@ -4248,7 +4241,7 @@ describe('[order]', () => {
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x03a16475e3233d4e1d9c8cf724e39cac186c6eeee3f0945500c13df3d6f5f8dd',
+      '0x4c5fbf2897891074700b605a5407ca25c5d269f2dd3a8e314c972953fc1cdd2c',
     );
   });
 
