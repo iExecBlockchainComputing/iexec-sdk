@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [BREAKING] `iexec init` set default chain `viviani` (iExec sidecahin testnet) in `chain.json`, previously was `goerli` (using `--chain` option still overrides the `chain.json` configuration).
 - [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
 - [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
 - [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.

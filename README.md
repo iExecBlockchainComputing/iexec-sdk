@@ -321,7 +321,7 @@ iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
-iexec info --chain goerli
+iexec info --chain viviani
 ```
 
 ## Global options
@@ -704,7 +704,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ```json
 {
-  "default": "goerli",
+  "default": "viviani",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
@@ -750,6 +750,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       }
     },
     "goerli": {},
+    "viviani": {},
     "mainnet": {},
     "bellecour": {},
     "enterprise": {}
@@ -940,7 +941,7 @@ const iexec = new IExec({
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain), '133' (iExec test sidechain)).
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain), '133' (iExec sidechain testnet)).
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 

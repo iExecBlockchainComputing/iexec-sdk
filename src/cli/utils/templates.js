@@ -128,7 +128,7 @@ const category = {
 };
 
 const chains = {
-  default: 'goerli',
+  default: 'viviani',
   chains: {
     // dev: {
     //   host: 'http://localhost:8545',
