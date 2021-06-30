@@ -72,7 +72,7 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet getRLC # ask iExec faucet for RLC
+iexec wallet get-RLC # ask iExec faucet for RLC
 iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
@@ -364,12 +364,12 @@ iexec init --skip-wallet # skip the wallet creation step
 iexec wallet create # create a new encrypted wallet
 iexec wallet create --unencrypted # create unencrypted wallet.json (not recommended)
 iexec wallet import <privateKey> # create an encrypted wallet from a privateKey
-iexec wallet getETH # ask ETH from faucets
-iexec wallet getRLC # ask RLC from faucets
+iexec wallet get-ETH # ask ETH from faucets
+iexec wallet get-RLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
-iexec wallet sendETH <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
-iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC or specified unit) to the specified eth address
+iexec wallet send-ether <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
+iexec wallet send-RLC <amount> [unit] --to <address>  # send RLC amount (in RLC or specified unit) to the specified eth address
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
