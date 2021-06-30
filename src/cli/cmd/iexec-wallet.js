@@ -297,7 +297,7 @@ sendETH
       const txHash = await wallet.sendETH(chain.contracts, weiAmount, opts.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
-          amount,
+          amount: weiAmount,
           from: address,
           to: opts.to,
           txHash,

@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `iexec wallet sendETH` is now an alias to `iexec wallet send-ether` and will be removed in a next version
 - [DEPRECATED] `iexec wallet sendRLC` will be removed in a next version, use `iexec wallet send-RLC` BEWARE default unit is RLC!
 - `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
+- fix `iexec wallet send-ether` return sent `amount` in wei
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
 - removed `mrenclave` from app default template

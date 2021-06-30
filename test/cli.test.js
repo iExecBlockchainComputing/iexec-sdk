@@ -1722,7 +1722,7 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
-    expect(res.amount).toBe('1');
+    expect(res.amount).toBe('1000000000000000000');
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
@@ -1768,6 +1768,7 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
+    expect(res.amount).toBe('1000000000');
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
