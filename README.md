@@ -72,7 +72,6 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet getETH # ask faucet for ETH, this may require manual action
 iexec wallet getRLC # ask iExec faucet for RLC
 iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
