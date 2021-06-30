@@ -306,9 +306,10 @@ describe('[cli]', () => {
   test('invalid command', async () => {
     const out = await execAsync(`${iexecPath} test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
-    expect(
-      out.message.indexOf("error: unknown command 'test'. See 'iexec --help'."),
-    ).not.toBe(-1);
+    expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
+    expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
+      -1,
+    );
   });
   test('unknown option', async () => {
     const out = await execAsync(`${iexecPath} --test`).catch((e) => e);
@@ -327,10 +328,9 @@ describe('[cli]', () => {
   test('invalid subcommand', async () => {
     const out = await execAsync(`${iexecPath} app test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
+    expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
     expect(
-      out.message.indexOf(
-        "error: unknown command 'test'. See 'iexec app --help'.",
-      ),
+      out.message.indexOf('Usage: iexec app <command> [options]'),
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {
@@ -1845,8 +1845,7 @@ describe('[Mainchain]', () => {
           app: address,
           appprice: 100000000,
           volume: 100,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           datasetrestrict: NULL_ADDRESS,
           workerpoolrestrict: NULL_ADDRESS,
           requesterrestrict: NULL_ADDRESS,
@@ -1961,8 +1960,7 @@ describe('[Mainchain]', () => {
           dataset: address,
           datasetprice: 100000000,
           volume: 100,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           apprestrict: POOR_ADDRESS1,
           workerpoolrestrict: NULL_ADDRESS,
           requesterrestrict: NULL_ADDRESS,
@@ -2082,8 +2080,7 @@ describe('[Mainchain]', () => {
           workerpool: address,
           workerpoolprice: 2,
           volume: 5,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           trust: 20,
           category: 1,
           apprestrict: NULL_ADDRESS,
@@ -3199,9 +3196,9 @@ describe('[Common]', () => {
 
     // keystoredir custom
     test('iexec wallet import --keystoredir [path]', async () => {
-      await execAsync(
-        'rm -rf out/keystore && mkdir out/keystore',
-      ).catch(() => {});
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
       const raw = await execAsync(
         `${iexecPath}  wallet import ${POOR_PRIVATE_KEY1} --password customPath --keystoredir ./out/keystore --raw`,
       );
@@ -3224,9 +3221,9 @@ describe('[Common]', () => {
 
     // keystoredir local
     test('iexec wallet import --keystoredir local', async () => {
-      await execAsync(
-        'rm -rf out/keystore && mkdir out/keystore',
-      ).catch(() => {});
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
       const raw = await execAsync(
         `${iexecPath} wallet import ${POOR_PRIVATE_KEY2} --password 'my local pass phrase' --keystoredir local --raw`,
       );

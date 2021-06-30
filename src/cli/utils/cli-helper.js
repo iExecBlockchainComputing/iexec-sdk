@@ -16,6 +16,7 @@ const { storageProviders } = require('../../common/utils/params-utils');
 const debug = Debug('help');
 
 const finalizeCli = (cli) => {
+  cli.showHelpAfterError();
   cli.addHelpText(
     'afterAll',
     '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n',
