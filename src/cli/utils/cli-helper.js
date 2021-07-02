@@ -16,6 +16,7 @@ const { storageProviders } = require('../../common/utils/params-utils');
 const debug = Debug('help');
 
 const finalizeCli = (cli) => {
+  cli.showHelpAfterError();
   cli.addHelpText(
     'afterAll',
     '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n  help: https://slack.iex.ec\n',
@@ -75,7 +76,8 @@ const desc = {
   getETH: () => 'apply for test ether from pre-registered faucets',
   getRLC: () => 'apply for test RLC from iExec faucet',
   sendETH: () => 'send ether to an address (default unit ether)',
-  sendRLC: () => 'send RLC to an address (default unit nRLC)',
+  sendRLC: () => 'send RLC to an address (default unit RLC)',
+  sendNRLC: () => '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
   validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',

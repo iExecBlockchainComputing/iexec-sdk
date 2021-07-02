@@ -12,13 +12,19 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [BREAKING] `iexec init` set default chain `viviani` (iExec sidecahin testnet) in `chain.json`, previously was `goerli` (using `--chain` option still overrides the `chain.json` configuration).
 - [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
 - [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
 - [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.
 - [BREAKING] app `mrenclave` format changed from string to object previously deployed TEE apps must be rebuilt and redeployed with v6 workflow
 - [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
 - [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
+- [DEPRECATED] `iexec wallet getETH` is now an alias to `iexec wallet get-ether` and will be removed in a next version
+- [DEPRECATED] `iexec wallet getRLC` is now an alias to `iexec wallet get-RLC` and will be removed in a next version
+- [DEPRECATED] `iexec wallet sendETH` is now an alias to `iexec wallet send-ether` and will be removed in a next version
+- [DEPRECATED] `iexec wallet sendRLC` will be removed in a next version, use `iexec wallet send-RLC` BEWARE default unit is RLC!
 - `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
+- fix `iexec wallet send-ether` return sent `amount` in wei
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
 - removed `mrenclave` from app default template

@@ -306,9 +306,10 @@ describe('[cli]', () => {
   test('invalid command', async () => {
     const out = await execAsync(`${iexecPath} test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
-    expect(
-      out.message.indexOf("error: unknown command 'test'. See 'iexec --help'."),
-    ).not.toBe(-1);
+    expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
+    expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
+      -1,
+    );
   });
   test('unknown option', async () => {
     const out = await execAsync(`${iexecPath} --test`).catch((e) => e);
@@ -327,10 +328,9 @@ describe('[cli]', () => {
   test('invalid subcommand', async () => {
     const out = await execAsync(`${iexecPath} app test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
+    expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
     expect(
-      out.message.indexOf(
-        "error: unknown command 'test'. See 'iexec app --help'.",
-      ),
+      out.message.indexOf('Usage: iexec app <command> [options]'),
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {
@@ -1713,26 +1713,25 @@ describe('[Mainchain]', () => {
     expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
-  // sendETH
-  test('[mainchain] iexec wallet sendETH', async () => {
+  // send-ether
+  test('[mainchain] iexec wallet send-ether', async () => {
     const raw = await execAsync(
-      `${iexecPath} wallet sendETH 1 --to ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} wallet send-ether 1 --to ${POOR_ADDRESS1} --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
-    expect(res.amount).toBe('1');
+    expect(res.amount).toBe('1000000000000000000');
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
-  // sendRLC
-  test('[mainchain] iexec wallet sendRLC 1000000000', async () => {
+  test('[mainchain] iexec wallet send-ether', async () => {
     const raw = await execAsync(
-      `${iexecPath} wallet sendRLC 1000000000 --to ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} wallet send-ether 1 gwei --to ${POOR_ADDRESS1} --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1745,15 +1744,31 @@ describe('[Mainchain]', () => {
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
-  test('[mainchain] iexec wallet sendRLC 0.5 RLC', async () => {
+  // send-RLC
+  test('[mainchain] iexec wallet send-RLC 0.5', async () => {
     const raw = await execAsync(
-      `${iexecPath} wallet sendRLC 0.5 RLC --to ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} wallet send-RLC 0.5 --to ${POOR_ADDRESS1} --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.from).toBe(ADDRESS);
     expect(res.to).toBe(POOR_ADDRESS1);
     expect(res.amount).toBe('500000000');
+    expect(res.txHash).toBeDefined();
+    const tx = await tokenChainRPC.getTransaction(res.txHash);
+    expect(tx).toBeDefined();
+    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
+  });
+
+  test('[mainchain] iexec wallet send-RLC 1000000000 nRLC', async () => {
+    const raw = await execAsync(
+      `${iexecPath} wallet send-RLC 1000000000 nRLC --to ${POOR_ADDRESS1} --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.from).toBe(ADDRESS);
+    expect(res.to).toBe(POOR_ADDRESS1);
+    expect(res.amount).toBe('1000000000');
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
@@ -1830,8 +1845,7 @@ describe('[Mainchain]', () => {
           app: address,
           appprice: 100000000,
           volume: 100,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           datasetrestrict: NULL_ADDRESS,
           workerpoolrestrict: NULL_ADDRESS,
           requesterrestrict: NULL_ADDRESS,
@@ -1946,8 +1960,7 @@ describe('[Mainchain]', () => {
           dataset: address,
           datasetprice: 100000000,
           volume: 100,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           apprestrict: POOR_ADDRESS1,
           workerpoolrestrict: NULL_ADDRESS,
           requesterrestrict: NULL_ADDRESS,
@@ -2067,8 +2080,7 @@ describe('[Mainchain]', () => {
           workerpool: address,
           workerpoolprice: 2,
           volume: 5,
-          tag:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
           trust: 20,
           category: 1,
           apprestrict: NULL_ADDRESS,
@@ -2181,9 +2193,9 @@ describe('[Sidechain]', () => {
     expect(res.balance.ether).toBeUndefined();
   });
 
-  test('[sidechain] iexec wallet sendETH', async () => {
+  test('[sidechain] iexec wallet send-ether', async () => {
     const raw = await execAsync(
-      `${iexecPath} wallet sendETH 0.1 --to ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} wallet send-ether 0.1 --to ${POOR_ADDRESS1} --force --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -3184,9 +3196,9 @@ describe('[Common]', () => {
 
     // keystoredir custom
     test('iexec wallet import --keystoredir [path]', async () => {
-      await execAsync(
-        'rm -rf out/keystore && mkdir out/keystore',
-      ).catch(() => {});
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
       const raw = await execAsync(
         `${iexecPath}  wallet import ${POOR_PRIVATE_KEY1} --password customPath --keystoredir ./out/keystore --raw`,
       );
@@ -3209,9 +3221,9 @@ describe('[Common]', () => {
 
     // keystoredir local
     test('iexec wallet import --keystoredir local', async () => {
-      await execAsync(
-        'rm -rf out/keystore && mkdir out/keystore',
-      ).catch(() => {});
+      await execAsync('rm -rf out/keystore && mkdir out/keystore').catch(
+        () => {},
+      );
       const raw = await execAsync(
         `${iexecPath} wallet import ${POOR_PRIVATE_KEY2} --password 'my local pass phrase' --keystoredir local --raw`,
       );

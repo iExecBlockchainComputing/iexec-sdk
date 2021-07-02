@@ -180,7 +180,7 @@ show
     }
   });
 
-const getEth = cli.command('getETH');
+const getEth = cli.command('get-ether').alias('getETH'); // DEPRECATED getETH
 addGlobalOptions(getEth);
 addWalletLoadOptions(getEth);
 getEth
@@ -218,7 +218,7 @@ getEth
     }
   });
 
-const getRlc = cli.command('getRLC');
+const getRlc = cli.command('get-RLC');
 addGlobalOptions(getRlc);
 addWalletLoadOptions(getRlc);
 getRlc
@@ -256,7 +256,7 @@ getRlc
     }
   });
 
-const sendETH = cli.command('sendETH <amount> [unit]');
+const sendETH = cli.command('send-ether <amount> [unit]').alias('sendETH'); // DEPRECATED senETH
 addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
@@ -297,7 +297,7 @@ sendETH
       const txHash = await wallet.sendETH(chain.contracts, weiAmount, opts.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
-          amount,
+          amount: weiAmount,
           from: address,
           to: opts.to,
           txHash,
@@ -308,7 +308,7 @@ sendETH
     }
   });
 
-const sendRLC = cli.command('sendRLC <amount> [unit]');
+const sendRLC = cli.command('send-RLC <amount> [unit]');
 addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
@@ -322,7 +322,9 @@ sendRLC
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const nRlcAmount = await nRlcAmountSchema({
+        defaultUnit: 'RLC',
+      }).validate([amount, unit]);
       const walletOptions = await computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
@@ -693,6 +695,59 @@ unwrapEnterpriseRLC
       spinner.succeed(`Unwrapped ${message}\n`, {
         raw: {
           amount: nRlcAmount,
+          txHash,
+        },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+// DEPRECATED
+const sendNRLC = cli.command('sendRLC <amount> [unit]');
+addGlobalOptions(sendNRLC);
+addWalletLoadOptions(sendNRLC);
+sendNRLC
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .option(...option.force())
+  .option(...option.to())
+  .description(desc.sendNRLC())
+  .action(async (amount, unit, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const [[address], chain] = await Promise.all([
+        keystore.accounts(),
+        loadChain(opts.chain, { txOptions, spinner }),
+      ]);
+      if (!opts.to) throw Error('Missing --to option');
+      await connectKeystore(chain, keystore, { txOptions });
+      if (!opts.force) {
+        await prompt.transferRLC(
+          formatRLC(nRlcAmount),
+          chain.name,
+          opts.to,
+          chain.id,
+        );
+      }
+      const message = `${formatRLC(nRlcAmount)} ${
+        chain.name
+      } RLC from ${address} to ${opts.to}`;
+      spinner.start(`Sending ${message}...`);
+
+      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, opts.to);
+
+      spinner.succeed(`Sent ${message}\n`, {
+        raw: {
+          amount: nRlcAmount,
+          from: address,
+          to: opts.to,
           txHash,
         },
       });
