@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.1] 2021-07-12
+
+### changed
+
+- set ethers version to ~5.3.1 for pre berlin fork compatibility (iExec sidechains)
+
 ## [5.3.0] 2021-05-05
 
 ### changed
