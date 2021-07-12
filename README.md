@@ -13,15 +13,13 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - [CLI documentation](#iexec-sdk-cli-api)
 - [JS lib documentation](#iexec-sdk-library-api)
 - [CHANGELOG](./CHANGELOG.md)
+- iExec main documentation: https://docs.iex.ec/for-developers/
 - The iExec Dapp Store: https://dapps.iex.ec
-- The iExec Data Store: https://data.iex.ec
 - The iExec Marketplace: https://market.iex.ec
 - The iExec Explorer: https://explorer.iex.ec
 - The iExec Workerpool registry: https://pools.iex.ec
 - The RLC faucet: https://faucet.iex.ec
-- iExec main documentation: https://docs.iex.ec
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
-- [iExec data registry](https://github.com/iExecBlockchainComputing/iexec-datasets-registry), to apply for Data Store listing
 
 ## Install
 
@@ -884,9 +882,9 @@ The encrypted dataset files must be upload on a public file system and reference
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec52x-uy8tc?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec52x-q9qbg?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec52x-4me7q?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/buy-computation-iexec60x-876r7?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec60x-l4hh4?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec60x-micsl?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
@@ -958,7 +956,7 @@ const getIExec = async () => {
     throw Error('Need to install MetaMask');
   ethProvider = window.ethereum;
   try {
-    await window.ethereum.enable(); // prompt the use to grant the dapp access to the blockchain
+    await window.ethereum.request({ method: 'eth_requestAccounts' }); // prompt the use to grant the dapp access to the blockchain
   } catch (error) {
     throw Error('User denied access', error);
   }
@@ -2121,22 +2119,6 @@ const task = await waitFinalState(
   '0x3c0ab2de0cd14de2746d0e1b6ae4ad07659c02f61ca24bffba500b1b2a216d30',
   '0xbae010aa25684354e5dc9bf01b8dc8a05f36ed549a31a353e02917f62a496a43',
 );
-```
-
-#### waitForTaskStatusChange (deprecated prefer [obsTask](#obstask))
-
-iexec.**task.waitForTaskStatusChange ( taskid: Bytes32, initialStatus: Uint256 )** => Promise < **{ status: Uint256, statusName: String }** >
-
-> wait until the status of specified task change.
-
-_Example:_
-
-```js
-const res = await iexec.task.fetchResults(
-  '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19',
-  '1',
-);
-console.log('task status is', res.statusName);
 ```
 
 ### iexec.app
