@@ -35,11 +35,12 @@ expect.extend({
         stringifyNestedNumbers(received),
         stringifyNestedNumbers(target),
       ),
-      message: () => `not loosely equal \nreceived: ${JSON.stringify(
-        received,
-        null,
-        2,
-      )}\nexpected: ${JSON.stringify(target, null, 2)}`,
+      message: () =>
+        `not loosely equal \nreceived: ${JSON.stringify(
+          received,
+          null,
+          2,
+        )}\nexpected: ${JSON.stringify(target, null, 2)}`,
     };
   },
 });
@@ -76,12 +77,15 @@ const chainGasPrice = '20000000000';
 
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 // const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
-const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
-const POOR_PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
+const PRIVATE_KEY =
+  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const POOR_PRIVATE_KEY2 =
+  '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const POOR_ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 const POOR_ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 // const RICH_ADDRESS2 = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
-const RICH_PRIVATE_KEY2 = '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
+const RICH_PRIVATE_KEY2 =
+  '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
 // const RICH_ADDRESS3 = '0xbC11Bf07a83c7e04daef3dd5C6F9a046F8c5fA7b';
 // const RICH_PRIVATE_KEY3 = '0xfb9d8a917d85d7d9a052745248ecbf6a2268110945004dd797e82e8d4c071e79';
 
@@ -3173,7 +3177,9 @@ describe('[dataset]', () => {
     const outDirPath = path.join(process.cwd(), 'test/out');
     await fs
       .ensureDir(outDirPath)
-      .then(() => fs.writeFile(path.join(outDirPath, 'dataset.enc'), encryptedBytes));
+      .then(() =>
+        fs.writeFile(path.join(outDirPath, 'dataset.enc'), encryptedBytes),
+      );
     const encryptedFilePath = path.join(outDirPath, 'dataset.enc');
     const decryptedFilePath = path.join(outDirPath, 'decrypted.zip');
     await expect(
@@ -3198,17 +3204,15 @@ describe('[dataset]', () => {
       path.join(process.cwd(), 'test/inputs/files/text.zip'),
     );
 
-    const originalFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(
-      fileBytes,
-    );
+    const originalFileChecksum =
+      await iexec.dataset.computeEncryptedFileChecksum(fileBytes);
     expect(originalFileChecksum).toBe(
       '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515',
     );
 
     const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
-    const encryptedFileChecksum = await iexec.dataset.computeEncryptedFileChecksum(
-      encryptedFileBytes,
-    );
+    const encryptedFileChecksum =
+      await iexec.dataset.computeEncryptedFileChecksum(encryptedFileBytes);
     expect(encryptedFileChecksum).toMatch(bytes32Regex);
   });
   test('dataset.deployDataset()', async () => {
@@ -4147,8 +4151,7 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashApporder({
       ...order,
-      salt:
-        '0x77d3087b2ff82dc336c1add5ad220a32e8b3f46201ad33a7afdb1d6442132e13',
+      salt: '0x77d3087b2ff82dc336c1add5ad220a32e8b3f46201ad33a7afdb1d6442132e13',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
@@ -4175,8 +4178,7 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashDatasetorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
@@ -4204,8 +4206,7 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashWorkerpoolorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
@@ -4236,8 +4237,7 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashRequestorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
@@ -4420,8 +4420,7 @@ describe('[order]', () => {
     // invalid sign
     const apporderInvalidSign = {
       ...apporderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4436,8 +4435,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('apporder invalid sign'));
     const datasetorderInvalidSign = {
       ...datasetorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4452,8 +4450,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('datasetorder invalid sign'));
     const workerpoolorderInvalidSign = {
       ...workerpoolorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4468,8 +4465,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('workerpoolorder invalid sign'));
     const requestorderInvalidSign = {
       ...requestorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4535,9 +4531,11 @@ describe('[order]', () => {
       ),
     );
     // category check
-    const workerpoolorderCategoryMismatch = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, category: 2 },
-    );
+    const workerpoolorderCategoryMismatch =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        category: 2,
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4554,9 +4552,11 @@ describe('[order]', () => {
       ),
     );
     // trust check
-    const workerpoolorderTrustZero = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, trust: 0 },
-    );
+    const workerpoolorderTrustZero =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        trust: 0,
+      });
     // const requestorderTrustOne = await iexec.order.signRequestorder(
     //   { ...requestorderTemplate, trust: 1 },
     // );
@@ -4591,12 +4591,16 @@ describe('[order]', () => {
       },
       { checkRequest: false },
     );
-    const workerpoolorderTagGpu = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['gpu']) },
-    );
-    const workerpoolorderTagTee = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['tee']) },
-    );
+    const workerpoolorderTagGpu =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['gpu']),
+      });
+    const workerpoolorderTagTee =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['tee']),
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4695,12 +4699,11 @@ describe('[order]', () => {
       ),
     );
 
-    const workerpoolorderTooExpensive = await iexecPoolManager.order.signWorkerpoolorder(
-      {
+    const workerpoolorderTooExpensive =
+      await iexecPoolManager.order.signWorkerpoolorder({
         ...workerpoolorderTemplate,
         workerpoolprice: 1,
-      },
-    );
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4804,9 +4807,11 @@ describe('[order]', () => {
       ...datasetorderTemplate,
       datasetprice: 2,
     });
-    const workerpoolorder1nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 1 },
-    );
+    const workerpoolorder1nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 1,
+      });
     const requestorder300nRlc = await iexec.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -4842,9 +4847,12 @@ describe('[order]', () => {
       datasetprice: 0,
       volume: 1000,
     });
-    const workerpoolorder2nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 2, volume: 1000 },
-    );
+    const workerpoolorder2nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 2,
+        volume: 1000,
+      });
     const requestorder6nRlc = await iexec.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -4870,9 +4878,11 @@ describe('[order]', () => {
     );
 
     // workerpool owner stake check
-    const workerpoolorder7nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 7 },
-    );
+    const workerpoolorder7nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 7,
+      });
     await iexec.account.deposit(10);
     const poolManagerBalance = await iexecPoolManager.account.checkBalance(
       await iexecPoolManager.wallet.getAddress(),
@@ -5083,8 +5093,7 @@ describe('[order]', () => {
     // invalid sign
     const apporderInvalidSign = {
       ...apporderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexecRequester.order.matchOrders(
@@ -5099,8 +5108,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('apporder invalid sign'));
     const datasetorderInvalidSign = {
       ...datasetorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexecRequester.order.matchOrders(
@@ -5115,8 +5123,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('datasetorder invalid sign'));
     const workerpoolorderInvalidSign = {
       ...workerpoolorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexecRequester.order.matchOrders(
@@ -5131,8 +5138,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('workerpoolorder invalid sign'));
     const requestorderInvalidSign = {
       ...requestorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexecRequester.order.matchOrders(
@@ -5200,9 +5206,11 @@ describe('[order]', () => {
       ),
     );
     // category check
-    const workerpoolorderCategoryMismatch = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, category: 2 },
-    );
+    const workerpoolorderCategoryMismatch =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        category: 2,
+      });
     await expect(
       iexecRequester.order.matchOrders(
         {
@@ -5219,19 +5227,22 @@ describe('[order]', () => {
       ),
     );
     // trust check
-    const workerpoolorderTrustZero = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, trust: 0 },
-    );
+    const workerpoolorderTrustZero =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        trust: 0,
+      });
     // const requestorderTrustOne = await iexec.order.signRequestorder(
     //   { ...requestorderTemplate, trust: 1 },
     // );
-    const requestorderTrustTooHigh = await iexecRequester.order.signRequestorder(
-      {
-        ...requestorderTemplate,
-        trust: 2,
-      },
-      { checkRequest: false },
-    );
+    const requestorderTrustTooHigh =
+      await iexecRequester.order.signRequestorder(
+        {
+          ...requestorderTemplate,
+          trust: 2,
+        },
+        { checkRequest: false },
+      );
     await expect(
       iexecRequester.order.matchOrders(
         {
@@ -5256,12 +5267,16 @@ describe('[order]', () => {
       },
       { checkRequest: false },
     );
-    const workerpoolorderTagGpu = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['gpu']) },
-    );
-    const workerpoolorderTagTee = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['tee']) },
-    );
+    const workerpoolorderTagGpu =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['gpu']),
+      });
+    const workerpoolorderTagTee =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['tee']),
+      });
     await expect(
       iexecRequester.order.matchOrders(
         {
@@ -5340,12 +5355,11 @@ describe('[order]', () => {
       ),
     );
 
-    const datasetorderTooExpensive = await iexecDatasetDev.order.signDatasetorder(
-      {
+    const datasetorderTooExpensive =
+      await iexecDatasetDev.order.signDatasetorder({
         ...datasetorderTemplate,
         datasetprice: 1,
-      },
-    );
+      });
     await expect(
       iexecRequester.order.matchOrders(
         {
@@ -5362,12 +5376,11 @@ describe('[order]', () => {
       ),
     );
 
-    const workerpoolorderTooExpensive = await iexecPoolManager.order.signWorkerpoolorder(
-      {
+    const workerpoolorderTooExpensive =
+      await iexecPoolManager.order.signWorkerpoolorder({
         ...workerpoolorderTemplate,
         workerpoolprice: 1,
-      },
-    );
+      });
     await expect(
       iexecRequester.order.matchOrders(
         {
@@ -5471,9 +5484,11 @@ describe('[order]', () => {
       ...datasetorderTemplate,
       datasetprice: 2,
     });
-    const workerpoolorder1nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 1 },
-    );
+    const workerpoolorder1nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 1,
+      });
     const requestorder300nRlc = await iexecRequester.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -5509,9 +5524,12 @@ describe('[order]', () => {
       datasetprice: 0,
       volume: 1000,
     });
-    const workerpoolorder2nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 2, volume: 1000 },
-    );
+    const workerpoolorder2nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 2,
+        volume: 1000,
+      });
     const requestorder6nRlc = await iexecRequester.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -5537,9 +5555,11 @@ describe('[order]', () => {
     );
 
     // workerpool owner stake check
-    const workerpoolorder7nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 7 },
-    );
+    const workerpoolorder7nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 7,
+      });
     await iexecRequester.account.deposit(10);
     const poolManagerBalance = await iexecPoolManager.account.checkBalance(
       await iexecPoolManager.wallet.getAddress(),
@@ -6784,9 +6804,11 @@ describe('[orderbook]', () => {
             { ...requestorder, workerpool: utils.NULL_ADDRESS },
             { checkRequest: false },
           )
-          .then((o) => iexec.order.publishRequestorder(o, {
-            checkRequest: false,
-          }));
+          .then((o) =>
+            iexec.order.publishRequestorder(o, {
+              checkRequest: false,
+            }),
+          );
       }
       const res1 = await iexec.orderbook.fetchRequestOrderbook({
         requester: await iexec.wallet.getAddress(),
@@ -6853,8 +6875,10 @@ describe('[observables]', () => {
               next: (value) => {
                 obsTaskWithDealidValues.push(value);
               },
-              error: () => reject(Error('obsTask with dealid should not call error')),
-              complete: () => reject(Error('obsTask with dealid should not call complete')),
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
+              complete: () =>
+                reject(Error('obsTask with dealid should not call complete')),
             });
             sleep(10000).then(resolve);
           })
@@ -6873,12 +6897,14 @@ describe('[observables]', () => {
                   reject(e);
                 }
               },
-              error: () => reject(
-                Error('obsTask unsub before next should not call error'),
-              ),
-              complete: () => reject(
-                Error('obsTask unsub before next should not call complete'),
-              ),
+              error: () =>
+                reject(
+                  Error('obsTask unsub before next should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error('obsTask unsub before next should not call complete'),
+                ),
             });
             sleep(10000).then(resolve);
           })
@@ -6893,8 +6919,10 @@ describe('[observables]', () => {
                 next: (value) => {
                   obsTaskAfterInitValues.push(value);
                 },
-                error: () => reject(Error('obsTask after init should not call error')),
-                complete: () => reject(Error('obsTask after init should not call complete')),
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
+                complete: () =>
+                  reject(Error('obsTask after init should not call complete')),
               });
               sleep(5000).then(resolve);
             })
@@ -7006,7 +7034,8 @@ describe('[observables]', () => {
               next: (value) => {
                 obsTaskWithDealidValues.push(value);
               },
-              error: () => reject(Error('obsTask with dealid should not call error')),
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
               complete: resolve,
             });
           })
@@ -7021,9 +7050,10 @@ describe('[observables]', () => {
                 obsTaskWithWrongDealidValues.push(value);
               },
               error: resolve,
-              complete: () => reject(
-                Error('obsTask with wrong dealid should not call complete'),
-              ),
+              complete: () =>
+                reject(
+                  Error('obsTask with wrong dealid should not call complete'),
+                ),
             });
           })
           .catch(reject);
@@ -7037,7 +7067,8 @@ describe('[observables]', () => {
                 obsTaskBeforeInitValues.push(value);
               },
               error: resolve,
-              complete: () => reject(Error('obsTask before init should not call complete')),
+              complete: () =>
+                reject(Error('obsTask before init should not call complete')),
             });
           })
           .catch(reject);
@@ -7051,7 +7082,8 @@ describe('[observables]', () => {
                 next: (value) => {
                   obsTaskAfterInitValues.push(value);
                 },
-                error: () => reject(Error('obsTask after init should not call error')),
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
                 complete: resolve,
               });
             })
@@ -7066,8 +7098,10 @@ describe('[observables]', () => {
               next: (value) => {
                 obsTaskUnsubBeforeCompleteValues.push(value);
               },
-              error: () => reject(Error('obsTask unsubscribed should nol call complete')),
-              complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
+              error: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
+              complete: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
             });
             sleep(1000).then(resolve);
           })
@@ -7207,12 +7241,14 @@ describe('[observables]', () => {
                   reject(e);
                 }
               },
-              error: () => reject(
-                Error('obsDeal unsub before next should not call error'),
-              ),
-              complete: () => reject(
-                Error('obsDeal unsub before next should not call complete'),
-              ),
+              error: () =>
+                reject(
+                  Error('obsDeal unsub before next should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error('obsDeal unsub before next should not call complete'),
+                ),
             });
             sleep(10000).then(resolve);
           })
@@ -7378,9 +7414,10 @@ describe('[observables]', () => {
                 obsDealWithWrongDealidValues.push(value);
               },
               error: resolve,
-              complete: () => reject(
-                Error('obsDeal with wrong dealid should not call complete'),
-              ),
+              complete: () =>
+                reject(
+                  Error('obsDeal with wrong dealid should not call complete'),
+                ),
             });
           })
           .catch(reject);
@@ -7394,14 +7431,16 @@ describe('[observables]', () => {
                 unsubObsDealBeforeComplete();
                 obsDealUnsubBeforeCompleteValues.push(value);
               },
-              error: () => reject(
-                Error('obsDeal unsub before complete should not call error'),
-              ),
-              complete: () => reject(
-                Error(
-                  'obsDeal unsub before complete should not call complete',
+              error: () =>
+                reject(
+                  Error('obsDeal unsub before complete should not call error'),
                 ),
-              ),
+              complete: () =>
+                reject(
+                  Error(
+                    'obsDeal unsub before complete should not call complete',
+                  ),
+                ),
             });
             sleep(10000).then(resolve);
           })
@@ -8235,9 +8274,11 @@ describe('[lib utils]', () => {
       ).toStrictEqual(['tee']);
     });
     test('decodeTag unknown bit tag', () => {
-      expect(() => utils.decodeTag(
-        '0x0000000000000000000000000000000000000000000000000000000000000002',
-      )).toThrow('Unknown bit 2');
+      expect(() =>
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ),
+      ).toThrow('Unknown bit 2');
     });
   });
   describe('sumTags', () => {
@@ -8264,10 +8305,12 @@ describe('[lib utils]', () => {
       );
     });
     test('sumTags invalid bytes32', () => {
-      expect(() => utils.sumTags([
-        '0x000000000000000000000000000000000000000000000000000000000000000z',
-        '0x0000000000000000000000000000000000000000000000000000000000000001',
-      ])).toThrow('tag must be bytes32 hex string');
+      expect(() =>
+        utils.sumTags([
+          '0x000000000000000000000000000000000000000000000000000000000000000z',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toThrow('tag must be bytes32 hex string');
     });
   });
   describe('decryptResult', () => {

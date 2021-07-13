@@ -84,17 +84,19 @@ show
           });
         });
       }
-      const taskResult = taskFinalState || (await taskModule.show(chain.contracts, taskid));
+      const taskResult =
+        taskFinalState || (await taskModule.show(chain.contracts, taskid));
       spinner.info(`Task status ${taskResult.statusName}`);
       let resultPath;
       if (opts.download) {
         if (taskResult.status === 3) {
-          const resultFileName = opts.download !== true ? opts.download : taskid;
+          const resultFileName =
+            opts.download !== true ? opts.download : taskid;
 
           resultPath = path.join(
             process.cwd(),
-            resultFileName.length > 4
-              && resultFileName.substr(resultFileName.length - 4) === '.zip'
+            resultFileName.length > 4 &&
+              resultFileName.substr(resultFileName.length - 4) === '.zip'
               ? resultFileName
               : `${resultFileName}.zip`,
           );

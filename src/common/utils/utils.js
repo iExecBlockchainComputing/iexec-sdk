@@ -4,12 +4,8 @@ const BN = require('bn.js');
 const JSZip = require('jszip');
 const NodeRSA = require('node-rsa');
 const aesjs = require('aes-js');
-const {
-  getAddress,
-  randomBytes,
-  formatUnits,
-  parseUnits,
-} = require('ethers').utils;
+const { getAddress, randomBytes, formatUnits, parseUnits } =
+  require('ethers').utils;
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
 const { ValidationError } = require('./errors');
@@ -18,12 +14,14 @@ const debug = Debug('iexec:utils');
 
 const NULL_BYTES = '0x';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const NULL_BYTES32 =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
-const isEthersBn = (obj) => !!(obj._ethersType && obj._ethersType === 'BigNumber');
+const isEthersBn = (obj) =>
+  !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
 const bnToEthersBn = (bn) => BigNumber.from(bn.toString());
 const ethersBnToBn = (ethersBn) => new BN(ethersBn.toString());
@@ -84,9 +82,10 @@ const formatEth = (wei) => {
   }
 };
 
-const isEthUnit = (str) => ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
-  str,
-);
+const isEthUnit = (str) =>
+  ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
+    str,
+  );
 
 const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
@@ -120,7 +119,8 @@ const bnifyNestedEthersBn = (obj) => {
     const [k, v] = e;
     if (isEthersBn(v)) {
       objOut[k] = ethersBnToBn(v);
-    } else if (typeof v === 'object' && v._hex) objOut[k] = new BN(v._hex.substring(2), 16);
+    } else if (typeof v === 'object' && v._hex)
+      objOut[k] = new BN(v._hex.substring(2), 16);
     else if (typeof v === 'object') objOut[k] = bnifyNestedEthersBn(v);
     else objOut[k] = v;
   });
@@ -172,8 +172,8 @@ const cleanRPC = (rpcObj) => {
     if (Number.isNaN(parseInt(curr, 10))) {
       let value;
       if (
-        Array.isArray(rpcObj[curr])
-        && !rpcObj[curr].find((e) => typeof e === 'object')
+        Array.isArray(rpcObj[curr]) &&
+        !rpcObj[curr].find((e) => typeof e === 'object')
       ) {
         value = rpcObj[curr];
       } else if (typeof rpcObj[curr] === 'object') {
@@ -233,7 +233,8 @@ const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
   tags.forEach((tag) => {
     if (tag === '') return;
-    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number') throw new ValidationError(`Unknown tag ${tag}`);
+    if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number')
+      throw new ValidationError(`Unknown tag ${tag}`);
     binaryTags[TAG_MAP[tag] - 1] = true;
   });
   const binString = binaryTags.reduce(
@@ -246,14 +247,16 @@ const encodeTag = (tags) => {
 };
 
 const decodeTag = (tag) => {
-  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag))
+    throw new ValidationError('tag must be bytes32 hex string');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   const tags = [];
   for (let i = 1; i < binString.length + 1; i += 1) {
     const current = binString.charAt(binString.length - i);
     if (current === '1') {
       const currentTag = TAG_MAP[i];
-      if (currentTag === undefined || typeof currentTag !== 'string') throw new ValidationError(`Unknown bit ${i} in tag`);
+      if (currentTag === undefined || typeof currentTag !== 'string')
+        throw new ValidationError(`Unknown bit ${i} in tag`);
       tags.push(currentTag);
     }
   }
@@ -262,7 +265,8 @@ const decodeTag = (tag) => {
 
 const sumTags = (tagArray) => {
   const binStringArray = tagArray.map((hexTag) => {
-    if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex)) throw new ValidationError('tag must be bytes32 hex string');
+    if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex))
+      throw new ValidationError('tag must be bytes32 hex string');
     return new BN(hexTag.substr(2), 'hex').toString(2);
   });
   let summedTagsBinString = '';
@@ -283,15 +287,17 @@ const sumTags = (tagArray) => {
 const findMissingBitsInTag = (tag, requiredTag) => {
   debug('requiredTag', requiredTag);
   debug('tag', tag);
-  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
-  if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag)) throw new ValidationError('requiredTag must be bytes32 hex string');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag))
+    throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag))
+    throw new ValidationError('requiredTag must be bytes32 hex string');
   const tagBinString = new BN(tag.substr(2), 'hex').toString(2);
   const requiredTagBinString = new BN(requiredTag.substr(2), 'hex').toString(2);
   const missingBits = [];
   for (let i = 1; i <= requiredTagBinString.length; i += 1) {
     if (
-      requiredTagBinString.charAt(requiredTagBinString.length - i) === '1'
-      && tagBinString.charAt(tagBinString.length - i) !== '1'
+      requiredTagBinString.charAt(requiredTagBinString.length - i) === '1' &&
+      tagBinString.charAt(tagBinString.length - i) !== '1'
     ) {
       missingBits.push(i);
     }
@@ -300,14 +306,17 @@ const findMissingBitsInTag = (tag, requiredTag) => {
 };
 
 const checkActiveBitInTag = (tag, bit) => {
-  if (typeof tag !== 'string' || !bytes32Regex.test(tag)) throw new ValidationError('tag must be bytes32 hex string');
-  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag))
+    throw new ValidationError('tag must be bytes32 hex string');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256)
+    throw new ValidationError('Invalid bit tag');
   const binString = new BN(tag.substr(2), 'hex').toString(2);
   return binString.charAt(binString.length - bit) === '1';
 };
 
 const tagBitToHuman = (bit) => {
-  if (typeof bit !== 'number' || bit < 1 || bit > 256) throw new ValidationError('Invalid bit tag');
+  if (typeof bit !== 'number' || bit < 1 || bit > 256)
+    throw new ValidationError('Invalid bit tag');
   return TAG_MAP[bit] || bit;
 };
 

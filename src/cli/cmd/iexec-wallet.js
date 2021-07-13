@@ -144,7 +144,8 @@ show
         }
       }
 
-      if (!userWalletAddress && !address) throw Error('Missing address or wallet');
+      if (!userWalletAddress && !address)
+        throw Error('Missing address or wallet');
 
       const chain = await loadChain(opts.chain, { spinner });
       // show address balance
@@ -200,14 +201,15 @@ getEth
       spinner.start(`Requesting test ether from ${chain.name} faucets...`);
       const faucetsResponses = await wallet.getETH(chain.name, address);
       const responsesString = faucetsResponses.reduce(
-        (accu, curr) => accu.concat(
-          '- ',
-          curr.name,
-          ' :',
-          curr.response.error
-            ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
-            : pretty(curr.response),
-        ),
+        (accu, curr) =>
+          accu.concat(
+            '- ',
+            curr.name,
+            ' :',
+            curr.response.error
+              ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
+              : pretty(curr.response),
+          ),
         '',
       );
       spinner.succeed(`Faucets responses:\n${responsesString}`, {
@@ -238,14 +240,15 @@ getRlc
       spinner.start(`Requesting ${chain.name} faucet for test RLC...`);
       const faucetsResponses = await wallet.getRLC(chain.name, address);
       const responsesString = faucetsResponses.reduce(
-        (accu, curr) => accu.concat(
-          '- ',
-          curr.name,
-          ' :',
-          curr.response.error
-            ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
-            : pretty(curr.response),
-        ),
+        (accu, curr) =>
+          accu.concat(
+            '- ',
+            curr.name,
+            ' :',
+            curr.response.error
+              ? pretty(curr.response, { keysColor: 'red', stringColor: 'red' })
+              : pretty(curr.response),
+          ),
         '',
       );
       spinner.succeed(`Faucets responses:\n${responsesString}`, {
@@ -438,7 +441,8 @@ bridgeToSidechain
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (chain.contracts.isNative) throw Error('Cannot bridge sidechain to sidechain');
+      if (chain.contracts.isNative)
+        throw Error('Cannot bridge sidechain to sidechain');
       const bridgeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
@@ -461,10 +465,10 @@ bridgeToSidechain
         );
       }
       const bridgedChainConfigured = !!(
-        chain.bridgedNetwork
-        && chain.bridgedNetwork.contracts
-        && chain.bridgedNetwork.bridge
-        && chain.bridgedNetwork.bridge.contract
+        chain.bridgedNetwork &&
+        chain.bridgedNetwork.contracts &&
+        chain.bridgedNetwork.bridge &&
+        chain.bridgedNetwork.bridge.contract
       );
       const message = `${formatRLC(nRlcAmount)} ${
         chain.name
@@ -524,7 +528,8 @@ bridgeToMainchain
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (!chain.contracts.isNative) throw Error('Cannot bridge mainchain to mainchain');
+      if (!chain.contracts.isNative)
+        throw Error('Cannot bridge mainchain to mainchain');
       const bridgeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
@@ -547,10 +552,10 @@ bridgeToMainchain
         );
       }
       const bridgedChainConfigured = !!(
-        chain.bridgedNetwork
-        && chain.bridgedNetwork.contracts
-        && chain.bridgedNetwork.bridge
-        && chain.bridgedNetwork.bridge.contract
+        chain.bridgedNetwork &&
+        chain.bridgedNetwork.contracts &&
+        chain.bridgedNetwork.bridge &&
+        chain.bridgedNetwork.bridge.contract
       );
       const message = `${formatRLC(nRlcAmount)} ${
         chain.name
@@ -608,20 +613,23 @@ wrapEnterpriseRLC
       const [chain] = await Promise.all([
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      const hasEnterpriseFlavour =
+        chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(
           `No enterprise smart contracts found on current chain ${chain.id}`,
         );
       }
 
-      const standardContracts = chain.contracts.flavour === 'standard'
-        ? chain.contracts
-        : chain.enterpriseSwapNetwork.contracts;
+      const standardContracts =
+        chain.contracts.flavour === 'standard'
+          ? chain.contracts
+          : chain.enterpriseSwapNetwork.contracts;
 
-      const enterpriseContracts = chain.contracts.flavour === 'standard'
-        ? chain.enterpriseSwapNetwork.contracts
-        : chain.contracts;
+      const enterpriseContracts =
+        chain.contracts.flavour === 'standard'
+          ? chain.enterpriseSwapNetwork.contracts
+          : chain.contracts;
 
       await connectKeystore({ contracts: standardContracts }, keystore, {
         txOptions,
@@ -668,16 +676,18 @@ unwrapEnterpriseRLC
       const [chain] = await Promise.all([
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      const hasEnterpriseFlavour = chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
+      const hasEnterpriseFlavour =
+        chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(
           `No enterprise smart contracts found on current chain ${chain.id}`,
         );
       }
 
-      const enterpriseContracts = chain.contracts.flavour === 'standard'
-        ? chain.enterpriseSwapNetwork.contracts
-        : chain.contracts;
+      const enterpriseContracts =
+        chain.contracts.flavour === 'standard'
+          ? chain.enterpriseSwapNetwork.contracts
+          : chain.contracts;
 
       await connectKeystore({ contracts: enterpriseContracts }, keystore, {
         txOptions,

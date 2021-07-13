@@ -21,18 +21,20 @@ const concatenateAndHash = (...hexaStringArray) => {
   return keccak256(buffer);
 };
 
-const getChallengeForSetWeb3Secret = (secretAddress, secretValue) => concatenateAndHash(
-  keccak256(Buffer.from(DOMAIN, 'utf8')),
-  secretAddress,
-  keccak256(Buffer.from(secretValue, 'utf8')),
-);
+const getChallengeForSetWeb3Secret = (secretAddress, secretValue) =>
+  concatenateAndHash(
+    keccak256(Buffer.from(DOMAIN, 'utf8')),
+    secretAddress,
+    keccak256(Buffer.from(secretValue, 'utf8')),
+  );
 
-const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) => concatenateAndHash(
-  keccak256(Buffer.from(DOMAIN, 'utf8')),
-  ownerAddress,
-  keccak256(Buffer.from(secretKey, 'utf8')),
-  keccak256(Buffer.from(secretValue, 'utf8')),
-);
+const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) =>
+  concatenateAndHash(
+    keccak256(Buffer.from(DOMAIN, 'utf8')),
+    ownerAddress,
+    keccak256(Buffer.from(secretKey, 'utf8')),
+    keccak256(Buffer.from(secretValue, 'utf8')),
+  );
 
 const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),

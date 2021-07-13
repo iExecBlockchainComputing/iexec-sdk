@@ -16,9 +16,7 @@ const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   app = throwIfMissing(),
-  {
-    dataset, workerpool, requester, minTag, maxTag, minVolume,
-  } = {},
+  { dataset, workerpool, requester, minTag, maxTag, minVolume } = {},
 ) => {
   try {
     const query = {
@@ -70,9 +68,7 @@ const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   dataset = throwIfMissing(),
-  {
-    app, workerpool, requester, minTag, maxTag, minVolume,
-  } = {},
+  { app, workerpool, requester, minTag, maxTag, minVolume } = {},
 ) => {
   try {
     const query = {

@@ -186,14 +186,16 @@ show
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
-      const addressOrIndex = cliAddressOrIndex
-        || (await loadDeployedObj(objName).then(
+      const addressOrIndex =
+        cliAddressOrIndex ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
+      if (!isAddress && !userAddress)
+        throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
       spinner.start(info.showing(objName));
@@ -231,7 +233,8 @@ count
         keystore.accounts(),
       ]);
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
+      if (!userAddress)
+        throw Error(`Missing option ${option.user()[0]} or wallet`);
       spinner.start(info.counting(objName));
       const objCountBN = await countUserApps(chain.contracts, userAddress);
       spinner.succeed(
@@ -264,8 +267,9 @@ publish
     try {
       const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress
-        || (await loadDeployedObj(objName).then(
+      const address =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
@@ -332,8 +336,9 @@ unpublish
     try {
       const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress
-        || (await loadDeployedObj(objName).then(
+      const address =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
@@ -354,15 +359,15 @@ unpublish
       await connectKeystore(chain, keystore);
       const unpublished = all
         ? await unpublishAllApporders(
-          chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
-          address,
-        )
+            chain.contracts,
+            getPropertyFormChain(chain, 'iexecGateway'),
+            address,
+          )
         : await unpublishLastApporder(
-          chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
-          address,
-        );
+            chain.contracts,
+            getPropertyFormChain(chain, 'iexecGateway'),
+            address,
+          );
       spinner.succeed(
         `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
           all ? 's' : ''
@@ -411,8 +416,9 @@ run
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       const result = { deals: [] };
       const useDeployedApp = !appAddress;
-      const app = appAddress
-        || (await loadDeployedObj('app').then(
+      const app =
+        appAddress ||
+        (await loadDeployedObj('app').then(
           (deployedApp) => deployedApp && deployedApp[chain.id],
         ));
       if (!app) {
@@ -429,11 +435,12 @@ run
 
       const useDataset = opts.dataset !== undefined;
       const useDeployedDataset = useDataset && opts.dataset === 'deployed';
-      const dataset = useDataset
-        && (useDeployedDataset
+      const dataset =
+        useDataset &&
+        (useDeployedDataset
           ? await loadDeployedObj('dataset').then(
-            (deployedDataset) => deployedDataset && deployedDataset[chain.id],
-          )
+              (deployedDataset) => deployedDataset && deployedDataset[chain.id],
+            )
           : opts.dataset);
       if (useDataset && !dataset) {
         throw Error(
@@ -453,12 +460,15 @@ run
       }
 
       const runOnWorkerpool = opts.workerpool !== undefined;
-      const useDeployedWorkerpool = runOnWorkerpool && opts.workerpool === 'deployed';
-      const workerpool = runOnWorkerpool
-        && (useDeployedWorkerpool
+      const useDeployedWorkerpool =
+        runOnWorkerpool && opts.workerpool === 'deployed';
+      const workerpool =
+        runOnWorkerpool &&
+        (useDeployedWorkerpool
           ? await loadDeployedObj('workerpool').then(
-            (deployedWorkerpool) => deployedWorkerpool && deployedWorkerpool[chain.id],
-          )
+              (deployedWorkerpool) =>
+                deployedWorkerpool && deployedWorkerpool[chain.id],
+            )
           : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
         throw Error(
@@ -482,15 +492,12 @@ run
 
       const inputParams = await paramsSchema().validate(opts.params);
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
-      const inputParamsInputFiles = await paramsInputFilesArraySchema().validate(
-        opts.inputFiles,
-      );
-      const inputParamsStorageProvider = await paramsStorageProviderSchema().validate(
-        opts.storageProvider,
-      );
-      const inputParamsResultEncrytion = await paramsEncryptResultSchema().validate(
-        opts.encryptResult,
-      );
+      const inputParamsInputFiles =
+        await paramsInputFilesArraySchema().validate(opts.inputFiles);
+      const inputParamsStorageProvider =
+        await paramsStorageProviderSchema().validate(opts.storageProvider);
+      const inputParamsResultEncrytion =
+        await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
@@ -501,7 +508,8 @@ run
           [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: inputParamsStorageProvider,
+          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+            inputParamsStorageProvider,
         }),
         ...(inputParamsResultEncrytion !== undefined && {
           [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
@@ -519,11 +527,12 @@ run
         ethProvider: chain.contracts.provider,
       }).validate(opts.callback || NULL_ADDRESS);
       debug('callback', callback);
-      const beneficiary = opts.beneficiary === undefined
-        ? undefined
-        : await addressSchema({
-          ethProvider: chain.contracts.provider,
-        }).validate(opts.beneficiary);
+      const beneficiary =
+        opts.beneficiary === undefined
+          ? undefined
+          : await addressSchema({
+              ethProvider: chain.contracts.provider,
+            }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       const watch = !!opts.watch || !!opts.download;
@@ -533,7 +542,8 @@ run
 
       const getApporder = async () => {
         spinner.info(`Using app ${app}`);
-        if (!(await checkDeployedApp(chain.contracts, app))) throw Error(`No app deployed at address ${app}`);
+        if (!(await checkDeployedApp(chain.contracts, app)))
+          throw Error(`No app deployed at address ${app}`);
         const appOwner = await getAppOwner(chain.contracts, app);
         const isAppOwner = appOwner.toLowerCase() === requester.toLowerCase();
         if (isAppOwner) {
@@ -573,12 +583,15 @@ run
         );
         if (!useDataset) return NULL_DATASETORDER;
         if (
-          typeof dataset === 'string'
-          && dataset.toLowerCase() === NULL_ADDRESS
-        ) return NULL_DATASETORDER;
-        if (!(await checkDeployedDataset(chain.contracts, dataset))) throw Error(`No dataset deployed at address ${dataset}`);
+          typeof dataset === 'string' &&
+          dataset.toLowerCase() === NULL_ADDRESS
+        )
+          return NULL_DATASETORDER;
+        if (!(await checkDeployedDataset(chain.contracts, dataset)))
+          throw Error(`No dataset deployed at address ${dataset}`);
         const datasetOwner = await getDatasetOwner(chain.contracts, dataset);
-        const isDatasetOwner = datasetOwner.toLowerCase() === requester.toLowerCase();
+        const isDatasetOwner =
+          datasetOwner.toLowerCase() === requester.toLowerCase();
         if (isDatasetOwner) {
           spinner.info('Creating datasetorder');
           await connectKeystore(chain, keystore);
@@ -625,12 +638,14 @@ run
         const minTag = sumTags([apporder.tag, datasetorder.tag, tag]);
         debug('minTag', minTag);
         if (runOnWorkerpool) {
-          if (!(await checkDeployedWorkerpool(chain.contracts, workerpool))) throw Error(`No workerpool deployed at address ${workerpool}`);
+          if (!(await checkDeployedWorkerpool(chain.contracts, workerpool)))
+            throw Error(`No workerpool deployed at address ${workerpool}`);
           const workerpoolOwner = await getWorkerpoolOwner(
             chain.contracts,
             workerpool,
           );
-          const isWorkerpoolOwner = workerpoolOwner.toLowerCase() === requester.toLowerCase();
+          const isWorkerpoolOwner =
+            workerpoolOwner.toLowerCase() === requester.toLowerCase();
           if (isWorkerpoolOwner) {
             spinner.info('Creating workerpoolorder');
             await connectKeystore(chain, keystore);
@@ -786,15 +801,15 @@ run
             dataset:
               requestorder.dataset !== NULL_ADDRESS
                 ? `${requestorder.dataset} (${formatRLC(
-                  requestorder.datasetmaxprice,
-                )} RLC)`
+                    requestorder.datasetmaxprice,
+                  )} RLC)`
                 : undefined,
             workerpool: `${requestorder.workerpool} (${formatRLC(
               requestorder.workerpoolmaxprice,
             )} RLC)`,
             params:
-              (requestorder.params && JSON.parse(requestorder.params))
-              || undefined,
+              (requestorder.params && JSON.parse(requestorder.params)) ||
+              undefined,
             category: requestorder.category,
             tag:
               requestorder.tag !== NULL_BYTES32 ? requestorder.tag : undefined,
@@ -828,19 +843,20 @@ run
       } else {
         spinner.info(`Deal submitted with dealid ${dealid}`);
 
-        const waitDealFinalState = () => new Promise((resolve, reject) => {
-          let dealState;
-          obsDeal(chain.contracts, dealid).subscribe({
-            next: (data) => {
-              dealState = data;
-              spinner.start(
-                `Watching execution...\n${renderTasksStatus(data.tasks)}`,
-              );
-            },
-            error: reject,
-            complete: () => resolve(dealState),
+        const waitDealFinalState = () =>
+          new Promise((resolve, reject) => {
+            let dealState;
+            obsDeal(chain.contracts, dealid).subscribe({
+              next: (data) => {
+                dealState = data;
+                spinner.start(
+                  `Watching execution...\n${renderTasksStatus(data.tasks)}`,
+                );
+              },
+              error: reject,
+              complete: () => resolve(dealState),
+            });
           });
-        });
 
         const dealFinalState = await waitDealFinalState();
 
@@ -916,16 +932,16 @@ requestRun
       const dataset = opts.dataset || NULL_ADDRESS;
       debug('dataset', dataset);
       if (
-        dataset !== NULL_ADDRESS
-        && !(await checkDeployedDataset(chain.contracts, dataset))
+        dataset !== NULL_ADDRESS &&
+        !(await checkDeployedDataset(chain.contracts, dataset))
       ) {
         throw Error(`No dataset deployed at address ${dataset}`);
       }
       const workerpool = opts.workerpool || NULL_ADDRESS;
       debug('workerpool', workerpool);
       if (
-        workerpool !== NULL_ADDRESS
-        && !(await checkDeployedWorkerpool(chain.contracts, workerpool))
+        workerpool !== NULL_ADDRESS &&
+        !(await checkDeployedWorkerpool(chain.contracts, workerpool))
       ) {
         throw Error(`No workerpool deployed at address ${workerpool}`);
       }
@@ -948,15 +964,12 @@ requestRun
 
       const inputParams = await paramsSchema().validate(opts.params);
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
-      const inputParamsInputFiles = await paramsInputFilesArraySchema().validate(
-        opts.inputFiles,
-      );
-      const inputParamsStorageProvider = await paramsStorageProviderSchema().validate(
-        opts.storageProvider,
-      );
-      const inputParamsResultEncrytion = await paramsEncryptResultSchema().validate(
-        opts.encryptResult,
-      );
+      const inputParamsInputFiles =
+        await paramsInputFilesArraySchema().validate(opts.inputFiles);
+      const inputParamsStorageProvider =
+        await paramsStorageProviderSchema().validate(opts.storageProvider);
+      const inputParamsResultEncrytion =
+        await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
@@ -967,7 +980,8 @@ requestRun
           [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: inputParamsStorageProvider,
+          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+            inputParamsStorageProvider,
         }),
         ...(inputParamsResultEncrytion !== undefined && {
           [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
@@ -985,11 +999,12 @@ requestRun
         ethProvider: chain.contracts.provider,
       }).validate(opts.callback || NULL_ADDRESS);
       debug('callback', callback);
-      const beneficiary = opts.beneficiary === undefined
-        ? undefined
-        : await addressSchema({
-          ethProvider: chain.contracts.provider,
-        }).validate(opts.beneficiary);
+      const beneficiary =
+        opts.beneficiary === undefined
+          ? undefined
+          : await addressSchema({
+              ethProvider: chain.contracts.provider,
+            }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       spinner.info('Creating requestorder');
@@ -1062,16 +1077,16 @@ requestRun
             dataset:
               requestorder.dataset !== NULL_ADDRESS
                 ? `${requestorder.dataset} (${formatRLC(
-                  requestorder.datasetmaxprice,
-                )} RLC)`
+                    requestorder.datasetmaxprice,
+                  )} RLC)`
                 : undefined,
             workerpool: `${requestorder.workerpool} (${formatRLC(
               requestorder.workerpoolmaxprice,
             )} RLC)`,
             volume: requestorder.volume,
             params:
-              (requestorder.params && JSON.parse(requestorder.params))
-              || undefined,
+              (requestorder.params && JSON.parse(requestorder.params)) ||
+              undefined,
             category: requestorder.category,
             tag:
               requestorder.tag !== NULL_BYTES32 ? requestorder.tag : undefined,

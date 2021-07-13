@@ -103,7 +103,8 @@ const claim = async (
     );
 
     const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));
-    if (!checkEvent('TaskClaimed', claimTxReceipt.events)) throw Error('TaskClaimed not confirmed');
+    if (!checkEvent('TaskClaimed', claimTxReceipt.events))
+      throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;
   } catch (error) {

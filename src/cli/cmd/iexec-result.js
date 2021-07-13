@@ -142,10 +142,12 @@ decryptResults
         );
       }
 
-      const inputFile = encryptedResultsPath
-        || path.join(process.cwd(), DEFAULT_ENCRYPTED_RESULTS_NAME);
-      const outputFile = opts.decryptedResultsPath
-        || path.join(process.cwd(), DEFAULT_DECRYPTED_RESULTS_NAME);
+      const inputFile =
+        encryptedResultsPath ||
+        path.join(process.cwd(), DEFAULT_ENCRYPTED_RESULTS_NAME);
+      const outputFile =
+        opts.decryptedResultsPath ||
+        path.join(process.cwd(), DEFAULT_DECRYPTED_RESULTS_NAME);
 
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(
@@ -236,10 +238,7 @@ pushSecret
       const publicKey = await fs.readFile(secretFilePath, 'utf8');
       const secretToPush = Buffer.from(publicKey, 'utf8').toString('base64');
       debug('secretToPush', secretToPush);
-      const {
-        isPushed,
-        isUpdated,
-      } = await secretMgtServ.pushWeb2Secret(
+      const { isPushed, isUpdated } = await secretMgtServ.pushWeb2Secret(
         contracts,
         sms,
         getResultEncryptionKeyName(),

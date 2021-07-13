@@ -66,16 +66,14 @@ initStorage
         await connectKeystore(chain, keystore);
         token = await resultProxyServ.login(contracts, resultProxyURL);
       } else {
-        token = opts.token
-          || (await prompt.password(`Paste your ${provider} token`, {
+        token =
+          opts.token ||
+          (await prompt.password(`Paste your ${provider} token`, {
             useMask: true,
           }));
         await connectKeystore(chain, keystore);
       }
-      const {
-        isPushed,
-        isUpdated,
-      } = await secretMgtServ.pushWeb2Secret(
+      const { isPushed, isUpdated } = await secretMgtServ.pushWeb2Secret(
         contracts,
         smsURL,
         tokenKeyName,

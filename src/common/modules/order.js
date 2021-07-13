@@ -70,7 +70,8 @@ const ORDERS_TYPES = [
 ];
 
 const checkOrderName = (orderName) => {
-  if (!ORDERS_TYPES.includes(orderName)) throw new ValidationError(`Invalid orderName value ${orderName}`);
+  if (!ORDERS_TYPES.includes(orderName))
+    throw new ValidationError(`Invalid orderName value ${orderName}`);
 };
 
 const NULL_DATASETORDER = {
@@ -198,9 +199,7 @@ const signedOrderToStruct = (orderName, orderObj) => {
 
 const getEIP712Domain = async (contracts) => {
   const iexecContract = await contracts.getIExecContract();
-  const {
-    name, version, chainId, verifyingContract,
-  } = await wrapCall(
+  const { name, version, chainId, verifyingContract } = await wrapCall(
     iexecContract.domain(),
   );
   return {
@@ -272,43 +271,47 @@ const computeOrderHash = async (
 const hashApporder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
-) => computeOrderHash(
-  contracts,
-  APP_ORDER,
-  await saltedApporderSchema({
-    ethProvider: contracts.provider,
-  }).validate(order),
-);
+) =>
+  computeOrderHash(
+    contracts,
+    APP_ORDER,
+    await saltedApporderSchema({
+      ethProvider: contracts.provider,
+    }).validate(order),
+  );
 const hashDatasetorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
-) => computeOrderHash(
-  contracts,
-  DATASET_ORDER,
-  await saltedDatasetorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(order),
-);
+) =>
+  computeOrderHash(
+    contracts,
+    DATASET_ORDER,
+    await saltedDatasetorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(order),
+  );
 const hashWorkerpoolorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
-) => computeOrderHash(
-  contracts,
-  WORKERPOOL_ORDER,
-  await saltedWorkerpoolorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(order),
-);
+) =>
+  computeOrderHash(
+    contracts,
+    WORKERPOOL_ORDER,
+    await saltedWorkerpoolorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(order),
+  );
 const hashRequestorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
-) => computeOrderHash(
-  contracts,
-  REQUEST_ORDER,
-  await saltedRequestorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(order),
-);
+) =>
+  computeOrderHash(
+    contracts,
+    REQUEST_ORDER,
+    await saltedRequestorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(order),
+  );
 
 const getRemainingVolume = async (
   contracts = throwIfMissing(),
@@ -339,9 +342,10 @@ const signOrder = async (
   orderObj = throwIfMissing(),
 ) => {
   checkOrderName(orderName);
-  const signerAddress = orderName === REQUEST_ORDER
-    ? orderObj.requester
-    : await getContractOwner(contracts, orderName, orderObj);
+  const signerAddress =
+    orderName === REQUEST_ORDER
+      ? orderObj.requester
+      : await getContractOwner(contracts, orderName, orderObj);
   const address = await getAddress(contracts);
   if (signerAddress !== address) {
     throw Error(
@@ -372,46 +376,50 @@ const signOrder = async (
 const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => signOrder(
-  contracts,
-  APP_ORDER,
-  await apporderSchema({ ethProvider: contracts.provider }).validate(
-    apporder,
-  ),
-);
+) =>
+  signOrder(
+    contracts,
+    APP_ORDER,
+    await apporderSchema({ ethProvider: contracts.provider }).validate(
+      apporder,
+    ),
+  );
 
 const signDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
-) => signOrder(
-  contracts,
-  DATASET_ORDER,
-  await datasetorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(datasetorder),
-);
+) =>
+  signOrder(
+    contracts,
+    DATASET_ORDER,
+    await datasetorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetorder),
+  );
 
 const signWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
-) => signOrder(
-  contracts,
-  WORKERPOOL_ORDER,
-  await workerpoolorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(workerpoolorder),
-);
+) =>
+  signOrder(
+    contracts,
+    WORKERPOOL_ORDER,
+    await workerpoolorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolorder),
+  );
 
 const signRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
-) => signOrder(
-  contracts,
-  REQUEST_ORDER,
-  await requestorderSchema({
-    ethProvider: contracts.provider,
-  }).validate(requestorder),
-);
+) =>
+  signOrder(
+    contracts,
+    REQUEST_ORDER,
+    await requestorderSchema({
+      ethProvider: contracts.provider,
+    }).validate(requestorder),
+  );
 
 const cancelOrder = async (
   contracts = throwIfMissing(),
@@ -435,7 +443,8 @@ const cancelOrder = async (
       ),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-    if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events)) throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+    if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events))
+      throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return { order: orderObj, txHash: tx.hash };
   } catch (error) {
     debug('cancelOrder()', error);
@@ -446,38 +455,42 @@ const cancelOrder = async (
 const cancelApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => cancelOrder(
-  contracts,
-  APP_ORDER,
-  await signedApporderSchema().validate(apporder),
-);
+) =>
+  cancelOrder(
+    contracts,
+    APP_ORDER,
+    await signedApporderSchema().validate(apporder),
+  );
 
 const cancelDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
-) => cancelOrder(
-  contracts,
-  DATASET_ORDER,
-  await signedDatasetorderSchema().validate(datasetorder),
-);
+) =>
+  cancelOrder(
+    contracts,
+    DATASET_ORDER,
+    await signedDatasetorderSchema().validate(datasetorder),
+  );
 
 const cancelWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
-) => cancelOrder(
-  contracts,
-  WORKERPOOL_ORDER,
-  await signedWorkerpoolorderSchema().validate(workerpoolorder),
-);
+) =>
+  cancelOrder(
+    contracts,
+    WORKERPOOL_ORDER,
+    await signedWorkerpoolorderSchema().validate(workerpoolorder),
+  );
 
 const cancelRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
-) => cancelOrder(
-  contracts,
-  REQUEST_ORDER,
-  await signedRequestorderSchema().validate(requestorder),
-);
+) =>
+  cancelOrder(
+    contracts,
+    REQUEST_ORDER,
+    await signedRequestorderSchema().validate(requestorder),
+  );
 
 const publishOrder = async (
   contracts = throwIfMissing(),
@@ -518,49 +531,53 @@ const publishApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedApporder = throwIfMissing(),
-) => publishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  await signedApporderSchema().validate(signedApporder),
-);
+) =>
+  publishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    await signedApporderSchema().validate(signedApporder),
+  );
 
 const publishDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
-) => publishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  await signedDatasetorderSchema().validate(signedDatasetorder),
-);
+) =>
+  publishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    await signedDatasetorderSchema().validate(signedDatasetorder),
+  );
 
 const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
-) => publishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
-);
+) =>
+  publishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
+  );
 
 const publishRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
-) => publishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  await signedRequestorderSchema().validate(signedRequestorder),
-);
+) =>
+  publishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    await signedRequestorderSchema().validate(signedRequestorder),
+  );
 
 const UNPUBLISH_TARGET_ORDERHASH = 'unpublish_orderHash';
 const UNPUBLISH_TARGET_ALL_ORDERS = 'unpublish_all';
@@ -580,8 +597,8 @@ const unpublishOrder = async (
       if (!orderHash) throwIfMissing();
       body.orderHash = orderHash;
     } else if (
-      target === UNPUBLISH_TARGET_LAST_ORDER
-      || target === UNPUBLISH_TARGET_ALL_ORDERS
+      target === UNPUBLISH_TARGET_LAST_ORDER ||
+      target === UNPUBLISH_TARGET_ALL_ORDERS
     ) {
       if (!address) throwIfMissing();
       body[objDesc[orderName].addressField] = address;
@@ -675,66 +692,70 @@ const unpublishAllApporders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  APP_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_ALL_ORDERS,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(appAddress),
-  },
-);
+) =>
+  unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    APP_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_ALL_ORDERS,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(appAddress),
+    },
+  );
 
 const unpublishAllDatasetorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  DATASET_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_ALL_ORDERS,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(datasetAddress),
-  },
-);
+) =>
+  unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    DATASET_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_ALL_ORDERS,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(datasetAddress),
+    },
+  );
 
 const unpublishAllWorkerpoolorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  WORKERPOOL_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_ALL_ORDERS,
-    address: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpoolAddress),
-  },
-);
+) =>
+  unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    WORKERPOOL_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_ALL_ORDERS,
+      address: await addressSchema({
+        ethProvider: contracts.provider,
+      }).validate(workerpoolAddress),
+    },
+  );
 
 const unpublishAllRequestorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-) => unpublishOrder(
-  contracts,
-  iexecGatewayURL,
-  REQUEST_ORDER,
-  await chainIdSchema().validate(contracts.chainId),
-  {
-    target: UNPUBLISH_TARGET_ALL_ORDERS,
-    address: await getAddress(contracts),
-  },
-);
+) =>
+  unpublishOrder(
+    contracts,
+    iexecGatewayURL,
+    REQUEST_ORDER,
+    await chainIdSchema().validate(contracts.chainId),
+    {
+      target: UNPUBLISH_TARGET_ALL_ORDERS,
+      address: await getAddress(contracts),
+    },
+  );
 
 const unpublishLastApporder = async (
   contracts = throwIfMissing(),
@@ -891,17 +912,13 @@ const getMatchableVolume = async (
   requestOrder = throwIfMissing(),
 ) => {
   try {
-    const [
-      vAppOrder,
-      vDatasetOrder,
-      vWorkerpoolOrder,
-      vRequestOrder,
-    ] = await Promise.all([
-      signedApporderSchema().validate(appOrder),
-      signedDatasetorderSchema().validate(datasetOrder),
-      signedWorkerpoolorderSchema().validate(workerpoolOrder),
-      signedRequestorderSchema().validate(requestOrder),
-    ]);
+    const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
+      await Promise.all([
+        signedApporderSchema().validate(appOrder),
+        signedDatasetorderSchema().validate(datasetOrder),
+        signedWorkerpoolorderSchema().validate(workerpoolOrder),
+        signedRequestorderSchema().validate(requestOrder),
+      ]);
 
     // deployment checks
     const checkAppDeployedAsync = async () => {
@@ -1054,16 +1071,16 @@ const getMatchableVolume = async (
       );
     }
     if (
-      vRequestOrder.dataset !== NULL_ADDRESS
-      && vRequestOrder.dataset !== vDatasetOrder.dataset
+      vRequestOrder.dataset !== NULL_ADDRESS &&
+      vRequestOrder.dataset !== vDatasetOrder.dataset
     ) {
       throw new Error(
         `dataset address mismatch between requestorder (${vRequestOrder.dataset}) and datasetorder (${vDatasetOrder.dataset})`,
       );
     }
     if (
-      vRequestOrder.workerpool !== NULL_ADDRESS
-      && vRequestOrder.workerpool !== vWorkerpoolOrder.workerpool
+      vRequestOrder.workerpool !== NULL_ADDRESS &&
+      vRequestOrder.workerpool !== vWorkerpoolOrder.workerpool
     ) {
       throw new Error(
         `workerpool address mismatch between requestorder (${vRequestOrder.workerpool}) and workerpoolorder (${vWorkerpoolOrder.workerpool})`,
@@ -1092,7 +1109,9 @@ const getMatchableVolume = async (
     );
     if (workerpoolMissingTagBits.length > 0) {
       throw Error(
-        `Missing tags [${workerpoolMissingTagBits.map((bit) => tagBitToHuman(bit))}] in workerpoolorder`,
+        `Missing tags [${workerpoolMissingTagBits.map((bit) =>
+          tagBitToHuman(bit),
+        )}] in workerpoolorder`,
       );
     }
     // app tag check
@@ -1151,55 +1170,62 @@ const getMatchableVolume = async (
     const volumes = await Promise.all(
       vRequestOrder.dataset !== NULL_ADDRESS
         ? [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
-            (volume) => {
-              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+              (volume) => {
+                if (volume.lte(new BN(0)))
+                  throw new Error('apporder is fully consumed');
+                return volume;
+              },
+            ),
+            getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
+              (volume) => {
+                if (volume.lte(new BN(0)))
+                  throw new Error('datasetorder is fully consumed');
+                return volume;
+              },
+            ),
+            getRemainingVolume(
+              contracts,
+              WORKERPOOL_ORDER,
+              vWorkerpoolOrder,
+            ).then((volume) => {
+              if (volume.lte(new BN(0)))
+                throw new Error('workerpoolorder is fully consumed');
               return volume;
-            },
-          ),
-          getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
-            (volume) => {
-              if (volume.lte(new BN(0))) throw new Error('datasetorder is fully consumed');
-              return volume;
-            },
-          ),
-          getRemainingVolume(
-            contracts,
-            WORKERPOOL_ORDER,
-            vWorkerpoolOrder,
-          ).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
-            return volume;
-          }),
-          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
-            (volume) => {
-              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
-              return volume;
-            },
-          ),
-        ]
+            }),
+            getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+              (volume) => {
+                if (volume.lte(new BN(0)))
+                  throw new Error('requestorder is fully consumed');
+                return volume;
+              },
+            ),
+          ]
         : [
-          getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
-            (volume) => {
-              if (volume.lte(new BN(0))) throw new Error('apporder is fully consumed');
+            getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
+              (volume) => {
+                if (volume.lte(new BN(0)))
+                  throw new Error('apporder is fully consumed');
+                return volume;
+              },
+            ),
+            getRemainingVolume(
+              contracts,
+              WORKERPOOL_ORDER,
+              vWorkerpoolOrder,
+            ).then((volume) => {
+              if (volume.lte(new BN(0)))
+                throw new Error('workerpoolorder is fully consumed');
               return volume;
-            },
-          ),
-          getRemainingVolume(
-            contracts,
-            WORKERPOOL_ORDER,
-            vWorkerpoolOrder,
-          ).then((volume) => {
-            if (volume.lte(new BN(0))) throw new Error('workerpoolorder is fully consumed');
-            return volume;
-          }),
-          getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
-            (volume) => {
-              if (volume.lte(new BN(0))) throw new Error('requestorder is fully consumed');
-              return volume;
-            },
-          ),
-        ],
+            }),
+            getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
+              (volume) => {
+                if (volume.lte(new BN(0)))
+                  throw new Error('requestorder is fully consumed');
+                return volume;
+              },
+            ),
+          ],
     );
     return volumes.reduce(
       (min, curr) => (curr.lt(min) ? curr : min),
@@ -1219,17 +1245,13 @@ const matchOrders = async (
   requestOrder = throwIfMissing(),
 ) => {
   try {
-    const [
-      vAppOrder,
-      vDatasetOrder,
-      vWorkerpoolOrder,
-      vRequestOrder,
-    ] = await Promise.all([
-      signedApporderSchema().validate(appOrder),
-      signedDatasetorderSchema().validate(datasetOrder),
-      signedWorkerpoolorderSchema().validate(workerpoolOrder),
-      signedRequestorderSchema().validate(requestOrder),
-    ]);
+    const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
+      await Promise.all([
+        signedApporderSchema().validate(appOrder),
+        signedDatasetorderSchema().validate(datasetOrder),
+        signedWorkerpoolorderSchema().validate(workerpoolOrder),
+        signedRequestorderSchema().validate(requestOrder),
+      ]);
 
     // check matchability
     const matchableVolume = await getMatchableVolume(
@@ -1288,7 +1310,8 @@ const matchOrders = async (
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const matchEvent = 'OrdersMatched';
-    if (!checkEvent(matchEvent, txReceipt.events)) throw Error(`${matchEvent} not confirmed`);
+    if (!checkEvent(matchEvent, txReceipt.events))
+      throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(
       matchEvent,
       txReceipt.events,

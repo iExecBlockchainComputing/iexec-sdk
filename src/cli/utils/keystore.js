@@ -126,7 +126,8 @@ const importPrivateKeyAndSave = async (privateKey, options) => {
   return saveWallet(wallet, options);
 };
 
-const createAndSave = async (options) => importPrivateKeyAndSave(Wallet.createRandom().privateKey, options);
+const createAndSave = async (options) =>
+  importPrivateKeyAndSave(Wallet.createRandom().privateKey, options);
 
 const Keystore = ({
   walletOptions = computeWalletLoadOptions().walletOptions,
@@ -188,11 +189,11 @@ const Keystore = ({
         .filter((e) => {
           const address = e.split('--')[2];
           return (
-            address
-            && ('0x'.concat(address).toLowerCase()
-              === walletOptions.walletAddress.toLowerCase()
-              || address.toLowerCase()
-                === walletOptions.walletAddress.toLowerCase())
+            address &&
+            ('0x'.concat(address).toLowerCase() ===
+              walletOptions.walletAddress.toLowerCase() ||
+              address.toLowerCase() ===
+                walletOptions.walletAddress.toLowerCase())
           );
         })
         .sort(descSortWallet)[0];

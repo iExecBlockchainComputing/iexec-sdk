@@ -19,7 +19,8 @@ const getStorageTokenKeyName = (provider) => {
   }
 };
 
-const getResultEncryptionKeyName = () => reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY;
+const getResultEncryptionKeyName = () =>
+  reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY;
 
 module.exports = {
   reservedSecretKeyName,

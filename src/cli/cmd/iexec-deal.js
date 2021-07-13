@@ -40,33 +40,35 @@ show
       const chain = await loadChain(opts.chain, { spinner });
       let result;
       if (opts.watch) {
-        const waitDealFinalState = () => new Promise((resolve, reject) => {
-          let dealState;
-          obsDeal(chain.contracts, dealid).subscribe({
-            next: (data) => {
-              dealState = data;
-              spinner.start(
-                `Watching execution...\n${renderTasksStatus(data.tasks)}`,
-              );
-            },
-            error: reject,
-            complete: () => {
-              const tasks = Object.values(stringifyNestedBn(dealState.tasks));
-              const failedTasks = tasks.filter((task) => task.taskTimedOut);
-              resolve({
-                tasksCount: dealState.tasksCount,
-                completedTasksCount: dealState.completedTasksCount,
-                failedTasksCount: dealState.failedTasksCount,
-                deal: stringifyNestedBn(dealState.deal),
-                tasks,
-                failedTasks,
-              });
-            },
+        const waitDealFinalState = () =>
+          new Promise((resolve, reject) => {
+            let dealState;
+            obsDeal(chain.contracts, dealid).subscribe({
+              next: (data) => {
+                dealState = data;
+                spinner.start(
+                  `Watching execution...\n${renderTasksStatus(data.tasks)}`,
+                );
+              },
+              error: reject,
+              complete: () => {
+                const tasks = Object.values(stringifyNestedBn(dealState.tasks));
+                const failedTasks = tasks.filter((task) => task.taskTimedOut);
+                resolve({
+                  tasksCount: dealState.tasksCount,
+                  completedTasksCount: dealState.completedTasksCount,
+                  failedTasksCount: dealState.failedTasksCount,
+                  deal: stringifyNestedBn(dealState.deal),
+                  tasks,
+                  failedTasks,
+                });
+              },
+            });
           });
-        });
         result = await waitDealFinalState();
 
-        const dealStatus = result.failedTasksCount > 0 ? 'TIMEOUT' : 'COMPLETED';
+        const dealStatus =
+          result.failedTasksCount > 0 ? 'TIMEOUT' : 'COMPLETED';
         spinner.stop();
         spinner.info(
           `Deal status ${dealStatus}\n${renderTasksStatus(result.tasks, {

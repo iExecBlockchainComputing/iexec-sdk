@@ -43,7 +43,8 @@ const deposit = async (
 ) => {
   try {
     const vAmount = await nRlcAmountSchema().validate(amount);
-    if (new BN(vAmount).lte(new BN(0))) throw Error('Deposit amount must be greather than 0');
+    if (new BN(vAmount).lte(new BN(0)))
+      throw Error('Deposit amount must be greather than 0');
     if (contracts.flavour === 'enterprise') {
       await isInWhitelist(contracts, await getAddress(contracts), {
         strict: true,
@@ -54,7 +55,8 @@ const deposit = async (
       contracts,
       await getAddress(contracts),
     );
-    if (nRLC.lt(new BN(vAmount))) throw Error('Deposit amount exceed wallet balance');
+    if (nRLC.lt(new BN(vAmount)))
+      throw Error('Deposit amount exceed wallet balance');
     const iexecAddress = await contracts.fetchIExecAddress();
     const iexecContract = contracts.getIExecContract();
     if (!contracts.isNative) {
@@ -72,8 +74,10 @@ const deposit = async (
           ),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEvent('Approval', txReceipt.events)) throw Error('Approval not confirmed');
-      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Transfer not confirmed');
+      if (!checkEvent('Approval', txReceipt.events))
+        throw Error('Approval not confirmed');
+      if (!checkEvent('Transfer', txReceipt.events))
+        throw Error('Transfer not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToEthersBn(
@@ -87,7 +91,8 @@ const deposit = async (
         }),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEvent('Transfer', txReceipt.events)) throw Error('Deposit not confirmed');
+      if (!checkEvent('Transfer', txReceipt.events))
+        throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
     return { amount: vAmount, txHash };
@@ -103,7 +108,8 @@ const withdraw = async (
 ) => {
   try {
     const vAmount = await nRlcAmountSchema().validate(amount);
-    if (new BN(vAmount).lte(new BN(0))) throw Error('Withdraw amount must be greather than 0');
+    if (new BN(vAmount).lte(new BN(0)))
+      throw Error('Withdraw amount must be greather than 0');
     if (contracts.flavour === 'enterprise') {
       await isInWhitelist(contracts, await getAddress(contracts), {
         strict: true,
@@ -114,12 +120,14 @@ const withdraw = async (
       contracts,
       await getAddress(contracts),
     );
-    if (stake.lt(new BN(vAmount))) throw Error('Withdraw amount exceed account balance');
+    if (stake.lt(new BN(vAmount)))
+      throw Error('Withdraw amount exceed account balance');
     const tx = await wrapSend(
       iexecContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-    if (!checkEvent('Transfer', txReceipt.events)) throw Error('Withdraw not confirmed');
+    if (!checkEvent('Transfer', txReceipt.events))
+      throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {
     debug('withdraw()', error);

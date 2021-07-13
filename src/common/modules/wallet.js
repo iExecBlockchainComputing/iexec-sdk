@@ -29,23 +29,25 @@ const ethFaucets = [
   {
     chainName: 'ropsten',
     name: 'faucet.ropsten.be',
-    getETH: (address) => fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
-      .then((res) => res.json())
-      .catch(() => ({ error: 'ETH faucet is down.' })),
+    getETH: (address) =>
+      fetch(`http://faucet.ropsten.be:3001/donate/${address}`)
+        .then((res) => res.json())
+        .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'ropsten',
     name: 'ropsten.faucet.b9lab.com',
-    getETH: (address) => fetch('https://ropsten.faucet.b9lab.com/tap', {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify({ toWhom: address }),
-    })
-      .then((res) => res.json())
-      .catch(() => ({ error: 'ETH faucet is down.' })),
+    getETH: (address) =>
+      fetch('https://ropsten.faucet.b9lab.com/tap', {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({ toWhom: address }),
+      })
+        .then((res) => res.json())
+        .catch(() => ({ error: 'ETH faucet is down.' })),
   },
   {
     chainName: 'rinkeby',
@@ -172,7 +174,8 @@ const getETH = async (
   try {
     const vAddress = await addressSchema().validate(account);
     const filteredFaucets = ethFaucets.filter((e) => e.chainName === chainName);
-    if (filteredFaucets.length === 0) throw Error(`No ETH faucet on chain ${chainName}`);
+    if (filteredFaucets.length === 0)
+      throw Error(`No ETH faucet on chain ${chainName}`);
     const faucetsResponses = await Promise.all(
       filteredFaucets.map((faucet) => faucet.getETH(vAddress)),
     );
@@ -193,9 +196,10 @@ const getETH = async (
 const rlcFaucets = [
   {
     name: 'faucet.iex.ec',
-    getRLC: (chainName, address) => fetch(
-      `https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`,
-    ).then((res) => res.json()),
+    getRLC: (chainName, address) =>
+      fetch(
+        `https://api.faucet.iex.ec/getRLC?chainName=${chainName}&address=${address}`,
+      ).then((res) => res.json()),
   },
 ];
 
@@ -284,7 +288,8 @@ const sendETH = async (
       ethProvider: contracts.provider,
     }).validate(to);
     const vAmount = await weiAmountSchema().validate(amount);
-    if (contracts.isNative) throw Error('sendETH() is disabled on sidechain, use sendRLC()');
+    if (contracts.isNative)
+      throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     const balance = await getEthBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
       throw Error('Amount to send exceed wallet balance');
@@ -370,9 +375,10 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         balances = await checkBalances(contracts, userAddress);
       }
     }
-    const gasPrice = contracts.txOptions && contracts.txOptions.gasPrice
-      ? ethersBnToBn(BigNumber.from(contracts.txOptions.gasPrice))
-      : ethersBnToBn(await contracts.provider.getGasPrice());
+    const gasPrice =
+      contracts.txOptions && contracts.txOptions.gasPrice
+        ? ethersBnToBn(BigNumber.from(contracts.txOptions.gasPrice))
+        : ethersBnToBn(await contracts.provider.getGasPrice());
     const gasLimit = new BN(21000);
     const txFee = gasPrice.mul(gasLimit);
     const sweepNative = balances.wei.sub(txFee);
@@ -416,8 +422,8 @@ const bridgeToSidechain = async (
     }).validate(bridgeAddress);
     const vSidechainBridgeAddress = sidechainBridgeAddress
       ? await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(sidechainBridgeAddress)
+          ethProvider: contracts.provider,
+        }).validate(sidechainBridgeAddress)
       : undefined;
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (contracts.isNative) throw Error('Current chain is a sidechain');
@@ -546,40 +552,43 @@ const bridgeToSidechain = async (
       );
     }
 
-    const sidechainBlockNumber = vSidechainBridgeAddress && bridgedContracts
-      ? await bridgedContracts.provider.getBlockNumber()
-      : 0;
+    const sidechainBlockNumber =
+      vSidechainBridgeAddress && bridgedContracts
+        ? await bridgedContracts.provider.getBlockNumber()
+        : 0;
 
     sendTxHash = await sendRLC(contracts, vAmount, vBridgeAddress);
     debug('sendTxHash', sendTxHash);
 
     if (vSidechainBridgeAddress && bridgedContracts) {
-      const waitAffirmationCompleted = (txHash) => new Promise((resolve) => {
-        debug('waitAffirmationCompleted');
-        const sidechainBridge = new Contract(
-          vSidechainBridgeAddress,
-          homeBridgeErcToNativeDesc.abi,
-          bridgedContracts.provider,
-        );
-        const cleanListeners = () => sidechainBridge.removeAllListeners('AffirmationCompleted');
-        try {
-          sidechainBridge.on(
-            sidechainBridge.filters.AffirmationCompleted(),
-            (address, amount, refTxHash, event) => {
-              if (refTxHash === txHash) {
-                cleanListeners();
-                debug('AffirmationCompleted', event);
-                resolve(event);
-              }
-            },
+      const waitAffirmationCompleted = (txHash) =>
+        new Promise((resolve) => {
+          debug('waitAffirmationCompleted');
+          const sidechainBridge = new Contract(
+            vSidechainBridgeAddress,
+            homeBridgeErcToNativeDesc.abi,
+            bridgedContracts.provider,
           );
-          bridgedContracts.provider.resetEventsBlock(sidechainBlockNumber);
-          debug(`watching events from block ${sidechainBlockNumber}`);
-        } catch (e) {
-          cleanListeners();
-          throw e;
-        }
-      });
+          const cleanListeners = () =>
+            sidechainBridge.removeAllListeners('AffirmationCompleted');
+          try {
+            sidechainBridge.on(
+              sidechainBridge.filters.AffirmationCompleted(),
+              (address, amount, refTxHash, event) => {
+                if (refTxHash === txHash) {
+                  cleanListeners();
+                  debug('AffirmationCompleted', event);
+                  resolve(event);
+                }
+              },
+            );
+            bridgedContracts.provider.resetEventsBlock(sidechainBlockNumber);
+            debug(`watching events from block ${sidechainBlockNumber}`);
+          } catch (e) {
+            cleanListeners();
+            throw e;
+          }
+        });
       const event = await waitAffirmationCompleted(sendTxHash);
       receiveTxHash = event.transactionHash;
     }
@@ -605,8 +614,8 @@ const bridgeToMainchain = async (
     }).validate(bridgeAddress);
     const vMainchainBridgeAddress = mainchainBridgeAddress
       ? await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(mainchainBridgeAddress)
+          ethProvider: contracts.provider,
+        }).validate(mainchainBridgeAddress)
       : undefined;
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     if (!contracts.isNative) throw Error('Current chain is a mainchain');
@@ -623,23 +632,20 @@ const bridgeToMainchain = async (
     const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
     const weiValue = bnWeiValue.toString();
 
-    const [
-      minPerTx,
-      maxPerTx,
-      withinLimit,
-      dailyLimit,
-      totalSpentPerDay,
-    ] = await Promise.all([
-      wrapCall(sidechainBridgeContract.minPerTx()),
-      wrapCall(sidechainBridgeContract.maxPerTx()),
-      wrapCall(sidechainBridgeContract.withinLimit(weiValue)),
-      wrapCall(sidechainBridgeContract.dailyLimit()),
-      wrapCall(
-        sidechainBridgeContract
-          .getCurrentDay()
-          .then((currentDay) => sidechainBridgeContract.totalSpentPerDay(currentDay)),
-      ),
-    ]);
+    const [minPerTx, maxPerTx, withinLimit, dailyLimit, totalSpentPerDay] =
+      await Promise.all([
+        wrapCall(sidechainBridgeContract.minPerTx()),
+        wrapCall(sidechainBridgeContract.maxPerTx()),
+        wrapCall(sidechainBridgeContract.withinLimit(weiValue)),
+        wrapCall(sidechainBridgeContract.dailyLimit()),
+        wrapCall(
+          sidechainBridgeContract
+            .getCurrentDay()
+            .then((currentDay) =>
+              sidechainBridgeContract.totalSpentPerDay(currentDay),
+            ),
+        ),
+      ]);
     debug('minPerTx', minPerTx.toString());
     debug('maxPerTx', maxPerTx.toString());
     debug('withinLimit', withinLimit);
@@ -670,40 +676,43 @@ const bridgeToMainchain = async (
       );
     }
 
-    const mainchainBlockNumber = vMainchainBridgeAddress && bridgedContracts
-      ? await wrapCall(bridgedContracts.provider.getBlockNumber())
-      : 0;
+    const mainchainBlockNumber =
+      vMainchainBridgeAddress && bridgedContracts
+        ? await wrapCall(bridgedContracts.provider.getBlockNumber())
+        : 0;
 
     sendTxHash = await sendNativeToken(contracts, weiValue, vBridgeAddress);
     debug('sendTxHash', sendTxHash);
 
     if (vMainchainBridgeAddress && bridgedContracts) {
-      const waitRelayedMessage = (txHash) => new Promise((resolve) => {
-        debug('waitRelayedMessage');
-        const mainchainBridge = new Contract(
-          vMainchainBridgeAddress,
-          foreignBridgeErcToNativeDesc.abi,
-          bridgedContracts.provider,
-        );
-        const cleanListeners = () => mainchainBridge.removeAllListeners('RelayedMessage');
-        try {
-          mainchainBridge.on(
-            mainchainBridge.filters.RelayedMessage(),
-            (address, amount, refTxHash, event) => {
-              if (refTxHash === txHash) {
-                debug('RelayedMessage', event);
-                cleanListeners();
-                resolve(event);
-              }
-            },
+      const waitRelayedMessage = (txHash) =>
+        new Promise((resolve) => {
+          debug('waitRelayedMessage');
+          const mainchainBridge = new Contract(
+            vMainchainBridgeAddress,
+            foreignBridgeErcToNativeDesc.abi,
+            bridgedContracts.provider,
           );
-          bridgedContracts.provider.resetEventsBlock(mainchainBlockNumber);
-          debug(`watching events from block ${mainchainBlockNumber}`);
-        } catch (e) {
-          cleanListeners();
-          throw e;
-        }
-      });
+          const cleanListeners = () =>
+            mainchainBridge.removeAllListeners('RelayedMessage');
+          try {
+            mainchainBridge.on(
+              mainchainBridge.filters.RelayedMessage(),
+              (address, amount, refTxHash, event) => {
+                if (refTxHash === txHash) {
+                  debug('RelayedMessage', event);
+                  cleanListeners();
+                  resolve(event);
+                }
+              },
+            );
+            bridgedContracts.provider.resetEventsBlock(mainchainBlockNumber);
+            debug(`watching events from block ${mainchainBlockNumber}`);
+          } catch (e) {
+            cleanListeners();
+            throw e;
+          }
+        });
       const event = await waitRelayedMessage(sendTxHash);
       receiveTxHash = event.transactionHash;
     }

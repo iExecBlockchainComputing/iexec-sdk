@@ -1,9 +1,7 @@
 const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
-const {
-  object, string, number, boolean, lazy,
-} = require('yup');
+const { object, string, number, boolean, lazy } = require('yup');
 const {
   addressSchema,
   chainIdSchema,
@@ -13,87 +11,90 @@ const templates = require('./templates');
 
 const debug = Debug('iexec:fs');
 
-const chainConfSchema = () => object({
-  id: chainIdSchema(),
-  host: string(),
-  hub: string(),
-  sms: string(),
-  resultProxy: string(),
-  ipfsGateway: string(),
-  iexecGateway: string(),
-  native: boolean(),
-  useGas: boolean().default(true),
-  flavour: string().oneOf(['standard', 'enterprise']),
-  bridge: object({
-    bridgedChainName: string().required(),
-    contract: addressSchema().required(),
-  })
-    .notRequired()
-    .strict(),
-  enterprise: object({
-    enterpriseSwapChainName: string().required(),
-  })
-    .notRequired()
-    .strict(),
-})
-  .noUnknown(true, 'Unknown key "${unknown}"')
-  .strict();
-
-const chainsConfSchema = () => object({
-  default: string(),
-  chains: object()
-    .test(async (chains) => {
-      await Promise.all(
-        Object.entries({ ...chains }).map(async ([name, chain]) => {
-          await string().validate(name, { strict: true });
-          await chainConfSchema().validate(chain, { strict: true });
-        }),
-      );
-      return true;
+const chainConfSchema = () =>
+  object({
+    id: chainIdSchema(),
+    host: string(),
+    hub: string(),
+    sms: string(),
+    resultProxy: string(),
+    ipfsGateway: string(),
+    iexecGateway: string(),
+    native: boolean(),
+    useGas: boolean().default(true),
+    flavour: string().oneOf(['standard', 'enterprise']),
+    bridge: object({
+      bridgedChainName: string().required(),
+      contract: addressSchema().required(),
     })
-    .required(),
-  providers: object({
-    alchemy: string().notRequired(),
-    etherscan: string().notRequired(),
-    infura: lazy((value) => {
-      switch (typeof value) {
-        case 'object':
-          return object({
-            projectId: string().required(),
-            projectSecret: string(),
-          })
-            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
-            .strict();
-        default:
-          return string();
-      }
-    }),
-    quorum: number().integer().min(1).max(3)
-      .notRequired(),
+      .notRequired()
+      .strict(),
+    enterprise: object({
+      enterpriseSwapChainName: string().required(),
+    })
+      .notRequired()
+      .strict(),
   })
-    .noUnknown(true, 'Unknown key "${unknown}" in providers')
-    .strict(),
-})
-  .noUnknown(true, 'Unknown key "${unknown}"')
-  .strict();
+    .noUnknown(true, 'Unknown key "${unknown}"')
+    .strict();
 
-const deployedObjSchema = () => object().test(async (obj) => {
-  await Promise.all(
-    Object.entries({ ...obj }).map(async ([chainId, address]) => {
-      await chainIdSchema().validate(chainId, { strict: true });
-      await addressSchema().validate(address, { strict: true });
-    }),
-  );
-  return true;
-});
+const chainsConfSchema = () =>
+  object({
+    default: string(),
+    chains: object()
+      .test(async (chains) => {
+        await Promise.all(
+          Object.entries({ ...chains }).map(async ([name, chain]) => {
+            await string().validate(name, { strict: true });
+            await chainConfSchema().validate(chain, { strict: true });
+          }),
+        );
+        return true;
+      })
+      .required(),
+    providers: object({
+      alchemy: string().notRequired(),
+      etherscan: string().notRequired(),
+      infura: lazy((value) => {
+        switch (typeof value) {
+          case 'object':
+            return object({
+              projectId: string().required(),
+              projectSecret: string(),
+            })
+              .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+              .strict();
+          default:
+            return string();
+        }
+      }),
+      quorum: number().integer().min(1).max(3).notRequired(),
+    })
+      .noUnknown(true, 'Unknown key "${unknown}" in providers')
+      .strict(),
+  })
+    .noUnknown(true, 'Unknown key "${unknown}"')
+    .strict();
 
-const deployedConfSchema = () => object({
-  app: deployedObjSchema().notRequired(),
-  dataset: deployedObjSchema().notRequired(),
-  workerpool: deployedObjSchema().notRequired(),
-})
-  .noUnknown(true, 'Unknown key "${unknown}"')
-  .strict();
+const deployedObjSchema = () =>
+  object().test(async (obj) => {
+    await Promise.all(
+      Object.entries({ ...obj }).map(async ([chainId, address]) => {
+        await chainIdSchema().validate(chainId, { strict: true });
+        await addressSchema().validate(address, { strict: true });
+      }),
+    );
+    return true;
+  });
+
+const deployedConfSchema = () =>
+  object({
+    app: deployedObjSchema().notRequired(),
+    dataset: deployedObjSchema().notRequired(),
+    workerpool: deployedObjSchema().notRequired(),
+  })
+    .noUnknown(true, 'Unknown key "${unknown}"')
+    .strict();
 
 const IEXEC_FILE_NAME = 'iexec.json';
 const CHAIN_FILE_NAME = 'chain.json';
@@ -105,9 +106,7 @@ const ORDERS_FILE_NAME = 'orders.json';
 const saveToFile = async (
   fileName,
   text,
-  {
-    force = false, strict = true, fileDir, format,
-  } = {},
+  { force = false, strict = true, fileDir, format } = {},
 ) => {
   try {
     let filePath;
@@ -187,13 +186,19 @@ const saveWallet = (obj, deflautFileName, options) => {
   const fileName = options.walletName || deflautFileName;
   return saveJSONToFile(fileName, obj, options);
 };
-const saveWalletConf = (obj, options) => saveWallet(obj, WALLET_FILE_NAME, options);
-const saveEncryptedWalletConf = (obj, options) => saveWallet(obj, ENCRYPTED_WALLET_FILE_NAME, options);
+const saveWalletConf = (obj, options) =>
+  saveWallet(obj, WALLET_FILE_NAME, options);
+const saveEncryptedWalletConf = (obj, options) =>
+  saveWallet(obj, ENCRYPTED_WALLET_FILE_NAME, options);
 
-const saveIExecConf = (obj, options) => saveJSONToFile(IEXEC_FILE_NAME, obj, options);
-const saveDeployedConf = (obj, options) => saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
-const saveChainConf = (obj, options) => saveJSONToFile(CHAIN_FILE_NAME, obj, options);
-const saveSignedOrders = (obj, options) => saveJSONToFile(ORDERS_FILE_NAME, obj, options);
+const saveIExecConf = (obj, options) =>
+  saveJSONToFile(IEXEC_FILE_NAME, obj, options);
+const saveDeployedConf = (obj, options) =>
+  saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
+const saveChainConf = (obj, options) =>
+  saveJSONToFile(CHAIN_FILE_NAME, obj, options);
+const saveSignedOrders = (obj, options) =>
+  saveJSONToFile(ORDERS_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName, { fileDir } = {}) => {
   let filePath;
@@ -231,20 +236,25 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
   }
 };
 const loadIExecConf = (options) => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainConf = (options) => loadJSONAndRetry(CHAIN_FILE_NAME, {
-  validationSchema: chainsConfSchema,
-  ...options,
-});
-const loadWalletConf = (options) => loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
-const loadEncryptedWalletConf = (options) => loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
-const loadDeployedConf = (options) => loadJSONAndRetry(DEPLOYED_FILE_NAME, {
-  validationSchema: deployedConfSchema,
-  ...options,
-});
-const loadSignedOrders = (options) => loadJSONAndRetry(ORDERS_FILE_NAME, {
-  ...options,
-  loadErrorMessage: info.missingSignedOrders,
-});
+const loadChainConf = (options) =>
+  loadJSONAndRetry(CHAIN_FILE_NAME, {
+    validationSchema: chainsConfSchema,
+    ...options,
+  });
+const loadWalletConf = (options) =>
+  loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
+const loadEncryptedWalletConf = (options) =>
+  loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
+const loadDeployedConf = (options) =>
+  loadJSONAndRetry(DEPLOYED_FILE_NAME, {
+    validationSchema: deployedConfSchema,
+    ...options,
+  });
+const loadSignedOrders = (options) =>
+  loadJSONAndRetry(ORDERS_FILE_NAME, {
+    ...options,
+    loadErrorMessage: info.missingSignedOrders,
+  });
 
 const initIExecConf = async (options) => {
   const iexecConf = Object.assign(templates.main);
@@ -274,7 +284,8 @@ const initObj = async (objName, { obj, overwrite = {} } = {}) => {
     if (objName === 'app') await initObj('buyConf');
     if (objName === 'dataset') await initArray('dapps');
     const iexecConf = await loadIExecConf();
-    iexecConf[objName] = obj || templates.overwriteObject(templates[objName], overwrite);
+    iexecConf[objName] =
+      obj || templates.overwriteObject(templates[objName], overwrite);
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: iexecConf[objName], fileName };
   } catch (error) {

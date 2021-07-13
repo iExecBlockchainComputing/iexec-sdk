@@ -35,15 +35,20 @@ const resultProxyURL = DRONE
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
 
-const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
-const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
+const PRIVATE_KEY =
+  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const PUBLIC_KEY =
+  '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
-const POOR_PRIVATE_KEY1 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
+const POOR_PRIVATE_KEY1 =
+  '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const POOR_ADDRESS1 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
-const POOR_PRIVATE_KEY2 = '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
+const POOR_PRIVATE_KEY2 =
+  '0xcfae38ce58f250c2b5bd28389f42e720c1a8db98ef8eeb0bd4aef2ddf9d56076';
 const POOR_ADDRESS2 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const NULL_BYTES32 =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const chainId = 65535;
 const networkId = `${chainId}`;
@@ -81,106 +86,112 @@ const checkExists = async (file) => fs.pathExists(file);
 
 const removeWallet = () => fs.remove('./wallet.json').catch(() => {});
 
-const setRichWallet = () => saveJSONToFile(
-  {
-    privateKey: PRIVATE_KEY,
-    publicKey: PUBLIC_KEY,
-    address: ADDRESS,
-  },
-  'wallet.json',
-);
-
-const setPoorWallet1 = () => saveJSONToFile(
-  {
-    privateKey: POOR_PRIVATE_KEY1,
-    publicKey: '',
-    address: POOR_ADDRESS1,
-  },
-  'wallet.json',
-);
-
-const setTokenChain = (options) => saveJSONToFile(
-  {
-    default: 'dev',
-    chains: {
-      dev: {
-        id: networkId,
-        host: tokenChainUrl,
-        hub: hubAddress,
-        sms: smsURL,
-        resultProxy: resultProxyURL,
-        ...options,
-      },
+const setRichWallet = () =>
+  saveJSONToFile(
+    {
+      privateKey: PRIVATE_KEY,
+      publicKey: PUBLIC_KEY,
+      address: ADDRESS,
     },
-  },
-  'chain.json',
-);
+    'wallet.json',
+  );
 
-const setTokenEnterpriseChain = (defaultChain = 'dev') => saveJSONToFile(
-  {
-    default: defaultChain,
-    chains: {
-      dev: {
-        id: networkId,
-        host: tokenChainUrl,
-        hub: hubAddress,
-        sms: smsURL,
-        resultProxy: resultProxyURL,
-        enterprise: {
-          enterpriseSwapChainName: 'dev-enterprise',
-        },
-      },
-      'dev-enterprise': {
-        id: networkId,
-        host: tokenChainUrl,
-        hub: enterpriseHubAddress,
-        flavour: 'enterprise',
-        sms: smsURL,
-        resultProxy: resultProxyURL,
-        enterprise: {
-          enterpriseSwapChainName: 'dev',
+const setPoorWallet1 = () =>
+  saveJSONToFile(
+    {
+      privateKey: POOR_PRIVATE_KEY1,
+      publicKey: '',
+      address: POOR_ADDRESS1,
+    },
+    'wallet.json',
+  );
+
+const setTokenChain = (options) =>
+  saveJSONToFile(
+    {
+      default: 'dev',
+      chains: {
+        dev: {
+          id: networkId,
+          host: tokenChainUrl,
+          hub: hubAddress,
+          sms: smsURL,
+          resultProxy: resultProxyURL,
+          ...options,
         },
       },
     },
-  },
-  'chain.json',
-);
+    'chain.json',
+  );
 
-const setNativeChain = (options) => saveJSONToFile(
-  {
-    default: 'dev',
-    chains: {
-      dev: {
-        id: networkId,
-        host: nativeChainUrl,
-        hub: hubAddress,
-        native: true,
-        useGas: false,
-        sms: smsURL,
-        resultProxy: resultProxyURL,
-        ...options,
+const setTokenEnterpriseChain = (defaultChain = 'dev') =>
+  saveJSONToFile(
+    {
+      default: defaultChain,
+      chains: {
+        dev: {
+          id: networkId,
+          host: tokenChainUrl,
+          hub: hubAddress,
+          sms: smsURL,
+          resultProxy: resultProxyURL,
+          enterprise: {
+            enterpriseSwapChainName: 'dev-enterprise',
+          },
+        },
+        'dev-enterprise': {
+          id: networkId,
+          host: tokenChainUrl,
+          hub: enterpriseHubAddress,
+          flavour: 'enterprise',
+          sms: smsURL,
+          resultProxy: resultProxyURL,
+          enterprise: {
+            enterpriseSwapChainName: 'dev',
+          },
+        },
       },
     },
-  },
-  'chain.json',
-);
+    'chain.json',
+  );
 
-const setTokenChainParity = (options) => saveJSONToFile(
-  {
-    default: 'dev',
-    chains: {
-      dev: {
-        id: networkId,
-        host: tokenChainParityUrl,
-        hub: hubAddress,
-        sms: smsURL,
-        resultProxy: resultProxyURL,
-        ...options,
+const setNativeChain = (options) =>
+  saveJSONToFile(
+    {
+      default: 'dev',
+      chains: {
+        dev: {
+          id: networkId,
+          host: nativeChainUrl,
+          hub: hubAddress,
+          native: true,
+          useGas: false,
+          sms: smsURL,
+          resultProxy: resultProxyURL,
+          ...options,
+        },
       },
     },
-  },
-  'chain.json',
-);
+    'chain.json',
+  );
+
+const setTokenChainParity = (options) =>
+  saveJSONToFile(
+    {
+      default: 'dev',
+      chains: {
+        dev: {
+          id: networkId,
+          host: tokenChainParityUrl,
+          hub: hubAddress,
+          sms: smsURL,
+          resultProxy: resultProxyURL,
+          ...options,
+        },
+      },
+    },
+    'chain.json',
+  );
 
 let sequenceId = Date.now();
 const getId = () => {
@@ -224,15 +235,19 @@ const editRequestorder = async ({
   iexecJson.order.requestorder.app = app;
   iexecJson.order.requestorder.dataset = dataset;
   iexecJson.order.requestorder.workerpool = workerpool;
-  iexecJson.order.requestorder.category = category || iexecJson.order.requestorder.category;
-  iexecJson.order.requestorder.volume = volume || iexecJson.order.requestorder.volume;
+  iexecJson.order.requestorder.category =
+    category || iexecJson.order.requestorder.category;
+  iexecJson.order.requestorder.volume =
+    volume || iexecJson.order.requestorder.volume;
   await saveJSONToFile(iexecJson, 'iexec.json');
 };
 
 const editWorkerpoolorder = async ({ category, volume }) => {
   const iexecJson = await loadJSONFile('iexec.json');
-  iexecJson.order.workerpoolorder.category = category || iexecJson.order.workerpoolorder.category;
-  iexecJson.order.workerpoolorder.volume = volume || iexecJson.order.workerpoolorder.volume;
+  iexecJson.order.workerpoolorder.category =
+    category || iexecJson.order.workerpoolorder.category;
+  iexecJson.order.workerpoolorder.volume =
+    volume || iexecJson.order.workerpoolorder.volume;
   await saveJSONToFile(iexecJson, 'iexec.json');
 };
 
@@ -1570,7 +1585,8 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec deal show (no deal)', async () => {
-    const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
+    const fakeDealId =
+      '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
     const raw = await execAsync(
       `${iexecPath} deal show ${fakeDealId} --raw`,
     ).catch((e) => e.message);
@@ -2766,7 +2782,8 @@ describe('[Sidechain]', () => {
   });
 
   test('[sidechain] iexec deal show (no deal)', async () => {
-    const fakeDealId = '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
+    const fakeDealId =
+      '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
     const raw = await execAsync(
       `${iexecPath} deal show ${fakeDealId} --raw`,
     ).catch((e) => e.message);
@@ -3095,7 +3112,8 @@ describe('[Common]', () => {
     afterAll(async () => {
       await execAsync('rm -rf out/keystore').catch(() => {});
       await execAsync('rm wallet.json').catch(() => {});
-      if (localWalletFileName) await execAsync(`rm ${localWalletFileName}`).catch(() => {});
+      if (localWalletFileName)
+        await execAsync(`rm ${localWalletFileName}`).catch(() => {});
     });
 
     test('iexec wallet import', async () => {
@@ -3108,9 +3126,10 @@ describe('[Common]', () => {
       expect(res.address).toBe(ADDRESS);
       expect(res.fileName).toBeDefined();
       const importedWalletFileName = res.fileName;
-      importedWalletName = importedWalletFileName.split('/')[
-        importedWalletFileName.split('/').length - 1
-      ];
+      importedWalletName =
+        importedWalletFileName.split('/')[
+          importedWalletFileName.split('/').length - 1
+        ];
     });
 
     test('iexec wallet create', async () => {

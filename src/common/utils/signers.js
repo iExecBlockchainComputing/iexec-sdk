@@ -1,6 +1,4 @@
-const {
-  Wallet, Signer, BigNumber, getDefaultProvider,
-} = require('ethers');
+const { Wallet, Signer, BigNumber, getDefaultProvider } = require('ethers');
 const { Web3Provider } = require('ethers').providers;
 
 class EnhancedWallet extends Wallet {
@@ -15,8 +13,8 @@ class EnhancedWallet extends Wallet {
       }
     }
     if (
-      options.getTransactionCount !== undefined
-      && typeof options.getTransactionCount !== 'function'
+      options.getTransactionCount !== undefined &&
+      typeof options.getTransactionCount !== 'function'
     ) {
       throw Error('Invalid getTransactionCount option, must be a function');
     }
@@ -36,7 +34,8 @@ class EnhancedWallet extends Wallet {
   }
 
   getTransactionCount(...args) {
-    if (this._options.getTransactionCount === undefined) return super.getTransactionCount(...args);
+    if (this._options.getTransactionCount === undefined)
+      return super.getTransactionCount(...args);
     return this._options.getTransactionCount(...args);
   }
 }
@@ -74,10 +73,11 @@ const getSignerFromPrivateKey = (
   host,
   privateKey,
   { gasPrice, getTransactionCount, providers } = {},
-) => new EnhancedWallet(privateKey, getDefaultProvider(host, providers), {
-  gasPrice,
-  getTransactionCount,
-});
+) =>
+  new EnhancedWallet(privateKey, getDefaultProvider(host, providers), {
+    gasPrice,
+    getTransactionCount,
+  });
 
 module.exports = {
   EnhancedWallet,

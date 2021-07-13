@@ -24,13 +24,15 @@ const finalizeCli = (cli) => {
   cli.parse();
 };
 
-const listOfChoices = (arrayOfChoices, init = '') => arrayOfChoices.reduce(
-  (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
-  init,
-);
+const listOfChoices = (arrayOfChoices, init = '') =>
+  arrayOfChoices.reduce(
+    (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
+    init,
+  );
 
 const info = {
-  missingConfFile: (fileName) => `Missing "${fileName}" file, did you forget to run "iexec init"?`,
+  missingConfFile: (fileName) =>
+    `Missing "${fileName}" file, did you forget to run "iexec init"?`,
   checkBalance: (currency) => `Checking ${currency} balances...`,
   userAborted: () => 'Operation aborted by user.',
   creating: (obj) => `Creating ${obj}...`,
@@ -48,11 +50,15 @@ const info = {
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
-  missingAddress: (obj) => `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  missingAddress: (obj) =>
+    `${obj} address not provided to CLI AND missing in "deployed.json"`,
   checking: (obj) => `Checking ${obj}...`,
-  missingOrder: (orderName, optionName) => `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
-  missingOrdersFile: (fileName) => `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
-  orderSigned: (orderName, fileName) => `${orderName} signed and saved in ${fileName}, you can share it: `,
+  missingOrder: (orderName, optionName) =>
+    `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
+  missingOrdersFile: (fileName) =>
+    `Missing ${fileName}. You probably forgot to run "iexec order sign"`,
+  orderSigned: (orderName, fileName) =>
+    `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
 const desc = {
@@ -62,8 +68,10 @@ const desc = {
   initObj: (objName) => `init a new ${objName}`,
   deployObj: (objName) => `deploy a new ${objName}`,
   createObj: (objName) => `deploy a new ${objName}`,
-  publishObj: (objName) => `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
-  unpublishObj: (objName) => `unpublish last published ${objName}order for from the marketplace`,
+  publishObj: (objName) =>
+    `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
+  unpublishObj: (objName) =>
+    `unpublish last published ${objName}order for from the marketplace`,
   createWallet: () => 'create a new wallet',
   importWallet: () => 'import a wallet from an ethereum private key',
   fill: (objName) => `fill an ${objName} to execute a work`,
@@ -77,26 +85,38 @@ const desc = {
   getRLC: () => 'apply for test RLC from iExec faucet',
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
-  sendNRLC: () => '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
+  sendNRLC: () =>
+    '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
-  validateRessource: () => 'validate an app/dataset/workerpool description before submitting it to the iExec registry',
+  validateRessource: () =>
+    'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: (objName) => `cancel a signed ${objName}`,
   publish: (objName) => `publish a signed ${objName}`,
   unpublish: (objName) => `unpublish a signed ${objName}`,
-  pushDatasetSecret: () => 'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
-  pushResultKey: () => 'push the public encryption key to the secret management service',
-  checkSecret: () => 'check if a secret exists in the secret management service',
-  encryptDataset: () => "for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum",
-  generateKeys: () => 'generate a beneficiary key pair to encrypt and decrypt the results',
+  pushDatasetSecret: () =>
+    'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
+  pushResultKey: () =>
+    'push the public encryption key to the secret management service',
+  checkSecret: () =>
+    'check if a secret exists in the secret management service',
+  encryptDataset: () =>
+    "for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum",
+  generateKeys: () =>
+    'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficary key',
-  bridgeToSidechain: () => 'send RLC from the mainchain to the sidechain (default unit nRLC)',
-  bridgeToMainchain: () => 'send RLC from the sidechain to the mainchain (default unit nRLC)',
-  wrapEnterpriseRLC: () => 'swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC',
-  unwrapEnterpriseRLC: () => 'swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC',
-  appRun: () => 'run an iExec application at market price (default run last deployed app)',
+  bridgeToSidechain: () =>
+    'send RLC from the mainchain to the sidechain (default unit nRLC)',
+  bridgeToMainchain: () =>
+    'send RLC from the sidechain to the mainchain (default unit nRLC)',
+  wrapEnterpriseRLC: () =>
+    'swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC',
+  unwrapEnterpriseRLC: () =>
+    'swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC',
+  appRun: () =>
+    'run an iExec application at market price (default run last deployed app)',
   requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
@@ -470,44 +490,60 @@ const promptConfirmedPassword = async (
 
 const prompt = {
   password: (message, options) => promptPassword(message, options),
-  confimedPassword: (message, confirmation) => promptConfirmedPassword(message, confirmation),
+  confimedPassword: (message, confirmation) =>
+    promptConfirmedPassword(message, confirmation),
   custom: question,
   create: (file) => question(`You don't have a ${file} yet, create one?`),
-  overwrite: (file, options) => question(`"${file}" already exists, replace it with new one?`, options),
-  dirNotEmpty: (dir, options) => question(
-    `Directory ${dir} is not empty, continue and replace content?`,
-    options,
-  ),
-  fileExists: (filePath, options) => question(`File ${filePath} already exists, continue and replace?`, options),
-  transfer: (currency, amount, chainName, to, chainId) => question(
-    `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
-  ),
-  wrap: (amount, chainId) => question(
-    `Do you want to swap ${amount} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`,
-  ),
-  unwrap: (amount, chainId) => question(
-    `Do you want to swap ${amount} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`,
-  ),
-  cancelOrder: (orderName, order) => question(`Do you want to cancel the following ${orderName}? ${order}`),
-  publishOrder: (orderName, order) => question(`Do you want to publish the following ${orderName}? ${order}`),
-  unpublishOrder: (objName, address, all) => question(
-    `Do you want to unpublish ${
-      all ? 'all your' : 'your last'
-    } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`,
-  ),
-  signGeneratedOrder: (orderName, order) => question(
-    `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
-  ),
-  limitedVolume: (available, ask) => question(
-    `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
-  ),
-  unpublishFromJsonFile: (orderName, order) => question(`Do you want to unpublish the following ${orderName}? ${order}`),
+  overwrite: (file, options) =>
+    question(`"${file}" already exists, replace it with new one?`, options),
+  dirNotEmpty: (dir, options) =>
+    question(
+      `Directory ${dir} is not empty, continue and replace content?`,
+      options,
+    ),
+  fileExists: (filePath, options) =>
+    question(`File ${filePath} already exists, continue and replace?`, options),
+  transfer: (currency, amount, chainName, to, chainId) =>
+    question(
+      `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
+    ),
+  wrap: (amount, chainId) =>
+    question(
+      `Do you want to swap ${amount} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`,
+    ),
+  unwrap: (amount, chainId) =>
+    question(
+      `Do you want to swap ${amount} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`,
+    ),
+  cancelOrder: (orderName, order) =>
+    question(`Do you want to cancel the following ${orderName}? ${order}`),
+  publishOrder: (orderName, order) =>
+    question(`Do you want to publish the following ${orderName}? ${order}`),
+  unpublishOrder: (objName, address, all) =>
+    question(
+      `Do you want to unpublish ${
+        all ? 'all your' : 'your last'
+      } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`,
+    ),
+  signGeneratedOrder: (orderName, order) =>
+    question(
+      `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
+    ),
+  limitedVolume: (available, ask) =>
+    question(
+      `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
+    ),
+  unpublishFromJsonFile: (orderName, order) =>
+    question(`Do you want to unpublish the following ${orderName}? ${order}`),
   more: () => question('Show more?', { rejectDefault: true, strict: false }),
 };
 
 prompt.transferETH = (...args) => prompt.transfer('ether', ...args);
 prompt.transferRLC = (...args) => prompt.transfer('RLC', ...args);
-prompt.sweep = (currencies) => (...args) => prompt.transfer(currencies, 'all wallet', ...args);
+prompt.sweep =
+  (currencies) =>
+  (...args) =>
+    prompt.transfer(currencies, 'all wallet', ...args);
 
 const oraOptions = {
   color: 'yellow',
@@ -579,8 +615,10 @@ const oraOptions = {
 const Spinner = (opts) => {
   if (opts && opts.raw) {
     const nothing = () => {};
-    const succeed = (message, { raw = {} } = {}) => console.log(JSON.stringify({ ok: true, ...raw }));
-    const fail = (message, { raw = {} } = {}) => console.error(JSON.stringify({ ok: false, ...raw }));
+    const succeed = (message, { raw = {} } = {}) =>
+      console.log(JSON.stringify({ ok: true, ...raw }));
+    const fail = (message, { raw = {} } = {}) =>
+      console.error(JSON.stringify({ ok: false, ...raw }));
     return {
       start: nothing,
       stop: nothing,
@@ -636,13 +674,15 @@ const computeWalletCreateOptions = async (opts) => {
       );
     }
 
-    const global = (opts.keystoredir && opts.keystoredir === 'global') || !opts.keystoredir;
+    const global =
+      (opts.keystoredir && opts.keystoredir === 'global') || !opts.keystoredir;
     const local = (opts.keystoredir && opts.keystoredir === 'local') || false;
-    const keystorePath = opts.keystoredir
-      && opts.keystoredir !== 'local'
-      && opts.keystoredir !== 'global'
-      ? opts.keystoredir
-      : false;
+    const keystorePath =
+      opts.keystoredir &&
+      opts.keystoredir !== 'local' &&
+      opts.keystoredir !== 'global'
+        ? opts.keystoredir
+        : false;
 
     return {
       walletOptions: {
@@ -660,16 +700,19 @@ const computeWalletCreateOptions = async (opts) => {
 
 const computeWalletLoadOptions = (opts) => {
   try {
-    const global = (opts && opts.keystoredir && opts.keystoredir === 'global')
-      || !opts
-      || !opts.keystoredir;
-    const local = (opts && opts.keystoredir && opts.keystoredir === 'local') || false;
-    const keystorePath = opts
-      && opts.keystoredir
-      && opts.keystoredir !== 'local'
-      && opts.keystoredir !== 'global'
-      ? opts.keystoredir
-      : false;
+    const global =
+      (opts && opts.keystoredir && opts.keystoredir === 'global') ||
+      !opts ||
+      !opts.keystoredir;
+    const local =
+      (opts && opts.keystoredir && opts.keystoredir === 'local') || false;
+    const keystorePath =
+      opts &&
+      opts.keystoredir &&
+      opts.keystoredir !== 'local' &&
+      opts.keystoredir !== 'global'
+        ? opts.keystoredir
+        : false;
     const password = (opts && opts.password) || false;
     const walletFileName = (opts && opts.walletFile) || false;
     const walletAddress = (opts && opts.walletAddress) || false;
@@ -697,9 +740,10 @@ const originalDatasetFolderName = 'original';
 const encryptedDatasetFolderName = 'encrypted';
 
 const createEncFolderPaths = (opts = {}) => {
-  const absolutePath = (relativeOrAbsolutePath) => (path.isAbsolute(relativeOrAbsolutePath)
-    ? relativeOrAbsolutePath
-    : path.join(process.cwd(), relativeOrAbsolutePath));
+  const absolutePath = (relativeOrAbsolutePath) =>
+    path.isAbsolute(relativeOrAbsolutePath)
+      ? relativeOrAbsolutePath
+      : path.join(process.cwd(), relativeOrAbsolutePath);
 
   const datasetSecretsFolderPath = opts.datasetKeystoredir
     ? absolutePath(opts.datasetKeystoredir)
@@ -757,7 +801,8 @@ const computeTxOptions = async (opts) => {
 
 const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
   const value = chain[property];
-  if (value === undefined && strict) throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
+  if (value === undefined && strict)
+    throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
   return value;
 };
 
@@ -799,9 +844,11 @@ const prettyRPC = (rpcObj) => {
 };
 
 const isEthAddress = (address, { strict = false } = {}) => {
-  const isHexString = typeof address === 'string' && address.substr(0, 2) === '0x';
-  const isEns = typeof address === 'string'
-    && address.substr(address.length - 4, 4) === '.eth';
+  const isHexString =
+    typeof address === 'string' && address.substr(0, 2) === '0x';
+  const isEns =
+    typeof address === 'string' &&
+    address.substr(address.length - 4, 4) === '.eth';
   const isAddress = isEns || (isHexString && address.length === 42);
   if (!isAddress && strict) {
     throw Error(`Address ${address} is not a valid Ethereum address`);
@@ -811,9 +858,9 @@ const isEthAddress = (address, { strict = false } = {}) => {
 
 const isBytes32 = (str, { strict = false } = {}) => {
   if (
-    typeof str !== 'string'
-    || str.length !== 66
-    || str.substr(0, 2) !== '0x'
+    typeof str !== 'string' ||
+    str.length !== 66 ||
+    str.substr(0, 2) !== '0x'
   ) {
     if (strict) throw new Error(`${str} is not a valid Bytes32 HexString`);
     return false;
@@ -827,9 +874,10 @@ const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initilResultsCount, totalCount) => `Results (${initilResultsCount + 1} to ${
-      initilResultsCount + callResults.length
-    }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
+    createResultsMessage = (callResults, initilResultsCount, totalCount) =>
+      `Results (${initilResultsCount + 1} to ${
+        initilResultsCount + callResults.length
+      }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
     spinner,
     raw = false,
   },
@@ -885,37 +933,41 @@ const renderTasksStatus = (tasksStatusMap, { detailed = false } = {}) => {
   );
   const completedTasksArray = tasksArray.filter((task) => task.status === 3);
   const timedoutTasksArray = tasksArray.filter((task) => task.taskTimedOut);
-  const completedMsg = completedTasksArray.length > 0
-    ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${
-      detailed
-        ? `:${pretty(
-          completedTasksArray.map(
-            ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+  const completedMsg =
+    completedTasksArray.length > 0
+      ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${
+          detailed
+            ? `:${pretty(
+                completedTasksArray.map(
+                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+                ),
+              )}`
+            : '\n'
+        }`
+      : '';
+  const failedMsg =
+    timedoutTasksArray.length > 0
+      ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${
+          detailed
+            ? `:${pretty(
+                timedoutTasksArray.map(
+                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+                ),
+              )}`
+            : '\n'
+        }`
+      : '';
+  const statusMsg =
+    runningTasksArray.length > 0
+      ? `${runningTasksArray.length}/${
+          tasksArray.length
+        } tasks running:${pretty(
+          runningTasksArray.map(
+            ({ idx, taskid, statusName }) =>
+              `Task idx ${idx} (${taskid}) status ${statusName}`,
           ),
         )}`
-        : '\n'
-    }`
-    : '';
-  const failedMsg = timedoutTasksArray.length > 0
-    ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${
-      detailed
-        ? `:${pretty(
-          timedoutTasksArray.map(
-            ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
-          ),
-        )}`
-        : '\n'
-    }`
-    : '';
-  const statusMsg = runningTasksArray.length > 0
-    ? `${runningTasksArray.length}/${
-      tasksArray.length
-    } tasks running:${pretty(
-      runningTasksArray.map(
-        ({ idx, taskid, statusName }) => `Task idx ${idx} (${taskid}) status ${statusName}`,
-      ),
-    )}`
-    : '';
+      : '';
   return `${completedMsg}${failedMsg}${statusMsg}`;
 };
 

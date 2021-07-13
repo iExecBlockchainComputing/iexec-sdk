@@ -80,13 +80,13 @@ const getChainDefaults = ({ id, flavour }) => ({
   sms: smsMap[flavour] && smsMap[flavour][id],
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway:
-    (ipfsGatewayMap[flavour]
-      && (ipfsGatewayMap[flavour][id] || ipfsGatewayMap[flavour].default))
-    || 'https://ipfs.iex.ec',
+    (ipfsGatewayMap[flavour] &&
+      (ipfsGatewayMap[flavour][id] || ipfsGatewayMap[flavour].default)) ||
+    'https://ipfs.iex.ec',
   iexecGateway:
-    (iexecGatewayMap[flavour]
-      && (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default))
-    || 'https://v6.api.market.iex.ec',
+    (iexecGatewayMap[flavour] &&
+      (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default)) ||
+    'https://v6.api.market.iex.ec',
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
 });

@@ -123,7 +123,8 @@ const show = async (
     const deal = bnifyNestedEthersBn(
       cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
     );
-    const dealExists = deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
+    const dealExists =
+      deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
     if (!dealExists) {
       throw new ObjectNotFoundError('deal', dealid, chainId);
     }
@@ -201,9 +202,14 @@ const claim = async (
         }
       }),
     );
-    if (initialized.length === 0 && notInitialized.length === 0) throw Error('Nothing to claim');
-    initialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
-    notInitialized.sort((a, b) => (parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1));
+    if (initialized.length === 0 && notInitialized.length === 0)
+      throw Error('Nothing to claim');
+    initialized.sort((a, b) =>
+      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
+    );
+    notInitialized.sort((a, b) =>
+      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
+    );
     const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());

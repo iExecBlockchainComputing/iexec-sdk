@@ -56,10 +56,10 @@ init
     const spinner = Spinner(opts);
     try {
       const initAll = !(
-        opts.app
-        || opts.dataset
-        || opts.workerpool
-        || opts.request
+        opts.app ||
+        opts.dataset ||
+        opts.workerpool ||
+        opts.request
       );
 
       const walletOptions = await computeWalletLoadOptions(opts);
@@ -138,10 +138,10 @@ sign
     const spinner = Spinner(opts);
     try {
       const signAll = !(
-        opts.app
-        || opts.dataset
-        || opts.workerpool
-        || opts.request
+        opts.app ||
+        opts.dataset ||
+        opts.workerpool ||
+        opts.request
       );
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
@@ -221,7 +221,8 @@ sign
       const signWorkerpoolOrder = async () => {
         spinner.start('Signing workerpoolorder');
         try {
-          const loadedOrder = iexecConf.order && iexecConf.order.workerpoolorder;
+          const loadedOrder =
+            iexecConf.order && iexecConf.order.workerpoolorder;
           if (!loadedOrder) {
             throw new Error(
               info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
@@ -497,13 +498,15 @@ publish
 
       const publishOrder = async (orderName) => {
         try {
-          const orderToPublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
+          const orderToPublish =
+            signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToPublish) {
             throw new Error(
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!opts.force) await prompt.publishOrder(orderName, pretty(orderToPublish));
+          if (!opts.force)
+            await prompt.publishOrder(orderName, pretty(orderToPublish));
           spinner.start(`Publishing ${orderName}`);
 
           let orderHash;
@@ -620,7 +623,8 @@ unpublish
             spinner.info(
               `No orderHash specified for unpublish ${orderName}, using orders.json`,
             );
-            const orderToUnpublish = signedOrders[chain.id] && signedOrders[chain.id][orderName];
+            const orderToUnpublish =
+              signedOrders[chain.id] && signedOrders[chain.id][orderName];
             if (!orderToUnpublish) {
               throw new Error(
                 `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
@@ -683,7 +687,8 @@ unpublish
 
       if (opts.app) await unpublishOrder(order.APP_ORDER, opts.app);
       if (opts.dataset) await unpublishOrder(order.DATASET_ORDER, opts.dataset);
-      if (opts.workerpool) await unpublishOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.workerpool)
+        await unpublishOrder(order.WORKERPOOL_ORDER, opts.workerpool);
       if (opts.request) await unpublishOrder(order.REQUEST_ORDER, opts.request);
 
       if (failed.length === 0) {
@@ -741,7 +746,8 @@ cancel
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
-          if (!opts.force) await prompt.cancelOrder(orderName, pretty(orderToCancel));
+          if (!opts.force)
+            await prompt.cancelOrder(orderName, pretty(orderToCancel));
           spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
@@ -861,14 +867,15 @@ show
           }
           const orderString = orderToShow
             ? `${orderName} with orderHash ${orderHash} details:${pretty(
-              orderToShow,
-            )}`
+                orderToShow,
+              )}`
             : `${orderName} with orderHash ${orderHash} is not published`;
-          const dealsString = deals && deals.count
-            ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
-              deals.deals,
-            )}`
-            : '\nDeals count: 0';
+          const dealsString =
+            deals && deals.count
+              ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
+                  deals.deals,
+                )}`
+              : '\nDeals count: 0';
           const raw = {
             ...orderToShow,
             ...(deals && {
@@ -884,7 +891,8 @@ show
 
       if (opts.app) await showOrder(order.APP_ORDER, opts.app);
       if (opts.dataset) await showOrder(order.DATASET_ORDER, opts.dataset);
-      if (opts.workerpool) await showOrder(order.WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.workerpool)
+        await showOrder(order.WORKERPOOL_ORDER, opts.workerpool);
       if (opts.request) await showOrder(order.REQUEST_ORDER, opts.request);
       if (failed.length === 0) {
         spinner.succeed('Successfully found', {

@@ -73,8 +73,8 @@ const checkRequestRequirements = async (
   }
   // check storage token
   if (
-    params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'ipfs'
-    || params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'dropbox'
+    params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'ipfs' ||
+    params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'dropbox'
   ) {
     const isStorageTokenSet = await checkWeb2SecretExists(
       contracts,

@@ -43,9 +43,7 @@ const ENTERPRISE_SWAP_MAP = {
 const createChainFromConf = (
   chainName,
   chainConf,
-  {
-    bridgeConf, enterpriseSwapConf, providersOptions, txOptions = {},
-  } = {},
+  { bridgeConf, enterpriseSwapConf, providersOptions, txOptions = {} } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -129,7 +127,8 @@ const loadChain = async (
       name = 'goerli';
       loadedConf = chainsConf.chain.goerli;
     }
-    if (!name) throw Error('Missing chain parameter. Check your "chain.json" file');
+    if (!name)
+      throw Error('Missing chain parameter. Check your "chain.json" file');
 
     const idAndFlavour = {
       ...CHAIN_NAME_MAP[name],
@@ -161,7 +160,8 @@ const loadChain = async (
         if (alias && chainsConf.chains[alias]) {
           bridgeLoadedConf = chainsConf.chains[alias];
         }
-        if (!bridgeLoadedConf) throw Error(`Missing "${name}" chain in "chain.json"`);
+        if (!bridgeLoadedConf)
+          throw Error(`Missing "${name}" chain in "chain.json"`);
       }
       const bridgedIdAndFlavour = {
         ...CHAIN_NAME_MAP[bridgedChainNameOrId],
@@ -185,9 +185,11 @@ const loadChain = async (
     debug('bridged chain', bridgeConf);
 
     let enterpriseSwapConf;
-    const enterpriseSwapChainName = (conf.enterprise && conf.enterprise.enterpriseSwapChainName)
-      || ENTERPRISE_SWAP_MAP[name];
-    const enterpriseSwapFlavour = conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
+    const enterpriseSwapChainName =
+      (conf.enterprise && conf.enterprise.enterpriseSwapChainName) ||
+      ENTERPRISE_SWAP_MAP[name];
+    const enterpriseSwapFlavour =
+      conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
     if (isEnterpriseEnabled(conf.id) || enterpriseSwapChainName) {
       let enterpriseSwapLoadedConf;
       if (chainsConf.chains[enterpriseSwapChainName]) {
@@ -195,8 +197,8 @@ const loadChain = async (
       }
       const enterpriseSwapIdAndFlavour = {
         ...CHAIN_NAME_MAP[enterpriseSwapChainName],
-        ...(enterpriseSwapLoadedConf
-          && enterpriseSwapLoadedConf.id && { id: enterpriseSwapLoadedConf.id }),
+        ...(enterpriseSwapLoadedConf &&
+          enterpriseSwapLoadedConf.id && { id: enterpriseSwapLoadedConf.id }),
         flavour: enterpriseSwapFlavour,
       };
       const enterpriseSwapDefaultConf = getChainDefaults(

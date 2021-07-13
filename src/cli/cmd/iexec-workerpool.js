@@ -133,14 +133,16 @@ show
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
-      const addressOrIndex = cliAddressOrIndex
-        || (await loadDeployedObj(objName).then(
+      const addressOrIndex =
+        cliAddressOrIndex ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!isAddress && !userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
+      if (!isAddress && !userAddress)
+        throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex) throw Error(info.missingAddress(objName));
 
@@ -184,7 +186,8 @@ count
       ]);
 
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!userAddress) throw Error(`Missing option ${option.user()[0]} or wallet`);
+      if (!userAddress)
+        throw Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
       const objCountBN = await countUserWorkerpools(
@@ -223,8 +226,9 @@ publish
     try {
       const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress
-        || (await loadDeployedObj(objName).then(
+      const address =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
@@ -299,8 +303,9 @@ unpublish
     try {
       const chain = await loadChain(opts.chain, { spinner });
       const useDeployedObj = !objAddress;
-      const address = objAddress
-        || (await loadDeployedObj(objName).then(
+      const address =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
@@ -321,15 +326,15 @@ unpublish
       await connectKeystore(chain, keystore);
       const unpublished = all
         ? await unpublishAllWorkerpoolorders(
-          chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
-          address,
-        )
+            chain.contracts,
+            getPropertyFormChain(chain, 'iexecGateway'),
+            address,
+          )
         : await unpublishLastWorkerpoolorder(
-          chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
-          address,
-        );
+            chain.contracts,
+            getPropertyFormChain(chain, 'iexecGateway'),
+            address,
+          );
       spinner.succeed(
         `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
           all ? 's' : ''

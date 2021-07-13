@@ -32,87 +32,94 @@ const {
 
 const debug = Debug('iexec:iexec-registry');
 
-const addressListSchema = () => object().test(async (value) => {
-  await Promise.all(
-    Object.entries({ ...value }).map(async ([chainId, address]) => {
-      await chainIdSchema().validate(chainId);
-      await addressSchema().validate(address);
-    }),
-  );
-  return true;
-});
+const addressListSchema = () =>
+  object().test(async (value) => {
+    await Promise.all(
+      Object.entries({ ...value }).map(async ([chainId, address]) => {
+        await chainIdSchema().validate(chainId);
+        await addressSchema().validate(address);
+      }),
+    );
+    return true;
+  });
 
-const baseSchema = () => object({
-  type: string(),
-  description: string().min(150).max(2000).required(),
-  logo: string().required(),
-  social: object({
-    website: string(),
-    github: string(),
-  }).required(),
-  repo: string(),
-});
+const baseSchema = () =>
+  object({
+    type: string(),
+    description: string().min(150).max(2000).required(),
+    logo: string().required(),
+    social: object({
+      website: string(),
+      github: string(),
+    }).required(),
+    repo: string(),
+  });
 
-const buyConfSchema = () => object({
-  params: object({
-    [paramsKeyName.IEXEC_ARGS]: string(),
-  })
-    .required()
+const buyConfSchema = () =>
+  object({
+    params: object({
+      [paramsKeyName.IEXEC_ARGS]: string(),
+    })
+      .required()
+      .noUnknown()
+      .strict(),
+    trust: uint256Schema(),
+    tag: bytes32Schema(),
+    callback: addressSchema(),
+  });
+
+const dappSchema = () =>
+  baseSchema()
+    .shape({
+      license: string().required(),
+      author: string().required(),
+      app: object({
+        owner: addressSchema().required(),
+        name: string().required(),
+        type: appTypeSchema().required(),
+        multiaddr: string().required(),
+        checksum: bytes32Schema().required(),
+        mrenclave: string(),
+      }).required(),
+      buyConf: buyConfSchema().required(),
+    })
     .noUnknown()
-    .strict(),
-  trust: uint256Schema(),
-  tag: bytes32Schema(),
-  callback: addressSchema(),
-});
+    .strict();
 
-const dappSchema = () => baseSchema()
-  .shape({
-    license: string().required(),
-    author: string().required(),
-    app: object({
-      owner: addressSchema().required(),
-      name: string().required(),
-      type: appTypeSchema().required(),
-      multiaddr: string().required(),
-      checksum: bytes32Schema().required(),
-      mrenclave: string(),
-    }).required(),
-    buyConf: buyConfSchema().required(),
-  })
-  .noUnknown()
-  .strict();
+const datasetCompatibleDappSchema = () =>
+  object({
+    name: string().required(),
+    addresses: addressListSchema().required(),
+    buyConf: buyConfSchema(),
+  });
 
-const datasetCompatibleDappSchema = () => object({
-  name: string().required(),
-  addresses: addressListSchema().required(),
-  buyConf: buyConfSchema(),
-});
+const datasetSchema = () =>
+  baseSchema()
+    .shape({
+      license: string().required(),
+      author: string().required(),
+      categories: string(),
+      dataset: object({
+        owner: addressSchema().required(),
+        name: string().required(),
+        multiaddr: string().required(),
+        checksum: bytes32Schema().required(),
+      }).required(),
+      dapps: array().of(datasetCompatibleDappSchema()),
+    })
+    .noUnknown()
+    .strict();
 
-const datasetSchema = () => baseSchema()
-  .shape({
-    license: string().required(),
-    author: string().required(),
-    categories: string(),
-    dataset: object({
-      owner: addressSchema().required(),
-      name: string().required(),
-      multiaddr: string().required(),
-      checksum: bytes32Schema().required(),
-    }).required(),
-    dapps: array().of(datasetCompatibleDappSchema()),
-  })
-  .noUnknown()
-  .strict();
-
-const workerpoolSchema = () => baseSchema()
-  .shape({
-    workerpool: object({
-      owner: addressSchema().required(),
-      description: string().required(),
-    }).required(),
-  })
-  .noUnknown()
-  .strict();
+const workerpoolSchema = () =>
+  baseSchema()
+    .shape({
+      workerpool: object({
+        owner: addressSchema().required(),
+        description: string().required(),
+      }).required(),
+    })
+    .noUnknown()
+    .strict();
 
 cli.name('iexec registry').usage('<command> [options]');
 
@@ -179,9 +186,10 @@ validate.description(desc.validateRessource()).action(async (objName, opts) => {
       }
       validated.push(iexecConf.logo);
     } catch (logoError) {
-      const errorMessage = logoError.code === 'ENOENT'
-        ? `Missing "${iexecConf.logo}" logo image file`
-        : logoError.message;
+      const errorMessage =
+        logoError.code === 'ENOENT'
+          ? `Missing "${iexecConf.logo}" logo image file`
+          : logoError.message;
       failed.push(`${iexecConf.logo}: ${errorMessage}`);
     }
 

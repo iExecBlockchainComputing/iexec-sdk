@@ -123,10 +123,11 @@ async function main() {
       try {
         const chain = await loadChain(opts.chain, { spinner });
 
-        const host = chain.host
-          === getChainDefaults({ id: chain.id, flavour: chain.flavour }).host
-          ? 'default'
-          : chain.host;
+        const host =
+          chain.host ===
+          getChainDefaults({ id: chain.id, flavour: chain.flavour }).host
+            ? 'default'
+            : chain.host;
         spinner.info(`Ethereum host: ${host}`);
 
         spinner.start(info.checking('iExec contracts info'));
@@ -138,10 +139,10 @@ async function main() {
         const rlcAddress = useNative
           ? undefined
           : await wrapCall(
-            chain.contracts.fetchRLCAddress({
-              hub: hubAddress,
-            }),
-          );
+              chain.contracts.fetchRLCAddress({
+                hub: hubAddress,
+              }),
+            );
         const [
           appRegistryAddress,
           datasetRegistryAddress,
