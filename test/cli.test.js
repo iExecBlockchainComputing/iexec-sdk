@@ -8,7 +8,9 @@ const { bytes32Regex } = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
 
-jest.setTimeout(15000);
+const DEFAULT_TIMEOUT = 60000;
+
+jest.setTimeout(DEFAULT_TIMEOUT);
 
 // CONFIG
 const { DRONE, WITH_STACK } = process.env;
@@ -304,7 +306,7 @@ beforeAll(async () => {
   await execAsync('rm test/wallet.json').catch(() => {});
   await execAsync('mkdir test/out').catch(() => {});
   process.chdir('test');
-}, 15000);
+});
 
 afterAll(() => {
   process.chdir('..');
@@ -446,7 +448,7 @@ describe('[Mainchain]', () => {
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
-  }, 30000);
+  });
 
   test('[mainchain] iexec account deposit 10 RLC', async () => {
     const initialWalletBalance = new BN(
@@ -487,7 +489,7 @@ describe('[Mainchain]', () => {
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
-  }, 30000);
+  });
 
   test('[mainchain] iexec account withdraw 500', async () => {
     const initialWalletBalance = new BN(
@@ -528,7 +530,7 @@ describe('[Mainchain]', () => {
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
-  }, 30000);
+  });
 
   test('[mainchain] iexec account withdraw 5 RLC', async () => {
     const initialWalletBalance = new BN(
@@ -569,7 +571,7 @@ describe('[Mainchain]', () => {
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
-  }, 30000);
+  });
 
   test('[mainchain] iexec account show', async () => {
     const raw = await execAsync(`${iexecPath} account show --raw`);
@@ -643,7 +645,7 @@ describe('[Mainchain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainApp = res.address;
-  }, 15000);
+  });
 
   test('[mainchain] iexec app show (from deployed.json)', async () => {
     const raw = await execAsync(`${iexecPath} app show --raw`);
@@ -739,7 +741,7 @@ describe('[Mainchain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDataset = res.address;
-  }, 15000);
+  });
 
   test('[mainchain] iexec dataset show (from deployed.json)', async () => {
     const raw = await execAsync(`${iexecPath} dataset show --raw`);
@@ -836,7 +838,7 @@ describe('[Mainchain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainWorkerpool = res.address;
-  }, 15000);
+  });
 
   test('[mainchain] iexec workerpool show (from deployed.json)', async () => {
     const raw = await execAsync(`${iexecPath} workerpool show --raw`);
@@ -1039,7 +1041,7 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder.dataset).toBeDefined();
     expect(res.workerpoolorder.workerpool).toBeDefined();
     expect(res.requestorder.app).toBeDefined();
-  }, 30000);
+  });
 
   test('[mainchain] iexec order fill', async () => {
     const raw = await execAsync(
@@ -1278,7 +1280,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
-  }, 15000);
+  });
 
   test('[common] iexec app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000', async () => {
     const deployed = {
@@ -1326,7 +1328,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
-  }, 15000);
+  });
 
   test('[common] iexec app run --workerpool deployed --dataset deployed --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
     const deployed = {
@@ -1377,7 +1379,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
-  }, 15000);
+  });
 
   test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee', async () => {
     const deployed = {
@@ -1430,7 +1432,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
-  }, 15000);
+  });
 
   test('[common] iexec app run --workerpool deployed --watch (timeout)', async () => {
     const deployed = {
@@ -1468,7 +1470,7 @@ describe('[Mainchain]', () => {
     expect(res.failedTasks[0].status).toBe(0);
     expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
     expect(res.failedTasks[0].taskTimedOut).toBe(true);
-  }, 15000);
+  });
 
   // DEAL
   test('[mainchain] iexec deal show', async () => {
@@ -1803,7 +1805,7 @@ describe('[Mainchain]', () => {
     expect(res.sendERC20TxHash).toBeDefined();
     expect(res.sendNativeTxHash).toBeDefined();
     expect(res.errors).toBeUndefined();
-  }, 15000);
+  });
 
   if (WITH_STACK) {
     describe('[with stack]', () => {
@@ -1836,7 +1838,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.apporder.order.sign,
           salt: orderShowRes.apporder.order.salt,
         });
-      }, 15000);
+      });
 
       test('[mainchain] iexec app publish [address] with options', async () => {
         await setRichWallet();
@@ -1868,7 +1870,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.apporder.order.sign,
           salt: orderShowRes.apporder.order.salt,
         });
-      }, 15000);
+      });
 
       test('[common] iexec app unpublish (from deployed)', async () => {
         await setRichWallet();
@@ -1890,7 +1892,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
 
       test('[common] iexec app unpublish [address] --all', async () => {
         await setRichWallet();
@@ -1919,7 +1921,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
 
       test('[common] iexec dataset publish (from deployed)', async () => {
         await setRichWallet();
@@ -1951,7 +1953,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.datasetorder.order.sign,
           salt: orderShowRes.datasetorder.order.salt,
         });
-      }, 15000);
+      });
 
       test('[mainchain] iexec dataset publish [address] with options', async () => {
         await setRichWallet();
@@ -1983,7 +1985,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.datasetorder.order.sign,
           salt: orderShowRes.datasetorder.order.salt,
         });
-      }, 15000);
+      });
 
       test('[common] iexec dataset unpublish (from deployed)', async () => {
         await setRichWallet();
@@ -2007,7 +2009,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
 
       test('[common] iexec dataset unpublish [address] --all', async () => {
         await setRichWallet();
@@ -2036,7 +2038,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
 
       test('[common] iexec workerpool publish (from deployed)', async () => {
         await setRichWallet();
@@ -2070,7 +2072,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.workerpoolorder.order.sign,
           salt: orderShowRes.workerpoolorder.order.salt,
         });
-      }, 15000);
+      });
 
       test('[mainchain] iexec workerpool publish [address] with options', async () => {
         await setRichWallet();
@@ -2105,7 +2107,7 @@ describe('[Mainchain]', () => {
           sign: orderShowRes.workerpoolorder.order.sign,
           salt: orderShowRes.workerpoolorder.order.salt,
         });
-      }, 20000);
+      });
 
       test('[common] iexec workerpool unpublish (from deployed)', async () => {
         await setRichWallet();
@@ -2129,7 +2131,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
 
       test('[common] iexec workerpool unpublish [address] --all', async () => {
         await setRichWallet();
@@ -2158,7 +2160,7 @@ describe('[Mainchain]', () => {
         ).catch((e) => e.message);
         const resErr = JSON.parse(rawErr);
         expect(resErr.ok).toBe(false);
-      }, 20000);
+      });
     });
   }
 });
@@ -2284,7 +2286,7 @@ describe('[Sidechain]', () => {
     const tx = await nativeChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
-  }, 30000);
+  });
 
   test('[sidechain] iexec account deposit 5 RLC', async () => {
     const initialWalletBalance = new BN(
@@ -2325,7 +2327,7 @@ describe('[Sidechain]', () => {
     const tx = await nativeChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
-  }, 30000);
+  });
 
   test('[sidechain] iexec account withdraw 500', async () => {
     const initialWalletBalance = new BN(
@@ -2366,7 +2368,7 @@ describe('[Sidechain]', () => {
     const tx = await nativeChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
-  }, 30000);
+  });
 
   test('[sidechain] iexec account withdraw 2 RLC', async () => {
     const initialWalletBalance = new BN(
@@ -2407,7 +2409,7 @@ describe('[Sidechain]', () => {
     const tx = await nativeChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
-  }, 30000);
+  });
 
   test('[common] iexec app init', async () => {
     const raw = await execAsync(`${iexecPath} app init --raw`);
@@ -2428,7 +2430,7 @@ describe('[Sidechain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainApp = res.address;
-  }, 15000);
+  });
 
   test('[sidechain] iexec app show [appAddress]', async () => {
     await execAsync('mv deployed.json deployed.back');
@@ -2477,7 +2479,7 @@ describe('[Sidechain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDataset = res.address;
-  }, 15000);
+  });
 
   test('[sidechain] iexec dataset show [datasetAddress]', async () => {
     await execAsync('mv deployed.json deployed.back');
@@ -2528,7 +2530,7 @@ describe('[Sidechain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainWorkerpool = res.address;
-  }, 15000);
+  });
 
   test('[sidechain] iexec workerpool show [workerpoolAddress]', async () => {
     await execAsync('mv deployed.json deployed.back');
@@ -2649,7 +2651,7 @@ describe('[Sidechain]', () => {
     expect(res.datasetorder.dataset).toBeDefined();
     expect(res.workerpoolorder.workerpool).toBeDefined();
     expect(res.requestorder.app).toBeDefined();
-  }, 30000);
+  });
 
   test('[sidechain] iexec order fill', async () => {
     const raw = await execAsync(
@@ -2691,7 +2693,7 @@ describe('[Sidechain]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(nativeChainGasPrice);
     sidechainDealidNoDuration = res.dealid;
-  }, 20000);
+  });
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     await execAsync(
@@ -2945,7 +2947,7 @@ describe('[Sidechain]', () => {
     expect(res.sendERC20TxHash).toBeUndefined();
     expect(res.sendNativeTxHash).toBeDefined();
     expect(res.errors).toBeUndefined();
-  }, 15000);
+  });
 
   test('[sidechain] iexec wallet sweep (empty wallet)', async () => {
     const raw = await execAsync(
@@ -2958,7 +2960,7 @@ describe('[Sidechain]', () => {
     expect(res.sendERC20TxHash).toBeUndefined();
     expect(res.sendNativeTxHash).toBeUndefined();
     expect(res.errors.length).toBe(1);
-  }, 15000);
+  });
 });
 
 describe('[Enterprise]', () => {
@@ -3007,7 +3009,7 @@ describe('[Enterprise]', () => {
         .add(new BN('10000000000'))
         .eq(new BN(enterpriseFinalBalance.nRLC)),
     );
-  }, 15000);
+  });
 
   test('[token enterprise] iexec wallet swap-eRLC-for-RLC 10 RLC', async () => {
     const standardInitialBalance = JSON.parse(
@@ -3042,7 +3044,7 @@ describe('[Enterprise]', () => {
         .add(new BN('10000000000'))
         .eq(new BN(enterpriseFinalBalance.nRLC)),
     );
-  }, 15000);
+  });
 });
 
 describe('[Common]', () => {
@@ -3513,7 +3515,7 @@ describe('[Common]', () => {
       expect(resAlreadyExists.error.message).toBe(
         `Secret already exists for ${address} and can't be updated`,
       );
-    }, 15000);
+    });
 
     test('iexec dataset check-secret', async () => {
       await setRichWallet();
@@ -3541,7 +3543,7 @@ describe('[Common]', () => {
       const resRandomDataset = JSON.parse(rawRandomDataset);
       expect(resRandomDataset.ok).toBe(true);
       expect(resRandomDataset.isSecretSet).toBe(false);
-    }, 20000);
+    });
   });
 
   describe('[result]', () => {
@@ -4035,95 +4037,99 @@ describe('[Common]', () => {
       expect(res.useNative).toBe(true);
     });
 
-    test.skip('providers config', async () => {
-      const chainJsonDefault = await loadJSONFile('chain.json');
-      const alchemyFailQuorumFail = {
-        alchemy: 'FAIL',
-        quorum: 3,
-      };
-      const alchemyFailQuorumPass = {
-        alchemy: 'FAIL',
-        quorum: 2,
-      };
-      const infuraFailQuorumFail = {
-        infura: 'FAIL',
-        quorum: 3,
-      };
-      const infuraFailQuorumPass = {
-        infura: 'FAIL',
-        quorum: 2,
-      };
-      const etherscanFailQuorumFail = {
-        etherscan: 'FAIL',
-        quorum: 3,
-      };
-      const etherscanFailQuorumPass = {
-        etherscan: 'FAIL',
-        quorum: 2,
-      };
+    test.skip(
+      'providers config',
+      async () => {
+        const chainJsonDefault = await loadJSONFile('chain.json');
+        const alchemyFailQuorumFail = {
+          alchemy: 'FAIL',
+          quorum: 3,
+        };
+        const alchemyFailQuorumPass = {
+          alchemy: 'FAIL',
+          quorum: 2,
+        };
+        const infuraFailQuorumFail = {
+          infura: 'FAIL',
+          quorum: 3,
+        };
+        const infuraFailQuorumPass = {
+          infura: 'FAIL',
+          quorum: 2,
+        };
+        const etherscanFailQuorumFail = {
+          etherscan: 'FAIL',
+          quorum: 3,
+        };
+        const etherscanFailQuorumPass = {
+          etherscan: 'FAIL',
+          quorum: 2,
+        };
 
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: alchemyFailQuorumFail,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).rejects.toThrow();
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: alchemyFailQuorumPass,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).resolves.toBeDefined();
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: alchemyFailQuorumFail,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).rejects.toThrow();
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: alchemyFailQuorumPass,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).resolves.toBeDefined();
 
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: etherscanFailQuorumFail,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).rejects.toThrow();
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: etherscanFailQuorumPass,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).resolves.toBeDefined();
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: etherscanFailQuorumFail,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).rejects.toThrow();
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: etherscanFailQuorumPass,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).resolves.toBeDefined();
 
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: infuraFailQuorumFail,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).rejects.toThrow();
-      await saveJSONToFile(
-        {
-          ...chainJsonDefault,
-          providers: infuraFailQuorumPass,
-        },
-        'chain.json',
-      );
-      await expect(
-        execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
-      ).resolves.toBeDefined();
-    }, 120000);
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: infuraFailQuorumFail,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).rejects.toThrow();
+        await saveJSONToFile(
+          {
+            ...chainJsonDefault,
+            providers: infuraFailQuorumPass,
+          },
+          'chain.json',
+        );
+        await expect(
+          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+        ).resolves.toBeDefined();
+      },
+      DEFAULT_TIMEOUT * 2,
+    );
   });
 });
