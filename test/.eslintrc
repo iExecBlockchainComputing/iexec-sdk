@@ -2,7 +2,9 @@
   "env": {
     "jest": true
   },
+  "extends": ["airbnb-base", "prettier"],
   "rules": {
-    "no-await-in-loop": "off"
+    "no-await-in-loop": "off",
+    "no-console": 0
   }
 }
