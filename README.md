@@ -1,6 +1,6 @@
 ![iExec SDK logo](./iexec_sdk_logo.jpg)
 
-# iExec SDK V5
+# iExec SDK V6
 
 [![Build Status](https://drone.iex.ec/api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE) [![Twitter Follow](https://img.shields.io/twitter/follow/iex_ec.svg?style=social&label=Follow)](https://twitter.com/iex_ec)
@@ -13,15 +13,13 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - [CLI documentation](#iexec-sdk-cli-api)
 - [JS lib documentation](#iexec-sdk-library-api)
 - [CHANGELOG](./CHANGELOG.md)
+- iExec main documentation: https://docs.iex.ec/for-developers/
 - The iExec Dapp Store: https://dapps.iex.ec
-- The iExec Data Store: https://data.iex.ec
 - The iExec Marketplace: https://market.iex.ec
 - The iExec Explorer: https://explorer.iex.ec
 - The iExec Workerpool registry: https://pools.iex.ec
 - The RLC faucet: https://faucet.iex.ec
-- iExec main documentation: https://docs.iex.ec
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
-- [iExec data registry](https://github.com/iExecBlockchainComputing/iexec-datasets-registry), to apply for Data Store listing
 
 ## Install
 
@@ -72,8 +70,7 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet getETH # ask faucet for ETH, this may require manual action
-iexec wallet getRLC # ask iExec faucet for RLC
+iexec wallet get-RLC # ask iExec faucet for RLC
 iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
@@ -160,11 +157,11 @@ iexec order cancel --app <orderHash> # cancel your order
 
 First go through [Init project](#Init-project)
 
-#### Encrypt your dataset (optional)
+#### Encrypt your dataset
 
 ```bash
 cp 'myAwsomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
-iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it
+iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it, also output the encrypted file checksum to use for deployment.
 cat ./.secrets/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
 cat ./datasets/encrypted/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
@@ -178,7 +175,7 @@ iexec dataset deploy # deploy dataset on Ethereum
 iexec dataset show # show details of deployed dataset
 ```
 
-### Securely share the dataset secret key (Encrypted datasets only)
+### Securely share the dataset secret key
 
 **Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
 
@@ -321,7 +318,7 @@ iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
-iexec info --chain goerli
+iexec info --chain viviani
 ```
 
 ## Global options
@@ -344,6 +341,7 @@ iexec info --chain goerli
 
 ```bash
 --gas-price <amount> [unit] # use the specified value (in wei or specified unit) for next transactions gas price (default use eth_gasPrice current value)
+--confirms <blockCount> # set custom block count to wait for transactions confirmation (default 1 block)
 ```
 
 ## init
@@ -364,12 +362,12 @@ iexec init --skip-wallet # skip the wallet creation step
 iexec wallet create # create a new encrypted wallet
 iexec wallet create --unencrypted # create unencrypted wallet.json (not recommended)
 iexec wallet import <privateKey> # create an encrypted wallet from a privateKey
-iexec wallet getETH # ask ETH from faucets
-iexec wallet getRLC # ask RLC from faucets
+iexec wallet get-ETH # ask ETH from faucets
+iexec wallet get-RLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
-iexec wallet sendETH <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
-iexec wallet sendRLC <amount> [unit] --to <address>  # send RLC amount (in nRLC or specified unit) to the specified eth address
+iexec wallet send-ether <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
+iexec wallet send-RLC <amount> [unit] --to <address>  # send RLC amount (in RLC or specified unit) to the specified eth address
 iexec wallet sweep --to <address> # drain all ether and RLC, sending them to the specified eth address
 iexec wallet bridge-to-sidechain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a mainchain to the bridged sidechain.
 iexec wallet bridge-to-mainchain <amount> [unit] # send RLC amount (in nRLC or specified unit) from a sidechain to the bridged mainchain.
@@ -402,6 +400,7 @@ iexec account withdraw <amount> [unit] # withdraw the specified amount of RLC  (
 # --chain <chainName>
 # --user <address>
 iexec app init # init the app template
+iexec app init --tee # init the TEE app template
 iexec app deploy # deploy the app on the blockchain
 iexec app publish [address] # publish an apporder to make your app publicly available on the marketplace (use options to manage access)
 iexec app unpublish [address] # unpublish the last published apporder for specified app
@@ -462,17 +461,17 @@ iexec app request-execution <appAddress> [options] # request an iExec applicatio
 # --chain <chainName>
 # --user <address>
 iexec dataset init # init the dataset template
-iexec dataset init --encrypted # init the dataset template and create the folders for dataset encryption
+iexec dataset init --tee # init the dataset template and create the folders for dataset encryption
+iexec dataset encrypt # for each dataset file in ./datasets/original/ generate a 256 bits key and encrypt the dataset using AES-256-CBC and compute the encrypted file's sha256 checksum
 iexec dataset deploy # deploy the dataset on the blockchain
+iexec dataset push-secret [datasetAddress] # push the key for the encrypted dataset
+iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 iexec dataset publish [datasetAddress] # publish an datasetorder to make your dataset publicly available on the marketplace (use options to manage access)
 iexec dataset unpublish [datasetAddress] # unpublish the last published datasetorder for specified dataset
 iexec dataset unpublish [datasetAddress] --all # unpublish all the published datasetorders for specified dataset
 iexec dataset show [address|index] # show dataset details
 iexec dataset count # count your total number of dataset
 iexec dataset count --user <userAddress> # count user total number of dataset
-iexec dataset encrypt --algorithm scone # generate a key and encrypt the dataset files from ./datasets/original/ with Scone TEE
-iexec dataset push-secret [datasetAddress] # push the secret for the encrypted dataset
-iexec dataset check-secret [datasetAddress] # check if a secret exists for the dataset
 ```
 
 ## workerpool
@@ -613,8 +612,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
     "name": "VanityGen",
     "type": "DOCKER",
     "multiaddr": "registry.hub.docker.com/iexechub/vanitygen:1.0.0",
-    "checksum": "0x762a451c05e0d8097b35d6376e748798b5dc6a13290439cf67d5202f7c6f695f",
-    "mrenclave": ""
+    "checksum": "0x762a451c05e0d8097b35d6376e748798b5dc6a13290439cf67d5202f7c6f695f"
   },
   "dataset": {
     "owner": "0xF048eF3d7E3B33A465E0599E641BB29421f7Df92",
@@ -703,7 +701,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ```json
 {
-  "default": "goerli",
+  "default": "viviani",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
@@ -749,6 +747,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       }
     },
     "goerli": {},
+    "viviani": {},
     "mainnet": {},
     "bellecour": {},
     "enterprise": {}
@@ -849,24 +848,24 @@ The `orders.json` file, located in iExec project, locally stores your latest sig
 
 ### ./secrets/
 
-This folder is created when running `iexec result generate-encryption-keypair` or `ìexec dataset init --encrypted` and is intended to store credentials generated by the iexec SDK CLI.
+This folder is created when running `iexec result generate-encryption-keypair` or `ìexec dataset init --tee` and is intended to store credentials generated by the iexec SDK CLI.
 
 #### ./secrets/beneficiary/
 
-This folder store the keypair to use for result encryption and decryption.
+This folder stores the keypair to use for result encryption and decryption.
 A keypair is generated when running `iexec result generate-encryption-keypair`
 Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `ìexec result push-encryption-key`
 Private keys name follow the pattern _userAddress_\_key this should never be shared with third party, the private key is used by the SDK CLI to decrypt a result when running `ìexec result decrypt`.
 
 #### ./secrets/datasets/
 
-This folder store the secret used for dataset encryption.
-A secret is generated when running `iexec dataset encrypt`
-The secret file is named after the dataset file, last secret generated is also stored in `./secrets/datasets/dataset.secret` to be used as default secret to share with workers when running `iexec dataset push-secret`.
+This folder stores the AES keys used for dataset encryption.
+A key is generated for each dataset file when running `iexec dataset encrypt`.
+The key file is named after the dataset file name, last key generated is also stored in `./secrets/datasets/dataset.key` to be used as default secret to share with workers when running `iexec dataset push-secret`.
 
 ### ./datasets/
 
-This folder is created when running `ìexec dataset init --encrypted` and is intended to store datasets files.
+This folder is created when running `ìexec dataset init --tee` and is intended to store datasets files.
 
 #### ./datasets/original/
 
@@ -874,24 +873,18 @@ Paste your original dataset files in this folder and run `iexec dataset encrypt`
 
 #### ./datasets/encrypted/
 
-Encrypted dataset files ends in this folder when you run `iexec dataset encrypt`.
+This folder stores the encrypted datasets files.
+An encrypted dataset file is created for each dataset file when running `iexec dataset encrypt`.
+The encrypted dataset file is named after the dataset file name.
+The encrypted dataset files must be upload on a public file system and referenced in multriaddr when running `iexec dataset deploy`.
 
 # iExec SDK Library API
 
-**[Work In Progress]** Although we'll try to avoid any API change, the Lib API may still evolve based on beta-testers feedback.
-
-iExec SDK can be imported in your project as a library/module, and it's compatible with old JS engines:
-
-- \>= Node v8
-- \>= Firefox v22
-- \>= Chrome v28
-- \>= IE 9
-
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/iexec-sdk-demo-iexec52x-uy8tc?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec52x-q9qbg?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec52x-4me7q?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/buy-computation-iexec60x-876r7?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec60x-l4hh4?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec60x-micsl?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
@@ -918,7 +911,7 @@ npm install iexec
 
 #### IExec Constructor
 
-**new Iexec ({ ethProvider: Web3SignerProvider, chainId: String, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
+**new IExec ({ ethProvider: Web3SignerProvider, flavour: 'standard'|'enterprise'|undefined } \[, options \])** => **IExec**
 
 > _options:_
 >
@@ -928,6 +921,7 @@ npm install iexec
 > - `ipfsGatewayURL: URL` specify the IPFS gateway to use
 > - `isNative: Boolean` true when the RLC is the chain native token
 > - `useGas: Boolean` false when the chain does NOT requires to spend gas to send a transaction
+> - `confirms: Number` confirmations block count to wait for each transaction (must be positive, default 1)
 > - `bridgeAddress: Address` specify the bridge smart contract on current chain to transfert RLC to a bridged chain
 > - `bridgedNetworkConf: { rpcURL: URL, chainId: String, hubAddress: Address, bridgeAddress: Address }` specify how to connect to the bridged chain
 > - `enterpriseSwapConf: { hubAddress: Address }` specify enterprise flavour binding
@@ -941,11 +935,10 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '5', // id of the chain (5 for goerli)
 });
 ```
 
-**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain)).
+**Important:** if the current network change, you must reinstanciate the iExec SDK (actual supported networks are '1' (ethereum mainnet), '5' (goerli testnet), '134' (iExec sidechain), '133' (iExec sidechain testnet)).
 
 **Important:** ethProvider must implement eth_signTypedData_v3 (EIP712)
 
@@ -963,13 +956,12 @@ const getIExec = async () => {
     throw Error('Need to install MetaMask');
   ethProvider = window.ethereum;
   try {
-    await window.ethereum.enable(); // prompt the use to grant the dapp access to the blockchain
+    await window.ethereum.request({ method: 'eth_requestAccounts' }); // prompt the use to grant the dapp access to the blockchain
   } catch (error) {
     throw Error('User denied access', error);
   }
   return new IExec({
     ethProvider: ethProvider,
-    chainId: ethProvider.networkVersion,
   });
 };
 ```
@@ -998,8 +990,7 @@ import { IExec } from 'iexec';
 
 const iexec = new IExec(
   {
-    ethProvider: ethProvider, // an eth signer provider like MetaMask
-    chainId: '134', // id of the chain (134 for iExec sidechain)
+    ethProvider: ethProvider, // an eth signer provider like MetaMask connected to https://bellecour.iex.ec
   },
   {
     isNative: true, // iExec sidechain use RLC as native token
@@ -1027,7 +1018,6 @@ const bridgedNetworkConf = {
 
 const iexec = new IExec({
   ethProvider: ethProvider, // an eth signer provider like MetaMask
-  chainId: '1', // id of the chain (1 for mainnet)
 }, {
   bridgeAddress,
   bridgedNetworkConf
@@ -1284,7 +1274,7 @@ console.log('total orders:', res.count);
 
 #### fetchWorkerpoolOrderbook
 
-iexec.**orderbook.fetchWorkerpoolOrderbook ( \[, { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
+iexec.**orderbook.fetchWorkerpoolOrderbook ( \[ { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
 > find the cheapest orders for computing resource.
 >
@@ -1304,7 +1294,7 @@ iexec.**orderbook.fetchWorkerpoolOrderbook ( \[, { workerpool: Address, workerpo
 _Example:_
 
 ```js
-const res = await iexec.orderbook.fetchWorkerpoolOrderbook('1');
+const res = await iexec.orderbook.fetchWorkerpoolOrderbook();
 console.log('best order:', res.workerpoolOrders[0].order);
 console.log('total orders:', res.count);
 ```
@@ -1572,7 +1562,7 @@ const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 
 #### createRequestorder
 
-iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: String, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
+iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: Object, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
 > create a requestorder with specified params
 >
@@ -2131,22 +2121,6 @@ const task = await waitFinalState(
 );
 ```
 
-#### waitForTaskStatusChange (deprecated prefer [obsTask](#obstask))
-
-iexec.**task.waitForTaskStatusChange ( taskid: Bytes32, initialStatus: Uint256 )** => Promise < **{ status: Uint256, statusName: String }** >
-
-> wait until the status of specified task change.
-
-_Example:_
-
-```js
-const res = await iexec.task.fetchResults(
-  '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19',
-  '1',
-);
-console.log('task status is', res.statusName);
-```
-
 ### iexec.app
 
 #### show
@@ -2180,7 +2154,6 @@ const { address } = await iexec.app.deployApp({
   multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
   checksum:
     '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-  mrenclave: '',
 });
 console.log('deployed at', address);
 ```
@@ -2200,6 +2173,72 @@ const { dataset } = await iexec.dataset.showDataset(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
 );
 console.log('dataset:', dataset);
+```
+
+#### generateEncryptionKey
+
+iexec.**dataset.generateEncryptionKey ()** => String
+
+> generate an encryption key to encrypt a dataset
+>
+> _NB_: This method returns a base64 encoded 256 bits key
+
+_Example:_
+
+```js
+const encryptionKey = iexec.dataset.generateEncryptionKey();
+console.log('encryption key:', encryptionKey);
+```
+
+#### encrypt
+
+iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Promise < **encryptedDataset: Buffer** >
+
+> encrypt the dataset file with the specified key using AES-256-CBC
+>
+> _NB_:
+>
+> - the supplied key must be 256 bits base64 encoded
+> - DO NOT leak the key and DO NOT use the same key for encrypting different datasets
+
+_Example:_
+
+```js
+const datasetFile = await readDatasetAsArrayBuffer(); // somehow load the dataset file
+
+const encryptionKey = iexec.dataset.generateEncryptionKey(); // DO NOT leak this key
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
+```
+
+#### computeEncryptedFileChecksum
+
+iexec.**dataset.computeEncryptedFileChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
+
+> compute the encrypted dataset file's checksum required for dataset deployment
+>
+> - :warning: the dataset checksum is the encrypted file checksum, use this method on the encrypted file but DO NOT use it on the original dataset file
+>
+> _NB_:
+>
+> - the dataset checksum is the sha256sum of the encrypted dataset file
+> - the checksum is used in the computation workflow to ensure the dataset's integrity
+
+_Example:_
+
+```js
+const encryptedDataset = await iexec.dataset.encrypt(
+  datasetFile,
+  encryptionKey,
+);
+
+const checksum = await iexec.dataset.computeEncryptedFileChecksum(
+  encryptedDataset,
+);
 ```
 
 #### deploy
@@ -2225,15 +2264,15 @@ console.log('deployed at', address);
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
 
-> push the dataset secret to the SMS
-> pushed secret can't be ubdated
+> push the dataset's key to the SMS
+> :warning: pushed secrets CAN NOT be updated
 
 _Example:_
 
 ```js
 const pushed = await iexec.dataset.pushDatasetSecret(
   datasetAddress,
-  'secretkey',
+  encryptionKey,
 );
 console.log('secret pushed:', pushed);
 ```
@@ -2382,28 +2421,17 @@ console.log('ipfs storage initialized:', isIpfsStorageInitialized);
 
 ### iexec.network
 
-#### id
+#### getNetwork
 
-iexec.**network.id** => **String**
+iexec.**network.getNetwork()** => Promise< **{ chainId: String, isSidechain: Boolean }** >
 
-> current chain Id
-
-_Example:_
-
-```js
-console.log('current chain:', iexec.network.id);
-```
-
-#### isSidechain
-
-iexec.**network.isSidechain** => **Boolean**
-
-> current is a sidechain
+> get information about the connected network
 
 _Example:_
 
 ```js
-console.log('current chain is a sidechain:', iexec.network.isSidechain);
+const { chainId, isSidechain } = await iexec.network.getNetwork();
+console.log('current chain', chainId, '(sidechain:', isSidechain, ')');
 ```
 
 ### Utils
@@ -2543,7 +2571,7 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### decryptResult
 
-utils.**decryptResult ( encryptedZipFile: Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
+utils.**decryptResult ( encryptedZipFile: ArrayBuffer|Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
 > decrypt en encrypted result with the beneficiary RSA Key.
 
@@ -2589,7 +2617,6 @@ const ethProvider = utils.getSignerFromPrivateKey(
 );
 const iexec = new IExec({
   ethProvider,
-  chainId: '42',
 });
 ```
 
@@ -2669,7 +2696,7 @@ Accepted:
 
 - url as string
 - multiaddr string representation
-- multiaddr().buffer
+- multiaddr buffer
 
 #### App
 
@@ -2680,25 +2707,17 @@ Accepted:
   owner: Address,
   name: String,
   type: String, // only "DOCKER" is supported
-  multiaddr: Multiaddress,
-  checksum: Bytes32,
-  mrenclave: String,
-}
-```
-
-#### Apporder
-
-`Apporder` is an object representation of an apporder not signed.
-
-```js
-{
-  app: Address,
-  appprice: Uint256,
-  volume: Uint256,
-  tag: Bytes32,
-  datasetrestrict: Address,
-  workerpoolrestrict: Address,
-  requesterrestrict: Address
+  multiaddr: Multiaddress, // app image address
+  checksum: Bytes32, // app image digest
+  mrenclave: ?{ // optional for TEE apps only, specify the TEE protocol to use
+    {
+      provider: String, // only "SCONE" is supported
+      version: String, // provider's protocol version
+      entrypoint: String, // app entrypoint path
+      heapSize: Number, // dedicated memory in bytes
+      fingerprint: String // app tee fingerprint
+    }
+  },
 }
 ```
 
@@ -2710,8 +2729,8 @@ Accepted:
 {
   owner: Address,
   name: String,
-  multiaddr: Multiaddress,
-  checksum: Bytes32
+  multiaddr: Multiaddress, // dataset file download address
+  checksum: Bytes32 // sha256sum of the file
 }
 ```
 
@@ -2738,6 +2757,22 @@ Accepted:
 }
 ```
 
+#### Apporder
+
+`Apporder` is an object representation of an apporder not signed.
+
+```js
+{
+  app: Address,
+  appprice: NRlcAmount, // price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // required encoded tags
+  datasetrestrict: Address, // allowed dataset default any
+  workerpoolrestrict: Address, // allowed workerpool default any
+  requesterrestrict: Address // allowed requester default any
+}
+```
+
 #### SignedApporder
 
 `SignedApporder` is an object representation of a signed apporder.
@@ -2745,14 +2780,14 @@ Accepted:
 ```js
 {
   app: Address,
-  appprice: uint256S,
-  volume: Uint256,
-  tag: Bytes32,
-  datasetrestrict: Address,
-  workerpoolrestrict: Address,
-  requesterrestrict: Address,
-  salt: Bytes32,
-  sign: HexString
+  appprice: NRlcAmount, // price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // required encoded tags
+  datasetrestrict: Address, // allowed dataset default any
+  workerpoolrestrict: Address, // allowed workerpool default any
+  requesterrestrict: Address // allowed requester default any
+  salt: Bytes32, // random salt
+  sign: HexString // owner sign
 }
 ```
 
@@ -2763,12 +2798,12 @@ Accepted:
 ```js
 {
   dataset: Address,
-  datasetprice: NRlcAmount,
-  volume: Uint256,
-  tag: Bytes32,
-  apprestrict: Address,
-  workerpoolrestrict: Address,
-  requesterrestrict: Address,
+  datasetprice: NRlcAmount, // price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // required encoded tags
+  apprestrict: Address, // allowed app default any
+  workerpoolrestrict: Address, // allowed workerpool default any
+  requesterrestrict: Address // allowed requester default any
 }
 ```
 
@@ -2779,14 +2814,14 @@ Accepted:
 ```js
 {
   dataset: Address,
-  datasetprice: uint256S,
-  volume: Uint256,
-  tag: Bytes32,
-  apprestrict: Address,
-  workerpoolrestrict: Address,
-  requesterrestrict: Address,
-  salt: Bytes32,
-  sign: HexString
+  datasetprice: NRlcAmount, // price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // required encoded tags
+  apprestrict: Address, // allowed app default any
+  workerpoolrestrict: Address, // allowed workerpool default any
+  requesterrestrict: Address // allowed requester default any
+  salt: Bytes32, // random salt
+  sign: HexString // owner sign
 }
 ```
 
@@ -2797,14 +2832,14 @@ Accepted:
 ```js
 {
   workerpool: Address,
-  workerpoolprice: NRlcAmount,
-  volume: Uint256,
-  tag: Bytes32,
-  category: Uint256,
-  trust: Uint256,
-  apprestrict: Address,
-  datasetrestrict: Address,
-  requesterrestrict: Address,
+  workerpoolprice: NRlcAmount,// price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // available encoded tags
+  category: Uint256, // execution category id
+  trust: Uint256, // offered execution trust level
+  apprestrict: Address, // allowed app default any
+  datasetrestrict: Address, // allowed dataset default any
+  requesterrestrict: Address // allowed requester default any
 }
 ```
 
@@ -2815,16 +2850,16 @@ Accepted:
 ```js
 {
   workerpool: Address,
-  workerpoolprice: Uint256,
-  volume: Uint256,
-  tag: Bytes32,
-  category: Uint256,
-  trust: Uint256,
-  apprestrict: Address,
-  datasetrestrict: Address,
-  requesterrestrict: Address,
-  salt: Bytes32,
-  sign: HexString
+  workerpoolprice: NRlcAmount,// price to pay per task
+  volume: Uint256, // number of uses
+  tag: Bytes32, // available encoded tags
+  category: Uint256, // execution category id
+  trust: Uint256, // offered execution trust level
+  apprestrict: Address, // allowed app default any
+  datasetrestrict: Address, // allowed dataset default any
+  requesterrestrict: Address // allowed requester default any
+  salt: Bytes32, // random salt
+  sign: HexString // owner sign
 }
 ```
 
@@ -2834,20 +2869,27 @@ Accepted:
 
 ```js
 {
-  app: Address,
-  appmaxprice: NRlcAmount,
-  dataset: Address,
-  datasetmaxprice: NRlcAmount,
-  workerpool: Address,
-  workerpoolprice: NRlcAmount,
-  requester: Address,
-  volume: Uint256,
-  tag: Bytes32,
-  category: Uint256,
-  trust: Uint256,
-  beneficary: Address,
-  callback: Address,
-  params: String,
+  app: Address, // app to use
+  appmaxprice: NRlcAmount, // max price to pay per task for the app
+  dataset: Address, // dataset to use default none
+  datasetmaxprice: NRlcAmount, // max price to pay per task for the app
+  workerpool: Address, // workerpool to use default any
+  workerpoolprice: NRlcAmount, // max price to pay per task for the app
+  requester: Address, // paying address
+  volume: Uint256, // number of task to execute
+  tag: Bytes32,  // required encoded tags
+  category: Uint256, // execution category id
+  trust: Uint256, // required execution trust level
+  beneficary: Address, // execution beneficiary default requester
+  callback: Address, // smart contract to call on task COMPLETED
+  params: {
+    iexec_args: String, // args to pass to the app
+    iexec_input_files: String[], // array of url to use as input files
+    iexec_result_encryption: Boolean, // must encrypt the result with beneficary key default false
+    iexec_result_storage_provider: String, // storage provider ('ipfs' | 'dropbox') defaut 'ipfs'
+    iexec_result_storage_proxy: String, // url of storage-proxy to use (defaut to iExec's storage proxy)
+    iexec_developer_logger: Boolean, // enable app logging default false
+  },
 }
 ```
 
@@ -2857,22 +2899,29 @@ Accepted:
 
 ```js
 {
-  app: Address,
-  appmaxprice: uint256S,
-  dataset: Address,
-  datasetmaxprice: uint256,
-  workerpool: Address,
-  workerpoolprice: Uint256,
-  requester: Address,
-  volume: Uint256,
-  tag: Bytes32,
-  category: Uint256,
-  trust: Uint256,
-  beneficary: Address,
-  callback: Address,
-  params: String,
-  salt: Bytes32,
-  sign: HexString
+  app: Address, // app to use
+  appmaxprice: NRlcAmount, // max price to pay per task for the app
+  dataset: Address, // dataset to use default none
+  datasetmaxprice: NRlcAmount, // max price to pay per task for the app
+  workerpool: Address, // workerpool to use default any
+  workerpoolprice: NRlcAmount, // max price to pay per task for the app
+  requester: Address, // paying address
+  volume: Uint256, // number of task to execute
+  tag: Bytes32,  // required encoded tags
+  category: Uint256, // execution category id
+  trust: Uint256, // required execution trust level
+  beneficary: Address, // execution beneficiary default requester
+  callback: Address, // smart contract to call on task COMPLETED
+  params: {
+    iexec_args: String, // args to pass to the app
+    iexec_input_files: String[], // array of url to use as input files
+    iexec_result_encryption: Boolean, // must encrypt the result with beneficary key default false
+    iexec_result_storage_provider: String, // storage provider ('ipfs' | 'dropbox') defaut 'ipfs'
+    iexec_result_storage_proxy: String, // url of storage-proxy to use (defaut to iExec's storage proxy)
+    iexec_developer_logger: Boolean, // enable app logging default false
+  },
+  salt: Bytes32, // random salt
+  sign: HexString // requester sign
 }
 ```
 

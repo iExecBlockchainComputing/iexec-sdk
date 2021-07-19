@@ -3,13 +3,20 @@ const BN = require('bn.js');
 const fs = require('fs-extra');
 const path = require('path');
 const JSZip = require('jszip');
-const { utils, IExec, errors } = require('../src/iexec-lib');
-const { sleep, bytes32Regex, addressRegex } = require('../src/utils');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
+const { execAsync } = require('./test-utils');
+
+const { utils, IExec, errors } = require('../src/lib/iexec-lib');
+const {
+  sleep,
+  bytes32Regex,
+  addressRegex,
+} = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
 
-jest.setTimeout(10000);
+const DEFAULT_TIMEOUT = 60000;
+
+jest.setTimeout(DEFAULT_TIMEOUT);
 
 // compare object with nested number or string number
 expect.extend({
@@ -30,11 +37,12 @@ expect.extend({
         stringifyNestedNumbers(received),
         stringifyNestedNumbers(target),
       ),
-      message: () => `not loosely equal \nreceived: ${JSON.stringify(
-        received,
-        null,
-        2,
-      )}\nexpected: ${JSON.stringify(target, null, 2)}`,
+      message: () =>
+        `not loosely equal \nreceived: ${JSON.stringify(
+          received,
+          null,
+          2,
+        )}\nexpected: ${JSON.stringify(target, null, 2)}`,
     };
   },
 });
@@ -56,34 +64,44 @@ const tokenChainUrl1s = DRONE
 const tokenChainParityUrl = DRONE
   ? 'http://token-chain-parity:8545'
   : 'http://localhost:9545';
+// secret management service
+const smsURL = DRONE ? 'http://token-sms:15000' : 'http://localhost:5000';
+const smsHttpsURL = DRONE
+  ? 'https://token-sms:15443'
+  : 'https://localhost:5443';
+// result proxy
+const resultProxyURL = DRONE
+  ? 'http://token-result-proxy:18089'
+  : 'http://localhost:18089';
 
 const chainGasPrice = '20000000000';
 // const nativeChainGasPrice = '0';
 
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 // const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
-const PRIVATE_KEY = '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
-const POOR_PRIVATE_KEY2 = '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
+const PRIVATE_KEY =
+  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
+const POOR_PRIVATE_KEY2 =
+  '0xd0c5f29f0e7ebe1d3217096fb06130e217758c90f361d3c52ea26c2a0ecc99fb';
 const POOR_ADDRESS2 = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
 const POOR_ADDRESS3 = '0xA540FCf5f097c3F996e680F5cb266629600F064A';
 // const RICH_ADDRESS2 = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
-const RICH_PRIVATE_KEY2 = '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
+const RICH_PRIVATE_KEY2 =
+  '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
 // const RICH_ADDRESS3 = '0xbC11Bf07a83c7e04daef3dd5C6F9a046F8c5fA7b';
 // const RICH_PRIVATE_KEY3 = '0xfb9d8a917d85d7d9a052745248ecbf6a2268110945004dd797e82e8d4c071e79';
 
-const chainId = 65535;
-const networkId = `${chainId}`;
+const networkId = 65535;
 const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
 const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 
-console.log('chainId', chainId);
+// console.log('chainId', chainId);
 console.log('hubAddress', hubAddress);
 console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-
 const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
 const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChainUrl1s);
 const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
@@ -239,7 +257,6 @@ const deployAndGetApporder = async (
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    mrenclave: 'abc|123|test',
   });
   const app = appDeployRes.address;
   const apporder = await iexec.order
@@ -367,7 +384,7 @@ const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 // TESTS
 describe('[IExec]', () => {
-  test('sms required function throw if no smsURL configured', () => {
+  test('sms required function throw if no smsURL configured', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -376,20 +393,21 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.dataset.checkDatasetSecretExists(randomAddress)).toThrow(
+    await expect(
+      iexec.dataset.checkDatasetSecretExists(randomAddress),
+    ).rejects.toThrow(
       Error(
         `smsURL option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('resultProxy required function throw if no resultProxyURL configured', () => {
+  test('resultProxy required function throw if no resultProxyURL configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -397,20 +415,19 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.storage.defaultStorageLogin()).toThrow(
+    await expect(iexec.storage.defaultStorageLogin()).rejects.toThrow(
       Error(
         `resultProxyURL option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('bridge required function throw if no bridgeAddress configured', () => {
+  test('bridge required function throw if no bridgeAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
@@ -418,39 +435,38 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexec.wallet.bridgeToSidechain(0)).toThrow(
+    await expect(iexec.wallet.bridgeToSidechain(0)).rejects.toThrow(
       Error(
         `bridgeAddress option not set and no default value for your chain ${networkId}`,
       ),
     );
   });
-  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', () => {
+  test('chainId not set in custom bridgedNetworkConf throw on unknown chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          id: '123456',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            id: '123456',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         `Missing chainId in bridgedNetworkConf and no default value for your chain ${networkId}`,
       ),
@@ -461,21 +477,21 @@ describe('[IExec]', () => {
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '123456',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            chainId: '123456',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         'Missing rpcURL in bridgedNetworkConf and no default value for bridged chain 123456',
       ),
@@ -486,22 +502,22 @@ describe('[IExec]', () => {
       tokenChainParityUrl,
       PRIVATE_KEY,
     );
-    expect(
-      () => new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        bridgedNetworkConf: {
+          chainId: '123456',
+          rpcURL: 'http://localhost:8545',
         },
-        {
-          hubAddress,
-          isNative: false,
-          bridgedNetworkConf: {
-            chainId: '123456',
-            rpcURL: 'http://localhost:8545',
-          },
-        },
-      ),
-    ).toThrow(
+      },
+    );
+    await expect(
+      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+    ).rejects.toThrow(
       Error(
         'Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain 123456',
       ),
@@ -520,7 +536,7 @@ describe('[IExec]', () => {
         },
       },
     );
-    // relay on viviani
+    // rely on viviani
     await expect(
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
@@ -533,7 +549,6 @@ describe('[IExec]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -561,7 +576,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -583,7 +597,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -599,7 +612,6 @@ describe('[workflow]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     });
     expect(appDeployRes.address).toBeDefined();
     expect(appDeployRes.txHash).toBeDefined();
@@ -615,7 +627,7 @@ describe('[workflow]', () => {
     expect(appShowRes.app.appChecksum).toBe(
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     );
-    expect(appShowRes.app.appMREnclave).toBe('abc|123|test');
+    expect(appShowRes.app.appMREnclave).toBe('');
 
     const order = await iexec.order.createApporder({
       app: appDeployRes.address,
@@ -631,7 +643,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -677,7 +688,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -733,7 +743,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -789,7 +798,6 @@ describe('[workflow]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -937,7 +945,7 @@ describe('[workflow]', () => {
     expect(claimDealRes.claimed).toBeDefined();
     expect(Object.keys(claimDealRes.claimed).length).toBe(9);
     expect(claimDealRes.claimed[0]).toBeDefined();
-  }, 15000);
+  });
 });
 
 describe('[getSignerFromPrivateKey]', () => {
@@ -948,7 +956,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -988,7 +995,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1031,7 +1037,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1093,7 +1098,6 @@ describe('[getSignerFromPrivateKey]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1192,81 +1196,85 @@ describe('[getSignerFromPrivateKey]', () => {
         senderFinalBalances.nRLC.add(new BN(amount)),
       ),
     ).toBe(true);
-  }, 20000);
-  test.skip('providers option', async () => {
-    const alchemyFailQuorumFail = {
-      alchemy: 'FAIL',
-      quorum: 3,
-    };
-    const alchemyFailQuorumPass = {
-      alchemy: 'FAIL',
-      quorum: 2,
-    };
-    const infuraFailQuorumFail = {
-      infura: 'FAIL',
-      quorum: 3,
-    };
-    const infuraFailQuorumPass = {
-      infura: 'FAIL',
-      quorum: 2,
-    };
-    const etherscanFailQuorumFail = {
-      etherscan: 'FAIL',
-      quorum: 3,
-    };
-    const etherscanFailQuorumPass = {
-      etherscan: 'FAIL',
-      quorum: 2,
-    };
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: alchemyFailQuorumFail,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).rejects.toThrow();
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: alchemyFailQuorumPass,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).resolves.toBeDefined();
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: etherscanFailQuorumFail,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).rejects.toThrow();
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: etherscanFailQuorumPass,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).resolves.toBeDefined();
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: infuraFailQuorumFail,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).rejects.toThrow();
-    await expect(
-      new IExec({
-        ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
-          providers: infuraFailQuorumPass,
-        }),
-        chainId: '5',
-      }).wallet.checkBalances(utils.NULL_ADDRESS),
-    ).resolves.toBeDefined();
-  }, 120000);
+  });
+  test.skip(
+    'providers option',
+    async () => {
+      const alchemyFailQuorumFail = {
+        alchemy: 'FAIL',
+        quorum: 3,
+      };
+      const alchemyFailQuorumPass = {
+        alchemy: 'FAIL',
+        quorum: 2,
+      };
+      const infuraFailQuorumFail = {
+        infura: 'FAIL',
+        quorum: 3,
+      };
+      const infuraFailQuorumPass = {
+        infura: 'FAIL',
+        quorum: 2,
+      };
+      const etherscanFailQuorumFail = {
+        etherscan: 'FAIL',
+        quorum: 3,
+      };
+      const etherscanFailQuorumPass = {
+        etherscan: 'FAIL',
+        quorum: 2,
+      };
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: alchemyFailQuorumFail,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).rejects.toThrow();
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: alchemyFailQuorumPass,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).resolves.toBeDefined();
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: etherscanFailQuorumFail,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).rejects.toThrow();
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: etherscanFailQuorumPass,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).resolves.toBeDefined();
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: infuraFailQuorumFail,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).rejects.toThrow();
+      await expect(
+        new IExec({
+          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+            providers: infuraFailQuorumPass,
+          }),
+          chainId: '5',
+        }).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).resolves.toBeDefined();
+    },
+    DEFAULT_TIMEOUT * 2,
+  );
   test('providers option ignored with RPC host', async () => {
     const alchemyFailQuorumFail = {
       alchemy: 'FAIL',
@@ -1290,7 +1298,6 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: alchemyFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -1307,7 +1314,6 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: etherscanFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -1324,14 +1330,13 @@ describe('[getSignerFromPrivateKey]', () => {
               providers: infuraFailQuorumFail,
             },
           ),
-          chainId: networkId,
         },
         {
           hubAddress,
         },
       ).wallet.checkBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
-  }, 10000);
+  });
 });
 
 describe('[wallet]', () => {
@@ -1340,7 +1345,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1355,7 +1359,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1380,7 +1383,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1417,7 +1419,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1448,7 +1449,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1483,7 +1483,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1500,7 +1499,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1529,7 +1527,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1562,7 +1559,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1600,7 +1596,6 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1644,7 +1639,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1676,7 +1671,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1694,7 +1689,7 @@ describe('[wallet]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1710,7 +1705,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1723,7 +1717,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1758,7 +1751,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1771,7 +1763,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1806,7 +1797,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1819,7 +1809,6 @@ describe('[wallet]', () => {
           tokenChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -1858,7 +1847,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1872,7 +1860,6 @@ describe('[wallet]', () => {
           nativeChainUrl,
           POOR_PRIVATE_KEY2,
         ),
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -1923,7 +1910,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1937,7 +1924,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -1990,7 +1977,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2020,7 +2007,7 @@ describe('[wallet]', () => {
           tokenChainUrl,
           randomSenderWallet.privateKey,
         ),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2046,7 +2033,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2062,7 +2048,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2075,7 +2060,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2119,7 +2104,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2135,7 +2119,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2148,7 +2131,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2192,7 +2175,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2209,7 +2192,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2222,7 +2204,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2266,7 +2248,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2283,7 +2265,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2296,7 +2277,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2340,7 +2321,6 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2356,7 +2336,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2380,7 +2359,7 @@ describe('[wallet]', () => {
     const iexecRichman = new IExec(
       {
         ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2397,7 +2376,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2422,7 +2401,6 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2445,7 +2423,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2469,7 +2447,7 @@ describe('[wallet]', () => {
     const iexecEnterprise = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2477,7 +2455,7 @@ describe('[wallet]', () => {
         isNative: false,
       },
     );
-    expect(() => iexecEnterprise.wallet.wrapEnterpriseRLC(5)).toThrow(
+    await expect(iexecEnterprise.wallet.wrapEnterpriseRLC(5)).rejects.toThrow(
       `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
@@ -2490,14 +2468,13 @@ describe('[wallet]', () => {
     const iexecStandard = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
         isNative: false,
       },
     );
-    expect(() => iexecStandard.wallet.unwrapEnterpriseRLC(5)).toThrow(
+    await expect(iexecStandard.wallet.unwrapEnterpriseRLC(5)).rejects.toThrow(
       `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
@@ -2509,7 +2486,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2534,7 +2510,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2563,7 +2539,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2592,7 +2567,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2625,7 +2599,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2653,7 +2626,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2683,7 +2655,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2717,7 +2688,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2746,7 +2716,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2780,7 +2750,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -2798,7 +2768,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2828,7 +2797,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2860,7 +2828,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2889,7 +2856,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2920,7 +2886,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2953,7 +2918,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress: nativeHubAddress,
@@ -2983,7 +2947,6 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -2999,7 +2962,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -3034,7 +2997,7 @@ describe('[account]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
+
         flavour: 'enterprise',
       },
       {
@@ -3054,7 +3017,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3068,7 +3030,6 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     };
     const res = await iexec.app.deployApp(app);
     expect(res.txHash).toMatch(bytes32Regex);
@@ -3083,7 +3044,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3097,7 +3057,14 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
+      mrenclave: {
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: 'python /app/app.py',
+        heapSize: 1073741824,
+        fingerprint:
+          'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      },
     };
     const { address } = await iexec.app.deployApp(app);
 
@@ -3109,7 +3076,7 @@ describe('[app]', () => {
     expect(res.app.appType).toBe(app.type);
     expect(res.app.appMultiaddr).toBe(app.multiaddr);
     expect(res.app.appChecksum).toBe(app.checksum);
-    expect(res.app.appMREnclave).toBe(app.mrenclave);
+    expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
 
     await expect(iexec.app.showApp(utils.NULL_ADDRESS)).rejects.toThrow(
       new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
@@ -3120,7 +3087,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3135,7 +3101,6 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     };
     const resBeforeDeploy = await iexec.app.countUserApps(userAddress);
     await iexec.app.deployApp(app);
@@ -3149,7 +3114,6 @@ describe('[app]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3164,7 +3128,14 @@ describe('[app]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
+      mrenclave: {
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: 'python /app/app.py',
+        heapSize: 1073741824,
+        fingerprint:
+          'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      },
     };
     const { address } = await iexec.app.deployApp(app);
     const count = await iexec.app.countUserApps(userAddress);
@@ -3176,7 +3147,7 @@ describe('[app]', () => {
     expect(res.app.appType).toBe(app.type);
     expect(res.app.appMultiaddr).toBe(app.multiaddr);
     expect(res.app.appChecksum).toBe(app.checksum);
-    expect(res.app.appMREnclave).toBe(app.mrenclave);
+    expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
     await expect(iexec.app.showUserApp(count, userAddress)).rejects.toThrow(
       Error('app not deployed'),
     );
@@ -3184,12 +3155,77 @@ describe('[app]', () => {
 });
 
 describe('[dataset]', () => {
+  test('dataset.generateEncryptionKey()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    expect(typeof key).toBe('string');
+    expect(Buffer.from(key, 'base64').length).toBe(32);
+  });
+  test('dataset.encrypt()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const encryptedBytes = await iexec.dataset.encrypt(
+      await fs.readFile(path.join(process.cwd(), 'test/inputs/files/text.zip')),
+      key,
+    );
+    expect(encryptedBytes).toBeInstanceOf(Buffer);
+    expect(encryptedBytes.length).toBe(224);
+
+    // decrypt with openssl
+    const outDirPath = path.join(process.cwd(), 'test/out');
+    await fs
+      .ensureDir(outDirPath)
+      .then(() =>
+        fs.writeFile(path.join(outDirPath, 'dataset.enc'), encryptedBytes),
+      );
+    const encryptedFilePath = path.join(outDirPath, 'dataset.enc');
+    const decryptedFilePath = path.join(outDirPath, 'decrypted.zip');
+    await expect(
+      execAsync(
+        `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${iexec.dataset.generateEncryptionKey()}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+      ),
+    ).rejects.toBeInstanceOf(Error);
+    await expect(
+      execAsync(
+        `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+      ),
+    ).resolves.toBeDefined();
+  });
+  test('dataset.computeEncryptedFileChecksum()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+      chainId: '1',
+    });
+    const key = iexec.dataset.generateEncryptionKey();
+    const fileBytes = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    );
+
+    const originalFileChecksum =
+      await iexec.dataset.computeEncryptedFileChecksum(fileBytes);
+    expect(originalFileChecksum).toBe(
+      '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515',
+    );
+
+    const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
+    const encryptedFileChecksum =
+      await iexec.dataset.computeEncryptedFileChecksum(encryptedFileBytes);
+    expect(encryptedFileChecksum).toMatch(bytes32Regex);
+  });
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3216,7 +3252,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3249,7 +3284,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3276,7 +3310,6 @@ describe('[dataset]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3307,170 +3340,156 @@ describe('[dataset]', () => {
       iexec.dataset.showUserDataset(count, userAddress),
     ).rejects.toThrow(Error('dataset not deployed'));
   });
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('dataset.pushDatasetSecret()', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      const pushRes = await iexec.dataset.pushDatasetSecret(
-        datasetAddress,
-        'oops',
-      );
-      expect(pushRes).toBe(true);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`,
-        ),
-      );
+
+  test('dataset.pushDatasetSecret()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (not deployed)', async () => {
-      const randomAddress = getRandomAddress();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(
-        iexec.dataset.pushDatasetSecret(randomAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
-        ),
-      );
+    const datasetAddress = datasetDeployRes.address;
+    const pushRes = await iexec.dataset.pushDatasetSecret(
+      datasetAddress,
+      'oops',
+    );
+    expect(pushRes).toBe(true);
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(`Secret already exists for ${datasetAddress} and can't be updated`),
+    );
+  });
+  test('dataset.pushDatasetSecret() (not deployed)', async () => {
+    const randomAddress = getRandomAddress();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    await expect(
+      iexec.dataset.pushDatasetSecret(randomAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(
+        `Wallet ${ADDRESS} is not allowed to set secret for ${randomAddress}`,
+      ),
+    );
+  });
+  test('dataset.pushDatasetSecret() (invalid owner)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: POOR_ADDRESS2,
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (invalid owner)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: POOR_ADDRESS2,
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(
-        Error(
-          `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
-        ),
-      );
+    const datasetAddress = datasetDeployRes.address;
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(
+      Error(
+        `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
+      ),
+    );
+  });
+  test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-      ).rejects.toThrow(Error(`SMS at ${smsURL} didn't answered`));
+    const datasetAddress = datasetDeployRes.address;
+    await expect(
+      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
+    ).rejects.toThrow(Error(`SMS at ${smsHttpsURL} didn't answered`));
+  });
+  test('dataset.checkDatasetSecretExists()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const datasetDeployRes = await iexec.dataset.deployDataset({
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
-    test('dataset.checkDatasetSecretExists()', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const datasetDeployRes = await iexec.dataset.deployDataset({
-        owner: await iexec.wallet.getAddress(),
-        name: `dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      });
-      const datasetAddress = datasetDeployRes.address;
-      const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
-        datasetAddress,
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.dataset.pushDatasetSecret(datasetAddress, 'oops');
-      const withSecretRes = await iexec.dataset.checkDatasetSecretExists(
-        datasetAddress,
-      );
-      expect(withSecretRes).toBe(true);
-    });
-  }
+    const datasetAddress = datasetDeployRes.address;
+    const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddress,
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.dataset.pushDatasetSecret(datasetAddress, 'oops');
+    const withSecretRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddress,
+    );
+    expect(withSecretRes).toBe(true);
+  });
 });
 
 describe('[workerpool]', () => {
@@ -3479,7 +3498,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3503,7 +3521,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3539,7 +3556,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3565,7 +3581,6 @@ describe('[workerpool]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3601,7 +3616,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3628,7 +3642,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3664,7 +3677,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3691,7 +3703,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3727,7 +3738,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3757,7 +3767,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3797,7 +3806,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3821,8 +3829,6 @@ describe('[order]', () => {
       params: {
         iexec_result_storage_provider: 'ipfs',
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-        iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-        iexec_tee_post_compute_image: teePostComputeDefaults.image,
       },
       requester: ADDRESS,
       tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -3838,7 +3844,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3861,8 +3866,6 @@ describe('[order]', () => {
       workerpoolmaxprice: '0.1 RLC',
       params: {
         iexec_result_storage_provider: 'dropbox',
-        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
-        iexec_tee_post_compute_image: 'teePostComputeImage',
         iexec_result_encryption: true,
       },
       tag: 'tee',
@@ -3879,8 +3882,6 @@ describe('[order]', () => {
       datasetmaxprice: '100',
       params: {
         iexec_result_storage_provider: 'dropbox',
-        iexec_tee_post_compute_fingerprint: 'teePostComputeFingerprint',
-        iexec_tee_post_compute_image: 'teePostComputeImage',
         iexec_result_encryption: true,
       },
       requester: ADDRESS,
@@ -3897,7 +3898,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3911,7 +3911,6 @@ describe('[order]', () => {
       multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      mrenclave: 'abc|123|test',
     });
     const order = await iexec.order.createApporder({
       app: address,
@@ -3931,7 +3930,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3963,7 +3961,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -3996,7 +3993,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4021,151 +4017,132 @@ describe('[order]', () => {
     });
   });
 
-  if (WITH_STACK) {
-    // this test requires
-    test('order.signRequestorder() (checkRequest default storage)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-      });
-
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
-        ),
-      );
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+  test('order.signRequestorder() (checkRequest default storage)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
     });
 
-    test('order.signRequestorder() (checkRequest dropbox storage)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-        tag: ['tee'],
-        params: {
-          iexec_result_storage_provider: 'dropbox',
-        },
-      });
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+      ),
+    );
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
+    });
+  });
 
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
-        ),
-      );
-
-      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+  test('order.signRequestorder() (checkRequest dropbox storage)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
+      tag: ['tee'],
+      params: {
+        iexec_result_storage_provider: 'dropbox',
+      },
     });
 
-    test('order.signRequestorder() (checkRequest with encryption)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        getRandomWallet().privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-          smsURL,
-        },
-      );
-      const order = await iexec.order.createRequestorder({
-        app: POOR_ADDRESS2,
-        category: 5,
-        params: { iexec_result_encryption: true },
-      });
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-        Error(
-          'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
-        ),
-      );
-      await iexec.result.pushResultEncryptionKey('oops');
-      const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
-      expect(res.sign).toMatch(signRegex);
-      expect(res).toEqual({
-        ...order,
-        ...{ params: JSON.stringify(order.params) },
-        ...{ sign: res.sign, salt: res.salt },
-      });
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
+      ),
+    );
+
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
     });
-  }
+  });
+
+  test('order.signRequestorder() (checkRequest with encryption)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: POOR_ADDRESS2,
+      category: 5,
+      params: { iexec_result_encryption: true },
+    });
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
+      ),
+    );
+    await iexec.result.pushResultEncryptionKey('oops');
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
+    });
+  });
 
   test('order.hashApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4180,12 +4157,11 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashApporder({
       ...order,
-      salt:
-        '0x77d3087b2ff82dc336c1add5ad220a32e8b3f46201ad33a7afdb1d6442132e13',
+      salt: '0x77d3087b2ff82dc336c1add5ad220a32e8b3f46201ad33a7afdb1d6442132e13',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0x364b7ef2ee48ec4b769b76cbacfa32418dc6d91f4d556df96a3390e07b772ed8',
+      '0x20a9ac876315f0b68a393fddd78e85e4e5e43e53d29261df1801f3f8bdcf8fc7',
     );
   });
 
@@ -4194,7 +4170,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4209,12 +4184,11 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashDatasetorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xa67bdea49715c1a9c73200134e94d77795532e28c8ee00befc73c84d252c602c',
+      '0x5c8b2f93f33ee23fb9047c43b41784ac5f5aacd2cdc374461791ebf1967a3b4f',
     );
   });
 
@@ -4223,7 +4197,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4239,12 +4212,11 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashWorkerpoolorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xa8ae3bce37fce87397f55f65c8cc6c03a7cd9b687a15c08f21d535bdf144d268',
+      '0x84579fe94e633bcf677aa104894c889cd8d68974273e22e3531793168bd2aa63',
     );
   });
 
@@ -4253,7 +4225,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4272,12 +4243,11 @@ describe('[order]', () => {
 
     const res = await iexec.order.hashRequestorder({
       ...order,
-      salt:
-        '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
+      salt: '0x0f4c934f0fb4fa32dcef23ad90a695f94d1e5fca8147016c1c58553d3f20bf6c',
     });
     expect(res).toMatch(bytes32Regex);
     expect(res).toBe(
-      '0xb7f314f7937a1103e5fe92e5e84886b1bc0b4e85134a850f25cc4e8362731fbd',
+      '0x4c5fbf2897891074700b605a5407ca25c5d269f2dd3a8e314c972953fc1cdd2c',
     );
   });
 
@@ -4286,7 +4256,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4307,7 +4276,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4328,7 +4296,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4349,7 +4316,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4380,7 +4346,6 @@ describe('[order]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4395,7 +4360,6 @@ describe('[order]', () => {
     const iexecPoolManager = new IExec(
       {
         ethProvider: poolManagerSigner,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -4462,8 +4426,7 @@ describe('[order]', () => {
     // invalid sign
     const apporderInvalidSign = {
       ...apporderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4478,8 +4441,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('apporder invalid sign'));
     const datasetorderInvalidSign = {
       ...datasetorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4494,8 +4456,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('datasetorder invalid sign'));
     const workerpoolorderInvalidSign = {
       ...workerpoolorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4510,8 +4471,7 @@ describe('[order]', () => {
     ).rejects.toThrow(Error('workerpoolorder invalid sign'));
     const requestorderInvalidSign = {
       ...requestorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
     };
     await expect(
       iexec.order.matchOrders(
@@ -4577,9 +4537,11 @@ describe('[order]', () => {
       ),
     );
     // category check
-    const workerpoolorderCategoryMismatch = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, category: 2 },
-    );
+    const workerpoolorderCategoryMismatch =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        category: 2,
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4596,9 +4558,11 @@ describe('[order]', () => {
       ),
     );
     // trust check
-    const workerpoolorderTrustZero = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, trust: 0 },
-    );
+    const workerpoolorderTrustZero =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        trust: 0,
+      });
     // const requestorderTrustOne = await iexec.order.signRequestorder(
     //   { ...requestorderTemplate, trust: 1 },
     // );
@@ -4633,12 +4597,16 @@ describe('[order]', () => {
       },
       { checkRequest: false },
     );
-    const workerpoolorderTagGpu = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['gpu']) },
-    );
-    const workerpoolorderTagTee = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['tee']) },
-    );
+    const workerpoolorderTagGpu =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['gpu']),
+      });
+    const workerpoolorderTagTee =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        tag: utils.encodeTag(['tee']),
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4737,12 +4705,11 @@ describe('[order]', () => {
       ),
     );
 
-    const workerpoolorderTooExpensive = await iexecPoolManager.order.signWorkerpoolorder(
-      {
+    const workerpoolorderTooExpensive =
+      await iexecPoolManager.order.signWorkerpoolorder({
         ...workerpoolorderTemplate,
         workerpoolprice: 1,
-      },
-    );
+      });
     await expect(
       iexec.order.matchOrders(
         {
@@ -4846,9 +4813,11 @@ describe('[order]', () => {
       ...datasetorderTemplate,
       datasetprice: 2,
     });
-    const workerpoolorder1nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 1 },
-    );
+    const workerpoolorder1nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 1,
+      });
     const requestorder300nRlc = await iexec.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -4884,9 +4853,12 @@ describe('[order]', () => {
       datasetprice: 0,
       volume: 1000,
     });
-    const workerpoolorder2nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 2, volume: 1000 },
-    );
+    const workerpoolorder2nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 2,
+        volume: 1000,
+      });
     const requestorder6nRlc = await iexec.order.signRequestorder(
       {
         ...requestorderTemplate,
@@ -4912,9 +4884,11 @@ describe('[order]', () => {
     );
 
     // workerpool owner stake check
-    const workerpoolorder7nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 7 },
-    );
+    const workerpoolorder7nRlc =
+      await iexecPoolManager.order.signWorkerpoolorder({
+        ...workerpoolorderTemplate,
+        workerpoolprice: 7,
+      });
     await iexec.account.deposit(10);
     const poolManagerBalance = await iexecPoolManager.account.checkBalance(
       await iexecPoolManager.wallet.getAddress(),
@@ -4954,885 +4928,891 @@ describe('[order]', () => {
     expect(res.volume).toBeInstanceOf(BN);
     expect(res.volume.eq(new BN(1))).toBe(true);
     expect(res.dealid).toMatch(bytes32Regex);
-  }, 60000);
+  });
 
-  test('order.matchOrders() (enterprise)', async () => {
-    const requesterWallet = getRandomWallet();
-    const poolManagerWallet = getRandomWallet();
-    const appDevWallet = getRandomWallet();
-    const datasetDevWallet = getRandomWallet();
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      requesterWallet.address,
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      poolManagerWallet.address,
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      appDevWallet.address,
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      datasetDevWallet.address,
-    );
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-    const iexecRichman = new IExec(
-      {
-        ethProvider: signer,
-        chainId: networkId,
-        flavour: 'enterprise',
-      },
-      {
-        hubAddress: enterpriseHubAddress,
-        isNative: false,
-      },
-    );
-    await iexecRichman.wallet.sendRLC('10 RLC', requesterWallet.address);
-    await iexecRichman.wallet.sendETH('0.1 ether', requesterWallet.address);
-    await iexecRichman.wallet.sendRLC('10 RLC', poolManagerWallet.address);
-    await iexecRichman.wallet.sendETH('0.1 ether', poolManagerWallet.address);
-    await iexecRichman.wallet.sendETH('0.1 ether', appDevWallet.address);
-    await iexecRichman.wallet.sendETH('0.1 ether', datasetDevWallet.address);
-    const requesterSigner = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
-      requesterWallet.privateKey,
-    );
-    const iexecRequester = new IExec(
-      {
-        ethProvider: requesterSigner,
-        chainId: networkId,
-        flavour: 'enterprise',
-      },
-      {
-        hubAddress: enterpriseHubAddress,
-        isNative: false,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const poolManagerSigner = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
-      poolManagerWallet.privateKey,
-    );
-    const iexecPoolManager = new IExec(
-      {
-        ethProvider: poolManagerSigner,
-        chainId: networkId,
-        flavour: 'enterprise',
-      },
-      {
-        hubAddress: enterpriseHubAddress,
-        isNative: false,
-      },
-    );
-    const appDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
-      appDevWallet.privateKey,
-    );
-    const iexecAppDev = new IExec(
-      {
-        ethProvider: appDevSigner,
-        chainId: networkId,
-        flavour: 'enterprise',
-      },
-      {
-        hubAddress: enterpriseHubAddress,
-        isNative: false,
-      },
-    );
-    const datasetDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
-      datasetDevWallet.privateKey,
-    );
-    const iexecDatasetDev = new IExec(
-      {
-        ethProvider: datasetDevSigner,
-        chainId: networkId,
-        flavour: 'enterprise',
-      },
-      {
-        hubAddress: enterpriseHubAddress,
-        isNative: false,
-      },
-    );
-
-    const apporderTemplate = await deployAndGetApporder(iexecAppDev);
-    const datasetorderTemplate = await deployAndGetDatasetorder(
-      iexecDatasetDev,
-    );
-    const workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
-      iexecPoolManager,
-    );
-    const requestorderTemplate = await getMatchableRequestorder(
-      iexecRequester,
-      {
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-      },
-    );
-
-    // resouce not deployed
-    const apporderNotDeployed = { ...apporderTemplate, app: POOR_ADDRESS3 };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderNotDeployed,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error(`No app deployed at address ${POOR_ADDRESS3}`));
-    const datasetorderNotDeployed = {
-      ...datasetorderTemplate,
-      dataset: POOR_ADDRESS3,
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderNotDeployed,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error(`No dataset deployed at address ${POOR_ADDRESS3}`));
-    const workerpoolorderNotDeployed = {
-      ...workerpoolorderTemplate,
-      workerpool: POOR_ADDRESS3,
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderNotDeployed,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(`No workerpool deployed at address ${POOR_ADDRESS3}`),
-    );
-    // invalid sign
-    const apporderInvalidSign = {
-      ...apporderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderInvalidSign,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('apporder invalid sign'));
-    const datasetorderInvalidSign = {
-      ...datasetorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderInvalidSign,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('datasetorder invalid sign'));
-    const workerpoolorderInvalidSign = {
-      ...workerpoolorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderInvalidSign,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('workerpoolorder invalid sign'));
-    const requestorderInvalidSign = {
-      ...requestorderTemplate,
-      sign:
-        '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
-    };
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderInvalidSign,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('requestorder invalid sign'));
-
-    // address mismatch
-    const apporderAddressMismatch = await deployAndGetApporder(iexecRequester);
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderAddressMismatch,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`,
-      ),
-    );
-    const datasetorderAddressMismatch = await deployAndGetDatasetorder(
-      iexecRequester,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderAddressMismatch,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
-      ),
-    );
-    const workerpoolorderAddressMismatch = await deployAndGetWorkerpoolorder(
-      iexecRequester,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderAddressMismatch,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `workerpool address mismatch between requestorder (${requestorderTemplate.workerpool}) and workerpoolorder (${workerpoolorderAddressMismatch.workerpool})`,
-      ),
-    );
-    // category check
-    const workerpoolorderCategoryMismatch = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, category: 2 },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderCategoryMismatch,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `category mismatch between requestorder (${requestorderTemplate.category}) and workerpoolorder (${workerpoolorderCategoryMismatch.category})`,
-      ),
-    );
-    // trust check
-    const workerpoolorderTrustZero = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, trust: 0 },
-    );
-    // const requestorderTrustOne = await iexec.order.signRequestorder(
-    //   { ...requestorderTemplate, trust: 1 },
-    // );
-    const requestorderTrustTooHigh = await iexecRequester.order.signRequestorder(
-      {
-        ...requestorderTemplate,
-        trust: 2,
-      },
-      { checkRequest: false },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTrustZero,
-          requestorder: requestorderTrustTooHigh,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `workerpoolorder trust is too low (expected ${requestorderTrustTooHigh.trust}, got ${workerpoolorderTrustZero.trust})`,
-      ),
-    );
-
-    // workerpool tag check
-    const requestorderTagTeeGpu = await iexecRequester.order.signRequestorder(
-      {
-        ...requestorderTemplate,
-        tag: utils.encodeTag(['tee', 'gpu']),
-      },
-      { checkRequest: false },
-    );
-    const workerpoolorderTagGpu = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['gpu']) },
-    );
-    const workerpoolorderTagTee = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, tag: utils.encodeTag(['tee']) },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTagGpu,
-          requestorder: requestorderTagTeeGpu,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('Missing tags [tee] in workerpoolorder'));
-    const apporderTagGpu = await iexecAppDev.order.signApporder({
-      ...apporderTemplate,
-      tag: utils.encodeTag(['gpu']),
-    });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTagGpu,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTagTee,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
-    const datasetorderTagTeeGpu = await iexecDatasetDev.order.signDatasetorder({
-      ...datasetorderTemplate,
-      tag: utils.encodeTag(['gpu', 'tee']),
-    });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTagTeeGpu,
-          workerpoolorder: workerpoolorderTagTee,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
-    // app tag check
-    const datasetorderTagTee = await iexecDatasetDev.order.signDatasetorder({
-      ...datasetorderTemplate,
-      tag: utils.encodeTag(['tee']),
-    });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTagTee,
-          workerpoolorder: workerpoolorderTagTee,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('Missing tag [tee] in apporder'));
-    // price check
-    const apporderTooExpensive = await iexecAppDev.order.signApporder({
-      ...apporderTemplate,
-      appprice: 1,
-    });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTooExpensive,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `appmaxprice too low (expected ${apporderTooExpensive.appprice}, got ${requestorderTemplate.appmaxprice})`,
-      ),
-    );
-
-    const datasetorderTooExpensive = await iexecDatasetDev.order.signDatasetorder(
-      {
-        ...datasetorderTemplate,
-        datasetprice: 1,
-      },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTooExpensive,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `datasetmaxprice too low (expected ${datasetorderTooExpensive.datasetprice}, got ${requestorderTemplate.datasetmaxprice})`,
-      ),
-    );
-
-    const workerpoolorderTooExpensive = await iexecPoolManager.order.signWorkerpoolorder(
-      {
-        ...workerpoolorderTemplate,
-        workerpoolprice: 1,
-      },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTooExpensive,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `workerpoolmaxprice too low (expected ${workerpoolorderTooExpensive.workerpoolprice}, got ${requestorderTemplate.workerpoolmaxprice})`,
-      ),
-    );
-    // volumes checks
-    const apporderCanceled = await iexecAppDev.order
-      .signApporder(apporderTemplate)
-      .then(async (order) => {
-        await iexecAppDev.order.cancelApporder(order);
-        return order;
-      });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderCanceled,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('apporder is fully consumed'));
-
-    const datasetorderCanceled = await iexecDatasetDev.order
-      .signDatasetorder(datasetorderTemplate)
-      .then(async (order) => {
-        await iexecDatasetDev.order.cancelDatasetorder(order);
-        return order;
-      });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderCanceled,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('datasetorder is fully consumed'));
-
-    const workerpoolorderCanceled = await iexecPoolManager.order
-      .signWorkerpoolorder(workerpoolorderTemplate)
-      .then(async (order) => {
-        await iexecPoolManager.order.cancelWorkerpoolorder(order);
-        return order;
-      });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderCanceled,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('workerpoolorder is fully consumed'));
-
-    const requestorderCanceled = await iexecRequester.order
-      .signRequestorder(requestorderTemplate, { checkRequest: false })
-      .then(async (order) => {
-        await iexecRequester.order.cancelRequestorder(order);
-        return order;
-      });
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderCanceled,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(Error('requestorder is fully consumed'));
-
-    // requester account stake check
-    const balance = await iexecRequester.account.checkBalance(
-      await iexecRequester.wallet.getAddress(),
-    );
-    await iexecRequester.account.withdraw(balance.stake).catch(() => {});
-    await iexecRequester.account.deposit(5);
-
-    const apporder3nRlc = await iexecAppDev.order.signApporder({
-      ...apporderTemplate,
-      appprice: 3,
-    });
-    const datasetorder2nRlc = await iexecDatasetDev.order.signDatasetorder({
-      ...datasetorderTemplate,
-      datasetprice: 2,
-    });
-    const workerpoolorder1nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 1 },
-    );
-    const requestorder300nRlc = await iexecRequester.order.signRequestorder(
-      {
-        ...requestorderTemplate,
-        appmaxprice: 100,
-        datasetmaxprice: 100,
-        workerpoolmaxprice: 100,
-      },
-      { checkRequest: false },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporder3nRlc,
-          datasetorder: datasetorder2nRlc,
-          workerpoolorder: workerpoolorder1nRlc,
-          requestorder: requestorder300nRlc,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        "Cost per task (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account",
-      ),
-    );
-
-    const apporder0nRlc = await iexecAppDev.order.signApporder({
-      ...apporderTemplate,
-      appprice: 0,
-      volume: 1000,
-    });
-    const datasetorder0nRlc = await iexecDatasetDev.order.signDatasetorder({
-      ...datasetorderTemplate,
-      datasetprice: 0,
-      volume: 1000,
-    });
-    const workerpoolorder2nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 2, volume: 1000 },
-    );
-    const requestorder6nRlc = await iexecRequester.order.signRequestorder(
-      {
-        ...requestorderTemplate,
-        workerpoolmaxprice: 2,
-        volume: 3,
-      },
-      { checkRequest: false },
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporder0nRlc,
-          datasetorder: datasetorder0nRlc,
-          workerpoolorder: workerpoolorder2nRlc,
-          requestorder: requestorder6nRlc,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        "Total cost for 3 tasks (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume",
-      ),
-    );
-
-    // workerpool owner stake check
-    const workerpoolorder7nRlc = await iexecPoolManager.order.signWorkerpoolorder(
-      { ...workerpoolorderTemplate, workerpoolprice: 7 },
-    );
-    await iexecRequester.account.deposit(10);
-    const poolManagerBalance = await iexecPoolManager.account.checkBalance(
-      await iexecPoolManager.wallet.getAddress(),
-    );
-    await iexecPoolManager.account
-      .withdraw(poolManagerBalance.stake)
-      .catch(() => {});
-    await iexecRequester.wallet.sendRLC(
-      1,
-      await iexecPoolManager.wallet.getAddress(),
-    );
-    await iexecPoolManager.account.deposit(1);
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporder3nRlc,
-          datasetorder: datasetorder2nRlc,
-          workerpoolorder: workerpoolorder7nRlc,
-          requestorder: requestorder300nRlc,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        "workerpool required stake (2) is greather than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account",
-      ),
-    );
-
-    // requester not KYC
-    await revokeKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      requesterWallet.address,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `requester ${requesterWallet.address} is not authorized to interact with eRLC`,
-      ),
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      requesterWallet.address,
-    );
-
-    // app owner not KYC
-    await revokeKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      appDevWallet.address,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `app owner ${appDevWallet.address} is not authorized to interact with eRLC`,
-      ),
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      appDevWallet.address,
-    );
-
-    // dataset owner not KYC
-    await revokeKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      datasetDevWallet.address,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `dataset owner ${datasetDevWallet.address} is not authorized to interact with eRLC`,
-      ),
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      datasetDevWallet.address,
-    );
-
-    // workerpool owner not KYC
-    await revokeKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      poolManagerWallet.address,
-    );
-    await expect(
-      iexecRequester.order.matchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { checkRequest: false },
-      ),
-    ).rejects.toThrow(
-      Error(
-        `workerpool owner ${poolManagerWallet.address} is not authorized to interact with eRLC`,
-      ),
-    );
-    await grantKYC(
-      whitelistAdminWallet,
-      enterpriseHubAddress,
-      poolManagerWallet.address,
-    );
-
-    // standard case
-    const res = await iexecRequester.order.matchOrders(
-      {
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-        requestorder: requestorderTemplate,
-      },
-      { checkRequest: false },
-    );
-    expect(res.txHash).toMatch(bytes32Regex);
-    expect(res.volume).toBeInstanceOf(BN);
-    expect(res.volume.eq(new BN(1))).toBe(true);
-    expect(res.dealid).toMatch(bytes32Regex);
-  }, 60000);
-
-  if (WITH_STACK) {
-    // this test requires running local stack
-    test('order.matchOrders() (checkRequest)', async () => {
-      const randomWallet = getRandomWallet();
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-
-      const richSigner = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        PRIVATE_KEY,
+  test(
+    'order.matchOrders() (enterprise)',
+    async () => {
+      const requesterWallet = getRandomWallet();
+      const poolManagerWallet = getRandomWallet();
+      const appDevWallet = getRandomWallet();
+      const datasetDevWallet = getRandomWallet();
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        requesterWallet.address,
       );
-      const iexecRich = new IExec(
-        {
-          ethProvider: richSigner,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-          resultProxyURL,
-        },
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        poolManagerWallet.address,
       );
-      await iexecRich.wallet.sendETH('20000000000000000', randomWallet.address);
-
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainUrl,
-        randomWallet.privateKey,
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        appDevWallet.address,
       );
-      const iexec = new IExec(
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        datasetDevWallet.address,
+      );
+      const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+      const iexecRichman = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
+
+          flavour: 'enterprise',
         },
         {
-          hubAddress,
+          hubAddress: enterpriseHubAddress,
           isNative: false,
-          smsURL,
-          resultProxyURL,
         },
       );
-      const resourcesProviderSigner = utils.getSignerFromPrivateKey(
+      await iexecRichman.wallet.sendRLC('10 RLC', requesterWallet.address);
+      await iexecRichman.wallet.sendETH('0.1 ether', requesterWallet.address);
+      await iexecRichman.wallet.sendRLC('10 RLC', poolManagerWallet.address);
+      await iexecRichman.wallet.sendETH('0.1 ether', poolManagerWallet.address);
+      await iexecRichman.wallet.sendETH('0.1 ether', appDevWallet.address);
+      await iexecRichman.wallet.sendETH('0.1 ether', datasetDevWallet.address);
+      const requesterSigner = utils.getSignerFromPrivateKey(
         tokenChainUrl,
-        RICH_PRIVATE_KEY2,
+        requesterWallet.privateKey,
       );
-      const iexecResourcesProvider = new IExec(
+      const iexecRequester = new IExec(
         {
-          ethProvider: resourcesProviderSigner,
-          chainId: networkId,
+          ethProvider: requesterSigner,
+
+          flavour: 'enterprise',
         },
         {
-          hubAddress,
+          hubAddress: enterpriseHubAddress,
+          isNative: false,
+          resultProxyURL: 'https://result-proxy.iex.ec',
+        },
+      );
+      const poolManagerSigner = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        poolManagerWallet.privateKey,
+      );
+      const iexecPoolManager = new IExec(
+        {
+          ethProvider: poolManagerSigner,
+
+          flavour: 'enterprise',
+        },
+        {
+          hubAddress: enterpriseHubAddress,
+          isNative: false,
+        },
+      );
+      const appDevSigner = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        appDevWallet.privateKey,
+      );
+      const iexecAppDev = new IExec(
+        {
+          ethProvider: appDevSigner,
+
+          flavour: 'enterprise',
+        },
+        {
+          hubAddress: enterpriseHubAddress,
+          isNative: false,
+        },
+      );
+      const datasetDevSigner = utils.getSignerFromPrivateKey(
+        tokenChainUrl,
+        datasetDevWallet.privateKey,
+      );
+      const iexecDatasetDev = new IExec(
+        {
+          ethProvider: datasetDevSigner,
+
+          flavour: 'enterprise',
+        },
+        {
+          hubAddress: enterpriseHubAddress,
           isNative: false,
         },
       );
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider);
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
+      const apporderTemplate = await deployAndGetApporder(iexecAppDev);
+      const datasetorderTemplate = await deployAndGetDatasetorder(
+        iexecDatasetDev,
       );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
+      const workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
+        iexecPoolManager,
       );
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
+      const requestorderTemplate = await getMatchableRequestorder(
+        iexecRequester,
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        },
+      );
 
+      // resouce not deployed
+      const apporderNotDeployed = { ...apporderTemplate, app: POOR_ADDRESS3 };
       await expect(
-        iexec.order.matchOrders({
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
-        }),
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderNotDeployed,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error(`No app deployed at address ${POOR_ADDRESS3}`));
+      const datasetorderNotDeployed = {
+        ...datasetorderTemplate,
+        dataset: POOR_ADDRESS3,
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderNotDeployed,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(`No dataset deployed at address ${POOR_ADDRESS3}`),
+      );
+      const workerpoolorderNotDeployed = {
+        ...workerpoolorderTemplate,
+        workerpool: POOR_ADDRESS3,
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderNotDeployed,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(`No workerpool deployed at address ${POOR_ADDRESS3}`),
+      );
+      // invalid sign
+      const apporderInvalidSign = {
+        ...apporderTemplate,
+        sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderInvalidSign,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('apporder invalid sign'));
+      const datasetorderInvalidSign = {
+        ...datasetorderTemplate,
+        sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderInvalidSign,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('datasetorder invalid sign'));
+      const workerpoolorderInvalidSign = {
+        ...workerpoolorderTemplate,
+        sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderInvalidSign,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('workerpoolorder invalid sign'));
+      const requestorderInvalidSign = {
+        ...requestorderTemplate,
+        sign: '0xa1d59ea4f4ed84ed1c2fcbdb217f22d64180d95ccaed3268bdfef796ff7f5fa50c2d4c83bf7465afbd9ca292c433495eb573d1f8bcca585cb107b047c899dcb81c',
+      };
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderInvalidSign,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('requestorder invalid sign'));
+
+      // address mismatch
+      const apporderAddressMismatch = await deployAndGetApporder(
+        iexecRequester,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderAddressMismatch,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
       ).rejects.toThrow(
         Error(
-          'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+          `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`,
+        ),
+      );
+      const datasetorderAddressMismatch = await deployAndGetDatasetorder(
+        iexecRequester,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderAddressMismatch,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
+        ),
+      );
+      const workerpoolorderAddressMismatch = await deployAndGetWorkerpoolorder(
+        iexecRequester,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderAddressMismatch,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `workerpool address mismatch between requestorder (${requestorderTemplate.workerpool}) and workerpoolorder (${workerpoolorderAddressMismatch.workerpool})`,
+        ),
+      );
+      // category check
+      const workerpoolorderCategoryMismatch =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          category: 2,
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderCategoryMismatch,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `category mismatch between requestorder (${requestorderTemplate.category}) and workerpoolorder (${workerpoolorderCategoryMismatch.category})`,
+        ),
+      );
+      // trust check
+      const workerpoolorderTrustZero =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          trust: 0,
+        });
+      // const requestorderTrustOne = await iexec.order.signRequestorder(
+      //   { ...requestorderTemplate, trust: 1 },
+      // );
+      const requestorderTrustTooHigh =
+        await iexecRequester.order.signRequestorder(
+          {
+            ...requestorderTemplate,
+            trust: 2,
+          },
+          { checkRequest: false },
+        );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTrustZero,
+            requestorder: requestorderTrustTooHigh,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `workerpoolorder trust is too low (expected ${requestorderTrustTooHigh.trust}, got ${workerpoolorderTrustZero.trust})`,
         ),
       );
 
-      await iexec.storage
-        .defaultStorageLogin()
-        .then(iexec.storage.pushStorageToken);
-      const res = await iexec.order.matchOrders({
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
+      // workerpool tag check
+      const requestorderTagTeeGpu = await iexecRequester.order.signRequestorder(
+        {
+          ...requestorderTemplate,
+          tag: utils.encodeTag(['tee', 'gpu']),
+        },
+        { checkRequest: false },
+      );
+      const workerpoolorderTagGpu =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          tag: utils.encodeTag(['gpu']),
+        });
+      const workerpoolorderTagTee =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          tag: utils.encodeTag(['tee']),
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTagGpu,
+            requestorder: requestorderTagTeeGpu,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('Missing tags [tee] in workerpoolorder'));
+      const apporderTagGpu = await iexecAppDev.order.signApporder({
+        ...apporderTemplate,
+        tag: utils.encodeTag(['gpu']),
       });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTagGpu,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTagTee,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
+      const datasetorderTagTeeGpu =
+        await iexecDatasetDev.order.signDatasetorder({
+          ...datasetorderTemplate,
+          tag: utils.encodeTag(['gpu', 'tee']),
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTagTeeGpu,
+            workerpoolorder: workerpoolorderTagTee,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
+      // app tag check
+      const datasetorderTagTee = await iexecDatasetDev.order.signDatasetorder({
+        ...datasetorderTemplate,
+        tag: utils.encodeTag(['tee']),
+      });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTagTee,
+            workerpoolorder: workerpoolorderTagTee,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('Missing tag [tee] in apporder'));
+      // price check
+      const apporderTooExpensive = await iexecAppDev.order.signApporder({
+        ...apporderTemplate,
+        appprice: 1,
+      });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTooExpensive,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `appmaxprice too low (expected ${apporderTooExpensive.appprice}, got ${requestorderTemplate.appmaxprice})`,
+        ),
+      );
+
+      const datasetorderTooExpensive =
+        await iexecDatasetDev.order.signDatasetorder({
+          ...datasetorderTemplate,
+          datasetprice: 1,
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTooExpensive,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `datasetmaxprice too low (expected ${datasetorderTooExpensive.datasetprice}, got ${requestorderTemplate.datasetmaxprice})`,
+        ),
+      );
+
+      const workerpoolorderTooExpensive =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          workerpoolprice: 1,
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTooExpensive,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `workerpoolmaxprice too low (expected ${workerpoolorderTooExpensive.workerpoolprice}, got ${requestorderTemplate.workerpoolmaxprice})`,
+        ),
+      );
+      // volumes checks
+      const apporderCanceled = await iexecAppDev.order
+        .signApporder(apporderTemplate)
+        .then(async (order) => {
+          await iexecAppDev.order.cancelApporder(order);
+          return order;
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderCanceled,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('apporder is fully consumed'));
+
+      const datasetorderCanceled = await iexecDatasetDev.order
+        .signDatasetorder(datasetorderTemplate)
+        .then(async (order) => {
+          await iexecDatasetDev.order.cancelDatasetorder(order);
+          return order;
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderCanceled,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('datasetorder is fully consumed'));
+
+      const workerpoolorderCanceled = await iexecPoolManager.order
+        .signWorkerpoolorder(workerpoolorderTemplate)
+        .then(async (order) => {
+          await iexecPoolManager.order.cancelWorkerpoolorder(order);
+          return order;
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderCanceled,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('workerpoolorder is fully consumed'));
+
+      const requestorderCanceled = await iexecRequester.order
+        .signRequestorder(requestorderTemplate, { checkRequest: false })
+        .then(async (order) => {
+          await iexecRequester.order.cancelRequestorder(order);
+          return order;
+        });
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderCanceled,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(Error('requestorder is fully consumed'));
+
+      // requester account stake check
+      const balance = await iexecRequester.account.checkBalance(
+        await iexecRequester.wallet.getAddress(),
+      );
+      await iexecRequester.account.withdraw(balance.stake).catch(() => {});
+      await iexecRequester.account.deposit(5);
+
+      const apporder3nRlc = await iexecAppDev.order.signApporder({
+        ...apporderTemplate,
+        appprice: 3,
+      });
+      const datasetorder2nRlc = await iexecDatasetDev.order.signDatasetorder({
+        ...datasetorderTemplate,
+        datasetprice: 2,
+      });
+      const workerpoolorder1nRlc =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          workerpoolprice: 1,
+        });
+      const requestorder300nRlc = await iexecRequester.order.signRequestorder(
+        {
+          ...requestorderTemplate,
+          appmaxprice: 100,
+          datasetmaxprice: 100,
+          workerpoolmaxprice: 100,
+        },
+        { checkRequest: false },
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporder3nRlc,
+            datasetorder: datasetorder2nRlc,
+            workerpoolorder: workerpoolorder1nRlc,
+            requestorder: requestorder300nRlc,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          "Cost per task (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account",
+        ),
+      );
+
+      const apporder0nRlc = await iexecAppDev.order.signApporder({
+        ...apporderTemplate,
+        appprice: 0,
+        volume: 1000,
+      });
+      const datasetorder0nRlc = await iexecDatasetDev.order.signDatasetorder({
+        ...datasetorderTemplate,
+        datasetprice: 0,
+        volume: 1000,
+      });
+      const workerpoolorder2nRlc =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          workerpoolprice: 2,
+          volume: 1000,
+        });
+      const requestorder6nRlc = await iexecRequester.order.signRequestorder(
+        {
+          ...requestorderTemplate,
+          workerpoolmaxprice: 2,
+          volume: 3,
+        },
+        { checkRequest: false },
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporder0nRlc,
+            datasetorder: datasetorder0nRlc,
+            workerpoolorder: workerpoolorder2nRlc,
+            requestorder: requestorder6nRlc,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          "Total cost for 3 tasks (6) is greather than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume",
+        ),
+      );
+
+      // workerpool owner stake check
+      const workerpoolorder7nRlc =
+        await iexecPoolManager.order.signWorkerpoolorder({
+          ...workerpoolorderTemplate,
+          workerpoolprice: 7,
+        });
+      await iexecRequester.account.deposit(10);
+      const poolManagerBalance = await iexecPoolManager.account.checkBalance(
+        await iexecPoolManager.wallet.getAddress(),
+      );
+      await iexecPoolManager.account
+        .withdraw(poolManagerBalance.stake)
+        .catch(() => {});
+      await iexecRequester.wallet.sendRLC(
+        1,
+        await iexecPoolManager.wallet.getAddress(),
+      );
+      await iexecPoolManager.account.deposit(1);
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporder3nRlc,
+            datasetorder: datasetorder2nRlc,
+            workerpoolorder: workerpoolorder7nRlc,
+            requestorder: requestorder300nRlc,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          "workerpool required stake (2) is greather than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account",
+        ),
+      );
+
+      // requester not KYC
+      await revokeKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        requesterWallet.address,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `requester ${requesterWallet.address} is not authorized to interact with eRLC`,
+        ),
+      );
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        requesterWallet.address,
+      );
+
+      // app owner not KYC
+      await revokeKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        appDevWallet.address,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `app owner ${appDevWallet.address} is not authorized to interact with eRLC`,
+        ),
+      );
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        appDevWallet.address,
+      );
+
+      // dataset owner not KYC
+      await revokeKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        datasetDevWallet.address,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `dataset owner ${datasetDevWallet.address} is not authorized to interact with eRLC`,
+        ),
+      );
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        datasetDevWallet.address,
+      );
+
+      // workerpool owner not KYC
+      await revokeKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        poolManagerWallet.address,
+      );
+      await expect(
+        iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { checkRequest: false },
+        ),
+      ).rejects.toThrow(
+        Error(
+          `workerpool owner ${poolManagerWallet.address} is not authorized to interact with eRLC`,
+        ),
+      );
+      await grantKYC(
+        whitelistAdminWallet,
+        enterpriseHubAddress,
+        poolManagerWallet.address,
+      );
+
+      // standard case
+      const res = await iexecRequester.order.matchOrders(
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+          requestorder: requestorderTemplate,
+        },
+        { checkRequest: false },
+      );
       expect(res.txHash).toMatch(bytes32Regex);
       expect(res.volume).toBeInstanceOf(BN);
       expect(res.volume.eq(new BN(1))).toBe(true);
       expect(res.dealid).toMatch(bytes32Regex);
-    }, 60000);
-  }
+    },
+    DEFAULT_TIMEOUT * 2,
+  );
+
+  test('order.matchOrders() (checkRequest)', async () => {
+    const randomWallet = getRandomWallet();
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const iexecRich = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+        resultProxyURL,
+      },
+    );
+    await iexecRich.wallet.sendETH('20000000000000000', randomWallet.address);
+
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+        resultProxyURL,
+      },
+    );
+    const resourcesProviderSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      RICH_PRIVATE_KEY2,
+    );
+    const iexecResourcesProvider = new IExec(
+      {
+        ethProvider: resourcesProviderSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+
+    const apporder = await deployAndGetApporder(iexecResourcesProvider);
+    const datasetorder = await deployAndGetDatasetorder(iexecResourcesProvider);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(
+      iexecResourcesProvider,
+    );
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+
+    await expect(
+      iexec.order.matchOrders({
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      }),
+    ).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+      ),
+    );
+
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+    const res = await iexec.order.matchOrders({
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    });
+    expect(res.txHash).toMatch(bytes32Regex);
+    expect(res.volume).toBeInstanceOf(BN);
+    expect(res.volume.eq(new BN(1))).toBe(true);
+    expect(res.dealid).toMatch(bytes32Regex);
+  });
 
   if (WITH_STACK) {
     // this test requires running local stack
@@ -5847,7 +5827,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5870,7 +5849,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5893,7 +5871,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5918,7 +5895,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5956,14 +5932,9 @@ describe('[order]', () => {
       const iexecGatewayURL = DRONE
         ? 'http://token-gateway:3000'
         : 'http://localhost:13000';
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -5980,7 +5951,6 @@ describe('[order]', () => {
       const iexecAppOwner = new IExec(
         {
           ethProvider: appOwnerSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6023,7 +5993,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6052,7 +6021,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6083,7 +6051,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6118,7 +6085,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6155,7 +6121,7 @@ describe('[order]', () => {
           `API error: requestorder with orderHash ${orderHash} is not published`,
         ),
       );
-    }, 10000);
+    });
     // unpublishLast
     test('order.unpublishLastApporder()', async () => {
       const signer = utils.getSignerFromPrivateKey(
@@ -6168,7 +6134,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6207,7 +6172,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6248,7 +6212,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6294,7 +6257,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6310,7 +6272,6 @@ describe('[order]', () => {
       const iexecAppDev = new IExec(
         {
           ethProvider: appDevSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6361,7 +6322,7 @@ describe('[order]', () => {
           `API error: no open requestorder published by signer ${address} for requester ${requestorder.requester}`,
         ),
       );
-    }, 10000);
+    });
     // unpublishAll
     test('order.unpublishAllApporders()', async () => {
       const signer = utils.getSignerFromPrivateKey(
@@ -6374,7 +6335,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6412,7 +6372,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6452,7 +6411,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6497,7 +6455,6 @@ describe('[order]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6513,7 +6470,6 @@ describe('[order]', () => {
       const iexecAppDev = new IExec(
         {
           ethProvider: appDevSigner,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6563,7 +6519,7 @@ describe('[order]', () => {
           `API error: no open requestorder published by signer ${address} for requester ${requestorder.requester}`,
         ),
       );
-    }, 10000);
+    });
   }
 });
 
@@ -6581,7 +6537,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6612,7 +6567,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6643,7 +6597,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6674,7 +6627,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6712,30 +6664,6 @@ describe('[orderbook]', () => {
       expect(found.remaining).toBe(1);
       expect(found.publicationTimestamp).toBeDefined();
     });
-    test('orderbook.fetchAppOrderbook() (deprecated legacy)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const iexecGatewayURL = DRONE
-        ? 'http://token-gateway:3000'
-        : 'http://localhost:13000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          iexecGatewayURL,
-        },
-      );
-      const appAddress = getRandomAddress();
-      const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
-      expect(res.count).toBe(0);
-      expect(res.appOrders).toStrictEqual([]);
-    });
     test('orderbook.fetchAppOrderbook()', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -6747,7 +6675,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6773,30 +6700,6 @@ describe('[orderbook]', () => {
       expect(res2.count).toBe(22);
       expect(res2.orders.length).toBe(2);
       expect(res2.more).toBeUndefined();
-    }, 30000);
-    test('orderbook.fetchDatasetOrderbook() (deprecated legacy)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const iexecGatewayURL = DRONE
-        ? 'http://token-gateway:3000'
-        : 'http://localhost:13000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          iexecGatewayURL,
-        },
-      );
-      const datasetAddress = getRandomAddress();
-      const res = await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
-      expect(res.count).toBe(0);
-      expect(res.datasetOrders).toStrictEqual([]);
     });
     test('orderbook.fetchDatasetOrderbook()', async () => {
       const signer = utils.getSignerFromPrivateKey(
@@ -6809,7 +6712,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6837,29 +6739,6 @@ describe('[orderbook]', () => {
       expect(res2.count).toBe(23);
       expect(res2.orders.length).toBe(3);
       expect(res2.more).toBeUndefined();
-    }, 30000);
-    test('orderbook.fetchWorkerpoolOrderbook() (deprecated legacy)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const iexecGatewayURL = DRONE
-        ? 'http://token-gateway:3000'
-        : 'http://localhost:13000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          iexecGatewayURL,
-        },
-      );
-      const res = await iexec.orderbook.fetchWorkerpoolOrderbook(2);
-      expect(res.count).toBe(0);
-      expect(res.workerpoolOrders).toStrictEqual([]);
     });
     test('orderbook.fetchWorkerpoolOrderbook()', async () => {
       const signer = utils.getSignerFromPrivateKey(
@@ -6872,7 +6751,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6901,29 +6779,6 @@ describe('[orderbook]', () => {
       expect(res2.count).toBe(24);
       expect(res2.orders.length).toBe(4);
       expect(res2.more).toBeUndefined();
-    }, 30000);
-    test('orderbook.fetchRequestOrderbook() (deprecated legacy)', async () => {
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        PRIVATE_KEY,
-      );
-      const iexecGatewayURL = DRONE
-        ? 'http://token-gateway:3000'
-        : 'http://localhost:13000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          iexecGatewayURL,
-        },
-      );
-      const res = await iexec.orderbook.fetchRequestOrderbook(2);
-      expect(res.count).toBe(0);
-      expect(res.requestOrders).toStrictEqual([]);
     });
     test('orderbook.fetchRequestOrderbook()', async () => {
       const signer = utils.getSignerFromPrivateKey(
@@ -6936,7 +6791,6 @@ describe('[orderbook]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -6965,9 +6819,11 @@ describe('[orderbook]', () => {
             { ...requestorder, workerpool: utils.NULL_ADDRESS },
             { checkRequest: false },
           )
-          .then((o) => iexec.order.publishRequestorder(o, {
-            checkRequest: false,
-          }));
+          .then((o) =>
+            iexec.order.publishRequestorder(o, {
+              checkRequest: false,
+            }),
+          );
       }
       const res1 = await iexec.orderbook.fetchRequestOrderbook({
         requester: await iexec.wallet.getAddress(),
@@ -6980,7 +6836,7 @@ describe('[orderbook]', () => {
       expect(res2.count).toBe(25);
       expect(res2.orders.length).toBe(5);
       expect(res2.more).toBeUndefined();
-    }, 30000);
+    });
   }
 });
 
@@ -6990,7 +6846,6 @@ describe('[observables]', () => {
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7026,50 +6881,75 @@ describe('[observables]', () => {
     let unsubObsTaskBeforeNext;
     let unsubObsTaskAfterInit;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
-        unsubObsTaskWithDealid = iexec.task
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskWithDealidValues.push(value);
-            },
-            error: () => reject(Error('obsTask with dealid should not call error')),
-            complete: () => reject(Error('obsTask with dealid should not call complete')),
-          });
+          .then((obs) => {
+            unsubObsTaskWithDealid = obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
+              complete: () =>
+                reject(Error('obsTask with dealid should not call complete')),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
-      new Promise(async (resolve, reject) => {
-        unsubObsTaskBeforeNext = iexec.task
+      new Promise((resolve, reject) => {
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskUnsubBeforeNextValues.push(value);
-              try {
-                unsubObsTaskBeforeNext();
-              } catch (e) {
-                reject(e);
-              }
-            },
-            error: () => reject(Error('obsTask unsub before next should not call error')),
-            complete: () => reject(
-              Error('obsTask unsub before next should not call complete'),
-            ),
-          });
-        await sleep(10000);
+          .then((obs) => {
+            unsubObsTaskBeforeNext = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeNextValues.push(value);
+                try {
+                  unsubObsTaskBeforeNext();
+                } catch (e) {
+                  reject(e);
+                }
+              },
+              error: () =>
+                reject(
+                  Error('obsTask unsub before next should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error('obsTask unsub before next should not call complete'),
+                ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        unsubObsTaskAfterInit = iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: () => reject(Error('obsTask after init should not call complete')),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              unsubObsTaskAfterInit = obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
+                complete: () =>
+                  reject(Error('obsTask after init should not call complete')),
+              });
+              sleep(5000).then(resolve);
+            })
+            .catch(reject);
         });
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+            .then(resolve)
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7113,14 +6993,13 @@ describe('[observables]', () => {
     expect(obsTaskAfterInitValues[0].task.status).toBe(1);
     expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
     expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
-  }, 60000);
+  });
 
   test('task.obsTask() (task timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7163,54 +7042,85 @@ describe('[observables]', () => {
       obsTaskAfterInitComplete,
     ] = await Promise.all([
       new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid, { dealid }).subscribe({
-          next: (value) => {
-            obsTaskWithDealidValues.push(value);
-          },
-          error: () => reject(Error('obsTask with dealid should not call error')),
-          complete: resolve,
-        });
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid, { dealid: utils.NULL_BYTES32 }).subscribe({
-          next: (value) => {
-            obsTaskWithWrongDealidValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsTask with wrong dealid should not call complete')),
-        });
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskBeforeInitValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsTask before init should not call complete')),
-        });
-      }),
-      new Promise(async (resolve, reject) => {
-        await sleep(5000);
-        iexec.task.obsTask(taskid).subscribe({
-          next: (value) => {
-            obsTaskAfterInitValues.push(value);
-          },
-          error: () => reject(Error('obsTask after init should not call error')),
-          complete: resolve,
-        });
-      }),
-      new Promise(async (resolve, reject) => {
-        unsubObsTaskBeforeComplete = iexec.task
+        iexec.task
           .obsTask(taskid, { dealid })
-          .subscribe({
-            next: (value) => {
-              obsTaskUnsubBeforeCompleteValues.push(value);
-            },
-            error: () => reject(Error('obsTask unsubscribed should nol call complete')),
-            complete: () => reject(Error('obsTask unsubscribed should nol call complete')),
-          });
-        await sleep(1000);
-        resolve();
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
+              complete: resolve,
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid: utils.NULL_BYTES32 })
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithWrongDealidValues.push(value);
+              },
+              error: resolve,
+              complete: () =>
+                reject(
+                  Error('obsTask with wrong dealid should not call complete'),
+                ),
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskBeforeInitValues.push(value);
+              },
+              error: resolve,
+              complete: () =>
+                reject(Error('obsTask before init should not call complete')),
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
+                complete: resolve,
+              });
+            })
+            .catch(reject);
+        });
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            unsubObsTaskBeforeComplete = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeCompleteValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
+              complete: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
+            });
+            sleep(1000).then(resolve);
+          })
+          .catch(reject);
       }),
       sleep(1000).then(() => {
         unsubObsTaskBeforeComplete();
@@ -7278,14 +7188,13 @@ describe('[observables]', () => {
     expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
     expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
     expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
-  }, 60000);
+  });
 
   test('deal.obsDeal()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7318,36 +7227,60 @@ describe('[observables]', () => {
     let unsubObsDeal;
     let unsubObsDealBeforeNext;
 
-    await Promise.race([
+    await Promise.all([
       new Promise((resolve, reject) => {
-        unsubObsDeal = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealValues.push(value);
-          },
-          error: () => reject(Error('obsDeal should not call error')),
-          complete: () => reject(Error('obsDeal should not call complete')),
-        });
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDeal = obs.subscribe({
+              next: (value) => {
+                obsDealValues.push(value);
+              },
+              error: () => reject(Error('obsDeal should not call error')),
+              complete: () => reject(Error('obsDeal should not call complete')),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
-      new Promise(async (resolve, reject) => {
-        unsubObsDealBeforeNext = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealUnsubBeforeNextValues.push(value);
-            try {
-              unsubObsDealBeforeNext();
-            } catch (e) {
-              reject(e);
-            }
-          },
-          error: () => reject(Error('obsDeal unsub before next should not call error')),
-          complete: () => reject(Error('obsDeal unsub before next should not call complete')),
-        });
-        await sleep(10000);
+      new Promise((resolve, reject) => {
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDealBeforeNext = obs.subscribe({
+              next: (value) => {
+                obsDealUnsubBeforeNextValues.push(value);
+                try {
+                  unsubObsDealBeforeNext();
+                } catch (e) {
+                  reject(e);
+                }
+              },
+              error: () =>
+                reject(
+                  Error('obsDeal unsub before next should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error('obsDeal unsub before next should not call complete'),
+                ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
-      sleep(1000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(6000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(6000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7429,14 +7362,13 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeNextValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeNextValues[0].tasks[9].status).toBe(0);
-  }, 60000);
+  });
 
   test('deal.obsDeal() (deal timeout)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
-        chainId: networkId,
       },
       {
         hubAddress,
@@ -7475,44 +7407,72 @@ describe('[observables]', () => {
       obsDealUnsubBeforeComplete,
     ] = await Promise.all([
       new Promise((resolve, reject) => {
-        iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            obsDealCompleteValues.push(value);
-          },
-          error: () => reject(Error('obsDeal should not call error')),
-          complete: resolve,
-        });
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsDealCompleteValues.push(value);
+              },
+              error: () => reject(Error('obsDeal should not call error')),
+              complete: resolve,
+            });
+          })
+          .catch(reject);
       }),
       new Promise((resolve, reject) => {
-        iexec.deal.obsDeal(utils.NULL_BYTES32).subscribe({
-          next: (value) => {
-            obsDealWithWrongDealidValues.push(value);
-          },
-          error: resolve,
-          complete: () => reject(Error('obsDeal with wrong dealid should not call complete')),
-        });
+        iexec.deal
+          .obsDeal(utils.NULL_BYTES32)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsDealWithWrongDealidValues.push(value);
+              },
+              error: resolve,
+              complete: () =>
+                reject(
+                  Error('obsDeal with wrong dealid should not call complete'),
+                ),
+            });
+          })
+          .catch(reject);
       }),
-      new Promise(async (resolve, reject) => {
-        unsubObsDealBeforeComplete = iexec.deal.obsDeal(dealid).subscribe({
-          next: (value) => {
-            unsubObsDealBeforeComplete();
-            obsDealUnsubBeforeCompleteValues.push(value);
-          },
-          error: () => reject(
-            Error('obsDeal unsub before complete should not call error'),
-          ),
-          complete: () => reject(
-            Error('obsDeal unsub before complete should not call complete'),
-          ),
-        });
-        await sleep(10000);
-        resolve();
+      new Promise((resolve, reject) => {
+        iexec.deal
+          .obsDeal(dealid)
+          .then((obs) => {
+            unsubObsDealBeforeComplete = obs.subscribe({
+              next: (value) => {
+                unsubObsDealBeforeComplete();
+                obsDealUnsubBeforeCompleteValues.push(value);
+              },
+              error: () =>
+                reject(
+                  Error('obsDeal unsub before complete should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error(
+                    'obsDeal unsub before complete should not call complete',
+                  ),
+                ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
       }),
-      sleep(5000).then(async () => {
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 5);
-        await sleep(1000);
-        await initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-        await sleep(6000);
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
+            .then(() => {
+              sleep(1000).then(() => {
+                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+                  .then(() => sleep(6000).then(resolve))
+                  .catch(reject);
+              });
+            })
+            .catch(reject);
+        });
       }),
     ]);
 
@@ -7614,330 +7574,300 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
-  }, 60000);
+  });
 });
 
 describe('[result]', () => {
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('result.pushResultEncryptionKey()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.result.pushResultEncryptionKey('oops');
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.result.pushResultEncryptionKey('oops'),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
-        ),
-      );
+  test('result.pushResultEncryptionKey()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
     });
-    test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
-        forceUpdate: true,
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
-        forceUpdate: true,
-      });
-      expect(pushSameRes.isPushed).toBe(true);
-      expect(pushSameRes.isUpdated).toBe(true);
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
     });
-    test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(
-        iexec.result.pushResultEncryptionKey('oops'),
-      ).rejects.toThrow(Error(`SMS at ${smsURL} didn't answered`));
-    });
-    test('result.checkResultEncryptionKeyExists()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-        randomWallet.address,
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.result.pushResultEncryptionKey('oops');
-      const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-        randomWallet.address,
-      );
-      expect(withSecretRes).toBe(true);
-    });
-  }
+    expect(pushSameRes.isPushed).toBe(true);
+    expect(pushSameRes.isUpdated).toBe(true);
+  });
+  test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+  test('result.checkResultEncryptionKeyExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.result.pushResultEncryptionKey('oops');
+    const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withSecretRes).toBe(true);
+  });
 });
 
 describe('[storage]', () => {
-  if (WITH_STACK) {
-    // this test requires nexus.iex.ec image
-    test('storage.defaultStorageLogin()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const resultProxyURL = DRONE
-        ? 'http://token-result-proxy:18089'
-        : 'http://localhost:18089';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          resultProxyURL,
-        },
-      );
-      const token = await iexec.storage.defaultStorageLogin();
-      expect(typeof token).toBe('string');
-      expect(token.split('.').length).toBe(3);
-      const token2 = await iexec.storage.defaultStorageLogin();
-      expect(token2).toBe(token);
+  test('storage.defaultStorageLogin()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+      },
+    );
+    const token = await iexec.storage.defaultStorageLogin();
+    expect(typeof token).toBe('string');
+    expect(token.split('.').length).toBe(3);
+    const token2 = await iexec.storage.defaultStorageLogin();
+    expect(token2).toBe(token);
+  });
+  test('storage.pushStorageToken()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (provider: "default")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'default',
     });
-    test('storage.pushStorageToken()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops');
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'default' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (provider: "dropbox")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'dropbox',
     });
-    test('storage.pushStorageToken() (provider: "default")', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'default',
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'default' }),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+  test('storage.pushStorageToken() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
     });
-    test('storage.pushStorageToken() (provider: "dropbox")', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'dropbox',
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
-      ).rejects.toThrow(
-        Error(
-          `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
-        ),
-      );
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const updateRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
     });
-    test('storage.pushStorageToken() (forceUpdate)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        forceUpdate: true,
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      const updateRes = await iexec.storage.pushStorageToken('oops', {
-        forceUpdate: true,
-      });
-      expect(updateRes.isPushed).toBe(true);
-      expect(updateRes.isUpdated).toBe(true);
-    });
-    test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'https://token-sms' : 'https://localhost:5443';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        Error(`SMS at ${smsURL} didn't answered`),
-      );
-    });
-    test('storage.checkStorageTokenExists()', async () => {
-      const randomWallet = getRandomWallet();
-      const signer = utils.getSignerFromPrivateKey(
-        tokenChainParityUrl,
-        randomWallet.privateKey,
-      );
-      const smsURL = DRONE ? 'http://token-sms:5000' : 'http://localhost:5000';
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-          chainId: networkId,
-        },
-        {
-          hubAddress,
-          isNative: false,
-          smsURL,
-        },
-      );
-      const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-        { provider: 'dropbox' },
-      );
-      expect(withoutSecretRes).toBe(false);
-      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
-      const withSecretRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-        { provider: 'dropbox' },
-      );
-      expect(withSecretRes).toBe(true);
-      const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
-        randomWallet.address,
-      );
-      expect(unsetProviderRes).toBe(false);
-      expect(() => iexec.storage.checkStorageTokenExists(randomWallet.address, {
+    expect(updateRes.isPushed).toBe(true);
+    expect(updateRes.isUpdated).toBe(true);
+  });
+  test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+  test('storage.checkStorageTokenExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const withSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withSecretRes).toBe(true);
+    const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+    );
+    expect(unsetProviderRes).toBe(false);
+    await expect(
+      iexec.storage.checkStorageTokenExists(randomWallet.address, {
         provider: 'test',
-      })).toThrow(Error('"test" not supported'));
-    });
-  }
+      }),
+    ).rejects.toThrow(Error('"test" not supported'));
+  });
 });
 
 describe('[deal]', () => {
@@ -7954,7 +7884,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8021,7 +7950,7 @@ describe('[deal]', () => {
       expect(resWorkerpoolFiltered.deals[0].workerpool.pointer).toBe(
         workerpoolorder.workerpool,
       );
-    }, 20000);
+    });
     test('deal.fetchDealsByApporder()', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -8033,7 +7962,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8067,7 +7995,7 @@ describe('[deal]', () => {
       expect(resAfterMatch.count).toBe(1);
       expect(resAfterMatch.deals[0].dealid).toBe(dealid);
       expect(resAfterMatch.deals[0].app.pointer).toBe(apporder.app);
-    }, 20000);
+    });
     test('deal.fetchDealsByDatasetorder()', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -8079,7 +8007,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8115,7 +8042,7 @@ describe('[deal]', () => {
       expect(resAfterMatch.count).toBe(1);
       expect(resAfterMatch.deals[0].dealid).toBe(dealid);
       expect(resAfterMatch.deals[0].dataset.pointer).toBe(datasetorder.dataset);
-    }, 20000);
+    });
     test('deal.fetchDealsByWorkerpoolorder()', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -8127,7 +8054,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8165,7 +8091,7 @@ describe('[deal]', () => {
       expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
         workerpoolorder.workerpool,
       );
-    }, 20000);
+    });
     test('deal.fetchDealsByRequestorder()', async () => {
       const signer = utils.getSignerFromPrivateKey(
         tokenChainParityUrl,
@@ -8177,7 +8103,6 @@ describe('[deal]', () => {
       const iexec = new IExec(
         {
           ethProvider: signer,
-          chainId: networkId,
         },
         {
           hubAddress,
@@ -8213,7 +8138,7 @@ describe('[deal]', () => {
       expect(resAfterMatch.count).toBe(1);
       expect(resAfterMatch.deals[0].dealid).toBe(dealid);
       expect(resAfterMatch.deals[0].requester).toBe(requestorder.requester);
-    }, 20000);
+    });
   }
 });
 
@@ -8364,9 +8289,11 @@ describe('[lib utils]', () => {
       ).toStrictEqual(['tee']);
     });
     test('decodeTag unknown bit tag', () => {
-      expect(() => utils.decodeTag(
-        '0x0000000000000000000000000000000000000000000000000000000000000002',
-      )).toThrow('Unknown bit 2');
+      expect(() =>
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ),
+      ).toThrow('Unknown bit 2');
     });
   });
   describe('sumTags', () => {
@@ -8393,10 +8320,12 @@ describe('[lib utils]', () => {
       );
     });
     test('sumTags invalid bytes32', () => {
-      expect(() => utils.sumTags([
-        '0x000000000000000000000000000000000000000000000000000000000000000z',
-        '0x0000000000000000000000000000000000000000000000000000000000000001',
-      ])).toThrow('tag must be bytes32 hex string');
+      expect(() =>
+        utils.sumTags([
+          '0x000000000000000000000000000000000000000000000000000000000000000z',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toThrow('tag must be bytes32 hex string');
     });
   });
   describe('decryptResult', () => {

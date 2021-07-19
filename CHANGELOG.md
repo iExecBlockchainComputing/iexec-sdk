@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.0] 2021-07-19
+
+### Added
+
+- client-side (in browser) dataset encryption is now possible.
+- confirms option allows to set the number of block to wait for transaction confirmation.
+- `iexec app init --tee` init the TEE app template
+
+### Changed
+
+- [BREAKING] `iexec init` set default chain `viviani` (iExec sidecahin testnet) in `chain.json`, previously was `goerli` (using `--chain` option still overrides the `chain.json` configuration).
+- [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
+- [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
+- [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.
+- [BREAKING] app `mrenclave` format changed from string to object previously deployed TEE apps must be rebuilt and redeployed with v6 workflow
+- [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
+- [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
+- [DEPRECATED] `iexec wallet getETH` is now an alias to `iexec wallet get-ether` and will be removed in a next version
+- [DEPRECATED] `iexec wallet getRLC` is now an alias to `iexec wallet get-RLC` and will be removed in a next version
+- [DEPRECATED] `iexec wallet sendETH` is now an alias to `iexec wallet send-ether` and will be removed in a next version
+- [DEPRECATED] `iexec wallet sendRLC` will be removed in a next version, use `iexec wallet send-RLC` BEWARE default unit is RLC!
+- `chainId` is no longer required to call `IExec` constructor, the chainId is lazily fetched from the provider
+- fix `iexec wallet send-ether` return sent `amount` in wei
+- fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
+- fix `iexec app run` `--gas-price` option
+- removed `mrenclave` from app default template
+- `iexec appr run --watch` and `iexec deal show --watch` added tasks status details
+
+### Removed
+
+- [BREAKING] `--algorithm` option is removed from `iexec dataset encrypt`
+- [BREAKING] removed `iexec.network.id` and `iexec.network.isSidechain`, use `iexec.network.getNetwork() => Promise<{chainId: String, isSidechain: Boolean}>`
+- [BREAKING] tee post-compute configuration responsibility has been transferred to the SMS and is no longer supported by requestorder. any custom `iexec_tee_post_compute_image` and `iexec_tee_post_compute_fingerprint` will be silently removed from `requestorder.params`.
+- [BREAKING] drop previously deprecated `iexec wallet show --raw` returned json key `balance.ETH`, use `balance.ether` instead
+- [BREAKING] drop previously deprecated `bridge.bridgedChainId` in `chain.json` use `bridge.bridgedChainName` instead
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchRequestOrderbook(category, options)` use `category` as an option of `iexec.orderbook.fetchRequestOrderbook(options)`
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchAppOrderbook()` returned value `appOrders` use `orders`
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchDatasetOrderbook()` returned value `datasetOrders` use `orders`
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchWorkerpoolOrderbook()` returned value `workerpoolOrders` use `orders`
+- [BREAKING] drop previously deprecated `iexec.orderbook.fetchRequestOrderbook()` returned value `requestOrders` use `orders`
+- [BREAKING] drop previously deprecated `task.waitForTaskStatusChange(taskid, initialStatus)` use `task.obsTask(taskid)`
+
 ## [5.3.1] 2021-07-12
 
 ### changed
@@ -16,7 +59,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-- [BREAKING] Drop support for Node 10
+- [BREAKING] drop support for Node 10
 
 ## [5.2.0] 2021-01-22
 

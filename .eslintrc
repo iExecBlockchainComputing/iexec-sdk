@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base", "prettier"],
   "rules": {
     "new-cap": 0,
     "no-console": 0,
@@ -13,7 +13,14 @@
           "_hex",
           "_name",
           "_options",
-          "_subscribe"
+          "_signTypedData",
+          "_subscribe",
+          "_chainId",
+          "_contracts",
+          "_bridgedContracts",
+          "_enterpriseSwapContracts",
+          "_chainConfDefaults",
+          "_bridgedConf"
         ]
       }
     ],

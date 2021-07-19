@@ -1,6 +1,7 @@
 const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
-const { teePostComputeDefaults } = require('../src/secrets-utils');
+const fs = require('fs-extra');
+const path = require('path');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -24,13 +25,16 @@ const {
   // hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
+  mrenclaveSchema,
   // appSchema,
   // datasetSchema,
   // categorySchema,
   // workerpoolSchema,
   objParamsSchema,
+  base64Encoded256bitsKeySchema,
+  fileBufferSchema,
   ValidationError,
-} = require('../src/validator');
+} = require('../src/common/utils/validator');
 
 // TESTS
 describe('[positiveIntSchema]', () => {
@@ -303,7 +307,9 @@ describe('[nRlcAmountSchema]', () => {
     );
   });
   test('throw with invalid array', async () => {
-    await expect(() => nRlcAmountSchema().validate(['1', 'RLC', 'RLC'])).rejects.toThrow(new ValidationError('1 RLC RLC is not a valid amount'));
+    await expect(() =>
+      nRlcAmountSchema().validate(['1', 'RLC', 'RLC']),
+    ).rejects.toThrow(new ValidationError('1 RLC RLC is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(nRlcAmountSchema().validate(-1)).rejects.toThrow(
@@ -409,7 +415,9 @@ describe('[weiAmountSchema]', () => {
     ).resolves.toBe('48000000000');
   });
   test('throw with invalid unit', async () => {
-    await expect(() => weiAmountSchema().validate('48 ethereum')).rejects.toThrow(new ValidationError('48 ethereum is not a valid amount'));
+    await expect(() =>
+      weiAmountSchema().validate('48 ethereum'),
+    ).rejects.toThrow(new ValidationError('48 ethereum is not a valid amount'));
   });
   test('throw with invalid decimal string', async () => {
     await expect(() => weiAmountSchema().validate('0.48')).rejects.toThrow(
@@ -427,7 +435,9 @@ describe('[weiAmountSchema]', () => {
     );
   });
   test('throw with invalid array', async () => {
-    await expect(() => weiAmountSchema().validate(['1', 'eth', 'eth'])).rejects.toThrow(new ValidationError('1 eth eth is not a valid amount'));
+    await expect(() =>
+      weiAmountSchema().validate(['1', 'eth', 'eth']),
+    ).rejects.toThrow(new ValidationError('1 eth eth is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(weiAmountSchema().validate(-1)).rejects.toThrow(
@@ -533,8 +543,6 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -556,8 +564,6 @@ describe('[objParamsSchema]', () => {
       ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'dropbox',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -586,8 +592,6 @@ describe('[objParamsSchema]', () => {
       iexec_args: 'test',
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -609,8 +613,6 @@ describe('[objParamsSchema]', () => {
       ],
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -632,23 +634,6 @@ describe('[objParamsSchema]', () => {
     );
   });
 
-  test('with custom tee config', async () => {
-    await expect(
-      objParamsSchema().validate(
-        {
-          iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
-          iexec_tee_post_compute_image: 'custom-image',
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
-    ).resolves.toEqual({
-      iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: 'custom-fingerprint',
-      iexec_tee_post_compute_image: 'custom-image',
-    });
-  });
-
   test('with custom result-proxy', async () => {
     await expect(
       objParamsSchema().validate({
@@ -657,8 +642,6 @@ describe('[objParamsSchema]', () => {
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -674,8 +657,6 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -691,8 +672,6 @@ describe('[objParamsSchema]', () => {
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
@@ -723,33 +702,28 @@ describe('[objParamsSchema]', () => {
       iexec_developer_logger: true,
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 
   test('with isCallback in context, do not populate storage', async () => {
     await expect(
       objParamsSchema().validate({}, { context: { isCallback: true } }),
-    ).resolves.toEqual({
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
-    });
+    ).resolves.toEqual({});
   });
 
-  test('strip enexpected key', async () => {
+  test('strip unexpected key', async () => {
     await expect(
       objParamsSchema().validate(
         {
           foo: true,
+          iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
+          iexec_tee_post_compute_image: 'custom-image', // removed in in v6
         },
         { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
       ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      iexec_tee_post_compute_fingerprint: teePostComputeDefaults.fingerprint,
-      iexec_tee_post_compute_image: teePostComputeDefaults.image,
     });
   });
 });
@@ -858,6 +832,220 @@ describe('[addressSchema]', () => {
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
       new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
+    );
+  });
+});
+
+describe('[base64Encoded256bitsKeySchema]', () => {
+  test('valid key', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        'm7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=',
+      ),
+    ).resolves.toBe('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=');
+  });
+  test('invalid base64', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94',
+      ),
+    ).rejects.toThrow(
+      'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94 is not a valid encryption key (must be base64 encoded 256 bits key)',
+    );
+  });
+  test('invalid key length', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate('UtmonCp7SKOWuOPpXyikHQ=='),
+    ).rejects.toThrow(
+      'UtmonCp7SKOWuOPpXyikHQ== is not a valid encryption key (must be base64 encoded 256 bits key)',
+    );
+  });
+  test('buffer is not valid', async () => {
+    await expect(
+      base64Encoded256bitsKeySchema().validate(
+        Buffer.from('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=', 'base64'),
+      ),
+    ).rejects.toThrow();
+  });
+});
+
+describe('[fileBufferSchema]', () => {
+  test('file', async () => {
+    const fileBuffer = await fs.readFile(
+      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    );
+    await expect(
+      fileBufferSchema().validate(fileBuffer),
+    ).resolves.toBeInstanceOf(Buffer);
+  });
+  test('text', async () => {
+    await expect(fileBufferSchema().validate('foo')).rejects.toThrow(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  });
+  test('number', async () => {
+    await expect(fileBufferSchema().validate(42)).rejects.toThrow(
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
+    );
+  });
+});
+
+describe('[mrenclaveSchema]', () => {
+  test('valid obj', async () => {
+    const obj = {
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
+      Buffer.from(JSON.stringify(obj), 'utf8'),
+    );
+  });
+  test('valid string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    });
+    await expect(mrenclaveSchema().validate(str)).resolves.toEqual(
+      Buffer.from(str, 'utf8'),
+    );
+  });
+  test('valid bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: '/app/helloworld',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).resolves.toEqual(bytes);
+  });
+  test('allow empty string', async () => {
+    await expect(mrenclaveSchema().validate('')).resolves.toEqual(
+      Buffer.from([]),
+    );
+  });
+  test('allow undefined', async () => {
+    await expect(mrenclaveSchema().validate(undefined)).resolves.toEqual(
+      Buffer.from([]),
+    );
+    await expect(
+      mrenclaveSchema().required().validate(undefined),
+    ).resolves.toEqual(Buffer.from([]));
+  });
+  test('allow empty bytes', async () => {
+    await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
+      Buffer.from([]),
+    );
+  });
+  test('throw with null', async () => {
+    await expect(mrenclaveSchema().validate(null)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw with number', async () => {
+    await expect(mrenclaveSchema().validate(42)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw with boolean', async () => {
+    await expect(mrenclaveSchema().validate(false)).rejects.toThrow(
+      new ValidationError('this is not a valid mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in obj', async () => {
+    const obj = {
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      foo: 'bar',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in JSON string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      foo: 'bar',
+    });
+    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when unexpected key is found in decoded bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        entrypoint: '/app/helloworld',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+        foo: 'bar',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
+      new ValidationError('Unknown key "foo" in mrenclave'),
+    );
+  });
+  test('throw when a key is missing in obj', async () => {
+    const obj = {
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('provider is a required field'),
+    );
+  });
+  test('throw when a key is missing in JSON string', async () => {
+    const str = JSON.stringify({
+      provider: 'SCONE',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    });
+    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
+      new ValidationError('version is a required field'),
+    );
+  });
+  test('throw when a key is missing in decoded bytes', async () => {
+    const bytes = Buffer.from(
+      JSON.stringify({
+        provider: 'SCONE',
+        version: 'v5',
+        heapSize: 1073741824,
+        fingerprint:
+          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+      }),
+      'utf8',
+    );
+    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
+      new ValidationError('entrypoint is a required field'),
     );
   });
 });

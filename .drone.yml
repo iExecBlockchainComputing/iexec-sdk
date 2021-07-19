@@ -4,10 +4,12 @@ matrix:
     - 12
 
 pipeline:
-  build_node_12:
+  test_commit:
     image: node:${NODE_TAG}
     pull: true
     commands:
+      - apt update
+      - apt install xxd
       - node -v
       - npm -v
       - npm install
@@ -19,10 +21,12 @@ pipeline:
       matrix:
         NODE_TAG: 12
 
-  build_on_tag:
+  test_tag:
     image: node:${NODE_TAG}
     pull: true
     commands:
+      - apt update
+      - apt install xxd
       - node -v
       - npm -v
       - npm install
@@ -33,18 +37,18 @@ pipeline:
     when:
       ref: [refs/tags/v*]
 
-  npm_v5:
+  npm_v6:
     image: plugins/npm
     secrets: [npm_password]
     username: sulliwane
     email: sulliwane@gmail.com
     tag: latest
     when:
-      ref: [refs/tags/v5*]
+      ref: [refs/tags/v6*]
       matrix:
         NODE_TAG: 12
 
-  dockerhub_v5:
+  dockerhub_v6:
     image: plugins/docker
     repo: iexechub/iexec-sdk
     secrets: [docker_username, docker_password]
@@ -52,17 +56,63 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v5*]
+      ref: [refs/tags/v6*]
       matrix:
         NODE_TAG: 12
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:5.3.0-token
+    image: iexechub/poco-chaintest:5.3.0-ganache-update-token
     pull: true
+
   native-chain:
-    image: iexechub/poco-chaintest:5.3.0-native
+    image: iexechub/poco-chaintest:5.3.0-ganache-update-native
     pull: true
+
   token-chain-1s:
-    image: iexechub/poco-chaintest:5.3.0-token-1s
+    image: iexechub/poco-chaintest:5.3.0-ganache-update-token-1s
     pull: true
+
+  token-chain-parity:
+    image: 'iexechub/poco-chaintest:5.3.0-token-parity'
+
+  token-sms:
+    image: iexechub/iexec-sms:1.0.0
+    environment:
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
+      - IEXEC_SCONE_CAS_HOST=cas
+      - SCONE_CAS_ADDR=cas:18765
+      - SCONE_LAS_ADDR=las:18766
+      - SCONE_CONFIG_ID=s1/iexec-sms
+      - SCONE_HEAP=3G
+      - SCONE_LOG=6
+      - SCONE_VERSION=1
+      - SCONE_SYSLIBS=1
+    expose:
+      - '15000'
+      - '15443'
+    depends_on:
+      - token-chain-parity
+
+  token-result-proxy-mongo:
+    image: mongo:4-xenial
+
+  ipfs:
+    image: ipfs/go-ipfs:v0.4.20
+    container_name: ipfs
+
+  token-result-proxy:
+    image: iexechub/iexec-result-proxy:1.0.0
+    environment:
+      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - MONGO_HOST=token-result-proxy-mongo
+      - MONGO_PORT=27017
+      - IEXEC_IPFS_HOST=ipfs
+    expose:
+      - '18089'
+    depends_on:
+      - token-chain-parity
+      - token-result-proxy-mongo
+      - ipfs
