@@ -3964,6 +3964,17 @@ describe('[Common]', () => {
       expect(res.fail).toBeUndefined();
     });
 
+    test('iexec registry validate app (tee app)', async () => {
+      await execAsync('cp ./inputs/validator/iexec-app-tee.json iexec.json');
+      await execAsync('cp ./inputs/validator/deployed-app.json deployed.json');
+      await execAsync('cp ./inputs/validator/logo.png logo.png');
+      const raw = await execAsync(`${iexecPath} registry validate app --raw`);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.validated.length).toBe(3);
+      expect(res.fail).toBeUndefined();
+    });
+
     test('iexec registry validate dataset', async () => {
       await execAsync('cp ./inputs/validator/iexec-dataset.json iexec.json');
       await execAsync(

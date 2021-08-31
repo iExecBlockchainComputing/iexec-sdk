@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [next]
+
+### Added
+
+### Changed
+
+- fix `iexec registry validate app` to support new mrenclave format
+
+### Removed
+
 ## [6.0.0] 2021-07-19
 
 ### Added
