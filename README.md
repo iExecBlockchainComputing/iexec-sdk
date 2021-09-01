@@ -1908,8 +1908,8 @@ _Example:_
 ```js
 const res = await iexec.order.matchOrders({
   apporder,
-  datasetorder,
   workerpoolorder,
+  requestorder,
 });
 console.log('deal:', res.dealid);
 ```
