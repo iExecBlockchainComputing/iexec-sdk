@@ -249,7 +249,7 @@ see [app run available options](#app-run)
 
 ```bash
 iexec app request-execution [address] [--dataset [address] --args <args> --category <id>] # publish a requestorder on the Marketplace and get an orderHash
-iexec order show --app <orderHash> --deals # show your order on the Marketplace and check the deals
+iexec order show --request <orderHash> --deals # show your order on the Marketplace and check the deals
 ```
 
 #### Watch your Deals, your Tasks and download the results

@@ -55,6 +55,12 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] drop previously deprecated `iexec.orderbook.fetchRequestOrderbook()` returned value `requestOrders` use `orders`
 - [BREAKING] drop previously deprecated `task.waitForTaskStatusChange(taskid, initialStatus)` use `task.obsTask(taskid)`
 
+## [5.3.1] 2021-07-12
+
+### changed
+
+- set ethers version to ~5.3.1 for pre berlin fork compatibility (iExec sidechains)
+
 ## [5.3.0] 2021-05-05
 
 ### changed
