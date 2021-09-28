@@ -98,6 +98,8 @@ async function main() {
 
   cli.command('category', 'manage iExec categories');
 
+  cli.command('ens', 'manage ethereum name spaces');
+
   cli.command('order', 'manage iExec marketplace orders');
 
   cli.command('orderbook', 'show marketplace orderbook');

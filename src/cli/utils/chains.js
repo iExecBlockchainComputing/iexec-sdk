@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { getDefaultProvider } = require('ethers');
+const { getDefaultProvider, ethers } = require('ethers');
 const IExecContractsClient = require('iexec-contracts-js-client');
 const {
   getChainDefaults,
@@ -47,7 +47,15 @@ const createChainFromConf = (
 ) => {
   try {
     const chain = { ...chainConf };
-    const provider = getDefaultProvider(chainConf.host, providersOptions);
+    const provider =
+      chainConf.host && chainConf.host.indexOf('http') === 0
+        ? new ethers.providers.JsonRpcProvider(chainConf.host, {
+            ensAddress: chainConf.ensRegistry,
+            chainId: parseInt(chainConf.id, 10),
+            name: chainName,
+          })
+        : getDefaultProvider(chainConf.host, providersOptions);
+
     chain.name = chainName;
     const contracts = new IExecContractsClient({
       provider,
@@ -61,10 +69,13 @@ const createChainFromConf = (
     chain.contracts = contracts;
     if (bridgeConf) {
       chain.bridgedNetwork = { ...bridgeConf };
-      const bridgeProvider = getDefaultProvider(
-        bridgeConf.host,
-        providersOptions,
-      );
+      const bridgeProvider =
+        bridgeConf.host && bridgeConf.host.indexOf('http') === 0
+          ? new ethers.providers.JsonRpcProvider(bridgeConf.host, {
+              ensAddress: bridgeConf.ensRegistry,
+              chainId: parseInt(bridgeConf.id, 10),
+            })
+          : getDefaultProvider(bridgeConf.host, providersOptions);
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,
