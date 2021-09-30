@@ -95,6 +95,8 @@ const networkId = 65535;
 const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
 const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+const ensRegistryAddress = '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a';
+// const ensPublicResolverAddress = '0x464E9FC01C2970173B183D24B43A0FA07e6A072E';
 
 // console.log('chainId', chainId);
 console.log('hubAddress', hubAddress);
@@ -3157,20 +3159,30 @@ describe('[app]', () => {
 describe('[dataset]', () => {
   test('dataset.generateEncryptionKey()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-    const iexec = new IExec({
-      ethProvider: signer,
-      chainId: '1',
-    });
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
     const key = iexec.dataset.generateEncryptionKey();
     expect(typeof key).toBe('string');
     expect(Buffer.from(key, 'base64').length).toBe(32);
   });
   test('dataset.encrypt()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-    const iexec = new IExec({
-      ethProvider: signer,
-      chainId: '1',
-    });
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
     const key = iexec.dataset.generateEncryptionKey();
     const encryptedBytes = await iexec.dataset.encrypt(
       await fs.readFile(path.join(process.cwd(), 'test/inputs/files/text.zip')),
@@ -3201,10 +3213,15 @@ describe('[dataset]', () => {
   });
   test('dataset.computeEncryptedFileChecksum()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
-    const iexec = new IExec({
-      ethProvider: signer,
-      chainId: '1',
-    });
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
     const key = iexec.dataset.generateEncryptionKey();
     const fileBytes = await fs.readFile(
       path.join(process.cwd(), 'test/inputs/files/text.zip'),
@@ -7574,6 +7591,49 @@ describe('[observables]', () => {
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[7].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[8].status).toBe(0);
     expect(obsDealUnsubBeforeCompleteValues[0].tasks[9].status).toBe(0);
+  });
+});
+
+describe('[ens]', () => {
+  test('resolve ens on iExec mainnet sidechaine', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      'https://bellecour.iex.ec',
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
+    expect(balance.wei).toBeInstanceOf(BN);
+    expect(balance.nRLC).toBeInstanceOf(BN);
+  });
+  test('resolve ens on iExec testnet sidechaine', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      'https://viviani.iex.ec',
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
+    expect(balance.wei).toBeInstanceOf(BN);
+    expect(balance.nRLC).toBeInstanceOf(BN);
+  });
+  test("resolve ens on custom chain wallet.checkBalances('admin.iexec.eth')", async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const balance = await iexec.wallet.checkBalances('admin.iexec.eth');
+    expect(balance.wei).toBeInstanceOf(BN);
+    expect(balance.nRLC).toBeInstanceOf(BN);
   });
 });
 

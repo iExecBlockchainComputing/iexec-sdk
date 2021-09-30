@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- ENS resolution on iExec sidechains and custom networks
+
 ### Changed
 
 - fix `iexec registry validate app` to support new mrenclave format
