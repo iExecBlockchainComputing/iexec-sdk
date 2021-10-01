@@ -87,7 +87,7 @@ class IExec {
       if (isEnhancedWallet) {
         disposableProvider = ethProvider.provider;
       } else {
-        disposableProvider = new providers.Web3Provider(ethProvider).provider;
+        disposableProvider = new providers.Web3Provider(ethProvider);
       }
       const { chainId, name, ensAddress } =
         await disposableProvider.getNetwork();
