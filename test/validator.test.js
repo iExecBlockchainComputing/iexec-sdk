@@ -1057,6 +1057,11 @@ describe('[ensLabelSchema]', () => {
     const res = await ensLabelSchema().validate('a@α');
     expect(res).toBe('a@α');
   });
+  test('throw with uppercase', async () => {
+    await expect(ensLabelSchema().validate('A@α')).rejects.toThrow(
+      'A@α is not a valid ENS label (label cannot contain uppercase characters)',
+    );
+  });
   test('throw with unicode unsupported', async () => {
     await expect(ensLabelSchema().validate('🦄&🦄')).rejects.toThrow(
       '🦄&🦄 is not a valid ENS label (label cannot contain unsupported characters)',

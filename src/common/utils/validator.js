@@ -654,6 +654,21 @@ const ensLabelSchema = () =>
           return false;
         }
       },
+    )
+    .test(
+      'no-uppercase',
+      '${originalValue} is not a valid ENS label (label cannot contain uppercase characters)',
+      (value) => {
+        try {
+          if (value !== value.toLowerCase()) {
+            throw Error('Label cannot have uppercase characters');
+          }
+          return true;
+        } catch (e) {
+          debug('ensLabelSchema no-uppercase', e);
+          return false;
+        }
+      },
     );
 
 const throwIfMissing = () => {
