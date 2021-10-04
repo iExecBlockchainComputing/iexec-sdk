@@ -33,6 +33,8 @@ const {
   objParamsSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
+  ensDomainSchema,
+  ensLabelSchema,
   ValidationError,
 } = require('../src/common/utils/validator');
 
@@ -1046,6 +1048,42 @@ describe('[mrenclaveSchema]', () => {
     );
     await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
       new ValidationError('entrypoint is a required field'),
+    );
+  });
+});
+
+describe('[ensLabelSchema]', () => {
+  test('unicode', async () => {
+    const res = await ensLabelSchema().validate('a@α');
+    expect(res).toBe('a@α');
+  });
+  test('throw with unicode unsupported', async () => {
+    await expect(ensLabelSchema().validate('🦄&🦄')).rejects.toThrow(
+      '🦄&🦄 is not a valid ENS label (label cannot contain unsupported characters)',
+    );
+  });
+  test('throw with dot', async () => {
+    await expect(ensLabelSchema().validate('foo.bar')).rejects.toThrow(
+      'foo.bar is not a valid ENS label (label cannot have `.`)',
+    );
+  });
+});
+
+describe('[ensDomainSchema]', () => {
+  test('unicode', async () => {
+    const res = await ensDomainSchema().validate('foo.a@α.bar.eth');
+    expect(res).toBe('foo.a@α.bar.eth');
+  });
+  test('throw with unicode unsupported', async () => {
+    await expect(
+      ensDomainSchema().validate('foo.🦄&🦄.bar.eth'),
+    ).rejects.toThrow(
+      'foo.🦄&🦄.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
+    );
+  });
+  test('throw with empty labels', async () => {
+    await expect(ensDomainSchema().validate('foo..bar.eth')).rejects.toThrow(
+      'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)',
     );
   });
 });
