@@ -5,7 +5,12 @@ const ENSRegistry = require('../abi/ens/ENSRegistry-min.json');
 const FIFSRegistrar = require('../abi/ens/FIFSRegistrar-min.json');
 const PublicResolver = require('../abi/ens/PublicResolver-min.json');
 const ReverseRegistrar = require('../abi/ens/ReverseRegistrar-min.json');
-const { throwIfMissing, addressSchema } = require('../utils/validator');
+const {
+  throwIfMissing,
+  addressSchema,
+  ensDomainSchema,
+  ensLabelSchema,
+} = require('../utils/validator');
 const { getAddress } = require('./wallet');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
 const { NULL_ADDRESS } = require('../utils/utils');
@@ -14,12 +19,49 @@ const debug = Debug('iexec:ens');
 
 const BASE_DOMAIN = 'users.iexec.eth';
 
+const getOwner = async (
+  contracts = throwIfMissing(),
+  name = throwIfMissing(),
+) => {
+  try {
+    const vName = await ensDomainSchema().validate(name);
+    const nameHash = utils.namehash(vName);
+    const { ensAddress } = await contracts.provider.getNetwork();
+    const ensRegistryContract = new Contract(
+      ensAddress,
+      ENSRegistry.abi,
+      contracts.provider,
+    );
+    const owner = await wrapCall(ensRegistryContract.owner(nameHash));
+    return owner;
+  } catch (e) {
+    debug('getOwner()', e);
+    throw e;
+  }
+};
+
+const resolveName = async (
+  contracts = throwIfMissing(),
+  name = throwIfMissing(),
+) => {
+  try {
+    const vName = await ensDomainSchema().validate(name);
+    const address = await contracts.provider.resolveName(vName);
+    return address;
+  } catch (e) {
+    debug('resolveName()', e);
+    throw e;
+  }
+};
+
 const lookupAddress = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
   try {
-    const vAddress = await addressSchema().validate(address);
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(address);
     const ens = await contracts.provider.lookupAddress(vAddress);
     return ens;
   } catch (e) {
@@ -34,53 +76,38 @@ const registerFifsEns = async (
   domain = BASE_DOMAIN,
 ) => {
   try {
-    const domainHash = utils.namehash(domain);
-    const name = `${label}.${domain}`;
-    debug('name', name);
-    const nameHash = utils.namehash(name);
-    const labelHash = utils.id(label);
+    const vDomain = await ensDomainSchema().validate(domain);
+    const vLabel = await ensLabelSchema().validate(label);
+    let registerTxHash;
+    const name = `${vLabel}.${vDomain}`;
+    const labelHash = utils.id(vLabel);
     const address = await getAddress(contracts);
-    debug('address', address);
-
-    const { ensAddress } = await contracts.provider.getNetwork();
-    const registryContract = new Contract(
-      ensAddress,
-      ENSRegistry.abi,
-      contracts.signer,
-    );
-
-    const ownedBy = await wrapCall(registryContract.owner(nameHash));
-    if (
-      ownedBy !== NULL_ADDRESS &&
-      ownedBy.toLowerCase() !== address.toLowerCase()
-    ) {
+    const ownedBy = await getOwner(contracts, name);
+    if (ownedBy === NULL_ADDRESS) {
+      const domainOwner = await getOwner(contracts, vDomain);
+      const domainOwnerCode = await contracts.provider.getCode(domainOwner);
+      if (domainOwnerCode === '0x') {
+        throw Error(
+          `The base domain ${vDomain} owner ${domainOwner} is not a contract`,
+        );
+      }
+      const fifsRegistrarContract = new Contract(
+        domainOwner,
+        FIFSRegistrar.abi,
+        contracts.signer,
+      );
+      const registerTx = await wrapSend(
+        fifsRegistrarContract.register(labelHash, address, contracts.txOptions),
+      );
+      await wrapWait(registerTx.wait(contracts.confirms));
+      registerTxHash = registerTx.hash;
+    } else if (ownedBy.toLowerCase() === address.toLowerCase()) {
+      debug(`${name} is already owned by current wallet ${ownedBy}`);
+    } else {
       throw Error(`${name} is already owned by ${ownedBy}`);
     }
-
-    const domainOwner = await wrapCall(registryContract.owner(domainHash));
-    const domainOwnerCode = await contracts.provider.getCode(domainOwner);
-    if (domainOwnerCode === '0x') {
-      throw Error(
-        `The base domain ${domain} owner ${domainOwner} is not a contract`,
-      );
-    }
-    const fifsRegistrarContract = new Contract(
-      domainOwner,
-      FIFSRegistrar.abi,
-      contracts.signer,
-    );
-    const registerTx = await wrapSend(
-      fifsRegistrarContract.register(labelHash, address, contracts.txOptions),
-    );
-    await wrapWait(registerTx.wait(contracts.confirms));
-    const newOwnedBy = await wrapCall(registryContract.owner(nameHash));
-    if (!newOwnedBy.toLowerCase() === address.toLowerCase()) {
-      throw Error(
-        `the register tx did not set ${address} as the owner of the node ${name}`,
-      );
-    }
     return {
-      registerTxHash: registerTx.hash,
+      registerTxHash,
       registeredName: name,
     };
   } catch (e) {
@@ -89,7 +116,7 @@ const registerFifsEns = async (
   }
 };
 
-const setupEnsResolution = async (
+const configureResolution = async (
   contracts = throwIfMissing(),
   publicResolverAddress = throwIfMissing(),
   name = throwIfMissing(),
@@ -100,32 +127,37 @@ const setupEnsResolution = async (
       address !== undefined
         ? await addressSchema().validate(address)
         : await getAddress(contracts);
-    const nameHash = utils.namehash(name);
+    const vName = await ensDomainSchema().validate(name);
+    const nameHash = utils.namehash(vName);
     const walletAddress = await getAddress(contracts);
-
-    // setup resolution
     const { ensAddress } = await contracts.provider.getNetwork();
-    const registryContract = new Contract(
-      ensAddress,
-      ENSRegistry.abi,
-      contracts.signer,
-    );
 
-    const ownedBy = await wrapCall(registryContract.owner(nameHash));
-    if (ownedBy.toLowerCase() !== walletAddress.toLowerCase()) {
-      throw Error(
-        `The current address ${walletAddress} is not owner of ${name}`,
-      );
+    let addressIsContract = false;
+    if (vAddress !== walletAddress) {
+      const addressCode = await contracts.provider.getCode(vAddress);
+      if (addressCode === '0x') {
+        throw Error(
+          `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`,
+        );
+      } else {
+        addressIsContract = true;
+      }
     }
 
+    // setup resolution
+    const ownedBy = await getOwner(contracts, vName);
+    if (ownedBy.toLowerCase() !== walletAddress.toLowerCase()) {
+      throw Error(
+        `The current address ${walletAddress} is not owner of ${vName}`,
+      );
+    }
     const resolverCode = await contracts.provider.getCode(
       publicResolverAddress,
     );
     if (resolverCode === '0x') {
       throw Error(`The resolver ${publicResolverAddress} is not a contract`);
     }
-
-    const currentResolver = await contracts.provider.getResolver(name);
+    const currentResolver = await contracts.provider.getResolver(vName);
     let setResolverTx;
     if (
       currentResolver &&
@@ -133,10 +165,13 @@ const setupEnsResolution = async (
       currentResolver.address.toLowerCase() ===
         publicResolverAddress.toLowerCase()
     ) {
-      debug(
-        `Resolver already setup with PublicResolver ${publicResolverAddress}`,
-      );
+      debug(`Resolver already setup with ${publicResolverAddress}`);
     } else {
+      const registryContract = new Contract(
+        ensAddress,
+        ENSRegistry.abi,
+        contracts.signer,
+      );
       setResolverTx = await wrapSend(
         registryContract.setResolver(
           nameHash,
@@ -146,7 +181,6 @@ const setupEnsResolution = async (
       );
       await wrapWait(setResolverTx.wait(contracts.confirms));
     }
-
     const resolverContract = new Contract(
       publicResolverAddress,
       PublicResolver.abi,
@@ -170,10 +204,14 @@ const setupEnsResolution = async (
     }
 
     // setup reverse resolution
-    const addressCode = await contracts.provider.getCode(vAddress);
     let setNameTx;
     let claimReverseTx;
-    if (addressCode !== '0x') {
+
+    const configuredName = await lookupAddress(contracts, vAddress);
+    debug('configuredName', configuredName);
+    if (configuredName === vName) {
+      debug('Reverse resolution configuration already done');
+    } else if (addressIsContract) {
       // for iExec NFTs
       const registryEntryContract = new Contract(
         vAddress,
@@ -183,8 +221,7 @@ const setupEnsResolution = async (
       const entryOwner = await wrapCall(registryEntryContract.owner());
       if (
         !(
-          entryOwner &&
-          entryOwner.toLowerCase() === walletAddress.toLocaleLowerCase()
+          entryOwner && entryOwner.toLowerCase() === walletAddress.toLowerCase()
         )
       ) {
         throw Error(
@@ -192,34 +229,28 @@ const setupEnsResolution = async (
         );
       }
       setNameTx = await wrapSend(
-        registryEntryContract.setName(ensAddress, name, contracts.txOptions),
+        registryEntryContract.setName(ensAddress, vName, contracts.txOptions),
       );
       await wrapWait(setNameTx.wait(contracts.confirms));
     } else {
       // for EOA
       const REVERSE_DOMAIN = 'addr.reverse';
-      const reverseName = `${walletAddress
-        .toLocaleLowerCase()
+      const reverseName = `${vAddress
+        .toLowerCase()
         .substring(2)}.${REVERSE_DOMAIN}`;
       debug('reverseName', reverseName);
-      const reverseNameOwner = await wrapCall(
-        registryContract.owner(utils.namehash(reverseName)),
-      );
+      const reverseNameOwner = await getOwner(contracts, reverseName);
       debug('reverseNameOwner', reverseNameOwner);
 
-      const reverseRegistrarAddress = await wrapCall(
-        registryContract.owner(utils.namehash(REVERSE_DOMAIN)),
-      );
-
+      const reverseRegistrarAddress = await getOwner(contracts, REVERSE_DOMAIN);
       const reverseRegistrarContract = new Contract(
         reverseRegistrarAddress,
         ReverseRegistrar.abi,
         contracts.signer,
       );
-      if (
-        reverseNameOwner &&
-        reverseNameOwner.toLowerCase() === walletAddress.toLocaleLowerCase()
-      ) {
+      debug('walletAddress', walletAddress);
+      debug('publicResolverAddress', publicResolverAddress);
+      if (reverseNameOwner && reverseNameOwner.toLowerCase() !== NULL_ADDRESS) {
         debug('Reverse registration already done');
       } else {
         claimReverseTx = await wrapSend(
@@ -232,25 +263,29 @@ const setupEnsResolution = async (
         await wrapWait(claimReverseTx.wait(contracts.confirms));
       }
       setNameTx = await wrapSend(
-        reverseRegistrarContract.setName(name, contracts.txOptions),
+        reverseRegistrarContract.setName(vName, contracts.txOptions),
       );
       await wrapWait(setNameTx.wait(contracts.confirms));
     }
 
     return {
+      address: vAddress,
+      name: vName,
       setResolverTxHash: setResolverTx && setResolverTx.hash,
       setAddrTxHash: setAddrTx && setAddrTx.hash,
       setNameTxHash: setNameTx && setNameTx.hash,
       claimReverseTxHash: claimReverseTx && claimReverseTx.hash,
     };
   } catch (e) {
-    debug('setupEnsResolution()', e);
+    debug('configureResolution()', e);
     throw e;
   }
 };
 
 module.exports = {
+  getOwner,
+  resolveName,
   lookupAddress,
   registerFifsEns,
-  setupEnsResolution,
+  configureResolution,
 };

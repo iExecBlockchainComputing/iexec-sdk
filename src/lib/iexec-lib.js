@@ -10,6 +10,7 @@ const task = require('../common/modules/task');
 const iexecProcess = require('../common/modules/iexecProcess');
 const secretMgtServ = require('../common/modules/sms');
 const resultProxyServ = require('../common/modules/result-proxy');
+const ens = require('../common/modules/ens');
 const {
   checkRequestRequirements,
 } = require('../common/modules/request-helper');
@@ -67,7 +68,7 @@ class IExec {
     {
       hubAddress,
       ensRegistryAddress,
-      // ensPublicResolverAddress,
+      ensPublicResolverAddress,
       isNative,
       useGas = true,
       confirms,
@@ -331,6 +332,19 @@ class IExec {
       }
       throw Error(
         `bridgeAddress option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    const getEnsPublicResolverAddress = async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const value =
+        ensPublicResolverAddress || chainConfDefaults.ensPublicResolver;
+      if (value !== undefined) {
+        return value;
+      }
+      throw Error(
+        `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -821,6 +835,22 @@ class IExec {
         getStorageTokenKeyName(provider),
         token,
         { forceUpdate },
+      );
+    this.ens = {};
+    this.ens.getOwner = async (name) =>
+      ens.getOwner(await contractsPromise, name);
+    this.ens.resolveName = async (name) =>
+      ens.resolveName(await contractsPromise, name);
+    this.ens.lookupAddress = async (address) =>
+      ens.lookupAddress(await contractsPromise, address);
+    this.ens.claimName = async (label, domain) =>
+      ens.registerFifsEns(await contractsPromise, label, domain);
+    this.ens.configureResolution = async (name, address) =>
+      ens.configureResolution(
+        await contractsPromise,
+        await getEnsPublicResolverAddress(),
+        name,
+        address,
       );
     this.network = {};
     this.network.getNetwork = async () => {

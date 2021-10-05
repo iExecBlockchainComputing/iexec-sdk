@@ -10,6 +10,7 @@ const {
   sleep,
   bytes32Regex,
   addressRegex,
+  NULL_ADDRESS,
 } = require('../src/common/utils/utils');
 
 console.log('Node version:', process.version);
@@ -96,7 +97,7 @@ const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
 const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const ensRegistryAddress = '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a';
-// const ensPublicResolverAddress = '0x464E9FC01C2970173B183D24B43A0FA07e6A072E';
+const ensPublicResolverAddress = '0x464E9FC01C2970173B183D24B43A0FA07e6A072E';
 
 // console.log('chainId', chainId);
 console.log('hubAddress', hubAddress);
@@ -564,6 +565,45 @@ describe('[IExec]', () => {
     await expect(
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
+  });
+  test('ensRegistryAddress required function throw if no ensRegistryAddress configured', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await expect(iexec.ens.resolveName('admin.eth')).rejects.toThrow();
+  });
+  test('ensPublicResolverAddress required function throw if no ensPublicResolverAddress configured', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        ensRegistryAddress,
+      },
+    );
+    await expect(
+      iexec.ens.configureResolution('admin.eth', ADDRESS),
+    ).rejects.toThrow(
+      Error(
+        'ensPublicResolverAddress option not set and no default value for your chain 65535',
+      ),
+    );
   });
 });
 
@@ -7634,6 +7674,491 @@ describe('[ens]', () => {
     const balance = await iexec.wallet.checkBalances('admin.iexec.eth');
     expect(balance.wei).toBeInstanceOf(BN);
     expect(balance.nRLC).toBeInstanceOf(BN);
+  });
+  test('ens.getOwner(name) registered names resolves to address', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.getOwner('admin.iexec.eth');
+    expect(res).toBe(ADDRESS);
+  });
+  test('ens.getOwner(name) unregistered names resolves to address zero', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.getOwner('unregistered.iexec.eth');
+    expect(res).toBe(NULL_ADDRESS);
+  });
+  test('ens.resoleName(name) known names resolves to address', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.resolveName('admin.iexec.eth');
+    expect(res).toBe(ADDRESS);
+  });
+  test('ens.resoleName(name) unknown name resolves to null', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.resolveName('unknown.eth');
+    expect(res).toBe(null);
+  });
+  test('ens.lookupAddress(address) reverse resolution configured', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.lookupAddress('admin.iexec.eth');
+    expect(res).toBe('admin.iexec.eth');
+  });
+  test('ens.lookupAddress(address) no reverse resolution', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const res = await iexec.ens.lookupAddress(getRandomAddress());
+    expect(res).toBe(null);
+  });
+  test('ens.claimName(label) available name', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    const res = await iexec.ens.claimName(label);
+
+    expect(res.registerTxHash).toMatch(bytes32Regex);
+    expect(res.registeredName).toBe(name);
+
+    const resClaimSame = await iexec.ens.claimName(label);
+    expect(resClaimSame.registerTxHash).toBeUndefined();
+    expect(resClaimSame.registeredName).toBe(name);
+  });
+  test('ens.claimName(label, domain) available name on domain', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const domain = 'iexec.eth';
+    const name = `${label}.${domain}`;
+    const res = await iexec.ens.claimName(label, domain);
+
+    expect(res.registerTxHash).toMatch(bytes32Regex);
+    expect(res.registeredName).toBe(name);
+
+    const resClaimSame = await iexec.ens.claimName(label, domain);
+    expect(resClaimSame.registerTxHash).toBeUndefined();
+    expect(resClaimSame.registeredName).toBe(name);
+  });
+  test('ens.claimName(label, domain) name not available', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = 'users';
+    const domain = 'iexec.eth';
+    await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
+      Error(
+        'users.iexec.eth is already owned by 0xFA53ad31430e4f0A4E337A9d87c01d033683fCAF',
+      ),
+    );
+  });
+  test('ens.claimName(label, domain) no registar', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = 'test';
+    const domain = 'no-registrar.iexec.eth';
+    await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
+      Error(
+        'The base domain no-registrar.iexec.eth owner 0x0000000000000000000000000000000000000000 is not a contract',
+      ),
+    );
+  });
+
+  test('ens.configureResolution(name) configure to self', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureRes = await iexec.ens.configureResolution(name);
+    expect(configureRes.name).toBe(name);
+    expect(configureRes.address).toBe(wallet.address);
+    expect(configureRes.claimReverseTxHash).toMatch(bytes32Regex);
+    expect(configureRes.setAddrTxHash).toMatch(bytes32Regex);
+    expect(configureRes.setNameTxHash).toMatch(bytes32Regex);
+    expect(configureRes.setResolverTxHash).toMatch(bytes32Regex);
+
+    const reconfigureSameRes = await iexec.ens.configureResolution(name);
+    expect(reconfigureSameRes.name).toBe(name);
+    expect(reconfigureSameRes.address).toBe(wallet.address);
+    expect(reconfigureSameRes.claimReverseTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setAddrTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
+  });
+
+  test('ens.configureResolution(name, address) configure for address', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const app1 = await iexec.app.deployApp({
+      owner: wallet.address,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+
+    const label = `address_${wallet.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureRes = await iexec.ens.configureResolution(
+      name,
+      app1.address,
+    );
+    expect(configureRes.name).toBe(name);
+    expect(configureRes.address).toBe(app1.address);
+    expect(configureRes.claimReverseTxHash).toBeUndefined();
+    expect(configureRes.setAddrTxHash).toMatch(bytes32Regex);
+    expect(configureRes.setNameTxHash).toMatch(bytes32Regex);
+    expect(configureRes.setResolverTxHash).toMatch(bytes32Regex);
+
+    const reconfigureSameRes = await iexec.ens.configureResolution(
+      name,
+      app1.address,
+    );
+    expect(reconfigureSameRes.name).toBe(name);
+    expect(reconfigureSameRes.address).toBe(app1.address);
+    expect(reconfigureSameRes.claimReverseTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setAddrTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
+    expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
+
+    const app2 = await iexec.app.deployApp({
+      owner: wallet.address,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+
+    const reconfigureRes = await iexec.ens.configureResolution(
+      name,
+      app2.address,
+    );
+    expect(reconfigureRes.name).toBe(name);
+    expect(reconfigureRes.address).toBe(app2.address);
+    expect(reconfigureRes.claimReverseTxHash).toBeUndefined();
+    expect(reconfigureRes.setAddrTxHash).toMatch(bytes32Regex);
+    expect(reconfigureRes.setNameTxHash).toMatch(bytes32Regex);
+    expect(reconfigureRes.setResolverTxHash).toBeUndefined();
+  });
+  test('ens.configureResolution(name, address) throw with name not owned', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    await expect(
+      iexec.ens.configureResolution('not-owned.eth', wallet.address),
+    ).rejects.toThrow(
+      Error(
+        `The current address ${wallet.address} is not owner of not-owned.eth`,
+      ),
+    );
+  });
+  test('ens.configureResolution(name, address) throw with target app address not owned', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const app = await iexec.app.deployApp({
+      owner: getRandomAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+    const label = `address_${app.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    await expect(
+      iexec.ens.configureResolution(name, app.address),
+    ).rejects.toThrow(
+      Error(
+        `${ADDRESS} is not the owner of ${app.address}, impossible to setup ENS resolution`,
+      ),
+    );
+  });
+  test('ens.configureResolution(name, address) throw with other EOA', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const address = getRandomAddress();
+    const label = `address_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    await expect(iexec.ens.configureResolution(name, address)).rejects.toThrow(
+      Error(
+        `Target address ${address} is not a contract and don't match current wallet address ${ADDRESS}, impossible to setup ENS resolution`,
+      ),
+    );
   });
 });
 

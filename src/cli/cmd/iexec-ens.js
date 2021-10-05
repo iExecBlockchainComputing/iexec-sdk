@@ -76,7 +76,7 @@ register
         setAddrTxHash,
         claimReverseTxHash,
         setNameTxHash,
-      } = await ensModule.setupEnsResolution(
+      } = await ensModule.configureResolution(
         chain.contracts,
         getPropertyFormChain(chain, 'ensPublicResolver'),
         registeredName,
