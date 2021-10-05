@@ -1079,6 +1079,11 @@ describe('[ensDomainSchema]', () => {
     const res = await ensDomainSchema().validate('foo.a@α.bar.eth');
     expect(res).toBe('foo.a@α.bar.eth');
   });
+  test('throw with uppercase', async () => {
+    await expect(ensDomainSchema().validate('foo.A@α.bar.eth')).rejects.toThrow(
+      'foo.A@α.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
+    );
+  });
   test('throw with unicode unsupported', async () => {
     await expect(
       ensDomainSchema().validate('foo.🦄&🦄.bar.eth'),

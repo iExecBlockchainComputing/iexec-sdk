@@ -620,7 +620,22 @@ const ensDomainSchema = () =>
           namehash(value);
           return true;
         } catch (e) {
-          debug('ensLabelSchema valid-namehash', e);
+          debug('ensDomainSchema valid-namehash', e);
+          return false;
+        }
+      },
+    )
+    .test(
+      'no-uppercase',
+      '${originalValue} is not a valid ENS domain (domain cannot contain uppercase characters)',
+      (value) => {
+        try {
+          if (value !== value.toLowerCase()) {
+            throw Error('Domain cannot have uppercase characters');
+          }
+          return true;
+        } catch (e) {
+          debug('ensDomainSchema no-uppercase', e);
           return false;
         }
       },
