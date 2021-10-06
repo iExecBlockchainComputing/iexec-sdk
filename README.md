@@ -307,6 +307,7 @@ iexec account withdraw 1000 # withdraw RLC from your account to your wallet
   - [task](#task)
   - [storage](#storage)
   - [result](#result)
+  - [ens](#ens)
   - [category](#category)
   - [registry](#registry)
 - [CLI files and folders](#cli-files-and-folders)
@@ -569,6 +570,17 @@ iexec storage init # initialize the IPFS based default remote storage
 iexec storage init [provider] # initialize the specified remote storage (supported "default"|"dropbox")
 iexec storage check [provider] # check if the specified remote storage is initialized
 iexec storage check [provider] --user <address> # check if the remote storage of specified user is initialized
+```
+
+## ens
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec ens resolve <name> # resolve an ENS name to an address
+iexec ens lookup <address> # lookup for the ENS name of an address
+iexec ens get-owner <name> # find the the owner address of an ENS name
+iexec ens register <label> --domain <domain> --for <address># register an ENS if needed and setup both ENS resolution and reverse resolution
 ```
 
 ## category
