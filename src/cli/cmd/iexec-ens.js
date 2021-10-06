@@ -67,8 +67,11 @@ register
       }
 
       spinner.start('Registering ENS');
-      const { registerTxHash, registeredName } =
-        await ensModule.registerFifsEns(chain.contracts, label, domain);
+      const { registerTxHash, name } = await ensModule.registerFifsEns(
+        chain.contracts,
+        label,
+        domain,
+      );
 
       spinner.start('Configuring ENS resolution');
       const {
@@ -79,14 +82,14 @@ register
       } = await ensModule.configureResolution(
         chain.contracts,
         getPropertyFormChain(chain, 'ensPublicResolver'),
-        registeredName,
+        name,
         targetAddress,
       );
       spinner.succeed(
-        `ENS ${registeredName} successfuly registered and configured for ${targetAddress}`,
+        `ENS ${name} successfuly registered and configured for ${targetAddress}`,
         {
           raw: {
-            registeredName,
+            name,
             address: targetAddress,
             registerTxHash,
             setResolverTxHash,

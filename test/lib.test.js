@@ -7802,11 +7802,11 @@ describe('[ens]', () => {
     const res = await iexec.ens.claimName(label);
 
     expect(res.registerTxHash).toMatch(bytes32Regex);
-    expect(res.registeredName).toBe(name);
+    expect(res.name).toBe(name);
 
     const resClaimSame = await iexec.ens.claimName(label);
     expect(resClaimSame.registerTxHash).toBeUndefined();
-    expect(resClaimSame.registeredName).toBe(name);
+    expect(resClaimSame.name).toBe(name);
   });
   test('ens.claimName(label, domain) available name on domain', async () => {
     const wallet = getRandomWallet();
@@ -7846,11 +7846,11 @@ describe('[ens]', () => {
     const res = await iexec.ens.claimName(label, domain);
 
     expect(res.registerTxHash).toMatch(bytes32Regex);
-    expect(res.registeredName).toBe(name);
+    expect(res.name).toBe(name);
 
     const resClaimSame = await iexec.ens.claimName(label, domain);
     expect(resClaimSame.registerTxHash).toBeUndefined();
-    expect(resClaimSame.registeredName).toBe(name);
+    expect(resClaimSame.name).toBe(name);
   });
   test('ens.claimName(label, domain) name not available', async () => {
     const wallet = getRandomWallet();

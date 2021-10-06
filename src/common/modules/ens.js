@@ -108,7 +108,7 @@ const registerFifsEns = async (
     }
     return {
       registerTxHash,
-      registeredName: name,
+      name,
     };
   } catch (e) {
     debug('registerFifsEns()', e);
