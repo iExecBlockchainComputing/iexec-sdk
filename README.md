@@ -1228,7 +1228,7 @@ iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, 
 
 > find the cheapest orders for the specified app
 >
-> _Optional_:
+> _Optional:_
 >
 > - dataset: include dataset specific orders
 > - workerpool: include workerpool specific orders
@@ -1253,7 +1253,7 @@ iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, w
 
 > find the cheapest orders for the specified dataset
 >
-> _Optional_:
+> _Optional:_
 >
 > - app: include app specific orders
 > - workerpool: include workerpool specific orders
@@ -1278,7 +1278,7 @@ iexec.**orderbook.fetchWorkerpoolOrderbook ( \[ { workerpool: Address, workerpoo
 
 > find the cheapest orders for computing resource.
 >
-> _Optional_:
+> _Optional:_
 >
 > - workerpool: filter on specific workerpool
 > - category: filter on specific category
@@ -1305,7 +1305,7 @@ iexec.**orderbook.fetchRequestOrderbook ( \[, { requester: Address, beneficiary:
 
 > find the best paying request orders for computing resource.
 >
-> _Optional_:
+> _Optional:_
 >
 > - requester: filter on specific requester
 > - category: filter on specific category
@@ -1941,7 +1941,7 @@ iexec.**deal.obsDeal ( dealid: Bytes32 )** => Observable < **{ subscribe: Functi
 > - error is called once on error and stops the updates
 > - complete is called once on task completion or timeout/fail
 >
-> _messages_:
+> _messages:_
 >
 > - `DEAL_UPDATED`: deal status changed (task updated)
 > - `DEAL_COMPLETED`: all tasks are completed
@@ -1988,7 +1988,7 @@ iexec.**deal.fetchRequesterDeals ( requesterAddress: Address, \[ { appAddress: A
 
 > show the last deals of the specified requester.
 >
-> _Optional_: filter by appAddress, datasetAddress, workerpoolAddress.
+> _Optional:_ filter by appAddress, datasetAddress, workerpoolAddress.
 
 _Example:_
 
@@ -2078,9 +2078,9 @@ iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observab
 > - `error` is called once on error and stops the updates
 > - `complete` is called once on task completion or timeout/fail
 >
-> _Optional_: specify the dealid of the task, this prevent error to be called when task is not yet initialized (ACTIVE)
+> _Optional:_ specify the dealid of the task, this prevent error to be called when task is not yet initialized (ACTIVE)
 >
-> _messages_:
+> _messages:_
 >
 > - `TASK_UPDATED`: task status changed
 > - `TASK_COMPLETED`: task is completed
@@ -2181,7 +2181,7 @@ iexec.**dataset.generateEncryptionKey ()** => String
 
 > generate an encryption key to encrypt a dataset
 >
-> _NB_: This method returns a base64 encoded 256 bits key
+> _NB:_ This method returns a base64 encoded 256 bits key
 
 _Example:_
 
@@ -2196,7 +2196,7 @@ iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Pro
 
 > encrypt the dataset file with the specified key using AES-256-CBC
 >
-> _NB_:
+> _NB:_
 >
 > - the supplied key must be 256 bits base64 encoded
 > - DO NOT leak the key and DO NOT use the same key for encrypting different datasets
@@ -2223,7 +2223,7 @@ iexec.**dataset.computeEncryptedFileChecksum (encryptedDatasetFile: ArrayBuffer|
 >
 > - :warning: the dataset checksum is the encrypted file checksum, use this method on the encrypted file but DO NOT use it on the original dataset file
 >
-> _NB_:
+> _NB:_
 >
 > - the dataset checksum is the sha256sum of the encrypted dataset file
 > - the checksum is used in the computation workflow to ensure the dataset's integrity
@@ -2417,6 +2417,89 @@ const isIpfsStorageInitialized = await iexec.storage.checkStorageTokenExists(
   await iexec.wallet.getAddress(),
 );
 console.log('ipfs storage initialized:', isIpfsStorageInitialized);
+```
+
+### iexec.ens
+
+#### getOwner
+
+iexec.**ens.getOwner(name)** => Promise< **owner: Address | null** >
+
+> get the address of the ENS name's owner
+
+_Example:_
+
+```js
+const owner = await iexec.ens.getOwner('iexec.eth');
+console.log('iexec.eth owner:', owner);
+```
+
+#### resolveName
+
+iexec.**ens.resolveName(name)** => Promise< **address: Address | null** >
+
+> resolve the ENS name to an ethereum address if a resolver is configured for the name
+
+_Example:_
+
+```js
+const address = await iexec.ens.resolveName('me.users.iexec.eth');
+console.log('me.users.iexec.eth:', address);
+```
+
+#### lookupAddress
+
+iexec.**ens.lookupAddress(address)** => Promise< **name: String | null** >
+
+> lookup to find the ENS name of an ethereum address
+
+_Example:_
+
+```js
+const name = await iexec.ens.lookupAddress(await iexec.wallet.getAddress());
+console.log('my ENS name:', name);
+```
+
+#### claimName
+
+iexec.**ens.claimName(label: String \[, domain: String\])** => Promise< **{ registeredName: String \[, registerTxHash: TxHash \]}** >
+
+> register a subdomain (label) on an ENS FIFSRegistrar
+> _Optional:_ the `domain` must be controlled by a [FIFSRegistrar](https://github.com/ensdomains/ens#fifsregistrarsol), default `"users.iexec.eth"` > _NB:_ if the user already own the domain the register transaction will not occur
+
+_Example:_
+
+```js
+const { name, registerTxHash } = await iexec.ens.claimName(
+  'me',
+  'users.iexec.eth',
+);
+console.log('regitered:', name);
+```
+
+#### configureResolution
+
+iexec.**ens.configureResolution(name: String \[, address: Address\])** => Promise< **{ name: String, address: Address \[, setResolverTxHash: TxHash, setAddrTxHash: TxHash, setNameTxHash: TxHash, claimReverseTxHash: TxHash \]}** >
+
+> configure the ENS resolution AND reverse resolution for an owned ENS name
+> _Optional:_ the `address` must be an iExec RegistryEntry address (ie: app, dataset or workerpool) or the user address, default user address
+> _NB:_ depending on the target type (EOA or RegistryEntry) and the current state, some transaction may or may not occur to complete the configuration
+
+_Example:_
+
+```js
+const { address, name } = await iexec.ens.configureResolution(
+  'me.users.iexec.eth',
+);
+console.log('configured resolution:', address, '<=>', name);
+```
+
+```js
+const { address, name } = await iexec.ens.configureResolution(
+  'my-app.eth',
+  appAddress,
+);
+console.log('configured resolution:', address, '<=>', name);
 ```
 
 ### iexec.network
