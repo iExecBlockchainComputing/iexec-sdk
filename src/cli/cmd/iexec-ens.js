@@ -23,6 +23,85 @@ const { loadChain, connectKeystore } = require('../utils/chains');
 
 cli.name('iexec ens').usage('<command> [options]');
 
+const resolve = cli.command('resolve <name>');
+addGlobalOptions(resolve);
+resolve
+  .option(...option.chain())
+  .description('resolve an ENS name to an address')
+  .action(async (name, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+
+      spinner.start('Resolving ENS');
+      const address = await ensModule.resolveName(chain.contracts, name);
+      spinner.succeed(
+        address
+          ? `ENS ${name} resolved to ${address}`
+          : `No resolver configured for ${name}`,
+        {
+          raw: {
+            address,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const lookup = cli.command('lookup <address>');
+addGlobalOptions(lookup);
+lookup
+  .option(...option.chain())
+  .description('lookup for the ENS name of an address')
+  .action(async (address, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+
+      spinner.start('Looking up for the ENS name');
+      const name = await ensModule.lookupAddress(chain.contracts, address);
+      spinner.succeed(
+        name
+          ? `${address} is associated to ENS ${name}`
+          : `No reverse resolution configured for ${address}`,
+        {
+          raw: {
+            name,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const getOwner = cli.command('get-owner <name>');
+addGlobalOptions(getOwner);
+getOwner
+  .option(...option.chain())
+  .description('find the the owner address of an ENS name')
+  .action(async (name, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+
+      spinner.start('Finding ENS name owner');
+      const owner = await ensModule.getOwner(chain.contracts, name);
+      spinner.succeed(`ENS ${name} is owned by ${owner}`, {
+        raw: {
+          owner,
+        },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
 const register = cli.command('register <label>');
 addGlobalOptions(register);
 addWalletLoadOptions(register);
@@ -32,18 +111,24 @@ register
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(
-    '--domain <ensDomain>',
-    'register on the specified domain, this domain must be controled by a FIFS registrar (default domain `users.iexec.eth`)',
+    '--domain <domain>',
+    `use the specified ENS domain (default \`users.iexec.eth\`)
+ - if the ENS name (label.domain) is not owned by the user, the domain must be controled by a FIFS registrar
+ - if the ENS name (label.domain) is already owned by the user, the registration will be skipped`,
   )
-  .option('--for-address <address>', 'register for an owned iExec resource')
+  .option(
+    '--for <address>',
+    'register for an owned iExec app, dataset or workerpool',
+  )
   .description(
-    'Register an ENS from a FIFS registrar and setup ENS resolution and reverse resolution',
+    'register an ENS if needed and setup both ENS resolution and reverse resolution',
   )
   .action(async (label, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const { domain, forAddress, force } = opts;
+      const { domain, force } = opts;
+      const forAddress = opts.for; // workaround cannot destructure for
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
@@ -71,6 +156,11 @@ register
         chain.contracts,
         label,
         domain,
+      );
+      spinner.info(
+        registerTxHash
+          ? `Registered new ENS ${name}`
+          : `ENS ${name} already owned`,
       );
 
       spinner.start('Configuring ENS resolution');
