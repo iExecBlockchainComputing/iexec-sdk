@@ -2138,6 +2138,32 @@ const { app } = await iexec.app.showApp(
 console.log('app:', app);
 ```
 
+#### countUserApps
+
+iexec.**app.countUserApps ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the apps owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.app.countUserApps(await iexec.wallet.getAddress());
+console.log('app count:', count);
+```
+
+#### showUserApp
+
+iexec.**app.showUserApp ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
+
+> show the details of an app.
+
+_Example:_
+
+```js
+const { app } = await iexec.app.showUserApp(0, await iexec.wallet.getAddress());
+console.log('app:', app);
+```
+
 #### deploy
 
 iexec.**app.deployApp ( app: App )** => Promise < **{ address: Address, txHash: TxHash }** >
@@ -2171,6 +2197,37 @@ _Example:_
 ```js
 const { dataset } = await iexec.dataset.showDataset(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
+);
+console.log('dataset:', dataset);
+```
+
+#### countUserDatasets
+
+iexec.**dataset.countUserDatasets ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the datasets owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.dataset.countUserDatasets(
+  await iexec.wallet.getAddress(),
+);
+console.log('dataset count:', count);
+```
+
+#### showUserDataset
+
+iexec.**dataset.showUserDataset ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
+
+> show the details of a dataset.
+
+_Example:_
+
+```js
+const { dataset } = await iexec.dataset.showUserDataset(
+  0,
+  await iexec.wallet.getAddress(),
 );
 console.log('dataset:', dataset);
 ```
@@ -2305,6 +2362,37 @@ _Example:_
 ```js
 const { workerpool } = await iexec.workerpool.showWorkerpool(
   '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
+);
+console.log('workerpool:', workerpool);
+```
+
+#### countUserWorkerpools
+
+iexec.**workerpool.countUserWorkerpools ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the workerpools owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.workerpool.countUserWorkerpools(
+  await iexec.wallet.getAddress(),
+);
+console.log('workerpool count:', count);
+```
+
+#### showUserWorkerpool
+
+iexec.**workerpool.showUserWorkerpool ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
+
+> show the details of an workerpool.
+
+_Example:_
+
+```js
+const { workerpool } = await iexec.workerpool.showUserWorkerpool(
+  0,
+  await iexec.wallet.getAddress(),
 );
 console.log('workerpool:', workerpool);
 ```
