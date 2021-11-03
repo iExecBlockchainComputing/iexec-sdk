@@ -1106,6 +1106,21 @@ _Example:_
 await sdk.wallet.sweep(toEthAddress);
 ```
 
+#### checkBridgedBalances
+
+iexec.**wallet.checkBridgedBalances ( address: Address )** => Promise < **{ nRLC: BN, wei: BN }** >
+
+> check the wallet balance on bridged chain of specified address
+> ie: when connected to mainnet, check the wallet ballance on bellecour
+
+_Example:_
+
+```js
+const balance = await iexec.wallet.checkBridgedBalances(ethAddress);
+console.log('Nano RLC:', balance.nRLC.toString());
+console.log('Eth wei:', balance.wei.toString());
+```
+
 #### bridgeToSidechain
 
 iexec.**wallet.bridgeToSidechain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
@@ -1218,6 +1233,21 @@ _Example:_
 const { amount, txHash } = await iexec.account.withdraw('1000000000');
 console.log('Withdrawn:', amount);
 console.log('tx:', txHash);
+```
+
+#### checkBridgedBalance
+
+iexec.**account.checkBridgedBalance ( address: Address )** => Promise < **{ stake: BN, locked: BN }** >
+
+> check the account balance on bridged chain of specified address
+> ie: when connected to mainnet, check the account ballance on bellecour
+
+_Example:_
+
+```js
+const balance = await iexec.account.checkBridgedBalance(ethAddress);
+console.log('Nano RLC staked:', balance.stake.toString());
+console.log('Nano RLC locked:', balance.locked.toString());
 ```
 
 ### iexec.orderbook
