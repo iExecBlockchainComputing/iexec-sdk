@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const { string, number, object, mixed, boolean, array } = require('yup');
-const { getAddress } = require('ethers').utils;
+const { getAddress, namehash } = require('ethers').utils;
 const {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -593,6 +593,99 @@ const base64Encoded256bitsKeySchema = () =>
     },
   );
 
+const ensDomainSchema = () =>
+  string()
+    .test(
+      'no-empty-label',
+      '${originalValue} is not a valid ENS domain (domain cannot have empty labels)',
+      async (value) => {
+        try {
+          const nameArray = value.split('.');
+          const hasEmptyLabels =
+            nameArray.filter((e) => e.length < 1).length > 0;
+          if (hasEmptyLabels)
+            throw new Error('Domain cannot have empty labels');
+          return true;
+        } catch (e) {
+          debug('ensDomainSchema no-empty-label', e);
+          return false;
+        }
+      },
+    )
+    .test(
+      'valid-namehash',
+      '${originalValue} is not a valid ENS domain (domain cannot contain unsupported characters)',
+      (value) => {
+        try {
+          namehash(value);
+          return true;
+        } catch (e) {
+          debug('ensDomainSchema valid-namehash', e);
+          return false;
+        }
+      },
+    )
+    .test(
+      'no-uppercase',
+      '${originalValue} is not a valid ENS domain (domain cannot contain uppercase characters)',
+      (value) => {
+        try {
+          if (value !== value.toLowerCase()) {
+            throw Error('Domain cannot have uppercase characters');
+          }
+          return true;
+        } catch (e) {
+          debug('ensDomainSchema no-uppercase', e);
+          return false;
+        }
+      },
+    );
+
+const ensLabelSchema = () =>
+  string()
+    .test(
+      'no-dot',
+      '${originalValue} is not a valid ENS label (label cannot have `.`)',
+      async (value) => {
+        try {
+          const hasDot = value.indexOf('.') !== -1;
+          if (hasDot) throw new Error('Label cannot have `.`');
+          return true;
+        } catch (e) {
+          debug('ensLabelSchema no-dot', e);
+          return false;
+        }
+      },
+    )
+    .test(
+      'valid-namehash',
+      '${originalValue} is not a valid ENS label (label cannot contain unsupported characters)',
+      (value) => {
+        try {
+          namehash(value);
+          return true;
+        } catch (e) {
+          debug('ensLabelSchema valid-namehash', e);
+          return false;
+        }
+      },
+    )
+    .test(
+      'no-uppercase',
+      '${originalValue} is not a valid ENS label (label cannot contain uppercase characters)',
+      (value) => {
+        try {
+          if (value !== value.toLowerCase()) {
+            throw Error('Label cannot have uppercase characters');
+          }
+          return true;
+        } catch (e) {
+          debug('ensLabelSchema no-uppercase', e);
+          return false;
+        }
+      },
+    );
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -637,5 +730,7 @@ module.exports = {
   workerpoolSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
+  ensDomainSchema,
+  ensLabelSchema,
   ValidationError,
 };

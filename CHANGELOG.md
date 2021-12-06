@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- ENS resolution on iExec sidechains and custom networks
+- ENS methods in CLI & lib:
+  - `iexec ens resolve <name>` and `iexec.ens.resolveName(name)`
+  - `iexec ens lookup <address>` and `iexec.ens.lookupAddress(addres)`
+  - `iexec ens get-owner <name>` and `iexec.ens.getOwner(name)`
+  - `iexec ens register <label>`
+  - `iexec.ens.claimName(label, domain)`
+  - `iexec.ens.configureResolution(label, address)`
+
 ### Changed
 
 - fix `iexec registry validate app` to support new mrenclave format

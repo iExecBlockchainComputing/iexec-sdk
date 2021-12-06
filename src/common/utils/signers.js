@@ -41,9 +41,9 @@ class EnhancedWallet extends Wallet {
 }
 
 class EnhancedWeb3Signer extends Signer {
-  constructor(web3) {
+  constructor(...args) {
     super();
-    const web3Provider = new Web3Provider(web3);
+    const web3Provider = new Web3Provider(...args);
     this.provider = web3Provider;
   }
 
