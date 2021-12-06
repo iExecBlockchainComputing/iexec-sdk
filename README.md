@@ -1118,6 +1118,21 @@ _Example:_
 await sdk.wallet.sweep(toEthAddress);
 ```
 
+#### checkBridgedBalances
+
+iexec.**wallet.checkBridgedBalances ( address: Address )** => Promise < **{ nRLC: BN, wei: BN }** >
+
+> check the wallet balance on bridged chain of specified address
+> ie: when connected to mainnet, check the wallet ballance on bellecour
+
+_Example:_
+
+```js
+const balance = await iexec.wallet.checkBridgedBalances(ethAddress);
+console.log('Nano RLC:', balance.nRLC.toString());
+console.log('Eth wei:', balance.wei.toString());
+```
+
 #### bridgeToSidechain
 
 iexec.**wallet.bridgeToSidechain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
@@ -1230,6 +1245,21 @@ _Example:_
 const { amount, txHash } = await iexec.account.withdraw('1000000000');
 console.log('Withdrawn:', amount);
 console.log('tx:', txHash);
+```
+
+#### checkBridgedBalance
+
+iexec.**account.checkBridgedBalance ( address: Address )** => Promise < **{ stake: BN, locked: BN }** >
+
+> check the account balance on bridged chain of specified address
+> ie: when connected to mainnet, check the account ballance on bellecour
+
+_Example:_
+
+```js
+const balance = await iexec.account.checkBridgedBalance(ethAddress);
+console.log('Nano RLC staked:', balance.stake.toString());
+console.log('Nano RLC locked:', balance.locked.toString());
 ```
 
 ### iexec.orderbook
@@ -2150,6 +2180,32 @@ const { app } = await iexec.app.showApp(
 console.log('app:', app);
 ```
 
+#### countUserApps
+
+iexec.**app.countUserApps ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the apps owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.app.countUserApps(await iexec.wallet.getAddress());
+console.log('app count:', count);
+```
+
+#### showUserApp
+
+iexec.**app.showUserApp ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
+
+> show the details of an app.
+
+_Example:_
+
+```js
+const { app } = await iexec.app.showUserApp(0, await iexec.wallet.getAddress());
+console.log('app:', app);
+```
+
 #### deploy
 
 iexec.**app.deployApp ( app: App )** => Promise < **{ address: Address, txHash: TxHash }** >
@@ -2183,6 +2239,37 @@ _Example:_
 ```js
 const { dataset } = await iexec.dataset.showDataset(
   '0xf6b2bA0793C225c28a6E7753f6f67a3C68750bF1',
+);
+console.log('dataset:', dataset);
+```
+
+#### countUserDatasets
+
+iexec.**dataset.countUserDatasets ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the datasets owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.dataset.countUserDatasets(
+  await iexec.wallet.getAddress(),
+);
+console.log('dataset count:', count);
+```
+
+#### showUserDataset
+
+iexec.**dataset.showUserDataset ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
+
+> show the details of a dataset.
+
+_Example:_
+
+```js
+const { dataset } = await iexec.dataset.showUserDataset(
+  0,
+  await iexec.wallet.getAddress(),
 );
 console.log('dataset:', dataset);
 ```
@@ -2317,6 +2404,37 @@ _Example:_
 ```js
 const { workerpool } = await iexec.workerpool.showWorkerpool(
   '0xD34b0356D3A80De34d4fd71eF51346E468fe8cC2',
+);
+console.log('workerpool:', workerpool);
+```
+
+#### countUserWorkerpools
+
+iexec.**workerpool.countUserWorkerpools ( userAddress: Address )** => Promise < **count: BN** >
+
+> count the workerpools owned by an address.
+
+_Example:_
+
+```js
+const count = await iexec.workerpool.countUserWorkerpools(
+  await iexec.wallet.getAddress(),
+);
+console.log('workerpool count:', count);
+```
+
+#### showUserWorkerpool
+
+iexec.**workerpool.showUserWorkerpool ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
+
+> show the details of an workerpool.
+
+_Example:_
+
+```js
+const { workerpool } = await iexec.workerpool.showUserWorkerpool(
+  0,
+  await iexec.wallet.getAddress(),
 );
 console.log('workerpool:', workerpool);
 ```
