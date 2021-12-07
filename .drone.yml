@@ -39,9 +39,9 @@ pipeline:
 
   npm_v6:
     image: plugins/npm
-    secrets: [npm_password]
-    username: sulliwane
-    email: sulliwane@gmail.com
+    secrets: [npm_token]
+    username: iexecteam
+    email: dev@iex.ec
     tag: latest
     when:
       ref: [refs/tags/v6*]
