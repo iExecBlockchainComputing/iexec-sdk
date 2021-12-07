@@ -1,0 +1,19 @@
+{
+  "name": "browser",
+  "version": "6.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel serve index.html --open"
+  },
+  "dependencies": {
+    "iexec": "file:../.."
+  },
+  "devDependencies": {
+    "parcel": "^2.0.1"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11"
+  ]
+}
