@@ -1,64 +1,84 @@
-matrix:
-  NODE_TAG:
-    - 14
-    - 12
-
 pipeline:
-  test_commit:
-    image: node:${NODE_TAG}
+  test_node16:
+    image: node:16
     pull: true
     commands:
       - apt update
       - apt install xxd
       - node -v
       - npm -v
-      - npm install
-      - ./node_modules/.bin/babel --version
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      matrix:
-        NODE_TAG: 12
-
-  test_tag:
-    image: node:${NODE_TAG}
-    pull: true
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm install
-      - ./node_modules/.bin/babel --version
+      - npm ci
       - npm run build
       - npm -g install .
       - npm test
     when:
       ref: [refs/tags/v*]
 
-  npm_v6:
+  test_node14:
+    image: node:14
+    pull: true
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
+    when:
+      ref: [refs/tags/v*]
+
+  test_node12:
+    image: node:12
+    pull: true
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
+
+  publish_npm_alpha:
     image: plugins/npm
     secrets: [npm_token]
     username: iexecteam
     email: dev@iex.ec
-    tag: latest
+    tag: alpha
     when:
-      ref: [refs/tags/v6*]
-      matrix:
-        NODE_TAG: 12
+      ref: [refs/tags/v7*]
 
-  dockerhub_v6:
+  publish_dockerhub_alpha:
     image: plugins/docker
     repo: iexechub/iexec-sdk
     secrets: [docker_username, docker_password]
     tags:
-      - latest
+      - alpha
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v6*]
-      matrix:
-        NODE_TAG: 12
+      ref: [refs/tags/v7*]
+
+  # publish_npm:
+  #   image: plugins/npm
+  #   secrets: [npm_token]
+  #   username: iexecteam
+  #   email: dev@iex.ec
+  #   tag: latest
+  #   when:
+  #     ref: [refs/tags/v7*]
+
+  # publish_dockerhub:
+  #   image: plugins/docker
+  #   repo: iexechub/iexec-sdk
+  #   secrets: [docker_username, docker_password]
+  #   tags:
+  #     - latest
+  #     - ${DRONE_TAG##v}
+  #   when:
+  #     ref: [refs/tags/v7*]
 
 services:
   token-chain:
