@@ -38,6 +38,14 @@ class EnhancedWallet extends Wallet {
       return super.getTransactionCount(...args);
     return this._options.getTransactionCount(...args);
   }
+
+  sendTransaction(tx) {
+    let gasPrice;
+    if (this._options.gasPrice !== undefined) {
+      gasPrice = BigNumber.from(this._options.gasPrice).toHexString();
+    }
+    return super.sendTransaction({ gasPrice, ...tx });
+  }
 }
 
 class EnhancedWeb3Signer extends Signer {

@@ -33,7 +33,7 @@
     "commander": "^8.0.0",
     "cross-fetch": "^3.0.5",
     "debug": "^4.3.1",
-    "ethers": "~5.3.1",
+    "ethers": "^5.5.2",
     "ethjs-custom-signer": "1.4.1",
     "fs-extra": "^10.0.0",
     "iexec-contracts-js-client": "^6.0.0-alpha.1",
