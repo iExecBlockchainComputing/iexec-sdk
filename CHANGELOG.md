@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [next]
+
+### Changed
+
+- update default ipfs gateway
+
 ## [6.0.0] 2021-07-19
 
 ### Added

@@ -82,7 +82,7 @@ const getChainDefaults = ({ id, flavour }) => ({
   ipfsGateway:
     (ipfsGatewayMap[flavour] &&
       (ipfsGatewayMap[flavour][id] || ipfsGatewayMap[flavour].default)) ||
-    'https://ipfs.iex.ec',
+    'https://ipfs-legacy.iex.ec',
   iexecGateway:
     (iexecGatewayMap[flavour] &&
       (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default)) ||
