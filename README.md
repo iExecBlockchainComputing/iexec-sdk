@@ -13,19 +13,19 @@ The iExec SDK is a CLI and a JS library that allows easy interactions with iExec
 - [CLI documentation](#iexec-sdk-cli-api)
 - [JS lib documentation](#iexec-sdk-library-api)
 - [CHANGELOG](./CHANGELOG.md)
-- iExec main documentation: https://docs.iex.ec/for-developers/
-- The iExec Dapp Store: https://dapps.iex.ec
-- The iExec Marketplace: https://market.iex.ec
-- The iExec Explorer: https://explorer.iex.ec
-- The iExec Workerpool registry: https://pools.iex.ec
-- The RLC faucet: https://faucet.iex.ec
+- iExec main documentation: <https://docs.iex.ec/for-developers/>
+- The iExec Dapp Store: <https://dapps.iex.ec>
+- The iExec Marketplace: <https://market.iex.ec>
+- The iExec Explorer: <https://explorer.iex.ec>
+- The iExec Workerpool registry: <https://pools.iex.ec>
+- The RLC faucet: <https://faucet.iex.ec>
 - [iExec dapps registry](https://github.com/iExecBlockchainComputing/iexec-dapps-registry), to apply for Dapp Store listing
 
 ## Install
 
 All three major OS are supported (linux, OSX, windows).
 
-#### Using Nodejs
+### Using Nodejs
 
 Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=12.0.0-brightgreen.svg)](https://nodejs.org/en/) and [Git](https://git-scm.com/).
 
@@ -35,7 +35,7 @@ iexec --version
 iexec --help
 ```
 
-#### Using Docker
+### Using Docker
 
 Requirements: [Docker](https://docs.docker.com/install/).
 
@@ -177,7 +177,7 @@ iexec dataset show # show details of deployed dataset
 
 ### Securely share the dataset secret key
 
-**Disclaimer: The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it**
+**Disclaimer:** The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it.
 
 ```bash
 iexec dataset push-secret # Push the secret in the Secret Management Service (sms)
@@ -274,7 +274,7 @@ iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the pr
 
 First go through [Init project](#Init-project)
 
-#### Top up your iExec account to buy compution
+#### Top up your iExec account to stake
 
 ```bash
 iexec account deposit 200 # deposit RLC from your wallet to your account
@@ -985,10 +985,10 @@ const getIExec = async () => {
 Click `Custom RPC` in the MetaMask Networks dropdown and fill with the following values:
 
 - Network Name: Bellecour (iExec sidechain)
-- New RPC URL: https://bellecour.iex.ec
+- New RPC URL: <https://bellecour.iex.ec>
 - ChainID (optional): 134
 - Symbol (optional): xRLC
-- Block Explorer URL (optional): https://blockscout-bellecour.iex.ec
+- Block Explorer URL (optional): <https://blockscout-bellecour.iex.ec>
 
 ###### Connecting iExec SDK to iExec sidechain
 
@@ -1053,7 +1053,7 @@ const iexec = new IExec({
 
 ### iexec.wallet
 
-#### getAddress
+#### iexec.wallet.getAddress
 
 iexec.**wallet.getAddress ( )** => Promise < **Address** >
 
@@ -1066,7 +1066,7 @@ const userAddress = await iexec.wallet.getAddress();
 console.log('User address:', userAddress);
 ```
 
-#### checkBalances
+#### iexec.wallet.checkBalances
 
 iexec.**wallet.checkBalances ( address: Address )** => Promise < **{ nRLC: BN, wei: BN }** >
 
@@ -1080,7 +1080,7 @@ console.log('Nano RLC:', balance.nRLC.toString());
 console.log('Eth wei:', balance.wei.toString());
 ```
 
-#### sendRLC
+#### iexec.wallet.sendRLC
 
 iexec.**wallet.sendRLC ( nRlcAmount: NRlcAmount, address: Address )** => Promise < **TxHash** >
 
@@ -1093,7 +1093,7 @@ const txHash = await iexec.wallet.sendRLC(nRlcAmount, toEthAddress);
 console.log('Transaction hash:', txHash);
 ```
 
-#### sendETH
+#### iexec.wallet.sendETH
 
 iexec.**wallet.sendETH ( weiAmount: WeiAmount, address: Address )** => Promise < **TxHash** >
 
@@ -1106,7 +1106,7 @@ const txHash = await iexec.wallet.sendETH(weiAmount, toEthAddress);
 console.log('Transaction hash:', txHash);
 ```
 
-#### sweep
+#### iexec.wallet.sweep
 
 iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendNativeTxHash: TxHash, sendERC20TxHash: TxHash, errors }**
 
@@ -1115,10 +1115,10 @@ iexec.**wallet.sweep ( address: Address )** => Promise < **{ sendNativeTxHash: T
 _Example:_
 
 ```js
-await sdk.wallet.sweep(toEthAddress);
+await iexec.wallet.sweep(toEthAddress);
 ```
 
-#### checkBridgedBalances
+#### iexec.wallet.checkBridgedBalances
 
 iexec.**wallet.checkBridgedBalances ( address: Address )** => Promise < **{ nRLC: BN, wei: BN }** >
 
@@ -1133,7 +1133,7 @@ console.log('Nano RLC:', balance.nRLC.toString());
 console.log('Eth wei:', balance.wei.toString());
 ```
 
-#### bridgeToSidechain
+#### iexec.wallet.bridgeToSidechain
 
 iexec.**wallet.bridgeToSidechain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
 
@@ -1154,7 +1154,7 @@ console.log(
 );
 ```
 
-#### bridgeToMainchain
+#### iexec.wallet.bridgeToMainchain
 
 iexec.**wallet.bridgeToMainchain ( amount: NRlcAmount )** => Promise < **{ sendTxHash: TxHash \[, receiveTxHash: TxHash \] }**
 
@@ -1175,7 +1175,7 @@ console.log(
 );
 ```
 
-#### wrapEnterpriseRLC
+#### iexec.wallet.wrapEnterpriseRLC
 
 iexec.**wallet.wrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
 
@@ -1189,7 +1189,7 @@ const txHash = await sdk.wallet.wrapEnterpriseRLC('1000000000');
 console.log(`Wrapped 1000000000 nRLC into neRLC (tx: ${txHash})`);
 ```
 
-#### unwrapEnterpriseRLC
+#### iexec.wallet.unwrapEnterpriseRLC
 
 iexec.**wallet.unwrapEnterpriseRLC ( amount: NRlcAmount )** => Promise < **wrapTxHash: TxHash**
 
@@ -1205,7 +1205,7 @@ console.log(`Unwrapped 1000000000 neRLC into nRLC (tx: ${txHash})`);
 
 ### iexec.account
 
-#### checkBalance
+#### iexec.account.checkBalance
 
 iexec.**account.checkBalance ( address: Address )** => Promise < **{ stake: BN, locked: BN }** >
 
@@ -1219,7 +1219,7 @@ console.log('Nano RLC staked:', balance.stake.toString());
 console.log('Nano RLC locked:', balance.locked.toString());
 ```
 
-#### deposit
+#### iexec.account.deposit
 
 iexec.**account.deposit ( nRlcAmount: NRlcAmount )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
@@ -1233,7 +1233,7 @@ console.log('Deposited:', amount);
 console.log('tx:', txHash);
 ```
 
-#### withdraw
+#### iexec.account.withdraw
 
 iexec.**account.withdraw ( nRlcAmount: NRlcAmount )** => Promise < **{ amount: BN, txHash: TxHash }** >
 
@@ -1247,7 +1247,7 @@ console.log('Withdrawn:', amount);
 console.log('tx:', txHash);
 ```
 
-#### checkBridgedBalance
+#### iexec.account.checkBridgedBalance
 
 iexec.**account.checkBridgedBalance ( address: Address )** => Promise < **{ stake: BN, locked: BN }** >
 
@@ -1264,7 +1264,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 ### iexec.orderbook
 
-#### fetchAppOrderbook
+#### iexec.orderbook.fetchAppOrderbook
 
 iexec.**orderbook.fetchAppOrderbook ( address: Address, \[, { dataset: Address, workerpool: Address, requester: Address, minTag: Tag, maxTag: Tag, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedApporder, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
@@ -1289,7 +1289,7 @@ console.log('best order:', res.appOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
-#### fetchDatasetOrderbook
+#### iexec.orderbook.fetchDatasetOrderbook
 
 iexec.**orderbook.fetchDatasetOrderbook ( address: Address \[, { app: Address, workerpool: Address, requester: Address, minTag: Tag, maxTag: Tag, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedDatasetorder, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
@@ -1314,7 +1314,7 @@ console.log('best order:', res.datasetOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
-#### fetchWorkerpoolOrderbook
+#### iexec.orderbook.fetchWorkerpoolOrderbook
 
 iexec.**orderbook.fetchWorkerpoolOrderbook ( \[ { workerpool: Address, workerpoolOwner: Address, category: Uint256, app: Address, dataset: Address, requester: Address, minTag: Tag, maxTag: Tag, minTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedWorkerpoolorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
@@ -1341,7 +1341,7 @@ console.log('best order:', res.workerpoolOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
-#### fetchRequestOrderbook
+#### iexec.orderbook.fetchRequestOrderbook
 
 iexec.**orderbook.fetchRequestOrderbook ( \[, { requester: Address, beneficiary: Address, category: Uint256, app: Address, dataset: Address, workerpool: Address, minTag: Tag, maxTag: Tag, maxTrust: Int, minVolume: Int } \] )** => Promise < **{ count, orders: \[ { order: SignedRequestorde, orderHash: Bytes32, status: String, remaining: } [, more: Function => Promise] \] }** >
 
@@ -1368,7 +1368,7 @@ console.log('best order:', res.requestOrders[0].order);
 console.log('total orders:', res.count);
 ```
 
-#### fetchApporder
+#### iexec.orderbook.fetchApporder
 
 iexec.**orderbook.fetchApporder ( orderHash: Bytes32 )** => Promise < **{ order: SignedApporder, status, remaining }** >
 
@@ -1385,7 +1385,7 @@ console.log('status:', res.status);
 console.log('remaining:', res.remaining);
 ```
 
-#### fetchDatasetorder
+#### iexec.orderbook.fetchDatasetorder
 
 iexec.**orderbook.fetchDatasetorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedDatasetorder, status, remaining }** >
 
@@ -1402,7 +1402,7 @@ console.log('status:', res.status);
 console.log('remaining:', res.remaining);
 ```
 
-#### fetchWorkerpoolorder
+#### iexec.orderbook.fetchWorkerpoolorder
 
 iexec.**orderbook.fetchWorkerpoolorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedWorkerpoolorder, status, remaining }** >
 
@@ -1419,7 +1419,7 @@ console.log('status:', res.status);
 console.log('remaining:', res.remaining);
 ```
 
-#### fetchRequestorder
+#### iexec.orderbook.fetchRequestorder
 
 iexec.**orderbook.fetchRequestorder ( orderHash: Bytes32 )** => Promise < **{ order: SignedRequestorder, status, remaining }** >
 
@@ -1436,7 +1436,7 @@ console.log('remaining:', res.remaining);
 
 ### iexec.order
 
-#### createApporder
+#### iexec.order.createApporder
 
 iexec.**order.createApporder ( { app: Address \[, appprice: NRlcAmount, volume: Uint256, tag: Bytes32, datasetrestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Apporder** >
 
@@ -1465,7 +1465,7 @@ const apporderToSign = await iexec.order.createApporder({
 });
 ```
 
-#### signApporder
+#### iexec.order.signApporder
 
 iexec.**order.signApporder ( apporderToSign: Apporder )** => Promise < **SignedApporder** >
 
@@ -1477,7 +1477,7 @@ _Example:_
 const signedApporder = await iexec.order.signApporder(apporderToSign);
 ```
 
-#### hashApporder
+#### iexec.order.hashApporder
 
 iexec.**order.hashApporder ( signedorder: SignerdApporder )** => Promise < **orderHash: Bytes32** >
 
@@ -1489,7 +1489,7 @@ _Example:_
 const hash = await iexec.order.hashApporder(apporder);
 ```
 
-#### createDatasetorder
+#### iexec.order.createDatasetorder
 
 iexec.**order.createDatasetorder ( { dataset: Address \[, datasetprice: NRlcAmount, volume: Uint256, tag: Bytes32, apprestrict: Address, workerpoolrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Datasetorder** >
 
@@ -1518,7 +1518,7 @@ const datasetorderToSign = await iexec.order.createDatasetorder({
 });
 ```
 
-#### signDatasetorder
+#### iexec.order.signDatasetorder
 
 iexec.**order.signDatasetorder ( datasetorderToSign: Datasetorder )** => Promise < **SignedDatasetorder** >
 
@@ -1532,7 +1532,7 @@ const signedDatasetorder = await iexec.order.signDatasetorder(
 );
 ```
 
-#### hashDatasetorder
+#### iexec.order.hashDatasetorder
 
 iexec.**order.hashDatasetorder ( signedorder: SignerdDatasetorder )** => Promise < **orderHash: Bytes32** >
 
@@ -1544,7 +1544,7 @@ _Example:_
 const hash = await iexec.order.hashDatasetorder(datasetorder);
 ```
 
-#### createWorkerpoolorder
+#### iexec.order.createWorkerpoolorder
 
 iexec.**order.createWorkerpoolorder ( { workerpool: Address, category: Uint256 \[, workerpoolprice: NRlcAmount, volume: Uint256, trust: Uint256, tag: Bytes32, apprestrict: Address, datasetrestrict: Address, requesterrestrict: Address \] } )** => Promise < **Workerpoolorder** >
 
@@ -1576,7 +1576,7 @@ const workerpoolorderToSign = await iexec.order.createWorkerpoolorder({
 });
 ```
 
-#### signWorkerpoolorder
+#### iexec.order.signWorkerpoolorder
 
 iexec.**order.signWorkerpoolorder ( workerpoolorderToSign: Workerpoolorder )** => Promise < **SignedWorkerpoolorder** >
 
@@ -1590,7 +1590,7 @@ const signedWorkerpoolorder = await iexec.order.signWorkerpoolorder(
 );
 ```
 
-#### hashWorkerpoolorder
+#### iexec.order.hashWorkerpoolorder
 
 iexec.**order.hashWorkerpoolorder ( signedorder: SignerdWorkerpoolorder )** => Promise < **orderHash: Bytes32** >
 
@@ -1602,7 +1602,7 @@ _Example:_
 const hash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
 ```
 
-#### createRequestorder
+#### iexec.order.createRequestorder
 
 iexec.**order.createRequestorder ( { app: Address, category: Uint256 \[, appmaxprice: NRlcAmount, workerpoolmaxprice: NRlcAmount, requester: Address, volume: Uint256, workerpool: Address, dataset: Address, datasetmaxprice: NRlcAmount, beneficiary: Address, params: Object, callback: Address, trust: Uint256, tag: Bytes32 \] } )** => Promise < **Requestorder** >
 
@@ -1645,7 +1645,7 @@ const requestorderToSign = await iexec.order.createRequestorder({
 });
 ```
 
-#### signRequestorder
+#### iexec.order.signRequestorder
 
 iexec.**order.signRequestorder ( requestorderToSign: Requestorder \[, options: Object \] )** => Promise < **SignedRequestorder** >
 
@@ -1663,7 +1663,7 @@ const SignedRequestorder = await iexec.order.signRequestorder(
 );
 ```
 
-#### hashRequestorder
+#### iexec.order.hashRequestorder
 
 iexec.**order.hashRequestorder ( signedorder: SignerdRequestorder )** => Promise < **orderHash: Bytes32** >
 
@@ -1675,7 +1675,7 @@ _Example:_
 const hash = await iexec.order.hashRequestorder(requestorder);
 ```
 
-#### publishApporder
+#### iexec.order.publishApporder
 
 iexec.**order.publishApporder ( order: SignedApporder )** => Promise < **orderHash: Bytes32** >
 
@@ -1688,7 +1688,7 @@ const orderHash = await iexec.order.publishApporder(signedApporder);
 console.log('order published with orderHash:', orderHash);
 ```
 
-#### unpublishApporder
+#### iexec.order.unpublishApporder
 
 iexec.**order.unpublishApporder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
@@ -1700,7 +1700,7 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishApporder(orderHash);
 ```
 
-#### unpublishLastApporder
+#### iexec.order.unpublishLastApporder
 
 iexec.**order.unpublishApporder ( appAddress: Address )** => Promise < **orderHash: Bytes32** >
 
@@ -1712,7 +1712,7 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishLastApporder(appAddess);
 ```
 
-#### unpublishAllApporders
+#### iexec.order.unpublishAllApporders
 
 iexec.**order.unpublishAllApporders ( appAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
 
@@ -1724,7 +1724,7 @@ _Example:_
 const unpublishedOrders = await iexec.order.unpublishAllApporders(appAddess);
 ```
 
-#### cancelApporder
+#### iexec.order.cancelApporder
 
 iexec.**order.cancelApporder ( order: SignedApporder )** => Promise < **{ order: SignedApporder, txHash; TxHash }** >
 
@@ -1736,7 +1736,7 @@ _Example:_
 await iexec.order.cancelApporder(signedApporder);
 ```
 
-#### publishDatasetorder
+#### iexec.order.publishDatasetorder
 
 iexec.**order.publishDatasetorder ( order: SignedDatasetorder )** => Promise < **orderHash: Bytes32** >
 
@@ -1749,7 +1749,7 @@ const orderHash = await iexec.order.publishDatasetorder(signedDatasetorder);
 console.log('order published with orderHash:', orderHash);
 ```
 
-#### unpublishDatasetorder
+#### iexec.order.unpublishDatasetorder
 
 iexec.**order.unpublishDatasetorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
@@ -1761,7 +1761,7 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishDatasetorder(orderHash);
 ```
 
-#### unpublishLastDatasetorder
+#### iexec.order.unpublishLastDatasetorder
 
 iexec.**order.unpublishDatasetorder ( datasetAddress: Address )** => Promise < **orderHash: Bytes32** >
 
@@ -1775,7 +1775,7 @@ const unpublishedOrderHash = await iexec.order.unpublishLastDatasetorder(
 );
 ```
 
-#### unpublishAllDatasetorders
+#### iexec.order.unpublishAllDatasetorders
 
 iexec.**order.unpublishAllDatasetorders ( datasetAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
 
@@ -1789,7 +1789,7 @@ const unpublishedOrders = await iexec.order.unpublishAllDatasetorders(
 );
 ```
 
-#### cancelDatasetorder
+#### iexec.order.cancelDatasetorder
 
 iexec.**order.cancelDatasetorder ( order: SignedDatasetorder )** => Promise < **{ order: SignedDatasetorder, txHash; TxHash }** >
 
@@ -1801,7 +1801,7 @@ _Example:_
 await iexec.order.cancelDatasetorder(signedDatasetorder);
 ```
 
-#### publishWorkerpoolorder
+#### iexec.order.publishWorkerpoolorder
 
 iexec.**order.publishWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **orderHash: Bytes32** >
 
@@ -1816,7 +1816,7 @@ const orderHash = await iexec.order.publishWorkerpoolorder(
 console.log('order published with orderHash:', orderHash);
 ```
 
-#### unpublisWorkerpoolorder
+#### iexec.order.unpublisWorkerpoolorder
 
 iexec.**order.unpublisWorkerpoolorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
@@ -1830,7 +1830,7 @@ const unpublishedOrderHash = await iexec.order.unpublisWorkerpoolorder(
 );
 ```
 
-#### unpublishLastWorkerpoolorder
+#### iexec.order.unpublishLastWorkerpoolorder
 
 iexec.**order.unpublishWorkerpoolorder ( workerpoolAddress: Address )** => Promise < **orderHash: Bytes32** >
 
@@ -1844,7 +1844,7 @@ const unpublishedOrderHash = await iexec.order.unpublishLastWorkerpoolorder(
 );
 ```
 
-#### unpublishAllWorkerpoolorders
+#### iexec.order.unpublishAllWorkerpoolorders
 
 iexec.**order.unpublishAllWorkerpoolorders ( workerpoolAddress: Address )** => Promise < **[ ...orderHash: Bytes32 ]** >
 
@@ -1858,7 +1858,7 @@ const unpublishedOrders = await iexec.order.unpublishAllWorkerpoolorders(
 );
 ```
 
-#### cancelWorkerpoolorder
+#### iexec.order.cancelWorkerpoolorder
 
 iexec.**order.cancelWorkerpoolorder ( order: SignedWorkerpoolorder )** => Promise < **{ order: SignedWorkerpoolorder, txHash; TxHash }** >
 
@@ -1870,7 +1870,7 @@ _Example:_
 await iexec.order.cancelWorkerpoolorder(signedWorkerpoolorder);
 ```
 
-#### publishRequestorder
+#### iexec.order.publishRequestorder
 
 iexec.**order.publishRequestorder ( order: SignedRequestorder \[, options: Object \] )** => Promise < **orderHash: Bytes32** >
 
@@ -1887,7 +1887,7 @@ const orderHash = await iexec.order.publishRequestorder(signedRequestorder);
 console.log('order published with orderHash:', orderHash);
 ```
 
-#### unpublishRequestorder
+#### iexec.order.unpublishRequestorder
 
 iexec.**order.unpublishRequestorder ( orderHash: Bytes32 )** => Promise < **orderHash: Bytes32** >
 
@@ -1899,7 +1899,7 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishRequestorder(orderHash);
 ```
 
-#### unpublishLastRequestorder
+#### iexec.order.unpublishLastRequestorder
 
 iexec.**order.unpublishRequestorder ( )** => Promise < **orderHash: Bytes32** >
 
@@ -1911,7 +1911,7 @@ _Example:_
 const unpublishedOrderHash = await iexec.order.unpublishLastRequestorder();
 ```
 
-#### unpublishAllRequestorders
+#### iexec.order.unpublishAllRequestorders
 
 iexec.**order.unpublishAllRequestorders ( )** => Promise < **[ ...orderHash: Bytes32 ]** >
 
@@ -1923,7 +1923,7 @@ _Example:_
 const unpublishedOrders = await iexec.order.unpublishAllRequestorders();
 ```
 
-#### cancelRequestorder
+#### iexec.order.cancelRequestorder
 
 iexec.**order.cancelRequestorder ( order: SignedRequestorder )** => Promise < **{ order: SignedRequestorder, txHash; TxHash }** >
 
@@ -1935,7 +1935,7 @@ _Example:_
 await iexec.order.cancelRequestorder(signedRequestorder);
 ```
 
-#### matchOrders
+#### iexec.order.matchOrders
 
 iexec.**order.matchOrders ( { apporder: SignedApporder, workerpoolorder: SignedWorkerpoolorder, requestorder: SignedRequestorder \[, datasetorder: SignedDatasetorder \]} \[, options: Object \] )** => Promise < **{ dealid: Bytes32, volume: BN, txHash: TxHash }** >
 
@@ -1958,7 +1958,7 @@ console.log('deal:', res.dealid);
 
 ### iexec.deal
 
-#### show
+#### iexec.deal.show
 
 iexec.**deal.show ( dealid: Bytes32 )** => Promise < **{ app : { pointer: Address, owner: Address, price: BN }, dataset : { pointer: Address, owner: Address, price: BN }, workerpool : { pointer: Address, owner: Address, price: BN }, trust: BN, category: BN, tag: Tag, requester: Address, beneficiary: Address, callback: Address, params: String, startTime: BN, deadlineReached: Boolean, botFirst: BN, botSize: BN, workerStake: BN, schedulerRewardRatio: BN, tasks: { ...\[ {\[idx\]: taskid] }\] }** >
 
@@ -1973,7 +1973,7 @@ const deal = await iexec.deal.show(
 console.log('deal:', deal);
 ```
 
-#### obsDeal
+#### iexec.deal.obsDeal
 
 iexec.**deal.obsDeal ( dealid: Bytes32 )** => Observable < **{ subscribe: Function({ next: Function({ message: String, tasksCount: Int, completedTasksCount: Int, failedTasksCount: Int, deal: Deal, tasks: { ...\[ {\[idx\]: task ] }\] } }), error: Function(Error), complete: Function() }) }** >
 
@@ -2008,7 +2008,7 @@ const unsubscribe = dealObservable.subscribe({
 // call unsubscribe() to unsubscribe from dealObservable
 ```
 
-#### computeTaskId
+#### iexec.deal.computeTaskId
 
 iexec.**deal.computeTaskId ( dealid: Bytes32, taskIdx: Uint256 )** => Promise < **taskid: Bytes32** >
 
@@ -2024,7 +2024,7 @@ const taskid = await iexec.deal.computeTaskId(
 console.log('taskid:', taskid);
 ```
 
-#### fetchRequesterDeals
+#### iexec.deal.fetchRequesterDeals
 
 iexec.**deal.fetchRequesterDeals ( requesterAddress: Address, \[ { appAddress: Address, datasetAddress: Address, workerpoolAddress: Address } \] )** => Promise < **{ count, deals: \[ ...Deals \]}** >
 
@@ -2042,7 +2042,7 @@ console.log('deals count:', res.count);
 console.log('last deal:', res.deals[0]);
 ```
 
-#### claim
+#### iexec.deal.claim
 
 iexec.**deal.claim ( dealid: Bytes32 )** => Promise < **{ claimed : { ...\[ {\[idx\]: taskid] }\] }, transactions: \[ { txHash: TxHash, type: String } \] }** >
 
@@ -2066,7 +2066,7 @@ transactions.forEach((e) => {
 
 ### iexec.task
 
-#### show
+#### iexec.task.show
 
 iexec.**task.show ( taskid: Bytes32 )** => Promise < **{ status: Number(0|1|2|3|4), dealid: Bytes32, idx: BN, timeref: BN, contributionDeadline: BN, revealDeadline: BN, finalDeadline: BN, consensusValue: Bytes32, revealCounter: BN, winnerCounter: BN, contributors: [...Address], resultDigest: Bytes32, results: { storage: String('none'|StorageProviderName) \[, location: String \]}, statusName: String('UNSET'|'ACTIVE'|'REVEALING'|'COMPLETED'|'FAILED'|'TIMEOUT'), taskTimedOut: Boolean }** >
 
@@ -2081,7 +2081,7 @@ const task = await iexec.task.show(
 console.log('task:', task);
 ```
 
-#### claim
+#### iexec.task.claim
 
 iexec.**task.claim ( taskid: Bytes32 )** => Promise < **TxHash** >
 
@@ -2095,7 +2095,7 @@ await iexec.task.claim(
 );
 ```
 
-#### fetchResults
+#### iexec.task.fetchResults
 
 iexec.**task.fetchResults ( taskid: Bytes32 )** => Promise < **fetchResponse: Response** >
 
@@ -2110,7 +2110,7 @@ const res = await iexec.task.fetchResults(
 const binary = await res.blob();
 ```
 
-#### obsTask
+#### iexec.task.obsTask
 
 iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observable < **{ subscribe: Function({ next: Function({ message: String, task: Task }), error: Function(Error), complete: Function() }) }** >
 
@@ -2165,7 +2165,7 @@ const task = await waitFinalState(
 
 ### iexec.app
 
-#### show
+#### iexec.app.show
 
 iexec.**app.showApp ( appAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
 
@@ -2180,7 +2180,7 @@ const { app } = await iexec.app.showApp(
 console.log('app:', app);
 ```
 
-#### countUserApps
+#### iexec.app.countUserApps
 
 iexec.**app.countUserApps ( userAddress: Address )** => Promise < **count: BN** >
 
@@ -2193,7 +2193,7 @@ const count = await iexec.app.countUserApps(await iexec.wallet.getAddress());
 console.log('app count:', count);
 ```
 
-#### showUserApp
+#### iexec.app.showUserApp
 
 iexec.**app.showUserApp ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, app: { appName, appMultiaddr, appChecksum, owner, appMREnclave, appType } }** >
 
@@ -2206,7 +2206,7 @@ const { app } = await iexec.app.showUserApp(0, await iexec.wallet.getAddress());
 console.log('app:', app);
 ```
 
-#### deploy
+#### iexec.app.deploy
 
 iexec.**app.deployApp ( app: App )** => Promise < **{ address: Address, txHash: TxHash }** >
 
@@ -2228,7 +2228,7 @@ console.log('deployed at', address);
 
 ### iexec.dataset
 
-#### show
+#### iexec.dataset.show
 
 iexec.**dataset.showDataset ( datasetAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
 
@@ -2243,7 +2243,7 @@ const { dataset } = await iexec.dataset.showDataset(
 console.log('dataset:', dataset);
 ```
 
-#### countUserDatasets
+#### iexec.dataset.countUserDatasets
 
 iexec.**dataset.countUserDatasets ( userAddress: Address )** => Promise < **count: BN** >
 
@@ -2258,7 +2258,7 @@ const count = await iexec.dataset.countUserDatasets(
 console.log('dataset count:', count);
 ```
 
-#### showUserDataset
+#### iexec.dataset.showUserDataset
 
 iexec.**dataset.showUserDataset ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, dataset: { datasetName, datasetMultiaddr, datasetChecksum, owner } }** >
 
@@ -2274,7 +2274,7 @@ const { dataset } = await iexec.dataset.showUserDataset(
 console.log('dataset:', dataset);
 ```
 
-#### generateEncryptionKey
+#### iexec.dataset.generateEncryptionKey
 
 iexec.**dataset.generateEncryptionKey ()** => String
 
@@ -2289,7 +2289,7 @@ const encryptionKey = iexec.dataset.generateEncryptionKey();
 console.log('encryption key:', encryptionKey);
 ```
 
-#### encrypt
+#### iexec.dataset.encrypt
 
 iexec.**dataset.encrypt (datasetFile: ArrayBuffer|Buffer, key: String )** => Promise < **encryptedDataset: Buffer** >
 
@@ -2314,7 +2314,7 @@ const encryptedDataset = await iexec.dataset.encrypt(
 const binary = new Blob([encryptedDataset]); // the encrypted binary can be shared
 ```
 
-#### computeEncryptedFileChecksum
+#### iexec.dataset.computeEncryptedFileChecksum
 
 iexec.**dataset.computeEncryptedFileChecksum (encryptedDatasetFile: ArrayBuffer|Buffer )** => Promise < **checksum: Bytes32** >
 
@@ -2340,7 +2340,7 @@ const checksum = await iexec.dataset.computeEncryptedFileChecksum(
 );
 ```
 
-#### deploy
+#### iexec.dataset.deploy
 
 iexec.**dataset.deployDataset ( dataset: Dataset )** => Promise < **{ address: Address, txHash: TxHash }** >
 
@@ -2359,7 +2359,7 @@ const { address } = await iexec.dataset.deployDataset({
 console.log('deployed at', address);
 ```
 
-#### pushDatasetSecret
+#### iexec.dataset.pushDatasetSecret
 
 iexec.**dataset.pushDatasetSecret ( datasetAddress: Address, secret: String )** => Promise < **success: Boolean** >
 
@@ -2376,7 +2376,7 @@ const pushed = await iexec.dataset.pushDatasetSecret(
 console.log('secret pushed:', pushed);
 ```
 
-#### checkDatasetSecretExists
+#### iexec.dataset.checkDatasetSecretExists
 
 iexec.**dataset.checkDatasetSecretExists ( datasetAddress: Address )** => Promise < **secretExists: Boolean** >
 
@@ -2393,7 +2393,7 @@ console.log('secret exists:', isSecretSet);
 
 ### iexec.workerpool
 
-#### show
+#### iexec.workerpool.show
 
 iexec.**workerpool.showWorkerpool ( workerpoolAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
 
@@ -2408,7 +2408,7 @@ const { workerpool } = await iexec.workerpool.showWorkerpool(
 console.log('workerpool:', workerpool);
 ```
 
-#### countUserWorkerpools
+#### iexec.workerpool.countUserWorkerpools
 
 iexec.**workerpool.countUserWorkerpools ( userAddress: Address )** => Promise < **count: BN** >
 
@@ -2423,7 +2423,7 @@ const count = await iexec.workerpool.countUserWorkerpools(
 console.log('workerpool count:', count);
 ```
 
-#### showUserWorkerpool
+#### iexec.workerpool.showUserWorkerpool
 
 iexec.**workerpool.showUserWorkerpool ( index: Integer, userAddress: Address )** => Promise < **{ objAddress: Address, workerpool: { workerpoolDescription, owner } }** >
 
@@ -2439,7 +2439,7 @@ const { workerpool } = await iexec.workerpool.showUserWorkerpool(
 console.log('workerpool:', workerpool);
 ```
 
-#### deploy
+#### iexec.workerpool.deploy
 
 iexec.**workerpool.deployWorkerpool ( workerpool: Workerpool )** => Promise < **{ address: Address, txHash: TxHash }** >
 
@@ -2457,7 +2457,7 @@ console.log('deployed at', address);
 
 ### iexec.result
 
-#### pushResultEncryptionKey
+#### iexec.result.pushResultEncryptionKey
 
 iexec.**result.pushResultEncryptionKey ( rsaPublicKey: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
 
@@ -2488,7 +2488,7 @@ const { isPushed } = await iexec.result.pushResultEncryptionKey(
 console.log('encryption key pushed:', isPushed);
 ```
 
-#### checkResultEncryptionKeyExists
+#### iexec.result.checkResultEncryptionKeyExists
 
 iexec.**result.checkResultEncryptionKeyExists ( userAddress: Address )** => Promise < **encryptionKeyExists: Boolean** >
 
@@ -2505,13 +2505,13 @@ console.log('encryption key set:', isMyKeySet);
 
 ### iexec.storage
 
-#### defaultStorageLogin
+#### iexec.storage.defaultStorageLogin
 
 iexec.**storage.defaultStorageLogin ()** => Promise < **token: String** >
 
 > get an authorization token from the default IPFS based remote storage. [Share this token through the SMS](#pushStorageToken) to allows the worker to push your tasks results to the default remote storage.
 
-#### pushStorageToken
+#### iexec.storage.pushStorageToken
 
 iexec.**storage.pushStorageToken ( token: String \[, options \])** => Promise < **{ isPushed: Boolean, isUpdated: Boolean }** >
 
@@ -2530,7 +2530,7 @@ const { isPushed } = await iexec.storage.pushStorageToken(defaultStorageToken);
 console.log('default storage initialized:', isPushed);
 ```
 
-#### checkStorageTokenExists
+#### iexec.storage.checkStorageTokenExists
 
 iexec.**storage.checkStorageTokenExists ( userAddress: Address \[, options \] )** => Promise < **storageInitialized: Boolean** >
 
@@ -2551,7 +2551,7 @@ console.log('ipfs storage initialized:', isIpfsStorageInitialized);
 
 ### iexec.ens
 
-#### getOwner
+#### iexec.ens.getOwner
 
 iexec.**ens.getOwner(name)** => Promise< **owner: Address | null** >
 
@@ -2564,7 +2564,7 @@ const owner = await iexec.ens.getOwner('iexec.eth');
 console.log('iexec.eth owner:', owner);
 ```
 
-#### resolveName
+#### iexec.ens.resolveName
 
 iexec.**ens.resolveName(name)** => Promise< **address: Address | null** >
 
@@ -2577,7 +2577,7 @@ const address = await iexec.ens.resolveName('me.users.iexec.eth');
 console.log('me.users.iexec.eth:', address);
 ```
 
-#### lookupAddress
+#### iexec.ens.lookupAddress
 
 iexec.**ens.lookupAddress(address)** => Promise< **name: String | null** >
 
@@ -2590,7 +2590,7 @@ const name = await iexec.ens.lookupAddress(await iexec.wallet.getAddress());
 console.log('my ENS name:', name);
 ```
 
-#### claimName
+#### iexec.ens.claimName
 
 iexec.**ens.claimName(label: String \[, domain: String\])** => Promise< **{ registeredName: String \[, registerTxHash: TxHash \]}** >
 
@@ -2607,7 +2607,7 @@ const { name, registerTxHash } = await iexec.ens.claimName(
 console.log('regitered:', name);
 ```
 
-#### configureResolution
+#### iexec.ens.configureResolution
 
 iexec.**ens.configureResolution(name: String \[, address: Address\])** => Promise< **{ name: String, address: Address \[, setResolverTxHash: TxHash, setAddrTxHash: TxHash, setNameTxHash: TxHash, claimReverseTxHash: TxHash \]}** >
 
@@ -2634,7 +2634,7 @@ console.log('configured resolution:', address, '<=>', name);
 
 ### iexec.network
 
-#### getNetwork
+#### iexec.network.getNetwork
 
 iexec.**network.getNetwork()** => Promise< **{ chainId: String, isSidechain: Boolean }** >
 
@@ -2647,11 +2647,11 @@ const { chainId, isSidechain } = await iexec.network.getNetwork();
 console.log('current chain', chainId, '(sidechain:', isSidechain, ')');
 ```
 
-### Utils
+### utils
 
 `utils` provides some utility functions for iExec.
 
-#### BN
+#### utils.BN
 
 `BN` is instance of `bn.js` it allows big numbers manipulation in js (see [bn.js](https://www.npmjs.com/package/bn.js)).
 
@@ -2661,7 +2661,7 @@ _Example:_
 new utils.BN(1);
 ```
 
-#### NULL_ADDRESS
+#### utils.NULL_ADDRESS
 
 Constant: the address 0 represention
 
@@ -2671,7 +2671,7 @@ _Example:_
 console.log(utils.NULL_ADDRESS);
 ```
 
-#### NULL_BYTES32
+#### utils.NULL_BYTES32
 
 Constant: an empty bytes32 represention
 
@@ -2681,7 +2681,7 @@ _Example:_
 console.log(utils.NULL_BYTES32);
 ```
 
-#### parseEth
+#### utils.parseEth
 
 utils.**parseEth (value: String|Number|BN [, defaultUnit: String])** => weiValue: BN
 
@@ -2695,7 +2695,7 @@ _Example:_
 console.log('5 gwei = ' + utils.parseEth('5 gwei') + 'wei');
 ```
 
-#### formatEth
+#### utils.formatEth
 
 utils.**formatEth (weiAmount: BN|Number|String)** => etherAmount: String
 
@@ -2709,7 +2709,7 @@ console.log(
 );
 ```
 
-#### parseRLC
+#### utils.parseRLC
 
 utils.**parseRLC (value: String|Number|BN [, defaultUnit: String])** => nRlcValue: BN
 
@@ -2723,7 +2723,7 @@ _Example:_
 console.log('5 RLC = ' + utils.parseEth('5 RLC') + 'nRLC');
 ```
 
-#### formatRLC
+#### utils.formatRLC
 
 utils.**formatRLC (nRlcAmount: BN|Number|String)** => RlcAmount: String
 
@@ -2735,7 +2735,7 @@ _Example:_
 console.log('500000000 nRLC = ' + utils.formatRLC('500000000') + 'RLC');
 ```
 
-#### encodeTag
+#### utils.encodeTag
 
 utils.**encodeTag ([...tag: String])** => tag: Bytes32
 
@@ -2747,7 +2747,7 @@ _Example:_
 console.log(utils.encodeTag(['tee', 'gpu']));
 ```
 
-#### decodeTag
+#### utils.decodeTag
 
 utils.**decodeTag (tag: Bytes32)** => [...tag: String]
 
@@ -2763,7 +2763,7 @@ console.log(
 );
 ```
 
-#### sumTags
+#### utils.sumTags
 
 utils.**sumTags ([...tag: Bytes32])** => tag: Bytes32
 
@@ -2782,7 +2782,7 @@ const workerpoolMinTag = utils.sumTags([appTag, datasetTag, requestTag]);
 console.log('workerpoolMinTag', workerpoolMinTag);
 ```
 
-#### decryptResult
+#### utils.decryptResult
 
 utils.**decryptResult ( encryptedZipFile: ArrayBuffer|Buffer, beneficiaryKey: String|Buffer)** => Promise < **decryptedZipFile: Buffer** >
 
@@ -2804,7 +2804,7 @@ const decryptedFileBuffer = await utils.decryptResult(
 const binary = new Blob([decryptedFileBuffer]);
 ```
 
-#### getSignerFromPrivateKey
+#### utils.getSignerFromPrivateKey
 
 utils.**getSignerFromPrivateKey ( host: 'goerli'|'mainnet'|Url, privateKey: PrivateKey \[, options \] )** => SignerProvider
 
@@ -3195,7 +3195,7 @@ Reasons:
 - network failure
 - unexpected args
 
-#### Web3ProviderCallError
+#### Web3ProviderSendError
 
 `Web3ProviderSendError` extends the `Web3ProviderError`, this `Error` is thrown when an exception is catched during a web3 send transaction.
 
