@@ -6,7 +6,7 @@ networks:
   resultproxy:
 
 services:
-  token-chaintest-v5:
+  token-chain:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-ganache-update-token'
     expose:
@@ -16,7 +16,7 @@ services:
     networks:
       - blockchain
 
-  native-chaintest-v5:
+  native-chain:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-ganache-update-native'
     expose:
@@ -26,7 +26,7 @@ services:
     networks:
       - blockchain
 
-  token-chaintest-v5-1s:
+  token-chain-1s:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-ganache-update-token-1s'
     ports:
@@ -34,7 +34,7 @@ services:
     networks:
       - blockchain
 
-  token-chaintest-v5-parity:
+  token-chain-parity:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-token-parity'
     expose:
@@ -48,7 +48,7 @@ services:
   token-sms:
     image: iexechub/iexec-sms:1.0.0
     environment:
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chaintest-v5-parity:8545
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-parity:8545
       - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
       - IEXEC_SCONE_CAS_HOST=cas
       - SCONE_CAS_ADDR=cas:18765
@@ -62,22 +62,22 @@ services:
       - 5000:15000
       - 5443:15443
     depends_on:
-      - token-chaintest-v5-parity
+      - token-chain-parity
     networks:
       - blockchain
 
   token-result-proxy:
     image: iexechub/iexec-result-proxy:1.0.0
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chaintest-v5-parity:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chaintest-v5-parity:8545
+      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-parity:8545
       - MONGO_HOST=token-result-proxy-mongo
       - MONGO_PORT=47017
       - IEXEC_IPFS_HOST=ipfs
     ports:
       - 18089:18089
     depends_on:
-      - token-chaintest-v5-parity
+      - token-chain-parity
       - token-result-proxy-mongo
       - ipfs
     networks:
@@ -106,3 +106,71 @@ services:
       - '5001'
     networks:
       - resultproxy
+
+  gateway-mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    expose:
+      - '27017'
+    ports:
+      - '27017:27017'
+    networks:
+      - gateway
+
+  gateway-redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    networks:
+      - gateway
+
+  token-watcher:
+    image: iexechub/iexec-market-watcher:next
+    restart: unless-stopped
+    environment:
+      - DEBUG=iexec-watcher*
+      - DEBUG_COLORS=true
+      - CHAIN=DEV
+      - CHAIN_ID=65535
+      - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - ETH_WS_HOST=ws://token-chain-parity:8546
+      - ETH_RPC_HOST=http://token-chain-parity:8545
+      - MONGO_HOST=gateway-mongo
+      - REDIS_HOST=gateway-redis
+    depends_on:
+      - token-chain-parity
+      - gateway-redis
+      - gateway-mongo
+    networks:
+      - gateway
+      - blockchain
+
+  token-gateway:
+    image: iexechub/iexec-market-api:next
+    restart: unless-stopped
+    ports:
+      - 13000:3000
+    environment:
+      - DEBUG=iexec-market-api*
+      - DEBUG_COLORS=true
+      - CHAINS=DEV
+      - DEV_NATIVE=false
+      - DEV_ETH_RPC_HOST=http://token-chain-parity:8545
+      - DEV_CHAIN_ID=65535
+      - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - MONGO_HOST=gateway-mongo
+      - REDIS_HOST=gateway-redis
+      - RATE_LIMIT_MAX=10000
+      - RATE_LIMIT_PERIOD=60000
+      - MAX_OPEN_ORDERS_PER_WALLET=1000
+    depends_on:
+      - token-chain-parity
+      - gateway-redis
+      - gateway-mongo
+    networks:
+      - gateway
+      - blockchain

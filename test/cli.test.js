@@ -13,7 +13,7 @@ const DEFAULT_TIMEOUT = 60000;
 jest.setTimeout(DEFAULT_TIMEOUT);
 
 // CONFIG
-const { DRONE, WITH_STACK } = process.env;
+const { DRONE } = process.env;
 const iexecPath = DRONE ? 'iexec' : 'node ../src/cli/cmd/iexec.js';
 
 // 1 block / tx
@@ -33,6 +33,10 @@ const smsURL = DRONE ? 'http://token-sms:15000' : 'http://localhost:5000';
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:18089'
   : 'http://localhost:18089';
+// marketplace
+const iexecGatewayURL = DRONE
+  ? 'http://token-gateway:3000'
+  : 'http://localhost:13000';
 
 const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
@@ -1807,362 +1811,349 @@ describe('[Mainchain]', () => {
     expect(res.errors).toBeUndefined();
   });
 
-  if (WITH_STACK) {
-    describe('[with stack]', () => {
-      // this test requires running local stack
-      test('[common] iexec app publish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} app init`);
-        await setAppUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} app deploy --raw`),
-        );
-        const raw = await execAsync(`${iexecPath} app publish --force --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --app ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.apporder.order).toEqual({
-          app: address,
-          appprice: 0,
-          volume: 1000000,
-          tag: NULL_BYTES32,
-          datasetrestrict: NULL_ADDRESS,
-          workerpoolrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.apporder.order.sign,
-          salt: orderShowRes.apporder.order.salt,
-        });
-      });
-
-      test('[mainchain] iexec app publish [address] with options', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} app init`);
-        await setAppUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} app deploy --raw`),
-        );
-        const raw = await execAsync(
-          `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --app ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.apporder.order).toEqual({
-          app: address,
-          appprice: 100000000,
-          volume: 100,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
-          datasetrestrict: NULL_ADDRESS,
-          workerpoolrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.apporder.order.sign,
-          salt: orderShowRes.apporder.order.salt,
-        });
-      });
-
-      test('[common] iexec app unpublish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} app init`);
-        await setAppUniqueName();
-        await execAsync(`${iexecPath} app deploy --raw`);
-        await execAsync(`${iexecPath} app publish --force --raw`);
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} app publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(`${iexecPath} app unpublish --force --raw`);
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toBe(lastOrderHash);
-        await execAsync(`${iexecPath} app unpublish --force --raw`);
-        const rawErr = await execAsync(
-          `${iexecPath} app unpublish --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
-
-      test('[common] iexec app unpublish [address] --all', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} app init`);
-        await setAppUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} app deploy --raw`),
-        );
-        const { orderHash } = JSON.parse(
-          await execAsync(`${iexecPath} app publish --force --raw`),
-        );
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} app publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(
-          `${iexecPath} app unpublish ${address} --all --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toEqual(
-          expect.arrayContaining([orderHash, lastOrderHash]),
-        );
-        const rawErr = await execAsync(
-          `${iexecPath} app unpublish --all --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
-
-      test('[common] iexec dataset publish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} dataset deploy --raw`),
-        );
-        const raw = await execAsync(
-          `${iexecPath} dataset publish --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --dataset ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.datasetorder.order).toEqual({
-          dataset: address,
-          datasetprice: 0,
-          volume: 1000000,
-          tag: NULL_BYTES32,
-          apprestrict: NULL_ADDRESS,
-          workerpoolrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.datasetorder.order.sign,
-          salt: orderShowRes.datasetorder.order.salt,
-        });
-      });
-
-      test('[mainchain] iexec dataset publish [address] with options', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} dataset deploy --raw`),
-        );
-        const raw = await execAsync(
-          `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --dataset ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.datasetorder.order).toEqual({
-          dataset: address,
-          datasetprice: 100000000,
-          volume: 100,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
-          apprestrict: POOR_ADDRESS1,
-          workerpoolrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.datasetorder.order.sign,
-          salt: orderShowRes.datasetorder.order.salt,
-        });
-      });
-
-      test('[common] iexec dataset unpublish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        await execAsync(`${iexecPath} dataset deploy --raw`);
-        await execAsync(`${iexecPath} dataset publish --force --raw`);
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} dataset publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(
-          `${iexecPath} dataset unpublish --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toBe(lastOrderHash);
-        await execAsync(`${iexecPath} dataset unpublish --force --raw`);
-        const rawErr = await execAsync(
-          `${iexecPath} dataset unpublish --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
-
-      test('[common] iexec dataset unpublish [address] --all', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} dataset init`);
-        await setDatasetUniqueName();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} dataset deploy --raw`),
-        );
-        const { orderHash } = JSON.parse(
-          await execAsync(`${iexecPath} dataset publish --force --raw`),
-        );
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} dataset publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(
-          `${iexecPath} dataset unpublish ${address} --all --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toEqual(
-          expect.arrayContaining([orderHash, lastOrderHash]),
-        );
-        const rawErr = await execAsync(
-          `${iexecPath} dataset unpublish --all --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
-
-      test('[common] iexec workerpool publish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} workerpool init`);
-        await setWorkerpoolUniqueDescription();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} workerpool deploy --raw`),
-        );
-        const raw = await execAsync(
-          `${iexecPath} workerpool publish --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.workerpoolorder.order).toEqual({
-          workerpool: address,
-          workerpoolprice: 0,
-          volume: 1,
-          tag: NULL_BYTES32,
-          trust: 0,
-          category: 0,
-          apprestrict: NULL_ADDRESS,
-          datasetrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.workerpoolorder.order.sign,
-          salt: orderShowRes.workerpoolorder.order.salt,
-        });
-      });
-
-      test('[mainchain] iexec workerpool publish [address] with options', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} account deposit 10`);
-        await execAsync(`${iexecPath} workerpool init`);
-        await setWorkerpoolUniqueDescription();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} workerpool deploy --raw`),
-        );
-        const raw = await execAsync(
-          `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.orderHash).toBeDefined();
-        const orderShowRes = JSON.parse(
-          await execAsync(
-            `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
-          ),
-        );
-        expect(orderShowRes.workerpoolorder.order).toEqual({
-          workerpool: address,
-          workerpoolprice: 2,
-          volume: 5,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
-          trust: 20,
-          category: 1,
-          apprestrict: NULL_ADDRESS,
-          datasetrestrict: NULL_ADDRESS,
-          requesterrestrict: NULL_ADDRESS,
-          sign: orderShowRes.workerpoolorder.order.sign,
-          salt: orderShowRes.workerpoolorder.order.salt,
-        });
-      });
-
-      test('[common] iexec workerpool unpublish (from deployed)', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} workerpool init`);
-        await setWorkerpoolUniqueDescription();
-        await execAsync(`${iexecPath} workerpool deploy --raw`);
-        await execAsync(`${iexecPath} workerpool publish --force --raw`);
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} workerpool publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(
-          `${iexecPath} workerpool unpublish --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toBe(lastOrderHash);
-        await execAsync(`${iexecPath} workerpool unpublish --force --raw`);
-        const rawErr = await execAsync(
-          `${iexecPath} workerpool unpublish --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
-
-      test('[common] iexec workerpool unpublish [address] --all', async () => {
-        await setRichWallet();
-        await setTokenChainParity({ iexecGateway: 'http://localhost:13000' });
-        await execAsync(`${iexecPath} workerpool init`);
-        await setWorkerpoolUniqueDescription();
-        const { address } = JSON.parse(
-          await execAsync(`${iexecPath} workerpool deploy --raw`),
-        );
-        const { orderHash } = JSON.parse(
-          await execAsync(`${iexecPath} workerpool publish --force --raw`),
-        );
-        const lastOrderHash = JSON.parse(
-          await execAsync(`${iexecPath} workerpool publish --force --raw`),
-        ).orderHash;
-        const raw = await execAsync(
-          `${iexecPath} workerpool unpublish ${address} --all --force --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.unpublished).toEqual(
-          expect.arrayContaining([orderHash, lastOrderHash]),
-        );
-        const rawErr = await execAsync(
-          `${iexecPath} workerpool unpublish --all --force --raw`,
-        ).catch((e) => e.message);
-        const resErr = JSON.parse(rawErr);
-        expect(resErr.ok).toBe(false);
-      });
+  test('[common] iexec app publish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} app init`);
+    await setAppUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} app deploy --raw`),
+    );
+    const raw = await execAsync(`${iexecPath} app publish --force --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+    );
+    expect(orderShowRes.apporder.order).toEqual({
+      app: address,
+      appprice: 0,
+      volume: 1000000,
+      tag: NULL_BYTES32,
+      datasetrestrict: NULL_ADDRESS,
+      workerpoolrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.apporder.order.sign,
+      salt: orderShowRes.apporder.order.salt,
     });
-  }
+  });
+
+  test('[mainchain] iexec app publish [address] with options', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} app init`);
+    await setAppUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} app deploy --raw`),
+    );
+    const raw = await execAsync(
+      `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+    );
+    expect(orderShowRes.apporder.order).toEqual({
+      app: address,
+      appprice: 100000000,
+      volume: 100,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      datasetrestrict: NULL_ADDRESS,
+      workerpoolrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.apporder.order.sign,
+      salt: orderShowRes.apporder.order.salt,
+    });
+  });
+
+  test('[common] iexec app unpublish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} app init`);
+    await setAppUniqueName();
+    await execAsync(`${iexecPath} app deploy --raw`);
+    await execAsync(`${iexecPath} app publish --force --raw`);
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} app publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(`${iexecPath} app unpublish --force --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toBe(lastOrderHash);
+    await execAsync(`${iexecPath} app unpublish --force --raw`);
+    const rawErr = await execAsync(
+      `${iexecPath} app unpublish --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
+
+  test('[common] iexec app unpublish [address] --all', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} app init`);
+    await setAppUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} app deploy --raw`),
+    );
+    const { orderHash } = JSON.parse(
+      await execAsync(`${iexecPath} app publish --force --raw`),
+    );
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} app publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(
+      `${iexecPath} app unpublish ${address} --all --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toEqual(
+      expect.arrayContaining([orderHash, lastOrderHash]),
+    );
+    const rawErr = await execAsync(
+      `${iexecPath} app unpublish --all --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
+
+  test('[common] iexec dataset publish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} dataset init`);
+    await setDatasetUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} dataset deploy --raw`),
+    );
+    const raw = await execAsync(`${iexecPath} dataset publish --force --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(
+        `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+      ),
+    );
+    expect(orderShowRes.datasetorder.order).toEqual({
+      dataset: address,
+      datasetprice: 0,
+      volume: 1000000,
+      tag: NULL_BYTES32,
+      apprestrict: NULL_ADDRESS,
+      workerpoolrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.datasetorder.order.sign,
+      salt: orderShowRes.datasetorder.order.salt,
+    });
+  });
+
+  test('[mainchain] iexec dataset publish [address] with options', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} dataset init`);
+    await setDatasetUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} dataset deploy --raw`),
+    );
+    const raw = await execAsync(
+      `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(
+        `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+      ),
+    );
+    expect(orderShowRes.datasetorder.order).toEqual({
+      dataset: address,
+      datasetprice: 100000000,
+      volume: 100,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      apprestrict: POOR_ADDRESS1,
+      workerpoolrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.datasetorder.order.sign,
+      salt: orderShowRes.datasetorder.order.salt,
+    });
+  });
+
+  test('[common] iexec dataset unpublish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} dataset init`);
+    await setDatasetUniqueName();
+    await execAsync(`${iexecPath} dataset deploy --raw`);
+    await execAsync(`${iexecPath} dataset publish --force --raw`);
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} dataset publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(`${iexecPath} dataset unpublish --force --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toBe(lastOrderHash);
+    await execAsync(`${iexecPath} dataset unpublish --force --raw`);
+    const rawErr = await execAsync(
+      `${iexecPath} dataset unpublish --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
+
+  test('[common] iexec dataset unpublish [address] --all', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} dataset init`);
+    await setDatasetUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} dataset deploy --raw`),
+    );
+    const { orderHash } = JSON.parse(
+      await execAsync(`${iexecPath} dataset publish --force --raw`),
+    );
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} dataset publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(
+      `${iexecPath} dataset unpublish ${address} --all --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toEqual(
+      expect.arrayContaining([orderHash, lastOrderHash]),
+    );
+    const rawErr = await execAsync(
+      `${iexecPath} dataset unpublish --all --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
+
+  test('[common] iexec workerpool publish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} workerpool init`);
+    await setWorkerpoolUniqueDescription();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} workerpool deploy --raw`),
+    );
+    const raw = await execAsync(
+      `${iexecPath} workerpool publish --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(
+        `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+      ),
+    );
+    expect(orderShowRes.workerpoolorder.order).toEqual({
+      workerpool: address,
+      workerpoolprice: 0,
+      volume: 1,
+      tag: NULL_BYTES32,
+      trust: 0,
+      category: 0,
+      apprestrict: NULL_ADDRESS,
+      datasetrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.workerpoolorder.order.sign,
+      salt: orderShowRes.workerpoolorder.order.salt,
+    });
+  });
+
+  test('[mainchain] iexec workerpool publish [address] with options', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} account deposit 10`);
+    await execAsync(`${iexecPath} workerpool init`);
+    await setWorkerpoolUniqueDescription();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} workerpool deploy --raw`),
+    );
+    const raw = await execAsync(
+      `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.orderHash).toBeDefined();
+    const orderShowRes = JSON.parse(
+      await execAsync(
+        `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+      ),
+    );
+    expect(orderShowRes.workerpoolorder.order).toEqual({
+      workerpool: address,
+      workerpoolprice: 2,
+      volume: 5,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: 20,
+      category: 1,
+      apprestrict: NULL_ADDRESS,
+      datasetrestrict: NULL_ADDRESS,
+      requesterrestrict: NULL_ADDRESS,
+      sign: orderShowRes.workerpoolorder.order.sign,
+      salt: orderShowRes.workerpoolorder.order.salt,
+    });
+  });
+
+  test('[common] iexec workerpool unpublish (from deployed)', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} workerpool init`);
+    await setWorkerpoolUniqueDescription();
+    await execAsync(`${iexecPath} workerpool deploy --raw`);
+    await execAsync(`${iexecPath} workerpool publish --force --raw`);
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} workerpool publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(
+      `${iexecPath} workerpool unpublish --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toBe(lastOrderHash);
+    await execAsync(`${iexecPath} workerpool unpublish --force --raw`);
+    const rawErr = await execAsync(
+      `${iexecPath} workerpool unpublish --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
+
+  test('[common] iexec workerpool unpublish [address] --all', async () => {
+    await setRichWallet();
+    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await execAsync(`${iexecPath} workerpool init`);
+    await setWorkerpoolUniqueDescription();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} workerpool deploy --raw`),
+    );
+    const { orderHash } = JSON.parse(
+      await execAsync(`${iexecPath} workerpool publish --force --raw`),
+    );
+    const lastOrderHash = JSON.parse(
+      await execAsync(`${iexecPath} workerpool publish --force --raw`),
+    ).orderHash;
+    const raw = await execAsync(
+      `${iexecPath} workerpool unpublish ${address} --all --force --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.unpublished).toEqual(
+      expect.arrayContaining([orderHash, lastOrderHash]),
+    );
+    const rawErr = await execAsync(
+      `${iexecPath} workerpool unpublish --all --force --raw`,
+    ).catch((e) => e.message);
+    const resErr = JSON.parse(rawErr);
+    expect(resErr.ok).toBe(false);
+  });
 });
 
 describe('[Sidechain]', () => {
