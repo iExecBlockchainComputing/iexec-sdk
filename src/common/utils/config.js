@@ -12,27 +12,27 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: 'https://v6.sms.mainnet.iex.ec',
-    5: 'https://v6.sms.goerli.iex.ec',
-    133: 'https://v6.sms.viviani.iex.ec',
-    134: 'https://v6.sms.bellecour.iex.ec',
+    1: 'https://v7.sms.mainnet.iex.ec',
+    5: 'https://v7.sms.goerli.iex.ec',
+    133: 'https://v7.sms.viviani.iex.ec',
+    134: 'https://v7.sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v6.sms-enterprise.mainnet.iex.ec',
-    5: 'https://v6.sms-enterprise.goerli.iex.ec',
+    1: 'https://v7.sms-enterprise.mainnet.iex.ec',
+    5: 'https://v7.sms-enterprise.goerli.iex.ec',
   },
 };
 
 const resultProxyMap = {
   standard: {
-    1: 'https://v6.result.mainnet.iex.ec',
-    5: 'https://v6.result.goerli.iex.ec',
-    133: 'https://v6.result.viviani.iex.ec',
-    134: 'https://v6.result.bellecour.iex.ec',
+    1: 'https://v7.result.mainnet.iex.ec',
+    5: 'https://v7.result.goerli.iex.ec',
+    133: 'https://v7.result.viviani.iex.ec',
+    134: 'https://v7.result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v6.result-enterprise.mainnet.iex.ec',
-    5: 'https://v6.result-enterprise.goerli.iex.ec',
+    1: 'https://v7.result-enterprise.mainnet.iex.ec',
+    5: 'https://v7.result-enterprise.goerli.iex.ec',
   },
 };
 
@@ -67,10 +67,10 @@ const ipfsGatewayMap = {};
 
 const iexecGatewayMap = {
   standard: {
-    default: 'https://v6.api.market.iex.ec',
+    default: 'https://v7.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v6.api-enterprise.market.iex.ec',
+    default: 'https://v7.api-enterprise.market.iex.ec',
   },
 };
 
@@ -107,7 +107,7 @@ const getChainDefaults = ({ id, flavour }) => ({
   iexecGateway:
     (iexecGatewayMap[flavour] &&
       (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default)) ||
-    'https://v6.api.market.iex.ec',
+    'https://v7.api.market.iex.ec',
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
 });
