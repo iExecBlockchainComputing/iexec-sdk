@@ -145,7 +145,7 @@ services:
     command: redis-server --appendonly yes
 
   token-watcher:
-    image: iexechub/iexec-market-watcher:next
+    image: iexechub/iexec-market-watcher:5
     environment:
       - DEBUG=iexec-watcher*
       - DEBUG_COLORS=true
@@ -162,7 +162,7 @@ services:
       - gateway-mongo
 
   token-gateway:
-    image: iexechub/iexec-market-api:next
+    image: iexechub/iexec-market-api:5
     expose:
       - '3000'
     environment:
