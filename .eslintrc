@@ -1,6 +1,7 @@
 {
   "extends": ["airbnb-base", "prettier"],
   "rules": {
+    "default-param-last": "off",
     "new-cap": 0,
     "no-console": 0,
     "no-underscore-dangle": [

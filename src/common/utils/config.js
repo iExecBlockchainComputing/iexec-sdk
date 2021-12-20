@@ -12,27 +12,27 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: 'https://v6.sms.mainnet.iex.ec',
-    5: 'https://v6.sms.goerli.iex.ec',
-    133: 'https://v6.sms.viviani.iex.ec',
-    134: 'https://v6.sms.bellecour.iex.ec',
+    1: 'https://v7.sms.mainnet.iex.ec',
+    5: 'https://v7.sms.goerli.iex.ec',
+    133: 'https://v7.sms.viviani.iex.ec',
+    134: 'https://v7.sms.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v6.sms-enterprise.mainnet.iex.ec',
-    5: 'https://v6.sms-enterprise.goerli.iex.ec',
+    1: 'https://v7.sms-enterprise.mainnet.iex.ec',
+    5: 'https://v7.sms-enterprise.goerli.iex.ec',
   },
 };
 
 const resultProxyMap = {
   standard: {
-    1: 'https://v6.result.mainnet.iex.ec',
-    5: 'https://v6.result.goerli.iex.ec',
-    133: 'https://v6.result.viviani.iex.ec',
-    134: 'https://v6.result.bellecour.iex.ec',
+    1: 'https://v7.result.mainnet.iex.ec',
+    5: 'https://v7.result.goerli.iex.ec',
+    133: 'https://v7.result.viviani.iex.ec',
+    134: 'https://v7.result.bellecour.iex.ec',
   },
   enterprise: {
-    1: 'https://v6.result-enterprise.mainnet.iex.ec',
-    5: 'https://v6.result-enterprise.goerli.iex.ec',
+    1: 'https://v7.result-enterprise.mainnet.iex.ec',
+    5: 'https://v7.result-enterprise.goerli.iex.ec',
   },
 };
 
@@ -67,10 +67,29 @@ const ipfsGatewayMap = {};
 
 const iexecGatewayMap = {
   standard: {
-    default: 'https://v6.api.market.iex.ec',
+    default: 'https://v7.api.market.iex.ec',
   },
   enterprise: {
-    default: 'https://v6.api-enterprise.market.iex.ec',
+    default: 'https://v7.api-enterprise.market.iex.ec',
+  },
+};
+
+const ensMap = {
+  1: {
+    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    publicResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+  },
+  5: {
+    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    publicResolver: '0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329',
+  },
+  133: {
+    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+  },
+  134: {
+    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
   },
 };
 
@@ -78,6 +97,8 @@ const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
+  ensRegistry: ensMap[id] && ensMap[id].registry,
+  ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway:
     (ipfsGatewayMap[flavour] &&
@@ -86,7 +107,7 @@ const getChainDefaults = ({ id, flavour }) => ({
   iexecGateway:
     (iexecGatewayMap[flavour] &&
       (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default)) ||
-    'https://v6.api.market.iex.ec',
+    'https://v7.api.market.iex.ec',
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
 });

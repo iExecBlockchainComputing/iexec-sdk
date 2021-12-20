@@ -13,6 +13,7 @@ const {
   bytes32Schema,
   appTypeSchema,
   uint256Schema,
+  mrenclaveSchema,
 } = require('../../common/utils/validator');
 const {
   finalizeCli,
@@ -79,7 +80,7 @@ const dappSchema = () =>
         type: appTypeSchema().required(),
         multiaddr: string().required(),
         checksum: bytes32Schema().required(),
-        mrenclave: string(),
+        mrenclave: mrenclaveSchema(),
       }).required(),
       buyConf: buyConfSchema().required(),
     })

@@ -15,7 +15,9 @@ const chainConfSchema = () =>
   object({
     id: chainIdSchema(),
     host: string(),
-    hub: string(),
+    hub: string(), // todo address
+    ensRegistry: string(), // todo address
+    ensPublicResolver: string(), // todo address
     sms: string(),
     resultProxy: string(),
     ipfsGateway: string(),

@@ -96,8 +96,6 @@ async function main() {
 
   cli.command('workerpool', 'manage iExec workerpools');
 
-  cli.command('category', 'manage iExec categories');
-
   cli.command('order', 'manage iExec marketplace orders');
 
   cli.command('orderbook', 'show marketplace orderbook');
@@ -106,9 +104,13 @@ async function main() {
 
   cli.command('task', 'manage iExec tasks');
 
+  cli.command('storage', 'manage remote storage');
+
   cli.command('result', 'manage results encryption');
 
-  cli.command('storage', 'manage remote storage');
+  cli.command('ens', 'manage ENS names');
+
+  cli.command('category', 'manage iExec categories');
 
   cli.command('registry', 'interact with iExec registry');
 

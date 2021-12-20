@@ -1,54 +1,57 @@
-matrix:
-  NODE_TAG:
-    - 14
-    - 12
-
 pipeline:
-  test_commit:
-    image: node:${NODE_TAG}
+  test_node16:
+    image: node:16
     pull: true
     commands:
       - apt update
       - apt install xxd
       - node -v
       - npm -v
-      - npm install
-      - ./node_modules/.bin/babel --version
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      matrix:
-        NODE_TAG: 12
-
-  test_tag:
-    image: node:${NODE_TAG}
-    pull: true
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm install
-      - ./node_modules/.bin/babel --version
+      - npm ci
       - npm run build
       - npm -g install .
       - npm test
     when:
       ref: [refs/tags/v*]
 
-  npm_v6:
+  test_node14:
+    image: node:14
+    pull: true
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
+    when:
+      ref: [refs/tags/v*]
+
+  test_node12:
+    image: node:12
+    pull: true
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
+
+  publish_npm:
     image: plugins/npm
-    secrets: [npm_password]
-    username: sulliwane
-    email: sulliwane@gmail.com
+    secrets: [npm_token]
+    username: iexecteam
+    email: dev@iex.ec
     tag: latest
     when:
-      ref: [refs/tags/v6*]
-      matrix:
-        NODE_TAG: 12
+      ref: [refs/tags/v7*]
 
-  dockerhub_v6:
+  publish_dockerhub:
     image: plugins/docker
     repo: iexechub/iexec-sdk
     secrets: [docker_username, docker_password]
@@ -56,9 +59,7 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v6*]
-      matrix:
-        NODE_TAG: 12
+      ref: [refs/tags/v7*]
 
 services:
   token-chain:
@@ -116,3 +117,49 @@ services:
       - token-chain-parity
       - token-result-proxy-mongo
       - ipfs
+
+  gateway-mongo:
+    image: mongo:latest
+
+  gateway-redis:
+    image: redis:alpine
+    command: redis-server --appendonly yes
+
+  token-watcher:
+    image: iexechub/iexec-market-watcher:5
+    environment:
+      - DEBUG=iexec-watcher*
+      - DEBUG_COLORS=true
+      - CHAIN=DEV
+      - CHAIN_ID=65535
+      - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - ETH_WS_HOST=ws://token-chain-parity:8546
+      - ETH_RPC_HOST=http://token-chain-parity:8545
+      - MONGO_HOST=gateway-mongo
+      - REDIS_HOST=gateway-redis
+    depends_on:
+      - token-chain-parity
+      - gateway-redis
+      - gateway-mongo
+
+  token-gateway:
+    image: iexechub/iexec-market-api:5
+    expose:
+      - '3000'
+    environment:
+      - DEBUG=iexec-market-api*
+      - DEBUG_COLORS=true
+      - CHAINS=DEV
+      - DEV_NATIVE=false
+      - DEV_ETH_RPC_HOST=http://token-chain-parity:8545
+      - DEV_CHAIN_ID=65535
+      - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - MONGO_HOST=gateway-mongo
+      - REDIS_HOST=gateway-redis
+      - RATE_LIMIT_MAX=10000
+      - RATE_LIMIT_PERIOD=60000
+      - MAX_OPEN_ORDERS_PER_WALLET=1000
+    depends_on:
+      - token-chain-parity
+      - gateway-redis
+      - gateway-mongo
