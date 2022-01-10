@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.0.1] 2021-01-10
+
+### Changed
+
+- fix `colors` to uncorrupted version
+
 ## [7.0.0] 2021-12-17
 
 ### Added
