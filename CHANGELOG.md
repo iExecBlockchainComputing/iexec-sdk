@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Added
+
+- observable ENS configuration with `ens.obsConfigureResolution(label, address)`
+
 ## [7.0.1] 2021-01-10
 
 ### Changed

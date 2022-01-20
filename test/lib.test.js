@@ -7980,6 +7980,7 @@ describe('[ens]', () => {
     expect(reconfigureRes.setNameTxHash).toMatch(bytes32Regex);
     expect(reconfigureRes.setResolverTxHash).toBeUndefined();
   });
+
   test('ens.configureResolution(name, address) throw with name not owned', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -8006,6 +8007,7 @@ describe('[ens]', () => {
       ),
     );
   });
+
   test('ens.configureResolution(name, address) throw with target app address not owned', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -8040,6 +8042,7 @@ describe('[ens]', () => {
       ),
     );
   });
+
   test('ens.configureResolution(name, address) throw with other EOA', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -8060,6 +8063,321 @@ describe('[ens]', () => {
     await iexec.ens.claimName(label);
 
     await expect(iexec.ens.configureResolution(name, address)).rejects.toThrow(
+      Error(
+        `Target address ${address} is not a contract and don't match current wallet address ${ADDRESS}, impossible to setup ENS resolution`,
+      ),
+    );
+  });
+
+  test('ens.obsConfigureResolution(name) configure to self', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureMessages = [];
+    const reconfigureSameMessages = [];
+
+    const configureObs = await iexec.ens.obsConfigureResolution(name);
+
+    await new Promise((resolve, reject) => {
+      configureObs.subscribe({
+        error: reject,
+        next: (data) => configureMessages.push(data),
+        complete: resolve,
+      });
+    });
+
+    await new Promise((resolve, reject) => {
+      configureObs.subscribe({
+        error: reject,
+        next: (data) => reconfigureSameMessages.push(data),
+        complete: resolve,
+      });
+    });
+
+    expect(configureMessages.length).toBe(13);
+    expect(reconfigureSameMessages.length).toBe(5);
+  });
+
+  test('ens.obsConfigureResolution(name, address) configure for address', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const app1 = await iexec.app.deployApp({
+      owner: wallet.address,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+
+    const app2 = await iexec.app.deployApp({
+      owner: wallet.address,
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+
+    const label = `address_${wallet.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureMessages = [];
+    const reconfigureMessages = [];
+    const reconfigureSameMessages = [];
+
+    const configureObs = await iexec.ens.obsConfigureResolution(
+      name,
+      app1.address,
+    );
+
+    const reconfigureObs = await iexec.ens.obsConfigureResolution(
+      name,
+      app2.address,
+    );
+
+    await new Promise((resolve, reject) => {
+      configureObs.subscribe({
+        error: reject,
+        next: (data) => configureMessages.push(data),
+        complete: resolve,
+      });
+    });
+
+    await new Promise((resolve, reject) => {
+      reconfigureObs.subscribe({
+        error: reject,
+        next: (data) => reconfigureMessages.push(data),
+        complete: resolve,
+      });
+    });
+
+    await new Promise((resolve, reject) => {
+      reconfigureObs.subscribe({
+        error: reject,
+        next: (data) => reconfigureSameMessages.push(data),
+        complete: resolve,
+      });
+    });
+    expect(configureMessages.length).toBe(10);
+    expect(reconfigureMessages.length).toBe(8);
+    expect(reconfigureSameMessages.length).toBe(4);
+  });
+
+  test('ens.obsConfigureResolution(name, address) throw with name not owned', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const configureObs = await iexec.ens.obsConfigureResolution(
+      'not-owned.eth',
+      wallet.address,
+    );
+
+    const configureMessages = [];
+    let error;
+    let completed = false;
+
+    await new Promise((resolve) => {
+      configureObs.subscribe({
+        error: (err) => {
+          error = err;
+          resolve();
+        },
+        next: (data) => configureMessages.push(data),
+        complete: () => {
+          completed = true;
+          resolve();
+        },
+      });
+    });
+
+    expect(configureMessages.length).toBe(0);
+    expect(completed).toBe(false);
+    expect(error).toStrictEqual(
+      Error(
+        `The current address ${wallet.address} is not owner of not-owned.eth`,
+      ),
+    );
+  });
+
+  test('ens.obsConfigureResolution(name, address) throw with target app address not owned', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const app = await iexec.app.deployApp({
+      owner: getRandomAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    });
+    const label = `address_${app.address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureObs = await iexec.ens.obsConfigureResolution(
+      name,
+      app.address,
+    );
+
+    const configureMessages = [];
+    let error;
+    let completed = false;
+
+    await new Promise((resolve) => {
+      configureObs.subscribe({
+        error: (err) => {
+          error = err;
+          resolve();
+        },
+        next: (data) => configureMessages.push(data),
+        complete: () => {
+          completed = true;
+          resolve();
+        },
+      });
+    });
+
+    expect(configureMessages.length).toBe(0);
+    expect(completed).toBe(false);
+    expect(error).toStrictEqual(
+      Error(
+        `${ADDRESS} is not the owner of ${app.address}, impossible to setup ENS resolution`,
+      ),
+    );
+  });
+
+  test('ens.obsConfigureResolution(name, address) throw with other EOA', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const address = getRandomAddress();
+    const label = `address_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+
+    const configureObs = await iexec.ens.obsConfigureResolution(name, address);
+
+    const configureMessages = [];
+    let error;
+    let completed = false;
+
+    await new Promise((resolve) => {
+      configureObs.subscribe({
+        error: (err) => {
+          error = err;
+          resolve();
+        },
+        next: (data) => configureMessages.push(data),
+        complete: () => {
+          completed = true;
+          resolve();
+        },
+      });
+    });
+
+    expect(configureMessages.length).toBe(0);
+    expect(completed).toBe(false);
+    expect(error).toStrictEqual(
       Error(
         `Target address ${address} is not a contract and don't match current wallet address ${ADDRESS}, impossible to setup ENS resolution`,
       ),

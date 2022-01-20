@@ -845,6 +845,13 @@ class IExec {
       ens.lookupAddress(await contractsPromise, address);
     this.ens.claimName = async (label, domain) =>
       ens.registerFifsEns(await contractsPromise, label, domain);
+    this.ens.obsConfigureResolution = async (name, address) =>
+      ens.obsConfigureResolution(
+        await contractsPromise,
+        await getEnsPublicResolverAddress(),
+        name,
+        address,
+      );
     this.ens.configureResolution = async (name, address) =>
       ens.configureResolution(
         await contractsPromise,
