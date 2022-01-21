@@ -12,7 +12,7 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      ref: [refs/tags/v*]
+      ref: refs/tags/v*
 
   test_node14:
     image: node:14
@@ -27,7 +27,7 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      ref: [refs/tags/v*]
+      ref: refs/tags/v*
 
   test_node12:
     image: node:12
@@ -49,7 +49,18 @@ pipeline:
     email: dev@iex.ec
     tag: latest
     when:
-      ref: [refs/tags/v7*]
+      ref:
+        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+
+  publish_alpha_npm:
+    image: plugins/npm
+    secrets: [npm_token]
+    username: iexecteam
+    email: dev@iex.ec
+    tag: alpha
+    when:
+      ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
 
   publish_dockerhub:
     image: plugins/docker
@@ -59,7 +70,9 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v7*]
+      ref:
+        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
 services:
   token-chain:
