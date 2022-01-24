@@ -894,9 +894,9 @@ The encrypted dataset files must be upload on a public file system and reference
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/buy-computation-iexec60x-876r7?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec60x-l4hh4?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec60x-micsl?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/876r7?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/l4hh4?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/micsl?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
