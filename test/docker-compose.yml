@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-ganache-update-token'
     expose:
-      - '8545'
+      - 8545
     ports:
       - 8545:8545
     networks:
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-ganache-update-native'
     expose:
-      - '8545'
+      - 8545
     ports:
       - 18545:8545
     networks:
@@ -38,44 +38,48 @@ services:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.0-token-parity'
     expose:
-      - '8545'
-      - '8546'
+      - 8545
+      - 8546
     ports:
       - 9545:8545
     networks:
       - blockchain
 
   token-sms:
-    image: iexechub/iexec-sms:1.0.0
+    image: iexechub/iexec-sms:7.0.0
     environment:
+      - TZ=Europe/Paris
       - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-parity:8545
-      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
-      - IEXEC_SCONE_CAS_HOST=cas
-      - SCONE_CAS_ADDR=cas:18765
-      - SCONE_LAS_ADDR=las:18766
-      - SCONE_CONFIG_ID=s1/iexec-sms
-      - SCONE_HEAP=3G
-      - SCONE_LOG=6
-      - SCONE_VERSION=1
-      - SCONE_SYSLIBS=1
+      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.0.0-debug
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=02ffe0d4d54bb4c55f00ad4d56c5e53692f8a61cbef17bdd1f45e491f1bb6f65
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.0.0-debug
+      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=6862335c4b7f535d1da929d55becb0aa7f1d057d5e3a7409892e0f2b1a5ec9a2
+      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
+      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
+      - IEXEC_SCONE_CAS_HOST=foo
+      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
     ports:
-      - 5000:15000
-      - 5443:15443
+      - 13300:13300
     depends_on:
       - token-chain-parity
     networks:
       - blockchain
 
   token-result-proxy:
-    image: iexechub/iexec-result-proxy:1.0.0
+    image: iexechub/iexec-result-proxy:7.0.2
     environment:
       - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-parity:8545
       - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=47017
+      - MONGO_PORT=13202
       - IEXEC_IPFS_HOST=ipfs
     ports:
-      - 18089:18089
+      - 13200:13200
     depends_on:
       - token-chain-parity
       - token-result-proxy-mongo
@@ -85,25 +89,20 @@ services:
       - resultproxy
 
   token-result-proxy-mongo:
-    image: mongo:4-xenial
+    restart: unless-stopped
+    image: library/mongo:4.2
     entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 47017"
+    command: -c "mongod --bind_ip_all --port 13202"
     expose:
-      - '47017'
+      - 13202
     networks:
       - resultproxy
 
   ipfs:
     restart: unless-stopped
-    image: ipfs/go-ipfs:v0.4.20
-    container_name: ipfs
-    volumes:
-      - /tmp/ipfs-docker-staging:/export
-      - /tmp/ipfs-docker-data:/data/ipfs
+    image: ipfs/go-ipfs:v0.9.1
     expose:
-      - '8080'
-      - '4001'
-      - '5001'
+      - 8080
     networks:
       - resultproxy
 
@@ -111,9 +110,9 @@ services:
     image: mongo:latest
     restart: unless-stopped
     expose:
-      - '27017'
+      - 27017
     ports:
-      - '27017:27017'
+      - 27017:27017
     networks:
       - gateway
 
@@ -122,9 +121,9 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
     expose:
-      - '6379'
+      - 6379
     ports:
-      - '6379:6379'
+      - 6379:6379
     networks:
       - gateway
 

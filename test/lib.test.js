@@ -66,14 +66,11 @@ const tokenChainParityUrl = DRONE
   ? 'http://token-chain-parity:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:15000' : 'http://localhost:5000';
-const smsHttpsURL = DRONE
-  ? 'https://token-sms:15443'
-  : 'https://localhost:5443';
+const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
 // result proxy
 const resultProxyURL = DRONE
-  ? 'http://token-result-proxy:18089'
-  : 'http://localhost:18089';
+  ? 'http://token-result-proxy:13200'
+  : 'http://localhost:13200';
 // marketplace
 const iexecGatewayURL = DRONE
   ? 'http://token-gateway:3000'
@@ -3567,34 +3564,6 @@ describe('[dataset]', () => {
         `Wallet ${ADDRESS} is not allowed to set secret for ${datasetAddress}`,
       ),
     );
-  });
-
-  test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL: smsHttpsURL,
-      },
-    );
-    const datasetDeployRes = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
-    const datasetAddress = datasetDeployRes.address;
-    await expect(
-      iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
-    ).rejects.toThrow(Error(`SMS at ${smsHttpsURL} didn't answered`));
   });
 
   test('dataset.checkDatasetSecretExists()', async () => {
@@ -8034,27 +8003,6 @@ describe('[storage]', () => {
     expect(updateRes.isUpdated).toBe(true);
   });
 
-  test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL: smsHttpsURL,
-      },
-    );
-    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-      Error(`SMS at ${smsHttpsURL} didn't answered`),
-    );
-  });
-
   test('storage.checkStorageTokenExists()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -8147,27 +8095,6 @@ describe('[result]', () => {
     });
     expect(pushSameRes.isPushed).toBe(true);
     expect(pushSameRes.isUpdated).toBe(true);
-  });
-
-  test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL: smsHttpsURL,
-      },
-    );
-    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
-      Error(`SMS at ${smsHttpsURL} didn't answered`),
-    );
   });
 
   test('result.checkResultEncryptionKeyExists()', async () => {
