@@ -414,6 +414,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('resultProxy required function throw if no resultProxyURL configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -434,6 +435,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('bridge required function throw if no bridgeAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -454,6 +456,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('chainId not set in custom bridgedNetworkConf throw on unknown chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -479,6 +482,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('rpcURL not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -504,6 +508,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('bridgeAddress not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -530,6 +535,7 @@ describe('[IExec]', () => {
       ),
     );
   });
+
   test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
     const signer = utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY);
     const iexec = new IExec(
@@ -548,6 +554,7 @@ describe('[IExec]', () => {
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
+
   test('chainId set to known chain in bridgedNetworkConf use defaults', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -570,6 +577,7 @@ describe('[IExec]', () => {
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
+
   test('ensRegistryAddress required function throw if no ensRegistryAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -586,6 +594,7 @@ describe('[IExec]', () => {
     );
     await expect(iexec.ens.resolveName('admin.eth')).rejects.toThrow();
   });
+
   test('ensPublicResolverAddress required function throw if no ensPublicResolverAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -617,6 +626,7 @@ describe('[workflow]', () => {
   let datasetorder;
   let workerpoolorder;
   let workerpoolorderToClaim;
+
   test('create category', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -638,6 +648,7 @@ describe('[workflow]', () => {
     expect(res.catid).toBeDefined();
     expect(res.txHash).toBeDefined();
   });
+
   test('deploy and sell app', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -684,6 +695,7 @@ describe('[workflow]', () => {
     apporder = signedorder;
     expect(signedorder.sign).toBeDefined();
   });
+
   test('deploy and sell dataset', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -729,6 +741,7 @@ describe('[workflow]', () => {
     datasetorder = signedorder;
     expect(signedorder.sign).toBeDefined();
   });
+
   test('deploy and sell computing power', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -784,6 +797,7 @@ describe('[workflow]', () => {
     );
     expect(workerpoolorderToClaim.sign).toBeDefined();
   });
+
   test('buy computation', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1034,6 +1048,7 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
+
   test('sign tx no value', async () => {
     const amount = '1000000000';
     const receiver = POOR_ADDRESS2;
@@ -1073,6 +1088,7 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
+
   test('gasPrice option', async () => {
     const amount = '1000000000';
     const gasPrice = '123456789';
@@ -1115,6 +1131,7 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx).toBeDefined();
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
+
   // skip until txSend queue is implemented
   test.skip('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
     const amount = new BN(1000);
@@ -1243,6 +1260,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ),
     ).toBe(true);
   });
+
   test.skip(
     'providers option',
     async () => {
@@ -1321,6 +1339,7 @@ describe('[getSignerFromPrivateKey]', () => {
     },
     DEFAULT_TIMEOUT * 2,
   );
+
   test('providers option ignored with RPC host', async () => {
     const alchemyFailQuorumFail = {
       alchemy: 'FAIL',
@@ -1400,6 +1419,7 @@ describe('[wallet]', () => {
     const res = await iexec.wallet.getAddress();
     expect(res).toBe(ADDRESS);
   });
+
   test('wallet.checkBalances()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1424,6 +1444,7 @@ describe('[wallet]', () => {
       true,
     );
   });
+
   test('wallet.checkBalances() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1454,12 +1475,15 @@ describe('[wallet]', () => {
       true,
     );
   });
+
   test.skip('wallet.checkBridgedBalances() (token)', async () => {
     throw Error('TODO');
   });
+
   test.skip('wallet.checkBridgedBalances() (native)', async () => {
     throw Error('TODO');
   });
+
   test('wallet.sendETH()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1490,6 +1514,7 @@ describe('[wallet]', () => {
       true,
     );
   });
+
   test('wallet.sendETH() (specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1524,6 +1549,7 @@ describe('[wallet]', () => {
       true,
     );
   });
+
   test('wallet.sendETH() (throw on native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1540,6 +1566,7 @@ describe('[wallet]', () => {
       Error('sendETH() is disabled on sidechain, use sendRLC()'),
     );
   });
+
   test('wallet.sendRLC()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1568,6 +1595,7 @@ describe('[wallet]', () => {
       receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC.add(new BN(5))),
     ).toBe(true);
   });
+
   test('wallet.sendRLC() (specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1600,6 +1628,7 @@ describe('[wallet]', () => {
       ),
     ).toBe(true);
   });
+
   test('wallet.sendRLC() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1637,6 +1666,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.wei),
     ).toBe(true);
   });
+
   test('wallet.sendRLC() (native, specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1678,6 +1708,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.wei),
     ).toBe(true);
   });
+
   test('wallet.sendRLC() (token enterprise, receiver whitelisted)', async () => {
     const randomAddress = getRandomAddress();
     await grantKYC(whitelistAdminWallet, enterpriseHubAddress, randomAddress);
@@ -1708,6 +1739,7 @@ describe('[wallet]', () => {
       receiverFinalBalance.nRLC.sub(new BN(5)).eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.sendRLC() (token enterprise, not whitelisted)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -1730,6 +1762,7 @@ describe('[wallet]', () => {
       Error(`${randomWallet.address} is not authorized to interact with eRLC`),
     );
   });
+
   test('wallet.sendRLC() (token enterprise, receiver not whitelisted)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -1747,6 +1780,7 @@ describe('[wallet]', () => {
       Error(`${POOR_ADDRESS3} is not authorized to interact with eRLC`),
     );
   });
+
   test('wallet.sweep()', async () => {
     const iexecRichman = new IExec(
       {
@@ -1793,6 +1827,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.sweep() (ERC20 fail)', async () => {
     const iexecRichman = new IExec(
       {
@@ -1839,6 +1874,7 @@ describe('[wallet]', () => {
       true,
     );
   });
+
   test('wallet.sweep() (ERC20 success, native fail)', async () => {
     const iexecRichman = new IExec(
       {
@@ -1889,6 +1925,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.sweep() (native)', async () => {
     const iexecRichman = new IExec(
       {
@@ -1940,6 +1977,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.sweep() (token enterprise, receiver whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
@@ -2009,6 +2047,7 @@ describe('[wallet]', () => {
         .eq(receiverInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.sweep() (token enterprise, not whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
@@ -2039,6 +2078,7 @@ describe('[wallet]', () => {
       ),
     );
   });
+
   test('wallet.sweep() (token enterprise, receiver not whitelisted)', async () => {
     const randomSenderWallet = getRandomWallet();
     const randomReceiverWallet = getRandomWallet();
@@ -2069,6 +2109,7 @@ describe('[wallet]', () => {
       ),
     );
   });
+
   test('wallet.wrapEnterpriseRLC() (token standard -> enterprise)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2140,6 +2181,7 @@ describe('[wallet]', () => {
         .eq(enterpriseInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.wrapEnterpriseRLC() (token standard -> enterprise) (init enterprise)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2211,6 +2253,7 @@ describe('[wallet]', () => {
         .eq(enterpriseInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2284,6 +2327,7 @@ describe('[wallet]', () => {
         .eq(enterpriseInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard) (init standard)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2357,6 +2401,7 @@ describe('[wallet]', () => {
         .eq(enterpriseInitialBalance.nRLC),
     ).toBe(true);
   });
+
   test('wallet.wrapEnterpriseRLC() (token standard -> enterprise, exceed balance)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2395,6 +2440,7 @@ describe('[wallet]', () => {
       iexecStandard.wallet.wrapEnterpriseRLC('2 RLC'),
     ).rejects.toThrow(Error('Amount to wrap exceed wallet balance'));
   });
+
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard, exceed balance)', async () => {
     const randomWallet = getRandomWallet();
     await grantKYC(
@@ -2438,6 +2484,7 @@ describe('[wallet]', () => {
       iexecEnterprise.wallet.unwrapEnterpriseRLC('2 RLC'),
     ).rejects.toThrow('Amount to unwrap exceed wallet balance');
   });
+
   test('wallet.wrapEnterpriseRLC() (token standard -> enterprise, not whitelisted)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -2460,6 +2507,7 @@ describe('[wallet]', () => {
       Error(`${randomWallet.address} is not authorized to interact with eRLC`),
     );
   });
+
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard not whitelisted)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -2484,6 +2532,7 @@ describe('[wallet]', () => {
       Error(`${randomWallet.address} is not authorized to interact with eRLC`),
     );
   });
+
   test('wallet.wrapEnterpriseRLC() (token standard -> enterprise, missing conf)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -2505,6 +2554,7 @@ describe('[wallet]', () => {
       `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
     );
   });
+
   test('wallet.unwrapEnterpriseRLC() (token enterprise -> standard, missing conf)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -2580,6 +2630,7 @@ describe('[account]', () => {
   test.skip('account.checkBridgedBalance()', async () => {
     throw Error('TODO');
   });
+
   test('account.deposit() (token)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2608,6 +2659,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (token, specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2640,6 +2692,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (token, exceed wallet balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2667,6 +2720,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2696,6 +2750,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (native, specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2729,6 +2784,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (native, exceed wallet balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2757,6 +2813,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (token enterprise)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2787,6 +2844,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.deposit() (token enterprise, not whitelisted)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -2838,6 +2896,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (token, specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2869,6 +2928,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (token, exceed account balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2897,6 +2957,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (native)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2927,6 +2988,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (native, specified unit)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2959,6 +3021,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (native, exceed account balance)', async () => {
     const signer = utils.getSignerFromPrivateKey(nativeChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -2988,6 +3051,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (withdraw amount 0)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3003,6 +3067,7 @@ describe('[account]', () => {
       Error('Withdraw amount must be greather than 0'),
     );
   });
+
   test('account.withdraw() (token enterprise)', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3034,6 +3099,7 @@ describe('[account]', () => {
       true,
     );
   });
+
   test('account.withdraw() (token enterprise, not whitelisted)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -3085,6 +3151,7 @@ describe('[app]', () => {
       Error(`App already deployed at address ${res.address}`),
     );
   });
+
   test('app.showApp()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3128,6 +3195,7 @@ describe('[app]', () => {
       new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
     );
   });
+
   test('app.countUserApps()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3155,6 +3223,7 @@ describe('[app]', () => {
     expect(res).toBeInstanceOf(BN);
     expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
   });
+
   test('app.showUserApp()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3216,6 +3285,7 @@ describe('[dataset]', () => {
     expect(typeof key).toBe('string');
     expect(Buffer.from(key, 'base64').length).toBe(32);
   });
+
   test('dataset.encrypt()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3255,6 +3325,7 @@ describe('[dataset]', () => {
       ),
     ).resolves.toBeDefined();
   });
+
   test('dataset.computeEncryptedFileChecksum()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3282,6 +3353,7 @@ describe('[dataset]', () => {
       await iexec.dataset.computeEncryptedFileChecksum(encryptedFileBytes);
     expect(encryptedFileChecksum).toMatch(bytes32Regex);
   });
+
   test('dataset.deployDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3308,6 +3380,7 @@ describe('[dataset]', () => {
       Error(`Dataset already deployed at address ${res.address}`),
     );
   });
+
   test('dataset.showDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3340,6 +3413,7 @@ describe('[dataset]', () => {
       new errors.ObjectNotFoundError('dataset', utils.NULL_ADDRESS, networkId),
     );
   });
+
   test('dataset.countUserDatasets()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3366,6 +3440,7 @@ describe('[dataset]', () => {
     expect(res).toBeInstanceOf(BN);
     expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
   });
+
   test('dataset.showUserDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3436,6 +3511,7 @@ describe('[dataset]', () => {
       Error(`Secret already exists for ${datasetAddress} and can't be updated`),
     );
   });
+
   test('dataset.pushDatasetSecret() (not deployed)', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
@@ -3460,6 +3536,7 @@ describe('[dataset]', () => {
       ),
     );
   });
+
   test('dataset.pushDatasetSecret() (invalid owner)', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -3491,6 +3568,7 @@ describe('[dataset]', () => {
       ),
     );
   });
+
   test('dataset.pushDatasetSecret() (fail with self signed certificates)', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -3518,6 +3596,7 @@ describe('[dataset]', () => {
       iexec.dataset.pushDatasetSecret(datasetAddress, 'oops'),
     ).rejects.toThrow(Error(`SMS at ${smsHttpsURL} didn't answered`));
   });
+
   test('dataset.checkDatasetSecretExists()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -3577,6 +3656,7 @@ describe('[workerpool]', () => {
       Error(`Workerpool already deployed at address ${res.address}`),
     );
   });
+
   test('workerpool.showWorkerpool()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3612,6 +3692,7 @@ describe('[workerpool]', () => {
       ),
     );
   });
+
   test('workerpool.countUserWorkerpools()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3637,6 +3718,7 @@ describe('[workerpool]', () => {
     expect(res).toBeInstanceOf(BN);
     expect(resBeforeDeploy.add(new BN(1)).eq(res)).toBe(true);
   });
+
   test('workerpool.showUserWorkerpool()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -5894,6 +5976,7 @@ describe('[order]', () => {
     const orderHash = await iexec.order.publishApporder(apporder);
     expect(orderHash).toMatch(bytes32Regex);
   });
+
   test('order.publishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -5913,6 +5996,7 @@ describe('[order]', () => {
     const orderHash = await iexec.order.publishDatasetorder(datasetorder);
     expect(orderHash).toMatch(bytes32Regex);
   });
+
   test('order.publishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -5932,6 +6016,7 @@ describe('[order]', () => {
     const orderHash = await iexec.order.publishWorkerpoolorder(workerpoolorder);
     expect(orderHash).toMatch(bytes32Regex);
   });
+
   test('order.publishRequestorder() (no checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -5969,6 +6054,7 @@ describe('[order]', () => {
     });
     expect(orderHash).toMatch(bytes32Regex);
   });
+
   test('order.publishRequestorder() (checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6022,6 +6108,7 @@ describe('[order]', () => {
     const orderHash = await iexec.order.publishRequestorder(requestorder);
     expect(orderHash).toMatch(bytes32Regex);
   });
+
   test('order.unpublishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6045,6 +6132,7 @@ describe('[order]', () => {
       Error(`API error: apporder with orderHash ${orderHash} is not published`),
     );
   });
+
   test('order.unpublishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6070,6 +6158,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6097,6 +6186,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6140,7 +6230,7 @@ describe('[order]', () => {
       ),
     );
   });
-  // unpublishLast
+
   test('order.unpublishLastApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6176,6 +6266,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishLastDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6213,6 +6304,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishLastWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6252,6 +6344,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishLastRequestorder()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -6326,7 +6419,7 @@ describe('[order]', () => {
       ),
     );
   });
-  // unpublishAll
+
   test('order.unpublishAllApporders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6361,6 +6454,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishAllDatasetorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6397,6 +6491,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishAllWorkerpoolorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6435,6 +6530,7 @@ describe('[order]', () => {
       ),
     );
   });
+
   test('order.unpublishAllRequestorders()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -6538,6 +6634,7 @@ describe('[orderbook]', () => {
     expect(found.remaining).toBe(1);
     expect(found.publicationTimestamp).toBeDefined();
   });
+
   test('orderbook.fetchDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6565,6 +6662,7 @@ describe('[orderbook]', () => {
     expect(found.remaining).toBe(1);
     expect(found.publicationTimestamp).toBeDefined();
   });
+
   test('orderbook.fetchWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6592,6 +6690,7 @@ describe('[orderbook]', () => {
     expect(found.remaining).toBe(1);
     expect(found.publicationTimestamp).toBeDefined();
   });
+
   test('orderbook.fetchRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6637,6 +6736,7 @@ describe('[orderbook]', () => {
     expect(found.remaining).toBe(1);
     expect(found.publicationTimestamp).toBeDefined();
   });
+
   test('orderbook.fetchAppOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6671,6 +6771,7 @@ describe('[orderbook]', () => {
     expect(res2.orders.length).toBe(2);
     expect(res2.more).toBeUndefined();
   });
+
   test('orderbook.fetchDatasetOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6708,6 +6809,7 @@ describe('[orderbook]', () => {
     expect(res2.orders.length).toBe(3);
     expect(res2.more).toBeUndefined();
   });
+
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6746,6 +6848,7 @@ describe('[orderbook]', () => {
     expect(res2.orders.length).toBe(4);
     expect(res2.more).toBeUndefined();
   });
+
   test('orderbook.fetchRequestOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainParityUrl,
@@ -6802,9 +6905,12 @@ describe('[orderbook]', () => {
   });
 });
 
-describe('[observables]', () => {
-  test('task.obsTask()', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+describe('[deal]', () => {
+  test('deal.fetchRequesterDeals()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -6812,153 +6918,75 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
-    const catid = await createCategory(iexec, { workClockTimeRef: 10 });
+    const requesterAddress = await iexec.wallet.getAddress();
     const apporder = await deployAndGetApporder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
-      category: catid,
-    });
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
     const requestorder = await getMatchableRequestorder(iexec, {
       apporder,
+      datasetorder,
       workerpoolorder,
     });
+    const res = await iexec.deal.fetchRequesterDeals(
+      await iexec.wallet.getAddress(),
+    );
+    expect(typeof res.count).toBe('number');
     const { dealid } = await iexec.order.matchOrders(
       {
         apporder,
+        datasetorder,
         workerpoolorder,
         requestorder,
       },
       { checkRequest: false },
     );
-    const { tasks } = await iexec.deal.show(dealid);
-    const taskid = tasks[0];
-
-    const obsTaskWithDealidValues = [];
-    const obsTaskUnsubBeforeNextValues = [];
-    const obsTaskAfterInitValues = [];
-
-    let unsubObsTaskWithDealid;
-    let unsubObsTaskBeforeNext;
-    let unsubObsTaskAfterInit;
-
-    await Promise.all([
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid, { dealid })
-          .then((obs) => {
-            unsubObsTaskWithDealid = obs.subscribe({
-              next: (value) => {
-                obsTaskWithDealidValues.push(value);
-              },
-              error: () =>
-                reject(Error('obsTask with dealid should not call error')),
-              complete: () =>
-                reject(Error('obsTask with dealid should not call complete')),
-            });
-            sleep(10000).then(resolve);
-          })
-          .catch(reject);
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid, { dealid })
-          .then((obs) => {
-            unsubObsTaskBeforeNext = obs.subscribe({
-              next: (value) => {
-                obsTaskUnsubBeforeNextValues.push(value);
-                try {
-                  unsubObsTaskBeforeNext();
-                } catch (e) {
-                  reject(e);
-                }
-              },
-              error: () =>
-                reject(
-                  Error('obsTask unsub before next should not call error'),
-                ),
-              complete: () =>
-                reject(
-                  Error('obsTask unsub before next should not call complete'),
-                ),
-            });
-            sleep(10000).then(resolve);
-          })
-          .catch(reject);
-      }),
-      new Promise((resolve, reject) => {
-        sleep(5000).then(() => {
-          iexec.task
-            .obsTask(taskid)
-            .then((obs) => {
-              unsubObsTaskAfterInit = obs.subscribe({
-                next: (value) => {
-                  obsTaskAfterInitValues.push(value);
-                },
-                error: () =>
-                  reject(Error('obsTask after init should not call error')),
-                complete: () =>
-                  reject(Error('obsTask after init should not call complete')),
-              });
-              sleep(5000).then(resolve);
-            })
-            .catch(reject);
-        });
-      }),
-      new Promise((resolve, reject) => {
-        sleep(1000).then(() => {
-          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
-            .then(resolve)
-            .catch(reject);
-        });
-      }),
-    ]);
-
-    expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
-    expect(unsubObsTaskBeforeNext).toBeInstanceOf(Function);
-    expect(unsubObsTaskAfterInit).toBeInstanceOf(Function);
-
-    unsubObsTaskWithDealid();
-    unsubObsTaskAfterInit();
-
-    expect(obsTaskWithDealidValues.length).toBe(2);
-
-    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
-    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
-    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
-    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
-    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
-    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
-    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
-    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskUnsubBeforeNextValues.length).toBe(1);
-
-    expect(obsTaskUnsubBeforeNextValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskUnsubBeforeNextValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskUnsubBeforeNextValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskUnsubBeforeNextValues[0].task.status).toBe(0);
-    expect(obsTaskUnsubBeforeNextValues[0].task.statusName).toBe('UNSET');
-    expect(obsTaskUnsubBeforeNextValues[0].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskAfterInitValues.length).toBe(1);
-
-    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
-    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
-    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
+    await sleep(1000);
+    const resAfterMatch = await iexec.deal.fetchRequesterDeals(
+      requesterAddress,
+    );
+    expect(res.count).toBe(resAfterMatch.count - 1);
+    const resAppFiltered = await iexec.deal.fetchRequesterDeals(
+      requesterAddress,
+      {
+        appAddress: apporder.app,
+      },
+    );
+    expect(resAppFiltered.count).toBe(1);
+    expect(resAppFiltered.deals[0].dealid).toBe(dealid);
+    expect(resAppFiltered.deals[0].app.pointer).toBe(apporder.app);
+    const resDatasetFiltered = await iexec.deal.fetchRequesterDeals(
+      requesterAddress,
+      {
+        datasetAddress: datasetorder.dataset,
+      },
+    );
+    expect(resDatasetFiltered.count).toBe(1);
+    expect(resDatasetFiltered.deals[0].dealid).toBe(dealid);
+    expect(resDatasetFiltered.deals[0].dataset.pointer).toBe(
+      datasetorder.dataset,
+    );
+    const resWorkerpoolFiltered = await iexec.deal.fetchRequesterDeals(
+      requesterAddress,
+      {
+        workerpoolAddress: workerpoolorder.workerpool,
+      },
+    );
+    expect(resWorkerpoolFiltered.deals[0].dealid).toBe(dealid);
+    expect(resWorkerpoolFiltered.count).toBe(1);
+    expect(resWorkerpoolFiltered.deals[0].workerpool.pointer).toBe(
+      workerpoolorder.workerpool,
+    );
   });
 
-  test('task.obsTask() (task timeout)', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+  test('deal.fetchDealsByApporder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -6966,190 +6994,168 @@ describe('[observables]', () => {
       {
         hubAddress,
         isNative: false,
+        iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
-    const catid = await createCategory(iexec, { workClockTimeRef: 1 });
     const apporder = await deployAndGetApporder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
-      category: catid,
-    });
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
     const requestorder = await getMatchableRequestorder(iexec, {
       apporder,
+      datasetorder,
       workerpoolorder,
     });
+    const orderHash = await iexec.order.hashApporder(apporder);
+    const res = await iexec.deal.fetchDealsByApporder(orderHash);
+    expect(res.count).toBe(0);
     const { dealid } = await iexec.order.matchOrders(
       {
         apporder,
+        datasetorder,
         workerpoolorder,
         requestorder,
       },
       { checkRequest: false },
     );
-    const { tasks } = await iexec.deal.show(dealid);
-    const taskid = tasks[0];
+    await sleep(1000);
+    const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
+    expect(resAfterMatch.count).toBe(1);
+    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+    expect(resAfterMatch.deals[0].app.pointer).toBe(apporder.app);
+  });
 
-    const obsTaskWithDealidValues = [];
-    const obsTaskWithWrongDealidValues = [];
-    const obsTaskBeforeInitValues = [];
-    const obsTaskAfterInitValues = [];
-    const obsTaskUnsubBeforeCompleteValues = [];
-
-    let unsubObsTaskBeforeComplete;
-
-    const [
-      obsTaskWithDealidComplete,
-      obsTaskWithWrongDealidError,
-      obsTaskBeforeInitError,
-      obsTaskAfterInitComplete,
-    ] = await Promise.all([
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid, { dealid })
-          .then((obs) => {
-            obs.subscribe({
-              next: (value) => {
-                obsTaskWithDealidValues.push(value);
-              },
-              error: () =>
-                reject(Error('obsTask with dealid should not call error')),
-              complete: resolve,
-            });
-          })
-          .catch(reject);
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid, { dealid: utils.NULL_BYTES32 })
-          .then((obs) => {
-            obs.subscribe({
-              next: (value) => {
-                obsTaskWithWrongDealidValues.push(value);
-              },
-              error: resolve,
-              complete: () =>
-                reject(
-                  Error('obsTask with wrong dealid should not call complete'),
-                ),
-            });
-          })
-          .catch(reject);
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid)
-          .then((obs) => {
-            obs.subscribe({
-              next: (value) => {
-                obsTaskBeforeInitValues.push(value);
-              },
-              error: resolve,
-              complete: () =>
-                reject(Error('obsTask before init should not call complete')),
-            });
-          })
-          .catch(reject);
-      }),
-      new Promise((resolve, reject) => {
-        sleep(5000).then(() => {
-          iexec.task
-            .obsTask(taskid)
-            .then((obs) => {
-              obs.subscribe({
-                next: (value) => {
-                  obsTaskAfterInitValues.push(value);
-                },
-                error: () =>
-                  reject(Error('obsTask after init should not call error')),
-                complete: resolve,
-              });
-            })
-            .catch(reject);
-        });
-      }),
-      new Promise((resolve, reject) => {
-        iexec.task
-          .obsTask(taskid, { dealid })
-          .then((obs) => {
-            unsubObsTaskBeforeComplete = obs.subscribe({
-              next: (value) => {
-                obsTaskUnsubBeforeCompleteValues.push(value);
-              },
-              error: () =>
-                reject(Error('obsTask unsubscribed should nol call complete')),
-              complete: () =>
-                reject(Error('obsTask unsubscribed should nol call complete')),
-            });
-            sleep(1000).then(resolve);
-          })
-          .catch(reject);
-      }),
-      sleep(1000).then(() => {
-        unsubObsTaskBeforeComplete();
-        initializeTask(tokenChainWallet, hubAddress, dealid, 0);
-      }),
-    ]);
-
-    expect(obsTaskWithDealidComplete).toBeUndefined();
-    expect(obsTaskWithWrongDealidError).toEqual(
-      new errors.ObjectNotFoundError('deal', utils.NULL_BYTES32, networkId),
+  test('deal.fetchDealsByDatasetorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
     );
-    expect(obsTaskBeforeInitError).toEqual(
-      new errors.ObjectNotFoundError('task', taskid, networkId),
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        iexecGatewayURL,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
     );
-    expect(obsTaskAfterInitComplete).toBeUndefined();
+    const apporder = await deployAndGetApporder(iexec);
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    const orderHash = await iexec.order.hashDatasetorder(datasetorder);
+    const res = await iexec.deal.fetchDealsByDatasetorder(orderHash);
+    expect(res.count).toBe(0);
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest: false },
+    );
+    await sleep(1000);
+    const resAfterMatch = await iexec.deal.fetchDealsByDatasetorder(orderHash);
+    expect(resAfterMatch.count).toBe(1);
+    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+    expect(resAfterMatch.deals[0].dataset.pointer).toBe(datasetorder.dataset);
+  });
 
-    expect(obsTaskWithDealidValues.length).toBe(3);
+  test('deal.fetchDealsByWorkerpoolorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        iexecGatewayURL,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const apporder = await deployAndGetApporder(iexec);
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
+    const res = await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
+    expect(res.count).toBe(0);
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest: false },
+    );
+    await sleep(1000);
+    const resAfterMatch = await iexec.deal.fetchDealsByWorkerpoolorder(
+      orderHash,
+    );
+    expect(resAfterMatch.count).toBe(1);
+    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+    expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
+      workerpoolorder.workerpool,
+    );
+  });
 
-    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
-    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
-    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
-    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
-    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
-    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
-    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
-    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskWithDealidValues[2].message).toBe('TASK_TIMEDOUT');
-    expect(obsTaskWithDealidValues[2].task.taskid).toBe(taskid);
-    expect(obsTaskWithDealidValues[2].task.dealid).toBe(dealid);
-    expect(obsTaskWithDealidValues[2].task.status).toBe(1);
-    expect(obsTaskWithDealidValues[2].task.statusName).toBe('TIMEOUT');
-    expect(obsTaskWithDealidValues[2].task.taskTimedOut).toBe(true);
-
-    expect(obsTaskWithWrongDealidValues.length).toBe(0);
-
-    expect(obsTaskBeforeInitValues.length).toBe(0);
-
-    expect(obsTaskAfterInitValues.length).toBe(2);
-
-    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
-    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
-    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
-
-    expect(obsTaskAfterInitValues[1].message).toBe('TASK_TIMEDOUT');
-    expect(obsTaskAfterInitValues[1].task.taskid).toBe(taskid);
-    expect(obsTaskAfterInitValues[1].task.dealid).toBe(dealid);
-    expect(obsTaskAfterInitValues[1].task.status).toBe(1);
-    expect(obsTaskAfterInitValues[1].task.statusName).toBe('TIMEOUT');
-    expect(obsTaskAfterInitValues[1].task.taskTimedOut).toBe(true);
-
-    expect(obsTaskUnsubBeforeCompleteValues.length).toBe(1);
-
-    expect(obsTaskUnsubBeforeCompleteValues[0].message).toBe('TASK_UPDATED');
-    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskid).toBe(taskid);
-    expect(obsTaskUnsubBeforeCompleteValues[0].task.dealid).toBe(dealid);
-    expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
-    expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
-    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
+  test('deal.fetchDealsByRequestorder()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        iexecGatewayURL,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const apporder = await deployAndGetApporder(iexec);
+    const datasetorder = await deployAndGetDatasetorder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    const orderHash = await iexec.order.hashRequestorder(requestorder);
+    const res = await iexec.deal.fetchDealsByRequestorder(orderHash);
+    expect(res.count).toBe(0);
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest: false },
+    );
+    await sleep(1000);
+    const resAfterMatch = await iexec.deal.fetchDealsByRequestorder(orderHash);
+    expect(resAfterMatch.count).toBe(1);
+    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+    expect(resAfterMatch.deals[0].requester).toBe(requestorder.requester);
   });
 
   test('deal.obsDeal()', async () => {
@@ -7539,6 +7545,732 @@ describe('[observables]', () => {
   });
 });
 
+describe('[task]', () => {
+  test('task.obsTask()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const catid = await createCategory(iexec, { workClockTimeRef: 10 });
+    const apporder = await deployAndGetApporder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest: false },
+    );
+    const { tasks } = await iexec.deal.show(dealid);
+    const taskid = tasks[0];
+
+    const obsTaskWithDealidValues = [];
+    const obsTaskUnsubBeforeNextValues = [];
+    const obsTaskAfterInitValues = [];
+
+    let unsubObsTaskWithDealid;
+    let unsubObsTaskBeforeNext;
+    let unsubObsTaskAfterInit;
+
+    await Promise.all([
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            unsubObsTaskWithDealid = obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
+              complete: () =>
+                reject(Error('obsTask with dealid should not call complete')),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            unsubObsTaskBeforeNext = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeNextValues.push(value);
+                try {
+                  unsubObsTaskBeforeNext();
+                } catch (e) {
+                  reject(e);
+                }
+              },
+              error: () =>
+                reject(
+                  Error('obsTask unsub before next should not call error'),
+                ),
+              complete: () =>
+                reject(
+                  Error('obsTask unsub before next should not call complete'),
+                ),
+            });
+            sleep(10000).then(resolve);
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              unsubObsTaskAfterInit = obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
+                complete: () =>
+                  reject(Error('obsTask after init should not call complete')),
+              });
+              sleep(5000).then(resolve);
+            })
+            .catch(reject);
+        });
+      }),
+      new Promise((resolve, reject) => {
+        sleep(1000).then(() => {
+          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
+            .then(resolve)
+            .catch(reject);
+        });
+      }),
+    ]);
+
+    expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
+    expect(unsubObsTaskBeforeNext).toBeInstanceOf(Function);
+    expect(unsubObsTaskAfterInit).toBeInstanceOf(Function);
+
+    unsubObsTaskWithDealid();
+    unsubObsTaskAfterInit();
+
+    expect(obsTaskWithDealidValues.length).toBe(2);
+
+    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
+    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
+    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskUnsubBeforeNextValues.length).toBe(1);
+
+    expect(obsTaskUnsubBeforeNextValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskUnsubBeforeNextValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskUnsubBeforeNextValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskUnsubBeforeNextValues[0].task.status).toBe(0);
+    expect(obsTaskUnsubBeforeNextValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskUnsubBeforeNextValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskAfterInitValues.length).toBe(1);
+
+    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
+    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
+  });
+
+  test('task.obsTask() (task timeout)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const catid = await createCategory(iexec, { workClockTimeRef: 1 });
+    const apporder = await deployAndGetApporder(iexec);
+    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
+      category: catid,
+    });
+    const requestorder = await getMatchableRequestorder(iexec, {
+      apporder,
+      workerpoolorder,
+    });
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder,
+        workerpoolorder,
+        requestorder,
+      },
+      { checkRequest: false },
+    );
+    const { tasks } = await iexec.deal.show(dealid);
+    const taskid = tasks[0];
+
+    const obsTaskWithDealidValues = [];
+    const obsTaskWithWrongDealidValues = [];
+    const obsTaskBeforeInitValues = [];
+    const obsTaskAfterInitValues = [];
+    const obsTaskUnsubBeforeCompleteValues = [];
+
+    let unsubObsTaskBeforeComplete;
+
+    const [
+      obsTaskWithDealidComplete,
+      obsTaskWithWrongDealidError,
+      obsTaskBeforeInitError,
+      obsTaskAfterInitComplete,
+    ] = await Promise.all([
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithDealidValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask with dealid should not call error')),
+              complete: resolve,
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid: utils.NULL_BYTES32 })
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskWithWrongDealidValues.push(value);
+              },
+              error: resolve,
+              complete: () =>
+                reject(
+                  Error('obsTask with wrong dealid should not call complete'),
+                ),
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid)
+          .then((obs) => {
+            obs.subscribe({
+              next: (value) => {
+                obsTaskBeforeInitValues.push(value);
+              },
+              error: resolve,
+              complete: () =>
+                reject(Error('obsTask before init should not call complete')),
+            });
+          })
+          .catch(reject);
+      }),
+      new Promise((resolve, reject) => {
+        sleep(5000).then(() => {
+          iexec.task
+            .obsTask(taskid)
+            .then((obs) => {
+              obs.subscribe({
+                next: (value) => {
+                  obsTaskAfterInitValues.push(value);
+                },
+                error: () =>
+                  reject(Error('obsTask after init should not call error')),
+                complete: resolve,
+              });
+            })
+            .catch(reject);
+        });
+      }),
+      new Promise((resolve, reject) => {
+        iexec.task
+          .obsTask(taskid, { dealid })
+          .then((obs) => {
+            unsubObsTaskBeforeComplete = obs.subscribe({
+              next: (value) => {
+                obsTaskUnsubBeforeCompleteValues.push(value);
+              },
+              error: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
+              complete: () =>
+                reject(Error('obsTask unsubscribed should nol call complete')),
+            });
+            sleep(1000).then(resolve);
+          })
+          .catch(reject);
+      }),
+      sleep(1000).then(() => {
+        unsubObsTaskBeforeComplete();
+        initializeTask(tokenChainWallet, hubAddress, dealid, 0);
+      }),
+    ]);
+
+    expect(obsTaskWithDealidComplete).toBeUndefined();
+    expect(obsTaskWithWrongDealidError).toEqual(
+      new errors.ObjectNotFoundError('deal', utils.NULL_BYTES32, networkId),
+    );
+    expect(obsTaskBeforeInitError).toEqual(
+      new errors.ObjectNotFoundError('task', taskid, networkId),
+    );
+    expect(obsTaskAfterInitComplete).toBeUndefined();
+
+    expect(obsTaskWithDealidValues.length).toBe(3);
+
+    expect(obsTaskWithDealidValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[0].task.status).toBe(0);
+    expect(obsTaskWithDealidValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskWithDealidValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[1].message).toBe('TASK_UPDATED');
+    expect(obsTaskWithDealidValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[1].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[1].task.statusName).toBe('ACTIVE');
+    expect(obsTaskWithDealidValues[1].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskWithDealidValues[2].message).toBe('TASK_TIMEDOUT');
+    expect(obsTaskWithDealidValues[2].task.taskid).toBe(taskid);
+    expect(obsTaskWithDealidValues[2].task.dealid).toBe(dealid);
+    expect(obsTaskWithDealidValues[2].task.status).toBe(1);
+    expect(obsTaskWithDealidValues[2].task.statusName).toBe('TIMEOUT');
+    expect(obsTaskWithDealidValues[2].task.taskTimedOut).toBe(true);
+
+    expect(obsTaskWithWrongDealidValues.length).toBe(0);
+
+    expect(obsTaskBeforeInitValues.length).toBe(0);
+
+    expect(obsTaskAfterInitValues.length).toBe(2);
+
+    expect(obsTaskAfterInitValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskAfterInitValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[0].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[0].task.statusName).toBe('ACTIVE');
+    expect(obsTaskAfterInitValues[0].task.taskTimedOut).toBe(false);
+
+    expect(obsTaskAfterInitValues[1].message).toBe('TASK_TIMEDOUT');
+    expect(obsTaskAfterInitValues[1].task.taskid).toBe(taskid);
+    expect(obsTaskAfterInitValues[1].task.dealid).toBe(dealid);
+    expect(obsTaskAfterInitValues[1].task.status).toBe(1);
+    expect(obsTaskAfterInitValues[1].task.statusName).toBe('TIMEOUT');
+    expect(obsTaskAfterInitValues[1].task.taskTimedOut).toBe(true);
+
+    expect(obsTaskUnsubBeforeCompleteValues.length).toBe(1);
+
+    expect(obsTaskUnsubBeforeCompleteValues[0].message).toBe('TASK_UPDATED');
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskid).toBe(taskid);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.dealid).toBe(dealid);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
+    expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
+  });
+});
+
+describe('[storage]', () => {
+  test('storage.defaultStorageLogin()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL,
+      },
+    );
+    const token = await iexec.storage.defaultStorageLogin();
+    expect(typeof token).toBe('string');
+    expect(token.split('.').length).toBe(3);
+    const token2 = await iexec.storage.defaultStorageLogin();
+    expect(token2).toBe(token);
+  });
+
+  test('storage.pushStorageToken()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+
+  test('storage.pushStorageToken() (provider: "default")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'default',
+    });
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'default' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+
+  test('storage.pushStorageToken() (provider: "dropbox")', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      provider: 'dropbox',
+    });
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(
+      iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+
+  test('storage.pushStorageToken() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
+    });
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const updateRes = await iexec.storage.pushStorageToken('oops', {
+      forceUpdate: true,
+    });
+    expect(updateRes.isPushed).toBe(true);
+    expect(updateRes.isUpdated).toBe(true);
+  });
+
+  test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+
+  test('storage.checkStorageTokenExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const withSecretRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { provider: 'dropbox' },
+    );
+    expect(withSecretRes).toBe(true);
+    const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+    );
+    expect(unsetProviderRes).toBe(false);
+    await expect(
+      iexec.storage.checkStorageTokenExists(randomWallet.address, {
+        provider: 'test',
+      }),
+    ).rejects.toThrow(Error('"test" not supported'));
+  });
+});
+
+describe('[result]', () => {
+  test('result.pushResultEncryptionKey()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('oops');
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
+      ),
+    );
+  });
+
+  test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
+    });
+    expect(pushRes.isPushed).toBe(true);
+    expect(pushRes.isUpdated).toBe(false);
+    const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
+      forceUpdate: true,
+    });
+    expect(pushSameRes.isPushed).toBe(true);
+    expect(pushSameRes.isUpdated).toBe(true);
+  });
+
+  test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL: smsHttpsURL,
+      },
+    );
+    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
+      Error(`SMS at ${smsHttpsURL} didn't answered`),
+    );
+  });
+
+  test('result.checkResultEncryptionKeyExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainParityUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withoutSecretRes).toBe(false);
+    await iexec.result.pushResultEncryptionKey('oops');
+    const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
+      randomWallet.address,
+    );
+    expect(withSecretRes).toBe(true);
+  });
+
+  test('result.decryptResult()', async () => {
+    const encZip = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'test/inputs/encryptedResults/encryptedResults.zip',
+      ),
+    );
+    const beneficiaryKey = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+      ),
+    );
+    const res = await utils.decryptResult(encZip, beneficiaryKey);
+    const resContent = [];
+    const resZip = await new JSZip().loadAsync(res);
+    resZip.forEach((relativePath, zipEntry) => {
+      resContent.push(zipEntry);
+    });
+    expect(resContent.length).toBe(3);
+    expect(resContent[0].name).toBe('computed.json');
+    expect(resContent[1].name).toBe('volume.fspf');
+    expect(resContent[2].name).toBe('result.txt');
+  });
+
+  test('result.decryptResult() string key', async () => {
+    const encZip = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'test/inputs/encryptedResults/encryptedResults.zip',
+      ),
+    );
+    const beneficiaryKey = (
+      await fs.readFile(
+        path.join(
+          process.cwd(),
+          'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+        ),
+      )
+    ).toString();
+    const res = await utils.decryptResult(encZip, beneficiaryKey);
+    const resContent = [];
+    const resZip = await new JSZip().loadAsync(res);
+    resZip.forEach((relativePath, zipEntry) => {
+      resContent.push(zipEntry);
+    });
+    expect(resContent.length).toBe(3);
+    expect(resContent[0].name).toBe('computed.json');
+    expect(resContent[1].name).toBe('volume.fspf');
+    expect(resContent[2].name).toBe('result.txt');
+  });
+
+  test('result.decryptResult() wrong key', async () => {
+    const encZip = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'test/inputs/encryptedResults/encryptedResults.zip',
+      ),
+    );
+    const beneficiaryKey = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'test/inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
+      ),
+    );
+    const err = await utils
+      .decryptResult(encZip, beneficiaryKey)
+      .catch((e) => e);
+    expect(err).toEqual(
+      new Error('Failed to decrypt results key with beneficiary key'),
+    );
+  });
+});
+
 describe('[ens]', () => {
   test('resolve ens on iExec mainnet sidechaine', async () => {
     const signer = utils.getSignerFromPrivateKey(
@@ -7552,6 +8284,7 @@ describe('[ens]', () => {
     expect(balance.wei).toBeInstanceOf(BN);
     expect(balance.nRLC).toBeInstanceOf(BN);
   });
+
   test('resolve ens on iExec testnet sidechaine', async () => {
     const signer = utils.getSignerFromPrivateKey(
       'https://viviani.iex.ec',
@@ -7564,6 +8297,7 @@ describe('[ens]', () => {
     expect(balance.wei).toBeInstanceOf(BN);
     expect(balance.nRLC).toBeInstanceOf(BN);
   });
+
   test("resolve ens on custom chain wallet.checkBalances('admin.iexec.eth')", async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7580,6 +8314,7 @@ describe('[ens]', () => {
     expect(balance.wei).toBeInstanceOf(BN);
     expect(balance.nRLC).toBeInstanceOf(BN);
   });
+
   test('ens.getOwner(name) registered names resolves to address', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7595,6 +8330,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.getOwner('admin.iexec.eth');
     expect(res).toBe(ADDRESS);
   });
+
   test('ens.getOwner(name) unregistered names resolves to address zero', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7610,6 +8346,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.getOwner('unregistered.iexec.eth');
     expect(res).toBe(NULL_ADDRESS);
   });
+
   test('ens.resoleName(name) known names resolves to address', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7625,6 +8362,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.resolveName('admin.iexec.eth');
     expect(res).toBe(ADDRESS);
   });
+
   test('ens.resoleName(name) unknown name resolves to null', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7640,6 +8378,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.resolveName('unknown.eth');
     expect(res).toBe(null);
   });
+
   test('ens.lookupAddress(address) reverse resolution configured', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7655,6 +8394,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.lookupAddress('admin.iexec.eth');
     expect(res).toBe('admin.iexec.eth');
   });
+
   test('ens.lookupAddress(address) no reverse resolution', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -7670,6 +8410,7 @@ describe('[ens]', () => {
     const res = await iexec.ens.lookupAddress(getRandomAddress());
     expect(res).toBe(null);
   });
+
   test('ens.claimName(label) available name', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -7713,6 +8454,7 @@ describe('[ens]', () => {
     expect(resClaimSame.registerTxHash).toBeUndefined();
     expect(resClaimSame.name).toBe(name);
   });
+
   test('ens.claimName(label, domain) available name on domain', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -7757,6 +8499,7 @@ describe('[ens]', () => {
     expect(resClaimSame.registerTxHash).toBeUndefined();
     expect(resClaimSame.name).toBe(name);
   });
+
   test('ens.claimName(label, domain) name not available', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -7797,6 +8540,7 @@ describe('[ens]', () => {
       ),
     );
   });
+
   test('ens.claimName(label, domain) no registar', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -8385,687 +9129,171 @@ describe('[ens]', () => {
   });
 });
 
-describe('[result]', () => {
-  test('result.pushResultEncryptionKey()', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.result.pushResultEncryptionKey('oops');
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
-      Error(
-        `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
-      ),
-    );
-  });
-  test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
-      forceUpdate: true,
-    });
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    const pushSameRes = await iexec.result.pushResultEncryptionKey('Oops', {
-      forceUpdate: true,
-    });
-    expect(pushSameRes.isPushed).toBe(true);
-    expect(pushSameRes.isUpdated).toBe(true);
-  });
-  test('result.pushResultEncryptionKey() (fail with self signed certificates)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL: smsHttpsURL,
-      },
-    );
-    await expect(iexec.result.pushResultEncryptionKey('oops')).rejects.toThrow(
-      Error(`SMS at ${smsHttpsURL} didn't answered`),
-    );
-  });
-  test('result.checkResultEncryptionKeyExists()', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-      randomWallet.address,
-    );
-    expect(withoutSecretRes).toBe(false);
-    await iexec.result.pushResultEncryptionKey('oops');
-    const withSecretRes = await iexec.result.checkResultEncryptionKeyExists(
-      randomWallet.address,
-    );
-    expect(withSecretRes).toBe(true);
-  });
-});
-
-describe('[storage]', () => {
-  test('storage.defaultStorageLogin()', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        resultProxyURL,
-      },
-    );
-    const token = await iexec.storage.defaultStorageLogin();
-    expect(typeof token).toBe('string');
-    expect(token.split('.').length).toBe(3);
-    const token2 = await iexec.storage.defaultStorageLogin();
-    expect(token2).toBe(token);
-  });
-  test('storage.pushStorageToken()', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.storage.pushStorageToken('oops');
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-      Error(
-        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-      ),
-    );
-  });
-  test('storage.pushStorageToken() (provider: "default")', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.storage.pushStorageToken('oops', {
-      provider: 'default',
-    });
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    await expect(
-      iexec.storage.pushStorageToken('oops', { provider: 'default' }),
-    ).rejects.toThrow(
-      Error(
-        `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
-      ),
-    );
-  });
-  test('storage.pushStorageToken() (provider: "dropbox")', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.storage.pushStorageToken('oops', {
-      provider: 'dropbox',
-    });
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    await expect(
-      iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
-    ).rejects.toThrow(
-      Error(
-        `Secret "iexec-result-dropbox-token" already exists for ${randomWallet.address}`,
-      ),
-    );
-  });
-  test('storage.pushStorageToken() (forceUpdate)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const pushRes = await iexec.storage.pushStorageToken('oops', {
-      forceUpdate: true,
-    });
-    expect(pushRes.isPushed).toBe(true);
-    expect(pushRes.isUpdated).toBe(false);
-    const updateRes = await iexec.storage.pushStorageToken('oops', {
-      forceUpdate: true,
-    });
-    expect(updateRes.isPushed).toBe(true);
-    expect(updateRes.isUpdated).toBe(true);
-  });
-  test('storage.pushStorageToken() (fail with self signed certificates)', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL: smsHttpsURL,
-      },
-    );
-    await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-      Error(`SMS at ${smsHttpsURL} didn't answered`),
-    );
-  });
-  test('storage.checkStorageTokenExists()', async () => {
-    const randomWallet = getRandomWallet();
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      randomWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        smsURL,
-      },
-    );
-    const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
-      randomWallet.address,
-      { provider: 'dropbox' },
-    );
-    expect(withoutSecretRes).toBe(false);
-    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
-    const withSecretRes = await iexec.storage.checkStorageTokenExists(
-      randomWallet.address,
-      { provider: 'dropbox' },
-    );
-    expect(withSecretRes).toBe(true);
-    const unsetProviderRes = await iexec.storage.checkStorageTokenExists(
-      randomWallet.address,
-    );
-    expect(unsetProviderRes).toBe(false);
-    await expect(
-      iexec.storage.checkStorageTokenExists(randomWallet.address, {
-        provider: 'test',
-      }),
-    ).rejects.toThrow(Error('"test" not supported'));
-  });
-});
-
-describe('[deal]', () => {
-  test('deal.fetchRequesterDeals()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const requesterAddress = await iexec.wallet.getAddress();
-    const apporder = await deployAndGetApporder(iexec);
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
-    const res = await iexec.deal.fetchRequesterDeals(
-      await iexec.wallet.getAddress(),
-    );
-    expect(typeof res.count).toBe('number');
-    const { dealid } = await iexec.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { checkRequest: false },
-    );
-    await sleep(1000);
-    const resAfterMatch = await iexec.deal.fetchRequesterDeals(
-      requesterAddress,
-    );
-    expect(res.count).toBe(resAfterMatch.count - 1);
-    const resAppFiltered = await iexec.deal.fetchRequesterDeals(
-      requesterAddress,
-      {
-        appAddress: apporder.app,
-      },
-    );
-    expect(resAppFiltered.count).toBe(1);
-    expect(resAppFiltered.deals[0].dealid).toBe(dealid);
-    expect(resAppFiltered.deals[0].app.pointer).toBe(apporder.app);
-    const resDatasetFiltered = await iexec.deal.fetchRequesterDeals(
-      requesterAddress,
-      {
-        datasetAddress: datasetorder.dataset,
-      },
-    );
-    expect(resDatasetFiltered.count).toBe(1);
-    expect(resDatasetFiltered.deals[0].dealid).toBe(dealid);
-    expect(resDatasetFiltered.deals[0].dataset.pointer).toBe(
-      datasetorder.dataset,
-    );
-    const resWorkerpoolFiltered = await iexec.deal.fetchRequesterDeals(
-      requesterAddress,
-      {
-        workerpoolAddress: workerpoolorder.workerpool,
-      },
-    );
-    expect(resWorkerpoolFiltered.deals[0].dealid).toBe(dealid);
-    expect(resWorkerpoolFiltered.count).toBe(1);
-    expect(resWorkerpoolFiltered.deals[0].workerpool.pointer).toBe(
-      workerpoolorder.workerpool,
-    );
-  });
-  test('deal.fetchDealsByApporder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
-    const orderHash = await iexec.order.hashApporder(apporder);
-    const res = await iexec.deal.fetchDealsByApporder(orderHash);
-    expect(res.count).toBe(0);
-    const { dealid } = await iexec.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { checkRequest: false },
-    );
-    await sleep(1000);
-    const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
-    expect(resAfterMatch.count).toBe(1);
-    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-    expect(resAfterMatch.deals[0].app.pointer).toBe(apporder.app);
-  });
-  test('deal.fetchDealsByDatasetorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
-    const orderHash = await iexec.order.hashDatasetorder(datasetorder);
-    const res = await iexec.deal.fetchDealsByDatasetorder(orderHash);
-    expect(res.count).toBe(0);
-    const { dealid } = await iexec.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { checkRequest: false },
-    );
-    await sleep(1000);
-    const resAfterMatch = await iexec.deal.fetchDealsByDatasetorder(orderHash);
-    expect(resAfterMatch.count).toBe(1);
-    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-    expect(resAfterMatch.deals[0].dataset.pointer).toBe(datasetorder.dataset);
-  });
-  test('deal.fetchDealsByWorkerpoolorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
-    const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
-    const res = await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
-    expect(res.count).toBe(0);
-    const { dealid } = await iexec.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { checkRequest: false },
-    );
-    await sleep(1000);
-    const resAfterMatch = await iexec.deal.fetchDealsByWorkerpoolorder(
-      orderHash,
-    );
-    expect(resAfterMatch.count).toBe(1);
-    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-    expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
-      workerpoolorder.workerpool,
-    );
-  });
-  test('deal.fetchDealsByRequestorder()', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        isNative: false,
-        iexecGatewayURL,
-        resultProxyURL: 'https://result-proxy.iex.ec',
-      },
-    );
-    const apporder = await deployAndGetApporder(iexec);
-    const datasetorder = await deployAndGetDatasetorder(iexec);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
-    const orderHash = await iexec.order.hashRequestorder(requestorder);
-    const res = await iexec.deal.fetchDealsByRequestorder(orderHash);
-    expect(res.count).toBe(0);
-    const { dealid } = await iexec.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { checkRequest: false },
-    );
-    await sleep(1000);
-    const resAfterMatch = await iexec.deal.fetchDealsByRequestorder(orderHash);
-    expect(resAfterMatch.count).toBe(1);
-    expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-    expect(resAfterMatch.deals[0].requester).toBe(requestorder.requester);
-  });
-});
-
-describe('[lib utils]', () => {
+describe('[utils]', () => {
   describe('parseEth', () => {
     test("parseEth('4.2')", () => {
       const res = utils.parseEth('4.2');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000000000000'))).toBe(true);
     });
+
     test('parseEth(4.2)', () => {
       const res = utils.parseEth(4.2);
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000000000000'))).toBe(true);
     });
+
     test('parseEth(new BN(42))', () => {
       const res = utils.parseEth(new BN(42));
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000000000000'))).toBe(true);
     });
+
     test("parseEth('4.2 ether')", () => {
       const res = utils.parseEth('4.2 ether');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000000000000'))).toBe(true);
     });
+
     test("parseEth('4.2 gwei')", () => {
       const res = utils.parseEth('4.2 gwei');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000'))).toBe(true);
     });
+
     test("parseEth('4.2', 'gwei')", () => {
       const res = utils.parseEth('4.2', 'gwei');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000'))).toBe(true);
     });
+
     test("parseEth('4.2 foo')", () => {
       expect(() => utils.parseEth('4.2 foo')).toThrow(
         Error('Invalid ether unit'),
       );
     });
+
     test("parseEth('4.2 wei')", () => {
       expect(() => utils.parseEth('4.2 wei')).toThrow(
         Error('Invalid ether amount'),
       );
     });
   });
+
   describe('parseRLC', () => {
     test("parseRLC('4.2')", () => {
       const res = utils.parseRLC('4.2');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000'))).toBe(true);
     });
+
     test('parseRLC(4.2)', () => {
       const res = utils.parseRLC(4.2);
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000'))).toBe(true);
     });
+
     test('parseRLC(new BN(42))', () => {
       const res = utils.parseRLC(new BN(42));
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42000000000'))).toBe(true);
     });
+
     test("parseRLC('4.2 RLC')", () => {
       const res = utils.parseRLC('4.2 RLC');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('4200000000'))).toBe(true);
     });
+
     test("parseRLC('42 nRLC')", () => {
       const res = utils.parseRLC('42 nRLC');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42'))).toBe(true);
     });
+
     test("parseRLC('42', 'nRLC')", () => {
       const res = utils.parseRLC('42', 'nRLC');
       expect(res instanceof BN).toBe(true);
       expect(res.eq(new BN('42'))).toBe(true);
     });
+
     test("parseRLC('4.2 nRLC')", () => {
       expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
         Error('Invalid token amount'),
       );
     });
+
     test("parseRLC('4.2 foo')", () => {
       expect(() => utils.parseRLC('4.2 foo')).toThrow(
         Error('Invalid token unit'),
       );
     });
   });
+
   describe('formatEth', () => {
     test("formatEth('4200000000000000000')", () => {
       const res = utils.formatEth('4200000000000000000');
       expect(res).toBe('4.2');
     });
+
     test('formatEth(42)', () => {
       const res = utils.formatEth(42);
       expect(res).toBe('0.000000000000000042');
     });
+
     test("formatEth(new BN('4200000000000000000'))", () => {
       const res = utils.formatEth(new BN('4200000000000000000'));
       expect(res).toBe('4.2');
     });
   });
+
   describe('formatRLC', () => {
     test("formatRLC('4200000000000000000')", () => {
       const res = utils.formatRLC('4200000000000000000');
       expect(res).toBe('4200000000.0');
     });
+
     test('formatRLC(42)', () => {
       const res = utils.formatRLC(42);
       expect(res).toBe('0.000000042');
     });
+
     test("formatRLC(new BN('4200000000000000000'))", () => {
       const res = utils.formatRLC(new BN('4200000000000000000'));
       expect(res).toBe('4200000000.0');
     });
   });
+
   describe('encodeTag', () => {
     test("encodeTag(['tee'])", () => {
       expect(utils.encodeTag(['tee'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000001',
       );
     });
+
     test("encodeTag(['gpu'])", () => {
       expect(utils.encodeTag(['gpu'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000100',
       );
     });
+
     test("encodeTag(['gpu','tee'])", () => {
       expect(utils.encodeTag(['gpu', 'tee'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000101',
       );
     });
+
     test("encodeTag(['gpu','tee','gpu','tee'])", () => {
       expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000101',
       );
     });
+
     test('encodeTag unknown tag', () => {
       expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('Unknown tag foo');
     });
   });
+
   describe('decodeTag', () => {
     test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001')", () => {
       expect(
@@ -9074,6 +9302,7 @@ describe('[lib utils]', () => {
         ),
       ).toStrictEqual(['tee']);
     });
+
     test('decodeTag unknown bit tag', () => {
       expect(() =>
         utils.decodeTag(
@@ -9082,6 +9311,7 @@ describe('[lib utils]', () => {
       ).toThrow('Unknown bit 2');
     });
   });
+
   describe('sumTags', () => {
     test('sumTags from Bytes32', () => {
       expect(
@@ -9094,6 +9324,7 @@ describe('[lib utils]', () => {
         '0x0000000000000000000000000000000000000000000000000000000000000101',
       );
     });
+
     test('sumTags unknown bit tag', () => {
       expect(
         utils.sumTags([
@@ -9105,6 +9336,7 @@ describe('[lib utils]', () => {
         '0x0000000000000000000000000000000000000000000000000000000000000103',
       );
     });
+
     test('sumTags invalid bytes32', () => {
       expect(() =>
         utils.sumTags([
@@ -9112,78 +9344,6 @@ describe('[lib utils]', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000001',
         ]),
       ).toThrow('tag must be bytes32 hex string');
-    });
-  });
-  describe('decryptResult', () => {
-    test('result.decryptResult()', async () => {
-      const encZip = await fs.readFile(
-        path.join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
-      );
-      const beneficiaryKey = await fs.readFile(
-        path.join(
-          process.cwd(),
-          'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
-        ),
-      );
-      const res = await utils.decryptResult(encZip, beneficiaryKey);
-      const resContent = [];
-      const resZip = await new JSZip().loadAsync(res);
-      resZip.forEach((relativePath, zipEntry) => {
-        resContent.push(zipEntry);
-      });
-      expect(resContent.length).toBe(3);
-      expect(resContent[0].name).toBe('computed.json');
-      expect(resContent[1].name).toBe('volume.fspf');
-      expect(resContent[2].name).toBe('result.txt');
-    });
-    test('result.decryptResult() string key', async () => {
-      const encZip = await fs.readFile(
-        path.join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
-      );
-      const beneficiaryKey = (
-        await fs.readFile(
-          path.join(
-            process.cwd(),
-            'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
-          ),
-        )
-      ).toString();
-      const res = await utils.decryptResult(encZip, beneficiaryKey);
-      const resContent = [];
-      const resZip = await new JSZip().loadAsync(res);
-      resZip.forEach((relativePath, zipEntry) => {
-        resContent.push(zipEntry);
-      });
-      expect(resContent.length).toBe(3);
-      expect(resContent[0].name).toBe('computed.json');
-      expect(resContent[1].name).toBe('volume.fspf');
-      expect(resContent[2].name).toBe('result.txt');
-    });
-    test('result.decryptResult() wrong key', async () => {
-      const encZip = await fs.readFile(
-        path.join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
-      );
-      const beneficiaryKey = await fs.readFile(
-        path.join(
-          process.cwd(),
-          'test/inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
-        ),
-      );
-      const err = await utils
-        .decryptResult(encZip, beneficiaryKey)
-        .catch((e) => e);
-      expect(err).toEqual(
-        new Error('Failed to decrypt results key with beneficiary key'),
-      );
     });
   });
 });
