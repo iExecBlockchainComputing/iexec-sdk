@@ -23,6 +23,34 @@
         <label for="native-wallet">Native wallet: </label
         ><span id="native-wallet" />
       </div>
+      <div class="container">
+        <div>
+          <label for="wallet-btm-input">Amount</label>
+          <input
+            id="wallet-btm-input"
+            type="number"
+            value="100"
+            min="1"
+            placeholder="nRLC to bridge"
+          />
+          <button id="wallet-btm-button" disabled>BRIDGE TO MAINCHAIN</button>
+        </div>
+        <label id="wallet-btm-error" class="error"></label>
+      </div>
+      <div class="container">
+        <div>
+          <label for="wallet-bts-input">Amount</label>
+          <input
+            id="wallet-bts-input"
+            type="number"
+            value="100"
+            min="1"
+            placeholder="nRLC to bridge"
+          />
+          <button id="wallet-bts-button" disabled>BRIDGE TO SIDECHAIN</button>
+        </div>
+        <label id="wallet-bts-error" class="error"></label>
+      </div>
       <hr />
       <h2>Account</h2>
       <div class="container">

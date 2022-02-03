@@ -14,6 +14,12 @@ const accountWithdrawButton = document.getElementById(
   'account-withdraw-button',
 );
 const accountWithdrawError = document.getElementById('account-withdraw-error');
+const walletBTMInput = document.getElementById('wallet-btm-input');
+const walletBTMButton = document.getElementById('wallet-btm-button');
+const walletBTMError = document.getElementById('wallet-btm-error');
+const walletBTSInput = document.getElementById('wallet-bts-input');
+const walletBTSButton = document.getElementById('wallet-bts-button');
+const walletBTSError = document.getElementById('wallet-bts-error');
 const storageInitButton = document.getElementById('storage-init-button');
 const storageInitError = document.getElementById('storage-init-error');
 const storageCheckOutput = document.getElementById('storage-check-output');
@@ -74,7 +80,7 @@ const deposit = (iexec) => async () => {
     accountDepositButton.disabled = true;
     accountDepositError.innerText = '';
     const amount = accountDepositInput.value;
-    await iexec.wallet.sendRLC(amount, 'core.v5.iexec.eth');
+    await iexec.account.deposit(amount);
     refreshUser(iexec)();
   } catch (error) {
     accountDepositError.innerText = error;
@@ -94,6 +100,34 @@ const withdraw = (iexec) => async () => {
     accountWithdrawError.innerText = error;
   } finally {
     accountWithdrawButton.disabled = false;
+  }
+};
+
+const bridgeToMainchain = (iexec) => async () => {
+  try {
+    walletBTMButton.disabled = true;
+    walletBTMError.innerText = '';
+    const amount = walletBTMInput.value;
+    await iexec.wallet.bridgeToMainchain(amount);
+    refreshUser(iexec)();
+  } catch (error) {
+    walletBTMError.innerText = error;
+  } finally {
+    walletBTMButton.disabled = false;
+  }
+};
+
+const bridgeToSidechain = (iexec) => async () => {
+  try {
+    walletBTSButton.disabled = true;
+    walletBTSError.innerText = '';
+    const amount = walletBTSInput.value;
+    await iexec.wallet.bridgeToSidechain(amount);
+    refreshUser(iexec)();
+  } catch (error) {
+    walletBTSError.innerText = error;
+  } finally {
+    walletBTSButton.disabled = false;
   }
 };
 
@@ -292,6 +326,8 @@ const init = async () => {
 
     accountDepositButton.addEventListener('click', deposit(iexec));
     accountWithdrawButton.addEventListener('click', withdraw(iexec));
+    walletBTMButton.addEventListener('click', bridgeToMainchain(iexec));
+    walletBTSButton.addEventListener('click', bridgeToSidechain(iexec));
     storageInitButton.addEventListener('click', initStorage(iexec));
     appsShowButton.addEventListener('click', showApp(iexec));
     buyBuyButton.addEventListener('click', buyComputation(iexec));
@@ -301,6 +337,8 @@ const init = async () => {
     resultsDownloadButton.addEventListener('click', dowloadResults(iexec));
     accountDepositButton.disabled = false;
     accountWithdrawButton.disabled = false;
+    walletBTMButton.disabled = false;
+    walletBTSButton.disabled = false;
     storageInitButton.disabled = false;
     appsShowButton.disabled = false;
     buyBuyButton.disabled = false;
