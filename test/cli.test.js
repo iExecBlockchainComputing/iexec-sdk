@@ -28,11 +28,11 @@ const tokenChainParityUrl = DRONE
   ? 'http://token-chain-parity:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:15000' : 'http://localhost:5000';
+const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
 // result proxy
 const resultProxyURL = DRONE
-  ? 'http://token-result-proxy:18089'
-  : 'http://localhost:18089';
+  ? 'http://token-result-proxy:13200'
+  : 'http://localhost:13200';
 // marketplace
 const iexecGatewayURL = DRONE
   ? 'http://token-gateway:3000'

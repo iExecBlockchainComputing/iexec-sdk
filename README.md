@@ -894,9 +894,9 @@ The encrypted dataset files must be upload on a public file system and reference
 
 ## Test iexec in codesandbox
 
-- [Buy computation demo](https://codesandbox.io/embed/buy-computation-iexec60x-876r7?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application demo](https://codesandbox.io/embed/app-management-iexec60x-l4hh4?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset demo](https://codesandbox.io/embed/dataset-management-iexec60x-micsl?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation demo](https://codesandbox.io/embed/876r7?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell application demo](https://codesandbox.io/embed/l4hh4?fontsize=14&hidenavigation=1&theme=dark)
+- [Deploy and sell dataset demo](https://codesandbox.io/embed/micsl?fontsize=14&hidenavigation=1&theme=dark)
 
 ## These dapps are built on the top of iexec SDK
 
@@ -1975,7 +1975,7 @@ console.log('deal:', deal);
 
 #### iexec.deal.obsDeal
 
-iexec.**deal.obsDeal ( dealid: Bytes32 )** => Observable < **{ subscribe: Function({ next: Function({ message: String, tasksCount: Int, completedTasksCount: Int, failedTasksCount: Int, deal: Deal, tasks: { ...\[ {\[idx\]: task ] }\] } }), error: Function(Error), complete: Function() }) }** >
+iexec.**deal.obsDeal ( dealid: Bytes32 )** => Promise < Observable < **{ subscribe: Function({ next: Function({ message: String, tasksCount: Int, completedTasksCount: Int, failedTasksCount: Int, deal: Deal, tasks: { ...\[ {\[idx\]: task ] }\] } }), error: Function(Error), complete: Function() }) }** > >
 
 > return an observable with subscribe method to monitor the deal status changes.
 >
@@ -2112,7 +2112,7 @@ const binary = await res.blob();
 
 #### iexec.task.obsTask
 
-iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Observable < **{ subscribe: Function({ next: Function({ message: String, task: Task }), error: Function(Error), complete: Function() }) }** >
+iexec.**task.obsTask ( taskid: Bytes32 \[, { dealid: Bytes32 }\] )** => Promise < Observable < **{ subscribe: Function({ next: Function({ message: String, task: Task }), error: Function(Error), complete: Function() }) }** > >
 
 > return an observable with subscribe method to monitor the task status changes.
 >
@@ -2595,7 +2595,10 @@ console.log('my ENS name:', name);
 iexec.**ens.claimName(label: String \[, domain: String\])** => Promise< **{ registeredName: String \[, registerTxHash: TxHash \]}** >
 
 > register a subdomain (label) on an ENS FIFSRegistrar
-> _Optional:_ the `domain` must be controlled by a [FIFSRegistrar](https://github.com/ensdomains/ens#fifsregistrarsol), default `"users.iexec.eth"` > _NB:_ if the user already own the domain the register transaction will not occur
+>
+> _Optional:_ the `domain` must be controlled by a [FIFSRegistrar](https://github.com/ensdomains/ens#fifsregistrarsol), default `"users.iexec.eth"`
+>
+> _NB:_ if the user already own the domain the register transaction will not occur
 
 _Example:_
 
@@ -2607,12 +2610,77 @@ const { name, registerTxHash } = await iexec.ens.claimName(
 console.log('regitered:', name);
 ```
 
+#### iexec.ens.obsConfigureResolution
+
+iexec.**ens.obsConfigureResolution(name: String \[, address: Address\])** => Promise < Observable < **{ subscribe: Function({ next: Function({ message: String, ...additionalEntries }), error: Function(Error), complete: Function() }) }** > >
+
+> create a cold Observable to configure the ENS resolution AND reverse resolution for an owned ENS name
+>
+> _Optional:_ the `address` must be an iExec RegistryEntry address (ie: app, dataset or workerpool) or the user address, default user address
+>
+> _NB:_ the configuration may require up to 4 transactions, depending on the target type (EOA or RegistryEntry) and the current state, some transaction may or may not occur to complete the configuration
+>
+> calling the `subscribe({next, error, complete})` method on the observable will immediately return a cancel `function()` and start the asynchronous ENS configuration.
+>
+> the `next` callback is called on every process step with a `message` and additional pieces of data, the values are described in the following table.
+>
+> the `error` callback is called when an error occurs, the observable process is also canceled.
+>
+> the `complete` callback is called when the process ends without error.
+>
+> calling the cancel `function()` will stop the observed process and prevent any further callback call.
+
+| message                                | sent                                                           | additional entries                                   |
+| -------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------- |
+| DESCRIBE_WORKFLOW                      | once                                                           | addessType: 'EOA' \| 'CONTRACT'<br/> steps: String[] |
+| SET_RESOLVER_TX_REQUEST                | once if resolver is not set                                    | name: String<br/> resolverAddress: Address           |
+| SET_RESOLVER_TX_SENT                   | once if resolver is not set                                    | txHash: TxHash                                       |
+| SET_RESOLVER_SUCCESS                   | once                                                           | name: String<br/> resolverAddress: Address           |
+| SET_ADDR_TX_REQUEST                    | once if addr is not set                                        | name: String<br/> address: Address                   |
+| SET_ADDR_TX_SENT                       | once if addr is not set                                        | txHash: TxHash                                       |
+| SET_ADDR_SUCCESS                       | once                                                           | name: String<br/> address: Address                   |
+| CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST | once if address type is EAO and reverse address is not claimed | address: Address<br/> resolverAddress: Address       |
+| CLAIM_REVERSE_WITH_RESOLVER_TX_SENT    | once if address type is EAO and reverse address is not claimed | txHash: TxHash                                       |
+| CLAIM_REVERSE_WITH_RESOLVER_SUCCESS    | once if address type is EAO                                    | address: Address<br/> resolverAddress: Address       |
+| SET_NAME_TX_REQUEST                    | once if name us not set                                        | name: String<br/> address: Address                   |
+| SET_NAME_TX_SENT                       | once if name us not set                                        | txHash: TxHash                                       |
+| SET_NAME_SUCCESS                       | once                                                           | name: String<br/> address: Address                   |
+
+_Example:_
+
+```js
+const configureResolutionObservable = await iexec.ens.obsConfigureResolution(
+  'me.users.iexec.eth',
+);
+configureResolutionObservable.subscribe({
+  error: console.error,
+  next: ({ message, ...rest }) =>
+    console.log(`${message} ${JSON.strigify(rest)}`),
+  completed: () => console.log('resolution configured'),
+});
+```
+
+```js
+const configureResolutionObservable = await iexec.ens.obsConfigureResolution(
+  'my-app.eth',
+  appAddress,
+);
+configureResolutionObservable.subscribe({
+  error: console.error,
+  next: ({ message, ...rest }) =>
+    console.log(`${message} ${JSON.strigify(rest)}`),
+  completed: () => console.log('resolution configured'),
+});
+```
+
 #### iexec.ens.configureResolution
 
 iexec.**ens.configureResolution(name: String \[, address: Address\])** => Promise< **{ name: String, address: Address \[, setResolverTxHash: TxHash, setAddrTxHash: TxHash, setNameTxHash: TxHash, claimReverseTxHash: TxHash \]}** >
 
-> configure the ENS resolution AND reverse resolution for an owned ENS name
+> configure the ENS resolution AND reverse resolution for an owned ENS name, same as `ens.obsConfigureResolution` wrapped in a Promise.
+>
 > _Optional:_ the `address` must be an iExec RegistryEntry address (ie: app, dataset or workerpool) or the user address, default user address
+>
 > _NB:_ depending on the target type (EOA or RegistryEntry) and the current state, some transaction may or may not occur to complete the configuration
 
 _Example:_
