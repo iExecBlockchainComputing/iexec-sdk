@@ -420,6 +420,18 @@ class IExec {
           ),
         },
       );
+    this.wallet.obsBridgeToSidechain = async (nRlcAmount) =>
+      wallet.obsBridgeToSidechain(
+        await contractsPromise,
+        await getBridgeAddress(),
+        nRlcAmount,
+        {
+          bridgedContracts: await getBridgedContracts(),
+          sidechainBridgeAddress: await getBridgedConf().then(
+            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
+          ),
+        },
+      );
     this.wallet.obsBridgeToMainchain = async (nRlcAmount) =>
       wallet.obsBridgeToMainchain(
         await contractsPromise,
