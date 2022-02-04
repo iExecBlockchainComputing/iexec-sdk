@@ -209,7 +209,7 @@ iexec workerpool show # show details of deployed workerpool
 
 ```bash
 iexec orderbook workerpool [address] --category <id> # check if you have valid sell orders for your workerpool on the Marketplace
-iexec publish workerpool # publish a workerpoolorder on the Marketplace and get an orderHash
+iexec workerpool publish # publish a workerpoolorder on the Marketplace and get an orderHash
 iexec order cancel --workerpool <orderHash> # cancel your order
 ```
 
