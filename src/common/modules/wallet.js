@@ -453,7 +453,7 @@ const obsBridgeToSidechain = (
   nRlcAmount = throwIfMissing(),
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) =>
-  new Observable(async (observer) => {
+  new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
     let abort;
     let stopWatchPromise;
@@ -705,7 +705,7 @@ const obsBridgeToMainchain = (
   nRlcAmount = throwIfMissing(),
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) =>
-  new Observable(async (observer) => {
+  new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
     let abort;
     let stopWatchPromise;
