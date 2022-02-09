@@ -97,7 +97,7 @@ const desc = {
   publish: (objName) => `publish a signed ${objName}`,
   unpublish: (objName) => `unpublish a signed ${objName}`,
   pushDatasetSecret: () =>
-    'push the dataset secret to the secret management service (default push the last secret genarated, use --secret-path <secretPath> to overwrite)',
+    'push the dataset secret to the secret management service (default push the last secret generated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () =>
     'push the public encryption key to the secret management service',
   checkSecret: () =>
