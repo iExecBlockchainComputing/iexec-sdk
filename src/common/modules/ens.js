@@ -140,7 +140,7 @@ const obsConfigureResolution = (
   name = throwIfMissing(),
   address,
 ) =>
-  new Observable(async (observer) => {
+  new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
     let abort = false;
 
