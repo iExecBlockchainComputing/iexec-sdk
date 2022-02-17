@@ -420,6 +420,30 @@ class IExec {
           ),
         },
       );
+    this.wallet.obsBridgeToSidechain = async (nRlcAmount) =>
+      wallet.obsBridgeToSidechain(
+        await contractsPromise,
+        await getBridgeAddress(),
+        nRlcAmount,
+        {
+          bridgedContracts: await getBridgedContracts(),
+          sidechainBridgeAddress: await getBridgedConf().then(
+            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
+          ),
+        },
+      );
+    this.wallet.obsBridgeToMainchain = async (nRlcAmount) =>
+      wallet.obsBridgeToMainchain(
+        await contractsPromise,
+        await getBridgeAddress(),
+        nRlcAmount,
+        {
+          bridgedContracts: await getBridgedContracts(),
+          mainchainBridgeAddress: await getBridgedConf().then(
+            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
+          ),
+        },
+      );
     this.wallet.wrapEnterpriseRLC = async (nRlcAmount) =>
       wallet.wrapEnterpriseRLC(
         await getStandardContracts(),
@@ -845,6 +869,13 @@ class IExec {
       ens.lookupAddress(await contractsPromise, address);
     this.ens.claimName = async (label, domain) =>
       ens.registerFifsEns(await contractsPromise, label, domain);
+    this.ens.obsConfigureResolution = async (name, address) =>
+      ens.obsConfigureResolution(
+        await contractsPromise,
+        await getEnsPublicResolverAddress(),
+        name,
+        address,
+      );
     this.ens.configureResolution = async (name, address) =>
       ens.configureResolution(
         await contractsPromise,

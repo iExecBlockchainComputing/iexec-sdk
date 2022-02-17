@@ -12,7 +12,7 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      ref: [refs/tags/v*]
+      ref: refs/tags/v*
 
   test_node14:
     image: node:14
@@ -27,7 +27,7 @@ pipeline:
       - npm -g install .
       - npm test
     when:
-      ref: [refs/tags/v*]
+      ref: refs/tags/v*
 
   test_node12:
     image: node:12
@@ -49,7 +49,18 @@ pipeline:
     email: dev@iex.ec
     tag: latest
     when:
-      ref: [refs/tags/v7*]
+      ref:
+        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+
+  publish_alpha_npm:
+    image: plugins/npm
+    secrets: [npm_token]
+    username: iexecteam
+    email: dev@iex.ec
+    tag: alpha
+    when:
+      ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
 
   publish_dockerhub:
     image: plugins/docker
@@ -59,7 +70,9 @@ pipeline:
       - latest
       - ${DRONE_TAG##v}
     when:
-      ref: [refs/tags/v7*]
+      ref:
+        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
 services:
   token-chain:
@@ -75,48 +88,60 @@ services:
     pull: true
 
   token-chain-parity:
-    image: 'iexechub/poco-chaintest:5.3.0-token-parity'
+    image: iexechub/poco-chaintest:5.3.0-token-parity
+    pull: true
 
   token-sms:
-    image: iexechub/iexec-sms:1.0.0
+    image: iexechub/iexec-sms:7.0.0
+    pull: true
     environment:
+      - TZ=Europe/Paris
       - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-parity:8545
-      - IEXEC_HUB_ADDRESS=0xBF6B2B07e47326B7c8bfCb4A5460bef9f0Fd2002
-      - IEXEC_SCONE_CAS_HOST=cas
-      - SCONE_CAS_ADDR=cas:18765
-      - SCONE_LAS_ADDR=las:18766
-      - SCONE_CONFIG_ID=s1/iexec-sms
-      - SCONE_HEAP=3G
-      - SCONE_LOG=6
-      - SCONE_VERSION=1
-      - SCONE_SYSLIBS=1
+      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.0.0-debug
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=02ffe0d4d54bb4c55f00ad4d56c5e53692f8a61cbef17bdd1f45e491f1bb6f65
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.0.0-debug
+      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=6862335c4b7f535d1da929d55becb0aa7f1d057d5e3a7409892e0f2b1a5ec9a2
+      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
+      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
+      - IEXEC_SCONE_CAS_HOST=foo
+      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
     expose:
-      - '15000'
-      - '15443'
+      - 13300
     depends_on:
       - token-chain-parity
 
-  token-result-proxy-mongo:
-    image: mongo:4-xenial
-
-  ipfs:
-    image: ipfs/go-ipfs:v0.4.20
-    container_name: ipfs
-
   token-result-proxy:
-    image: iexechub/iexec-result-proxy:1.0.0
+    image: iexechub/iexec-result-proxy:7.0.2
+    pull: true
     environment:
       - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-parity:8545
       - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=27017
+      - MONGO_PORT=13202
       - IEXEC_IPFS_HOST=ipfs
     expose:
-      - '18089'
+      - 13200
     depends_on:
       - token-chain-parity
       - token-result-proxy-mongo
       - ipfs
+
+  token-result-proxy-mongo:
+    pull: true
+    image: library/mongo:4.2
+    entrypoint: '/bin/bash'
+    command: -c "mongod --bind_ip_all --port 13202"
+    expose:
+      - 13202
+
+  ipfs:
+    image: ipfs/go-ipfs:v0.9.1
+    pull: true
 
   gateway-mongo:
     image: mongo:latest
@@ -145,7 +170,7 @@ services:
   token-gateway:
     image: iexechub/iexec-market-api:5
     expose:
-      - '3000'
+      - 3000
     environment:
       - DEBUG=iexec-market-api*
       - DEBUG_COLORS=true
