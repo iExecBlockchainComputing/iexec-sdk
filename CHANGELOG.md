@@ -2,17 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [7.0.2] 2022-02-16
 
 ### Added
 
 - observable ENS configuration with `ens.obsConfigureResolution(label, address)`
+- observable bridge to mainchain with `wallet.obsBridgeToMainchain(amount)`
+- observable bridge to sidechain with `wallet.obsBridgeToSidechain(amount)`
 
 ### Changed
 
 - update deps
 
-## [7.0.1] 2021-01-10
+## [7.0.1] 2022-01-10
 
 ### Changed
 
