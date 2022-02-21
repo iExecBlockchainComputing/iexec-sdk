@@ -1,10 +1,10 @@
 const Debug = require('debug');
 const { getDefaultProvider, ethers } = require('ethers');
-const IExecContractsClient = require('iexec-contracts-js-client');
 const {
   getChainDefaults,
   isEnterpriseEnabled,
 } = require('../../common/utils/config');
+const IExecContractsClient = require('../../common/utils/contracts');
 const { EnhancedWallet } = require('../../common/utils/signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');

@@ -1,5 +1,5 @@
-const IExecContractsClient = require('iexec-contracts-js-client');
 const { getDefaultProvider, providers } = require('ethers');
+const IExecContractsClient = require('../common/utils/contracts');
 const wallet = require('../common/modules/wallet');
 const account = require('../common/modules/account');
 const hub = require('../common/modules/hub');

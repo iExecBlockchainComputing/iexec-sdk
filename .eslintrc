@@ -8,6 +8,7 @@
       "error",
       {
         "allow": [
+          "_args",
           "_ethersType",
           "_eventName",
           "_execs",
