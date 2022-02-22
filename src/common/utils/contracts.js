@@ -128,6 +128,8 @@ const createClient = ({
   isNative,
   flavour,
 }) => {
+  const cachedAddresses = {};
+
   const contractsDescMap = getContractsDescMap(isNative, flavour);
 
   const hubAddress =
@@ -159,10 +161,14 @@ const createClient = ({
   const fetchRegistryAddress = async (objName) => {
     try {
       const { registryName } = contractsDescMap[objName];
+      if (cachedAddresses[registryName]) {
+        return cachedAddresses[registryName];
+      }
       const iexecContract = getIExecContract();
       const registryAddress = await iexecContract[
         contractsDescMap[registryName].hubPropName
       ]();
+      cachedAddresses[registryName] = registryAddress;
       return registryAddress;
     } catch (error) {
       debug('fetchRegistryAddress()', error);
@@ -186,8 +192,12 @@ const createClient = ({
 
   const fetchTokenAddress = async () => {
     try {
+      if (cachedAddresses.token) {
+        return cachedAddresses.token;
+      }
       const iexecContract = getIExecContract();
       const tokenAddress = await iexecContract.token();
+      cachedAddresses.token = tokenAddress;
       return tokenAddress;
     } catch (error) {
       debug('fetchTokenAddress()', error);
