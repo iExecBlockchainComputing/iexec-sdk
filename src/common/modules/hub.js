@@ -20,11 +20,13 @@ const {
   ValidationError,
 } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
-const { wrapCall, wrapSend } = require('../utils/errorWrappers');
+const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 
 const debug = Debug('iexec:hub');
 
 const RESOURCE_NAMES = ['app', 'dataset', 'workerpool'];
+
+const toUpperFirst = (str) => ''.concat(str[0].toUpperCase(), str.substr(1));
 
 const tokenIdToAddress = (tokenId) => {
   const hexTokenId = tokenId.toHexString().substring(2);
@@ -35,11 +37,44 @@ const tokenIdToAddress = (tokenId) => {
   return checksummedAddress(lowerCaseAddress);
 };
 
+const createArgs = {
+  app: ['owner', 'name', 'type', 'multiaddr', 'checksum', 'mrenclave'],
+  dataset: ['owner', 'name', 'multiaddr', 'checksum'],
+  workerpool: ['owner', 'description'],
+};
+
 const createObj =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
     try {
-      const txReceipt = await wrapSend(contracts.createObj(objName)(obj));
+      const registryContract = await wrapCall(
+        contracts.getAsyncRegistryContract(objName),
+      );
+      const args = createArgs[objName].map((e) => obj[e]);
+      const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
+      const predictedAddress = await wrapCall(
+        registryContract[predictFonctionName](...args),
+      );
+
+      const isDeployed = await contracts.checkDeployedObj(objName)(
+        predictedAddress,
+        {
+          strict: false,
+        },
+      );
+
+      if (isDeployed) {
+        throw Error(
+          `${toUpperFirst(
+            objName,
+          )} already deployed at address ${predictedAddress}`,
+        );
+      }
+      const createFonctionName = 'create'.concat(toUpperFirst(objName));
+      const tx = await wrapSend(
+        registryContract[createFonctionName](...args, contracts.txOptions),
+      );
+      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.events, {
         strict: true,
       });
@@ -139,10 +174,11 @@ const countObj =
       const vAddress = await addressSchema({
         ethProvider: contracts.provider,
       }).validate(userAddress);
-      const objCountBN = ethersBnToBn(
-        await wrapCall(contracts.getUserObjCount(objName)(vAddress)),
+      const registryContract = await wrapCall(
+        contracts.getAsyncRegistryContract(objName),
       );
-      return objCountBN;
+      const objCount = await wrapCall(registryContract.balanceOf(vAddress));
+      return ethersBnToBn(objCount);
     } catch (error) {
       debug('countObj()', error);
       throw error;
@@ -194,8 +230,12 @@ const showObjByIndex =
       }).validate(userAddress);
       const totalObj = await countObj(objName)(contracts, userAddress);
       if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
+
+      const registryContract = await wrapCall(
+        contracts.getAsyncRegistryContract(objName),
+      );
       const tokenId = await wrapCall(
-        contracts.getUserObjIdByIndex(objName)(vAddress, vIndex),
+        registryContract.tokenOfOwnerByIndex(vAddress, vIndex),
       );
       const objAddress = tokenIdToAddress(tokenId);
       return showObjByAddress(objName)(contracts, objAddress);
@@ -328,9 +368,24 @@ const createCategory = async (
   obj = throwIfMissing(),
 ) => {
   try {
-    const txReceipt = await wrapSend(
-      contracts.createCategory(await categorySchema().validate(obj)),
+    const vCategory = await categorySchema().validate(obj);
+    const iexecContract = contracts.getIExecContract();
+    const categoryOwner = await wrapCall(iexecContract.owner());
+    const userAddress = await contracts.signer.getAddress();
+    if (!(categoryOwner === userAddress)) {
+      throw Error(
+        `only category owner ${categoryOwner} can create new categories`,
+      );
+    }
+    const args = [
+      vCategory.name,
+      vCategory.description,
+      vCategory.workClockTimeRef,
+    ];
+    const tx = await wrapSend(
+      iexecContract.createCategory(...args, contracts.txOptions),
     );
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const { catid } = getEventFromLogs('CreateCategory', txReceipt.events, {
       strict: true,
     }).args;
@@ -347,12 +402,18 @@ const showCategory = async (
   index = throwIfMissing(),
 ) => {
   try {
-    const category = bnifyNestedEthersBn(
-      await wrapCall(
-        contracts.getCategoryByIndex(await uint256Schema().validate(index)),
-      ),
+    const vIndex = await uint256Schema().validate(index);
+    const iexecContract = contracts.getIExecContract();
+    const categoryRPC = await wrapCall(iexecContract.viewCategory(vIndex));
+    const categoryPropNames = ['name', 'description', 'workClockTimeRef'];
+    const category = categoryRPC.reduce(
+      (accu, curr, i) =>
+        Object.assign(accu, {
+          [categoryPropNames[i]]: curr,
+        }),
+      {},
     );
-    return category;
+    return bnifyNestedEthersBn(category);
   } catch (error) {
     debug('showCategory()', error);
     throw error;

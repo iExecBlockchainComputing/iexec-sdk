@@ -16,8 +16,6 @@ const datasetDesc = require('@iexec/poco/build/contracts-min/Dataset.json');
 
 const debug = Debug('iexec:contracts');
 
-const toUpperFirst = (str) => ''.concat(str[0].toUpperCase(), str.substr(1));
-
 const enterpriseHubMap = {
   1: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
   5: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
@@ -140,14 +138,6 @@ const getContractsDescMap = (isNative, flavour) => ({
   },
   app: {
     contractDesc: appDesc,
-    createParams: [
-      'owner',
-      'name',
-      'type',
-      'multiaddr',
-      'checksum',
-      'mrenclave',
-    ],
     registryName: 'appRegistry',
   },
   appRegistry: {
@@ -156,7 +146,6 @@ const getContractsDescMap = (isNative, flavour) => ({
   },
   dataset: {
     contractDesc: datasetDesc,
-    createParams: ['owner', 'name', 'multiaddr', 'checksum'],
     registryName: 'datasetRegistry',
   },
   datasetRegistry: {
@@ -165,7 +154,6 @@ const getContractsDescMap = (isNative, flavour) => ({
   },
   workerpool: {
     contractDesc: workerpoolDesc,
-    createParams: ['owner', 'description'],
     registryName: 'workerpoolRegistry',
   },
   workerpoolRegistry: {
@@ -181,9 +169,7 @@ const createClient = ({
   globalHubAddress,
   isNative,
   flavour,
-  gasPrice,
 }) => {
-  debug('chainId', chainId, 'isNative', isNative, 'flavour', flavour);
   const contractsDescMap = getContractsDescMap(isNative, flavour);
   const hubAddress =
     globalHubAddress ||
@@ -226,22 +212,59 @@ const createClient = ({
   const getIExecContract = ({ at = hubAddress } = {}) =>
     getContract('hub')({ at });
 
-  const getRLCContract = getContract('token');
+  const fetchRegistryAddress = async (objName, { hub = hubAddress } = {}) => {
+    try {
+      const iexecContract = getIExecContract({ at: hub });
+      const registryAddress = await iexecContract[
+        contractsDescMap[contractsDescMap[objName].registryName].hubPropName
+      ]();
+      return registryAddress;
+    } catch (error) {
+      debug('fetchRegistryAddress()', error);
+      throw error;
+    }
+  };
+
+  const fetchTokenAddress = async ({ hub = hubAddress } = {}) => {
+    try {
+      const iexecContract = getIExecContract({ at: hub });
+      const tokenAddress = await iexecContract.token();
+      return tokenAddress;
+    } catch (error) {
+      debug('fetchTokenAddress()', error);
+      throw error;
+    }
+  };
 
   const getAsyncRegistryContract = async (
     objName,
     { hub = hubAddress } = {},
   ) => {
-    const iexecContract = getIExecContract({ at: hub });
-    const registryAddress = await iexecContract[
-      contractsDescMap[contractsDescMap[objName].registryName].hubPropName
-    ]();
-    const registryContract = getContract(
-      contractsDescMap[objName].registryName,
-    )({
-      at: registryAddress,
-    });
-    return registryContract;
+    try {
+      const registryAddress = await fetchRegistryAddress(objName, { hub });
+      const registryContract = getContract(
+        contractsDescMap[objName].registryName,
+      )({
+        at: registryAddress,
+      });
+      return registryContract;
+    } catch (error) {
+      debug('getAsyncRegistryContract()', error);
+      throw error;
+    }
+  };
+
+  const getAsyncTokenContract = async ({ hub = hubAddress } = {}) => {
+    try {
+      const tokenAddress = await fetchTokenAddress({ hub });
+      const registryContract = getContract('token')({
+        at: tokenAddress,
+      });
+      return registryContract;
+    } catch (error) {
+      debug('getAsyncTokenContract()', error);
+      throw error;
+    }
   };
 
   const fetchContractAddress =
@@ -286,11 +309,6 @@ const createClient = ({
     };
 
   const fetchIExecAddress = fetchContractAddress('hub');
-  const fetchRLCAddress = fetchContractAddress('token');
-  const fetchAppRegistryAddress = fetchContractAddress('appRegistry');
-  const fetchDatasetRegistryAddress = fetchContractAddress('datasetRegistry');
-  const fetchWorkerpoolRegistryAddress =
-    fetchContractAddress('workerpoolRegistry');
 
   const checkDeployedObj =
     (objName) =>
@@ -313,48 +331,6 @@ const createClient = ({
       }
       return false;
     };
-
-  const createObj =
-    (objName) =>
-    async (obj, { hub = hubAddress } = {}) => {
-      try {
-        if (!hub) {
-          throw Error(
-            `no hub address provided, and no existing hub contract on chain ${chainId}`,
-          );
-        }
-        const registryContract = await getAsyncRegistryContract(objName, {
-          hub,
-        });
-        const args = contractsDescMap[objName].createParams.map((e) => obj[e]);
-        const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
-        const predictedAddress = await registryContract[predictFonctionName](
-          ...args,
-        );
-        const isDeployed = await checkDeployedObj(objName)(predictedAddress, {
-          strict: false,
-        });
-        if (isDeployed) {
-          throw Error(
-            `${toUpperFirst(
-              objName,
-            )} already deployed at address ${predictedAddress}`,
-          );
-        }
-        const createFonctionName = 'create'.concat(toUpperFirst(objName));
-        const tx = await registryContract[createFonctionName](...args, {
-          gasPrice,
-        });
-        const txReceipt = await tx.wait();
-        return txReceipt;
-      } catch (error) {
-        debug('createObj()', error);
-        throw error;
-      }
-    };
-  const createApp = createObj('app');
-  const createDataset = createObj('dataset');
-  const createWorkerpool = createObj('workerpool');
 
   const getObjProps = (objName) => async (at) => {
     try {
@@ -394,152 +370,19 @@ const createClient = ({
     }
   };
 
-  const getUserObjCount =
-    (objName) =>
-    async (userAddress, { hub = hubAddress } = {}) => {
-      try {
-        if (!hub) {
-          throw Error(
-            `no hub address provided, and no existing hub contract on chain ${chainId}`,
-          );
-        }
-
-        const iexecContract = getIExecContract({ at: hub });
-        const registryAddress = await iexecContract[
-          contractsDescMap[contractsDescMap[objName].registryName].hubPropName
-        ]();
-        const registryContract = getContract(
-          contractsDescMap[objName].registryName,
-        )({
-          at: registryAddress,
-        });
-
-        const objsCountBN = await registryContract.balanceOf(userAddress);
-        return objsCountBN;
-      } catch (error) {
-        debug('getUserObjCount()', error);
-        throw error;
-      }
-    };
-
-  const createCategory = async (category, { hub = hubAddress } = {}) => {
-    try {
-      const iexecContract = getIExecContract({ at: hub });
-      const categoryOwner = await iexecContract.owner();
-      const userAddress = await ethSigner.getAddress();
-      if (!(categoryOwner === userAddress)) {
-        throw Error(
-          `only category owner ${categoryOwner} can create new categories`,
-        );
-      }
-
-      const args = [
-        category.name,
-        category.description,
-        category.workClockTimeRef,
-      ];
-
-      const tx = await iexecContract.createCategory(...args, { gasPrice });
-      const txReceipt = await tx.wait();
-      return txReceipt;
-    } catch (error) {
-      debug('createCategory()', error);
-      throw error;
-    }
-  };
-
-  const getCategoryByIndex = async (index, { hub = hubAddress } = {}) => {
-    try {
-      const iexecContract = getIExecContract({ at: hub });
-      const categoryRPC = await iexecContract.viewCategory(index);
-      const categoryPropNames = ['name', 'description', 'workClockTimeRef'];
-      const category = categoryRPC.reduce(
-        (accu, curr, i) =>
-          Object.assign(accu, {
-            [categoryPropNames[i]]: curr,
-          }),
-        {},
-      );
-      return category;
-    } catch (error) {
-      debug('getCategoryByIndex()', error);
-      throw error;
-    }
-  };
-
-  const checkBalance = async (userAddress, { hub = hubAddress } = {}) => {
-    try {
-      if (!hub) {
-        throw Error(
-          `no hub address provided, and no existing hub contract on chain ${chainId}`,
-        );
-      }
-      const iexecContract = getIExecContract({
-        at: hub,
-      });
-      const balancesRPC = await iexecContract.viewAccount(userAddress);
-      return balancesRPC;
-    } catch (error) {
-      debug('checkBalance()', error);
-      throw error;
-    }
-  };
-
-  const getUserObjIdByIndex =
-    (objName) =>
-    async (userAddress, index, { hub = hubAddress } = {}) => {
-      try {
-        if (!hub) {
-          throw Error(
-            `no hub address provided, and no existing hub contract on chain ${chainId}`,
-          );
-        }
-        const iexecContract = getIExecContract({ at: hub });
-        const registryAddress = await iexecContract[
-          contractsDescMap[contractsDescMap[objName].registryName].hubPropName
-        ]();
-        const registryContract = getContract(
-          contractsDescMap[objName].registryName,
-        )({
-          at: registryAddress,
-        });
-        const objAddress = await registryContract.tokenOfOwnerByIndex(
-          userAddress,
-          index,
-        );
-        return objAddress;
-      } catch (error) {
-        debug('getUserObjIdByIndex()', error);
-        throw error;
-      }
-    };
-
   return {
     pocoVersion,
     isNative,
     flavour,
     hubAddress,
-    checkBalance,
     getContract,
     getIExecContract,
     getAsyncRegistryContract,
-    // getAsyncTokenContract,
-
-    ...(!isNative && { getRLCContract }),
-    ...(!isNative && { fetchRLCAddress }),
+    ...(!isNative && { getAsyncTokenContract }),
     fetchIExecAddress,
-    fetchAppRegistryAddress,
-    fetchDatasetRegistryAddress,
-    fetchWorkerpoolRegistryAddress,
-    createObj,
-    createApp,
-    createDataset,
-    createWorkerpool,
-    createCategory,
+    ...(!isNative && { fetchTokenAddress }),
+    fetchRegistryAddress,
     getObjProps,
-    getCategoryByIndex,
-    getUserObjIdByIndex,
-    getUserObjCount,
     checkDeployedObj,
   };
 };
@@ -554,11 +397,11 @@ class IExecContractsClient {
     isNative,
     flavour = 'standard',
   } = {}) {
-    if (!provider) {
-      throw Error('missing provider key');
-    }
     const stringChainId = `${chainId}`;
+    if (!provider) throw Error('missing provider key');
     if (!stringChainId) throw Error('missing chainId key');
+    if (flavour !== 'standard' && flavour !== 'enterprise')
+      throw Error('invalid flavour');
 
     this._args = {
       provider,
@@ -569,13 +412,13 @@ class IExecContractsClient {
       isNative,
       flavour,
     };
-    if (flavour !== 'standard' && flavour !== 'enterprise')
-      throw Error('invalid flavour');
 
     const native =
       isNative !== undefined ? !!isNative : getIsNative(stringChainId, flavour);
+
     const gasPriceOverride =
       useGas === false ? '0x0' : getGasPriceOverride(stringChainId);
+
     const client = createClient({
       ethSigner: signer,
       ethProvider: provider,
@@ -583,7 +426,6 @@ class IExecContractsClient {
       globalHubAddress: hubAddress,
       isNative: native,
       flavour,
-      gasPrice: gasPriceOverride,
     });
 
     this.setSigner = (ethSigner) => {

@@ -3,7 +3,6 @@
 const cli = require('commander');
 const packageJSON = require('../../../package.json');
 const { getChainDefaults } = require('../../common/utils/config');
-const { addressSchema } = require('../../common/utils/validator');
 const { wrapCall } = require('../../common/utils/errorWrappers');
 const {
   addGlobalOptions,
@@ -133,38 +132,20 @@ async function main() {
         spinner.info(`Ethereum host: ${host}`);
 
         spinner.start(info.checking('iExec contracts info'));
-        const hubAddress = await addressSchema({
-          ethProvider: chain.contracts.provider,
-        }).validate(chain.hub || (await chain.contracts.fetchIExecAddress()));
+
         const useNative = !!chain.contracts.isNative;
         const { flavour } = chain.contracts;
         const rlcAddress = useNative
           ? undefined
-          : await wrapCall(
-              chain.contracts.fetchRLCAddress({
-                hub: hubAddress,
-              }),
-            );
+          : await wrapCall(chain.contracts.fetchTokenAddress());
         const [
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          wrapCall(
-            chain.contracts.fetchAppRegistryAddress({
-              hub: hubAddress,
-            }),
-          ),
-          wrapCall(
-            chain.contracts.fetchDatasetRegistryAddress({
-              hub: hubAddress,
-            }),
-          ),
-          wrapCall(
-            chain.contracts.fetchWorkerpoolRegistryAddress({
-              hub: hubAddress,
-            }),
-          ),
+          wrapCall(chain.contracts.fetchRegistryAddress('app')),
+          wrapCall(chain.contracts.fetchRegistryAddress('dataset')),
+          wrapCall(chain.contracts.fetchRegistryAddress('workerpool')),
         ]);
         const { pocoVersion } = chain.contracts;
 
@@ -173,7 +154,7 @@ async function main() {
           ...((useNative && {
             'native RLC': true,
           }) || { 'RLC ERC20 address': rlcAddress }),
-          'iExec contract address': hubAddress || chain.contracts.hubAddress,
+          'iExec contract address': chain.contracts.hubAddress,
           'app registry address': appRegistryAddress,
           'dataset registry address': datasetRegistryAddress,
           'workerpool registry address': workerpoolRegistryAddress,
@@ -182,7 +163,7 @@ async function main() {
           raw: {
             pocoVersion,
             host,
-            hubAddress: hubAddress || chain.contracts.hubAddress,
+            hubAddress: chain.contracts.hubAddress,
             rlcAddress,
             appRegistryAddress,
             datasetRegistryAddress,
