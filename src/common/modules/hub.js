@@ -37,6 +37,48 @@ const tokenIdToAddress = (tokenId) => {
   return checksummedAddress(lowerCaseAddress);
 };
 
+const checkDeployedObj =
+  (objName = throwIfMissing()) =>
+  async (contracts = throwIfMissing(), address = throwIfMissing()) => {
+    try {
+      const registryContract = await wrapCall(
+        contracts.fetchRegistryContract(objName),
+      );
+      const isDeployed = await wrapCall(registryContract.isRegistered(address));
+      return isDeployed;
+    } catch (error) {
+      debug('checkDeployedObj()', error);
+      throw error;
+    }
+  };
+
+const checkDeployedApp = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) =>
+  checkDeployedObj('app')(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+  );
+
+const checkDeployedDataset = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) =>
+  checkDeployedObj('dataset')(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+  );
+
+const checkDeployedWorkerpool = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) =>
+  checkDeployedObj('workerpool')(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+  );
+
 const createArgs = {
   app: ['owner', 'name', 'type', 'multiaddr', 'checksum', 'mrenclave'],
   dataset: ['owner', 'name', 'multiaddr', 'checksum'],
@@ -48,21 +90,17 @@ const createObj =
   async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
     try {
       const registryContract = await wrapCall(
-        contracts.getAsyncRegistryContract(objName),
+        contracts.fetchRegistryContract(objName),
       );
       const args = createArgs[objName].map((e) => obj[e]);
       const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
       const predictedAddress = await wrapCall(
         registryContract[predictFonctionName](...args),
       );
-
-      const isDeployed = await contracts.checkDeployedObj(objName)(
+      const isDeployed = await checkDeployedObj(objName)(
+        contracts,
         predictedAddress,
-        {
-          strict: false,
-        },
       );
-
       if (isDeployed) {
         throw Error(
           `${toUpperFirst(
@@ -106,47 +144,6 @@ const deployWorkerpool = async (contracts, workerpool) =>
     ),
   );
 
-const checkDeployedObj =
-  (objName = throwIfMissing()) =>
-  async (contracts = throwIfMissing(), address = throwIfMissing()) => {
-    try {
-      const isDeployed = await wrapCall(
-        contracts.checkDeployedObj(objName)(address, { strict: false }),
-      );
-      return isDeployed;
-    } catch (error) {
-      debug('checkDeployedObj()', error);
-      throw error;
-    }
-  };
-
-const checkDeployedApp = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) =>
-  checkDeployedObj('app')(
-    contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
-  );
-
-const checkDeployedDataset = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) =>
-  checkDeployedObj('dataset')(
-    contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
-  );
-
-const checkDeployedWorkerpool = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) =>
-  checkDeployedObj('workerpool')(
-    contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
-  );
-
 const showObjByAddress =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), objAddress = throwIfMissing()) => {
@@ -157,9 +154,18 @@ const showObjByAddress =
       const isDeployed = await checkDeployedObj(objName)(contracts, objAddress);
       if (!isDeployed)
         throw new ObjectNotFoundError(objName, objAddress, contracts.chainId);
-      const obj = bnifyNestedEthersBn(
-        await wrapCall(contracts.getObjProps(objName)(vAddress)),
+      const contract = contracts.getContract(objName, vAddress);
+      const readableProps = Object.values(contract.interface.functions)
+        .filter((fragment) => fragment.constant)
+        .map((fragment) => fragment.name);
+      const values = await Promise.all(
+        readableProps.map((e) => wrapCall(contract[e]())),
       );
+      const objProps = values.reduce(
+        (acc, curr, i) => ({ ...acc, [readableProps[i]]: curr }),
+        {},
+      );
+      const obj = bnifyNestedEthersBn(objProps);
       return { obj, objAddress: vAddress };
     } catch (error) {
       debug('showObjByAddress()', error);
@@ -175,7 +181,7 @@ const countObj =
         ethProvider: contracts.provider,
       }).validate(userAddress);
       const registryContract = await wrapCall(
-        contracts.getAsyncRegistryContract(objName),
+        contracts.fetchRegistryContract(objName),
       );
       const objCount = await wrapCall(registryContract.balanceOf(vAddress));
       return ethersBnToBn(objCount);
@@ -230,9 +236,8 @@ const showObjByIndex =
       }).validate(userAddress);
       const totalObj = await countObj(objName)(contracts, userAddress);
       if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
-
       const registryContract = await wrapCall(
-        contracts.getAsyncRegistryContract(objName),
+        contracts.fetchRegistryContract(objName),
       );
       const tokenId = await wrapCall(
         registryContract.tokenOfOwnerByIndex(vAddress, vIndex),
@@ -444,9 +449,7 @@ const getOwner = async (
 ) => {
   try {
     checkResourceName(name);
-    const contract = contracts.getContract(name)({
-      at: address,
-    });
+    const contract = contracts.getContract(name, address);
     const owner = checksummedAddress(await wrapCall(contract.owner()));
     return owner;
   } catch (error) {

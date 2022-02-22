@@ -71,48 +71,6 @@ const getHubAddress = (chainId, flavour, { strict = true } = {}) => {
   }
 };
 
-const getContractAddress = (
-  objName,
-  desc,
-  chainId,
-  flavour,
-  { strict = true } = {},
-) => {
-  try {
-    if (objName === 'hub') return getHubAddress(chainId, flavour, { strict });
-    if (flavour === 'enterprise') {
-      if (strict) {
-        throw Error('missing enterprise configuration');
-      }
-      return undefined;
-    }
-    if (!('networks' in desc)) {
-      if (strict) {
-        throw Error('missing networks key in contract JSON description');
-      }
-      return undefined;
-    }
-    if (!(chainId in desc.networks)) {
-      if (strict) {
-        throw Error(`missing "${chainId}" key in contract JSON description`);
-      }
-      return undefined;
-    }
-    if (!('address' in desc.networks[chainId])) {
-      if (strict) {
-        throw Error(
-          `missing address key in contract JSON description for chainId: ${chainId}`,
-        );
-      }
-      return undefined;
-    }
-    return desc.networks[chainId].address;
-  } catch (error) {
-    debug('getContractAddress()', error);
-    throw error;
-  }
-};
-
 const getIsNative = (chainId, flavour) =>
   nativeNetworks[flavour].includes(chainId);
 
@@ -171,52 +129,39 @@ const createClient = ({
   flavour,
 }) => {
   const contractsDescMap = getContractsDescMap(isNative, flavour);
+
   const hubAddress =
     globalHubAddress ||
-    getContractAddress(
-      'hub',
-      contractsDescMap.hub.contractDesc,
-      chainId,
-      flavour,
-      {
-        strict: true,
-      },
-    );
+    getHubAddress(chainId, flavour, {
+      strict: true,
+    });
 
-  const getContract =
-    (objName) =>
-    ({ at } = {}) => {
-      try {
-        const { contractDesc } = contractsDescMap[objName];
-        const atAddress =
-          at ||
-          getContractAddress(objName, contractDesc, chainId, flavour, {
-            strict: false,
-          });
-        if (!atAddress) {
-          throw Error(
-            `no contract address provided, and no existing contract address on chain ${chainId}`,
-          );
-        }
-        const contract = new Contract(
-          atAddress,
-          contractDesc.abi,
-          ethSigner || ethProvider,
-        );
-        return contract;
-      } catch (error) {
-        debug('getContract()', error);
-        throw error;
-      }
-    };
-  const getIExecContract = ({ at = hubAddress } = {}) =>
-    getContract('hub')({ at });
-
-  const fetchRegistryAddress = async (objName, { hub = hubAddress } = {}) => {
+  const getContract = (objName, address) => {
     try {
-      const iexecContract = getIExecContract({ at: hub });
+      const { contractDesc } = contractsDescMap[objName];
+      if (!address) {
+        throw Error(`no contract address provided`);
+      }
+      const contract = new Contract(
+        address,
+        contractDesc.abi,
+        ethSigner || ethProvider,
+      );
+      return contract;
+    } catch (error) {
+      debug('getContract()', error);
+      throw error;
+    }
+  };
+
+  const getIExecContract = () => getContract('hub', hubAddress);
+
+  const fetchRegistryAddress = async (objName) => {
+    try {
+      const { registryName } = contractsDescMap[objName];
+      const iexecContract = getIExecContract();
       const registryAddress = await iexecContract[
-        contractsDescMap[contractsDescMap[objName].registryName].hubPropName
+        contractsDescMap[registryName].hubPropName
       ]();
       return registryAddress;
     } catch (error) {
@@ -225,9 +170,23 @@ const createClient = ({
     }
   };
 
-  const fetchTokenAddress = async ({ hub = hubAddress } = {}) => {
+  const fetchRegistryContract = async (objName) => {
     try {
-      const iexecContract = getIExecContract({ at: hub });
+      const registryAddress = await fetchRegistryAddress(objName);
+      const registryContract = getContract(
+        contractsDescMap[objName].registryName,
+        registryAddress,
+      );
+      return registryContract;
+    } catch (error) {
+      debug('fetchRegistryContract()', error);
+      throw error;
+    }
+  };
+
+  const fetchTokenAddress = async () => {
+    try {
+      const iexecContract = getIExecContract();
       const tokenAddress = await iexecContract.token();
       return tokenAddress;
     } catch (error) {
@@ -236,136 +195,13 @@ const createClient = ({
     }
   };
 
-  const getAsyncRegistryContract = async (
-    objName,
-    { hub = hubAddress } = {},
-  ) => {
+  const fetchTokenContract = async () => {
     try {
-      const registryAddress = await fetchRegistryAddress(objName, { hub });
-      const registryContract = getContract(
-        contractsDescMap[objName].registryName,
-      )({
-        at: registryAddress,
-      });
+      const tokenAddress = await fetchTokenAddress();
+      const registryContract = getContract('token', tokenAddress);
       return registryContract;
     } catch (error) {
-      debug('getAsyncRegistryContract()', error);
-      throw error;
-    }
-  };
-
-  const getAsyncTokenContract = async ({ hub = hubAddress } = {}) => {
-    try {
-      const tokenAddress = await fetchTokenAddress({ hub });
-      const registryContract = getContract('token')({
-        at: tokenAddress,
-      });
-      return registryContract;
-    } catch (error) {
-      debug('getAsyncTokenContract()', error);
-      throw error;
-    }
-  };
-
-  const fetchContractAddress =
-    (objName) =>
-    async ({ strict = true, hub = hubAddress } = {}) => {
-      const { contractDesc, hubPropName } = contractsDescMap[objName];
-      if (!hub && strict) {
-        throw Error(
-          `Hub address missing but needed to fetch ${objName} address`,
-        );
-      }
-      if (!hub) return undefined;
-
-      if (!hubPropName) {
-        return hub;
-      }
-      const defaultHubAddress = getContractAddress(
-        'hub',
-        contractsDescMap.hub.contractDesc,
-        chainId,
-        flavour,
-        {
-          strict: false,
-        },
-      );
-      if (hub === defaultHubAddress) {
-        const contractAddress = getContractAddress(
-          objName,
-          contractDesc,
-          chainId,
-          flavour,
-          {
-            strict: false,
-          },
-        );
-        if (contractAddress) return contractAddress;
-      }
-      const fetchedContractAddress = await getIExecContract({ at: hub })[
-        hubPropName
-      ]();
-      return fetchedContractAddress;
-    };
-
-  const fetchIExecAddress = fetchContractAddress('hub');
-
-  const checkDeployedObj =
-    (objName) =>
-    async (address, { strict = true, hub = hubAddress } = {}) => {
-      const iexecContract = getIExecContract({ at: hub });
-      const regisrtyHubName =
-        contractsDescMap[contractsDescMap[objName].registryName].hubPropName;
-      const registryAddress = await iexecContract[regisrtyHubName]();
-      const registryContract = getContract(
-        contractsDescMap[objName].registryName,
-      )({
-        at: registryAddress,
-      });
-      const isRegistered = await registryContract.isRegistered(address);
-      if (isRegistered) return true;
-      if (strict) {
-        throw new Error(
-          `No ${objName} contract deployed at address ${address}`,
-        );
-      }
-      return false;
-    };
-
-  const getObjProps = (objName) => async (at) => {
-    try {
-      const { contractDesc } = contractsDescMap[objName];
-      const objAddress =
-        at ||
-        getContractAddress(objName, contractDesc, chainId, flavour, {
-          strict: false,
-        });
-      if (!objAddress) {
-        throw Error(
-          `no contract address provided, and no existing contract on chain ${chainId}`,
-        );
-      }
-      const objContract = new Contract(
-        objAddress,
-        contractDesc.abi,
-        ethProvider,
-      );
-      const objPropNames = contractDesc.abi
-        .filter((e) => e.stateMutability === 'view' && e.inputs.length === 0)
-        .map((e) => e.name);
-      const objPropsRPC = await Promise.all(
-        objPropNames.map((e) => objContract[e]()),
-      );
-      const objProps = objPropsRPC.reduce(
-        (accu, curr, i) =>
-          Object.assign(accu, {
-            [objPropNames[i]]: curr,
-          }),
-        {},
-      );
-      return objProps;
-    } catch (error) {
-      debug('getObjProps()', error);
+      debug('fetchTokenContract()', error);
       throw error;
     }
   };
@@ -377,13 +213,10 @@ const createClient = ({
     hubAddress,
     getContract,
     getIExecContract,
-    getAsyncRegistryContract,
-    ...(!isNative && { getAsyncTokenContract }),
-    fetchIExecAddress,
+    fetchRegistryContract,
+    ...(!isNative && { fetchTokenContract }),
     ...(!isNative && { fetchTokenAddress }),
     fetchRegistryAddress,
-    getObjProps,
-    checkDeployedObj,
   };
 };
 

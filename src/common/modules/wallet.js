@@ -99,7 +99,7 @@ const isInWhitelist = async (
     ethProvider: contracts.provider,
   }).validate(address);
   try {
-    const eRlcContract = await wrapCall(contracts.getAsyncTokenContract());
+    const eRlcContract = await wrapCall(contracts.fetchTokenContract());
     const isKYC = await wrapCall(eRlcContract.isKYC(vAddress));
     if (!isKYC && strict) {
       throw Error(`${vAddress} is not authorized to interact with eRLC`);
@@ -123,7 +123,7 @@ const getRlcBalance = async (
     const weiBalance = await contracts.provider.getBalance(vAddress);
     return truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance));
   }
-  const rlcContract = await wrapCall(contracts.getAsyncTokenContract());
+  const rlcContract = await wrapCall(contracts.fetchTokenContract());
   const nRlcBalance = await wrapCall(rlcContract.balanceOf(vAddress));
   return ethersBnToBn(nRlcBalance);
 };
@@ -261,7 +261,7 @@ const sendERC20 = async (
   }).validate(to);
   const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
   try {
-    const rlcContract = await wrapCall(contracts.getAsyncTokenContract());
+    const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
       rlcContract.transfer(vAddress, vAmount, contracts.txOptions),
     );
@@ -521,7 +521,7 @@ const obsBridgeToSidechain = (
           dayStartTimestamp,
         );
         if (abort) return;
-        const erc20Contract = await wrapCall(contracts.getAsyncTokenContract());
+        const erc20Contract = await wrapCall(contracts.fetchTokenContract());
         const transferLogs = await contracts.provider.getLogs({
           fromBlock: startBlockNumber,
           toBlock: 'latest',
@@ -938,7 +938,7 @@ const wrapEnterpriseRLC = async (
   }
   try {
     const eRlcAddress = await wrapCall(enterpriseContracts.fetchTokenAddress());
-    const rlcContract = await wrapCall(contracts.getAsyncTokenContract());
+    const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
       rlcContract.approveAndCall(
         eRlcAddress,
@@ -969,7 +969,7 @@ const unwrapEnterpriseRLC = async (
     throw Error('Amount to unwrap exceed wallet balance');
   }
   try {
-    const eRlcContract = await wrapCall(contracts.getAsyncTokenContract());
+    const eRlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(eRlcContract.withdraw(vAmount));
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;

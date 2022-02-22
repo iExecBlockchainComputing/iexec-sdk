@@ -60,13 +60,12 @@ const deposit = async (
     );
     if (nRLC.lt(new BN(vAmount)))
       throw Error('Deposit amount exceed wallet balance');
-    const iexecAddress = await contracts.fetchIExecAddress();
     const iexecContract = contracts.getIExecContract();
     if (!contracts.isNative) {
-      const rlcContract = await wrapCall(contracts.getAsyncTokenContract());
+      const rlcContract = await wrapCall(contracts.fetchTokenContract());
       const tx = await wrapSend(
         rlcContract.approveAndCall(
-          iexecAddress,
+          contracts.hubAddress,
           vAmount,
           NULL_BYTES,
           contracts.txOptions,
