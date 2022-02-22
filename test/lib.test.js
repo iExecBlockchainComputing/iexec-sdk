@@ -49,7 +49,12 @@ expect.extend({
 });
 
 // CONFIG
-const { DRONE } = process.env;
+const { DRONE, INFURA_PROJECT_ID } = process.env;
+// public chains
+console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
+const goerliHost = INFURA_PROJECT_ID
+  ? `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+  : 'goerli';
 // 1 block / tx
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
@@ -534,7 +539,7 @@ describe('[IExec]', () => {
   });
 
   test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
-    const signer = utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -1287,7 +1292,7 @@ describe('[getSignerFromPrivateKey]', () => {
       };
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumFail,
           }),
           chainId: '5',
@@ -1295,7 +1300,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumPass,
           }),
           chainId: '5',
@@ -1303,7 +1308,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ).resolves.toBeDefined();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumFail,
           }),
           chainId: '5',
@@ -1311,7 +1316,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumPass,
           }),
           chainId: '5',
@@ -1319,7 +1324,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ).resolves.toBeDefined();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumFail,
           }),
           chainId: '5',
@@ -1327,7 +1332,7 @@ describe('[getSignerFromPrivateKey]', () => {
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey('goerli', PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumPass,
           }),
           chainId: '5',

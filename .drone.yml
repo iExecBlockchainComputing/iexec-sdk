@@ -2,6 +2,7 @@ pipeline:
   test_node16:
     image: node:16
     pull: true
+    secrets: [infura_project_id]
     commands:
       - apt update
       - apt install xxd
@@ -17,6 +18,7 @@ pipeline:
   test_node14:
     image: node:14
     pull: true
+    secrets: [infura_project_id]
     commands:
       - apt update
       - apt install xxd
@@ -32,6 +34,7 @@ pipeline:
   test_node12:
     image: node:12
     pull: true
+    secrets: [infura_project_id]
     commands:
       - apt update
       - apt install xxd
