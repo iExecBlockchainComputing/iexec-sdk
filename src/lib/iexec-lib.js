@@ -1,5 +1,4 @@
-const { getDefaultProvider, providers } = require('ethers');
-const IExecContractsClient = require('../common/utils/contracts');
+const IExecConfig = require('./IExecConfig');
 const wallet = require('../common/modules/wallet');
 const account = require('../common/modules/account');
 const hub = require('../common/modules/hub');
@@ -37,15 +36,7 @@ const {
   encryptAes256Cbc,
   sha256Sum,
 } = require('../common/utils/encryption-utils');
-const {
-  EnhancedWallet,
-  EnhancedWeb3Signer,
-  getSignerFromPrivateKey,
-} = require('../common/utils/signers');
-const {
-  getChainDefaults,
-  isEnterpriseEnabled,
-} = require('../common/utils/config');
+const { getSignerFromPrivateKey } = require('../common/utils/signers');
 
 const utils = {
   BN,
@@ -81,395 +72,115 @@ class IExec {
       iexecGatewayURL,
     } = {},
   ) {
-    const isEnhancedWallet = ethProvider instanceof EnhancedWallet;
-
-    const networkPromise = (async () => {
-      let disposableProvider;
-      if (isEnhancedWallet) {
-        disposableProvider = ethProvider.provider;
-      } else {
-        disposableProvider = new providers.Web3Provider(ethProvider);
-      }
-      const { chainId, name, ensAddress } =
-        await disposableProvider.getNetwork();
-      return { chainId, name, ensAddress };
-    })();
-
-    const chainConfDefaultsPromise = (async () => {
-      const { chainId } = await networkPromise;
-      return getChainDefaults({ id: chainId, flavour });
-    })();
-
-    const signerProviderPromise = (async () => {
-      let provider;
-      let signer;
-      const network = await networkPromise;
-      const { ensRegistry } = await chainConfDefaultsPromise;
-      const networkOverride = {
-        ...network,
-        ...(ensRegistry && { ensAddress: ensRegistry }),
-        ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
-      };
-      if (isEnhancedWallet) {
-        if (
-          ethProvider.provider &&
-          ethProvider.provider.connection &&
-          ethProvider.provider.connection.url
-        ) {
-          // case JsonRpcProvider
-          signer = ethProvider.connect(
-            new providers.JsonRpcProvider(
-              ethProvider.provider.connection.url,
-              networkOverride,
-            ),
-          );
-        } else {
-          // case FallbackProvider can not override
-          if (ensRegistryAddress) {
-            console.warn(
-              'IExec: ensRegistyAddress option is not supported when using a default provider',
-            );
-          }
-          signer = ethProvider;
-        }
-        provider = signer.provider;
-      } else {
-        const web3SignerProvider = new EnhancedWeb3Signer(
-          ethProvider,
-          networkOverride,
-        );
-        signer = web3SignerProvider;
-        provider = signer.provider;
-      }
-      return { provider, signer };
-    })();
-
-    const contractsPromise = (async () => {
-      const { chainId } = await networkPromise;
-      const { provider, signer } = await signerProviderPromise;
-      return new IExecContractsClient({
-        chainId,
-        provider,
-        signer,
+    const config = new IExecConfig(
+      { ethProvider, flavour },
+      {
         hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative,
         useGas,
         confirms,
-        isNative,
-        flavour,
-      });
-    })();
-
-    let _enterpriseSwapContracts;
-    const getEnterpriseSwapContracts = async () => {
-      if (!_enterpriseSwapContracts) {
-        const { chainId } = await networkPromise;
-        const { provider, signer } = await signerProviderPromise;
-        let enterpriseConf;
-        const hasEnterpriseConf =
-          enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
-        const enterpriseSwapFlavour =
-          flavour === 'enterprise' ? 'standard' : 'enterprise';
-        if (hasEnterpriseConf) {
-          const enterpriseSwapConfDefaults = getChainDefaults({
-            id: chainId,
-            flavour: enterpriseSwapFlavour,
-          });
-          enterpriseConf = {
-            ...enterpriseSwapConfDefaults,
-            ...enterpriseSwapConf,
-          };
-        }
-        _enterpriseSwapContracts = hasEnterpriseConf
-          ? new IExecContractsClient({
-              chainId,
-              provider,
-              signer,
-              hubAddress: enterpriseConf.hubAddress,
-              confirms,
-              isNative: enterpriseConf.isNative,
-              flavour: enterpriseSwapFlavour,
-            })
-          : undefined;
-      }
-      return _enterpriseSwapContracts;
-    };
-
-    let _bridgedConf;
-    const getBridgedConf = async () => {
-      if (!_bridgedConf) {
-        const { chainId } = await networkPromise;
-        const chainConfDefaults = await chainConfDefaultsPromise;
-        const contracts = await contractsPromise;
-        const isBridged =
-          Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
-          chainConfDefaults.bridge;
-
-        if (isBridged) {
-          const bridgedChainId =
-            bridgedNetworkConf.chainId !== undefined
-              ? bridgedNetworkConf.chainId
-              : chainConfDefaults.bridge &&
-                chainConfDefaults.bridge.bridgedChainId;
-          if (!bridgedChainId) {
-            throw new errors.ConfigurationError(
-              `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
-            );
-          }
-          const bridgedChainConfDefaults = getChainDefaults({
-            id: bridgedChainId,
-            flavour,
-          });
-          const bridgedRpcUrl =
-            bridgedNetworkConf.rpcURL !== undefined
-              ? bridgedNetworkConf.rpcURL
-              : bridgedChainConfDefaults.host;
-          if (!bridgedRpcUrl) {
-            throw new errors.ConfigurationError(
-              `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
-            );
-          }
-          const bridgedBridgeAddress =
-            bridgedNetworkConf.bridgeAddress !== undefined
-              ? bridgedNetworkConf.bridgeAddress
-              : bridgedChainConfDefaults.bridge &&
-                bridgedChainConfDefaults.bridge.contract;
-          if (!bridgedBridgeAddress) {
-            throw new errors.ConfigurationError(
-              `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
-            );
-          }
-          _bridgedConf = {
-            chainId: bridgedChainId,
-            rpcURL: bridgedRpcUrl,
-            isNative:
-              flavour === 'standard' ? !contracts.isNative : contracts.isNative,
-            hubAddress: bridgedNetworkConf.hubAddress,
-            bridgeAddress: bridgedBridgeAddress,
-          };
-        }
-      }
-      return _bridgedConf;
-    };
-
-    let _bridgedContracts;
-    const getBridgedContracts = async () => {
-      if (!_bridgedContracts) {
-        const chainConfDefaults = await chainConfDefaultsPromise;
-        const isBridged =
-          Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
-          chainConfDefaults.bridge;
-        if (isBridged) {
-          const bridgedConf = await getBridgedConf();
-          _bridgedContracts = new IExecContractsClient({
-            chainId: bridgedConf.chainId,
-            provider: getDefaultProvider(bridgedConf.rpcURL),
-            hubAddress: bridgedConf.hubAddress,
-            confirms,
-            isNative: bridgedConf.isNative,
-            flavour,
-          });
-        }
-      }
-      return _bridgedContracts;
-    };
-
-    const getSmsURL = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = smsURL || chainConfDefaults.sms;
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `smsURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getResultProxyURL = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = resultProxyURL || chainConfDefaults.resultProxy;
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `resultProxyURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getIexecGatewayURL = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = iexecGatewayURL || chainConfDefaults.iexecGateway;
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getIpfsGatewayURL = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = ipfsGatewayURL || chainConfDefaults.ipfsGateway;
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getBridgeAddress = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value =
-        bridgeAddress ||
-        (chainConfDefaults.bridge && chainConfDefaults.bridge.contract);
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `bridgeAddress option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getEnsPublicResolverAddress = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value =
-        ensPublicResolverAddress || chainConfDefaults.ensPublicResolver;
-      if (value !== undefined) {
-        return value;
-      }
-      throw Error(
-        `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getStandardContracts = async () => {
-      const { chainId } = await networkPromise;
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'standard') {
-        return contracts;
-      }
-      const enterpriseSwapContracts = await getEnterpriseSwapContracts();
-      if (
-        enterpriseSwapContracts &&
-        enterpriseSwapContracts.flavour === 'standard'
-      ) {
-        return enterpriseSwapContracts;
-      }
-      throw Error(
-        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    const getEnterpriseContracts = async () => {
-      const { chainId } = await networkPromise;
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'enterprise') {
-        return contracts;
-      }
-      const enterpriseSwapContracts = await getEnterpriseSwapContracts();
-      if (
-        enterpriseSwapContracts &&
-        enterpriseSwapContracts.flavour === 'enterprise'
-      ) {
-        return enterpriseSwapContracts;
-      }
-      throw Error(
-        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
-      );
-    };
+        bridgeAddress,
+        bridgedNetworkConf,
+        enterpriseSwapConf,
+        resultProxyURL,
+        smsURL,
+        ipfsGatewayURL,
+        iexecGatewayURL,
+      },
+    );
 
     this.wallet = {};
     this.wallet.getAddress = async () =>
-      wallet.getAddress(await contractsPromise);
+      wallet.getAddress(await config.getContracts());
     this.wallet.checkBalances = async (address) =>
-      wallet.checkBalances(await contractsPromise, address);
+      wallet.checkBalances(await config.getContracts(), address);
     this.wallet.checkBridgedBalances = async (address) =>
-      wallet.checkBalances(await getBridgedContracts(), address);
+      wallet.checkBalances(await config.getBridgedContracts(), address);
     this.wallet.sendETH = async (weiAmount, to) =>
-      wallet.sendETH(await contractsPromise, weiAmount, to);
+      wallet.sendETH(await config.getContracts(), weiAmount, to);
     this.wallet.sendRLC = async (nRlcAmount, to) =>
-      wallet.sendRLC(await contractsPromise, nRlcAmount, to);
-    this.wallet.sweep = async (to) => wallet.sweep(await contractsPromise, to);
+      wallet.sendRLC(await config.getContracts(), nRlcAmount, to);
+    this.wallet.sweep = async (to) =>
+      wallet.sweep(await config.getContracts(), to);
     this.wallet.bridgeToSidechain = async (nRlcAmount) =>
       wallet.bridgeToSidechain(
-        await contractsPromise,
-        await getBridgeAddress(),
+        await config.getContracts(),
+        await config.getBridgeAddress(),
         nRlcAmount,
         {
-          bridgedContracts: await getBridgedContracts(),
-          sidechainBridgeAddress: await getBridgedConf().then(
-            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
-          ),
+          bridgedContracts: await config.getBridgedContracts(),
+          sidechainBridgeAddress: await config
+            .getBridgedConf()
+            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
         },
       );
     this.wallet.bridgeToMainchain = async (nRlcAmount) =>
       wallet.bridgeToMainchain(
-        await contractsPromise,
-        await getBridgeAddress(),
+        await config.getContracts(),
+        await config.getBridgeAddress(),
         nRlcAmount,
         {
-          bridgedContracts: await getBridgedContracts(),
-          mainchainBridgeAddress: await getBridgedConf().then(
-            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
-          ),
+          bridgedContracts: await config.getBridgedContracts(),
+          mainchainBridgeAddress: await config
+            .getBridgedConf()
+            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
         },
       );
     this.wallet.obsBridgeToSidechain = async (nRlcAmount) =>
       wallet.obsBridgeToSidechain(
-        await contractsPromise,
-        await getBridgeAddress(),
+        await config.getContracts(),
+        await config.getBridgeAddress(),
         nRlcAmount,
         {
-          bridgedContracts: await getBridgedContracts(),
-          sidechainBridgeAddress: await getBridgedConf().then(
-            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
-          ),
+          bridgedContracts: await config.getBridgedContracts(),
+          sidechainBridgeAddress: await config
+            .getBridgedConf()
+            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
         },
       );
     this.wallet.obsBridgeToMainchain = async (nRlcAmount) =>
       wallet.obsBridgeToMainchain(
-        await contractsPromise,
-        await getBridgeAddress(),
+        await config.getContracts(),
+        await config.getBridgeAddress(),
         nRlcAmount,
         {
-          bridgedContracts: await getBridgedContracts(),
-          mainchainBridgeAddress: await getBridgedConf().then(
-            (bridgedConf) => bridgedConf && bridgedConf.bridgeAddress,
-          ),
+          bridgedContracts: await config.getBridgedContracts(),
+          mainchainBridgeAddress: await config
+            .getBridgedConf()
+            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
         },
       );
     this.wallet.wrapEnterpriseRLC = async (nRlcAmount) =>
       wallet.wrapEnterpriseRLC(
-        await getStandardContracts(),
-        await getEnterpriseContracts(),
+        await config.getStandardContracts(),
+        await config.getEnterpriseContracts(),
         nRlcAmount,
       );
     this.wallet.unwrapEnterpriseRLC = async (nRlcAmount) =>
-      wallet.unwrapEnterpriseRLC(await getEnterpriseContracts(), nRlcAmount);
+      wallet.unwrapEnterpriseRLC(
+        await config.getEnterpriseContracts(),
+        nRlcAmount,
+      );
     this.account = {};
     this.account.checkBalance = async (address) =>
-      account.checkBalance(await contractsPromise, address);
+      account.checkBalance(await config.getContracts(), address);
     this.account.checkBridgedBalance = async (address) =>
-      account.checkBalance(await getBridgedContracts(), address);
+      account.checkBalance(await config.getBridgedContracts(), address);
     this.account.deposit = async (nRlcAmount) =>
-      account.deposit(await contractsPromise, nRlcAmount);
+      account.deposit(await config.getContracts(), nRlcAmount);
     this.account.withdraw = async (nRlcAmount) =>
-      account.withdraw(await contractsPromise, nRlcAmount);
+      account.withdraw(await config.getContracts(), nRlcAmount);
     this.app = {};
     this.app.deployApp = async (app) =>
-      hub.deployApp(await contractsPromise, app);
+      hub.deployApp(await config.getContracts(), app);
     this.app.showApp = async (address) =>
-      hub.showApp(await contractsPromise, address);
+      hub.showApp(await config.getContracts(), address);
     this.app.showUserApp = async (index, userAddress) =>
-      hub.showUserApp(await contractsPromise, index, userAddress);
+      hub.showUserApp(await config.getContracts(), index, userAddress);
     this.app.countUserApps = async (address) =>
-      hub.countUserApps(await contractsPromise, address);
+      hub.countUserApps(await config.getContracts(), address);
     this.dataset = {};
     this.dataset.generateEncryptionKey = () => generateAes256Key();
     this.dataset.encrypt = (datasetFile, encryptionKey) =>
@@ -477,49 +188,49 @@ class IExec {
     this.dataset.computeEncryptedFileChecksum = (encryptedFile) =>
       sha256Sum(encryptedFile);
     this.dataset.deployDataset = async (dataset) =>
-      hub.deployDataset(await contractsPromise, dataset);
+      hub.deployDataset(await config.getContracts(), dataset);
     this.dataset.showDataset = async (address) =>
-      hub.showDataset(await contractsPromise, address);
+      hub.showDataset(await config.getContracts(), address);
     this.dataset.showUserDataset = async (index, userAddress) =>
-      hub.showUserDataset(await contractsPromise, index, userAddress);
+      hub.showUserDataset(await config.getContracts(), index, userAddress);
     this.dataset.countUserDatasets = async (address) =>
-      hub.countUserDatasets(await contractsPromise, address);
+      hub.countUserDatasets(await config.getContracts(), address);
     this.dataset.checkDatasetSecretExists = async (datasetAddress) =>
       secretMgtServ.checkWeb3SecretExists(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         datasetAddress,
       );
     this.dataset.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
       secretMgtServ.pushWeb3Secret(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         datasetAddress,
         datasetSecret,
       );
     this.workerpool = {};
     this.workerpool.deployWorkerpool = async (workerpool) =>
-      hub.deployWorkerpool(await contractsPromise, workerpool);
+      hub.deployWorkerpool(await config.getContracts(), workerpool);
     this.workerpool.showWorkerpool = async (address) =>
-      hub.showWorkerpool(await contractsPromise, address);
+      hub.showWorkerpool(await config.getContracts(), address);
     this.workerpool.showUserWorkerpool = async (index, userAddress) =>
-      hub.showUserWorkerpool(await contractsPromise, index, userAddress);
+      hub.showUserWorkerpool(await config.getContracts(), index, userAddress);
     this.workerpool.countUserWorkerpools = async (address) =>
-      hub.countUserWorkerpools(await contractsPromise, address);
+      hub.countUserWorkerpools(await config.getContracts(), address);
     this.hub = {};
     this.hub.createCategory = async (category) =>
-      hub.createCategory(await contractsPromise, category);
+      hub.createCategory(await config.getContracts(), category);
     this.hub.showCategory = async (index) =>
-      hub.showCategory(await contractsPromise, index);
+      hub.showCategory(await config.getContracts(), index);
     this.hub.countCategory = async () =>
-      hub.countCategory(await contractsPromise);
+      hub.countCategory(await config.getContracts());
     this.hub.getTimeoutRatio = async () =>
-      hub.getTimeoutRatio(await contractsPromise);
+      hub.getTimeoutRatio(await config.getContracts());
     this.deal = {};
     this.deal.show = async (dealid) =>
-      deal.show(await contractsPromise, dealid);
+      deal.show(await config.getContracts(), dealid);
     this.deal.obsDeal = async (dealid) =>
-      iexecProcess.obsDeal(await contractsPromise, dealid);
+      iexecProcess.obsDeal(await config.getContracts(), dealid);
     this.deal.computeTaskId = (dealid, taskIdx) =>
       deal.computeTaskId(dealid, taskIdx);
     this.deal.fetchRequesterDeals = async (
@@ -527,8 +238,8 @@ class IExec {
       { appAddress, datasetAddress, workerpoolAddress } = {},
     ) =>
       deal.fetchRequesterDeals(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         requesterAddress,
         {
           appAddress,
@@ -537,107 +248,107 @@ class IExec {
         },
       );
     this.deal.claim = async (dealid) =>
-      deal.claim(await contractsPromise, dealid);
+      deal.claim(await config.getContracts(), dealid);
     this.deal.fetchDealsByApporder = async (apporderHash) =>
       order.fetchDealsByOrderHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.APP_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         apporderHash,
       );
     this.deal.fetchDealsByDatasetorder = async (datasetorderHash) =>
       order.fetchDealsByOrderHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.DATASET_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         datasetorderHash,
       );
     this.deal.fetchDealsByWorkerpoolorder = async (workerpoolorderHash) =>
       order.fetchDealsByOrderHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.WORKERPOOL_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         workerpoolorderHash,
       );
     this.deal.fetchDealsByRequestorder = async (requestorderHash) =>
       order.fetchDealsByOrderHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.REQUEST_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         requestorderHash,
       );
     this.order = {};
     this.order.createApporder = async (overwrite) =>
-      order.createApporder(await contractsPromise, overwrite);
+      order.createApporder(await config.getContracts(), overwrite);
     this.order.createDatasetorder = async (overwrite) =>
-      order.createDatasetorder(await contractsPromise, overwrite);
+      order.createDatasetorder(await config.getContracts(), overwrite);
     this.order.createWorkerpoolorder = async (overwrite) =>
-      order.createWorkerpoolorder(await contractsPromise, overwrite);
+      order.createWorkerpoolorder(await config.getContracts(), overwrite);
     this.order.createRequestorder = async (overwrite) =>
       order.createRequestorder(
         {
-          contracts: await contractsPromise,
-          resultProxyURL: await getResultProxyURL(),
+          contracts: await config.getContracts(),
+          resultProxyURL: await config.getResultProxyURL(),
         },
         overwrite,
       );
     this.order.hashApporder = async (apporder) =>
-      order.hashApporder(await contractsPromise, apporder);
+      order.hashApporder(await config.getContracts(), apporder);
     this.order.hashDatasetorder = async (datasetorder) =>
-      order.hashDatasetorder(await contractsPromise, datasetorder);
+      order.hashDatasetorder(await config.getContracts(), datasetorder);
     this.order.hashWorkerpoolorder = async (workerpoolorder) =>
-      order.hashWorkerpoolorder(await contractsPromise, workerpoolorder);
+      order.hashWorkerpoolorder(await config.getContracts(), workerpoolorder);
     this.order.hashRequestorder = async (requestorder) =>
-      order.hashRequestorder(await contractsPromise, requestorder);
+      order.hashRequestorder(await config.getContracts(), requestorder);
     this.order.signApporder = async (apporder) =>
-      order.signApporder(await contractsPromise, apporder);
+      order.signApporder(await config.getContracts(), apporder);
     this.order.signDatasetorder = async (datasetorder) =>
-      order.signDatasetorder(await contractsPromise, datasetorder);
+      order.signDatasetorder(await config.getContracts(), datasetorder);
     this.order.signWorkerpoolorder = async (workerpoolorder) =>
-      order.signWorkerpoolorder(await contractsPromise, workerpoolorder);
+      order.signWorkerpoolorder(await config.getContracts(), workerpoolorder);
     this.order.signRequestorder = async (
       requestorder,
       { checkRequest = true } = {},
     ) =>
       order.signRequestorder(
-        await contractsPromise,
+        await config.getContracts(),
         checkRequest === true
           ? await checkRequestRequirements(
               {
-                contracts: await contractsPromise,
-                smsURL: await getSmsURL(),
+                contracts: await config.getContracts(),
+                smsURL: await config.getSmsURL(),
               },
               requestorder,
             ).then(() => requestorder)
           : requestorder,
       );
     this.order.cancelApporder = async (signedApporder) =>
-      order.cancelApporder(await contractsPromise, signedApporder);
+      order.cancelApporder(await config.getContracts(), signedApporder);
     this.order.cancelDatasetorder = async (signedDatasetorder) =>
-      order.cancelDatasetorder(await contractsPromise, signedDatasetorder);
+      order.cancelDatasetorder(await config.getContracts(), signedDatasetorder);
     this.order.cancelWorkerpoolorder = async (signedWorkerpoolorder) =>
       order.cancelWorkerpoolorder(
-        await contractsPromise,
+        await config.getContracts(),
         signedWorkerpoolorder,
       );
     this.order.cancelRequestorder = async (signedRequestorder) =>
-      order.cancelRequestorder(await contractsPromise, signedRequestorder);
+      order.cancelRequestorder(await config.getContracts(), signedRequestorder);
     this.order.publishApporder = async (signedApporder) =>
       order.publishApporder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         signedApporder,
       );
     this.order.publishDatasetorder = async (signedDatasetorder) =>
       order.publishDatasetorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         signedDatasetorder,
       );
     this.order.publishWorkerpoolorder = async (signedWorkerpoolorder) =>
       order.publishWorkerpoolorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         signedWorkerpoolorder,
       );
     this.order.publishRequestorder = async (
@@ -645,13 +356,13 @@ class IExec {
       { checkRequest = true } = {},
     ) =>
       order.publishRequestorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         checkRequest === true
           ? await checkRequestRequirements(
               {
-                contracts: await contractsPromise,
-                smsURL: await getSmsURL(),
+                contracts: await config.getContracts(),
+                smsURL: await config.getSmsURL(),
               },
               signedRequestorder,
             ).then(() => signedRequestorder)
@@ -659,73 +370,73 @@ class IExec {
       );
     this.order.unpublishApporder = async (apporderHash) =>
       order.unpublishApporder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         apporderHash,
       );
     this.order.unpublishDatasetorder = async (datasetorderHash) =>
       order.unpublishDatasetorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         datasetorderHash,
       );
     this.order.unpublishWorkerpoolorder = async (workerpoolorderHash) =>
       order.unpublishWorkerpoolorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         workerpoolorderHash,
       );
     this.order.unpublishRequestorder = async (requestorderHash) =>
       order.unpublishRequestorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         requestorderHash,
       );
     this.order.unpublishLastApporder = async (appAddress) =>
       order.unpublishLastApporder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         appAddress,
       );
     this.order.unpublishLastDatasetorder = async (datasetAddress) =>
       order.unpublishLastDatasetorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         datasetAddress,
       );
     this.order.unpublishLastWorkerpoolorder = async (workerpoolAddress) =>
       order.unpublishLastWorkerpoolorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         workerpoolAddress,
       );
     this.order.unpublishLastRequestorder = async () =>
       order.unpublishLastRequestorder(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
       );
     this.order.unpublishAllApporders = async (appAddress) =>
       order.unpublishAllApporders(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         appAddress,
       );
     this.order.unpublishAllDatasetorders = async (datasetAddress) =>
       order.unpublishAllDatasetorders(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         datasetAddress,
       );
     this.order.unpublishAllWorkerpoolorders = async (workerpoolAddress) =>
       order.unpublishAllWorkerpoolorders(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         workerpoolAddress,
       );
     this.order.unpublishAllRequestorders = async () =>
       order.unpublishAllRequestorders(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
       );
     this.order.matchOrders = async (
       {
@@ -737,15 +448,15 @@ class IExec {
       { checkRequest = true } = {},
     ) =>
       order.matchOrders(
-        await contractsPromise,
+        await config.getContracts(),
         apporder,
         datasetorder,
         workerpoolorder,
         checkRequest === true
           ? await checkRequestRequirements(
               {
-                contracts: await contractsPromise,
-                smsURL: await getSmsURL(),
+                contracts: await config.getContracts(),
+                smsURL: await config.getSmsURL(),
               },
               requestorder,
             ).then(() => requestorder)
@@ -754,36 +465,36 @@ class IExec {
     this.orderbook = {};
     this.orderbook.fetchApporder = async (apporderHash) =>
       order.fetchPublishedOrderByHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.APP_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         apporderHash,
       );
     this.orderbook.fetchDatasetorder = async (datasetorderHash) =>
       order.fetchPublishedOrderByHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.DATASET_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         datasetorderHash,
       );
     this.orderbook.fetchWorkerpoolorder = async (workerpoolorderHash) =>
       order.fetchPublishedOrderByHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.WORKERPOOL_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         workerpoolorderHash,
       );
     this.orderbook.fetchRequestorder = async (requestorderHash) =>
       order.fetchPublishedOrderByHash(
-        await getIexecGatewayURL(),
+        await config.getIexecGatewayURL(),
         order.REQUEST_ORDER,
-        (await networkPromise).chainId,
+        await config.getChainId(),
         requestorderHash,
       );
     this.orderbook.fetchAppOrderbook = async (appAddress, options = {}) =>
       orderbook.fetchAppOrderbook(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         appAddress,
         options,
       );
@@ -792,39 +503,39 @@ class IExec {
       options = {},
     ) =>
       orderbook.fetchDatasetOrderbook(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         datasetAddress,
         options,
       );
     this.orderbook.fetchWorkerpoolOrderbook = async (options) =>
       orderbook.fetchWorkerpoolOrderbook(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         options,
       );
     this.orderbook.fetchRequestOrderbook = async (options) =>
       orderbook.fetchRequestOrderbook(
-        await contractsPromise,
-        await getIexecGatewayURL(),
+        await config.getContracts(),
+        await config.getIexecGatewayURL(),
         options,
       );
     this.task = {};
     this.task.show = async (taskid) =>
-      task.show(await contractsPromise, taskid);
+      task.show(await config.getContracts(), taskid);
     this.task.obsTask = async (taskid, { dealid } = {}) =>
-      iexecProcess.obsTask(await contractsPromise, taskid, { dealid });
+      iexecProcess.obsTask(await config.getContracts(), taskid, { dealid });
     this.task.claim = async (taskid) =>
-      task.claim(await contractsPromise, taskid);
+      task.claim(await config.getContracts(), taskid);
     this.task.fetchResults = async (taskid) =>
-      iexecProcess.fetchTaskResults(await contractsPromise, taskid, {
-        ipfsGatewayURL: await getIpfsGatewayURL(),
+      iexecProcess.fetchTaskResults(await config.getContracts(), taskid, {
+        ipfsGatewayURL: await config.getIpfsGatewayURL(),
       });
     this.result = {};
     this.result.checkResultEncryptionKeyExists = async (address) =>
       secretMgtServ.checkWeb2SecretExists(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         address,
         getResultEncryptionKeyName(),
       );
@@ -833,19 +544,22 @@ class IExec {
       { forceUpdate = false } = {},
     ) =>
       secretMgtServ.pushWeb2Secret(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         getResultEncryptionKeyName(),
         publicKey,
         { forceUpdate },
       );
     this.storage = {};
     this.storage.defaultStorageLogin = async () =>
-      resultProxyServ.login(await contractsPromise, await getResultProxyURL());
+      resultProxyServ.login(
+        await config.getContracts(),
+        await config.getResultProxyURL(),
+      );
     this.storage.checkStorageTokenExists = async (address, { provider } = {}) =>
       secretMgtServ.checkWeb2SecretExists(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         address,
         getStorageTokenKeyName(provider),
       );
@@ -854,38 +568,38 @@ class IExec {
       { provider, forceUpdate = false } = {},
     ) =>
       secretMgtServ.pushWeb2Secret(
-        await contractsPromise,
-        await getSmsURL(),
+        await config.getContracts(),
+        await config.getSmsURL(),
         getStorageTokenKeyName(provider),
         token,
         { forceUpdate },
       );
     this.ens = {};
     this.ens.getOwner = async (name) =>
-      ens.getOwner(await contractsPromise, name);
+      ens.getOwner(await config.getContracts(), name);
     this.ens.resolveName = async (name) =>
-      ens.resolveName(await contractsPromise, name);
+      ens.resolveName(await config.getContracts(), name);
     this.ens.lookupAddress = async (address) =>
-      ens.lookupAddress(await contractsPromise, address);
+      ens.lookupAddress(await config.getContracts(), address);
     this.ens.claimName = async (label, domain) =>
-      ens.registerFifsEns(await contractsPromise, label, domain);
+      ens.registerFifsEns(await config.getContracts(), label, domain);
     this.ens.obsConfigureResolution = async (name, address) =>
       ens.obsConfigureResolution(
-        await contractsPromise,
-        await getEnsPublicResolverAddress(),
+        await config.getContracts(),
+        await config.getEnsPublicResolverAddress(),
         name,
         address,
       );
     this.ens.configureResolution = async (name, address) =>
       ens.configureResolution(
-        await contractsPromise,
-        await getEnsPublicResolverAddress(),
+        await config.getContracts(),
+        await config.getEnsPublicResolverAddress(),
         name,
         address,
       );
     this.network = {};
     this.network.getNetwork = async () => {
-      const contracts = await contractsPromise;
+      const contracts = await config.getContracts();
       return { chainId: contracts.chainId, isNative: contracts.isNative };
     };
   }
