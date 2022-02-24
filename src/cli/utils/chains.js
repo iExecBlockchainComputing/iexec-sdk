@@ -4,7 +4,7 @@ const {
   getChainDefaults,
   isEnterpriseEnabled,
 } = require('../../common/utils/config');
-const IExecContractsClient = require('../../common/utils/contracts');
+const IExecContractsClient = require('../../common/utils/IExecContractsClient');
 const { EnhancedWallet } = require('../../common/utils/signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');

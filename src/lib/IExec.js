@@ -1,18 +1,18 @@
 const IExecModule = require('./IExecModule');
-const IExecWalletModule = require('./IExecWalletModule');
 const IExecAccountModule = require('./IExecAccountModule');
 const IExecAppModule = require('./IExecAppModule');
 const IExecDatasetModule = require('./IExecDatasetModule');
-const IExecWorkerpoolModule = require('./IExecWorkerpoolModule');
-const IExecHubModule = require('./IExecHubModule');
 const IExecDealModule = require('./IExecDealModule');
+const IExecENSModule = require('./IExecENSModule');
+const IExecHubModule = require('./IExecHubModule');
+const IExecNetworkModule = require('./IExecNetworkModule');
 const IExecOrderModule = require('./IExecOrderModule');
-const IExecOrderbookModule = require('./IExecOrderbook');
-const IExecTaskModule = require('./IExecTaskModule');
+const IExecOrderbookModule = require('./IExecOrderbookModule');
 const IExecResultModule = require('./IExecResultModule');
 const IExecStorageModule = require('./IExecStorageModule');
-const IExecENSModule = require('./IExecENSModule');
-const IExecNetworkModule = require('./IExecNetworkModule');
+const IExecTaskModule = require('./IExecTaskModule');
+const IExecWalletModule = require('./IExecWalletModule');
+const IExecWorkerpoolModule = require('./IExecWorkerpoolModule');
 
 class IExec extends IExecModule {
   constructor(...args) {

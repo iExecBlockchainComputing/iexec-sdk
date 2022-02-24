@@ -1,5 +1,5 @@
 const { getDefaultProvider, providers } = require('ethers');
-const IExecContractsClient = require('../common/utils/contracts');
+const IExecContractsClient = require('../common/utils/IExecContractsClient');
 const errors = require('../common/utils/errors');
 const {
   EnhancedWallet,
