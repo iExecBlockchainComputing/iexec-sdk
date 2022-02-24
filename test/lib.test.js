@@ -5,7 +5,7 @@ const path = require('path');
 const JSZip = require('jszip');
 const { execAsync } = require('./test-utils');
 
-const { utils, IExec, errors } = require('../src/lib/iexec-lib');
+const { utils, IExec, errors } = require('../src/lib');
 const {
   sleep,
   bytes32Regex,
