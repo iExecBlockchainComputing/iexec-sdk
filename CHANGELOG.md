@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## next
+
+### Changed
+
+- split lib into `IExecConfig` and independant `IExecModule`s to allow modular imports
+- reintegrated `iexec-contracts-js-client`
+
 ## [7.0.2] 2022-02-16
 
 ### Added
