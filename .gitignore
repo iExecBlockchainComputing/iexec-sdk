@@ -38,3 +38,9 @@ test/logo.png
 
 # sonar output
 .scannerwork
+
+# build output
+dist/**
+IExec*/**
+utils/**
+errors/**
