@@ -239,10 +239,13 @@ class IExecContractsClient {
     useGas = true,
     isNative,
     flavour = 'standard',
+    confirms = 1,
   } = {}) {
     const stringChainId = `${chainId}`;
     if (!provider) throw Error('missing provider key');
     if (!stringChainId) throw Error('missing chainId key');
+    if (!Number.isInteger(confirms) || confirms <= 0)
+      throw Error('invalid confirms');
     if (flavour !== 'standard' && flavour !== 'enterprise')
       throw Error('invalid flavour');
 
@@ -284,6 +287,7 @@ class IExecContractsClient {
       signer,
       chainId: stringChainId,
       txOptions: { gasPrice: gasPriceOverride },
+      confirms,
       ...client,
     });
   }
