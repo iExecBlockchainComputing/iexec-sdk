@@ -17,23 +17,30 @@ class IExecDatasetModule extends IExecModule {
     this.computeEncryptedFileChecksum = (encryptedFile) =>
       sha256Sum(encryptedFile);
     this.deployDataset = async (dataset) =>
-      hub.deployDataset(await this.config.getContracts(), dataset);
+      hub.deployDataset(await this.config.resolveContractsClient(), dataset);
     this.showDataset = async (address) =>
-      hub.showDataset(await this.config.getContracts(), address);
+      hub.showDataset(await this.config.resolveContractsClient(), address);
     this.showUserDataset = async (index, userAddress) =>
-      hub.showUserDataset(await this.config.getContracts(), index, userAddress);
+      hub.showUserDataset(
+        await this.config.resolveContractsClient(),
+        index,
+        userAddress,
+      );
     this.countUserDatasets = async (address) =>
-      hub.countUserDatasets(await this.config.getContracts(), address);
+      hub.countUserDatasets(
+        await this.config.resolveContractsClient(),
+        address,
+      );
     this.checkDatasetSecretExists = async (datasetAddress) =>
       secretMgtServ.checkWeb3SecretExists(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         datasetAddress,
       );
     this.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
       secretMgtServ.pushWeb3Secret(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         datasetAddress,
         datasetSecret,
       );

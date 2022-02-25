@@ -9,13 +9,13 @@ class IExecStorageModule extends IExecModule {
 
     this.defaultStorageLogin = async () =>
       resultProxyServ.login(
-        await this.config.getContracts(),
-        await this.config.getResultProxyURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveResultProxyURL(),
       );
     this.checkStorageTokenExists = async (address, { provider } = {}) =>
       secretMgtServ.checkWeb2SecretExists(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         address,
         getStorageTokenKeyName(provider),
       );
@@ -24,8 +24,8 @@ class IExecStorageModule extends IExecModule {
       { provider, forceUpdate = false } = {},
     ) =>
       secretMgtServ.pushWeb2Secret(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         getStorageTokenKeyName(provider),
         token,
         { forceUpdate },

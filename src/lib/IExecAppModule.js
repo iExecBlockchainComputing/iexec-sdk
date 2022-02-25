@@ -6,13 +6,17 @@ class IExecAppModule extends IExecModule {
     super(...args);
 
     this.deployApp = async (app) =>
-      hub.deployApp(await this.config.getContracts(), app);
+      hub.deployApp(await this.config.resolveContractsClient(), app);
     this.showApp = async (address) =>
-      hub.showApp(await this.config.getContracts(), address);
+      hub.showApp(await this.config.resolveContractsClient(), address);
     this.showUserApp = async (index, userAddress) =>
-      hub.showUserApp(await this.config.getContracts(), index, userAddress);
+      hub.showUserApp(
+        await this.config.resolveContractsClient(),
+        index,
+        userAddress,
+      );
     this.countUserApps = async (address) =>
-      hub.countUserApps(await this.config.getContracts(), address);
+      hub.countUserApps(await this.config.resolveContractsClient(), address);
   }
 }
 

@@ -8,9 +8,9 @@ class IExecDealModule extends IExecModule {
     super(...args);
 
     this.show = async (dealid) =>
-      deal.show(await this.config.getContracts(), dealid);
+      deal.show(await this.config.resolveContractsClient(), dealid);
     this.obsDeal = async (dealid) =>
-      iexecProcess.obsDeal(await this.config.getContracts(), dealid);
+      iexecProcess.obsDeal(await this.config.resolveContractsClient(), dealid);
     this.computeTaskId = (dealid, taskIdx) =>
       deal.computeTaskId(dealid, taskIdx);
     this.fetchRequesterDeals = async (
@@ -18,8 +18,8 @@ class IExecDealModule extends IExecModule {
       { appAddress, datasetAddress, workerpoolAddress } = {},
     ) =>
       deal.fetchRequesterDeals(
-        await this.config.getContracts(),
-        await this.config.getIexecGatewayURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveIexecGatewayURL(),
         requesterAddress,
         {
           appAddress,
@@ -28,33 +28,33 @@ class IExecDealModule extends IExecModule {
         },
       );
     this.claim = async (dealid) =>
-      deal.claim(await this.config.getContracts(), dealid);
+      deal.claim(await this.config.resolveContractsClient(), dealid);
     this.fetchDealsByApporder = async (apporderHash) =>
       order.fetchDealsByOrderHash(
-        await this.config.getIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL(),
         order.APP_ORDER,
-        await this.config.getChainId(),
+        await this.config.resolveChainId(),
         apporderHash,
       );
     this.fetchDealsByDatasetorder = async (datasetorderHash) =>
       order.fetchDealsByOrderHash(
-        await this.config.getIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL(),
         order.DATASET_ORDER,
-        await this.config.getChainId(),
+        await this.config.resolveChainId(),
         datasetorderHash,
       );
     this.fetchDealsByWorkerpoolorder = async (workerpoolorderHash) =>
       order.fetchDealsByOrderHash(
-        await this.config.getIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL(),
         order.WORKERPOOL_ORDER,
-        await this.config.getChainId(),
+        await this.config.resolveChainId(),
         workerpoolorderHash,
       );
     this.fetchDealsByRequestorder = async (requestorderHash) =>
       order.fetchDealsByOrderHash(
-        await this.config.getIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL(),
         order.REQUEST_ORDER,
-        await this.config.getChainId(),
+        await this.config.resolveChainId(),
         requestorderHash,
       );
   }

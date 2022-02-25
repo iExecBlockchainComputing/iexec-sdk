@@ -107,15 +107,15 @@ class IExecConfig {
       });
     })();
 
-    this.getChainId = async () => (await networkPromise).chainId;
+    this.resolveChainId = async () => (await networkPromise).chainId;
 
-    this.getContracts = async () => {
+    this.resolveContractsClient = async () => {
       const contracts = await contractsPromise;
       return contracts;
     };
 
     let _enterpriseSwapContracts;
-    const getEnterpriseSwapContracts = async () => {
+    const resolveEnterpriseSwapContracts = async () => {
       if (!_enterpriseSwapContracts) {
         const { chainId } = await networkPromise;
         const { provider, signer } = await signerProviderPromise;
@@ -150,7 +150,7 @@ class IExecConfig {
     };
 
     let _bridgedConf;
-    this.getBridgedConf = async () => {
+    const resolveBridgedConf = async () => {
       if (!_bridgedConf) {
         const { chainId } = await networkPromise;
         const chainConfDefaults = await chainConfDefaultsPromise;
@@ -207,14 +207,14 @@ class IExecConfig {
     };
 
     let _bridgedContracts;
-    this.getBridgedContracts = async () => {
+    this.resolveBridgedContractsClient = async () => {
       if (!_bridgedContracts) {
         const chainConfDefaults = await chainConfDefaultsPromise;
         const isBridged =
           Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
           chainConfDefaults.bridge;
         if (isBridged) {
-          const bridgedConf = await this.getBridgedConf();
+          const bridgedConf = await resolveBridgedConf();
           _bridgedContracts = new IExecContractsClient({
             chainId: bridgedConf.chainId,
             provider: getDefaultProvider(bridgedConf.rpcURL),
@@ -228,7 +228,7 @@ class IExecConfig {
       return _bridgedContracts;
     };
 
-    this.getSmsURL = async () => {
+    this.resolveSmsURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = smsURL || chainConfDefaults.sms;
@@ -240,7 +240,7 @@ class IExecConfig {
       );
     };
 
-    this.getResultProxyURL = async () => {
+    this.resolveResultProxyURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = resultProxyURL || chainConfDefaults.resultProxy;
@@ -252,7 +252,7 @@ class IExecConfig {
       );
     };
 
-    this.getIexecGatewayURL = async () => {
+    this.resolveIexecGatewayURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = iexecGatewayURL || chainConfDefaults.iexecGateway;
@@ -264,7 +264,7 @@ class IExecConfig {
       );
     };
 
-    this.getIpfsGatewayURL = async () => {
+    this.resolveIpfsGatewayURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = ipfsGatewayURL || chainConfDefaults.ipfsGateway;
@@ -276,7 +276,7 @@ class IExecConfig {
       );
     };
 
-    this.getBridgeAddress = async () => {
+    this.resolveBridgeAddress = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value =
@@ -290,7 +290,7 @@ class IExecConfig {
       );
     };
 
-    this.getEnsPublicResolverAddress = async () => {
+    this.resolveEnsPublicResolverAddress = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value =
@@ -303,13 +303,13 @@ class IExecConfig {
       );
     };
 
-    this.getStandardContracts = async () => {
+    this.resolveStandardContractsClient = async () => {
       const { chainId } = await networkPromise;
       const contracts = await contractsPromise;
       if (contracts.flavour === 'standard') {
         return contracts;
       }
-      const enterpriseSwapContracts = await getEnterpriseSwapContracts();
+      const enterpriseSwapContracts = await resolveEnterpriseSwapContracts();
       if (
         enterpriseSwapContracts &&
         enterpriseSwapContracts.flavour === 'standard'
@@ -321,13 +321,13 @@ class IExecConfig {
       );
     };
 
-    this.getEnterpriseContracts = async () => {
+    this.resolveEnterpriseContractsClient = async () => {
       const { chainId } = await networkPromise;
       const contracts = await contractsPromise;
       if (contracts.flavour === 'enterprise') {
         return contracts;
       }
-      const enterpriseSwapContracts = await getEnterpriseSwapContracts();
+      const enterpriseSwapContracts = await resolveEnterpriseSwapContracts();
       if (
         enterpriseSwapContracts &&
         enterpriseSwapContracts.flavour === 'enterprise'

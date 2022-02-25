@@ -8,8 +8,8 @@ class IExecResultModule extends IExecModule {
 
     this.checkResultEncryptionKeyExists = async (address) =>
       secretMgtServ.checkWeb2SecretExists(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         address,
         getResultEncryptionKeyName(),
       );
@@ -18,8 +18,8 @@ class IExecResultModule extends IExecModule {
       { forceUpdate = false } = {},
     ) =>
       secretMgtServ.pushWeb2Secret(
-        await this.config.getContracts(),
-        await this.config.getSmsURL(),
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
         getResultEncryptionKeyName(),
         publicKey,
         { forceUpdate },

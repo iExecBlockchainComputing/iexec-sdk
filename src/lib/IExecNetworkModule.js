@@ -5,7 +5,7 @@ class IExecNetworkModule extends IExecModule {
     super(...args);
 
     this.getNetwork = async () => {
-      const contracts = await this.config.getContracts();
+      const contracts = await this.config.resolveContractsClient();
       return { chainId: contracts.chainId, isNative: contracts.isNative };
     };
   }

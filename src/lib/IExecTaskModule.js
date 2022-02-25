@@ -7,17 +7,21 @@ class IExecTaskModule extends IExecModule {
     super(...args);
 
     this.show = async (taskid) =>
-      task.show(await this.config.getContracts(), taskid);
+      task.show(await this.config.resolveContractsClient(), taskid);
     this.obsTask = async (taskid, { dealid } = {}) =>
-      iexecProcess.obsTask(await this.config.getContracts(), taskid, {
+      iexecProcess.obsTask(await this.config.resolveContractsClient(), taskid, {
         dealid,
       });
     this.claim = async (taskid) =>
-      task.claim(await this.config.getContracts(), taskid);
+      task.claim(await this.config.resolveContractsClient(), taskid);
     this.fetchResults = async (taskid) =>
-      iexecProcess.fetchTaskResults(await this.config.getContracts(), taskid, {
-        ipfsGatewayURL: await this.config.getIpfsGatewayURL(),
-      });
+      iexecProcess.fetchTaskResults(
+        await this.config.resolveContractsClient(),
+        taskid,
+        {
+          ipfsGatewayURL: await this.config.resolveIpfsGatewayURL(),
+        },
+      );
   }
 }
 

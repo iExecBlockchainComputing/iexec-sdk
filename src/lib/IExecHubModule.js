@@ -6,13 +6,13 @@ class IExecHubModule extends IExecModule {
     super(...args);
 
     this.createCategory = async (category) =>
-      hub.createCategory(await this.config.getContracts(), category);
+      hub.createCategory(await this.config.resolveContractsClient(), category);
     this.showCategory = async (index) =>
-      hub.showCategory(await this.config.getContracts(), index);
+      hub.showCategory(await this.config.resolveContractsClient(), index);
     this.countCategory = async () =>
-      hub.countCategory(await this.config.getContracts());
+      hub.countCategory(await this.config.resolveContractsClient());
     this.getTimeoutRatio = async () =>
-      hub.getTimeoutRatio(await this.config.getContracts());
+      hub.getTimeoutRatio(await this.config.resolveContractsClient());
   }
 }
 

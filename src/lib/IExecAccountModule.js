@@ -6,13 +6,16 @@ class IExecAccountModule extends IExecModule {
     super(...args);
 
     this.checkBalance = async (address) =>
-      account.checkBalance(await this.config.getContracts(), address);
+      account.checkBalance(await this.config.resolveContractsClient(), address);
     this.checkBridgedBalance = async (address) =>
-      account.checkBalance(await this.config.getBridgedContracts(), address);
+      account.checkBalance(
+        await this.config.resolveBridgedContractsClient(),
+        address,
+      );
     this.deposit = async (nRlcAmount) =>
-      account.deposit(await this.config.getContracts(), nRlcAmount);
+      account.deposit(await this.config.resolveContractsClient(), nRlcAmount);
     this.withdraw = async (nRlcAmount) =>
-      account.withdraw(await this.config.getContracts(), nRlcAmount);
+      account.withdraw(await this.config.resolveContractsClient(), nRlcAmount);
   }
 }
 
