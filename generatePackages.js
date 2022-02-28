@@ -8,7 +8,9 @@ const mainDir = path.join(...packageJson.main.split('/').slice(0, -1));
 const packageFiles = packageJson.files;
 
 const generatePackage = async (fileName) => {
-  const [dirName] = fileName.split('.');
+  const [baseName] = fileName.split('.');
+  const dirName = baseName;
+  const typeFileName = `${baseName}.d.ts`;
   await fsPromises
     .rmdir(dirName, { recursive: true, force: true })
     .catch(() => {});
@@ -18,6 +20,7 @@ const generatePackage = async (fileName) => {
     JSON.stringify(
       {
         main: path.join('..', mainDir, fileName),
+        types: path.join('..', mainDir, typeFileName),
       },
       null,
       2,

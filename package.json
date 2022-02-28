@@ -3,6 +3,7 @@
   "version": "7.1.0-alpha.2",
   "description": "iExec SDK",
   "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
     "test": "jest --coverage --runInBand --detectOpenHandles --forceExit",
     "build": "./node_modules/.bin/babel src --out-dir dist --copy-files && node generatePackages.js"
@@ -47,6 +48,7 @@
   "dependencies": {
     "@iexec/erlc": "^1.0.0",
     "@iexec/poco": "^5.3.0",
+    "@types/bn.js": "^5.1.0",
     "aes-js": "3.1.2",
     "bn.js": "^5.1.2",
     "buffer": "^6.0.2",
@@ -78,7 +80,9 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
     "jest": "^27.4.7",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "typedoc": "^0.22.12",
+    "typescript": "^4.5.5"
   },
   "babel": {
     "presets": [
