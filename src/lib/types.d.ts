@@ -37,9 +37,17 @@ export type Dealid = Bytes32;
  */
 export type Taskid = Bytes32;
 /**
+ * index of a task in a bag of tasks
+ */
+export type TaskIndex = number;
+/**
  * transaction hash
  */
 export type TxHash = Bytes32;
+/**
+ * order hash
+ */
+export type OrderHash = Bytes32;
 /**
  * amount with specified unit (ex: '0.1 eth', '2 gwei', '1 nRLC')
  */
