@@ -972,7 +972,7 @@ describe('[workflow]', () => {
     );
     expect(showTaskActiveRes.revealCounter.eq(new BN(0))).toBe(true);
     expect(showTaskActiveRes.winnerCounter.eq(new BN(0))).toBe(true);
-    expect(showTaskActiveRes.contributors).toStrictEqual({});
+    expect(showTaskActiveRes.contributors).toStrictEqual([]);
     expect(showTaskActiveRes.consensusValue).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );

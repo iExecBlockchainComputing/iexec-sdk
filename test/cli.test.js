@@ -1635,7 +1635,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
@@ -1665,7 +1665,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
@@ -1701,7 +1701,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
@@ -2824,7 +2824,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
@@ -2854,7 +2854,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
@@ -2890,7 +2890,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - split lib into `IExecConfig` and independant `IExecModule`s to allow modular imports
 - reintegrated `iexec-contracts-js-client`
+- fix a bug transforming an Array into a plain object
 
 ## [7.0.2] 2022-02-16
 

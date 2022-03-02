@@ -114,7 +114,7 @@ const bnNRlcToBnWei = (bnNRlc) => {
 };
 
 const bnifyNestedEthersBn = (obj) => {
-  const objOut = {};
+  const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
     if (isEthersBn(v)) {
@@ -128,7 +128,7 @@ const bnifyNestedEthersBn = (obj) => {
 };
 
 const stringifyNestedBn = (obj) => {
-  const objOut = {};
+  const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
     if (v instanceof BN) objOut[k] = v.toString();
@@ -404,7 +404,12 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   }
 };
 
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+const sleep = (ms) =>
+  new Promise((res) => {
+    setTimeout(() => {
+      res();
+    }, ms);
+  });
 const FETCH_INTERVAL = 5000;
 
 module.exports = {
