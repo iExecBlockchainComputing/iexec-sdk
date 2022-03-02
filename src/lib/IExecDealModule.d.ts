@@ -5,6 +5,7 @@ import {
   Addressish,
   BN,
   BNish,
+  Bytes,
   Bytes32,
   Dealid,
   OrderHash,
@@ -65,12 +66,22 @@ declare class DealObservable extends Observable {
       };
       tasks: {
         taskid: Taskid;
-        idx: number;
+        idx: BN;
         dealid: Dealid;
         status: number;
         statusName: string;
         taskTimedOut: boolean;
-        // todo add other optional
+        contributionDeadline: BN;
+        revealDeadline: BN;
+        finalDeadline: BN;
+        consensusValue: Bytes32 | Bytes;
+        revealCounter: BN;
+        winnerCounter: BN;
+        contributors: Address[];
+        resultDigest: Bytes32 | Bytes;
+        results: { storage: string; location?: string } | Bytes;
+        resultsTimestamp: BN;
+        resultsCallback: Bytes;
       }[];
     }) => any;
     /**
@@ -216,7 +227,7 @@ export default class IExecDealModule extends IExecModule {
     claimed: Record<TaskIndex, Taskid>;
   }>;
   /**
-   * fetch the last deals of the requester optionaly filtered by specified filters.
+   * fetch the latest deals of the requester optionaly filtered by specified filters.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *
@@ -236,7 +247,7 @@ export default class IExecDealModule extends IExecModule {
     },
   ): Promise<PaginableDeals>;
   /**
-   * fetch the last deals sealed with a specified apporder.
+   * fetch the latest deals sealed with a specified apporder.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *
@@ -249,7 +260,7 @@ export default class IExecDealModule extends IExecModule {
    */
   fetchDealsByApporder(apporderHash: OrderHash): Promise<PaginableDeals>;
   /**
-   * fetch the last deals sealed with a specified datasetorder.
+   * fetch the latest deals sealed with a specified datasetorder.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *
@@ -264,7 +275,7 @@ export default class IExecDealModule extends IExecModule {
     datasetorderHash: OrderHash,
   ): Promise<PaginableDeals>;
   /**
-   * fetch the last deals sealed with a specified workerpoolorder.
+   * fetch the latest deals sealed with a specified workerpoolorder.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *
@@ -279,7 +290,7 @@ export default class IExecDealModule extends IExecModule {
     workerpoolorderHash: OrderHash,
   ): Promise<PaginableDeals>;
   /**
-   * fetch the last deals sealed with a specified requestorder.
+   * fetch the latest deals sealed with a specified requestorder.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *
