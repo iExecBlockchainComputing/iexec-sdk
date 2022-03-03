@@ -3,6 +3,9 @@ import IExecConfig, {
   IExecConfigOptions,
 } from './IExecConfig';
 
+/**
+ * module base
+ */
 export default class IExecModule {
   /**
    * Create an IExecModule instance using an IExecConfig like

@@ -49,21 +49,45 @@ export type TxHash = Bytes32;
  */
 export type OrderHash = Bytes32;
 /**
- * amount with specified unit (ex: '0.1 eth', '2 gwei', '1 nRLC')
- */
-export type NativeAmountWithUnit = string;
-/**
- * IExec token amount with specified unit (ex: '48 RLC', '1 nRLC')
- */
-export type TokenAmountWithUnit = string;
-/**
  * wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,000,000,000 wei).
+ *
+ * named units ('wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' or 'eth') can be used with the format `${amount} ${unit}`
+ *
+ * examples:
+ * ```js
+ * // number
+ * const oneWei = 1;
+ * const tenGigaWei = 1000000000;
+ * // string (works for amounts above `Number.MAX_SAFE_INTEGER`)
+ * const oneEth = '1000000000000000000';
+ * // string with unit
+ * const fiveGigaWei = '5 gwei';
+ * const zeroPointOneEth = '0.1 ether';
+ * // BN (from utils)
+ * const tenWei = new BN(10);
+ * ```
  */
-export type WeiAmount = BNish | NativeAmountWithUnit;
+export type WeiAmount = number | string | BN;
 /**
- * nRLC (nano RLC) amount (nRLC is the smallest sub-division of RLC: 1 RLC = 1,000,000,000 RLC).
+ * nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
+ *
+ * named units ('nRLC', 'RLC') can be used with the format `${amount} ${unit}` (example: `'0.1 RLC'`)
+ *
+ * examples:
+ * ```js
+ * // number
+ * const oneNRLC = 1;
+ * const tenRLC = 1000000000;
+ * // string (works for amounts above `Number.MAX_SAFE_INTEGER`)
+ * const tenMillionRLC = '10000000000000000';
+ * // string with unit
+ * const fiveRLC = '5 RLC';
+ * const zeroPointOneRLC = '0.1 RLC';
+ * // BN (from utils)
+ * const tenNRLC = new BN(10);
+ * ```
  */
-export type NRLCAmount = BNish | TokenAmountWithUnit;
+export type NRLCAmount = number | string | BN;
 /**
  * human redable task tag (ex: 'tee')
  */

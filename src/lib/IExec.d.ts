@@ -18,18 +18,60 @@ import IExecWorkerpoolModule from './IExecWorkerpoolModule';
  * module exposing all the iExec SDK modules
  */
 export default class IExec extends IExecModule {
+  /**
+   * account module
+   */
   account: IExecAccountModule;
+  /**
+   * app module
+   */
   app: IExecAppModule;
+  /**
+   * dataset module
+   */
   dataset: IExecDatasetModule;
+  /**
+   * deal module
+   */
   deal: IExecDealModule;
+  /**
+   * ens module
+   */
   ens: IExecENSModule;
+  /**
+   * hub module
+   */
   hub: IExecHubModule;
+  /**
+   * network module
+   */
   network: IExecNetworkModule;
+  /**
+   * order module
+   */
   order: IExecOrderModule;
+  /**
+   * orderbook module
+   */
   orderbook: IExecOrderbookModule;
+  /**
+   * result module
+   */
   result: IExecResultModule;
+  /**
+   * storage module
+   */
   storage: IExecStorageModule;
+  /**
+   * task module
+   */
   task: IExecTaskModule;
+  /**
+   * wallet module
+   */
   wallet: IExecWalletModule;
+  /**
+   * workerpool module
+   */
   workerpool: IExecWorkerpoolModule;
 }

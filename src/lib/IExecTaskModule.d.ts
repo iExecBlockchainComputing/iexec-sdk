@@ -52,7 +52,7 @@ declare class TaskObservable extends Observable {
 /**
  * module exposing task methods
  */
-export default class IExectaskModule extends IExecModule {
+export default class IExecTaskModule extends IExecModule {
   /**
    * show the details of a task.
    *

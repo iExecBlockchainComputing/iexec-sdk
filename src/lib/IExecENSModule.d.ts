@@ -18,7 +18,7 @@ declare class ENSConfigirationObservable extends Observable {
    * | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
    * | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
    * | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-   * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimedt | `address`,`resolverAddress` |
+   * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
    * | `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
    * | `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
    * | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
@@ -39,7 +39,7 @@ declare class ENSConfigirationObservable extends Observable {
      * | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
      * | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
      * | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-     * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimedt | `address`,`resolverAddress` |
+     * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
      * | `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
      * | `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
      * | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
@@ -130,6 +130,8 @@ export default class IExecDealModule extends IExecModule {
     domain?: string,
   ): Promise<{ registeredName: ENS; registerTxHash?: TxHash }>;
   /**
+   * **ONLY ENS NAME OWNER**
+   *
    * return a cold Observable with a `subscribe` method to start and monitor the ENS resolution and reverse resolution configuration.
    *
    * calling the `subscribe` method on the observable will immediately return a cancel function and start the asynchronous ENS configuration.
@@ -172,6 +174,8 @@ export default class IExecDealModule extends IExecModule {
     address?: Address,
   ): Promise<ENSConfigirationObservable>;
   /**
+   * **ONLY ENS NAME OWNER**
+   *
    * configure the ENS resolution and reverse resolution for an owned ENS name, same as `obsConfigureResolution` wrapped in a `Promise`.
    *
    * _NB_:

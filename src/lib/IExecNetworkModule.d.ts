@@ -1,20 +1,9 @@
 import IExecModule from './IExecModule';
-import {
-  Address,
-  Addressish,
-  App,
-  BN,
-  BNish,
-  Bytes32,
-  Category,
-  Multiaddress,
-  TxHash,
-} from './types';
 
 /**
  * module exposing network methods
  */
-export default class IExecHubModule extends IExecModule {
+export default class IExecNetworkModule extends IExecModule {
   /**
    * get info about the current iExec network
    *

@@ -153,6 +153,8 @@ export default class IExecDatasetModule extends IExecModule {
    */
   checkDatasetSecretExists(datasetAddress: Addressish): Promise<boolean>;
   /**
+   * **ONLY DATASET OWNER**
+   *
    * push the dataset's encryption key to the Secret Management Service
    *
    * **WARNING**: pushed secrets CAN NOT be updated

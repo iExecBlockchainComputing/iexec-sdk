@@ -6,7 +6,7 @@ import { BN, BNish, Category, TxHash } from './types';
  */
 export default class IExecHubModule extends IExecModule {
   /**
-   * **ONLY OWNER**
+   * **ONLY IEXEC OWNER**
    *
    * create a computation category on the iExec contract
    *
