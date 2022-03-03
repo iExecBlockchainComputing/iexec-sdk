@@ -490,9 +490,9 @@ const obsBridgeToSidechain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: minPerTx.toString(),
-          maxPerTx: maxPerTx.toString(),
-          dailyLimit: dailyLimit.toString(),
+          minPerTx: ethersBnToBn(minPerTx),
+          maxPerTx: ethersBnToBn(maxPerTx),
+          dailyLimit: ethersBnToBn(dailyLimit),
         });
         if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
           throw Error(
@@ -743,9 +743,9 @@ const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: minPerTx.toString(),
-          maxPerTx: maxPerTx.toString(),
-          dailyLimit: dailyLimit.toString(),
+          minPerTx: ethersBnToBn(minPerTx),
+          maxPerTx: ethersBnToBn(maxPerTx),
+          dailyLimit: ethersBnToBn(dailyLimit),
         });
         if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
           throw Error(
@@ -780,7 +780,7 @@ const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_LIMIT_CHECKED,
-          totalSpentPerDay,
+          totalSpentPerDay: ethersBnToBn(totalSpentPerDay),
         });
         if (!withinLimit) {
           throw Error(
