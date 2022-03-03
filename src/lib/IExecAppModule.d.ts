@@ -2,13 +2,42 @@ import IExecModule from './IExecModule';
 import {
   Address,
   Addressish,
-  App,
   BN,
   BNish,
   Bytes32,
   Multiaddress,
   TxHash,
 } from './types';
+
+/**
+ * IExec app
+ */
+export interface App {
+  /**
+   * the app owner
+   */
+  owner: Address;
+  /**
+   * a name for the app
+   */
+  name: string;
+  /**
+   * only 'DOCKER' is supported
+   */
+  type: string;
+  /**
+   * app image address
+   */
+  multiaddr: Multiaddress;
+  /**
+   * app image digest
+   */
+  checksum: Bytes32;
+  /**
+   * optional for TEE apps only, specify the TEE protocol to use
+   */
+  mrenclave?: string;
+}
 
 /**
  * module exposing app methods

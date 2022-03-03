@@ -13,7 +13,7 @@ import {
 /**
  * published sell order for an app
  */
-interface PublishedApporder {
+export interface PublishedApporder {
   orderHash: OrderHash;
   chainId: number;
   remaining: number;
@@ -36,7 +36,7 @@ interface PublishedApporder {
 /**
  * published sell order for a dataset
  */
-interface PublishedDatasetorder {
+export interface PublishedDatasetorder {
   orderHash: OrderHash;
   chainId: number;
   remaining: number;
@@ -59,7 +59,7 @@ interface PublishedDatasetorder {
 /**
  * published sell order for computing power
  */
-interface PublishedWorkerpoolorder {
+export interface PublishedWorkerpoolorder {
   orderHash: OrderHash;
   chainId: number;
   remaining: number;
@@ -84,7 +84,7 @@ interface PublishedWorkerpoolorder {
 /**
  * published buy order for computing tasks
  */
-interface PublishedRequestorder {
+export interface PublishedRequestorder {
   orderHash: OrderHash;
   chainId: number;
   remaining: number;
@@ -110,7 +110,7 @@ interface PublishedRequestorder {
   };
 }
 
-interface PaginableOrders<OT> {
+export interface PaginableOrders<OT> {
   /**
    * order page (this may be a partial result)
    */

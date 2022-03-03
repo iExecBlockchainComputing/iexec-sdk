@@ -1,5 +1,23 @@
 import IExecModule from './IExecModule';
-import { BN, BNish, Category, TxHash } from './types';
+import { BN, BNish, TxHash } from './types';
+
+/**
+ * IExec category
+ */
+export interface Category {
+  /**
+   * a name for the category
+   */
+  name: string;
+  /**
+   * a description of the category
+   */
+  description: string;
+  /**
+   * time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)
+   */
+  workClockTimeRef: BNish;
+}
 
 /**
  * module exposing hub methods

@@ -1,5 +1,19 @@
 import IExecModule from './IExecModule';
-import { Address, Addressish, Workerpool, BN, BNish, TxHash } from './types';
+import { Address, Addressish, BN, BNish, TxHash } from './types';
+
+/**
+ * IExec workerpool
+ */
+export interface Workerpool {
+  /**
+   * the workerpool owner
+   */
+  owner: Address;
+  /**
+   * a description of the workerpool
+   */
+  description: string;
+}
 
 /**
  * module exposing workerpool methods

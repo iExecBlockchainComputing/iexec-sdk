@@ -17,7 +17,7 @@ import {
 /**
  * sell order for an app
  */
-interface ApporderTemplate {
+export interface ApporderTemplate {
   app: Address;
   appprice: string;
   volume: string;
@@ -30,7 +30,7 @@ interface ApporderTemplate {
 /**
  * sell order for an app
  */
-interface HashableApporder {
+export interface HashableApporder {
   app: Address;
   appprice: BNish;
   volume: BNish;
@@ -44,7 +44,7 @@ interface HashableApporder {
 /**
  * signed sell order for an app
  */
-interface SignedApporder {
+export interface SignedApporder {
   app: Address;
   appprice: string;
   volume: string;
@@ -59,7 +59,7 @@ interface SignedApporder {
 /**
  * signed sell order for an app
  */
-interface ConsumableApporder {
+export interface ConsumableApporder {
   app: Address;
   appprice: BNish;
   volume: BNish;
@@ -74,7 +74,7 @@ interface ConsumableApporder {
 /**
  * sell order for a dataset
  */
-interface DatasetorderTemplate {
+export interface DatasetorderTemplate {
   dataset: Address;
   datasetprice: string;
   volume: string;
@@ -87,7 +87,7 @@ interface DatasetorderTemplate {
 /**
  * sell order for a dataset
  */
-interface HashableDatasetorder {
+export interface HashableDatasetorder {
   dataset: Address;
   datasetprice: BNish;
   volume: BNish;
@@ -101,7 +101,7 @@ interface HashableDatasetorder {
 /**
  * signed sell order for a dataset
  */
-interface SignedDatasetorder {
+export interface SignedDatasetorder {
   dataset: Address;
   datasetprice: string;
   volume: string;
@@ -116,7 +116,7 @@ interface SignedDatasetorder {
 /**
  * signed sell order for a dataset
  */
-interface ConsumableDatasetorder {
+export interface ConsumableDatasetorder {
   dataset: Address;
   datasetprice: BNish;
   volume: BNish;
@@ -131,7 +131,7 @@ interface ConsumableDatasetorder {
 /**
  * sell order for computing power
  */
-interface WorkerpoolorderTemplate {
+export interface WorkerpoolorderTemplate {
   workerpool: Address;
   workerpoolprice: string;
   volume: string;
@@ -146,7 +146,7 @@ interface WorkerpoolorderTemplate {
 /**
  * sell order for computing power
  */
-interface HashableWorkerpoolorder {
+export interface HashableWorkerpoolorder {
   workerpool: Address;
   workerpoolprice: BNish;
   volume: BNish;
@@ -162,7 +162,7 @@ interface HashableWorkerpoolorder {
 /**
  * signed sell order for computing power
  */
-interface SignedWorkerpoolorder {
+export interface SignedWorkerpoolorder {
   workerpool: Address;
   workerpoolprice: string;
   volume: string;
@@ -179,7 +179,7 @@ interface SignedWorkerpoolorder {
 /**
  * signed sell order for computing power
  */
-interface ConsumableWorkerpoolorder {
+export interface ConsumableWorkerpoolorder {
   workerpool: Address;
   workerpoolprice: BNish;
   volume: BNish;
@@ -196,7 +196,7 @@ interface ConsumableWorkerpoolorder {
 /**
  * buy order for computing tasks
  */
-interface RequestorderTemplate {
+export interface RequestorderTemplate {
   app: Address;
   appmaxprice: string;
   dataset: Address;
@@ -222,7 +222,7 @@ interface RequestorderTemplate {
 /**
  * buy order for computing tasks
  */
-interface HashableRequestorder {
+export interface HashableRequestorder {
   app: Address;
   appmaxprice: BNish;
   dataset: Address;
@@ -242,7 +242,7 @@ interface HashableRequestorder {
 /**
  * signed buy order for computing tasks
  */
-interface SignedRequestorder {
+export interface SignedRequestorder {
   app: Address;
   appmaxprice: string;
   dataset: Address;
@@ -263,7 +263,7 @@ interface SignedRequestorder {
 /**
  * signed buy order for computing tasks
  */
-interface ConsumableRequestorder {
+export interface ConsumableRequestorder {
   app: Address;
   appmaxprice: BNish;
   dataset: Address;

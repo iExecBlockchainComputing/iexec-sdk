@@ -2,13 +2,34 @@ import IExecModule from './IExecModule';
 import {
   Address,
   Addressish,
-  Dataset,
   BN,
   BNish,
   Bytes32,
   Multiaddress,
   TxHash,
 } from './types';
+
+/**
+ * IExec dataset
+ */
+export interface Dataset {
+  /**
+   * the dataset owner
+   */
+  owner: Address;
+  /**
+   * a name for the dataset
+   */
+  name: string;
+  /**
+   * dataset file download address
+   */
+  multiaddr: Multiaddress;
+  /**
+   * sha256sum of the file
+   */
+  checksum: Bytes32;
+}
 
 /**
  * module exposing dataset methods
