@@ -2,7 +2,7 @@ import { Observable } from '../common/utils/reactive';
 import IExecModule from './IExecModule';
 import { Address, ENS, TxHash } from './types';
 
-declare class ENSConfigirationObservable extends Observable {
+declare class ENSConfigurationObservable extends Observable {
   /**
    * subscribe and start the ENS configuration process until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned cancel method.
    *
@@ -78,7 +78,7 @@ declare class ENSConfigirationObservable extends Observable {
 /**
  * module exposing ENS methods
  */
-export default class IExecDealModule extends IExecModule {
+export default class IExecENSModule extends IExecModule {
   /**
    * get the address of the ENS name's owner.
    *
@@ -172,7 +172,7 @@ export default class IExecDealModule extends IExecModule {
   obsConfigureResolution(
     name: ENS,
     address?: Address,
-  ): Promise<ENSConfigirationObservable>;
+  ): Promise<ENSConfigurationObservable>;
   /**
    * **ONLY ENS NAME OWNER**
    *
