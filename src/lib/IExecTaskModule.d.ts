@@ -1,6 +1,6 @@
 import { Observable } from '../common/utils/reactive';
 import IExecModule from './IExecModule';
-import { Address, BN, Bytes32, Dealid, Taskid, TxHash } from './types';
+import { Address, BN, Bytes, Bytes32, Dealid, Taskid, TxHash } from './types';
 
 declare class TaskObservable extends Observable {
   /**

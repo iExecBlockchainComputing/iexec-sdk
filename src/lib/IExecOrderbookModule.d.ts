@@ -7,6 +7,7 @@ import {
   Bytes32,
   OrderHash,
   HumanSingleTag,
+  Tag,
 } from './types';
 
 /**

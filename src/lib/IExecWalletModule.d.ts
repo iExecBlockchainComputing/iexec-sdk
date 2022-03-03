@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import IExecModule from './IExecModule';
 import { Address, Addressish, NRLCAmount, TxHash, WeiAmount } from './types';
+import { Observable } from '../common/utils/reactive';
 
 declare class BrigdeObservable extends Observable {
   /**
