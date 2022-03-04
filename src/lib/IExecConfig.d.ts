@@ -79,8 +79,8 @@ export interface IExecConfigOptions {
  * const iexec = IExec.fromConfig(config);
  *
  * // or instanciate IExecModules sharing the same configuration
- * const account = IExecAccount.fromConfig(config);
- * const wallet = IExecWallet.fromConfig(config);
+ * const account = IExecAccountModule.fromConfig(config);
+ * const wallet = IExecWalletModule.fromConfig(config);
  * ```
  */
 export default class IExecConfig {
