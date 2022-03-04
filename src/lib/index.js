@@ -1,5 +1,6 @@
 const IExec = require('./IExec');
 const IExecConfig = require('./IExecConfig');
+const IExecModule = require('./IExecModule');
 const IExecAccountModule = require('./IExecAccountModule');
 const IExecAppModule = require('./IExecAppModule');
 const IExecDatasetModule = require('./IExecDatasetModule');
@@ -21,6 +22,7 @@ const utils = require('./utils');
 const sdk = {
   IExec,
   IExecConfig,
+  IExecModule,
   IExecAccountModule,
   IExecAppModule,
   IExecDatasetModule,

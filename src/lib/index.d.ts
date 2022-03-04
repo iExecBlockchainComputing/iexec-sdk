@@ -1,5 +1,6 @@
 export { default as IExec } from './IExec';
 export { default as IExecConfig } from './IExecConfig';
+export { default as IExecModule } from './IExecModule';
 export { default as IExecAccountModule } from './IExecAccountModule';
 export { default as IExecAppModule } from './IExecAppModule';
 export { default as IExecDatasetModule } from './IExecDatasetModule';
