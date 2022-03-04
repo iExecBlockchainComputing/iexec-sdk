@@ -3,13 +3,23 @@ import BN from 'bn.js';
 /**
  * big number like
  */
-type BNish = BN | string | number | bigint;
+type BNish = BN | string | number;
 /**
  * ethereum address
+ *
+ * example:
+ * ```js
+ * const address = '0xF048eF3d7E3B33A465E0599E641BB29421f7Df92';
+ * ```
  */
 type Address = string;
 /**
  * ENS
+ *
+ * example:
+ * ```js
+ * const ensName = 'iexec.eth';
+ * ```
  */
 type ENS = string;
 /**
@@ -18,10 +28,20 @@ type ENS = string;
 type Addressish = Address | ENS;
 /**
  * bytes hex string
+ *
+ * example:
+ * ```js
+ * const NULL_BYTES = '0x';
+ * ```
  */
 type Bytes = string;
 /**
  * bytes 32 hex string
+ *
+ * example:
+ * ```js
+ * const bytes32 = '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef883c6';
+ * ```
  */
 type Bytes32 = string;
 /**
@@ -67,7 +87,7 @@ type WeiAmount = number | string | BN;
 /**
  * nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
  *
- * named units ('nRLC', 'RLC') can be used with the format `${amount} ${unit}` (example: `'0.1 RLC'`)
+ * named units ('nRLC', 'RLC') can be used with the format `${amount} ${unit}`
  *
  * examples:
  * ```js
@@ -85,15 +105,32 @@ type WeiAmount = number | string | BN;
  */
 type NRLCAmount = number | string | BN;
 /**
- * human redable task tag (ex: 'tee')
+ * human redable task tag
+ *
+ * example:
+ * ```js
+ * const teeTag = 'tee';
+ * ```
  */
 type HumanSingleTag = string;
 /**
- * task tag
+ * task tag used to specify the runtime
+ *
+ * example:
+ * ```js
+ * const onlyTeeTag = ['tee'];
+ * const teePlusGpuTags = ['tee','gpu'];
+ * ```
  */
 type Tag = Bytes32 | HumanSingleTag[];
 /**
  * multiaddress
+ *
+ * example:
+ * ```js
+ * const url = 'https://example.com/foo.bar'
+ * const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
+ * ```
  */
 type Multiaddress = string | Buffer;
 
