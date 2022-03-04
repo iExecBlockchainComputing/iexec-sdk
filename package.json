@@ -6,7 +6,10 @@
   "types": "dist/lib/index.d.ts",
   "scripts": {
     "test": "jest --coverage --runInBand --detectOpenHandles --forceExit",
-    "build": "./node_modules/.bin/babel src --out-dir dist --copy-files && node generatePackages.js"
+    "build": "npm run generate-dist && npm run generate-packages && npm run generate-doc",
+    "generate-dist": "./node_modules/.bin/babel src --out-dir dist --copy-files",
+    "generate-packages": "node generatePackages.js",
+    "generate-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json"
   },
   "bin": {
     "iexec": "./dist/cli/cmd/iexec.js"
@@ -82,6 +85,9 @@
     "jest": "^27.4.7",
     "prettier": "^2.5.1",
     "typedoc": "^0.22.12",
+    "typedoc-plugin-markdown": "^3.11.14",
+    "typedoc-plugin-missing-exports": "^0.22.6",
+    "typedoc-plugin-rename-defaults": "^0.4.0",
     "typescript": "^4.5.5"
   },
   "babel": {
