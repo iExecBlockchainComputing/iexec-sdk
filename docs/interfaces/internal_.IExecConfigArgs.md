@@ -21,7 +21,7 @@ A web3 Eth provider
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:8](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L8)
+[src/lib/IExecConfig.d.ts:8](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L8)
 
 ___
 
@@ -33,4 +33,4 @@ flavour to use (default standard)
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L12)
+[src/lib/IExecConfig.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L12)

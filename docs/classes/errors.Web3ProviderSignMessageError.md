@@ -41,7 +41,7 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 #### Defined in
 
-[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/errors.d.ts#L14)
+[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/errors.d.ts#L14)
 
 ## Properties
 
@@ -55,4 +55,4 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 #### Defined in
 
-[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/errors.d.ts#L15)
+[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/errors.d.ts#L15)

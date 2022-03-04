@@ -94,7 +94,7 @@ export interface IExecConfigOptions {
  *
  * example:
  * ```js
- * // create the configurtion
+ * // create the configuration
  * const config = new IExecConfig({ ethProvider: window.ethereum });
  *
  * // instanciate iExec SDK

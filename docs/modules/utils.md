@@ -36,7 +36,7 @@ ethereum null/zero address
 
 #### Defined in
 
-[src/lib/utils.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L87)
+[src/lib/utils.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L87)
 
 ___
 
@@ -48,7 +48,7 @@ null bytes32
 
 #### Defined in
 
-[src/lib/utils.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L91)
+[src/lib/utils.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L91)
 
 ## Functions
 
@@ -75,7 +75,7 @@ console.log(decodeTag('0x0000000000000000000000000000000000000000000000000000000
 
 #### Defined in
 
-[src/lib/utils.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L151)
+[src/lib/utils.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L151)
 
 ___
 
@@ -108,7 +108,7 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### Defined in
 
-[src/lib/utils.d.ts:178](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L178)
+[src/lib/utils.d.ts:178](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L178)
 
 ___
 
@@ -135,7 +135,7 @@ console.log(encodeTag(['tee', 'gpu']));
 
 #### Defined in
 
-[src/lib/utils.d.ts:142](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L142)
+[src/lib/utils.d.ts:142](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L142)
 
 ___
 
@@ -162,7 +162,7 @@ console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 
 #### Defined in
 
-[src/lib/utils.d.ts:124](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L124)
+[src/lib/utils.d.ts:124](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L124)
 
 ___
 
@@ -189,7 +189,7 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:133](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L133)
+[src/lib/utils.d.ts:133](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L133)
 
 ___
 
@@ -222,7 +222,7 @@ const iexec = new IExec({ ethProvider });
 
 #### Defined in
 
-[src/lib/utils.d.ts:45](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L45)
+[src/lib/utils.d.ts:45](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L45)
 
 ___
 
@@ -253,7 +253,7 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Defined in
 
-[src/lib/utils.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L103)
+[src/lib/utils.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L103)
 
 ___
 
@@ -284,7 +284,7 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L115)
+[src/lib/utils.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L115)
 
 ___
 
@@ -315,4 +315,4 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### Defined in
 
-[src/lib/utils.d.ts:164](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/utils.d.ts#L164)
+[src/lib/utils.d.ts:164](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L164)

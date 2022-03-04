@@ -6,7 +6,7 @@ configuration for IExecModule
 
 example:
 ```js
-// create the configurtion
+// create the configuration
 const config = new IExecConfig({ ethProvider: window.ethereum });
 
 // instanciate iExec SDK
@@ -69,7 +69,7 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L127)
+[src/lib/IExecConfig.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L127)
 
 ## Methods
 
@@ -85,7 +85,7 @@ resolve the current bridge contract address
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L167)
+[src/lib/IExecConfig.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L167)
 
 ___
 
@@ -101,7 +101,7 @@ resolve the current bridged IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L139)
+[src/lib/IExecConfig.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L139)
 
 ___
 
@@ -117,7 +117,7 @@ resolve the current chainId
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:131](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L131)
+[src/lib/IExecConfig.d.ts:131](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L131)
 
 ___
 
@@ -133,7 +133,7 @@ resolve the current IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L135)
+[src/lib/IExecConfig.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L135)
 
 ___
 
@@ -149,7 +149,7 @@ resolve the current ENS public resolver contract address
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:171](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L171)
+[src/lib/IExecConfig.d.ts:171](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L171)
 
 ___
 
@@ -165,7 +165,7 @@ resolve the current enterprise IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:147](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L147)
+[src/lib/IExecConfig.d.ts:147](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L147)
 
 ___
 
@@ -181,7 +181,7 @@ resolve the current IExec market URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:159](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L159)
+[src/lib/IExecConfig.d.ts:159](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L159)
 
 ___
 
@@ -197,7 +197,7 @@ resolve the current IPFS gateway URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L163)
+[src/lib/IExecConfig.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L163)
 
 ___
 
@@ -213,7 +213,7 @@ resolve the current result proxy URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:155](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L155)
+[src/lib/IExecConfig.d.ts:155](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L155)
 
 ___
 
@@ -229,7 +229,7 @@ resolve the current SMS URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L151)
+[src/lib/IExecConfig.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L151)
 
 ___
 
@@ -245,4 +245,4 @@ resolve the current standard IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:143](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecConfig.d.ts#L143)
+[src/lib/IExecConfig.d.ts:143](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L143)

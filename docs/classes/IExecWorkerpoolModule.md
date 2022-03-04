@@ -49,7 +49,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -65,7 +65,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -93,7 +93,7 @@ console.log('workerpool count:', count);
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecWorkerpoolModule.d.ts#L65)
+[src/lib/IExecWorkerpoolModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecWorkerpoolModule.d.ts#L65)
 
 ___
 
@@ -126,7 +126,7 @@ console.log('deployed at', address);
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecWorkerpoolModule.d.ts#L34)
+[src/lib/IExecWorkerpoolModule.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecWorkerpoolModule.d.ts#L34)
 
 ___
 
@@ -155,7 +155,7 @@ console.log('workerpool:', workerpool);
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:75](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecWorkerpoolModule.d.ts#L75)
+[src/lib/IExecWorkerpoolModule.d.ts:75](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecWorkerpoolModule.d.ts#L75)
 
 ___
 
@@ -183,7 +183,7 @@ console.log('workerpool:', workerpool);
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:53](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecWorkerpoolModule.d.ts#L53)
+[src/lib/IExecWorkerpoolModule.d.ts:53](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecWorkerpoolModule.d.ts#L53)
 
 ___
 
@@ -209,4 +209,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L24)

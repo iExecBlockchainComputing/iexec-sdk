@@ -83,4 +83,4 @@ data:
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:30](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/IExecDealModule.d.ts#L30)
+[src/lib/IExecDealModule.d.ts:30](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecDealModule.d.ts#L30)

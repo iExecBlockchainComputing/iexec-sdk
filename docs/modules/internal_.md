@@ -64,7 +64,7 @@ big number like
 
 #### Defined in
 
-[src/lib/types.d.ts:6](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L6)
+[src/lib/types.d.ts:6](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L6)
 
 ___
 
@@ -81,7 +81,7 @@ const bytes32 = '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef88
 
 #### Defined in
 
-[src/lib/types.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L46)
+[src/lib/types.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L46)
 
 ___
 
@@ -98,7 +98,7 @@ const teeTag = 'tee';
 
 #### Defined in
 
-[src/lib/types.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L115)
+[src/lib/types.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L115)
 
 ___
 
@@ -116,7 +116,7 @@ const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
 
 #### Defined in
 
-[src/lib/types.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L135)
+[src/lib/types.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L135)
 
 ___
 
@@ -144,7 +144,7 @@ const tenNRLC = new BN(10);
 
 #### Defined in
 
-[src/lib/types.d.ts:106](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L106)
+[src/lib/types.d.ts:106](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L106)
 
 ___
 
@@ -162,7 +162,7 @@ const teePlusGpuTags = ['tee','gpu'];
 
 #### Defined in
 
-[src/lib/types.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L125)
+[src/lib/types.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L125)
 
 ___
 
@@ -190,4 +190,4 @@ const tenWei = new BN(10);
 
 #### Defined in
 
-[src/lib/types.d.ts:86](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/92c9bf6/src/lib/types.d.ts#L86)
+[src/lib/types.d.ts:86](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/types.d.ts#L86)
