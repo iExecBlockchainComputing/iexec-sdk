@@ -38,13 +38,35 @@ export interface IExecConfigOptions {
    */
   bridgeAddress?: string;
   /**
-   * todo
+   * override the bridged network configuration
    */
-  bridgedNetworkConf?: object;
+  bridgedNetworkConf?: {
+    /**
+     * bridged network chainId
+     */
+    chainId?: number | string;
+    /**
+     * bridged network node url
+     */
+    rpcURL?: string;
+    /**
+     * IExec contract address on bridgde network
+     */
+    hubAddress?: string;
+    /**
+     * bridge contract address on bridgde network
+     */
+    bridgeAddress?: string;
+  };
   /**
-   * todo
+   * override the enterprise configuration
    */
-  enterpriseSwapConf?: object;
+  enterpriseSwapConf?: {
+    /**
+     * IExec enerprise contract address
+     */
+    hubAddress?: string;
+  };
   /**
    * override the result proxy URL to target a custom instance
    */
