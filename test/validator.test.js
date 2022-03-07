@@ -38,6 +38,13 @@ const {
   ValidationError,
 } = require('../src/common/utils/validator');
 
+const { INFURA_PROJECT_ID } = process.env;
+// public chains
+console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
+const mainnetHost = INFURA_PROJECT_ID
+  ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
+  : 'mainnet';
+
 // TESTS
 describe('[positiveIntSchema]', () => {
   test('int', async () => {
@@ -794,7 +801,7 @@ describe('[addressSchema]', () => {
   });
   test('address (with ethProvider)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
         '0x607F4C5BB672230e8672085532f7e901544a7375',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
@@ -810,21 +817,23 @@ describe('[addressSchema]', () => {
   });
   test('address undefined (throw)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider() }).validate(undefined),
+      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
+        undefined,
+      ),
     ).rejects.toThrow(
       new ValidationError('undefined is not a valid ethereum address'),
     );
   });
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
         'rlc.iexec.eth',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   }, 10000);
-  test('invalid ens (throw when ethProvider is missing)', async () => {
+  test('invalid ens (throw when ens is missing)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider() }).validate(
+      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
         'pierre.iexec.eth',
       ),
     ).rejects.toThrow(

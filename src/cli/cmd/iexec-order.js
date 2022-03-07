@@ -2,6 +2,11 @@
 const Debug = require('debug');
 const cli = require('commander');
 const order = require('../../common/modules/order');
+const {
+  checkDeployedApp,
+  checkDeployedDataset,
+  checkDeployedWorkerpool,
+} = require('../../common/modules/hub');
 const { NULL_ADDRESS } = require('../../common/utils/utils');
 const {
   finalizeCli,
@@ -164,9 +169,8 @@ sign
             chain.contracts,
             loadedOrder,
           );
-          await chain.contracts.checkDeployedApp(orderObj.app, {
-            strict: true,
-          });
+          if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
+            throw Error(`No app deployed at address ${orderObj.app}`);
           const signedOrder = await order.signApporder(
             chain.contracts,
             orderObj,
@@ -196,9 +200,8 @@ sign
             chain.contracts,
             loadedOrder,
           );
-          await chain.contracts.checkDeployedDataset(orderObj.dataset, {
-            strict: true,
-          });
+          if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
+            throw Error(`No dataset deployed at address ${orderObj.dataset}`);
           const signedOrder = await order.signDatasetorder(
             chain.contracts,
             orderObj,
@@ -232,9 +235,15 @@ sign
             chain.contracts,
             loadedOrder,
           );
-          await chain.contracts.checkDeployedWorkerpool(orderObj.workerpool, {
-            strict: true,
-          });
+          if (
+            !(await checkDeployedWorkerpool(
+              chain.contracts,
+              orderObj.workerpool,
+            ))
+          )
+            throw Error(
+              `No workerpool deployed at address ${orderObj.workerpool}`,
+            );
           const signedOrder = await order.signWorkerpoolorder(
             chain.contracts,
             orderObj,
@@ -267,9 +276,8 @@ sign
             },
             loadedOrder,
           );
-          await chain.contracts.checkDeployedApp(orderObj.app, {
-            strict: true,
-          });
+          if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
+            throw Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipRequestCheck) {
             await checkRequestRequirements(
               { contracts: chain.contracts, smsURL: chain.sms },

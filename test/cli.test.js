@@ -13,9 +13,17 @@ const DEFAULT_TIMEOUT = 60000;
 jest.setTimeout(DEFAULT_TIMEOUT);
 
 // CONFIG
-const { DRONE } = process.env;
+const { DRONE, INFURA_PROJECT_ID } = process.env;
 const iexecPath = DRONE ? 'iexec' : 'node ../src/cli/cmd/iexec.js';
 
+// public chains
+console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
+const mainnetHost = INFURA_PROJECT_ID
+  ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
+  : 'mainnet';
+const goerliHost = INFURA_PROJECT_ID
+  ? `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+  : 'goerli';
 // 1 block / tx
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
@@ -1627,7 +1635,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
@@ -1657,7 +1665,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
@@ -1693,7 +1701,7 @@ describe('[Mainchain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
@@ -2816,7 +2824,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('ACTIVE');
@@ -2846,7 +2854,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('TIMEOUT');
@@ -2882,7 +2890,7 @@ describe('[Sidechain]', () => {
     expect(res.task.consensusValue).toBe(NULL_BYTES32);
     expect(res.task.revealCounter).toBe('0');
     expect(res.task.winnerCounter).toBe('0');
-    expect(res.task.contributors).toStrictEqual({});
+    expect(res.task.contributors).toStrictEqual([]);
     expect(res.task.resultDigest).toBe(NULL_BYTES32);
     expect(res.task.results).toStrictEqual({ storage: 'none' });
     expect(res.task.statusName).toBe('FAILED');
@@ -4000,6 +4008,20 @@ describe('[Common]', () => {
   describe('[chain.json]', () => {
     beforeAll(async () => {
       await execAsync(`${iexecPath} init --skip-wallet --force`);
+      await loadJSONFile('chain.json').then((obj) => {
+        const chainJson = {
+          ...obj,
+          chains: {
+            ...obj.chains,
+            mainnet: {
+              ...(obj.chains && obj.chains.mainnet),
+              host: mainnetHost,
+            },
+            goerli: { ...(obj.chains && obj.chains.goerli), host: goerliHost },
+          },
+        };
+        saveJSONToFile(chainJson, 'chain.json');
+      });
     });
 
     test('no "native" overwites in templates', async () => {

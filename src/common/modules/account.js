@@ -25,7 +25,10 @@ const checkBalance = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(address);
-    const { stake, locked } = await wrapCall(contracts.checkBalance(vAddress));
+    const iexecContract = contracts.getIExecContract();
+    const { stake, locked } = await wrapCall(
+      iexecContract.viewAccount(vAddress),
+    );
     const balance = {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
@@ -57,21 +60,16 @@ const deposit = async (
     );
     if (nRLC.lt(new BN(vAmount)))
       throw Error('Deposit amount exceed wallet balance');
-    const iexecAddress = await contracts.fetchIExecAddress();
     const iexecContract = contracts.getIExecContract();
     if (!contracts.isNative) {
-      const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
+      const rlcContract = await wrapCall(contracts.fetchTokenContract());
       const tx = await wrapSend(
-        contracts
-          .getRLCContract({
-            at: rlcAddress,
-          })
-          .approveAndCall(
-            iexecAddress,
-            vAmount,
-            NULL_BYTES,
-            contracts.txOptions,
-          ),
+        rlcContract.approveAndCall(
+          contracts.hubAddress,
+          vAmount,
+          NULL_BYTES,
+          contracts.txOptions,
+        ),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEvent('Approval', txReceipt.events))
