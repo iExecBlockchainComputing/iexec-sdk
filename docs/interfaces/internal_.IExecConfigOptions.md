@@ -32,7 +32,7 @@ override the bridge contract address to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:39](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L39)
+[src/lib/IExecConfig.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L40)
 
 ___
 
@@ -53,7 +53,7 @@ override the bridged network configuration
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:43](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L43)
+[src/lib/IExecConfig.d.ts:44](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L44)
 
 ___
 
@@ -65,7 +65,7 @@ number of block to wait for transactions confirmation (default 1)
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:89](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L89)
+[src/lib/IExecConfig.d.ts:90](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L90)
 
 ___
 
@@ -77,7 +77,7 @@ override the ENS public resolver contract address to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L35)
+[src/lib/IExecConfig.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L36)
 
 ___
 
@@ -89,7 +89,7 @@ override the ENS registry contract address to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:31](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L31)
+[src/lib/IExecConfig.d.ts:32](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L32)
 
 ___
 
@@ -107,7 +107,7 @@ override the enterprise configuration
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L64)
+[src/lib/IExecConfig.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L65)
 
 ___
 
@@ -119,7 +119,7 @@ override the IExec contract address to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L27)
+[src/lib/IExecConfig.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L28)
 
 ___
 
@@ -131,7 +131,7 @@ override the IExec market URL to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:85](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L85)
+[src/lib/IExecConfig.d.ts:86](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L86)
 
 ___
 
@@ -143,7 +143,7 @@ override the IPFS gateway URL to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:81](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L81)
+[src/lib/IExecConfig.d.ts:82](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L82)
 
 ___
 
@@ -155,7 +155,7 @@ true if IExec contract use the chain native token (default false)
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L19)
+[src/lib/IExecConfig.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L20)
 
 ___
 
@@ -167,7 +167,7 @@ override the result proxy URL to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:73](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L73)
+[src/lib/IExecConfig.d.ts:74](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L74)
 
 ___
 
@@ -179,7 +179,7 @@ override the SMS URL to target a custom instance
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:77](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L77)
+[src/lib/IExecConfig.d.ts:78](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L78)
 
 ___
 
@@ -191,4 +191,4 @@ if false set the gasPrice to 0 (default true)
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L23)
+[src/lib/IExecConfig.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L24)

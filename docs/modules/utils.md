@@ -7,7 +7,6 @@
 ### Classes
 
 - [BN](../classes/utils.BN.md)
-- [EnhancedWallet](../classes/utils.EnhancedWallet.md)
 
 ### Variables
 
@@ -36,7 +35,7 @@ ethereum null/zero address
 
 #### Defined in
 
-[src/lib/utils.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L87)
+[src/lib/utils.d.ts:63](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L63)
 
 ___
 
@@ -48,7 +47,7 @@ null bytes32
 
 #### Defined in
 
-[src/lib/utils.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L91)
+[src/lib/utils.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L67)
 
 ## Functions
 
@@ -75,7 +74,7 @@ console.log(decodeTag('0x0000000000000000000000000000000000000000000000000000000
 
 #### Defined in
 
-[src/lib/utils.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L151)
+[src/lib/utils.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L127)
 
 ___
 
@@ -108,7 +107,7 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### Defined in
 
-[src/lib/utils.d.ts:178](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L178)
+[src/lib/utils.d.ts:154](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L154)
 
 ___
 
@@ -135,7 +134,7 @@ console.log(encodeTag(['tee', 'gpu']));
 
 #### Defined in
 
-[src/lib/utils.d.ts:142](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L142)
+[src/lib/utils.d.ts:118](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L118)
 
 ___
 
@@ -162,7 +161,7 @@ console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 
 #### Defined in
 
-[src/lib/utils.d.ts:124](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L124)
+[src/lib/utils.d.ts:100](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L100)
 
 ___
 
@@ -189,13 +188,13 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:133](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L133)
+[src/lib/utils.d.ts:109](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L109)
 
 ___
 
 ### getSignerFromPrivateKey
 
-▸ **getSignerFromPrivateKey**(`host`, `privateKey`, `options?`): [`EnhancedWallet`](../classes/utils.EnhancedWallet.md)
+▸ **getSignerFromPrivateKey**(`host`, `privateKey`, `options?`): [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
 
 create a signer connected to the specified blockchain host from a private key
 
@@ -218,11 +217,11 @@ const iexec = new IExec({ ethProvider });
 
 #### Returns
 
-[`EnhancedWallet`](../classes/utils.EnhancedWallet.md)
+[`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
 
 #### Defined in
 
-[src/lib/utils.d.ts:45](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L45)
+[src/lib/utils.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L21)
 
 ___
 
@@ -253,7 +252,7 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Defined in
 
-[src/lib/utils.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L103)
+[src/lib/utils.d.ts:79](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L79)
 
 ___
 
@@ -284,7 +283,7 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L115)
+[src/lib/utils.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L91)
 
 ___
 
@@ -315,4 +314,4 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### Defined in
 
-[src/lib/utils.d.ts:164](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L164)
+[src/lib/utils.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L140)

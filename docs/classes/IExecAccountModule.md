@@ -49,7 +49,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -65,7 +65,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -94,7 +94,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Defined in
 
-[src/lib/IExecAccountModule.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecAccountModule.d.ts#L40)
+[src/lib/IExecAccountModule.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecAccountModule.d.ts#L40)
 
 ___
 
@@ -122,7 +122,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Defined in
 
-[src/lib/IExecAccountModule.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecAccountModule.d.ts#L50)
+[src/lib/IExecAccountModule.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecAccountModule.d.ts#L50)
 
 ___
 
@@ -151,7 +151,7 @@ console.log('tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecAccountModule.d.ts:18](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecAccountModule.d.ts#L18)
+[src/lib/IExecAccountModule.d.ts:18](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecAccountModule.d.ts#L18)
 
 ___
 
@@ -180,7 +180,7 @@ console.log('tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecAccountModule.d.ts:29](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecAccountModule.d.ts#L29)
+[src/lib/IExecAccountModule.d.ts:29](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecAccountModule.d.ts#L29)
 
 ___
 
@@ -206,4 +206,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L24)

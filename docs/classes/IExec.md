@@ -59,7 +59,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -71,7 +71,7 @@ account module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L24)
+[src/lib/IExec.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L24)
 
 ___
 
@@ -83,7 +83,7 @@ app module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L28)
+[src/lib/IExec.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L28)
 
 ___
 
@@ -99,7 +99,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L20)
 
 ___
 
@@ -111,7 +111,7 @@ dataset module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:32](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L32)
+[src/lib/IExec.d.ts:32](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L32)
 
 ___
 
@@ -123,7 +123,7 @@ deal module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L36)
+[src/lib/IExec.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L36)
 
 ___
 
@@ -135,7 +135,7 @@ ens module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L40)
+[src/lib/IExec.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L40)
 
 ___
 
@@ -147,7 +147,7 @@ hub module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:44](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L44)
+[src/lib/IExec.d.ts:44](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L44)
 
 ___
 
@@ -159,7 +159,7 @@ network module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L48)
+[src/lib/IExec.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L48)
 
 ___
 
@@ -171,7 +171,7 @@ order module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L52)
+[src/lib/IExec.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L52)
 
 ___
 
@@ -183,7 +183,7 @@ orderbook module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:56](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L56)
+[src/lib/IExec.d.ts:56](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L56)
 
 ___
 
@@ -195,7 +195,7 @@ result module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L60)
+[src/lib/IExec.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L60)
 
 ___
 
@@ -207,7 +207,7 @@ storage module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L64)
+[src/lib/IExec.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L64)
 
 ___
 
@@ -219,7 +219,7 @@ task module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L68)
+[src/lib/IExec.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L68)
 
 ___
 
@@ -231,7 +231,7 @@ wallet module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:72](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L72)
+[src/lib/IExec.d.ts:72](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L72)
 
 ___
 
@@ -243,7 +243,7 @@ workerpool module
 
 #### Defined in
 
-[src/lib/IExec.d.ts:76](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExec.d.ts#L76)
+[src/lib/IExec.d.ts:76](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExec.d.ts#L76)
 
 ## Methods
 
@@ -269,4 +269,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L24)

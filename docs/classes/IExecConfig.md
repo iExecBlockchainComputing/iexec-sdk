@@ -69,7 +69,7 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L127)
+[src/lib/IExecConfig.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L128)
 
 ## Methods
 
@@ -85,7 +85,7 @@ resolve the current bridge contract address
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L167)
+[src/lib/IExecConfig.d.ts:168](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L168)
 
 ___
 
@@ -101,7 +101,7 @@ resolve the current bridged IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L139)
+[src/lib/IExecConfig.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L140)
 
 ___
 
@@ -117,7 +117,7 @@ resolve the current chainId
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:131](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L131)
+[src/lib/IExecConfig.d.ts:132](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L132)
 
 ___
 
@@ -133,7 +133,7 @@ resolve the current IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L135)
+[src/lib/IExecConfig.d.ts:136](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L136)
 
 ___
 
@@ -149,7 +149,7 @@ resolve the current ENS public resolver contract address
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:171](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L171)
+[src/lib/IExecConfig.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L172)
 
 ___
 
@@ -165,7 +165,7 @@ resolve the current enterprise IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:147](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L147)
+[src/lib/IExecConfig.d.ts:148](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L148)
 
 ___
 
@@ -181,7 +181,7 @@ resolve the current IExec market URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:159](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L159)
+[src/lib/IExecConfig.d.ts:160](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L160)
 
 ___
 
@@ -197,7 +197,7 @@ resolve the current IPFS gateway URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L163)
+[src/lib/IExecConfig.d.ts:164](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L164)
 
 ___
 
@@ -213,7 +213,7 @@ resolve the current result proxy URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:155](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L155)
+[src/lib/IExecConfig.d.ts:156](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L156)
 
 ___
 
@@ -229,7 +229,7 @@ resolve the current SMS URL
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:151](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L151)
+[src/lib/IExecConfig.d.ts:152](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L152)
 
 ___
 
@@ -245,4 +245,4 @@ resolve the current standard IExecContractsClient
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:143](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L143)
+[src/lib/IExecConfig.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L144)

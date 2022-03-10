@@ -15,13 +15,13 @@
 
 ### ethProvider
 
-• **ethProvider**: `ExternalProvider`
+• **ethProvider**: [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md) \| `ExternalProvider`
 
 A web3 Eth provider
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:8](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L8)
+[src/lib/IExecConfig.d.ts:9](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L9)
 
 ___
 
@@ -33,4 +33,4 @@ flavour to use (default standard)
 
 #### Defined in
 
-[src/lib/IExecConfig.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/IExecConfig.d.ts#L12)
+[src/lib/IExecConfig.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecConfig.d.ts#L13)

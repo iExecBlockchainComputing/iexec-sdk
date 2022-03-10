@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [utils](../modules/utils.md) / EnhancedWallet
+[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / EnhancedWallet
 
 # Class: EnhancedWallet
 
-[utils](../modules/utils.md).EnhancedWallet
+[{internal}](../modules/internal_.md).EnhancedWallet
 
 ## Hierarchy
 
@@ -14,11 +14,11 @@
 
 ### Constructors
 
-- [constructor](utils.EnhancedWallet.md#constructor)
+- [constructor](internal_.EnhancedWallet.md#constructor)
 
 ### Methods
 
-- [signTypedData](utils.EnhancedWallet.md#signtypeddata)
+- [signTypedData](internal_.EnhancedWallet.md#signtypeddata)
 
 ## Constructors
 
@@ -42,7 +42,7 @@ Wallet.constructor
 
 #### Defined in
 
-[src/lib/utils.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L20)
+[src/common/utils/signers.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/common/utils/signers.d.ts#L12)
 
 ## Methods
 
@@ -64,4 +64,4 @@ Wallet.constructor
 
 #### Defined in
 
-[src/lib/utils.d.ts:29](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/460192e/src/lib/utils.d.ts#L29)
+[src/common/utils/signers.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/common/utils/signers.d.ts#L21)

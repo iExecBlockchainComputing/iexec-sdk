@@ -1,11 +1,12 @@
 import IExecContractsClient from '../common/utils/IExecContractsClient';
+import { EnhancedWallet } from '../common/utils/signers';
 import { ExternalProvider } from '@ethersproject/providers';
 
 export interface IExecConfigArgs {
   /**
    * A web3 Eth provider
    */
-  ethProvider: ExternalProvider;
+  ethProvider: ExternalProvider | EnhancedWallet;
   /**
    * flavour to use (default standard)
    */
