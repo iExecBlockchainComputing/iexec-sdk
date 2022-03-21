@@ -49,12 +49,22 @@ expect.extend({
 });
 
 // CONFIG
-const { DRONE, INFURA_PROJECT_ID } = process.env;
+const { DRONE, INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
+  process.env;
 // public chains
 console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
-const goerliHost = INFURA_PROJECT_ID
-  ? `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-  : 'goerli';
+console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
+console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
+
+const providerOptions = {
+  ...(INFURA_PROJECT_ID && { infura: INFURA_PROJECT_ID }),
+  ...(ETHERSCAN_API_KEY && { etherscan: ETHERSCAN_API_KEY }),
+  ...(ALCHEMY_API_KEY && { alchemy: ALCHEMY_API_KEY }),
+};
+
+const goerliHost = 'goerli';
+const vivianiHost = 'https://viviani.iex.ec';
+
 // 1 block / tx
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
@@ -539,18 +549,12 @@ describe('[IExec]', () => {
   });
 
   test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
-    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
-    const iexec = new IExec(
-      {
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+      providers: providerOptions,
+    });
+    const iexec = new IExec({
         ethProvider: signer,
-        chainId: '5',
-      },
-      {
-        bridgedNetworkConf: {
-          id: '123456',
-        },
-      },
-    );
+    });
     // rely on viviani
     await expect(
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
@@ -1478,12 +1482,29 @@ describe('[wallet]', () => {
     );
   });
 
-  test.skip('wallet.checkBridgedBalances() (token)', async () => {
-    throw Error('TODO');
+  test('wallet.checkBridgedBalances() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const res = await iexec.wallet.checkBridgedBalances(ADDRESS);
+    expect(res.nRLC).toBeInstanceOf(BN);
+    expect(res.wei).toBeInstanceOf(BN);
   });
 
-  test.skip('wallet.checkBridgedBalances() (native)', async () => {
-    throw Error('TODO');
+  test('wallet.checkBridgedBalances() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        providerOptions,
+      },
+    );
+    const res = await iexec.wallet.checkBridgedBalances(ADDRESS);
+    expect(res.nRLC).toBeInstanceOf(BN);
+    expect(res.wei).toBeInstanceOf(BN);
   });
 
   test('wallet.sendETH()', async () => {
@@ -2629,8 +2650,29 @@ describe('[account]', () => {
     expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
   });
 
-  test.skip('account.checkBridgedBalance()', async () => {
-    throw Error('TODO');
+  test('account.checkBridgedBalance() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const res = await iexec.account.checkBridgedBalance(ADDRESS);
+    expect(res.stake).toBeInstanceOf(BN);
+    expect(res.locked).toBeInstanceOf(BN);
+  });
+
+  test('account.checkBridgedBalance() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        providerOptions,
+      },
+    );
+    const res = await iexec.account.checkBridgedBalance(ADDRESS);
+    expect(res.stake).toBeInstanceOf(BN);
+    expect(res.locked).toBeInstanceOf(BN);
   });
 
   test('account.deposit() (token)', async () => {

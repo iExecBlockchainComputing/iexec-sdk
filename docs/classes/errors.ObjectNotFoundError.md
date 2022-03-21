@@ -44,7 +44,7 @@ Error.constructor
 
 #### Defined in
 
-[src/lib/errors.d.ts:33](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/errors.d.ts#L33)
+[src/lib/errors.d.ts:33](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/errors.d.ts#L33)
 
 ## Properties
 
@@ -54,7 +54,7 @@ Error.constructor
 
 #### Defined in
 
-[src/lib/errors.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/errors.d.ts#L36)
+[src/lib/errors.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/errors.d.ts#L36)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[src/lib/errors.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/errors.d.ts#L35)
+[src/lib/errors.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/errors.d.ts#L35)
 
 ___
 
@@ -74,4 +74,4 @@ ___
 
 #### Defined in
 
-[src/lib/errors.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/errors.d.ts#L34)
+[src/lib/errors.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/errors.d.ts#L34)

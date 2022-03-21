@@ -134,6 +134,39 @@ type Tag = Bytes32 | HumanSingleTag[];
  */
 type Multiaddress = string | Buffer;
 
+/**
+ * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
+ */
+interface ProviderOptions {
+  /**
+   * [Alchemy](https://alchemyapi.io/) API key
+   */
+  alchemy?: string;
+  /**
+   * [Etherscan](https://etherscan.io/) API key
+   */
+  etherscan?: string;
+  /**
+   * [INFURA](https://infura.io/) Project ID or { projectId, projectSecret }
+   */
+  infura?:
+    | string
+    | {
+        /**
+         * [INFURA](https://infura.io/) project ID
+         */
+        projectId: string;
+        /**
+         * [INFURA](https://infura.io/) project secret
+         */
+        projectSecret: string;
+      };
+  /**
+   * the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
+   */
+  quorum?: number;
+}
+
 export {
   BN,
   BNish,
@@ -152,4 +185,5 @@ export {
   HumanSingleTag,
   Tag,
   Multiaddress,
+  ProviderOptions,
 };

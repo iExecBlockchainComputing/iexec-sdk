@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - TypeScript interfaces
+- `providerOptions` can be passed to the constructor to configure ethers default provider on bridged chain
 
 ### Changed
 

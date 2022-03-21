@@ -27,6 +27,7 @@ class IExecConfig {
       smsURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      providerOptions,
     } = {},
   ) {
     const isEnhancedWallet = ethProvider instanceof EnhancedWallet;
@@ -217,7 +218,7 @@ class IExecConfig {
           const bridgedConf = await resolveBridgedConf();
           _bridgedContracts = new IExecContractsClient({
             chainId: bridgedConf.chainId,
-            provider: getDefaultProvider(bridgedConf.rpcURL),
+            provider: getDefaultProvider(bridgedConf.rpcURL, providerOptions),
             hubAddress: bridgedConf.hubAddress,
             confirms,
             isNative: bridgedConf.isNative,
