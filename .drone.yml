@@ -2,7 +2,7 @@ pipeline:
   test_node16:
     image: node:16
     pull: true
-    secrets: [infura_project_id]
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd
@@ -18,7 +18,7 @@ pipeline:
   test_node14:
     image: node:14
     pull: true
-    secrets: [infura_project_id]
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd
@@ -34,7 +34,7 @@ pipeline:
   test_node12:
     image: node:12
     pull: true
-    secrets: [infura_project_id]
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd

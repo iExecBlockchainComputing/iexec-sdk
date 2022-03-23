@@ -49,12 +49,22 @@ expect.extend({
 });
 
 // CONFIG
-const { DRONE, INFURA_PROJECT_ID } = process.env;
+const { DRONE, INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
+  process.env;
 // public chains
 console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
-const goerliHost = INFURA_PROJECT_ID
-  ? `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-  : 'goerli';
+console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
+console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
+
+const providerOptions = {
+  ...(INFURA_PROJECT_ID && { infura: INFURA_PROJECT_ID }),
+  ...(ETHERSCAN_API_KEY && { etherscan: ETHERSCAN_API_KEY }),
+  ...(ALCHEMY_API_KEY && { alchemy: ALCHEMY_API_KEY }),
+};
+
+const goerliHost = 'goerli';
+const vivianiHost = 'https://viviani.iex.ec';
+
 // 1 block / tx
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
@@ -539,18 +549,12 @@ describe('[IExec]', () => {
   });
 
   test('chainId not set in custom bridgedNetworkConf use defaults on known chain', async () => {
-    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-        chainId: '5',
-      },
-      {
-        bridgedNetworkConf: {
-          id: '123456',
-        },
-      },
-    );
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+      providers: providerOptions,
+    });
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
     // rely on viviani
     await expect(
       iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
@@ -1134,10 +1138,10 @@ describe('[getSignerFromPrivateKey]', () => {
     expect(tx.gasPrice.toString()).toBe(gasPrice);
   });
 
-  // skip until txSend queue is implemented
-  test.skip('getTransactionCount option (custom nonce management, concurrent tx)', async () => {
+  test('getTransactionCount option (custom nonce management)', async () => {
     const amount = new BN(1000);
     const receiver = POOR_ADDRESS2;
+
     const nonceProvider = await (async (address) => {
       const initNonce = ethers.BigNumber.from(
         await tokenChainRPC1s.send('eth_getTransactionCount', [
@@ -1146,13 +1150,14 @@ describe('[getSignerFromPrivateKey]', () => {
         ]),
       );
       let i = 0;
-      const getNonce = () => {
-        const nonce = initNonce.add(ethers.BigNumber.from(i)).toHexString();
+      const getNonce = () =>
+        Promise.resolve(initNonce.add(ethers.BigNumber.from(i)).toHexString());
+      const increaseNonce = () => {
         i += 1;
-        return nonce;
       };
       return {
         getNonce,
+        increaseNonce,
       };
     })(ADDRESS);
 
@@ -1169,124 +1174,52 @@ describe('[getSignerFromPrivateKey]', () => {
         isNative: false,
       },
     );
-    const senderInitialBalances = await iexec.wallet.checkBalances(
-      await iexec.wallet.getAddress(),
+
+    await expect(iexec.wallet.sendETH(amount, receiver)).resolves.toMatch(
+      bytes32Regex,
     );
-    const receiverInitialBalances = await iexec.wallet.checkBalances(receiver);
-
-    const resArray = await Promise.all([
-      iexec.workerpool.deployWorkerpool({
-        owner: ADDRESS,
-        description: `My workerpool${getId()}`,
-      }),
-      iexec.app.deployApp({
-        owner: ADDRESS,
-        name: `My app${getId()}`,
-        type: 'DOCKER',
-        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-        checksum:
-          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        mrenclave: '',
-      }),
-      iexec.dataset.deployDataset({
-        owner: ADDRESS,
-        name: `My dataset${getId()}`,
-        multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-        checksum:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      }),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.wallet.sendETH(amount, receiver),
-      iexec.account.deposit(amount),
-    ]);
-
-    expect(resArray).toBeDefined();
-    expect(resArray.length).toBe(7);
-    const txHashArray = [
-      resArray[0].txHash,
-      resArray[1].txHash,
-      resArray[2].txHash,
-      resArray[3],
-      resArray[4],
-      resArray[5],
-      resArray[6].txHash,
-    ];
-    expect(txHashArray[0].length).toBe(66);
-    expect(txHashArray[1].length).toBe(66);
-    expect(txHashArray[2].length).toBe(66);
-    expect(txHashArray[3].length).toBe(66);
-    expect(txHashArray[4].length).toBe(66);
-    expect(txHashArray[5].length).toBe(66);
-    expect(txHashArray[6].length).toBe(66);
-
-    const tx0 = await tokenChainRPC1s.getTransaction(txHashArray[0]);
-    expect(tx0).toBeDefined();
-    expect(tx0.gasPrice.toString()).toBe(chainGasPrice);
-    const tx1 = await tokenChainRPC1s.getTransaction(txHashArray[1]);
-    expect(tx1).toBeDefined();
-    expect(tx1.gasPrice.toString()).toBe(chainGasPrice);
-    const tx2 = await tokenChainRPC1s.getTransaction(txHashArray[2]);
-    expect(tx2).toBeDefined();
-    expect(tx2.gasPrice.toString()).toBe(chainGasPrice);
-    const tx3 = await tokenChainRPC1s.getTransaction(txHashArray[3]);
-    expect(tx3).toBeDefined();
-    expect(tx3.gasPrice.toString()).toBe(chainGasPrice);
-    const tx4 = await tokenChainRPC1s.getTransaction(txHashArray[4]);
-    expect(tx4).toBeDefined();
-    expect(tx4.gasPrice.toString()).toBe(chainGasPrice);
-    const tx5 = await tokenChainRPC1s.getTransaction(txHashArray[5]);
-    expect(tx5).toBeDefined();
-    expect(tx5.gasPrice.toString()).toBe(chainGasPrice);
-    const tx6 = await tokenChainRPC1s.getTransaction(txHashArray[6]);
-    expect(tx6).toBeDefined();
-    expect(tx6.gasPrice.toString()).toBe(chainGasPrice);
-
-    const senderFinalBalances = await iexec.wallet.checkBalances(
-      await iexec.wallet.getAddress(),
+    await expect(iexec.wallet.sendETH(amount, receiver)).rejects.toThrow();
+    nonceProvider.increaseNonce();
+    await expect(iexec.wallet.sendETH(amount, receiver)).resolves.toMatch(
+      bytes32Regex,
     );
-    const receiverFinalBalances = await iexec.wallet.checkBalances(receiver);
-    expect(
-      senderFinalBalances.wei
-        .add(new BN(amount))
-        .lte(senderInitialBalances.wei),
-    ).toBe(true);
-    expect(
-      receiverFinalBalances.wei
-        .sub(new BN(amount).mul(new BN(3)))
-        .eq(receiverInitialBalances.wei),
-    ).toBe(true);
-    expect(
-      senderInitialBalances.nRLC.eq(
-        senderFinalBalances.nRLC.add(new BN(amount)),
-      ),
-    ).toBe(true);
+    await expect(iexec.wallet.sendETH(amount, receiver)).rejects.toThrow();
+    nonceProvider.increaseNonce();
+    await expect(iexec.wallet.sendETH(amount, receiver)).resolves.toMatch(
+      bytes32Regex,
+    );
   });
 
-  test.skip(
+  test(
     'providers option',
     async () => {
       const alchemyFailQuorumFail = {
+        ...providerOptions,
         alchemy: 'FAIL',
         quorum: 3,
       };
       const alchemyFailQuorumPass = {
+        ...providerOptions,
         alchemy: 'FAIL',
         quorum: 2,
       };
       const infuraFailQuorumFail = {
+        ...providerOptions,
         infura: 'FAIL',
         quorum: 3,
       };
       const infuraFailQuorumPass = {
+        ...providerOptions,
         infura: 'FAIL',
         quorum: 2,
       };
       const etherscanFailQuorumFail = {
+        ...providerOptions,
         etherscan: 'FAIL',
         quorum: 3,
       };
       const etherscanFailQuorumPass = {
+        ...providerOptions,
         etherscan: 'FAIL',
         quorum: 2,
       };
@@ -1295,7 +1228,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumFail,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
@@ -1303,7 +1235,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumPass,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
@@ -1311,7 +1242,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumFail,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
@@ -1319,7 +1249,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumPass,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
@@ -1327,7 +1256,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumFail,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
@@ -1335,7 +1263,6 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumPass,
           }),
-          chainId: '5',
         }).wallet.checkBalances(utils.NULL_ADDRESS),
       ).resolves.toBeDefined();
     },
@@ -1478,12 +1405,29 @@ describe('[wallet]', () => {
     );
   });
 
-  test.skip('wallet.checkBridgedBalances() (token)', async () => {
-    throw Error('TODO');
+  test('wallet.checkBridgedBalances() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const res = await iexec.wallet.checkBridgedBalances(ADDRESS);
+    expect(res.nRLC).toBeInstanceOf(BN);
+    expect(res.wei).toBeInstanceOf(BN);
   });
 
-  test.skip('wallet.checkBridgedBalances() (native)', async () => {
-    throw Error('TODO');
+  test('wallet.checkBridgedBalances() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        providerOptions,
+      },
+    );
+    const res = await iexec.wallet.checkBridgedBalances(ADDRESS);
+    expect(res.nRLC).toBeInstanceOf(BN);
+    expect(res.wei).toBeInstanceOf(BN);
   });
 
   test('wallet.sendETH()', async () => {
@@ -2629,8 +2573,29 @@ describe('[account]', () => {
     expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
   });
 
-  test.skip('account.checkBridgedBalance()', async () => {
-    throw Error('TODO');
+  test('account.checkBridgedBalance() (token)', async () => {
+    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const iexec = new IExec({
+      ethProvider: signer,
+    });
+    const res = await iexec.account.checkBridgedBalance(ADDRESS);
+    expect(res.stake).toBeInstanceOf(BN);
+    expect(res.locked).toBeInstanceOf(BN);
+  });
+
+  test('account.checkBridgedBalance() (native)', async () => {
+    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        providerOptions,
+      },
+    );
+    const res = await iexec.account.checkBridgedBalance(ADDRESS);
+    expect(res.stake).toBeInstanceOf(BN);
+    expect(res.locked).toBeInstanceOf(BN);
   });
 
   test('account.deposit() (token)', async () => {

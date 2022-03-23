@@ -7,6 +7,7 @@ import {
   NRLCAmount,
   HumanSingleTag,
   Bytes32,
+  ProviderOptions,
 } from './types';
 
 /**
@@ -39,7 +40,7 @@ export const getSignerFromPrivateKey: (
     /**
      * providers options
      */
-    providers: any;
+    providers: ProviderOptions;
   },
 ) => EnhancedWallet;
 

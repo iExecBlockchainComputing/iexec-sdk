@@ -47,7 +47,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -63,7 +63,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -91,7 +91,7 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 
 #### Defined in
 
-[src/lib/IExecResultModule.d.ts:17](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecResultModule.d.ts#L17)
+[src/lib/IExecResultModule.d.ts:17](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecResultModule.d.ts#L17)
 
 ___
 
@@ -140,7 +140,7 @@ console.log('encryption key pushed:', isPushed);
 
 #### Defined in
 
-[src/lib/IExecResultModule.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecResultModule.d.ts#L48)
+[src/lib/IExecResultModule.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecResultModule.d.ts#L48)
 
 ___
 
@@ -166,4 +166,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L24)

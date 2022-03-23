@@ -35,7 +35,7 @@ ethereum null/zero address
 
 #### Defined in
 
-[src/lib/utils.d.ts:63](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L63)
+[src/lib/utils.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L64)
 
 ___
 
@@ -47,7 +47,7 @@ null bytes32
 
 #### Defined in
 
-[src/lib/utils.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L67)
+[src/lib/utils.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L68)
 
 ## Functions
 
@@ -74,7 +74,7 @@ console.log(decodeTag('0x0000000000000000000000000000000000000000000000000000000
 
 #### Defined in
 
-[src/lib/utils.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L127)
+[src/lib/utils.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L128)
 
 ___
 
@@ -107,7 +107,7 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### Defined in
 
-[src/lib/utils.d.ts:154](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L154)
+[src/lib/utils.d.ts:155](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L155)
 
 ___
 
@@ -134,7 +134,7 @@ console.log(encodeTag(['tee', 'gpu']));
 
 #### Defined in
 
-[src/lib/utils.d.ts:118](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L118)
+[src/lib/utils.d.ts:119](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L119)
 
 ___
 
@@ -161,7 +161,7 @@ console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 
 #### Defined in
 
-[src/lib/utils.d.ts:100](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L100)
+[src/lib/utils.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L101)
 
 ___
 
@@ -188,7 +188,7 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:109](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L109)
+[src/lib/utils.d.ts:110](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L110)
 
 ___
 
@@ -212,7 +212,7 @@ const iexec = new IExec({ ethProvider });
 | `privateKey` | `string` | - |
 | `options?` | `Object` | - |
 | `options.gasPrice?` | `string` | gas price override |
-| `options.providers` | `any` | providers options |
+| `options.providers` | [`ProviderOptions`](../interfaces/internal_.ProviderOptions.md) | providers options |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | - |
 
 #### Returns
@@ -221,7 +221,7 @@ const iexec = new IExec({ ethProvider });
 
 #### Defined in
 
-[src/lib/utils.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L21)
+[src/lib/utils.d.ts:22](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L22)
 
 ___
 
@@ -252,7 +252,7 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Defined in
 
-[src/lib/utils.d.ts:79](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L79)
+[src/lib/utils.d.ts:80](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L80)
 
 ___
 
@@ -283,7 +283,7 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Defined in
 
-[src/lib/utils.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L91)
+[src/lib/utils.d.ts:92](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L92)
 
 ___
 
@@ -314,4 +314,4 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 
 #### Defined in
 
-[src/lib/utils.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8e573c7/src/lib/utils.d.ts#L140)
+[src/lib/utils.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/utils.d.ts#L141)

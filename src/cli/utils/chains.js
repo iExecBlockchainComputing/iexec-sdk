@@ -43,7 +43,7 @@ const ENTERPRISE_SWAP_MAP = {
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, enterpriseSwapConf, providersOptions, txOptions = {} } = {},
+  { bridgeConf, enterpriseSwapConf, providerOptions, txOptions = {} } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -54,7 +54,7 @@ const createChainFromConf = (
             chainId: parseInt(chainConf.id, 10),
             name: chainName,
           })
-        : getDefaultProvider(chainConf.host, providersOptions);
+        : getDefaultProvider(chainConf.host, providerOptions);
 
     chain.name = chainName;
     const contracts = new IExecContractsClient({
@@ -75,7 +75,7 @@ const createChainFromConf = (
               ensAddress: bridgeConf.ensRegistry,
               chainId: parseInt(bridgeConf.id, 10),
             })
-          : getDefaultProvider(bridgeConf.host, providersOptions);
+          : getDefaultProvider(bridgeConf.host, providerOptions);
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,
@@ -112,7 +112,7 @@ const loadChain = async (
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
-    const providersOptions = chainsConf.providers;
+    const providerOptions = chainsConf.providers;
     let name;
     let loadedConf;
     if (chainName) {
@@ -233,7 +233,7 @@ const loadChain = async (
     const chain = createChainFromConf(name, conf, {
       bridgeConf,
       enterpriseSwapConf,
-      providersOptions,
+      providerOptions,
       txOptions,
     });
     spinner.info(`Using chain ${name} [chainId: ${chain.id}]`);
