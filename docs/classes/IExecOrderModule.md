@@ -78,7 +78,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -94,7 +94,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -124,7 +124,7 @@ console.log('cancel tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:675](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L675)
+[src/lib/IExecOrderModule.d.ts:675](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L675)
 
 ___
 
@@ -154,7 +154,7 @@ console.log('cancel tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:689](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L689)
+[src/lib/IExecOrderModule.d.ts:689](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L689)
 
 ___
 
@@ -184,7 +184,7 @@ console.log('cancel tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:717](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L717)
+[src/lib/IExecOrderModule.d.ts:717](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L717)
 
 ___
 
@@ -214,7 +214,7 @@ console.log('cancel tx:', txHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:703](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L703)
+[src/lib/IExecOrderModule.d.ts:703](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L703)
 
 ___
 
@@ -248,7 +248,7 @@ const apporderTemplate = await createApporder({app: appAddress});
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:296](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L296)
+[src/lib/IExecOrderModule.d.ts:296](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L296)
 
 ___
 
@@ -282,7 +282,7 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:343](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L343)
+[src/lib/IExecOrderModule.d.ts:343](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L343)
 
 ___
 
@@ -326,7 +326,7 @@ const requestorderTemplate = await createRequestorder({
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:451](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L451)
+[src/lib/IExecOrderModule.d.ts:451](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L451)
 
 ___
 
@@ -362,7 +362,7 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:390](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L390)
+[src/lib/IExecOrderModule.d.ts:390](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L390)
 
 ___
 
@@ -390,7 +390,7 @@ console.log('order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:631](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L631)
+[src/lib/IExecOrderModule.d.ts:631](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L631)
 
 ___
 
@@ -418,7 +418,7 @@ console.log('order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:641](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L641)
+[src/lib/IExecOrderModule.d.ts:641](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L641)
 
 ___
 
@@ -446,7 +446,7 @@ console.log('order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:663](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L663)
+[src/lib/IExecOrderModule.d.ts:663](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L663)
 
 ___
 
@@ -474,7 +474,7 @@ console.log('order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:651](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L651)
+[src/lib/IExecOrderModule.d.ts:651](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L651)
 
 ___
 
@@ -513,7 +513,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:961](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L961)
+[src/lib/IExecOrderModule.d.ts:961](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L961)
 
 ___
 
@@ -543,7 +543,7 @@ console.log('published order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:731](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L731)
+[src/lib/IExecOrderModule.d.ts:731](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L731)
 
 ___
 
@@ -573,7 +573,7 @@ console.log('published order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:743](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L743)
+[src/lib/IExecOrderModule.d.ts:743](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L743)
 
 ___
 
@@ -607,7 +607,7 @@ console.log('published order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:771](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L771)
+[src/lib/IExecOrderModule.d.ts:771](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L771)
 
 ___
 
@@ -637,7 +637,7 @@ console.log('published order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:755](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L755)
+[src/lib/IExecOrderModule.d.ts:755](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L755)
 
 ___
 
@@ -667,7 +667,7 @@ const apporder = await signApporder(apporderTemplate);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:573](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L573)
+[src/lib/IExecOrderModule.d.ts:573](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L573)
 
 ___
 
@@ -697,7 +697,7 @@ const datasetorder = await signDatasetorder(datasetorderTemplate);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:585](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L585)
+[src/lib/IExecOrderModule.d.ts:585](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L585)
 
 ___
 
@@ -735,7 +735,7 @@ const requestorder = await signRequestorder(requestorderTemplate);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:618](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L618)
+[src/lib/IExecOrderModule.d.ts:618](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L618)
 
 ___
 
@@ -764,7 +764,7 @@ const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:598](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L598)
+[src/lib/IExecOrderModule.d.ts:598](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L598)
 
 ___
 
@@ -796,7 +796,7 @@ console.log('published orders count:', orderHashes.length);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:902](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L902)
+[src/lib/IExecOrderModule.d.ts:902](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L902)
 
 ___
 
@@ -828,7 +828,7 @@ console.log('unpublished orders count:', orderHashes.length);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:916](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L916)
+[src/lib/IExecOrderModule.d.ts:916](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L916)
 
 ___
 
@@ -854,7 +854,7 @@ console.log('unpublished orders count:', orderHashes.length);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:946](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L946)
+[src/lib/IExecOrderModule.d.ts:946](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L946)
 
 ___
 
@@ -886,7 +886,7 @@ console.log('unpublished orders count:', orderHashes.length);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:930](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L930)
+[src/lib/IExecOrderModule.d.ts:930](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L930)
 
 ___
 
@@ -918,7 +918,7 @@ console.log(unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:788](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L788)
+[src/lib/IExecOrderModule.d.ts:788](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L788)
 
 ___
 
@@ -950,7 +950,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:802](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L802)
+[src/lib/IExecOrderModule.d.ts:802](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L802)
 
 ___
 
@@ -982,7 +982,7 @@ console.log('published order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:844](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L844)
+[src/lib/IExecOrderModule.d.ts:844](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L844)
 
 ___
 
@@ -1014,7 +1014,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:858](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L858)
+[src/lib/IExecOrderModule.d.ts:858](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L858)
 
 ___
 
@@ -1040,7 +1040,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:888](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L888)
+[src/lib/IExecOrderModule.d.ts:888](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L888)
 
 ___
 
@@ -1072,7 +1072,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:872](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L872)
+[src/lib/IExecOrderModule.d.ts:872](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L872)
 
 ___
 
@@ -1104,7 +1104,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:830](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L830)
+[src/lib/IExecOrderModule.d.ts:830](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L830)
 
 ___
 
@@ -1136,7 +1136,7 @@ console.log('unpublished order hash:', orderHash);
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:816](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecOrderModule.d.ts#L816)
+[src/lib/IExecOrderModule.d.ts:816](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecOrderModule.d.ts#L816)
 
 ___
 
@@ -1162,4 +1162,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecModule.d.ts#L24)

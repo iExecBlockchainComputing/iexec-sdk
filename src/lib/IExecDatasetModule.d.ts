@@ -137,7 +137,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   encrypt(
-    datasetFile: Buffer | Uint8Array,
+    datasetFile: Buffer | Uint8Array | ArrayBuffer,
     encyptionKey: string,
   ): Promise<Buffer>;
   /**

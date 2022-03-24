@@ -23,7 +23,7 @@ a description of the workerpool
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecWorkerpoolModule.d.ts#L15)
+[src/lib/IExecWorkerpoolModule.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecWorkerpoolModule.d.ts#L15)
 
 ___
 
@@ -35,4 +35,4 @@ the workerpool owner
 
 #### Defined in
 
-[src/lib/IExecWorkerpoolModule.d.ts:11](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/29964cf/src/lib/IExecWorkerpoolModule.d.ts#L11)
+[src/lib/IExecWorkerpoolModule.d.ts:11](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/IExecWorkerpoolModule.d.ts#L11)

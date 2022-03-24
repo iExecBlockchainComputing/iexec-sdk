@@ -153,6 +153,6 @@ export const sumTags: (tags: Bytes32[]) => Bytes32;
  * ```
  */
 export const decryptResult: (
-  encrypted: Buffer | Uint8Array | string,
-  beneficiaryKey: string,
+  encrypted: Buffer | ArrayBuffer | Uint8Array | string,
+  beneficiaryKey: Buffer | ArrayBuffer | Uint8Array | string,
 ) => Promise<Buffer>;
