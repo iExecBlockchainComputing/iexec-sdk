@@ -40,6 +40,70 @@ import { IExec } from 'iexec';
 const iexec = new IExec({ ethProvider: window.ethereum });
 ```
 
+**NB:** `iexec` SDK require some NodeJS modules to work, in the browser your bundler might on might not provides polyfills for these modules. If your bundler does not automatically includes NodeJS polyfills you must add them by yourself.
+
+### Webpack
+
+`webpack` >= 5 no longer provides polyfills for NodeJS, you must include them in your configuration.
+
+Here are the recommanded polyfills for the required NodeJS modudes:
+
+- crypto: fallback to `crypto-browserify`
+- stream: fallback to `stream-browserify`
+- constants: fallback to `constants-browserify`
+- Buffer: fallback to `buffer`
+
+### Create-react-app
+
+`create-react-app` >= 5 which relies on `webpack` >= 5 requires to customize the configuration to include NodeJS polyfills.
+
+Since `react-scripts` enforce the `webpack` configuration and ejecting is not an option, you will need to use `react-app-rewired` to override the configuration.
+
+Here is the steps to follow:
+
+- Install the following dev-dependencies:
+
+```bash
+npm install --save-dev react-app-rewired crypto-browserify stream-browserify constants-browserify process
+```
+
+- Create the following `config-overrides.js` at the root of your project:
+
+```js
+const webpack = require('webpack');
+
+module.exports = function override(config) {
+  const fallback = config.resolve.fallback || {};
+  Object.assign(fallback, {
+    crypto: require.resolve('crypto-browserify'),
+    stream: require.resolve('stream-browserify'),
+    constants: require.resolve('constants-browserify'),
+  });
+  config.resolve.fallback = fallback;
+  config.plugins = (config.plugins || []).concat([
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer'],
+    }),
+  ]);
+  return config;
+};
+```
+
+- Use `react-app-rewired` instead of `react-scripts` in your package.json scripts:
+
+```json
+{
+  ...
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  }
+}
+```
+
 ## Back-end integration
 
 ```js

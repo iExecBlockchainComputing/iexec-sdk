@@ -47,7 +47,7 @@ Error.constructor
 
 #### Defined in
 
-[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/errors.d.ts#L14)
+[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/errors.d.ts#L14)
 
 ## Properties
 
@@ -57,4 +57,4 @@ Error.constructor
 
 #### Defined in
 
-[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/79135f9/src/lib/errors.d.ts#L15)
+[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/errors.d.ts#L15)
