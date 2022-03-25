@@ -34,7 +34,7 @@ signed buy order for computing tasks
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:246](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L246)
+[src/lib/IExecOrderModule.d.ts:246](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L246)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:247](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L247)
+[src/lib/IExecOrderModule.d.ts:247](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L247)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:256](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L256)
+[src/lib/IExecOrderModule.d.ts:256](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L256)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:257](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L257)
+[src/lib/IExecOrderModule.d.ts:257](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L257)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:254](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L254)
+[src/lib/IExecOrderModule.d.ts:254](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L254)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:248](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L248)
+[src/lib/IExecOrderModule.d.ts:248](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L248)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:249](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L249)
+[src/lib/IExecOrderModule.d.ts:249](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L249)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:258](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L258)
+[src/lib/IExecOrderModule.d.ts:258](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L258)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:259](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L259)
+[src/lib/IExecOrderModule.d.ts:259](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L259)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:260](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L260)
+[src/lib/IExecOrderModule.d.ts:260](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L260)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:253](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L253)
+[src/lib/IExecOrderModule.d.ts:253](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L253)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:255](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L255)
+[src/lib/IExecOrderModule.d.ts:255](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L255)
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:252](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L252)
+[src/lib/IExecOrderModule.d.ts:252](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L252)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:250](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L250)
+[src/lib/IExecOrderModule.d.ts:250](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L250)
 
 ___
 
@@ -174,4 +174,4 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:251](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L251)
+[src/lib/IExecOrderModule.d.ts:251](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L251)

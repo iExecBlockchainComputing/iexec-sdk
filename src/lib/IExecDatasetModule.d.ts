@@ -137,7 +137,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   encrypt(
-    datasetFile: Buffer | Uint8Array | ArrayBuffer,
+    datasetFile: Buffer | ArrayBuffer | Uint8Array,
     encyptionKey: string,
   ): Promise<Buffer>;
   /**
@@ -161,7 +161,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   computeEncryptedFileChecksum(
-    encryptedFile: Buffer | Uint8Array,
+    encryptedFile: Buffer | ArrayBuffer | Uint8Array,
   ): Promise<string>;
   /**
    * check if a the dataset secret exists in the Secret Management Service

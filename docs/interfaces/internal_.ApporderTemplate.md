@@ -26,7 +26,7 @@ sell order for an app
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L21)
+[src/lib/IExecOrderModule.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L21)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:22](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L22)
+[src/lib/IExecOrderModule.d.ts:22](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L22)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:25](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L25)
+[src/lib/IExecOrderModule.d.ts:25](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L25)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L27)
+[src/lib/IExecOrderModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L27)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L24)
+[src/lib/IExecOrderModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L24)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L23)
+[src/lib/IExecOrderModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L23)
 
 ___
 
@@ -86,4 +86,4 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderModule.d.ts:26](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecOrderModule.d.ts#L26)
+[src/lib/IExecOrderModule.d.ts:26](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderModule.d.ts#L26)

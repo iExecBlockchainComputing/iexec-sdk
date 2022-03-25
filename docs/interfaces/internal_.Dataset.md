@@ -25,7 +25,7 @@ sha256sum of the file
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:31](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecDatasetModule.d.ts#L31)
+[src/lib/IExecDatasetModule.d.ts:31](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecDatasetModule.d.ts#L31)
 
 ___
 
@@ -37,7 +37,7 @@ dataset file download address
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecDatasetModule.d.ts#L27)
+[src/lib/IExecDatasetModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecDatasetModule.d.ts#L27)
 
 ___
 
@@ -49,7 +49,7 @@ a name for the dataset
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecDatasetModule.d.ts#L23)
+[src/lib/IExecDatasetModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecDatasetModule.d.ts#L23)
 
 ___
 
@@ -61,4 +61,4 @@ the dataset owner
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecDatasetModule.d.ts#L19)
+[src/lib/IExecDatasetModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecDatasetModule.d.ts#L19)

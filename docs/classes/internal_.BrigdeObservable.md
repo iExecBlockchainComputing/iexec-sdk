@@ -93,4 +93,4 @@ data:
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/7feaf0f/src/lib/IExecWalletModule.d.ts#L24)
+[src/lib/IExecWalletModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecWalletModule.d.ts#L24)
