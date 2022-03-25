@@ -51,7 +51,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -67,7 +67,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -103,7 +103,7 @@ console.log('regitered:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L128)
+[src/lib/IExecENSModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L128)
 
 ___
 
@@ -149,7 +149,7 @@ console.log('configured resolution:', address, '<=>', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L202)
+[src/lib/IExecENSModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L202)
 
 ___
 
@@ -177,7 +177,7 @@ console.log('iexec.eth owner:', owner);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L91)
+[src/lib/IExecENSModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L91)
 
 ___
 
@@ -205,7 +205,7 @@ console.log('ENS name:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L111)
+[src/lib/IExecENSModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L111)
 
 ___
 
@@ -265,7 +265,7 @@ configureResolutionObservable.subscribe({
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L172)
+[src/lib/IExecENSModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L172)
 
 ___
 
@@ -293,7 +293,7 @@ console.log('me.users.iexec.eth:', address);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecENSModule.d.ts#L101)
+[src/lib/IExecENSModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L101)
 
 ___
 
@@ -319,4 +319,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L24)

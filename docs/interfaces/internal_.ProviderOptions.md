@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[src/lib/types.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/types.d.ts#L144)
+[src/lib/types.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/types.d.ts#L144)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 #### Defined in
 
-[src/lib/types.d.ts:148](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/types.d.ts#L148)
+[src/lib/types.d.ts:148](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/types.d.ts#L148)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[src/lib/types.d.ts:152](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/types.d.ts#L152)
+[src/lib/types.d.ts:152](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/types.d.ts#L152)
 
 ___
 
@@ -61,4 +61,4 @@ the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
 
 #### Defined in
 
-[src/lib/types.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/types.d.ts#L167)
+[src/lib/types.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/types.d.ts#L167)

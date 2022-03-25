@@ -53,7 +53,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -69,7 +69,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -107,7 +107,7 @@ console.log('total orders:', count);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L144)
+[src/lib/IExecOrderbookModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L144)
 
 ___
 
@@ -136,7 +136,7 @@ console.log('remaining volume:', remaining);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:324](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L324)
+[src/lib/IExecOrderbookModule.d.ts:324](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L324)
 
 ___
 
@@ -174,7 +174,7 @@ console.log('total orders:', count);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:185](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L185)
+[src/lib/IExecOrderbookModule.d.ts:185](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L185)
 
 ___
 
@@ -203,7 +203,7 @@ console.log('remaining volume:', remaining);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:335](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L335)
+[src/lib/IExecOrderbookModule.d.ts:335](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L335)
 
 ___
 
@@ -243,7 +243,7 @@ console.log('total orders:', count);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:276](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L276)
+[src/lib/IExecOrderbookModule.d.ts:276](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L276)
 
 ___
 
@@ -272,7 +272,7 @@ console.log('remaining volume:', remaining);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:357](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L357)
+[src/lib/IExecOrderbookModule.d.ts:357](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L357)
 
 ___
 
@@ -312,7 +312,7 @@ console.log('total orders:', count);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:226](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L226)
+[src/lib/IExecOrderbookModule.d.ts:226](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L226)
 
 ___
 
@@ -341,7 +341,7 @@ console.log('remaining volume:', remaining);
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:346](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecOrderbookModule.d.ts#L346)
+[src/lib/IExecOrderbookModule.d.ts:346](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecOrderbookModule.d.ts#L346)
 
 ___
 
@@ -367,4 +367,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/af88fc2/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L24)
