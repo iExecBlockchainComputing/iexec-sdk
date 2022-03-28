@@ -35,6 +35,8 @@ const {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
   ValidationError,
 } = require('../src/common/utils/validator');
 
@@ -1103,6 +1105,48 @@ describe('[ensDomainSchema]', () => {
   test('throw with empty labels', async () => {
     await expect(ensDomainSchema().validate('foo..bar.eth')).rejects.toThrow(
       'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)',
+    );
+  });
+});
+
+describe('[textRecordKeySchema]', () => {
+  test('" "', async () => {
+    const res = await textRecordKeySchema().validate(' ');
+    expect(res).toBe(' ');
+  });
+  test('throw with empty string', async () => {
+    await expect(textRecordKeySchema().validate('')).rejects.toThrow(
+      'this is a required field',
+    );
+  });
+  test('throw with string coercible value', async () => {
+    await expect(textRecordKeySchema().validate(1)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `1`.',
+    );
+  });
+});
+
+describe('[textRecordValueSchema]', () => {
+  test('" "', async () => {
+    const res = await textRecordValueSchema().validate(' ');
+    expect(res).toBe(' ');
+  });
+  test('allow undefined', async () => {
+    const res = await textRecordValueSchema().validate();
+    expect(res).toBe('');
+  });
+  test('allow empty string', async () => {
+    const res = await textRecordValueSchema().validate('');
+    expect(res).toBe('');
+  });
+  test('throw with null', async () => {
+    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `null`.',
+    );
+  });
+  test('throw with string coercible value', async () => {
+    await expect(textRecordValueSchema().validate(1)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `1`.',
     );
   });
 });

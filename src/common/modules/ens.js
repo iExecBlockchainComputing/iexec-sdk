@@ -10,6 +10,8 @@ const {
   addressSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
 } = require('../utils/validator');
 const { getAddress } = require('./wallet');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
@@ -27,7 +29,7 @@ const getOwner = async (
   try {
     const vName = await ensDomainSchema().validate(name);
     const nameHash = utils.namehash(vName);
-    const { ensAddress } = await contracts.provider.getNetwork();
+    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
     const ensRegistryContract = new Contract(
       ensAddress,
       ENSRegistry.abi,
@@ -47,7 +49,7 @@ const resolveName = async (
 ) => {
   try {
     const vName = await ensDomainSchema().validate(name);
-    const address = await contracts.provider.resolveName(vName);
+    const address = await wrapCall(contracts.provider.resolveName(vName));
     return address;
   } catch (e) {
     debug('resolveName()', e);
@@ -63,7 +65,7 @@ const lookupAddress = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(address);
-    const ens = await contracts.provider.lookupAddress(vAddress);
+    const ens = await wrapCall(contracts.provider.lookupAddress(vAddress));
     return ens;
   } catch (e) {
     debug('lookupAddress()', e);
@@ -86,7 +88,9 @@ const registerFifsEns = async (
     const ownedBy = await getOwner(contracts, name);
     if (ownedBy === NULL_ADDRESS) {
       const domainOwner = await getOwner(contracts, vDomain);
-      const domainOwnerCode = await contracts.provider.getCode(domainOwner);
+      const domainOwnerCode = await wrapCall(
+        contracts.provider.getCode(domainOwner),
+      );
       if (domainOwnerCode === '0x') {
         throw Error(
           `The base domain ${vDomain} owner ${domainOwner} is not a contract`,
@@ -153,7 +157,7 @@ const obsConfigureResolution = (
         const vName = await ensDomainSchema().validate(name);
         const nameHash = utils.namehash(vName);
         const walletAddress = await getAddress(contracts);
-        const { ensAddress } = await contracts.provider.getNetwork();
+        const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
 
         const REVERSE_DOMAIN = 'addr.reverse';
         const reverseName = `${vAddress
@@ -162,7 +166,9 @@ const obsConfigureResolution = (
 
         let addressIsContract = false;
         if (vAddress !== walletAddress) {
-          const addressCode = await contracts.provider.getCode(vAddress);
+          const addressCode = await wrapCall(
+            contracts.provider.getCode(vAddress),
+          );
           if (addressCode === '0x') {
             throw Error(
               `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`,
@@ -207,8 +213,8 @@ const obsConfigureResolution = (
             .concat(['SET_NAME']),
         });
 
-        const resolverCode = await contracts.provider.getCode(
-          publicResolverAddress,
+        const resolverCode = await wrapCall(
+          contracts.provider.getCode(publicResolverAddress),
         );
         if (resolverCode === '0x') {
           throw Error(
@@ -218,7 +224,9 @@ const obsConfigureResolution = (
 
         // 1 - setup resolution
         // set resolver
-        const currentResolver = await contracts.provider.getResolver(vName);
+        const currentResolver = await wrapCall(
+          contracts.provider.getResolver(vName),
+        );
         const isResolverSet =
           currentResolver &&
           currentResolver.address &&
@@ -364,8 +372,8 @@ const obsConfigureResolution = (
               if (abort) return;
               await wrapWait(claimReverseTx.wait(contracts.confirms));
             }
-            const reverseNaneResolver = await contracts.provider.getResolver(
-              reverseName,
+            const reverseNaneResolver = await wrapCall(
+              contracts.provider.getResolver(reverseName),
             );
             safeObserver.next({
               message:
@@ -392,8 +400,8 @@ const obsConfigureResolution = (
             await wrapWait(setNameTx.wait(contracts.confirms));
           }
         } else if (!addressIsContract) {
-          const reverseNaneResolver = await contracts.provider.getResolver(
-            reverseName,
+          const reverseNaneResolver = await wrapCall(
+            contracts.provider.getResolver(reverseName),
           );
           safeObserver.next({
             message:
@@ -475,6 +483,76 @@ const configureResolution = async (
   }
 };
 
+const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
+  try {
+    const vName = await ensDomainSchema().validate(name);
+    const vKey = await textRecordKeySchema().validate(key);
+    const node = utils.namehash(vName);
+    const currentResolver = await wrapCall(
+      contracts.provider.getResolver(vName),
+    );
+    const isResolverSet =
+      currentResolver &&
+      currentResolver.address &&
+      currentResolver.address !== NULL_ADDRESS;
+    if (!isResolverSet) {
+      throw Error(`No resolver is configured for ${vName}`);
+    }
+    const resolverContract = new Contract(
+      currentResolver.address,
+      PublicResolver.abi,
+      contracts.signer,
+    );
+    const txt = await wrapCall(resolverContract.text(node, vKey));
+    return txt;
+  } catch (e) {
+    debug('readText()', e);
+    throw e;
+  }
+};
+
+const setTextRecord = async (
+  contracts = throwIfMissing(),
+  name,
+  key,
+  value = '',
+) => {
+  try {
+    const vName = await ensDomainSchema().validate(name);
+    const vKey = await textRecordKeySchema().validate(key);
+    const vValue = await textRecordValueSchema().validate(value);
+    const node = utils.namehash(vName);
+    const currentResolver = await wrapCall(
+      contracts.provider.getResolver(vName),
+    );
+    const isResolverSet =
+      currentResolver &&
+      currentResolver.address &&
+      currentResolver.address !== NULL_ADDRESS;
+    if (!isResolverSet) {
+      throw Error(`No resolver is configured for ${vName}`);
+    }
+    const ownedBy = await getOwner(contracts, vName);
+    const userAddress = await getAddress(contracts);
+    if (ownedBy !== userAddress) {
+      throw Error(
+        `${userAddress} is not authorised to set a text record for ${vName}`,
+      );
+    }
+    const resolverContract = new Contract(
+      currentResolver.address,
+      PublicResolver.abi,
+      contracts.signer,
+    );
+    const tx = await wrapSend(resolverContract.setText(node, vKey, vValue));
+    await wrapWait(tx.wait(contracts.confirms));
+    return tx.hash;
+  } catch (e) {
+    debug('setTextRecord()', e);
+    throw e;
+  }
+};
+
 module.exports = {
   getOwner,
   resolveName,
@@ -482,4 +560,6 @@ module.exports = {
   registerFifsEns,
   configureResolution,
   obsConfigureResolution,
+  readTextRecord,
+  setTextRecord,
 };

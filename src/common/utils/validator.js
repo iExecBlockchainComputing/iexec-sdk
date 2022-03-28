@@ -686,6 +686,10 @@ const ensLabelSchema = () =>
       },
     );
 
+const textRecordKeySchema = () => string().required().strict(true);
+
+const textRecordValueSchema = () => string().strict(true);
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -732,5 +736,7 @@ module.exports = {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
   ValidationError,
 };
