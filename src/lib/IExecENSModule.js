@@ -31,6 +31,15 @@ class IExecENSModule extends IExecModule {
         name,
         address,
       );
+    this.setTextRecord = async (name, key, value) =>
+      ens.setTextRecord(
+        await this.config.resolveContractsClient(),
+        name,
+        key,
+        value,
+      );
+    this.readTextRecord = async (name, key) =>
+      ens.readTextRecord(await this.config.resolveContractsClient(), name, key);
   }
 }
 

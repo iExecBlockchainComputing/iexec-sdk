@@ -3596,6 +3596,68 @@ describe('[workerpool]', () => {
     );
   });
 
+  test('workerpool.setWorkerpoolApiUrl()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    const label = address.toLowerCase();
+    const domain = 'users.iexec.eth';
+    const name = `${label}.${domain}`;
+    await iexec.ens.claimName(label, domain);
+    await iexec.ens.configureResolution(name, address);
+    const res = await iexec.workerpool.setWorkerpoolApiUrl(
+      address,
+      'https://my-workerpool.com',
+    );
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('workerpool.getWorkerpoolApiUrl()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    const resNoApiUrl = await iexec.workerpool.getWorkerpoolApiUrl(address);
+    expect(resNoApiUrl).toBe(undefined);
+
+    const label = address.toLowerCase();
+    const domain = 'users.iexec.eth';
+    const name = `${label}.${domain}`;
+    await iexec.ens.claimName(label, domain);
+    await iexec.ens.configureResolution(name, address);
+    const apiUrl = 'https://my-workerpool.com';
+    await iexec.workerpool.setWorkerpoolApiUrl(address, apiUrl);
+    const resConfigured = await iexec.workerpool.getWorkerpoolApiUrl(address);
+    expect(resConfigured).toBe(apiUrl);
+  });
+
   test('workerpool.showWorkerpool()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -8244,7 +8306,7 @@ describe('[ens]', () => {
     expect(res).toBe(NULL_ADDRESS);
   });
 
-  test('ens.resoleName(name) known names resolves to address', async () => {
+  test('ens.resolveName(name) known names resolves to address', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -9023,6 +9085,194 @@ describe('[ens]', () => {
         `Target address ${address} is not a contract and don't match current wallet address ${ADDRESS}, impossible to setup ENS resolution`,
       ),
     );
+  });
+
+  test('ens.setTextRecord(name, key, value) throw with unconfigured resolver', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const name = `${getId()}.users.iexec.eth`;
+    await expect(iexec.ens.setTextRecord(name, 'key', 'value')).rejects.toThrow(
+      Error(`No resolver is configured for ${name}`),
+    );
+  });
+
+  test('ens.setTextRecord(name, key, value) throw when the name is not owned', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const label = getId();
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name);
+
+    const randomWallet = getRandomWallet();
+    const signerNotOwner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexecNotOwner = new IExec(
+      {
+        ethProvider: signerNotOwner,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    await expect(
+      iexecNotOwner.ens.setTextRecord(name, 'key', 'value'),
+    ).rejects.toThrow(
+      Error(
+        `${randomWallet.address} is not authorised to set a text record for ${name}`,
+      ),
+    );
+  });
+
+  test('ens.setTextRecord(name, key, value)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const { address } = await iexec.workerpool.deployWorkerpool({
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    });
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+
+    const key = `key_${getId()}`;
+    const value = `value_${getId()}`;
+    const res = await iexec.ens.setTextRecord(name, key, value);
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('ens.setTextRecord(name, key)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const { address } = await iexec.workerpool.deployWorkerpool({
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    });
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+
+    const key = `key_${getId()}`;
+    const res = await iexec.ens.setTextRecord(name, key);
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('ens.readTextRecord(name, key) throw with unconfigured resolver', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const address = getRandomAddress();
+    const label = `address_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await expect(iexec.ens.readTextRecord(name, 'key')).rejects.toThrow(
+      Error(`No resolver is configured for ${name}`),
+    );
+  });
+
+  test('ens.readTextRecord(name, key) record not set', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const label = getId();
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name);
+    const res = await iexec.ens.readTextRecord(name, 'key');
+    expect(res).toBe('');
+  });
+
+  test('ens.readTextRecord(name, key)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const { address } = await iexec.workerpool.deployWorkerpool({
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    });
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    const key = `key_${getId()}`;
+    const value = `value_${getId()}`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+    await iexec.ens.setTextRecord(name, key, value);
+    const res = await iexec.ens.readTextRecord(name, key);
+    expect(res).toBe(value);
   });
 });
 

@@ -37,6 +37,7 @@ const {
   ensLabelSchema,
   textRecordKeySchema,
   textRecordValueSchema,
+  workerpoolApiUrlSchema,
   ValidationError,
 } = require('../src/common/utils/validator');
 
@@ -1133,7 +1134,7 @@ describe('[textRecordValueSchema]', () => {
   });
   test('allow undefined', async () => {
     const res = await textRecordValueSchema().validate();
-    expect(res).toBe('');
+    expect(res).toBe(undefined);
   });
   test('allow empty string', async () => {
     const res = await textRecordValueSchema().validate('');
@@ -1147,6 +1148,34 @@ describe('[textRecordValueSchema]', () => {
   test('throw with string coercible value', async () => {
     await expect(textRecordValueSchema().validate(1)).rejects.toThrow(
       'this must be a `string` type, but the final value was: `1`.',
+    );
+  });
+});
+
+describe('[workerpoolApiUrlSchema]', () => {
+  test('allow IP with port', async () => {
+    const res = await workerpoolApiUrlSchema().validate(
+      'http://192.168.0.1:8080',
+    );
+    expect(res).toBe('http://192.168.0.1:8080');
+  });
+  test('allow url', async () => {
+    const res = await workerpoolApiUrlSchema().validate(
+      'https://my-workerpool.com',
+    );
+    expect(res).toBe('https://my-workerpool.com');
+  });
+  test('allow undefined', async () => {
+    const res = await workerpoolApiUrlSchema().validate();
+    expect(res).toBe('');
+  });
+  test('allow empty string', async () => {
+    const res = await workerpoolApiUrlSchema().validate('');
+    expect(res).toBe('');
+  });
+  test('throw with null', async () => {
+    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `null`.',
     );
   });
 });

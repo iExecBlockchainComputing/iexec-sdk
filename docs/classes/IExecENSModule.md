@@ -27,7 +27,9 @@ module exposing ENS methods
 - [getOwner](IExecENSModule.md#getowner)
 - [lookupAddress](IExecENSModule.md#lookupaddress)
 - [obsConfigureResolution](IExecENSModule.md#obsconfigureresolution)
+- [readTextRecord](IExecENSModule.md#readtextrecord)
 - [resolveName](IExecENSModule.md#resolvename)
+- [setTextRecord](IExecENSModule.md#settextrecord)
 - [fromConfig](IExecENSModule.md#fromconfig)
 
 ## Constructors
@@ -51,7 +53,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -67,7 +69,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -103,7 +105,7 @@ console.log('regitered:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L128)
+[src/lib/IExecENSModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L128)
 
 ___
 
@@ -149,7 +151,7 @@ console.log('configured resolution:', address, '<=>', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L202)
+[src/lib/IExecENSModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L202)
 
 ___
 
@@ -177,7 +179,7 @@ console.log('iexec.eth owner:', owner);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L91)
+[src/lib/IExecENSModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L91)
 
 ___
 
@@ -205,7 +207,7 @@ console.log('ENS name:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L111)
+[src/lib/IExecENSModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L111)
 
 ___
 
@@ -265,7 +267,36 @@ configureResolutionObservable.subscribe({
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L172)
+[src/lib/IExecENSModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L172)
+
+___
+
+### readTextRecord
+
+▸ **readTextRecord**(`name`, `key`): `Promise`<`string`\>
+
+read an ENS text record associated to an ENS name
+
+example:
+```js
+const value = await readTextRecord('me.users.iexec.eth', 'email');
+console.log('email record:', value);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+#### Defined in
+
+[src/lib/IExecENSModule.d.ts:222](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L222)
 
 ___
 
@@ -293,7 +324,46 @@ console.log('me.users.iexec.eth:', address);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecENSModule.d.ts#L101)
+[src/lib/IExecENSModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L101)
+
+___
+
+### setTextRecord
+
+▸ **setTextRecord**(`name`, `key`, `value?`): `Promise`<`string`\>
+
+**ONLY ENS NAME OWNER**
+
+set a text record associated to an ENS name
+
+_NB_:
+- if value is not specified, the text record is reset to `""`
+
+example:
+```js
+const txHash = setTextRecord(
+  'me.users.iexec.eth',
+  'email',
+  'me@iex.ec'
+);
+console.log('txHash:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
+| `value?` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+#### Defined in
+
+[src/lib/IExecENSModule.d.ts:241](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L241)
 
 ___
 
@@ -319,4 +389,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L24)

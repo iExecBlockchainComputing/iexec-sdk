@@ -1,5 +1,9 @@
 const IExecModule = require('./IExecModule');
 const hub = require('../common/modules/hub');
+const {
+  setWorkerpoolApiUrl,
+  getWorkerpoolApiUrl,
+} = require('../common/modules/workerpool');
 
 class IExecWorkerpoolModule extends IExecModule {
   constructor(...args) {
@@ -22,6 +26,17 @@ class IExecWorkerpoolModule extends IExecModule {
       hub.countUserWorkerpools(
         await this.config.resolveContractsClient(),
         address,
+      );
+    this.setWorkerpoolApiUrl = async (workerpoolAddress, url) =>
+      setWorkerpoolApiUrl(
+        await this.config.resolveContractsClient(),
+        workerpoolAddress,
+        url,
+      );
+    this.getWorkerpoolApiUrl = async (workerpoolAddress) =>
+      getWorkerpoolApiUrl(
+        await this.config.resolveContractsClient(),
+        workerpoolAddress,
       );
   }
 }

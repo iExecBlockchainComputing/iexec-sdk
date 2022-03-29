@@ -76,4 +76,36 @@ export default class IExecWorkerpoolModule extends IExecModule {
     index: BNish,
     address: Addressish,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
+  /**
+   * **ONLY WORKERPOOL ENS NAME OWNER**
+   *
+   * declare the workerpool API url on the blockchain
+   *
+   * _NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
+   *
+   * example:
+   * ```js
+   * const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+   * console.log('txHash:', txHash);
+   * ```
+   */
+  setWorkerpoolApiUrl(
+    workerpoolAddress: Addressish,
+    url: string,
+  ): Promise<TxHash>;
+  /**
+   * read the workerpool API url on the blockchain
+   *
+   * _NB_: resolve to `undefined` if the workerpool API url was not declared.
+   *
+   * example:
+   * ```js
+   * const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+   * console.log('workerpool API url:', url);
+   * ```
+   */
+  getWorkerpoolApiUrl(
+    workerpoolAddress: Addressish,
+    url: string,
+  ): Promise<string | undefined>;
 }

@@ -210,4 +210,33 @@ export default class IExecENSModule extends IExecModule {
     claimReverseTxHash?: TxHash;
     setNameTxHash?: TxHash;
   }>;
+  /**
+   * read an ENS text record associated to an ENS name
+   *
+   * example:
+   * ```js
+   * const value = await readTextRecord('me.users.iexec.eth', 'email');
+   * console.log('email record:', value);
+   * ```
+   */
+  readTextRecord(name: ENS, key: string): Promise<string>;
+  /**
+   * **ONLY ENS NAME OWNER**
+   *
+   * set a text record associated to an ENS name
+   *
+   * _NB_:
+   * - if value is not specified, the text record is reset to `""`
+   *
+   * example:
+   * ```js
+   * const txHash = setTextRecord(
+   *   'me.users.iexec.eth',
+   *   'email',
+   *   'me@iex.ec'
+   * );
+   * console.log('txHash:', txHash);
+   * ```
+   */
+  setTextRecord(name: ENS, key: string, value?: string): Promise<TxHash>;
 }
