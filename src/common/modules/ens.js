@@ -22,6 +22,19 @@ const debug = Debug('iexec:ens');
 
 const BASE_DOMAIN = 'users.iexec.eth';
 
+const getEnsAddress = async (contracts = throwIfMissing()) => {
+  try {
+    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
+    if (!ensAddress) {
+      throw Error('network does not support ENS');
+    }
+    return ensAddress;
+  } catch (e) {
+    debug('getEnsAddress()', e);
+    throw e;
+  }
+};
+
 const getOwner = async (
   contracts = throwIfMissing(),
   name = throwIfMissing(),
@@ -29,7 +42,7 @@ const getOwner = async (
   try {
     const vName = await ensDomainSchema().validate(name);
     const nameHash = utils.namehash(vName);
-    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
+    const ensAddress = await getEnsAddress(contracts);
     const ensRegistryContract = new Contract(
       ensAddress,
       ENSRegistry.abi,
@@ -157,7 +170,7 @@ const obsConfigureResolution = (
         const vName = await ensDomainSchema().validate(name);
         const nameHash = utils.namehash(vName);
         const walletAddress = await getAddress(contracts);
-        const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
+        const ensAddress = await getEnsAddress(contracts);
 
         const REVERSE_DOMAIN = 'addr.reverse';
         const reverseName = `${vAddress
