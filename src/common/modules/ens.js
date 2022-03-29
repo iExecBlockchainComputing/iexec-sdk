@@ -514,7 +514,7 @@ const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
     const resolverContract = new Contract(
       currentResolver.address,
       PublicResolver.abi,
-      contracts.signer,
+      contracts.provider,
     );
     const txt = await wrapCall(resolverContract.text(node, vKey));
     return txt;
