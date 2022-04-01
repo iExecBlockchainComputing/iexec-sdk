@@ -486,6 +486,8 @@ export default class IExecOrderModule extends IExecModule {
            * encrypt results
            *
            * default `false`
+           *
+           * _NB_: `iexec_result_encryption: true` is ony available for TEE tasks, use with `tag: ["tee"]`
            */
           iexec_result_encryption?: boolean;
           /**

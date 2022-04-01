@@ -103,4 +103,4 @@ data:
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecENSModule.d.ts#L28)
+[src/lib/IExecENSModule.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecENSModule.d.ts#L28)

@@ -57,7 +57,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -73,7 +73,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -105,7 +105,7 @@ console.log(`sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainc
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:173](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L173)
+[src/lib/IExecWalletModule.d.ts:173](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L173)
 
 ___
 
@@ -137,7 +137,7 @@ console.log(`sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidec
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:157](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L157)
+[src/lib/IExecWalletModule.d.ts:157](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L157)
 
 ___
 
@@ -166,7 +166,7 @@ console.log('ethereum wei:', wei.toString());
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:93](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L93)
+[src/lib/IExecWalletModule.d.ts:93](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L93)
 
 ___
 
@@ -195,7 +195,7 @@ console.log('ethereum wei:', wei.toString());
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:107](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L107)
+[src/lib/IExecWalletModule.d.ts:107](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L107)
 
 ___
 
@@ -217,7 +217,7 @@ console.log('user address:', userAddress);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:82](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L82)
+[src/lib/IExecWalletModule.d.ts:82](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L82)
 
 ___
 
@@ -237,7 +237,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:203](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L203)
+[src/lib/IExecWalletModule.d.ts:203](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L203)
 
 ___
 
@@ -257,7 +257,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L189)
+[src/lib/IExecWalletModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L189)
 
 ___
 
@@ -286,7 +286,7 @@ console.log('transaction hash:', txHash);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:120](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L120)
+[src/lib/IExecWalletModule.d.ts:120](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L120)
 
 ___
 
@@ -315,7 +315,7 @@ console.log('transaction hash:', txHash);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:130](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L130)
+[src/lib/IExecWalletModule.d.ts:130](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L130)
 
 ___
 
@@ -344,7 +344,7 @@ console.log('sweep ether transaction hash:', sendNativeTxHash);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L141)
+[src/lib/IExecWalletModule.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L141)
 
 ___
 
@@ -374,7 +374,7 @@ console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:227](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L227)
+[src/lib/IExecWalletModule.d.ts:227](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L227)
 
 ___
 
@@ -404,7 +404,7 @@ console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
 
 #### Defined in
 
-[src/lib/IExecWalletModule.d.ts:215](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecWalletModule.d.ts#L215)
+[src/lib/IExecWalletModule.d.ts:215](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecWalletModule.d.ts#L215)
 
 ___
 
@@ -430,4 +430,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L24)

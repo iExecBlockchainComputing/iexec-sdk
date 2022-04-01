@@ -51,7 +51,7 @@ node_modules/typescript/lib/lib.es5.d.ts:1028
 
 #### Defined in
 
-[src/lib/errors.d.ts:43](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/errors.d.ts#L43)
+[src/lib/errors.d.ts:43](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/errors.d.ts#L43)
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 #### Defined in
 
-[src/lib/errors.d.ts:42](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/73dc692/src/lib/errors.d.ts#L42)
+[src/lib/errors.d.ts:42](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/errors.d.ts#L42)
