@@ -54,7 +54,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -70,7 +70,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -103,7 +103,7 @@ Object.entries(claimed).forEach(([idx, taskid]) => {
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:222](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L222)
+[src/lib/IExecDealModule.d.ts:222](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L222)
 
 ___
 
@@ -132,7 +132,7 @@ console.log('taskid:', taskid)
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:207](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L207)
+[src/lib/IExecDealModule.d.ts:207](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L207)
 
 ___
 
@@ -163,7 +163,7 @@ console.log('last deal:', deals[0]);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:261](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L261)
+[src/lib/IExecDealModule.d.ts:261](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L261)
 
 ___
 
@@ -194,7 +194,7 @@ console.log('last deal:', deals[0]);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:274](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L274)
+[src/lib/IExecDealModule.d.ts:274](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L274)
 
 ___
 
@@ -225,7 +225,7 @@ console.log('last deal:', deals[0]);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:304](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L304)
+[src/lib/IExecDealModule.d.ts:304](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L304)
 
 ___
 
@@ -256,7 +256,7 @@ console.log('last deal:', deals[0]);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:289](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L289)
+[src/lib/IExecDealModule.d.ts:289](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L289)
 
 ___
 
@@ -291,7 +291,7 @@ console.log('last deal:', deals[0]);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:241](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L241)
+[src/lib/IExecDealModule.d.ts:241](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L241)
 
 ___
 
@@ -328,7 +328,7 @@ const unsubscribe = dealObservable.subscribe({
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:197](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L197)
+[src/lib/IExecDealModule.d.ts:197](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L197)
 
 ___
 
@@ -358,7 +358,7 @@ console.log('deal:', deal);
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:158](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecDealModule.d.ts#L158)
+[src/lib/IExecDealModule.d.ts:158](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecDealModule.d.ts#L158)
 
 ___
 
@@ -384,4 +384,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L24)

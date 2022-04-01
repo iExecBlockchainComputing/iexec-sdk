@@ -49,7 +49,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -65,7 +65,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -93,7 +93,7 @@ console.log('task claimed:', claimTxHash);
 
 #### Defined in
 
-[src/lib/IExecTaskModule.d.ts:132](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecTaskModule.d.ts#L132)
+[src/lib/IExecTaskModule.d.ts:132](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecTaskModule.d.ts#L132)
 
 ___
 
@@ -123,7 +123,7 @@ cosnt binary = await response.blob();
 
 #### Defined in
 
-[src/lib/IExecTaskModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecTaskModule.d.ts#L144)
+[src/lib/IExecTaskModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecTaskModule.d.ts#L144)
 
 ___
 
@@ -177,7 +177,7 @@ const task = await waitFinalState(
 
 #### Defined in
 
-[src/lib/IExecTaskModule.d.ts:119](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecTaskModule.d.ts#L119)
+[src/lib/IExecTaskModule.d.ts:119](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecTaskModule.d.ts#L119)
 
 ___
 
@@ -207,7 +207,7 @@ console.log('task:', task);
 
 #### Defined in
 
-[src/lib/IExecTaskModule.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecTaskModule.d.ts#L67)
+[src/lib/IExecTaskModule.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecTaskModule.d.ts#L67)
 
 ___
 
@@ -233,4 +233,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/500b144/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L24)
