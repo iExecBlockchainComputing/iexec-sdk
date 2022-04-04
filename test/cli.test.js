@@ -3259,8 +3259,6 @@ describe('[Common]', () => {
       const raw = await execAsync(
         `${iexecPath} ens register ${ensLabel} --force --password test --wallet-address ${ADDRESS} --raw`,
       );
-      console.log(raw);
-
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.name).toBe(`${ensLabel}.users.iexec.eth`);
