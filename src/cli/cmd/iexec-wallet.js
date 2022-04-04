@@ -35,6 +35,8 @@ const {
   getPropertyFormChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
+const { lookupAddress } = require('../../common/modules/ens');
+const { ConfigurationError } = require('../../common/utils/errors');
 
 const objName = 'wallet';
 
@@ -151,18 +153,25 @@ show
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
-      const balances = await wallet.checkBalances(
-        chain.contracts,
-        addressToShow,
-      );
+      const [balances, ens] = await Promise.all([
+        wallet.checkBalances(chain.contracts, addressToShow),
+        lookupAddress(chain.contracts, addressToShow).catch((e) => {
+          if (e instanceof ConfigurationError) {
+            /** no ENS */
+          } else {
+            throw e;
+          }
+        }),
+      ]);
+      if (ens) {
+        spinner.info(`ENS: ${ens}`);
+      }
       const displayBalances = {
         ether: chain.contracts.isNative ? undefined : formatEth(balances.wei),
         RLC: formatRLC(balances.nRLC),
       };
       spinner.succeed(
-        `Wallet ${chain.name} balances [${chain.id}]:${pretty(
-          displayBalances,
-        )}`,
+        `Wallet balances [${chain.id}]:${pretty(displayBalances)}`,
         {
           raw: {
             balance: {
@@ -173,6 +182,7 @@ show
                 : balances.wei.toString(),
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
+            ens,
           },
         },
       );

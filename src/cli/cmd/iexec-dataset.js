@@ -55,6 +55,8 @@ const {
   isEthAddress,
   getPropertyFormChain,
 } = require('../utils/cli-helper');
+const { lookupAddress } = require('../../common/modules/ens');
+const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-dataset');
 
@@ -183,19 +185,44 @@ show
       spinner.start(info.showing(objName));
 
       let res;
+      let ens;
       if (isAddress) {
-        res = await showDataset(chain.contracts, addressOrIndex);
+        [res, ens] = await Promise.all([
+          showDataset(chain.contracts, addressOrIndex),
+          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          }),
+        ]);
       } else {
         res = await showUserDataset(
           chain.contracts,
           addressOrIndex,
           userAddress,
         );
+        ens = await lookupAddress(chain.contracts, res.objAddress).catch(
+          (e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          },
+        );
       }
       const { dataset, objAddress } = res;
-      spinner.succeed(`Dataset ${objAddress} details:${pretty(dataset)}`, {
-        raw: { address: objAddress, dataset },
-      });
+      spinner.succeed(
+        `Dataset ${objAddress} details:${pretty({
+          ...(ens && { ENS: ens }),
+          ...dataset,
+        })}`,
+        {
+          raw: { address: objAddress, ens, dataset },
+        },
+      );
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -495,9 +522,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -564,9 +589,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {

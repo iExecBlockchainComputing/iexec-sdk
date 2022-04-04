@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).ConfigurationError
 
-ValidationError is thrown when the current configuration does not allow tu perfome a specific operation
+ValidationError is thrown when the current configuration does not allow to perform a specific operation
 
 ## Hierarchy
 

@@ -69,6 +69,8 @@ const networkId = `${chainId}`;
 const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
 const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
 const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
+const ensRegistryAddress = '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a';
+const ensPublicResolverAddress = '0x464E9FC01C2970173B183D24B43A0FA07e6A072E';
 
 console.log('chainId', chainId);
 console.log('hubAddress', hubAddress);
@@ -131,6 +133,8 @@ const setTokenChain = (options) =>
           hub: hubAddress,
           sms: smsURL,
           resultProxy: resultProxyURL,
+          ensRegistry: ensRegistryAddress,
+          ensPublicResolver: ensPublicResolverAddress,
           ...options,
         },
       },
@@ -149,6 +153,8 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           hub: hubAddress,
           sms: smsURL,
           resultProxy: resultProxyURL,
+          ensRegistry: ensRegistryAddress,
+          ensPublicResolver: ensPublicResolverAddress,
           enterprise: {
             enterpriseSwapChainName: 'dev-enterprise',
           },
@@ -160,6 +166,8 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           flavour: 'enterprise',
           sms: smsURL,
           resultProxy: resultProxyURL,
+          ensRegistry: ensRegistryAddress,
+          ensPublicResolver: ensPublicResolverAddress,
           enterprise: {
             enterpriseSwapChainName: 'dev',
           },
@@ -182,6 +190,8 @@ const setNativeChain = (options) =>
           useGas: false,
           sms: smsURL,
           resultProxy: resultProxyURL,
+          ensRegistry: ensRegistryAddress,
+          ensPublicResolver: ensPublicResolverAddress,
           ...options,
         },
       },
@@ -200,6 +210,8 @@ const setTokenChainParity = (options) =>
           hub: hubAddress,
           sms: smsURL,
           resultProxy: resultProxyURL,
+          ensRegistry: ensRegistryAddress,
+          ensPublicResolver: ensPublicResolverAddress,
           ...options,
         },
       },
@@ -668,6 +680,20 @@ describe('[Mainchain]', () => {
     expect(res.app.owner).toBe(ADDRESS);
   });
 
+  test('[mainchain] iexec ens register <name> --for <app>', async () => {
+    const raw = await execAsync(
+      `${iexecPath} ens register ${mainchainApp.toLowerCase()} --for ${mainchainApp} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.name).toBe(`${mainchainApp.toLowerCase()}.users.iexec.eth`);
+    expect(res.address).toBe(mainchainApp);
+    expect(res.registerTxHash).toMatch(bytes32Regex);
+    expect(res.setResolverTxHash).toMatch(bytes32Regex);
+    expect(res.setAddrTxHash).toMatch(bytes32Regex);
+    expect(res.setNameTxHash).toMatch(bytes32Regex);
+  });
+
   test('[mainchain] iexec app show 0 (current user)', async () => {
     await execAsync('mv deployed.json deployed.back');
     const raw = await execAsync(`${iexecPath} app show 0 --raw`);
@@ -688,6 +714,7 @@ describe('[Mainchain]', () => {
     expect(res.address).toBe(mainchainApp);
     expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
+    expect(res.ens).toBe(`${mainchainApp.toLowerCase()}.users.iexec.eth`);
   });
 
   test('[mainchain] iexec app show 0 --user [address]', async () => {
@@ -764,6 +791,20 @@ describe('[Mainchain]', () => {
     expect(res.dataset.owner).toBe(ADDRESS);
   });
 
+  test('[mainchain] iexec ens register <name> --for <dataset>', async () => {
+    const raw = await execAsync(
+      `${iexecPath} ens register ${mainchainDataset.toLowerCase()} --for ${mainchainDataset} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.name).toBe(`${mainchainDataset.toLowerCase()}.users.iexec.eth`);
+    expect(res.address).toBe(mainchainDataset);
+    expect(res.registerTxHash).toMatch(bytes32Regex);
+    expect(res.setResolverTxHash).toMatch(bytes32Regex);
+    expect(res.setAddrTxHash).toMatch(bytes32Regex);
+    expect(res.setNameTxHash).toMatch(bytes32Regex);
+  });
+
   test('[mainchain] iexec dataset show 0 (current user)', async () => {
     await execAsync('mv deployed.json deployed.back');
     const raw = await execAsync(`${iexecPath} dataset show 0 --raw`);
@@ -786,6 +827,7 @@ describe('[Mainchain]', () => {
     expect(res.address).toBe(mainchainDataset);
     expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
+    expect(res.ens).toBe(`${mainchainDataset.toLowerCase()}.users.iexec.eth`);
   });
 
   test('[mainchain] iexec dataset show 0 --user [address]', async () => {
@@ -852,6 +894,56 @@ describe('[Mainchain]', () => {
     mainchainWorkerpool = res.address;
   });
 
+  test('[mainchain] iexec workerpool set-api-url (fail no ENS)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} workerpool set-api-url https://my-workerpool.com ${mainchainWorkerpool} --raw`,
+    ).catch((e) => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.error.name).toBe('Error');
+    expect(res.error.message).toBe(
+      `Missing ENS for workerpool ${mainchainWorkerpool}. You probably forgot to run "iexec ens register <name> --for ${mainchainWorkerpool}"`,
+    );
+  });
+
+  test('[mainchain] iexec ens register <name> --for <workerpool>', async () => {
+    const raw = await execAsync(
+      `${iexecPath} ens register ${mainchainWorkerpool.toLowerCase()} --for ${mainchainWorkerpool} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.name).toBe(
+      `${mainchainWorkerpool.toLowerCase()}.users.iexec.eth`,
+    );
+    expect(res.address).toBe(mainchainWorkerpool);
+    expect(res.registerTxHash).toMatch(bytes32Regex);
+    expect(res.setResolverTxHash).toMatch(bytes32Regex);
+    expect(res.setAddrTxHash).toMatch(bytes32Regex);
+    expect(res.setNameTxHash).toMatch(bytes32Regex);
+  });
+
+  test('[mainchain] iexec workerpool set-api-url', async () => {
+    const raw = await execAsync(
+      `${iexecPath} workerpool set-api-url https://my-workerpool.com ${mainchainWorkerpool} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainWorkerpool);
+    expect(res.url).toBe('https://my-workerpool.com');
+    expect(res.txHash).toMatch(bytes32Regex);
+  });
+
+  test('[mainchain] iexec workerpool set-api-url (from deployed.json)', async () => {
+    const raw = await execAsync(
+      `${iexecPath} workerpool set-api-url https://my-workerpool-0.com --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.address).toBe(mainchainWorkerpool);
+    expect(res.url).toBe('https://my-workerpool-0.com');
+    expect(res.txHash).toMatch(bytes32Regex);
+  });
+
   test('[mainchain] iexec workerpool show (from deployed.json)', async () => {
     const raw = await execAsync(`${iexecPath} workerpool show --raw`);
     const res = JSON.parse(raw);
@@ -859,6 +951,10 @@ describe('[Mainchain]', () => {
     expect(res.address).toBe(mainchainWorkerpool);
     expect(res.workerpool).toBeDefined();
     expect(res.workerpool.owner).toBe(ADDRESS);
+    expect(res.apiUrl).toBe('https://my-workerpool-0.com');
+    expect(res.ens).toBe(
+      `${mainchainWorkerpool.toLowerCase()}.users.iexec.eth`,
+    );
   });
 
   test('[mainchain] iexec workerpool show 0 (current user)', async () => {
@@ -3103,6 +3199,7 @@ describe('[Common]', () => {
   describe('[wallet]', () => {
     let importedWalletName;
     let localWalletFileName;
+    let ensLabel = `ens_${getId()}`;
 
     beforeAll(async () => {
       await execAsync('rm wallet.json').catch(() => {});
@@ -3158,7 +3255,23 @@ describe('[Common]', () => {
       expect(res.balance.nRLC).toBeDefined();
     });
 
-    test('iexec wallet show --show-private-key --wallet-addres <address>', async () => {
+    test('iexec ens register <name>', async () => {
+      const raw = await execAsync(
+        `${iexecPath} ens register ${ensLabel} --force --password test --wallet-address ${ADDRESS} --raw`,
+      );
+      console.log(raw);
+
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.name).toBe(`${ensLabel}.users.iexec.eth`);
+      expect(res.address).toBe(ADDRESS);
+      expect(res.registerTxHash).toMatch(bytes32Regex);
+      expect(res.setResolverTxHash).toMatch(bytes32Regex);
+      expect(res.setAddrTxHash).toMatch(bytes32Regex);
+      expect(res.setNameTxHash).toMatch(bytes32Regex);
+    });
+
+    test('iexec wallet show --show-private-key --wallet-address <address>', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show --show-private-key --password test --wallet-address ${ADDRESS} --raw`,
       );
@@ -3171,6 +3284,7 @@ describe('[Common]', () => {
       expect(res.wallet.privateKey).toBe(PRIVATE_KEY);
       expect(res.balance.ether).toBeDefined();
       expect(res.balance.nRLC).toBeDefined();
+      expect(res.ens).toBe(`${ensLabel}.users.iexec.eth`);
     });
 
     test('iexec wallet show --wallet-file <fileName>', async () => {

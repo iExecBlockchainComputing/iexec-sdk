@@ -19,7 +19,9 @@ const setWorkerpoolApiUrl = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(workerpoolAddress);
-    const vUrl = await workerpoolApiUrlSchema().validate(url);
+    const vUrl = await workerpoolApiUrlSchema()
+      .label('workerpool API url')
+      .validate(url);
     const name = await lookupAddress(contracts, vAddress);
     if (!name) {
       throw Error(`No ENS name reverse resolution configured for ${vAddress}`);
@@ -44,7 +46,9 @@ const getWorkerpoolApiUrl = async (
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(workerpoolAddress);
+    })
+      .label('workerpool address')
+      .validate(workerpoolAddress);
     const name = await lookupAddress(contracts, vAddress).catch(() => {
       /** return undefined */
     });

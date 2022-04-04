@@ -8581,7 +8581,6 @@ describe('[ens]', () => {
     const configureRes = await iexec.ens.configureResolution(name);
     expect(configureRes.name).toBe(name);
     expect(configureRes.address).toBe(wallet.address);
-    expect(configureRes.claimReverseTxHash).toMatch(bytes32Regex);
     expect(configureRes.setAddrTxHash).toMatch(bytes32Regex);
     expect(configureRes.setNameTxHash).toMatch(bytes32Regex);
     expect(configureRes.setResolverTxHash).toMatch(bytes32Regex);
@@ -8589,7 +8588,6 @@ describe('[ens]', () => {
     const reconfigureSameRes = await iexec.ens.configureResolution(name);
     expect(reconfigureSameRes.name).toBe(name);
     expect(reconfigureSameRes.address).toBe(wallet.address);
-    expect(reconfigureSameRes.claimReverseTxHash).toBeUndefined();
     expect(reconfigureSameRes.setAddrTxHash).toBeUndefined();
     expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
     expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
@@ -8647,7 +8645,6 @@ describe('[ens]', () => {
     );
     expect(configureRes.name).toBe(name);
     expect(configureRes.address).toBe(app1.address);
-    expect(configureRes.claimReverseTxHash).toBeUndefined();
     expect(configureRes.setAddrTxHash).toMatch(bytes32Regex);
     expect(configureRes.setNameTxHash).toMatch(bytes32Regex);
     expect(configureRes.setResolverTxHash).toMatch(bytes32Regex);
@@ -8658,7 +8655,6 @@ describe('[ens]', () => {
     );
     expect(reconfigureSameRes.name).toBe(name);
     expect(reconfigureSameRes.address).toBe(app1.address);
-    expect(reconfigureSameRes.claimReverseTxHash).toBeUndefined();
     expect(reconfigureSameRes.setAddrTxHash).toBeUndefined();
     expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
     expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
@@ -8678,7 +8674,6 @@ describe('[ens]', () => {
     );
     expect(reconfigureRes.name).toBe(name);
     expect(reconfigureRes.address).toBe(app2.address);
-    expect(reconfigureRes.claimReverseTxHash).toBeUndefined();
     expect(reconfigureRes.setAddrTxHash).toMatch(bytes32Regex);
     expect(reconfigureRes.setNameTxHash).toMatch(bytes32Regex);
     expect(reconfigureRes.setResolverTxHash).toBeUndefined();
@@ -8830,8 +8825,8 @@ describe('[ens]', () => {
       });
     });
 
-    expect(configureMessages.length).toBe(13);
-    expect(reconfigureSameMessages.length).toBe(5);
+    expect(configureMessages.length).toBe(10);
+    expect(reconfigureSameMessages.length).toBe(4);
   });
 
   test('ens.obsConfigureResolution(name, address) configure for address', async () => {

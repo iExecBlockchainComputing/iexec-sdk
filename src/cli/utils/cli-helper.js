@@ -50,8 +50,10 @@ const info = {
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
-  missingAddress: (obj) =>
-    `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  missingAddressOrDeployed: (objName, chainId) =>
+    `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chainId}`,
+  missingEnsForObjectAtAddress: (objName, address) =>
+    `Missing ENS for ${objName} ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
   checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) =>
     `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,

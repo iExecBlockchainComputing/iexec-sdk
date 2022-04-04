@@ -54,7 +54,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -70,7 +70,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -98,7 +98,7 @@ console.log('secret exists:', isSecretSet);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:175](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L175)
+[src/lib/IExecDatasetModule.d.ts:175](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L175)
 
 ___
 
@@ -137,7 +137,7 @@ const checksum = await computeEncryptedFileChecksum(
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L163)
+[src/lib/IExecDatasetModule.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L163)
 
 ___
 
@@ -165,7 +165,7 @@ console.log('dataset count:', count);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L91)
+[src/lib/IExecDatasetModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L91)
 
 ___
 
@@ -202,7 +202,7 @@ console.log('deployed at', address);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L52)
+[src/lib/IExecDatasetModule.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L52)
 
 ___
 
@@ -244,7 +244,7 @@ const binary = new Blob([encryptedDataset]);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L139)
+[src/lib/IExecDatasetModule.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L139)
 
 ___
 
@@ -268,7 +268,7 @@ console.log('encryption key:', encryptionKey);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:116](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L116)
+[src/lib/IExecDatasetModule.d.ts:116](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L116)
 
 ___
 
@@ -301,7 +301,7 @@ console.log('secret pushed:', pushed);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L189)
+[src/lib/IExecDatasetModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L189)
 
 ___
 
@@ -329,7 +329,7 @@ console.log('dataset:', dataset);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:79](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L79)
+[src/lib/IExecDatasetModule.d.ts:79](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L79)
 
 ___
 
@@ -358,7 +358,7 @@ console.log('dataset:', dataset);
 
 #### Defined in
 
-[src/lib/IExecDatasetModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecDatasetModule.d.ts#L101)
+[src/lib/IExecDatasetModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDatasetModule.d.ts#L101)
 
 ___
 
@@ -384,4 +384,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/25e3cbc/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecModule.d.ts#L24)
