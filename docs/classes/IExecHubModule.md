@@ -49,7 +49,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -65,7 +65,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -87,7 +87,7 @@ console.log('category count:', count);
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecHubModule.d.ts#L65)
+[src/lib/IExecHubModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecHubModule.d.ts#L65)
 
 ___
 
@@ -124,7 +124,7 @@ console.log('deployed with catid', catid);
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:41](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecHubModule.d.ts#L41)
+[src/lib/IExecHubModule.d.ts:41](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecHubModule.d.ts#L41)
 
 ___
 
@@ -148,7 +148,7 @@ console.log('timoutRatio:', timoutRatio);
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:77](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecHubModule.d.ts#L77)
+[src/lib/IExecHubModule.d.ts:77](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecHubModule.d.ts#L77)
 
 ___
 
@@ -176,7 +176,7 @@ console.log('category:', category);
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:55](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecHubModule.d.ts#L55)
+[src/lib/IExecHubModule.d.ts:55](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecHubModule.d.ts#L55)
 
 ___
 
@@ -202,4 +202,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L24)

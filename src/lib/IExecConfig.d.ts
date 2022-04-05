@@ -172,6 +172,10 @@ export default class IExecConfig {
    */
   resolveBridgeAddress(): Promise<string>;
   /**
+   * resolve the bridge contract address on bridged chain
+   */
+  resolveBridgeBackAddress(): Promise<string>;
+  /**
    * resolve the current ENS public resolver contract address
    */
   resolveEnsPublicResolverAddress(): Promise<string>;

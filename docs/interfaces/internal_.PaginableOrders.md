@@ -31,7 +31,7 @@ total count
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:121](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecOrderbookModule.d.ts#L121)
+[src/lib/IExecOrderbookModule.d.ts:121](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L121)
 
 ___
 
@@ -43,7 +43,7 @@ order page (this may be a partial result)
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecOrderbookModule.d.ts#L117)
+[src/lib/IExecOrderbookModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L117)
 
 ## Methods
 
@@ -59,4 +59,4 @@ when a partial result is returned, `more()` can be called to get the next page.
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/lib/IExecOrderbookModule.d.ts#L125)
+[src/lib/IExecOrderbookModule.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L125)

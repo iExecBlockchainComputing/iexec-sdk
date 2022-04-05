@@ -67,4 +67,4 @@ return the `unsubscribe: () => void` method.
 
 #### Defined in
 
-[src/common/utils/reactive.d.ts:7](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/8cfa57c/src/common/utils/reactive.d.ts#L7)
+[src/common/utils/reactive.d.ts:7](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/common/utils/reactive.d.ts#L7)
