@@ -218,7 +218,7 @@ class IExecConfig {
           const bridgedConf = await resolveBridgedConf();
           _bridgedContracts = new IExecContractsClient({
             chainId: bridgedConf.chainId,
-            provider: getDefaultProvider(bridgedConf.rpcURL, providerOptions),
+            provider: getDefaultProvider(bridgedConf.rpcURL, providerOptions), // TO DO if only one api key use corresponding provider
             hubAddress: bridgedConf.hubAddress,
             confirms,
             isNative: bridgedConf.isNative,
@@ -289,6 +289,11 @@ class IExecConfig {
       throw Error(
         `bridgeAddress option not set and no default value for your chain ${chainId}`,
       );
+    };
+
+    this.resolveBridgeBackAddress = async () => {
+      const brigedChainConf = await resolveBridgedConf();
+      return brigedChainConf.bridgeAddress;
     };
 
     this.resolveEnsPublicResolverAddress = async () => {

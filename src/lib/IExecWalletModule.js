@@ -31,9 +31,7 @@ class IExecWalletModule extends IExecModule {
         nRlcAmount,
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
-          sidechainBridgeAddress: await this.config
-            .getBridgedConf()
-            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
+          sidechainBridgeAddress: await this.config.resolveBridgeBackAddress(),
         },
       );
     this.bridgeToMainchain = async (nRlcAmount) =>
@@ -43,9 +41,7 @@ class IExecWalletModule extends IExecModule {
         nRlcAmount,
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
-          mainchainBridgeAddress: await this.config
-            .getBridgedConf()
-            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
+          mainchainBridgeAddress: await this.config.resolveBridgeBackAddress(),
         },
       );
     this.obsBridgeToSidechain = async (nRlcAmount) =>
@@ -55,9 +51,7 @@ class IExecWalletModule extends IExecModule {
         nRlcAmount,
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
-          sidechainBridgeAddress: await this.config
-            .getBridgedConf()
-            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
+          sidechainBridgeAddress: await this.config.resolveBridgeBackAddress(),
         },
       );
     this.obsBridgeToMainchain = async (nRlcAmount) =>
@@ -67,9 +61,7 @@ class IExecWalletModule extends IExecModule {
         nRlcAmount,
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
-          mainchainBridgeAddress: await this.config
-            .getBridgedConf()
-            .then((bridgedConf) => bridgedConf && bridgedConf.bridgeAddress),
+          mainchainBridgeAddress: await this.config.resolveBridgeBackAddress(),
         },
       );
     this.wrapEnterpriseRLC = async (nRlcAmount) =>

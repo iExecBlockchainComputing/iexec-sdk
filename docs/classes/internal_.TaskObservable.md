@@ -85,4 +85,4 @@ data:
 
 #### Defined in
 
-[src/lib/IExecTaskModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecTaskModule.d.ts#L19)
+[src/lib/IExecTaskModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecTaskModule.d.ts#L19)

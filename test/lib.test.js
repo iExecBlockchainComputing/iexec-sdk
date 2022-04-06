@@ -6945,7 +6945,7 @@ describe('[deal]', () => {
       },
       { checkRequest: false },
     );
-    await sleep(1000);
+    await sleep(5000);
     const resAfterMatch = await iexec.deal.fetchRequesterDeals(
       requesterAddress,
     );
@@ -7019,7 +7019,7 @@ describe('[deal]', () => {
       },
       { checkRequest: false },
     );
-    await sleep(1000);
+    await sleep(5000);
     const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
     expect(resAfterMatch.count).toBe(1);
     expect(resAfterMatch.deals[0].dealid).toBe(dealid);
@@ -7062,7 +7062,7 @@ describe('[deal]', () => {
       },
       { checkRequest: false },
     );
-    await sleep(1000);
+    await sleep(5000);
     const resAfterMatch = await iexec.deal.fetchDealsByDatasetorder(orderHash);
     expect(resAfterMatch.count).toBe(1);
     expect(resAfterMatch.deals[0].dealid).toBe(dealid);
@@ -7105,7 +7105,7 @@ describe('[deal]', () => {
       },
       { checkRequest: false },
     );
-    await sleep(1000);
+    await sleep(5000);
     const resAfterMatch = await iexec.deal.fetchDealsByWorkerpoolorder(
       orderHash,
     );
@@ -7152,7 +7152,7 @@ describe('[deal]', () => {
       },
       { checkRequest: false },
     );
-    await sleep(1000);
+    await sleep(5000);
     const resAfterMatch = await iexec.deal.fetchDealsByRequestorder(orderHash);
     expect(resAfterMatch.count).toBe(1);
     expect(resAfterMatch.deals[0].dealid).toBe(dealid);

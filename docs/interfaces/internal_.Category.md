@@ -24,7 +24,7 @@ a description of the category
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecHubModule.d.ts#L15)
+[src/lib/IExecHubModule.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L15)
 
 ___
 
@@ -36,7 +36,7 @@ a name for the category
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:11](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecHubModule.d.ts#L11)
+[src/lib/IExecHubModule.d.ts:11](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L11)
 
 ___
 
@@ -48,4 +48,4 @@ time base (in sec) for the category (tasks of this category must be completed un
 
 #### Defined in
 
-[src/lib/IExecHubModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecHubModule.d.ts#L19)
+[src/lib/IExecHubModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L19)

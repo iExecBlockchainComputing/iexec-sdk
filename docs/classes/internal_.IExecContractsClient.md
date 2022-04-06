@@ -56,7 +56,7 @@ Create a client for IExec contracts
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:9](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L9)
+[src/common/utils/IExecContractsClient.d.ts:9](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L9)
 
 ## Properties
 
@@ -68,7 +68,7 @@ current chainId
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:54](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L54)
+[src/common/utils/IExecContractsClient.d.ts:54](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L54)
 
 ___
 
@@ -80,7 +80,7 @@ number of block to wait for transactions confirmation
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:83](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L83)
+[src/common/utils/IExecContractsClient.d.ts:83](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L83)
 
 ___
 
@@ -92,7 +92,7 @@ current IExec flavour
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:62](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L62)
+[src/common/utils/IExecContractsClient.d.ts:62](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L62)
 
 ___
 
@@ -104,7 +104,7 @@ current IExec contract address
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:66](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L66)
+[src/common/utils/IExecContractsClient.d.ts:66](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L66)
 
 ___
 
@@ -116,7 +116,7 @@ true if current instance use native token
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:58](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L58)
+[src/common/utils/IExecContractsClient.d.ts:58](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L58)
 
 ___
 
@@ -128,7 +128,7 @@ IExec PoCo ABI version
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:70](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L70)
+[src/common/utils/IExecContractsClient.d.ts:70](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L70)
 
 ___
 
@@ -140,7 +140,7 @@ current Provider
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L46)
+[src/common/utils/IExecContractsClient.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L46)
 
 ___
 
@@ -152,7 +152,7 @@ current Signer
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L50)
+[src/common/utils/IExecContractsClient.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L50)
 
 ___
 
@@ -170,7 +170,7 @@ transaction options
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:74](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L74)
+[src/common/utils/IExecContractsClient.d.ts:74](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L74)
 
 ## Methods
 
@@ -192,7 +192,7 @@ fetch the IExec registry contract address of specified resource
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L103)
+[src/common/utils/IExecContractsClient.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L103)
 
 ___
 
@@ -214,7 +214,7 @@ fetch the IExec registry Contract instance of specified resource
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:99](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L99)
+[src/common/utils/IExecContractsClient.d.ts:99](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L99)
 
 ___
 
@@ -236,7 +236,7 @@ fetch the IExec token contract address, not available when isNative is true
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L111)
+[src/common/utils/IExecContractsClient.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L111)
 
 ___
 
@@ -258,7 +258,7 @@ fetch the IExec token Contract instance, not available when isNative is true
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:107](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L107)
+[src/common/utils/IExecContractsClient.d.ts:107](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L107)
 
 ___
 
@@ -281,7 +281,7 @@ get a known Contract instance at specified address
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L91)
+[src/common/utils/IExecContractsClient.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L91)
 
 ___
 
@@ -297,7 +297,7 @@ get the IExec Contract instance
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:95](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L95)
+[src/common/utils/IExecContractsClient.d.ts:95](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L95)
 
 ___
 
@@ -319,4 +319,4 @@ set the signer
 
 #### Defined in
 
-[src/common/utils/IExecContractsClient.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/common/utils/IExecContractsClient.d.ts#L87)
+[src/common/utils/IExecContractsClient.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/IExecContractsClient.d.ts#L87)

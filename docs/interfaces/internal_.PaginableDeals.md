@@ -25,7 +25,7 @@ total count
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:136](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDealModule.d.ts#L136)
+[src/lib/IExecDealModule.d.ts:136](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecDealModule.d.ts#L136)
 
 ___
 
@@ -37,7 +37,7 @@ deal page (this may be a partial result)
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDealModule.d.ts#L111)
+[src/lib/IExecDealModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecDealModule.d.ts#L111)
 
 ## Methods
 
@@ -53,4 +53,4 @@ when a partial result is returned, `more()` can be called to get the next page.
 
 #### Defined in
 
-[src/lib/IExecDealModule.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecDealModule.d.ts#L140)
+[src/lib/IExecDealModule.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecDealModule.d.ts#L140)

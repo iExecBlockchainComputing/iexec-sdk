@@ -27,7 +27,7 @@ app image digest
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L35)
+[src/lib/IExecAppModule.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L35)
 
 ___
 
@@ -39,7 +39,7 @@ optional for TEE apps only, specify the TEE protocol to use
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:39](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L39)
+[src/lib/IExecAppModule.d.ts:39](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L39)
 
 ___
 
@@ -51,7 +51,7 @@ app image address
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:31](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L31)
+[src/lib/IExecAppModule.d.ts:31](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L31)
 
 ___
 
@@ -63,7 +63,7 @@ a name for the app
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L23)
+[src/lib/IExecAppModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L23)
 
 ___
 
@@ -75,7 +75,7 @@ the app owner
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L19)
+[src/lib/IExecAppModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L19)
 
 ___
 
@@ -87,4 +87,4 @@ only 'DOCKER' is supported
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/19522bb/src/lib/IExecAppModule.d.ts#L27)
+[src/lib/IExecAppModule.d.ts:27](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAppModule.d.ts#L27)
