@@ -49,7 +49,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -65,7 +65,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -93,7 +93,7 @@ console.log('app count:', count);
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecAppModule.d.ts#L127)
+[src/lib/IExecAppModule.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L127)
 
 ___
 
@@ -138,7 +138,7 @@ console.log('deployed at', address);
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:61](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecAppModule.d.ts#L61)
+[src/lib/IExecAppModule.d.ts:61](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L61)
 
 ___
 
@@ -166,7 +166,7 @@ console.log('app:', app);
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecAppModule.d.ts#L117)
+[src/lib/IExecAppModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L117)
 
 ___
 
@@ -195,7 +195,7 @@ console.log('app:', app);
 
 #### Defined in
 
-[src/lib/IExecAppModule.d.ts:137](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecAppModule.d.ts#L137)
+[src/lib/IExecAppModule.d.ts:137](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L137)
 
 ___
 
@@ -221,4 +221,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

@@ -50,9 +50,6 @@ data:
 | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
 | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
 | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-| `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
-| `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
-| `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
 | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
 | `SET_NAME_TX_SENT` | sent once if the name is not set | `txHash` |
 | `SET_NAME_SUCCESS` | sent once | `name`,`address` |
@@ -86,9 +83,6 @@ data:
 | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
 | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
 | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-| `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
-| `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
-| `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
 | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
 | `SET_NAME_TX_SENT` | sent once if the name is not set | `txHash` |
 | `SET_NAME_SUCCESS` | sent once | `name`,`address` |
@@ -103,4 +97,4 @@ data:
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L28)
+[src/lib/IExecENSModule.d.ts:25](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L25)

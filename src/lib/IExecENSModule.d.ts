@@ -18,9 +18,6 @@ declare class ENSConfigurationObservable extends Observable {
    * | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
    * | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
    * | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-   * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
-   * | `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
-   * | `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
    * | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
    * | `SET_NAME_TX_SENT` | sent once if the name is not set | `txHash` |
    * | `SET_NAME_SUCCESS` | sent once | `name`,`address` |
@@ -39,9 +36,6 @@ declare class ENSConfigurationObservable extends Observable {
      * | `SET_ADDR_TX_REQUEST` | sent once if addr is not set | `name`,`address` |
      * | `SET_ADDR_TX_SENT` | sent once if addr is not set | `txHash` |
      * | `SET_ADDR_SUCCESS` | sent once | `name`,`address` |
-     * | `CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST` | sent once if address type is EAO and reverse address is not claimed | `address`,`resolverAddress` |
-     * | `CLAIM_REVERSE_WITH_RESOLVER_TX_SENT` | sent once if address type is EAO and reverse address is not claimed | `txHash` |
-     * | `CLAIM_REVERSE_WITH_RESOLVER_SUCCESS` | sent once if address type is EAO | `address`,`resolverAddress` |
      * | `SET_NAME_TX_REQUEST` | sent once if the name is not set | `name`,`address` |
      * | `SET_NAME_TX_SENT` | sent once if the name is not set | `txHash` |
      * | `SET_NAME_SUCCESS` | sent once | `name`,`address` |
@@ -180,7 +174,7 @@ export default class IExecENSModule extends IExecModule {
    *
    * _NB_:
    * - `address` must be an iExec RegistryEntry address (ie: app, dataset or workerpool) or the user address, default user address
-   * - the configuration may require up to 4 transactions, depending on the target type (EOA or RegistryEntry) and the current state, some transaction may or may not occur to complete the configuration
+   * - the configuration may require up to 3 transactions, depending on the current state, some transaction may or may not occur to complete the configuration
    *
    * example:
    * - EOA ENS configuration
@@ -207,7 +201,6 @@ export default class IExecENSModule extends IExecModule {
     address: Address;
     setResolverTxHash?: TxHash;
     setAddrTxHash?: TxHash;
-    claimReverseTxHash?: TxHash;
     setNameTxHash?: TxHash;
   }>;
 }

@@ -26,7 +26,7 @@ published buy order for computing tasks
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:89](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L89)
+[src/lib/IExecOrderbookModule.d.ts:89](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L89)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:94](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L94)
+[src/lib/IExecOrderbookModule.d.ts:94](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L94)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:88](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L88)
+[src/lib/IExecOrderbookModule.d.ts:88](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L88)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:93](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L93)
+[src/lib/IExecOrderbookModule.d.ts:93](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L93)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:90](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L90)
+[src/lib/IExecOrderbookModule.d.ts:90](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L90)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:92](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L92)
+[src/lib/IExecOrderbookModule.d.ts:92](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L92)
 
 ___
 
@@ -106,4 +106,4 @@ ___
 
 #### Defined in
 
-[src/lib/IExecOrderbookModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecOrderbookModule.d.ts#L91)
+[src/lib/IExecOrderbookModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L91)

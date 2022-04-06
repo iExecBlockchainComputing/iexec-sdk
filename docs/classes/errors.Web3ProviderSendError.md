@@ -41,7 +41,7 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 
 #### Defined in
 
-[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/errors.d.ts#L14)
+[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L14)
 
 ## Properties
 
@@ -55,4 +55,4 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 
 #### Defined in
 
-[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/errors.d.ts#L15)
+[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L15)

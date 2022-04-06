@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - reintegrated `iexec-contracts-js-client`
 - fix a bug transforming an Array into a plain object
 - documentation refactoring
+- fix ENS configure resolution removed useless transaction for EOA
 
 ## [7.0.2] 2022-02-16
 

@@ -42,7 +42,7 @@ Wallet.constructor
 
 #### Defined in
 
-[src/common/utils/signers.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/common/utils/signers.d.ts#L12)
+[src/common/utils/signers.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/signers.d.ts#L12)
 
 ## Methods
 
@@ -64,4 +64,4 @@ Wallet.constructor
 
 #### Defined in
 
-[src/common/utils/signers.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/common/utils/signers.d.ts#L21)
+[src/common/utils/signers.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/signers.d.ts#L21)

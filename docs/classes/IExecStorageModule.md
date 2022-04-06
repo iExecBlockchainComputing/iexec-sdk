@@ -48,7 +48,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -64,7 +64,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -96,7 +96,7 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 
 #### Defined in
 
-[src/lib/IExecStorageModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecStorageModule.d.ts#L19)
+[src/lib/IExecStorageModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecStorageModule.d.ts#L19)
 
 ___
 
@@ -121,7 +121,7 @@ console.log('default storage initialized:', isPushed);
 
 #### Defined in
 
-[src/lib/IExecStorageModule.d.ts:37](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecStorageModule.d.ts#L37)
+[src/lib/IExecStorageModule.d.ts:37](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecStorageModule.d.ts#L37)
 
 ___
 
@@ -165,7 +165,7 @@ console.log('dropbox storage initialized:', isPushed);
 
 #### Defined in
 
-[src/lib/IExecStorageModule.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecStorageModule.d.ts#L60)
+[src/lib/IExecStorageModule.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecStorageModule.d.ts#L60)
 
 ___
 
@@ -191,4 +191,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

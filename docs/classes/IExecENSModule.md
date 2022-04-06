@@ -51,7 +51,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L13)
+[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
 
 ## Properties
 
@@ -67,7 +67,7 @@ current IExecConfig
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L20)
+[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -103,13 +103,13 @@ console.log('regitered:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L128)
+[src/lib/IExecENSModule.d.ts:122](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L122)
 
 ___
 
 ### configureResolution
 
-▸ **configureResolution**(`name`, `address?`): `Promise`<{ `address`: `string` ; `claimReverseTxHash?`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
+▸ **configureResolution**(`name`, `address?`): `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
 **ONLY ENS NAME OWNER**
 
@@ -117,7 +117,7 @@ configure the ENS resolution and reverse resolution for an owned ENS name, same 
 
 _NB_:
 - `address` must be an iExec RegistryEntry address (ie: app, dataset or workerpool) or the user address, default user address
-- the configuration may require up to 4 transactions, depending on the target type (EOA or RegistryEntry) and the current state, some transaction may or may not occur to complete the configuration
+- the configuration may require up to 3 transactions, depending on the current state, some transaction may or may not occur to complete the configuration
 
 example:
 - EOA ENS configuration
@@ -145,11 +145,11 @@ console.log('configured resolution:', address, '<=>', name);
 
 #### Returns
 
-`Promise`<{ `address`: `string` ; `claimReverseTxHash?`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
+`Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L202)
+[src/lib/IExecENSModule.d.ts:196](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L196)
 
 ___
 
@@ -177,7 +177,7 @@ console.log('iexec.eth owner:', owner);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L91)
+[src/lib/IExecENSModule.d.ts:85](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L85)
 
 ___
 
@@ -205,7 +205,7 @@ console.log('ENS name:', name);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L111)
+[src/lib/IExecENSModule.d.ts:105](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L105)
 
 ___
 
@@ -265,7 +265,7 @@ configureResolutionObservable.subscribe({
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L172)
+[src/lib/IExecENSModule.d.ts:166](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L166)
 
 ___
 
@@ -293,7 +293,7 @@ console.log('me.users.iexec.eth:', address);
 
 #### Defined in
 
-[src/lib/IExecENSModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecENSModule.d.ts#L101)
+[src/lib/IExecENSModule.d.ts:95](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L95)
 
 ___
 
@@ -319,4 +319,4 @@ Create an IExecModule using an IExecConfig instance
 
 #### Defined in
 
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/0c88714/src/lib/IExecModule.d.ts#L24)
+[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)
