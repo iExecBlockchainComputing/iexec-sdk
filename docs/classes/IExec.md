@@ -57,10 +57,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### account
@@ -69,10 +65,6 @@ Create an IExecModule instance using an IExecConfig like
 
 account module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L24)
-
 ___
 
 ### app
@@ -80,10 +72,6 @@ ___
 • **app**: [`IExecAppModule`](IExecAppModule.md)
 
 app module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:28](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L28)
 
 ___
 
@@ -97,10 +85,6 @@ current IExecConfig
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
-
 ___
 
 ### dataset
@@ -108,10 +92,6 @@ ___
 • **dataset**: [`IExecDatasetModule`](IExecDatasetModule.md)
 
 dataset module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:32](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L32)
 
 ___
 
@@ -121,10 +101,6 @@ ___
 
 deal module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L36)
-
 ___
 
 ### ens
@@ -132,10 +108,6 @@ ___
 • **ens**: [`IExecENSModule`](IExecENSModule.md)
 
 ens module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L40)
 
 ___
 
@@ -145,10 +117,6 @@ ___
 
 hub module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:44](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L44)
-
 ___
 
 ### network
@@ -156,10 +124,6 @@ ___
 • **network**: [`IExecNetworkModule`](IExecNetworkModule.md)
 
 network module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L48)
 
 ___
 
@@ -169,10 +133,6 @@ ___
 
 order module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L52)
-
 ___
 
 ### orderbook
@@ -180,10 +140,6 @@ ___
 • **orderbook**: [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 orderbook module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:56](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L56)
 
 ___
 
@@ -193,10 +149,6 @@ ___
 
 result module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L60)
-
 ___
 
 ### storage
@@ -204,10 +156,6 @@ ___
 • **storage**: [`IExecStorageModule`](IExecStorageModule.md)
 
 storage module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L64)
 
 ___
 
@@ -217,10 +165,6 @@ ___
 
 task module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L68)
-
 ___
 
 ### wallet
@@ -228,10 +172,6 @@ ___
 • **wallet**: [`IExecWalletModule`](IExecWalletModule.md)
 
 wallet module
-
-#### Defined in
-
-[src/lib/IExec.d.ts:72](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L72)
 
 ___
 
@@ -241,17 +181,13 @@ ___
 
 workerpool module
 
-#### Defined in
-
-[src/lib/IExec.d.ts:76](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExec.d.ts#L76)
-
 ## Methods
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExec`](IExec.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExec instance using an IExecConfig instance
 
 #### Parameters
 
@@ -261,12 +197,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExec`](IExec.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

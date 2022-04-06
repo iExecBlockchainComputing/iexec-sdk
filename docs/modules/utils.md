@@ -33,10 +33,6 @@
 
 ethereum null/zero address
 
-#### Defined in
-
-[src/lib/utils.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L64)
-
 ___
 
 ### NULL\_BYTES32
@@ -44,10 +40,6 @@ ___
 • `Const` **NULL\_BYTES32**: `string`
 
 null bytes32
-
-#### Defined in
-
-[src/lib/utils.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L68)
 
 ## Functions
 
@@ -71,10 +63,6 @@ console.log(decodeTag('0x0000000000000000000000000000000000000000000000000000000
 #### Returns
 
 `string`[]
-
-#### Defined in
-
-[src/lib/utils.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L128)
 
 ___
 
@@ -105,10 +93,6 @@ const binary = new Blob([decryptedFileBuffer]);
 
 `Promise`<`Buffer`\>
 
-#### Defined in
-
-[src/lib/utils.d.ts:155](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L155)
-
 ___
 
 ### encodeTag
@@ -131,10 +115,6 @@ console.log(encodeTag(['tee', 'gpu']));
 #### Returns
 
 `string`
-
-#### Defined in
-
-[src/lib/utils.d.ts:119](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L119)
 
 ___
 
@@ -159,10 +139,6 @@ console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 
 `string`
 
-#### Defined in
-
-[src/lib/utils.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L101)
-
 ___
 
 ### formatRLC
@@ -185,10 +161,6 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 #### Returns
 
 `string`
-
-#### Defined in
-
-[src/lib/utils.d.ts:110](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L110)
 
 ___
 
@@ -219,10 +191,6 @@ const iexec = new IExec({ ethProvider });
 
 [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
 
-#### Defined in
-
-[src/lib/utils.d.ts:22](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L22)
-
 ___
 
 ### parseEth
@@ -249,10 +217,6 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 #### Returns
 
 `BN`
-
-#### Defined in
-
-[src/lib/utils.d.ts:80](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L80)
 
 ___
 
@@ -281,10 +245,6 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 `BN`
 
-#### Defined in
-
-[src/lib/utils.d.ts:92](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L92)
-
 ___
 
 ### sumTags
@@ -311,7 +271,3 @@ console.log('workerpoolMinTag', workerpoolMinTag);
 #### Returns
 
 `string`
-
-#### Defined in
-
-[src/lib/utils.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/utils.d.ts#L141)

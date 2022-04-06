@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { Address, Addressish, BN, BNish, TxHash } from './types';
 
@@ -108,4 +109,8 @@ export default class IExecWorkerpoolModule extends IExecModule {
     workerpoolAddress: Addressish,
     url: string,
   ): Promise<string | undefined>;
+  /**
+   * Create an IExecWorkerpoolModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecWorkerpoolModule;
 }

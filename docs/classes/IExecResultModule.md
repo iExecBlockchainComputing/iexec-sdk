@@ -45,10 +45,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -60,10 +56,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -88,10 +80,6 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 #### Returns
 
 `Promise`<`boolean`\>
-
-#### Defined in
-
-[src/lib/IExecResultModule.d.ts:17](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecResultModule.d.ts#L17)
 
 ___
 
@@ -138,17 +126,13 @@ console.log('encryption key pushed:', isPushed);
 
 `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
 
-#### Defined in
-
-[src/lib/IExecResultModule.d.ts:48](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecResultModule.d.ts#L48)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecResultModule`](IExecResultModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecResultModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -158,12 +142,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecResultModule`](IExecResultModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

@@ -47,10 +47,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -62,10 +58,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -90,10 +82,6 @@ console.log('task claimed:', claimTxHash);
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecTaskModule.d.ts:132](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecTaskModule.d.ts#L132)
 
 ___
 
@@ -120,10 +108,6 @@ cosnt binary = await response.blob();
 #### Returns
 
 `Promise`<`Response`\>
-
-#### Defined in
-
-[src/lib/IExecTaskModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecTaskModule.d.ts#L144)
 
 ___
 
@@ -175,10 +159,6 @@ const task = await waitFinalState(
 
 `Promise`<[`TaskObservable`](internal_.TaskObservable.md)\>
 
-#### Defined in
-
-[src/lib/IExecTaskModule.d.ts:119](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecTaskModule.d.ts#L119)
-
 ___
 
 ### show
@@ -205,17 +185,13 @@ console.log('task:', task);
 
 `Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: `BN` ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: `BN` ; `idx`: `BN` ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: `BN` ; `revealCounter`: `BN` ; `revealDeadline`: `BN` ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: `BN`  }\>
 
-#### Defined in
-
-[src/lib/IExecTaskModule.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecTaskModule.d.ts#L67)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecTaskModule`](IExecTaskModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecTaskModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -225,12 +201,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecTaskModule`](IExecTaskModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

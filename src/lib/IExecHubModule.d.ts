@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { BN, BNish, TxHash } from './types';
 
@@ -75,4 +76,8 @@ export default class IExecHubModule extends IExecModule {
    * ```
    */
   getTimeoutRatio(): Promise<BN>;
+  /**
+   * Create an IExecHubModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecHubModule;
 }

@@ -46,10 +46,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -61,10 +57,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -94,10 +86,6 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 
 `Promise`<`boolean`\>
 
-#### Defined in
-
-[src/lib/IExecStorageModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecStorageModule.d.ts#L19)
-
 ___
 
 ### defaultStorageLogin
@@ -118,10 +106,6 @@ console.log('default storage initialized:', isPushed);
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecStorageModule.d.ts:37](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecStorageModule.d.ts#L37)
 
 ___
 
@@ -163,17 +147,13 @@ console.log('dropbox storage initialized:', isPushed);
 
 `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
 
-#### Defined in
-
-[src/lib/IExecStorageModule.d.ts:60](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecStorageModule.d.ts#L60)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecStorageModule`](IExecStorageModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecStorageModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -183,12 +163,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecStorageModule`](IExecStorageModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

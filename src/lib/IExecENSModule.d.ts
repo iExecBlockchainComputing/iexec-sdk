@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import { Observable } from '../common/utils/reactive';
 import IExecModule from './IExecModule';
 import { Address, ENS, TxHash } from './types';
@@ -232,4 +233,8 @@ export default class IExecENSModule extends IExecModule {
    * ```
    */
   setTextRecord(name: ENS, key: string, value?: string): Promise<TxHash>;
+  /**
+   * Create an IExecENSModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecENSModule;
 }

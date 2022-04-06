@@ -36,7 +36,3 @@ ValidationError is thrown when a method is called with missing or unexpected par
 #### Inherited from
 
 YupValidationError.constructor
-
-#### Defined in
-
-node_modules/yup/lib/ValidationError.d.ts:11

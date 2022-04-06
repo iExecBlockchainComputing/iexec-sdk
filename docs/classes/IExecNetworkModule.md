@@ -44,10 +44,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -59,10 +55,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -84,17 +76,13 @@ console.log(`working on chain ${chainId}, using native token: ${isNative}`);
 
 `Promise`<{ `chainId`: `number` ; `isNative`: `boolean`  }\>
 
-#### Defined in
-
-[src/lib/IExecNetworkModule.d.ts:18](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecNetworkModule.d.ts#L18)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecNetworkModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -104,12 +92,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecNetworkModule`](IExecNetworkModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

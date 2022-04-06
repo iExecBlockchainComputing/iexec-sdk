@@ -26,19 +26,11 @@ signed sell order for a dataset
 
 • **apprestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:124](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L124)
-
 ___
 
 ### dataset
 
 • **dataset**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:120](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L120)
 
 ___
 
@@ -46,19 +38,11 @@ ___
 
 • **datasetprice**: [`BNish`](../modules/internal_.md#bnish)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:121](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L121)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:126](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L126)
 
 ___
 
@@ -66,19 +50,11 @@ ___
 
 • **salt**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L127)
-
 ___
 
 ### sign
 
 • **sign**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:128](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L128)
 
 ___
 
@@ -86,26 +62,14 @@ ___
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:123](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L123)
-
 ___
 
 ### volume
 
 • **volume**: [`BNish`](../modules/internal_.md#bnish)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:122](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L122)
-
 ___
 
 ### workerpoolrestrict
 
 • **workerpoolrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L125)

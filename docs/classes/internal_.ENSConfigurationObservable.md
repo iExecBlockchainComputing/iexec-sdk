@@ -94,7 +94,3 @@ data:
 #### Overrides
 
 [Observable](internal_.Observable.md).[subscribe](internal_.Observable.md#subscribe)
-
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:25](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecENSModule.d.ts#L25)

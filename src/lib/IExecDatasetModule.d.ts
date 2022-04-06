@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import {
   Address,
@@ -190,4 +191,8 @@ export default class IExecDatasetModule extends IExecModule {
     datasetAddress: Addressish,
     encryptionKey: string,
   ): Promise<boolean>;
+  /**
+   * Create an IExecDatasetModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecDatasetModule;
 }

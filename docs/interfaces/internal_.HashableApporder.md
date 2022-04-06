@@ -25,19 +25,11 @@ sell order for an app
 
 • **app**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L34)
-
 ___
 
 ### appprice
 
 • **appprice**: [`BNish`](../modules/internal_.md#bnish)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L35)
 
 ___
 
@@ -45,19 +37,11 @@ ___
 
 • **datasetrestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:38](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L38)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L40)
 
 ___
 
@@ -65,19 +49,11 @@ ___
 
 • **salt**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:41](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L41)
-
 ___
 
 ### tag
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:37](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L37)
 
 ___
 
@@ -85,16 +61,8 @@ ___
 
 • **volume**: [`BNish`](../modules/internal_.md#bnish)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L36)
-
 ___
 
 ### workerpoolrestrict
 
 • **workerpoolrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:39](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L39)

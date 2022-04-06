@@ -39,10 +39,6 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 
 [Web3ProviderError](errors.Web3ProviderError.md).[constructor](errors.Web3ProviderError.md#constructor)
 
-#### Defined in
-
-[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L14)
-
 ## Properties
 
 ### originalError
@@ -52,7 +48,3 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 #### Inherited from
 
 [Web3ProviderError](errors.Web3ProviderError.md).[originalError](errors.Web3ProviderError.md#originalerror)
-
-#### Defined in
-
-[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L15)

@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import IExecAccountModule from './IExecAccountModule';
 import IExecAppModule from './IExecAppModule';
@@ -74,4 +75,8 @@ export default class IExec extends IExecModule {
    * workerpool module
    */
   workerpool: IExecWorkerpoolModule;
+  /**
+   * Create an IExec instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExec;
 }

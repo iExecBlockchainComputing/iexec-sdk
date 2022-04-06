@@ -40,10 +40,6 @@
 
 Wallet.constructor
 
-#### Defined in
-
-[src/common/utils/signers.d.ts:12](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/signers.d.ts#L12)
-
 ## Methods
 
 ### signTypedData
@@ -61,7 +57,3 @@ Wallet.constructor
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/common/utils/signers.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/common/utils/signers.d.ts#L21)

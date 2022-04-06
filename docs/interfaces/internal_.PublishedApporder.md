@@ -24,10 +24,6 @@ published sell order for an app
 
 • **chainId**: `number`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:18](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L18)
-
 ___
 
 ### order
@@ -48,19 +44,11 @@ ___
 | `volume` | `number` |
 | `workerpoolrestrict` | `string` |
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:23](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L23)
-
 ___
 
 ### orderHash
 
 • **orderHash**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:17](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L17)
 
 ___
 
@@ -68,19 +56,11 @@ ___
 
 • **publicationTimestamp**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:22](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L22)
-
 ___
 
 ### remaining
 
 • **remaining**: `number`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L19)
 
 ___
 
@@ -88,16 +68,8 @@ ___
 
 • **signer**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:21](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L21)
-
 ___
 
 ### status
 
 • **status**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L20)

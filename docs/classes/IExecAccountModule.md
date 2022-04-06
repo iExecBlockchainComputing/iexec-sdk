@@ -47,10 +47,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -62,10 +58,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -92,10 +84,6 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 `Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
 
-#### Defined in
-
-[src/lib/IExecAccountModule.d.ts:40](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAccountModule.d.ts#L40)
-
 ___
 
 ### checkBridgedBalance
@@ -119,10 +107,6 @@ console.log('Nano RLC locked:', balance.locked.toString());
 #### Returns
 
 `Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
-
-#### Defined in
-
-[src/lib/IExecAccountModule.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAccountModule.d.ts#L50)
 
 ___
 
@@ -149,10 +133,6 @@ console.log('tx:', txHash);
 
 `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecAccountModule.d.ts:18](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAccountModule.d.ts#L18)
-
 ___
 
 ### withdraw
@@ -178,17 +158,13 @@ console.log('tx:', txHash);
 
 `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecAccountModule.d.ts:29](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecAccountModule.d.ts#L29)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecAccountModule`](IExecAccountModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecAccountModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -198,12 +174,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecAccountModule`](IExecAccountModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

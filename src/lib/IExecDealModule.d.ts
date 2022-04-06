@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import { Observable } from '../common/utils/reactive';
 import IExecModule from './IExecModule';
 import {
@@ -304,4 +305,8 @@ export default class IExecDealModule extends IExecModule {
   fetchDealsByRequestorder(
     requestorderHash: OrderHash,
   ): Promise<PaginableDeals>;
+  /**
+   * Create an IExecDealModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecDealModule;
 }

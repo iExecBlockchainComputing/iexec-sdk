@@ -67,10 +67,6 @@ Create an IExecModule instance using an IExecConfig like
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -79,17 +75,13 @@ Create an IExecModule instance using an IExecConfig like
 
 current IExecConfig
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
-
 ## Methods
 
 ### fromConfig
 
 ▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -100,7 +92,3 @@ Create an IExecModule using an IExecConfig instance
 #### Returns
 
 [`IExecModule`](IExecModule.md)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

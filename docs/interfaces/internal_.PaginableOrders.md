@@ -29,10 +29,6 @@
 
 total count
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:121](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L121)
-
 ___
 
 ### orders
@@ -40,10 +36,6 @@ ___
 • **orders**: `OT`[]
 
 order page (this may be a partial result)
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L117)
 
 ## Methods
 
@@ -56,7 +48,3 @@ when a partial result is returned, `more()` can be called to get the next page.
 #### Returns
 
 `Promise`<[`PaginableOrders`](internal_.PaginableOrders.md)<`OT`\>\>
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderbookModule.d.ts#L125)

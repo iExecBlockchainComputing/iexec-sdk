@@ -42,19 +42,11 @@ ObjectNotFoundError is thrown when trying to access an unknown resource.
 
 Error.constructor
 
-#### Defined in
-
-[src/lib/errors.d.ts:33](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L33)
-
 ## Properties
 
 ### chainId
 
 • `Optional` **chainId**: `string`
-
-#### Defined in
-
-[src/lib/errors.d.ts:36](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L36)
 
 ___
 
@@ -62,16 +54,8 @@ ___
 
 • `Optional` **objId**: `string`
 
-#### Defined in
-
-[src/lib/errors.d.ts:35](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L35)
-
 ___
 
 ### objName
 
 • `Optional` **objName**: `string`
-
-#### Defined in
-
-[src/lib/errors.d.ts:34](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/errors.d.ts#L34)

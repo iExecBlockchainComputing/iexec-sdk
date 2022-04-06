@@ -47,10 +47,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -62,10 +58,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -84,10 +76,6 @@ console.log('category count:', count);
 #### Returns
 
 `Promise`<`BN`\>
-
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L65)
 
 ___
 
@@ -122,10 +110,6 @@ console.log('deployed with catid', catid);
 
 `Promise`<{ `catid`: `BN` ; `txHash`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:41](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L41)
-
 ___
 
 ### getTimeoutRatio
@@ -145,10 +129,6 @@ console.log('timoutRatio:', timoutRatio);
 #### Returns
 
 `Promise`<`BN`\>
-
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:77](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L77)
 
 ___
 
@@ -174,17 +154,13 @@ console.log('category:', category);
 
 `Promise`<[`Category`](../interfaces/internal_.Category.md)\>
 
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:55](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecHubModule.d.ts#L55)
-
 ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecHubModule`](IExecHubModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecHubModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -194,12 +170,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecHubModule`](IExecHubModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecModule.d.ts#L24)

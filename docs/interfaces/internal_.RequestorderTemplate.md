@@ -30,19 +30,11 @@ buy order for computing tasks
 
 • **app**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:200](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L200)
-
 ___
 
 ### appmaxprice
 
 • **appmaxprice**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:201](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L201)
 
 ___
 
@@ -50,19 +42,11 @@ ___
 
 • **beneficiary**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:210](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L210)
-
 ___
 
 ### callback
 
 • **callback**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:211](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L211)
 
 ___
 
@@ -70,29 +54,17 @@ ___
 
 • **category**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:208](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L208)
-
 ___
 
 ### dataset
 
 • **dataset**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:202](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L202)
-
 ___
 
 ### datasetmaxprice
 
 • **datasetmaxprice**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:203](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L203)
 
 ___
 
@@ -111,19 +83,11 @@ ___
 | `iexec_result_storage_provider?` | `string` |
 | `iexec_result_storage_proxy?` | `string` |
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:212](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L212)
-
 ___
 
 ### tag
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:207](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L207)
 
 ___
 
@@ -131,19 +95,11 @@ ___
 
 • **trust**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:209](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L209)
-
 ___
 
 ### volume
 
 • **volume**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:206](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L206)
 
 ___
 
@@ -151,16 +107,8 @@ ___
 
 • **workerpool**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:204](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L204)
-
 ___
 
 ### workerpoolmaxprice
 
 • **workerpoolmaxprice**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:205](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/961d430/src/lib/IExecOrderModule.d.ts#L205)

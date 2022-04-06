@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import {
   Address,
@@ -355,4 +356,8 @@ export default class IExecOrderbookModule extends IExecModule {
    * ```
    */
   fetchRequestorder(orderHash: OrderHash): Promise<PublishedRequestorder>;
+  /**
+   * Create an IExecOrderbookModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecOrderbookModule;
 }

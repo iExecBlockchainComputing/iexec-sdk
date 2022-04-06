@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import {
   Address,
@@ -138,4 +139,8 @@ export default class IExecAppModule extends IExecModule {
     index: BNish,
     address: Addressish,
   ): Promise<{ objAddress: Address; app: App }>;
+  /**
+   * Create an IExecAppModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecAppModule;
 }

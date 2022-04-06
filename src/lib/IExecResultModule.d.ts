@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { Addressish } from './types';
 
@@ -51,4 +52,8 @@ export default class IExecResultModule extends IExecModule {
       forceUpdate?: boolean;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;
+  /**
+   * Create an IExecResultModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecResultModule;
 }
