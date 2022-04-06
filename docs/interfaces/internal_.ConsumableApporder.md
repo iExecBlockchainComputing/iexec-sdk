@@ -26,19 +26,11 @@ signed sell order for an app
 
 • **app**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:63](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L63)
-
 ___
 
 ### appprice
 
 • **appprice**: [`BNish`](../modules/internal_.md#bnish)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:64](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L64)
 
 ___
 
@@ -46,19 +38,11 @@ ___
 
 • **datasetrestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:67](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L67)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:69](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L69)
 
 ___
 
@@ -66,19 +50,11 @@ ___
 
 • **salt**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:70](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L70)
-
 ___
 
 ### sign
 
 • **sign**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:71](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L71)
 
 ___
 
@@ -86,26 +62,14 @@ ___
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:66](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L66)
-
 ___
 
 ### volume
 
 • **volume**: [`BNish`](../modules/internal_.md#bnish)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:65](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L65)
-
 ___
 
 ### workerpoolrestrict
 
 • **workerpoolrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:68](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L68)

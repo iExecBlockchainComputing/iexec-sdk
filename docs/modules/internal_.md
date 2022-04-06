@@ -64,10 +64,6 @@
 
 big number like
 
-#### Defined in
-
-[src/lib/types.d.ts:6](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L6)
-
 ___
 
 ### Bytes32
@@ -80,10 +76,6 @@ example:
 ```js
 const bytes32 = '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef883c6';
 ```
-
-#### Defined in
-
-[src/lib/types.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L46)
 
 ___
 
@@ -98,10 +90,6 @@ example:
 const teeTag = 'tee';
 ```
 
-#### Defined in
-
-[src/lib/types.d.ts:115](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L115)
-
 ___
 
 ### Multiaddress
@@ -115,10 +103,6 @@ example:
 const url = 'https://example.com/foo.bar'
 const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
 ```
-
-#### Defined in
-
-[src/lib/types.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L135)
 
 ___
 
@@ -144,10 +128,6 @@ const zeroPointOneRLC = '0.1 RLC';
 const tenNRLC = new BN(10);
 ```
 
-#### Defined in
-
-[src/lib/types.d.ts:106](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L106)
-
 ___
 
 ### Tag
@@ -161,10 +141,6 @@ example:
 const onlyTeeTag = ['tee'];
 const teePlusGpuTags = ['tee','gpu'];
 ```
-
-#### Defined in
-
-[src/lib/types.d.ts:125](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L125)
 
 ___
 
@@ -189,7 +165,3 @@ const zeroPointOneEth = '0.1 ether';
 // BN (from utils)
 const tenWei = new BN(10);
 ```
-
-#### Defined in
-
-[src/lib/types.d.ts:86](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L86)

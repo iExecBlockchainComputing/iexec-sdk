@@ -52,10 +52,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -67,10 +63,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -101,10 +93,6 @@ Object.entries(claimed).forEach(([idx, taskid]) => {
 
 `Promise`<{ `claimed`: `Record`<`number`, `string`\> ; `transactions`: { `txHash`: `string` ; `type`: `string`  }[]  }\>
 
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:222](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L222)
-
 ___
 
 ### computeTaskId
@@ -129,10 +117,6 @@ console.log('taskid:', taskid)
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:207](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L207)
 
 ___
 
@@ -161,10 +145,6 @@ console.log('last deal:', deals[0]);
 
 `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:261](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L261)
-
 ___
 
 ### fetchDealsByDatasetorder
@@ -191,10 +171,6 @@ console.log('last deal:', deals[0]);
 #### Returns
 
 `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
-
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:274](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L274)
 
 ___
 
@@ -223,10 +199,6 @@ console.log('last deal:', deals[0]);
 
 `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:304](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L304)
-
 ___
 
 ### fetchDealsByWorkerpoolorder
@@ -253,10 +225,6 @@ console.log('last deal:', deals[0]);
 #### Returns
 
 `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
-
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:289](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L289)
 
 ___
 
@@ -288,10 +256,6 @@ console.log('last deal:', deals[0]);
 #### Returns
 
 `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
-
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:241](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L241)
 
 ___
 
@@ -326,10 +290,6 @@ const unsubscribe = dealObservable.subscribe({
 
 `Promise`<[`DealObservable`](internal_.DealObservable.md)\>
 
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:197](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L197)
-
 ___
 
 ### show
@@ -356,10 +316,6 @@ console.log('deal:', deal);
 
 `Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `beneficiary`: `string` ; `botFirst`: `BN` ; `botSize`: `BN` ; `callback`: `string` ; `category`: `BN` ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: `BN` ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: `BN` ; `startTime`: `BN` ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: `BN` ; `workerStake`: `BN` ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  }  }\>
 
-#### Defined in
-
-[src/lib/IExecDealModule.d.ts:158](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDealModule.d.ts#L158)
-
 ___
 
 ### fromConfig
@@ -381,7 +337,3 @@ Create an IExecModule using an IExecConfig instance
 #### Inherited from
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

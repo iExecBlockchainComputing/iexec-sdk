@@ -51,10 +51,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -66,10 +62,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -105,10 +97,6 @@ console.log('total orders:', count);
 
 `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>\>
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L144)
-
 ___
 
 ### fetchApporder
@@ -133,10 +121,6 @@ console.log('remaining volume:', remaining);
 #### Returns
 
 `Promise`<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:324](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L324)
 
 ___
 
@@ -172,10 +156,6 @@ console.log('total orders:', count);
 
 `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>\>
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:185](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L185)
-
 ___
 
 ### fetchDatasetorder
@@ -200,10 +180,6 @@ console.log('remaining volume:', remaining);
 #### Returns
 
 `Promise`<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:335](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L335)
 
 ___
 
@@ -241,10 +217,6 @@ console.log('total orders:', count);
 
 `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:276](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L276)
-
 ___
 
 ### fetchRequestorder
@@ -269,10 +241,6 @@ console.log('remaining volume:', remaining);
 #### Returns
 
 `Promise`<[`PublishedRequestorder`](../interfaces/internal_.PublishedRequestorder.md)\>
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:357](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L357)
 
 ___
 
@@ -310,10 +278,6 @@ console.log('total orders:', count);
 
 `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:226](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L226)
-
 ___
 
 ### fetchWorkerpoolorder
@@ -339,10 +303,6 @@ console.log('remaining volume:', remaining);
 
 `Promise`<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:346](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L346)
-
 ___
 
 ### fromConfig
@@ -364,7 +324,3 @@ Create an IExecModule using an IExecConfig instance
 #### Inherited from
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

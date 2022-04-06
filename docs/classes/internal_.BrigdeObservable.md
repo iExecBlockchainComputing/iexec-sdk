@@ -90,7 +90,3 @@ data:
 #### Overrides
 
 [Observable](internal_.Observable.md).[subscribe](internal_.Observable.md#subscribe)
-
-#### Defined in
-
-[src/lib/IExecWalletModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecWalletModule.d.ts#L24)

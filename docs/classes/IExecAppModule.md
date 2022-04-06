@@ -47,10 +47,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -62,10 +58,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -90,10 +82,6 @@ console.log('app count:', count);
 #### Returns
 
 `Promise`<`BN`\>
-
-#### Defined in
-
-[src/lib/IExecAppModule.d.ts:127](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L127)
 
 ___
 
@@ -136,10 +124,6 @@ console.log('deployed at', address);
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecAppModule.d.ts:61](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L61)
-
 ___
 
 ### showApp
@@ -163,10 +147,6 @@ console.log('app:', app);
 #### Returns
 
 `Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
-
-#### Defined in
-
-[src/lib/IExecAppModule.d.ts:117](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L117)
 
 ___
 
@@ -193,10 +173,6 @@ console.log('app:', app);
 
 `Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecAppModule.d.ts:137](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecAppModule.d.ts#L137)
-
 ___
 
 ### fromConfig
@@ -218,7 +194,3 @@ Create an IExecModule using an IExecConfig instance
 #### Inherited from
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

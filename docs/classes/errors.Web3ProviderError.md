@@ -45,16 +45,8 @@ Web3ProviderError encapsulate an error thrown by the web3 provider.
 
 Error.constructor
 
-#### Defined in
-
-[src/lib/errors.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L14)
-
 ## Properties
 
 ### originalError
 
 • `Optional` **originalError**: `Error`
-
-#### Defined in
-
-[src/lib/errors.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L15)

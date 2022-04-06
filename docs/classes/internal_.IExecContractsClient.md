@@ -54,10 +54,6 @@ Create a client for IExec contracts
 | `args.signer?` | `Signer` | ethers Signer, required to sign transactions and messages |
 | `args.useGas?` | `boolean` | if false set the gasPrice to 0 (default true) |
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:9](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L9)
-
 ## Properties
 
 ### chainId
@@ -65,10 +61,6 @@ Create a client for IExec contracts
 • **chainId**: `string`
 
 current chainId
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:54](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L54)
 
 ___
 
@@ -78,10 +70,6 @@ ___
 
 number of block to wait for transactions confirmation
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:83](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L83)
-
 ___
 
 ### flavour
@@ -89,10 +77,6 @@ ___
 • **flavour**: `string`
 
 current IExec flavour
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:62](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L62)
 
 ___
 
@@ -102,10 +86,6 @@ ___
 
 current IExec contract address
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:66](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L66)
-
 ___
 
 ### isNative
@@ -113,10 +93,6 @@ ___
 • **isNative**: `string`
 
 true if current instance use native token
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:58](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L58)
 
 ___
 
@@ -126,10 +102,6 @@ ___
 
 IExec PoCo ABI version
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:70](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L70)
-
 ___
 
 ### provider
@@ -138,10 +110,6 @@ ___
 
 current Provider
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:46](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L46)
-
 ___
 
 ### signer
@@ -149,10 +117,6 @@ ___
 • `Optional` **signer**: `Signer`
 
 current Signer
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:50](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L50)
 
 ___
 
@@ -167,10 +131,6 @@ transaction options
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `gasPrice?` | `string` | gasPrice override |
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:74](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L74)
 
 ## Methods
 
@@ -190,10 +150,6 @@ fetch the IExec registry contract address of specified resource
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:103](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L103)
-
 ___
 
 ### fetchRegistryContract
@@ -211,10 +167,6 @@ fetch the IExec registry Contract instance of specified resource
 #### Returns
 
 `Promise`<`Contract`\>
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:99](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L99)
 
 ___
 
@@ -234,10 +186,6 @@ fetch the IExec token contract address, not available when isNative is true
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:111](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L111)
-
 ___
 
 ### fetchTokenContract
@@ -255,10 +203,6 @@ fetch the IExec token Contract instance, not available when isNative is true
 #### Returns
 
 `Promise`<`Contract`\>
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:107](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L107)
 
 ___
 
@@ -279,10 +223,6 @@ get a known Contract instance at specified address
 
 `Contract`
 
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L91)
-
 ___
 
 ### getIExecContract
@@ -294,10 +234,6 @@ get the IExec Contract instance
 #### Returns
 
 `Contract`
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:95](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L95)
 
 ___
 
@@ -316,7 +252,3 @@ set the signer
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/common/utils/IExecContractsClient.d.ts:87](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/common/utils/IExecContractsClient.d.ts#L87)

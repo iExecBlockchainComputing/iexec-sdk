@@ -19,10 +19,6 @@
 
 A web3 Eth provider
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:10](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L10)
-
 ___
 
 ### flavour
@@ -30,7 +26,3 @@ ___
 • `Optional` **flavour**: `string`
 
 flavour to use (default standard)
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:14](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L14)

@@ -46,10 +46,6 @@ const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
 
 BNJS.constructor
 
-#### Defined in
-
-node_modules/@types/bn.js/index.d.ts:32
-
 • **new BN**(`number`, `endian?`)
 
 #### Parameters
@@ -62,7 +58,3 @@ node_modules/@types/bn.js/index.d.ts:32
 #### Inherited from
 
 BNJS.constructor
-
-#### Defined in
-
-node_modules/@types/bn.js/index.d.ts:37

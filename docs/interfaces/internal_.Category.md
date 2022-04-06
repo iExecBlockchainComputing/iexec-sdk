@@ -22,10 +22,6 @@ IExec category
 
 a description of the category
 
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:15](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecHubModule.d.ts#L15)
-
 ___
 
 ### name
@@ -34,10 +30,6 @@ ___
 
 a name for the category
 
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:11](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecHubModule.d.ts#L11)
-
 ___
 
 ### workClockTimeRef
@@ -45,7 +37,3 @@ ___
 • **workClockTimeRef**: [`BNish`](../modules/internal_.md#bnish)
 
 time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)
-
-#### Defined in
-
-[src/lib/IExecHubModule.d.ts:19](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecHubModule.d.ts#L19)

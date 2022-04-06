@@ -24,10 +24,6 @@ published buy order for computing tasks
 
 • **chainId**: `number`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:89](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L89)
-
 ___
 
 ### order
@@ -54,19 +50,11 @@ ___
 | `workerpool` | `string` |
 | `workerpoolmaxprice` | `number` |
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:94](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L94)
-
 ___
 
 ### orderHash
 
 • **orderHash**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:88](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L88)
 
 ___
 
@@ -74,19 +62,11 @@ ___
 
 • **publicationTimestamp**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:93](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L93)
-
 ___
 
 ### remaining
 
 • **remaining**: `number`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:90](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L90)
 
 ___
 
@@ -94,16 +74,8 @@ ___
 
 • **signer**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:92](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L92)
-
 ___
 
 ### status
 
 • **status**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderbookModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderbookModule.d.ts#L91)

@@ -39,26 +39,14 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 Error.constructor
 
-#### Defined in
-
-node_modules/typescript/lib/lib.es5.d.ts:1028
-
 ## Properties
 
 ### originalError
 
 • `Optional` **originalError**: `Error`
 
-#### Defined in
-
-[src/lib/errors.d.ts:43](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L43)
-
 ___
 
 ### sendTxHash
 
 • `Optional` **sendTxHash**: `string`
-
-#### Defined in
-
-[src/lib/errors.d.ts:42](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/errors.d.ts#L42)

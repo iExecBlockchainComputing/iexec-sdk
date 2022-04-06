@@ -68,10 +68,6 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 | `args` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:133](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L133)
-
 ## Methods
 
 ### resolveBridgeAddress
@@ -83,10 +79,6 @@ resolve the current bridge contract address
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:173](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L173)
 
 ___
 
@@ -100,10 +92,6 @@ resolve the bridge contract address on bridged chain
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:177](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L177)
-
 ___
 
 ### resolveBridgedContractsClient
@@ -115,10 +103,6 @@ resolve the current bridged IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:145](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L145)
 
 ___
 
@@ -132,10 +116,6 @@ resolve the current chainId
 
 `Promise`<`number`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:137](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L137)
-
 ___
 
 ### resolveContractsClient
@@ -147,10 +127,6 @@ resolve the current IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L141)
 
 ___
 
@@ -164,10 +140,6 @@ resolve the current ENS public resolver contract address
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:181](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L181)
-
 ___
 
 ### resolveEnterpriseContractsClient
@@ -179,10 +151,6 @@ resolve the current enterprise IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:153](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L153)
 
 ___
 
@@ -196,10 +164,6 @@ resolve the current IExec market URL
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:165](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L165)
-
 ___
 
 ### resolveIpfsGatewayURL
@@ -211,10 +175,6 @@ resolve the current IPFS gateway URL
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:169](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L169)
 
 ___
 
@@ -228,10 +188,6 @@ resolve the current result proxy URL
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:161](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L161)
-
 ___
 
 ### resolveSmsURL
@@ -244,10 +200,6 @@ resolve the current SMS URL
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:157](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L157)
-
 ___
 
 ### resolveStandardContractsClient
@@ -259,7 +211,3 @@ resolve the current standard IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-#### Defined in
-
-[src/lib/IExecConfig.d.ts:149](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecConfig.d.ts#L149)

@@ -26,19 +26,11 @@ sell order for computing power
 
 • **apprestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:141](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L141)
-
 ___
 
 ### category
 
 • **category**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L139)
 
 ___
 
@@ -46,19 +38,11 @@ ___
 
 • **datasetrestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:142](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L142)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:143](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L143)
 
 ___
 
@@ -66,19 +50,11 @@ ___
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:138](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L138)
-
 ___
 
 ### trust
 
 • **trust**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:140](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L140)
 
 ___
 
@@ -86,26 +62,14 @@ ___
 
 • **volume**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:137](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L137)
-
 ___
 
 ### workerpool
 
 • **workerpool**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:135](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L135)
-
 ___
 
 ### workerpoolprice
 
 • **workerpoolprice**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:136](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L136)

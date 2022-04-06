@@ -9,7 +9,7 @@
     "build": "npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "generate-dist": "./node_modules/.bin/babel src --out-dir dist --copy-files",
     "generate-packages": "node generatePackages.js",
-    "generate-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json"
+    "generate-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources"
   },
   "bin": {
     "iexec": "./dist/cli/cmd/iexec.js"

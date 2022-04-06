@@ -52,10 +52,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -67,10 +63,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -95,10 +87,6 @@ console.log('secret exists:', isSecretSet);
 #### Returns
 
 `Promise`<`boolean`\>
-
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:175](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L175)
 
 ___
 
@@ -135,10 +123,6 @@ const checksum = await computeEncryptedFileChecksum(
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:163](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L163)
-
 ___
 
 ### countUserDatasets
@@ -162,10 +146,6 @@ console.log('dataset count:', count);
 #### Returns
 
 `Promise`<`BN`\>
-
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:91](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L91)
 
 ___
 
@@ -199,10 +179,6 @@ console.log('deployed at', address);
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
-
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:52](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L52)
 
 ___
 
@@ -242,10 +218,6 @@ const binary = new Blob([encryptedDataset]);
 
 `Promise`<`Buffer`\>
 
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:139](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L139)
-
 ___
 
 ### generateEncryptionKey
@@ -265,10 +237,6 @@ console.log('encryption key:', encryptionKey);
 #### Returns
 
 `string`
-
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:116](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L116)
 
 ___
 
@@ -299,10 +267,6 @@ console.log('secret pushed:', pushed);
 
 `Promise`<`boolean`\>
 
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L189)
-
 ___
 
 ### showDataset
@@ -326,10 +290,6 @@ console.log('dataset:', dataset);
 #### Returns
 
 `Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
-
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:79](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L79)
 
 ___
 
@@ -356,10 +316,6 @@ console.log('dataset:', dataset);
 
 `Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecDatasetModule.d.ts:101](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecDatasetModule.d.ts#L101)
-
 ___
 
 ### fromConfig
@@ -381,7 +337,3 @@ Create an IExecModule using an IExecConfig instance
 #### Inherited from
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

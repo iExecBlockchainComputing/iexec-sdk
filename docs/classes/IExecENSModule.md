@@ -49,10 +49,6 @@ Create an IExecModule instance using an IExecConfig like
 
 [IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
-#### Defined in
-
-[src/lib/IExecModule.d.ts:13](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L13)
-
 ## Properties
 
 ### config
@@ -64,10 +60,6 @@ current IExecConfig
 #### Inherited from
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:20](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L20)
 
 ## Methods
 
@@ -100,10 +92,6 @@ console.log('regitered:', name);
 #### Returns
 
 `Promise`<{ `registerTxHash?`: `string` ; `registeredName`: `string`  }\>
-
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:122](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L122)
 
 ___
 
@@ -147,10 +135,6 @@ console.log('configured resolution:', address, '<=>', name);
 
 `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:196](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L196)
-
 ___
 
 ### getOwner
@@ -175,10 +159,6 @@ console.log('iexec.eth owner:', owner);
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:85](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L85)
-
 ___
 
 ### lookupAddress
@@ -202,10 +182,6 @@ console.log('ENS name:', name);
 #### Returns
 
 `Promise`<`string`\>
-
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:105](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L105)
 
 ___
 
@@ -263,10 +239,6 @@ configureResolutionObservable.subscribe({
 
 `Promise`<[`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)\>
 
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:166](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L166)
-
 ___
 
 ### resolveName
@@ -291,10 +263,6 @@ console.log('me.users.iexec.eth:', address);
 
 `Promise`<`string`\>
 
-#### Defined in
-
-[src/lib/IExecENSModule.d.ts:95](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecENSModule.d.ts#L95)
-
 ___
 
 ### fromConfig
@@ -316,7 +284,3 @@ Create an IExecModule using an IExecConfig instance
 #### Inherited from
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
-
-#### Defined in
-
-[src/lib/IExecModule.d.ts:24](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecModule.d.ts#L24)

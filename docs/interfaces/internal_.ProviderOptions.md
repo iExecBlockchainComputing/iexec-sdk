@@ -23,10 +23,6 @@
 
 [Alchemy](https://alchemyapi.io/) API key
 
-#### Defined in
-
-[src/lib/types.d.ts:144](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L144)
-
 ___
 
 ### etherscan
@@ -34,10 +30,6 @@ ___
 • `Optional` **etherscan**: `string`
 
 [Etherscan](https://etherscan.io/) API key
-
-#### Defined in
-
-[src/lib/types.d.ts:148](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L148)
 
 ___
 
@@ -47,10 +39,6 @@ ___
 
 [INFURA](https://infura.io/) Project ID or { projectId, projectSecret }
 
-#### Defined in
-
-[src/lib/types.d.ts:152](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L152)
-
 ___
 
 ### quorum
@@ -58,7 +46,3 @@ ___
 • `Optional` **quorum**: `number`
 
 the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
-
-#### Defined in
-
-[src/lib/types.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/types.d.ts#L167)

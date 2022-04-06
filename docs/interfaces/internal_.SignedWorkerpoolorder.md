@@ -28,19 +28,11 @@ signed sell order for computing power
 
 • **apprestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:172](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L172)
-
 ___
 
 ### category
 
 • **category**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:170](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L170)
 
 ___
 
@@ -48,19 +40,11 @@ ___
 
 • **datasetrestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:173](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L173)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:174](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L174)
 
 ___
 
@@ -68,19 +52,11 @@ ___
 
 • **salt**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:175](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L175)
-
 ___
 
 ### sign
 
 • **sign**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:176](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L176)
 
 ___
 
@@ -88,19 +64,11 @@ ___
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:169](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L169)
-
 ___
 
 ### trust
 
 • **trust**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:171](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L171)
 
 ___
 
@@ -108,26 +76,14 @@ ___
 
 • **volume**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:168](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L168)
-
 ___
 
 ### workerpool
 
 • **workerpool**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:166](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L166)
-
 ___
 
 ### workerpoolprice
 
 • **workerpoolprice**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:167](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L167)

@@ -28,19 +28,11 @@ signed sell order for computing power
 
 • **apprestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:189](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L189)
-
 ___
 
 ### category
 
 • **category**: [`BNish`](../modules/internal_.md#bnish)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:187](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L187)
 
 ___
 
@@ -48,19 +40,11 @@ ___
 
 • **datasetrestrict**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:190](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L190)
-
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:191](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L191)
 
 ___
 
@@ -68,19 +52,11 @@ ___
 
 • **salt**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:192](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L192)
-
 ___
 
 ### sign
 
 • **sign**: `string`
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:193](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L193)
 
 ___
 
@@ -88,19 +64,11 @@ ___
 
 • **tag**: [`Tag`](../modules/internal_.md#tag)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:186](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L186)
-
 ___
 
 ### trust
 
 • **trust**: [`BNish`](../modules/internal_.md#bnish)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:188](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L188)
 
 ___
 
@@ -108,26 +76,14 @@ ___
 
 • **volume**: [`BNish`](../modules/internal_.md#bnish)
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:185](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L185)
-
 ___
 
 ### workerpool
 
 • **workerpool**: `string`
 
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:183](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L183)
-
 ___
 
 ### workerpoolprice
 
 • **workerpoolprice**: [`BNish`](../modules/internal_.md#bnish)
-
-#### Defined in
-
-[src/lib/IExecOrderModule.d.ts:184](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/4161173/src/lib/IExecOrderModule.d.ts#L184)

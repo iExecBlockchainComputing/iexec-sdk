@@ -33,7 +33,3 @@ ValidationError is thrown when the current configuration does not allow to perfo
 #### Inherited from
 
 Error.constructor
-
-#### Defined in
-
-node_modules/typescript/lib/lib.es5.d.ts:1028
