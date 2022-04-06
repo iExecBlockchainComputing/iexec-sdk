@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 
 /**
@@ -16,4 +17,8 @@ export default class IExecNetworkModule extends IExecModule {
    * ```
    */
   getNetwork(): Promise<{ chainId: number; isNative: boolean }>;
+  /**
+   * Create an IExecNetworkModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecNetworkModule;
 }

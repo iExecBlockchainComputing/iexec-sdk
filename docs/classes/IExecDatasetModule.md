@@ -320,9 +320,9 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecDatasetModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -332,8 +332,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecDatasetModule`](IExecDatasetModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

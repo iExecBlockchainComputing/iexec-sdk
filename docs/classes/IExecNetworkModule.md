@@ -80,9 +80,9 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecNetworkModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -92,8 +92,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecNetworkModule`](IExecNetworkModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

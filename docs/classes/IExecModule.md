@@ -81,7 +81,7 @@ current IExecConfig
 
 ▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecModule instance using an IExecConfig instance
 
 #### Parameters
 

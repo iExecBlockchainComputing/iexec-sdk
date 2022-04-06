@@ -19,7 +19,7 @@ export default class IExecModule {
    */
   config: IExecConfig;
   /**
-   * Create an IExecModule using an IExecConfig instance
+   * Create an IExecModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecModule;
 }

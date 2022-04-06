@@ -1,5 +1,6 @@
-import { Observable } from '../common/utils/reactive';
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
+import { Observable } from '../common/utils/reactive';
 import { Address, BN, Bytes, Bytes32, Dealid, Taskid, TxHash } from './types';
 
 declare class TaskObservable extends Observable {
@@ -142,4 +143,8 @@ export default class IExecTaskModule extends IExecModule {
    * ```
    */
   fetchResults(taskid: Taskid): Promise<Response>;
+  /**
+   * Create an IExecTaskModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecTaskModule;
 }

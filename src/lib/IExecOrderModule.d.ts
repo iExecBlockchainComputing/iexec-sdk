@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import {
   Address,
@@ -971,4 +972,8 @@ export default class IExecOrderModule extends IExecModule {
       checkRequest?: boolean;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
+  /**
+   * Create an IExecOrderModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecOrderModule;
 }

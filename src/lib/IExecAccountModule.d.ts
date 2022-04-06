@@ -1,3 +1,4 @@
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { Addressish, BN, NRLCAmount, TxHash } from './types';
 
@@ -48,4 +49,8 @@ export default class IExecAccountModule extends IExecModule {
    * ```
    */
   checkBridgedBalance(address: Addressish): Promise<{ stake: BN; locked: BN }>;
+  /**
+   * Create an IExecAccountModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecAccountModule;
 }

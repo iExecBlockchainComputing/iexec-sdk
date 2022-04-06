@@ -189,9 +189,9 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ `Static` **fromConfig**(`config`): [`IExecTaskModule`](IExecTaskModule.md)
 
-Create an IExecModule using an IExecConfig instance
+Create an IExecTaskModule instance using an IExecConfig instance
 
 #### Parameters
 
@@ -201,8 +201,8 @@ Create an IExecModule using an IExecConfig instance
 
 #### Returns
 
-[`IExecModule`](IExecModule.md)
+[`IExecTaskModule`](IExecTaskModule.md)
 
-#### Inherited from
+#### Overrides
 
 [IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

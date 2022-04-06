@@ -1,6 +1,13 @@
-import BN from 'bn.js';
+import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
-import { Address, Addressish, NRLCAmount, TxHash, WeiAmount } from './types';
+import {
+  Address,
+  Addressish,
+  NRLCAmount,
+  TxHash,
+  WeiAmount,
+  BN,
+} from './types';
 import { Observable } from '../common/utils/reactive';
 
 declare class BrigdeObservable extends Observable {
@@ -225,4 +232,8 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   unwrapEnterpriseRLC(nRLCAmount: NRLCAmount): Promise<TxHash>;
+  /**
+   * Create an IExecWalletModule instance using an IExecConfig instance
+   */
+  static fromConfig(config: IExecConfig): IExecWalletModule;
 }
