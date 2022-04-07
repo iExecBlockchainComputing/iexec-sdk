@@ -5,9 +5,15 @@ import { ProviderOptions } from './types';
 
 export interface IExecConfigArgs {
   /**
-   * A web3 Eth provider
+   * A web3 Eth provider or network name or chain id
+   *
+   * examples:
+   * - `window.ethereum`
+   * - `"mainnet"` or  `"1"` for ethereum mainnet
+   * - `"bellecour"` or `"134"` for iExec sidechain
+   * - `"http://localhost:8545"` for local chain
    */
-  ethProvider: ExternalProvider | EnhancedWallet;
+  ethProvider: ExternalProvider | EnhancedWallet | string;
   /**
    * flavour to use (default standard)
    */

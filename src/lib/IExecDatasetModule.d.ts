@@ -37,6 +37,8 @@ export interface Dataset {
  */
 export default class IExecDatasetModule extends IExecModule {
   /**
+   * **SIGNER REQUIRED**
+   *
    * deploy a dataset contract on the blockchain
    *
    * example:
@@ -175,7 +177,7 @@ export default class IExecDatasetModule extends IExecModule {
    */
   checkDatasetSecretExists(datasetAddress: Addressish): Promise<boolean>;
   /**
-   * **ONLY DATASET OWNER**
+   * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * push the dataset's encryption key to the Secret Management Service
    *

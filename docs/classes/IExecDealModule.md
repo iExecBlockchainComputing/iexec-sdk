@@ -70,6 +70,8 @@ current IExecConfig
 
 ▸ **claim**(`dealid`): `Promise`<{ `claimed`: `Record`<`number`, `string`\> ; `transactions`: { `txHash`: `string` ; `type`: `string`  }[]  }\>
 
+**SIGNER REQUIRED**
+
 claim all the failed task from a deal
 
 depending the number and the status of task to claim, this may involve several transactions in order to fit in the blockchain gasLimit per block. (for example a 10_000_000 gas block size allows to claim 180 initialized task or 40 non-initialized tasks in one block)

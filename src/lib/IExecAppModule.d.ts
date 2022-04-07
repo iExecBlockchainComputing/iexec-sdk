@@ -45,6 +45,8 @@ export interface App {
  */
 export default class IExecAppModule extends IExecModule {
   /**
+   * **SIGNER REQUIRED**
+   *
    * deploy an app contract on the blockchain
    *
    * example:

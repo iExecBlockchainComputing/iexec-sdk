@@ -83,7 +83,7 @@ ___
 
 ▸ **createCategory**(`category`): `Promise`<{ `catid`: `BN` ; `txHash`: `string`  }\>
 
-**ONLY IEXEC OWNER**
+**SIGNER REQUIRED, ONLY IEXEC OWNER**
 
 create a computation category on the iExec contract
 

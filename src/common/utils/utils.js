@@ -8,7 +8,7 @@ const { getAddress, randomBytes, formatUnits, parseUnits } =
   require('ethers').utils;
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
-const { ValidationError } = require('./errors');
+const { ValidationError, ConfigurationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
 
@@ -412,6 +412,14 @@ const sleep = (ms) =>
   });
 const FETCH_INTERVAL = 5000;
 
+const checkSigner = (contracts) => {
+  if (!(contracts && contracts.signer)) {
+    throw new ConfigurationError(
+      'The current provider is not a signer, impossible to sign messages or transactions',
+    );
+  }
+};
+
 module.exports = {
   BN,
   isRlcUnit,
@@ -449,5 +457,6 @@ module.exports = {
   bytes32Regex,
   addressRegex,
   sleep,
+  checkSigner,
   FETCH_INTERVAL,
 };

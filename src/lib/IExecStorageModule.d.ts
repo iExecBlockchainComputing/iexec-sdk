@@ -24,7 +24,7 @@ export default class IExecStorageModule extends IExecModule {
     },
   ): Promise<boolean>;
   /**
-   * **ONLY BENEFICIARY**
+   * **SIGNER REQUIRED, ONLY BENEFICIARY**
    *
    * get an authorization token from the default IPFS based remote storage
    *
@@ -37,7 +37,7 @@ export default class IExecStorageModule extends IExecModule {
    */
   defaultStorageLogin(): Promise<string>;
   /**
-   * **ONLY BENEFICIARY**
+   * **SIGNER REQUIRED, ONLY BENEFICIARY**
    *
    * push a personal storage token to the Secret Management Service to allow result archive upload
    *

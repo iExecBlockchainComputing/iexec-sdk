@@ -94,7 +94,7 @@ current IExecConfig
 
 ▸ **cancelApporder**(`apporder`): `Promise`<{ `order`: [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) ; `txHash`: `string`  }\>
 
-**ONLY APP OWNER**
+**SIGNER REQUIRED, ONLY APP OWNER**
 
 cancel an apporder on the blockchain making it invalid
 
@@ -120,7 +120,7 @@ ___
 
 ▸ **cancelDatasetorder**(`datasetorder`): `Promise`<{ `order`: [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) ; `txHash`: `string`  }\>
 
-**ONLY DATASET OWNER**
+**SIGNER REQUIRED, ONLY DATASET OWNER**
 
 cancel a datasetorder on the blockchain making it invalid
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **cancelRequestorder**(`requestorder`): `Promise`<{ `order`: [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) ; `txHash`: `string`  }\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 cancel a requestorder on the blockchain making it invalid
 
@@ -172,7 +172,7 @@ ___
 
 ▸ **cancelWorkerpoolorder**(`workerpoolorder`): `Promise`<{ `order`: [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) ; `txHash`: `string`  }\>
 
-**ONLY WORKERPOOL OWNER**
+**SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
 cancel a workerpoolorder on the blockchain making it invalid
 
@@ -426,6 +426,8 @@ ___
 
 ▸ **matchOrders**(`orders`, `options?`): `Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: `BN`  }\>
 
+**SIGNER REQUIRED**
+
 make a deal on-chain with compatible orders to trigger the off-chain computation.
 
 _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
@@ -461,7 +463,7 @@ ___
 
 ▸ **publishApporder**(`apporder`): `Promise`<`string`\>
 
-**ONLY APP OWNER**
+**SIGNER REQUIRED, ONLY APP OWNER**
 
 publish an apporder on the off-chain marketplace making it available for other users
 
@@ -487,7 +489,7 @@ ___
 
 ▸ **publishDatasetorder**(`datasetorder`): `Promise`<`string`\>
 
-**ONLY DATASET OWNER**
+**SIGNER REQUIRED, ONLY DATASET OWNER**
 
 publish a datasetorder on the off-chain marketplace making it available for other users
 
@@ -513,7 +515,7 @@ ___
 
 ▸ **publishRequestorder**(`requestorder`, `options?`): `Promise`<`string`\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 publish a requestorder on the off-chain marketplace making it available for other users
 
@@ -543,7 +545,7 @@ ___
 
 ▸ **publishWorkerpoolorder**(`workerpoolorder`): `Promise`<`string`\>
 
-**ONLY WORKERPOOL OWNER**
+**SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
 publish a workerpoolorder on the off-chain marketplace making it available for other users
 
@@ -595,7 +597,7 @@ ___
 
 ▸ **signDatasetorder**(`datasetorderTemplate`): `Promise`<[`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md)\>
 
-**ONLY DATASET OWNER**
+**SIGNER REQUIRED, ONLY DATASET OWNER**
 
 sign a datasetorder template to create a valid order
 
@@ -621,7 +623,7 @@ ___
 
 ▸ **signRequestorder**(`requestorderTemplate`, `options?`): `Promise`<[`SignedRequestorder`](../interfaces/internal_.SignedRequestorder.md)\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 sign a requestorder template to create a valid order
 
@@ -655,7 +657,7 @@ ___
 
 ▸ **signWorkerpoolorder**(`workerpoolorderTemplate`): `Promise`<[`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md)\>
 
-**ONLY WORKERPOOL OWNER**
+**SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
 sign a workerpoolorder template to create a valid order
 
@@ -680,7 +682,7 @@ ___
 
 ▸ **unpublishAllApporders**(`appAddress`): `Promise`<`string`[]\>
 
-**ONLY APPORDER SIGNER**
+**SIGNER REQUIRED, ONLY APPORDER SIGNER**
 
 unpublish all the published app's apporders from the off-chain marketplace
 
@@ -708,7 +710,7 @@ ___
 
 ▸ **unpublishAllDatasetorders**(`datasetAddress`): `Promise`<`string`[]\>
 
-**ONLY DATASETORDER SIGNER**
+**SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
 
 unpublish all the published dataset's datasetorders from the off-chain marketplace
 
@@ -736,7 +738,7 @@ ___
 
 ▸ **unpublishAllRequestorders**(): `Promise`<`string`[]\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 unpublish all the published requester's requestorders from the off-chain marketplace
 
@@ -758,7 +760,7 @@ ___
 
 ▸ **unpublishAllWorkerpoolorders**(`workerpoolAddress`): `Promise`<`string`[]\>
 
-**ONLY WORKERPOOLORDER SIGNER**
+**SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
 
 unpublish all the published workerpool's workerpoolorders from the off-chain marketplace
 
@@ -786,7 +788,7 @@ ___
 
 ▸ **unpublishApporder**(`apporderHash`): `Promise`<`string`\>
 
-**ONLY APPORDER SIGNER**
+**SIGNER REQUIRED, ONLY APPORDER SIGNER**
 
 unpublish an apporder from the off-chain marketplace
 
@@ -814,7 +816,7 @@ ___
 
 ▸ **unpublishDatasetorder**(`datasetorderHash`): `Promise`<`string`\>
 
-**ONLY DATASETORDER SIGNER**
+**SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
 
 unpublish a datasetorder from the off-chain marketplace
 
@@ -842,7 +844,7 @@ ___
 
 ▸ **unpublishLastApporder**(`appAddress`): `Promise`<`string`\>
 
-**ONLY APPORDER SIGNER**
+**SIGNER REQUIRED, ONLY APPORDER SIGNER**
 
 unpublish the last published app's apporder from the off-chain marketplace
 
@@ -870,7 +872,7 @@ ___
 
 ▸ **unpublishLastDatasetorder**(`datasetAddress`): `Promise`<`string`\>
 
-**ONLY DATASETORDER SIGNER**
+**SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
 
 unpublish the last published dataset's datasetorder from the off-chain marketplace
 
@@ -898,7 +900,7 @@ ___
 
 ▸ **unpublishLastRequestorder**(): `Promise`<`string`\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 unpublish the last published requester's requestorder from the off-chain marketplace
 
@@ -920,7 +922,7 @@ ___
 
 ▸ **unpublishLastWorkerpoolorder**(`workerpoolAddress`): `Promise`<`string`\>
 
-**ONLY WORKERPOOLORDER SIGNER**
+****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
 
 unpublish the last published workerpool's workerpoolorder from the off-chain marketplace
 
@@ -948,7 +950,7 @@ ___
 
 ▸ **unpublishRequestorder**(`requestorderHash`): `Promise`<`string`\>
 
-**ONLY REQUESTER**
+**SIGNER REQUIRED, ONLY REQUESTER**
 
 unpublish a requestorder from the off-chain marketplace
 
@@ -976,7 +978,7 @@ ___
 
 ▸ **unpublishWorkerpoolorder**(`workerpoolorderHash`): `Promise`<`string`\>
 
-**ONLY WORKERPOOLORDER SIGNER**
+**SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
 
 unpublish a workerpoolorder from the off-chain marketplace
 

@@ -6,6 +6,7 @@ const {
   cleanRPC,
   NULL_BYTES32,
   NULL_BYTES,
+  checkSigner,
 } = require('../utils/utils');
 const { bytes32Schema, throwIfMissing } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
@@ -77,6 +78,7 @@ const claim = async (
   taskid = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vTaskId = await bytes32Schema().validate(taskid);
     const task = await show(contracts, vTaskId);
     const taskStatus = task.status;

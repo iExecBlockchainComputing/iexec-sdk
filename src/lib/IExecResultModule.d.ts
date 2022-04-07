@@ -19,7 +19,7 @@ export default class IExecResultModule extends IExecModule {
     beneficiaryAddress: Addressish,
   ): Promise<boolean>;
   /**
-   * **ONLY BENEFICIARY**
+   * **SIGNER REQUIRED, ONLY BENEFICIARY**
    *
    * push a beneficiary result encryption key to the Secret Management Service to allow result encryption
    *

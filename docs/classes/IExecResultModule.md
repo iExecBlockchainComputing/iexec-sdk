@@ -87,7 +87,7 @@ ___
 
 ▸ **pushResultEncryptionKey**(`rsaPublicKey`, `options?`): `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
 
-**ONLY BENEFICIARY**
+**SIGNER REQUIRED, ONLY BENEFICIARY**
 
 push a beneficiary result encryption key to the Secret Management Service to allow result encryption
 
