@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "7.1.0-alpha.8",
+  "version": "7.1.0-alpha.9",
   "description": "iExec SDK",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
