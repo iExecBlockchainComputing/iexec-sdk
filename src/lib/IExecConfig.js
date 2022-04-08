@@ -13,7 +13,7 @@ const { getReadOnlyProvider } = require('../common/utils/providers');
 
 class IExecConfig {
   constructor(
-    { ethProvider, flavour = 'standard' },
+    { ethProvider, flavour = 'standard' } = {},
     {
       hubAddress,
       ensRegistryAddress,
@@ -31,14 +31,18 @@ class IExecConfig {
       providerOptions,
     } = {},
   ) {
-    const isEnhancedWallet = ethProvider instanceof EnhancedWallet;
-    const isNetworkish = typeof ethProvider === 'string';
+    if (ethProvider === undefined || ethProvider === null) {
+      throw new errors.ConfigurationError('Missing ethProvider');
+    }
+    const isReadOnlyProvider =
+      typeof ethProvider === 'string' || typeof ethProvider === 'number';
+    const isEnhancedWalletProvider = ethProvider instanceof EnhancedWallet;
 
     const networkPromise = (async () => {
       let disposableProvider;
-      if (isEnhancedWallet) {
+      if (isEnhancedWalletProvider) {
         disposableProvider = ethProvider.provider;
-      } else if (isNetworkish) {
+      } else if (isReadOnlyProvider) {
         disposableProvider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
         });
@@ -65,7 +69,7 @@ class IExecConfig {
         ...chainDefaults.network,
         ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
       };
-      if (isEnhancedWallet) {
+      if (isEnhancedWalletProvider) {
         if (
           ethProvider.provider &&
           ethProvider.provider.connection &&
@@ -88,7 +92,7 @@ class IExecConfig {
           signer = ethProvider;
         }
         provider = signer.provider;
-      } else if (isNetworkish) {
+      } else if (isReadOnlyProvider) {
         provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
           network: networkOverride,

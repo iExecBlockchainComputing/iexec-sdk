@@ -9,11 +9,11 @@ export interface IExecConfigArgs {
    *
    * examples:
    * - `window.ethereum`
-   * - `"mainnet"` or  `"1"` for ethereum mainnet
-   * - `"bellecour"` or `"134"` for iExec sidechain
+   * - `"mainnet"` or `1` or `"1"` for ethereum mainnet
+   * - `"bellecour"` or `134` or `"134"` for iExec sidechain
    * - `"http://localhost:8545"` for local chain
    */
-  ethProvider: ExternalProvider | EnhancedWallet | string;
+  ethProvider: ExternalProvider | EnhancedWallet | string | number;
   /**
    * flavour to use (default standard)
    */
