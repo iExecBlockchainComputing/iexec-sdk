@@ -114,6 +114,8 @@ ___
 
 ▸ **deposit**(`amount`): `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
 deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
 
 example:
@@ -138,6 +140,8 @@ ___
 ### withdraw
 
 ▸ **withdraw**(`amount`): `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+
+**SIGNER REQUIRED**
 
 withdraw some nRLC (1 nRLC = 1*10^-9 RLC) from user account to user wallet
 

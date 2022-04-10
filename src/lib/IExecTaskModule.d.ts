@@ -122,6 +122,8 @@ export default class IExecTaskModule extends IExecModule {
     optional?: { dealid?: Dealid },
   ): Promise<TaskObservable>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * claim a task not completed after the final deadline (proceed to refunds).
    *
    * example:

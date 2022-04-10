@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - TypeScript interfaces
 - `providerOptions` can be passed to the constructor to configure ethers default provider on bridged chain
+- `ethProvider` now accepts network name, network chainId and RPC url, using one of those option will setup an IExecConfig with provider allowing read-only operations (operations requiring a Signer will fail)
 
 ### Changed
 

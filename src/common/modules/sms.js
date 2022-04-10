@@ -9,6 +9,7 @@ const {
   throwIfMissing,
 } = require('../utils/validator');
 const { wrapPersonalSign } = require('../utils/errorWrappers');
+const { checkSigner } = require('../utils/utils');
 
 const debug = Debug('iexec:sms');
 
@@ -113,6 +114,7 @@ const pushWeb3Secret = async (
   secretValue = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vResourceAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(resourceAddress);
@@ -170,6 +172,7 @@ const pushWeb2Secret = async (
   { forceUpdate = false } = {},
 ) => {
   try {
+    checkSigner(contracts);
     const ownerAddress = await getAddress(contracts);
     await stringSchema().validate(secretName, { strict: true });
     await stringSchema().validate(secretValue, { strict: true });

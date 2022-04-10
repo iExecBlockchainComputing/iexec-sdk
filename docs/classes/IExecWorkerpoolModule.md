@@ -89,6 +89,8 @@ ___
 
 ▸ **deployWorkerpool**(`workerpool`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
 deploy a workerpool contract on the blockchain
 
 example:

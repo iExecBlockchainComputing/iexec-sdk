@@ -7,6 +7,7 @@ const {
   bnNRlcToBnWei,
   bnToEthersBn,
   NULL_BYTES,
+  checkSigner,
 } = require('../utils/utils');
 const {
   nRlcAmountSchema,
@@ -45,6 +46,7 @@ const deposit = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
       throw Error('Deposit amount must be greather than 0');
@@ -105,6 +107,7 @@ const withdraw = async (
   amount = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
       throw Error('Withdraw amount must be greather than 0');

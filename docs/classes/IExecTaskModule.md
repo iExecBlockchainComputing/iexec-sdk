@@ -65,6 +65,8 @@ current IExecConfig
 
 ▸ **claim**(`taskid`): `Promise`<`string`\>
 
+**SIGNER REQUIRED**
+
 claim a task not completed after the final deadline (proceed to refunds).
 
 example:

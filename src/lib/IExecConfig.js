@@ -1,4 +1,4 @@
-const { getDefaultProvider, providers } = require('ethers');
+const { providers } = require('ethers');
 const IExecContractsClient = require('../common/utils/IExecContractsClient');
 const errors = require('../common/utils/errors');
 const {
@@ -9,10 +9,11 @@ const {
   getChainDefaults,
   isEnterpriseEnabled,
 } = require('../common/utils/config');
+const { getReadOnlyProvider } = require('../common/utils/providers');
 
 class IExecConfig {
   constructor(
-    { ethProvider, flavour = 'standard' },
+    { ethProvider, flavour = 'standard' } = {},
     {
       hubAddress,
       ensRegistryAddress,
@@ -30,12 +31,21 @@ class IExecConfig {
       providerOptions,
     } = {},
   ) {
-    const isEnhancedWallet = ethProvider instanceof EnhancedWallet;
+    if (ethProvider === undefined || ethProvider === null) {
+      throw new errors.ConfigurationError('Missing ethProvider');
+    }
+    const isReadOnlyProvider =
+      typeof ethProvider === 'string' || typeof ethProvider === 'number';
+    const isEnhancedWalletProvider = ethProvider instanceof EnhancedWallet;
 
     const networkPromise = (async () => {
       let disposableProvider;
-      if (isEnhancedWallet) {
+      if (isEnhancedWalletProvider) {
         disposableProvider = ethProvider.provider;
+      } else if (isReadOnlyProvider) {
+        disposableProvider = getReadOnlyProvider(ethProvider, {
+          providers: providerOptions,
+        });
       } else {
         disposableProvider = new providers.Web3Provider(ethProvider);
       }
@@ -49,17 +59,17 @@ class IExecConfig {
       return getChainDefaults({ id: chainId, flavour });
     })();
 
-    const signerProviderPromise = (async () => {
+    const providerAndSignerPromise = (async () => {
       let provider;
       let signer;
       const network = await networkPromise;
-      const { ensRegistry } = await chainConfDefaultsPromise;
+      const chainDefaults = await chainConfDefaultsPromise;
       const networkOverride = {
         ...network,
-        ...(ensRegistry && { ensAddress: ensRegistry }),
+        ...chainDefaults.network,
         ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
       };
-      if (isEnhancedWallet) {
+      if (isEnhancedWalletProvider) {
         if (
           ethProvider.provider &&
           ethProvider.provider.connection &&
@@ -82,6 +92,11 @@ class IExecConfig {
           signer = ethProvider;
         }
         provider = signer.provider;
+      } else if (isReadOnlyProvider) {
+        provider = getReadOnlyProvider(ethProvider, {
+          providers: providerOptions,
+          network: networkOverride,
+        });
       } else {
         const web3SignerProvider = new EnhancedWeb3Signer(
           ethProvider,
@@ -95,7 +110,7 @@ class IExecConfig {
 
     const contractsPromise = (async () => {
       const { chainId } = await networkPromise;
-      const { provider, signer } = await signerProviderPromise;
+      const { provider, signer } = await providerAndSignerPromise;
       return new IExecContractsClient({
         chainId,
         provider,
@@ -119,7 +134,7 @@ class IExecConfig {
     const resolveEnterpriseSwapContracts = async () => {
       if (!_enterpriseSwapContracts) {
         const { chainId } = await networkPromise;
-        const { provider, signer } = await signerProviderPromise;
+        const { provider, signer } = await providerAndSignerPromise;
         let enterpriseConf;
         const hasEnterpriseConf =
           enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
@@ -201,6 +216,7 @@ class IExecConfig {
               flavour === 'standard' ? !contracts.isNative : contracts.isNative,
             hubAddress: bridgedNetworkConf.hubAddress,
             bridgeAddress: bridgedBridgeAddress,
+            network: bridgedChainConfDefaults.network,
           };
         }
       }
@@ -218,7 +234,10 @@ class IExecConfig {
           const bridgedConf = await resolveBridgedConf();
           _bridgedContracts = new IExecContractsClient({
             chainId: bridgedConf.chainId,
-            provider: getDefaultProvider(bridgedConf.rpcURL, providerOptions), // TO DO if only one api key use corresponding provider
+            provider: getReadOnlyProvider(bridgedConf.rpcURL, {
+              providers: providerOptions,
+              network: bridgedConf.network,
+            }),
             hubAddress: bridgedConf.hubAddress,
             confirms,
             isNative: bridgedConf.isNative,

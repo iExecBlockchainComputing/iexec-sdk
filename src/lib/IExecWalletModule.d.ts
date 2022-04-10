@@ -78,6 +78,8 @@ declare class BrigdeObservable extends Observable {
  */
 export default class IExecWalletModule extends IExecModule {
   /**
+   * **SIGNER REQUIRED**
+   *
    * get the connected wallet address
    *
    * example:
@@ -116,6 +118,8 @@ export default class IExecWalletModule extends IExecModule {
     nRLC: BN;
   }>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * send some wei to the specified address
    *
    * example:
@@ -126,6 +130,8 @@ export default class IExecWalletModule extends IExecModule {
    */
   sendETH(WeiAmount: WeiAmount, to: Addressish): Promise<TxHash>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * send some nRLC to the specified address
    *
    * example:
@@ -136,6 +142,8 @@ export default class IExecWalletModule extends IExecModule {
    */
   sendRLC(nRLCAmount: NRLCAmount, to: Addressish): Promise<TxHash>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * send all the iExec token and the native token owned by the wallet to the specified address
    *
    * example:
@@ -149,6 +157,8 @@ export default class IExecWalletModule extends IExecModule {
     to: Addressish,
   ): Promise<{ sendERC20TxHash: TxHash; sendNativeTxHash: TxHash }>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * send some nRLC to the sidechain
    *
    * _NB_:
@@ -165,6 +175,8 @@ export default class IExecWalletModule extends IExecModule {
     nRLCAmount: NRLCAmount,
   ): Promise<{ sendTxHash: TxHash; receiveTxHash?: TxHash }>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * send some nRLC to the mainchain
    *
    * _NB_:
@@ -180,7 +192,9 @@ export default class IExecWalletModule extends IExecModule {
   bridgeToMainchain(
     nRLCAmount: NRLCAmount,
   ): Promise<{ sendTxHash: TxHash; receiveTxHash?: TxHash }>;
-  /*
+  /**
+   * **SIGNER REQUIRED**
+   *
    * return an Observable with a subscribe method to start and monitor the bridge to sidechain process
    *
    * example:
@@ -194,7 +208,9 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   obsBridgeToSidechain(nRLCAmount: NRLCAmount): Promise<BrigdeObservable>;
-  /*
+  /**
+   * **SIGNER REQUIRED**
+   *
    * return an Observable with a subscribe method to start and monitor the bridge to mainchain process
    *
    * example:
@@ -209,7 +225,7 @@ export default class IExecWalletModule extends IExecModule {
    */
   obsBridgeToMainchain(nRLCAmount: NRLCAmount): Promise<BrigdeObservable>;
   /**
-   * **ONLY ERLC WHITELISTED ACCOUNTS**
+   * **SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
    *
    * wrap some nRLC into neRLC (enterprise nRLC)
    *
@@ -221,7 +237,7 @@ export default class IExecWalletModule extends IExecModule {
    */
   wrapEnterpriseRLC(nRLCAmount: NRLCAmount): Promise<TxHash>;
   /**
-   * **ONLY ERLC WHITELISTED ACCOUNTS**
+   * **SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
    *
    * unwrap some neRLC (enterprise nRLC) into nRLC
    *

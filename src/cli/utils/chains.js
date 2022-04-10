@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { getDefaultProvider, ethers } = require('ethers');
+const { ethers } = require('ethers');
 const {
   getChainDefaults,
   isEnterpriseEnabled,
@@ -8,6 +8,7 @@ const IExecContractsClient = require('../../common/utils/IExecContractsClient');
 const { EnhancedWallet } = require('../../common/utils/signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
+const { getReadOnlyProvider } = require('../../common/utils/providers');
 
 const debug = Debug('iexec:chains');
 
@@ -54,7 +55,7 @@ const createChainFromConf = (
             chainId: parseInt(chainConf.id, 10),
             name: chainName,
           })
-        : getDefaultProvider(chainConf.host, providerOptions);
+        : getReadOnlyProvider(chainConf.host, { providers: providerOptions });
 
     chain.name = chainName;
     const contracts = new IExecContractsClient({
@@ -75,7 +76,9 @@ const createChainFromConf = (
               ensAddress: bridgeConf.ensRegistry,
               chainId: parseInt(bridgeConf.id, 10),
             })
-          : getDefaultProvider(bridgeConf.host, providerOptions);
+          : getReadOnlyProvider(bridgeConf.host, {
+              providers: providerOptions,
+            });
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,

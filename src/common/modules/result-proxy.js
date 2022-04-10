@@ -2,6 +2,7 @@ const Debug = require('debug');
 const { getAddress } = require('./wallet');
 const { getAuthorization, httpRequest } = require('../utils/api-utils');
 const { throwIfMissing } = require('../utils/validator');
+const { checkSigner } = require('../utils/utils');
 
 const debug = Debug('iexec:result-proxy');
 
@@ -10,6 +11,7 @@ const login = async (
   resultProxyURL = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const userAddress = await getAddress(contracts);
     const authorization = await getAuthorization(
       resultProxyURL,
