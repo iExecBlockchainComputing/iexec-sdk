@@ -1,13 +1,14 @@
 const Debug = require('debug');
-const { getDefaultProvider, ethers } = require('ethers');
-const IExecContractsClient = require('iexec-contracts-js-client');
+const { ethers } = require('ethers');
 const {
   getChainDefaults,
   isEnterpriseEnabled,
 } = require('../../common/utils/config');
+const IExecContractsClient = require('../../common/utils/IExecContractsClient');
 const { EnhancedWallet } = require('../../common/utils/signers');
 const { loadChainConf } = require('./fs');
 const { Spinner } = require('./cli-helper');
+const { getReadOnlyProvider } = require('../../common/utils/providers');
 
 const debug = Debug('iexec:chains');
 
@@ -43,7 +44,7 @@ const ENTERPRISE_SWAP_MAP = {
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, enterpriseSwapConf, providersOptions, txOptions = {} } = {},
+  { bridgeConf, enterpriseSwapConf, providerOptions, txOptions = {} } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -54,7 +55,7 @@ const createChainFromConf = (
             chainId: parseInt(chainConf.id, 10),
             name: chainName,
           })
-        : getDefaultProvider(chainConf.host, providersOptions);
+        : getReadOnlyProvider(chainConf.host, { providers: providerOptions });
 
     chain.name = chainName;
     const contracts = new IExecContractsClient({
@@ -75,7 +76,9 @@ const createChainFromConf = (
               ensAddress: bridgeConf.ensRegistry,
               chainId: parseInt(bridgeConf.id, 10),
             })
-          : getDefaultProvider(bridgeConf.host, providersOptions);
+          : getReadOnlyProvider(bridgeConf.host, {
+              providers: providerOptions,
+            });
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,
@@ -112,7 +115,7 @@ const loadChain = async (
   try {
     const chainsConf = await loadChainConf();
     debug('chainsConf', chainsConf);
-    const providersOptions = chainsConf.providers;
+    const providerOptions = chainsConf.providers;
     let name;
     let loadedConf;
     if (chainName) {
@@ -233,7 +236,7 @@ const loadChain = async (
     const chain = createChainFromConf(name, conf, {
       bridgeConf,
       enterpriseSwapConf,
-      providersOptions,
+      providerOptions,
       txOptions,
     });
     spinner.info(`Using chain ${name} [chainId: ${chain.id}]`);

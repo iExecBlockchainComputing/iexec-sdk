@@ -23,6 +23,7 @@ const {
   findMissingBitsInTag,
   checkActiveBitInTag,
   tagBitToHuman,
+  checkSigner,
 } = require('../utils/utils');
 const { jsonApi, getAuthorization } = require('../utils/api-utils');
 const { hashEIP712 } = require('../utils/sig-utils');
@@ -342,6 +343,7 @@ const signOrder = async (
   orderObj = throwIfMissing(),
 ) => {
   checkOrderName(orderName);
+  checkSigner(contracts);
   const signerAddress =
     orderName === REQUEST_ORDER
       ? orderObj.requester
@@ -428,6 +430,7 @@ const cancelOrder = async (
 ) => {
   try {
     checkOrderName(orderName);
+    checkSigner(contracts);
     const args = signedOrderToStruct(orderName, orderObj);
     const remainingVolume = await getRemainingVolume(
       contracts,
@@ -501,6 +504,7 @@ const publishOrder = async (
 ) => {
   try {
     checkOrderName(orderName);
+    checkSigner(contracts);
     const address = await getAddress(contracts);
     const body = { order: signedOrder };
     const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
@@ -592,6 +596,7 @@ const unpublishOrder = async (
 ) => {
   try {
     checkOrderName(orderName);
+    checkSigner(contracts);
     const body = { target };
     if (target === UNPUBLISH_TARGET_ORDERHASH) {
       if (!orderHash) throwIfMissing();
@@ -1245,6 +1250,7 @@ const matchOrders = async (
   requestOrder = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
       await Promise.all([
         signedApporderSchema().validate(appOrder),

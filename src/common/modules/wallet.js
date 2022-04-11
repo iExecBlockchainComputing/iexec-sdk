@@ -10,6 +10,7 @@ const {
   checksummedAddress,
   formatRLC,
   NULL_BYTES,
+  checkSigner,
 } = require('../utils/utils');
 const {
   addressSchema,
@@ -19,7 +20,7 @@ const {
   throwIfMissing,
 } = require('../utils/validator');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { BridgeError } = require('../utils/errors');
+const { BridgeError, ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
 const foreignBridgeErcToNativeDesc = require('../abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('../abi/bridge/HomeBridgeErcToNative.json');
@@ -82,7 +83,7 @@ const ethFaucets = [
 ];
 
 const getAddress = async (contracts = throwIfMissing()) => {
-  if (!contracts.signer) throw Error('Missing Signer');
+  if (!contracts.signer) throw new ConfigurationError('Missing Signer');
   const address = await wrapCall(contracts.signer.getAddress());
   return checksummedAddress(address);
 };
@@ -99,8 +100,7 @@ const isInWhitelist = async (
     ethProvider: contracts.provider,
   }).validate(address);
   try {
-    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
-    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
+    const eRlcContract = await wrapCall(contracts.fetchTokenContract());
     const isKYC = await wrapCall(eRlcContract.isKYC(vAddress));
     if (!isKYC && strict) {
       throw Error(`${vAddress} is not authorized to interact with eRLC`);
@@ -124,12 +124,8 @@ const getRlcBalance = async (
     const weiBalance = await contracts.provider.getBalance(vAddress);
     return truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance));
   }
-  const rlcAddress = await contracts.fetchRLCAddress();
-  const nRlcBalance = await contracts
-    .getRLCContract({
-      at: rlcAddress,
-    })
-    .balanceOf(vAddress);
+  const rlcContract = await wrapCall(contracts.fetchTokenContract());
+  const nRlcBalance = await wrapCall(rlcContract.balanceOf(vAddress));
   return ethersBnToBn(nRlcBalance);
 };
 
@@ -233,6 +229,7 @@ const sendNativeToken = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -261,13 +258,13 @@ const sendERC20 = async (
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
   }).validate(to);
   const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
   try {
-    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
-    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
+    const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
       rlcContract.transfer(vAddress, vAmount, contracts.txOptions),
     );
@@ -285,6 +282,7 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -309,6 +307,7 @@ const sendRLC = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -340,6 +339,7 @@ const sendRLC = async (
 
 const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
+    checkSigner(contracts);
     const vAddressTo = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -459,6 +459,7 @@ const obsBridgeToSidechain = (
     let stopWatchPromise;
     const bridgeToken = async () => {
       try {
+        checkSigner(contracts);
         // input validation
         const vBridgeAddress = await addressSchema({
           ethProvider: contracts.provider,
@@ -496,9 +497,9 @@ const obsBridgeToSidechain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: minPerTx.toString(),
-          maxPerTx: maxPerTx.toString(),
-          dailyLimit: dailyLimit.toString(),
+          minPerTx: ethersBnToBn(minPerTx),
+          maxPerTx: ethersBnToBn(maxPerTx),
+          dailyLimit: ethersBnToBn(dailyLimit),
         });
         if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
           throw Error(
@@ -527,18 +528,17 @@ const obsBridgeToSidechain = (
           dayStartTimestamp,
         );
         if (abort) return;
-        const erc20Address = await contracts.fetchRLCAddress();
-        const erc20conctract = contracts.getRLCContract({ at: erc20Address });
+        const erc20Contract = await wrapCall(contracts.fetchTokenContract());
         const transferLogs = await contracts.provider.getLogs({
           fromBlock: startBlockNumber,
           toBlock: 'latest',
-          address: erc20Address,
+          address: erc20Contract.address,
           topics: [
             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
           ],
         });
 
-        const erc20Interface = erc20conctract.interface;
+        const erc20Interface = erc20Contract.interface;
         let totalSpentPerDay = new BN(0);
         const processTransferLogs = async (logs, checkTimestamp = true) => {
           if (logs.length === 0) return;
@@ -670,6 +670,7 @@ const bridgeToSidechain = async (
   nRlcAmount = throwIfMissing(),
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;
   try {
@@ -711,6 +712,7 @@ const obsBridgeToMainchain = (
     let stopWatchPromise;
     const bridgeToken = async () => {
       try {
+        checkSigner(contracts);
         // input validation
         const vBridgeAddress = await addressSchema({
           ethProvider: contracts.provider,
@@ -750,9 +752,9 @@ const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: minPerTx.toString(),
-          maxPerTx: maxPerTx.toString(),
-          dailyLimit: dailyLimit.toString(),
+          minPerTx: ethersBnToBn(minPerTx),
+          maxPerTx: ethersBnToBn(maxPerTx),
+          dailyLimit: ethersBnToBn(dailyLimit),
         });
         if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
           throw Error(
@@ -787,7 +789,7 @@ const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_LIMIT_CHECKED,
-          totalSpentPerDay,
+          totalSpentPerDay: ethersBnToBn(totalSpentPerDay),
         });
         if (!withinLimit) {
           throw Error(
@@ -895,6 +897,7 @@ const bridgeToMainchain = async (
   nRlcAmount = throwIfMissing(),
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;
   try {
@@ -929,6 +932,7 @@ const wrapEnterpriseRLC = async (
   enterpriseContracts,
   nRlcAmount = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   if (contracts.flavour !== 'standard' || contracts.isNative) {
     throw Error('Unable to wrap RLC into eRLC on current chain');
   }
@@ -944,9 +948,8 @@ const wrapEnterpriseRLC = async (
     throw Error('Amount to wrap exceed wallet balance');
   }
   try {
-    const eRlcAddress = await wrapCall(enterpriseContracts.fetchRLCAddress());
-    const rlcAddress = await wrapCall(contracts.fetchRLCAddress());
-    const rlcContract = contracts.getRLCContract({ at: rlcAddress });
+    const eRlcAddress = await wrapCall(enterpriseContracts.fetchTokenAddress());
+    const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
       rlcContract.approveAndCall(
         eRlcAddress,
@@ -967,6 +970,7 @@ const unwrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   if (contracts.flavour !== 'enterprise' || contracts.isNative) {
     throw Error('Unable to unwrap eRLC into RLC on current chain');
   }
@@ -977,8 +981,7 @@ const unwrapEnterpriseRLC = async (
     throw Error('Amount to unwrap exceed wallet balance');
   }
   try {
-    const eRlcAddress = await wrapCall(contracts.fetchRLCAddress());
-    const eRlcContract = contracts.getRLCContract({ at: eRlcAddress });
+    const eRlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(eRlcContract.withdraw(vAmount));
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;

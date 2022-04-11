@@ -416,7 +416,7 @@ const orderOption = {
   ],
   requestEncryptResult: () => [
     '--encrypt-result',
-    'encrypt the result archive with the beneficiary public key',
+    'encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)',
   ],
   requestStorageProvider: () => [
     `--storage-provider <${listOfChoices(storageProviders())}>`,

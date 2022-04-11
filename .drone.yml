@@ -2,6 +2,7 @@ pipeline:
   test_node16:
     image: node:16
     pull: true
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd
@@ -17,6 +18,7 @@ pipeline:
   test_node14:
     image: node:14
     pull: true
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd
@@ -32,6 +34,7 @@ pipeline:
   test_node12:
     image: node:12
     pull: true
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
     commands:
       - apt update
       - apt install xxd
@@ -152,6 +155,10 @@ services:
 
   token-watcher:
     image: iexechub/iexec-market-watcher:5
+    commands:
+      - sleep 10
+      - cd /app
+      - npm start
     environment:
       - DEBUG=iexec-watcher*
       - DEBUG_COLORS=true
@@ -162,15 +169,13 @@ services:
       - ETH_RPC_HOST=http://token-chain-parity:8545
       - MONGO_HOST=gateway-mongo
       - REDIS_HOST=gateway-redis
-    depends_on:
-      - token-chain-parity
-      - gateway-redis
-      - gateway-mongo
 
   token-gateway:
     image: iexechub/iexec-market-api:5
-    expose:
-      - 3000
+    commands:
+      - sleep 10
+      - cd /app
+      - npm start
     environment:
       - DEBUG=iexec-market-api*
       - DEBUG_COLORS=true
@@ -184,7 +189,3 @@ services:
       - RATE_LIMIT_MAX=10000
       - RATE_LIMIT_PERIOD=60000
       - MAX_OPEN_ORDERS_PER_WALLET=1000
-    depends_on:
-      - token-chain-parity
-      - gateway-redis
-      - gateway-mongo

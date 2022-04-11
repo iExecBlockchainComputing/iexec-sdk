@@ -8,7 +8,7 @@ const { getAddress, randomBytes, formatUnits, parseUnits } =
   require('ethers').utils;
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
-const { ValidationError } = require('./errors');
+const { ValidationError, ConfigurationError } = require('./errors');
 
 const debug = Debug('iexec:utils');
 
@@ -114,7 +114,7 @@ const bnNRlcToBnWei = (bnNRlc) => {
 };
 
 const bnifyNestedEthersBn = (obj) => {
-  const objOut = {};
+  const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
     if (isEthersBn(v)) {
@@ -128,7 +128,7 @@ const bnifyNestedEthersBn = (obj) => {
 };
 
 const stringifyNestedBn = (obj) => {
-  const objOut = {};
+  const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
     if (v instanceof BN) objOut[k] = v.toString();
@@ -404,8 +404,21 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   }
 };
 
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+const sleep = (ms) =>
+  new Promise((res) => {
+    setTimeout(() => {
+      res();
+    }, ms);
+  });
 const FETCH_INTERVAL = 5000;
+
+const checkSigner = (contracts) => {
+  if (!(contracts && contracts.signer)) {
+    throw new ConfigurationError(
+      'The current provider is not a signer, impossible to sign messages or transactions',
+    );
+  }
+};
 
 module.exports = {
   BN,
@@ -444,5 +457,6 @@ module.exports = {
   bytes32Regex,
   addressRegex,
   sleep,
+  checkSigner,
   FETCH_INTERVAL,
 };

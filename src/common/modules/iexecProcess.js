@@ -14,7 +14,7 @@ const downloadFromIpfs = async (
   { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
 ) => {
   try {
-    const res = await await downloadZipApi.get({
+    const res = await downloadZipApi.get({
       api: ipfsGatewayURL,
       endpoint: ipfsAddress,
     });

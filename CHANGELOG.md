@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.1.0] 2022-04-11
+
+### Added
+
+- TypeScript interfaces
+- `providerOptions` can be passed to the constructor to configure ethers default provider on bridged chain
+- `ethProvider` now accepts network name, network chainId and RPC url, using one of those option will setup an IExecConfig with provider allowing read-only operations (operations requiring a Signer will fail)
+
+### Changed
+
+- split lib into `IExecConfig` and independant `IExecModule`s to allow modular imports
+- reintegrated `iexec-contracts-js-client`
+- fix a bug transforming an Array into a plain object
+- documentation refactoring
+- fix ENS configure resolution removed useless transaction for EOA
+
 ## [7.0.2] 2022-02-16
 
 ### Added

@@ -13,12 +13,35 @@ const {
 } = require('../utils/validator');
 const { getAddress } = require('./wallet');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
+const { ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
-const { NULL_ADDRESS } = require('../utils/utils');
+const { NULL_ADDRESS, checkSigner } = require('../utils/utils');
 
 const debug = Debug('iexec:ens');
 
 const BASE_DOMAIN = 'users.iexec.eth';
+
+const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
+  try {
+    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
+    if (!ensAddress) {
+      throw new ConfigurationError('Network does not support ENS');
+    }
+    return ensAddress;
+  } catch (e) {
+    debug('getEnsRegistryAddress()', e);
+    throw e;
+  }
+};
+
+const checkEns = async (contracts = throwIfMissing()) => {
+  try {
+    await getEnsRegistryAddress(contracts);
+  } catch (e) {
+    debug('checkEns()', e);
+    throw e;
+  }
+};
 
 const getOwner = async (
   contracts = throwIfMissing(),
@@ -27,7 +50,7 @@ const getOwner = async (
   try {
     const vName = await ensDomainSchema().validate(name);
     const nameHash = utils.namehash(vName);
-    const { ensAddress } = await contracts.provider.getNetwork();
+    const ensAddress = await getEnsRegistryAddress(contracts);
     const ensRegistryContract = new Contract(
       ensAddress,
       ENSRegistry.abi,
@@ -47,7 +70,8 @@ const resolveName = async (
 ) => {
   try {
     const vName = await ensDomainSchema().validate(name);
-    const address = await contracts.provider.resolveName(vName);
+    await checkEns(contracts);
+    const address = await wrapCall(contracts.provider.resolveName(vName));
     return address;
   } catch (e) {
     debug('resolveName()', e);
@@ -63,7 +87,8 @@ const lookupAddress = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(address);
-    const ens = await contracts.provider.lookupAddress(vAddress);
+    await checkEns(contracts);
+    const ens = await wrapCall(contracts.provider.lookupAddress(vAddress));
     return ens;
   } catch (e) {
     debug('lookupAddress()', e);
@@ -77,6 +102,7 @@ const registerFifsEns = async (
   domain = BASE_DOMAIN,
 ) => {
   try {
+    checkSigner(contracts);
     const vDomain = await ensDomainSchema().validate(domain);
     const vLabel = await ensLabelSchema().validate(label);
     let registerTxHash;
@@ -86,7 +112,9 @@ const registerFifsEns = async (
     const ownedBy = await getOwner(contracts, name);
     if (ownedBy === NULL_ADDRESS) {
       const domainOwner = await getOwner(contracts, vDomain);
-      const domainOwnerCode = await contracts.provider.getCode(domainOwner);
+      const domainOwnerCode = await wrapCall(
+        contracts.provider.getCode(domainOwner),
+      );
       if (domainOwnerCode === '0x') {
         throw Error(
           `The base domain ${vDomain} owner ${domainOwner} is not a contract`,
@@ -125,10 +153,6 @@ const obsConfigureResolutionMessages = {
   SET_ADDR_TX_REQUEST: 'SET_ADDR_TX_REQUEST',
   SET_ADDR_TX_SENT: 'SET_ADDR_TX_SENT',
   SET_ADDR_SUCCESS: 'SET_ADDR_SUCCESS',
-  CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST:
-    'CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST',
-  CLAIM_REVERSE_WITH_RESOLVER_TX_SENT: 'CLAIM_REVERSE_WITH_RESOLVER_TX_SENT',
-  CLAIM_REVERSE_WITH_RESOLVER_SUCCESS: 'CLAIM_REVERSE_WITH_RESOLVER_SUCCESS',
   SET_NAME_TX_REQUEST: 'SET_NAME_TX_REQUEST',
   SET_NAME_TX_SENT: 'SET_NAME_TX_SENT',
   SET_NAME_SUCCESS: 'SET_NAME_SUCCESS',
@@ -146,6 +170,7 @@ const obsConfigureResolution = (
 
     const configure = async () => {
       try {
+        checkSigner(contracts);
         const vAddress =
           address !== undefined
             ? await addressSchema().validate(address)
@@ -153,16 +178,15 @@ const obsConfigureResolution = (
         const vName = await ensDomainSchema().validate(name);
         const nameHash = utils.namehash(vName);
         const walletAddress = await getAddress(contracts);
-        const { ensAddress } = await contracts.provider.getNetwork();
+        const ensAddress = await getEnsRegistryAddress(contracts);
 
         const REVERSE_DOMAIN = 'addr.reverse';
-        const reverseName = `${vAddress
-          .toLowerCase()
-          .substring(2)}.${REVERSE_DOMAIN}`;
 
         let addressIsContract = false;
         if (vAddress !== walletAddress) {
-          const addressCode = await contracts.provider.getCode(vAddress);
+          const addressCode = await wrapCall(
+            contracts.provider.getCode(vAddress),
+          );
           if (addressCode === '0x') {
             throw Error(
               `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`,
@@ -202,13 +226,11 @@ const obsConfigureResolution = (
         safeObserver.next({
           message: obsConfigureResolutionMessages.DESCRIBE_WORKFLOW,
           addessType: addressIsContract ? 'CONTRACT' : 'EAO',
-          steps: ['SET_RESOLVER', 'SET_ADDR']
-            .concat(addressIsContract ? [] : ['CLAIM_REVERSE_WITH_RESOLVER'])
-            .concat(['SET_NAME']),
+          steps: ['SET_RESOLVER', 'SET_ADDR', 'SET_NAME'],
         });
 
-        const resolverCode = await contracts.provider.getCode(
-          publicResolverAddress,
+        const resolverCode = await wrapCall(
+          contracts.provider.getCode(publicResolverAddress),
         );
         if (resolverCode === '0x') {
           throw Error(
@@ -218,7 +240,9 @@ const obsConfigureResolution = (
 
         // 1 - setup resolution
         // set resolver
-        const currentResolver = await contracts.provider.getResolver(vName);
+        const currentResolver = await wrapCall(
+          contracts.provider.getResolver(vName),
+        );
         const isResolverSet =
           currentResolver &&
           currentResolver.address &&
@@ -306,7 +330,6 @@ const obsConfigureResolution = (
               RegistryEntry.abi,
               contracts.signer,
             );
-
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_REQUEST,
               name: vName,
@@ -327,8 +350,7 @@ const obsConfigureResolution = (
             if (abort) return;
             await wrapWait(setNameTx.wait(contracts.confirms));
           } else {
-            // claim reverse for EAO if needed
-            const reverseNameOwner = await getOwner(contracts, reverseName);
+            // set name for EOA
             const reverseRegistrarAddress = await getOwner(
               contracts,
               REVERSE_DOMAIN,
@@ -338,43 +360,6 @@ const obsConfigureResolution = (
               ReverseRegistrar.abi,
               contracts.signer,
             );
-            const isReverseAddrClaimed =
-              reverseNameOwner &&
-              reverseNameOwner.toLowerCase() === walletAddress.toLowerCase();
-            if (!isReverseAddrClaimed) {
-              safeObserver.next({
-                message:
-                  obsConfigureResolutionMessages.CLAIM_REVERSE_WITH_RESOLVER_TX_REQUEST,
-                address: vAddress,
-                resolverAddress: publicResolverAddress,
-              });
-              if (abort) return;
-              const claimReverseTx = await wrapSend(
-                reverseRegistrarContract.claimWithResolver(
-                  vAddress,
-                  publicResolverAddress,
-                  contracts.txOptions,
-                ),
-              );
-              safeObserver.next({
-                message:
-                  obsConfigureResolutionMessages.CLAIM_REVERSE_WITH_RESOLVER_TX_SENT,
-                txHash: claimReverseTx.hash,
-              });
-              if (abort) return;
-              await wrapWait(claimReverseTx.wait(contracts.confirms));
-            }
-            const reverseNaneResolver = await contracts.provider.getResolver(
-              reverseName,
-            );
-            safeObserver.next({
-              message:
-                obsConfigureResolutionMessages.CLAIM_REVERSE_WITH_RESOLVER_SUCCESS,
-              address: vAddress,
-              resolverAddress: reverseNaneResolver.address,
-            });
-
-            // set name for EOA
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_REQUEST,
               name: vName,
@@ -391,16 +376,6 @@ const obsConfigureResolution = (
             if (abort) return;
             await wrapWait(setNameTx.wait(contracts.confirms));
           }
-        } else if (!addressIsContract) {
-          const reverseNaneResolver = await contracts.provider.getResolver(
-            reverseName,
-          );
-          safeObserver.next({
-            message:
-              obsConfigureResolutionMessages.CLAIM_REVERSE_WITH_RESOLVER_SUCCESS,
-            address: vAddress,
-            resolverAddress: reverseNaneResolver.address,
-          });
         }
         safeObserver.next({
           message: obsConfigureResolutionMessages.SET_NAME_SUCCESS,
@@ -428,6 +403,7 @@ const configureResolution = async (
   address,
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress =
       address !== undefined
         ? await addressSchema().validate(address)
@@ -456,9 +432,6 @@ const configureResolution = async (
               break;
             case obsConfigureResolutionMessages.SET_NAME_TX_SENT:
               result.setNameTxHash = rest.txHash;
-              break;
-            case obsConfigureResolutionMessages.CLAIM_REVERSE_WITH_RESOLVER_TX_SENT:
-              result.claimReverseTxHash = rest.txHash;
               break;
             default:
               break;

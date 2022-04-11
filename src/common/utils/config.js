@@ -5,6 +5,38 @@ const hostMap = {
   134: 'https://bellecour.iex.ec',
 };
 
+const ensMap = {
+  1: {
+    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    publicResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+  },
+  5: {
+    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    publicResolver: '0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329',
+  },
+  133: {
+    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+  },
+  134: {
+    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+  },
+};
+
+const networkMap = {
+  133: {
+    name: 'viviani',
+    chainId: 133,
+    ensAddress: ensMap[133].registry,
+  },
+  134: {
+    name: 'bellecour',
+    chainId: 134,
+    ensAddress: ensMap[134].registry,
+  },
+};
+
 const hubMap = {
   standard: {},
   enterprise: {},
@@ -74,24 +106,14 @@ const iexecGatewayMap = {
   },
 };
 
-const ensMap = {
-  1: {
-    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-    publicResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
-  },
-  5: {
-    // registry: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-    publicResolver: '0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329',
-  },
-  133: {
-    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-  },
-  134: {
-    registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-    publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-  },
+const idMap = {
+  mainnet: 1,
+  goerli: 5,
+  viviani: 133,
+  bellecour: 134,
 };
+
+const getId = (idOrName) => idMap[idOrName] || idOrName;
 
 const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[id],
@@ -110,11 +132,13 @@ const getChainDefaults = ({ id, flavour }) => ({
     'https://v7.api.market.iex.ec',
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
+  network: networkMap[id],
 });
 
 const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
 
 module.exports = {
+  getId,
   getChainDefaults,
   isEnterpriseEnabled,
 };

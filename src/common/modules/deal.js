@@ -7,6 +7,7 @@ const {
   ethersBnToBn,
   NULL_ADDRESS,
   BN,
+  checkSigner,
 } = require('../utils/utils');
 const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
 const {
@@ -179,6 +180,7 @@ const claim = async (
   const transactions = [];
   const claimed = {};
   try {
+    checkSigner(contracts);
     const vDealid = await bytes32Schema().validate(dealid);
     const deal = await show(contracts, vDealid);
     if (!deal.deadlineReached) {

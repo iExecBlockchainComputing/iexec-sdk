@@ -1,5 +1,6 @@
-const { Wallet, Signer, BigNumber, getDefaultProvider } = require('ethers');
+const { Wallet, Signer, BigNumber } = require('ethers');
 const { Web3Provider } = require('ethers').providers;
+const { getReadOnlyProvider } = require('./providers');
 
 class EnhancedWallet extends Wallet {
   constructor(privateKey, provider, options = {}) {
@@ -82,7 +83,7 @@ const getSignerFromPrivateKey = (
   privateKey,
   { gasPrice, getTransactionCount, providers } = {},
 ) =>
-  new EnhancedWallet(privateKey, getDefaultProvider(host, providers), {
+  new EnhancedWallet(privateKey, getReadOnlyProvider(host, { providers }), {
     gasPrice,
     getTransactionCount,
   });
