@@ -89,6 +89,8 @@ ___
 
 ▸ **deployApp**(`app`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
 deploy an app contract on the blockchain
 
 example:

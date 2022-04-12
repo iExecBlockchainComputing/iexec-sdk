@@ -7,6 +7,8 @@ import { Addressish, BN, NRLCAmount, TxHash } from './types';
  */
 export default class IExecAccountModule extends IExecModule {
   /**
+   * **SIGNER REQUIRED**
+   *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
    *
    * example:
@@ -18,6 +20,8 @@ export default class IExecAccountModule extends IExecModule {
    */
   deposit(amount: NRLCAmount): Promise<{ amount: BN; txHash: TxHash }>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * withdraw some nRLC (1 nRLC = 1*10^-9 RLC) from user account to user wallet
    *
    * example:

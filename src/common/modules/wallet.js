@@ -10,6 +10,7 @@ const {
   checksummedAddress,
   formatRLC,
   NULL_BYTES,
+  checkSigner,
 } = require('../utils/utils');
 const {
   addressSchema,
@@ -19,7 +20,7 @@ const {
   throwIfMissing,
 } = require('../utils/validator');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { BridgeError } = require('../utils/errors');
+const { BridgeError, ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
 const foreignBridgeErcToNativeDesc = require('../abi/bridge/ForeignBridgeErcToNative.json');
 const homeBridgeErcToNativeDesc = require('../abi/bridge/HomeBridgeErcToNative.json');
@@ -82,7 +83,7 @@ const ethFaucets = [
 ];
 
 const getAddress = async (contracts = throwIfMissing()) => {
-  if (!contracts.signer) throw Error('Missing Signer');
+  if (!contracts.signer) throw new ConfigurationError('Missing Signer');
   const address = await wrapCall(contracts.signer.getAddress());
   return checksummedAddress(address);
 };
@@ -228,6 +229,7 @@ const sendNativeToken = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -256,6 +258,7 @@ const sendERC20 = async (
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
   }).validate(to);
@@ -279,6 +282,7 @@ const sendETH = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -303,6 +307,7 @@ const sendRLC = async (
   to = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -334,6 +339,7 @@ const sendRLC = async (
 
 const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
   try {
+    checkSigner(contracts);
     const vAddressTo = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
@@ -453,6 +459,7 @@ const obsBridgeToSidechain = (
     let stopWatchPromise;
     const bridgeToken = async () => {
       try {
+        checkSigner(contracts);
         // input validation
         const vBridgeAddress = await addressSchema({
           ethProvider: contracts.provider,
@@ -663,6 +670,7 @@ const bridgeToSidechain = async (
   nRlcAmount = throwIfMissing(),
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;
   try {
@@ -704,6 +712,7 @@ const obsBridgeToMainchain = (
     let stopWatchPromise;
     const bridgeToken = async () => {
       try {
+        checkSigner(contracts);
         // input validation
         const vBridgeAddress = await addressSchema({
           ethProvider: contracts.provider,
@@ -888,6 +897,7 @@ const bridgeToMainchain = async (
   nRlcAmount = throwIfMissing(),
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;
   try {
@@ -922,6 +932,7 @@ const wrapEnterpriseRLC = async (
   enterpriseContracts,
   nRlcAmount = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   if (contracts.flavour !== 'standard' || contracts.isNative) {
     throw Error('Unable to wrap RLC into eRLC on current chain');
   }
@@ -959,6 +970,7 @@ const unwrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
 ) => {
+  checkSigner(contracts);
   if (contracts.flavour !== 'enterprise' || contracts.isNative) {
     throw Error('Unable to unwrap eRLC into RLC on current chain');
   }

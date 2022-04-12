@@ -36,7 +36,7 @@ const getHubAddress = (chainId, flavour, { strict = true } = {}) => {
     if (flavour === 'enterprise') {
       if (!enterpriseHubMap[chainId]) {
         if (strict) {
-          throw Error('missing iExec proxy configuration');
+          throw Error('Missing iExec proxy configuration');
         }
         return undefined;
       }
@@ -44,14 +44,14 @@ const getHubAddress = (chainId, flavour, { strict = true } = {}) => {
     }
     if (!iexecProxyNetworks) {
       if (strict) {
-        throw Error('missing iExec proxy configuration');
+        throw Error('Missing iExec proxy configuration');
       }
       return undefined;
     }
     if (!(chainId in iexecProxyNetworks)) {
       if (strict) {
         throw Error(
-          `missing chainId "${chainId}" in iExec proxy configuration`,
+          `Missing chainId "${chainId}" in iExec proxy configuration`,
         );
       }
       return undefined;
@@ -59,7 +59,7 @@ const getHubAddress = (chainId, flavour, { strict = true } = {}) => {
     if (!('address' in iexecProxyNetworks[chainId])) {
       if (strict) {
         throw Error(
-          `missing address in iExec proxy configuration for chainId "${chainId}"`,
+          `Missing address in iExec proxy configuration for chainId "${chainId}"`,
         );
       }
       return undefined;

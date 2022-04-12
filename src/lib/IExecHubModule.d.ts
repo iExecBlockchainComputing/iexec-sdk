@@ -25,7 +25,7 @@ export interface Category {
  */
 export default class IExecHubModule extends IExecModule {
   /**
-   * **ONLY IEXEC OWNER**
+   * **SIGNER REQUIRED, ONLY IEXEC OWNER**
    *
    * create a computation category on the iExec contract
    *

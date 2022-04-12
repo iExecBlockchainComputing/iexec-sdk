@@ -17,7 +17,7 @@ const { getAddress } = require('./wallet');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
 const { ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
-const { NULL_ADDRESS } = require('../utils/utils');
+const { NULL_ADDRESS, checkSigner } = require('../utils/utils');
 
 const debug = Debug('iexec:ens');
 
@@ -104,6 +104,7 @@ const registerFifsEns = async (
   domain = BASE_DOMAIN,
 ) => {
   try {
+    checkSigner(contracts);
     const vDomain = await ensDomainSchema().validate(domain);
     const vLabel = await ensLabelSchema().validate(label);
     let registerTxHash;
@@ -171,6 +172,7 @@ const obsConfigureResolution = (
 
     const configure = async () => {
       try {
+        checkSigner(contracts);
         const vAddress =
           address !== undefined
             ? await addressSchema().validate(address)
@@ -403,6 +405,7 @@ const configureResolution = async (
   address,
 ) => {
   try {
+    checkSigner(contracts);
     const vAddress =
       address !== undefined
         ? await addressSchema().validate(address)

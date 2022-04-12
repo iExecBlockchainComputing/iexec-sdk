@@ -101,7 +101,7 @@ ___
 
 ▸ **configureResolution**(`name`, `address?`): `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
-**ONLY ENS NAME OWNER**
+**SIGNER REQUIRED, ONLY ENS NAME OWNER**
 
 configure the ENS resolution and reverse resolution for an owned ENS name, same as `obsConfigureResolution` wrapped in a `Promise`.
 
@@ -191,7 +191,7 @@ ___
 
 ▸ **obsConfigureResolution**(`name`, `address?`): `Promise`<[`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)\>
 
-**ONLY ENS NAME OWNER**
+**SIGNER REQUIRED, ONLY ENS NAME OWNER**
 
 return a cold Observable with a `subscribe` method to start and monitor the ENS resolution and reverse resolution configuration.
 

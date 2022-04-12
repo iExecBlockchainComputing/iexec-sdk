@@ -2,14 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## next
+## Next
+
+### Added
+
+- workerpool API url configuration
+
+### Changed
+
+- `show` commands display ENS when configured
+
+## [7.1.0] 2022-04-11
 
 ### Added
 
 - TypeScript interfaces
 - `providerOptions` can be passed to the constructor to configure ethers default provider on bridged chain
-- workerpool API url configuration
-- `show` commands display ENS when configured
+- `ethProvider` now accepts network name, network chainId and RPC url, using one of those option will setup an IExecConfig with provider allowing read-only operations (operations requiring a Signer will fail)
 
 ### Changed
 

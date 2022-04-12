@@ -125,7 +125,7 @@ export default class IExecENSModule extends IExecModule {
     domain?: string,
   ): Promise<{ registeredName: ENS; registerTxHash?: TxHash }>;
   /**
-   * **ONLY ENS NAME OWNER**
+   * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
    *
    * return a cold Observable with a `subscribe` method to start and monitor the ENS resolution and reverse resolution configuration.
    *
@@ -169,7 +169,7 @@ export default class IExecENSModule extends IExecModule {
     address?: Address,
   ): Promise<ENSConfigurationObservable>;
   /**
-   * **ONLY ENS NAME OWNER**
+   * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
    *
    * configure the ENS resolution and reverse resolution for an owned ENS name, same as `obsConfigureResolution` wrapped in a `Promise`.
    *

@@ -8,6 +8,7 @@ const {
   hexToBuffer,
   NULL_ADDRESS,
   BN,
+  checkSigner,
 } = require('../utils/utils');
 const {
   addressSchema,
@@ -89,6 +90,7 @@ const createObj =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
     try {
+      checkSigner(contracts);
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
@@ -373,6 +375,7 @@ const createCategory = async (
   obj = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vCategory = await categorySchema().validate(obj);
     const iexecContract = contracts.getIExecContract();
     const categoryOwner = await wrapCall(iexecContract.owner());

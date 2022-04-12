@@ -575,7 +575,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signApporder(apporderTemplate: ApporderTemplate): Promise<SignedApporder>;
   /**
-   * **ONLY DATASET OWNER**
+   * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * sign a datasetorder template to create a valid order
    *
@@ -589,7 +589,7 @@ export default class IExecOrderModule extends IExecModule {
     datasetorderTemplate: DatasetorderTemplate,
   ): Promise<SignedDatasetorder>;
   /**
-   * **ONLY WORKERPOOL OWNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
    *
    * sign a workerpoolorder template to create a valid order
    *
@@ -602,7 +602,7 @@ export default class IExecOrderModule extends IExecModule {
     workerpoolorderTemplate: WorkerpoolorderTemplate,
   ): Promise<SignedWorkerpoolorder>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * sign a requestorder template to create a valid order
    *
@@ -665,7 +665,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   hashRequestorder(requestorder: HashableRequestorder): Promise<OrderHash>;
   /**
-   * **ONLY APP OWNER**
+   * **SIGNER REQUIRED, ONLY APP OWNER**
    *
    * cancel an apporder on the blockchain making it invalid
    *
@@ -679,7 +679,7 @@ export default class IExecOrderModule extends IExecModule {
     apporder: ConsumableApporder,
   ): Promise<{ txHash: TxHash; order: ConsumableApporder }>;
   /**
-   * **ONLY DATASET OWNER**
+   * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * cancel a datasetorder on the blockchain making it invalid
    *
@@ -693,7 +693,7 @@ export default class IExecOrderModule extends IExecModule {
     datasetorder: ConsumableDatasetorder,
   ): Promise<{ txHash: TxHash; order: ConsumableDatasetorder }>;
   /**
-   * **ONLY WORKERPOOL OWNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
    *
    * cancel a workerpoolorder on the blockchain making it invalid
    *
@@ -707,7 +707,7 @@ export default class IExecOrderModule extends IExecModule {
     workerpoolorder: ConsumableWorkerpoolorder,
   ): Promise<{ txHash: TxHash; order: ConsumableWorkerpoolorder }>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * cancel a requestorder on the blockchain making it invalid
    *
@@ -721,7 +721,7 @@ export default class IExecOrderModule extends IExecModule {
     requestorder: ConsumableRequestorder,
   ): Promise<{ txHash: TxHash; order: ConsumableRequestorder }>;
   /**
-   * **ONLY APP OWNER**
+   * **SIGNER REQUIRED, ONLY APP OWNER**
    *
    * publish an apporder on the off-chain marketplace making it available for other users
    *
@@ -733,7 +733,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   publishApporder(apporder: ConsumableApporder): Promise<OrderHash>;
   /**
-   * **ONLY DATASET OWNER**
+   * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * publish a datasetorder on the off-chain marketplace making it available for other users
    *
@@ -745,7 +745,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   publishDatasetorder(datasetorder: ConsumableDatasetorder): Promise<OrderHash>;
   /**
-   * **ONLY WORKERPOOL OWNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
    *
    * publish a workerpoolorder on the off-chain marketplace making it available for other users
    *
@@ -759,7 +759,7 @@ export default class IExecOrderModule extends IExecModule {
     workerpoolorder: ConsumableWorkerpoolorder,
   ): Promise<OrderHash>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * publish a requestorder on the off-chain marketplace making it available for other users
    *
@@ -776,7 +776,7 @@ export default class IExecOrderModule extends IExecModule {
     options?: { checkRequest?: boolean },
   ): Promise<OrderHash>;
   /**
-   * **ONLY APPORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY APPORDER SIGNER**
    *
    * unpublish an apporder from the off-chain marketplace
    *
@@ -790,7 +790,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishApporder(apporderHash: OrderHash): Promise<OrderHash>;
   /**
-   * **ONLY DATASETORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
    *
    * unpublish a datasetorder from the off-chain marketplace
    *
@@ -804,7 +804,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishDatasetorder(datasetorderHash: OrderHash): Promise<OrderHash>;
   /**
-   * **ONLY WORKERPOOLORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
    * unpublish a workerpoolorder from the off-chain marketplace
    *
@@ -818,7 +818,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishWorkerpoolorder(workerpoolorderHash: OrderHash): Promise<OrderHash>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * unpublish a requestorder from the off-chain marketplace
    *
@@ -832,7 +832,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishRequestorder(requestorderHash: OrderHash): Promise<OrderHash>;
   /**
-   * **ONLY APPORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY APPORDER SIGNER**
    *
    * unpublish the last published app's apporder from the off-chain marketplace
    *
@@ -846,7 +846,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishLastApporder(appAddress: Addressish): Promise<OrderHash>;
   /**
-   * **ONLY DATASETORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
    *
    * unpublish the last published dataset's datasetorder from the off-chain marketplace
    *
@@ -860,7 +860,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishLastDatasetorder(datasetAddress: Addressish): Promise<OrderHash>;
   /**
-   * **ONLY WORKERPOOLORDER SIGNER**
+   * ****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
    * unpublish the last published workerpool's workerpoolorder from the off-chain marketplace
    *
@@ -876,7 +876,7 @@ export default class IExecOrderModule extends IExecModule {
     workerpoolAddress: Addressish,
   ): Promise<OrderHash>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * unpublish the last published requester's requestorder from the off-chain marketplace
    *
@@ -890,7 +890,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishLastRequestorder(): Promise<OrderHash>;
   /**
-   * **ONLY APPORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY APPORDER SIGNER**
    *
    * unpublish all the published app's apporders from the off-chain marketplace
    *
@@ -904,7 +904,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishAllApporders(appAddress: Addressish): Promise<OrderHash[]>;
   /**
-   * **ONLY DATASETORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
    *
    * unpublish all the published dataset's datasetorders from the off-chain marketplace
    *
@@ -918,7 +918,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishAllDatasetorders(datasetAddress: Addressish): Promise<OrderHash[]>;
   /**
-   * **ONLY WORKERPOOLORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
    * unpublish all the published workerpool's workerpoolorders from the off-chain marketplace
    *
@@ -934,7 +934,7 @@ export default class IExecOrderModule extends IExecModule {
     workerpoolAddress: Addressish,
   ): Promise<OrderHash[]>;
   /**
-   * **ONLY REQUESTER**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * unpublish all the published requester's requestorders from the off-chain marketplace
    *
@@ -948,6 +948,8 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishAllRequestorders(): Promise<OrderHash[]>;
   /**
+   * **SIGNER REQUIRED**
+   *
    * make a deal on-chain with compatible orders to trigger the off-chain computation.
    *
    * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`

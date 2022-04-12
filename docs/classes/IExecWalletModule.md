@@ -73,6 +73,8 @@ current IExecConfig
 
 ▸ **bridgeToMainchain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
 send some nRLC to the mainchain
 
 _NB_:
@@ -100,6 +102,8 @@ ___
 ### bridgeToSidechain
 
 ▸ **bridgeToSidechain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+
+**SIGNER REQUIRED**
 
 send some nRLC to the sidechain
 
@@ -179,6 +183,8 @@ ___
 
 ▸ **getAddress**(): `Promise`<`string`\>
 
+**SIGNER REQUIRED**
+
 get the connected wallet address
 
 example:
@@ -197,6 +203,20 @@ ___
 
 ▸ **obsBridgeToMainchain**(`nRLCAmount`): `Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
 
+**SIGNER REQUIRED**
+
+return an Observable with a subscribe method to start and monitor the bridge to mainchain process
+
+example:
+```js
+const bridgeObservable = await obsBridgeToMainchain('1000000000');
+const cancel = bridgeObservable.subscribe({
+  next: ({message, ...rest}) => console.log(message, ...rest),
+  error: (err) => console.error(err),
+  complete: () => console.log('completed'),
+});
+```
+
 #### Parameters
 
 | Name | Type |
@@ -213,6 +233,20 @@ ___
 
 ▸ **obsBridgeToSidechain**(`nRLCAmount`): `Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
 
+**SIGNER REQUIRED**
+
+return an Observable with a subscribe method to start and monitor the bridge to sidechain process
+
+example:
+```js
+const bridgeObservable = await obsBridgeToSidechain('1000000000');
+const cancel = bridgeObservable.subscribe({
+  next: ({message, ...rest}) => console.log(message, ...rest),
+  error: (err) => console.error(err),
+  complete: () => console.log('completed'),
+});
+```
+
 #### Parameters
 
 | Name | Type |
@@ -228,6 +262,8 @@ ___
 ### sendETH
 
 ▸ **sendETH**(`WeiAmount`, `to`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
 
 send some wei to the specified address
 
@@ -254,6 +290,8 @@ ___
 
 ▸ **sendRLC**(`nRLCAmount`, `to`): `Promise`<`string`\>
 
+**SIGNER REQUIRED**
+
 send some nRLC to the specified address
 
 example:
@@ -278,6 +316,8 @@ ___
 ### sweep
 
 ▸ **sweep**(`to`): `Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
+
+**SIGNER REQUIRED**
 
 send all the iExec token and the native token owned by the wallet to the specified address
 
@@ -304,7 +344,7 @@ ___
 
 ▸ **unwrapEnterpriseRLC**(`nRLCAmount`): `Promise`<`string`\>
 
-**ONLY ERLC WHITELISTED ACCOUNTS**
+**SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
 
 unwrap some neRLC (enterprise nRLC) into nRLC
 
@@ -330,7 +370,7 @@ ___
 
 ▸ **wrapEnterpriseRLC**(`nRLCAmount`): `Promise`<`string`\>
 
-**ONLY ERLC WHITELISTED ACCOUNTS**
+**SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
 
 wrap some nRLC into neRLC (enterprise nRLC)
 

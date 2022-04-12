@@ -153,6 +153,8 @@ ___
 
 ▸ **deployDataset**(`dataset`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
 deploy a dataset contract on the blockchain
 
 example:
@@ -244,7 +246,7 @@ ___
 
 ▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`): `Promise`<`boolean`\>
 
-**ONLY DATASET OWNER**
+**SIGNER REQUIRED, ONLY DATASET OWNER**
 
 push the dataset's encryption key to the Secret Management Service
 

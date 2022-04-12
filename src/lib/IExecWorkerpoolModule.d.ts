@@ -21,6 +21,8 @@ export interface Workerpool {
  */
 export default class IExecWorkerpoolModule extends IExecModule {
   /**
+   * **SIGNER REQUIRED**
+   *
    * deploy a workerpool contract on the blockchain
    *
    * example:
