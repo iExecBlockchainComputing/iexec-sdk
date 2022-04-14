@@ -8,6 +8,7 @@ const taskModule = require('../../common/modules/task');
 const {
   obsTask,
   fetchTaskResults,
+  fetchTaskOffchainInfo,
 } = require('../../common/modules/iexecProcess');
 const {
   stringifyNestedBn,
@@ -173,6 +174,40 @@ show
         spinner.info(
           'Consensus deadline reached before consensus. You can claim the task to get a full refund using "iexec task claim"',
         );
+      }
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const debugTask = cli.command('debug <taskid>');
+addGlobalOptions(debugTask);
+debugTask
+  .option(...option.chain())
+  .description(desc.debugTask())
+  .action(async (taskid, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+      spinner.start('Fetching debug information');
+      const onchainData = await taskModule.show(chain.contracts, taskid);
+      const offchainData = await fetchTaskOffchainInfo(
+        chain.contracts,
+        taskid,
+      ).catch((e) => {
+        spinner.warn(`Failed to fetch offchain data: ${e.message}`);
+      });
+      const raw = {
+        onchainData: stringifyNestedBn(onchainData),
+        offchainData,
+      };
+      spinner.succeed(`Task ${taskid}:\n`, {
+        raw,
+      });
+      spinner.info(`on-chain data:\n${pretty(raw.onchainData)}\n`);
+      if (raw.offchainData) {
+        spinner.info(`off-chain data:\n${pretty(raw.offchainData)}\n`);
       }
     } catch (error) {
       handleError(error, cli, opts);

@@ -1,8 +1,9 @@
 const Debug = require('debug');
 const dealModule = require('./deal');
 const taskModule = require('./task');
+const { getWorkerpoolApiUrl } = require('./workerpool');
 const { FETCH_INTERVAL } = require('../utils/utils');
-const { downloadZipApi } = require('../utils/api-utils');
+const { downloadZipApi, jsonApi } = require('../utils/api-utils');
 const { bytes32Schema, throwIfMissing } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
@@ -49,6 +50,46 @@ const fetchTaskResults = async (
     return res;
   } catch (error) {
     debug('fetchResults()', error);
+    throw error;
+  }
+};
+
+const getTaskOffchainApiUrl = async (
+  contracts = throwIfMissing(),
+  taskid = throwIfMissing(),
+) => {
+  try {
+    const { dealid } = await taskModule.show(contracts, taskid);
+    const deal = await dealModule.show(contracts, dealid);
+    const workerpool = deal.workerpool && deal.workerpool.pointer;
+    if (!workerpool) {
+      throw Error(`Cannot find task's workerpool`);
+    }
+    const apiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
+    if (!apiUrl) {
+      throw Error(`Impossible to resolve API url for workerpool ${workerpool}`);
+    }
+    return apiUrl;
+  } catch (error) {
+    debug('getTaskOffchainApiUrl()', error);
+    throw error;
+  }
+};
+
+const fetchTaskOffchainInfo = async (
+  contracts = throwIfMissing(),
+  taskid = throwIfMissing(),
+) => {
+  try {
+    const vTaskid = await bytes32Schema().validate(taskid);
+    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const json = await jsonApi.get({
+      api: apiUrl,
+      endpoint: `/tasks/${vTaskid}`,
+    });
+    return json;
+  } catch (error) {
+    debug('fetchTaskOffchainInfo()', error);
     throw error;
   }
 };
@@ -238,4 +279,5 @@ module.exports = {
   fetchTaskResults,
   obsTask,
   obsDeal,
+  fetchTaskOffchainInfo,
 };

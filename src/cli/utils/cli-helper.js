@@ -122,6 +122,7 @@ const desc = {
   requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
+  debugTask: () => `show task debug information`,
 };
 
 const option = {
