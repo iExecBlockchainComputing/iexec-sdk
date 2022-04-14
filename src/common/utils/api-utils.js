@@ -34,7 +34,7 @@ const makeHeaders = (method, headers, body) => {
 
 const httpRequest =
   (method) =>
-  async ({ api, endpoint, query = {}, body = {}, headers = {} }) => {
+  async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
     debug(
       'httpRequest()',
       '\nmethod',
@@ -50,9 +50,9 @@ const httpRequest =
       '\nheaders',
       headers,
     );
-    const baseURL = api;
+    const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(method, query);
-    const url = baseURL.concat(endpoint, queryString);
+    const url = baseURL.concat(queryString);
     const response = await fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
