@@ -4,7 +4,8 @@ const {
   addressSchema,
   workerpoolApiUrlSchema,
 } = require('../utils/validator');
-const { readTextRecord, setTextRecord, lookupAddress } = require('./ens');
+const { lookupAddress } = require('../ens/resolution');
+const { readTextRecord, setTextRecord } = require('../ens/text-record');
 
 const debug = Debug('iexec:workerpool');
 

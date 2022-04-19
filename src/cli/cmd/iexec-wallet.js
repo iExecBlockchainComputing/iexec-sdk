@@ -35,7 +35,7 @@ const {
   getPropertyFormChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
-const { lookupAddress } = require('../../common/modules/ens');
+const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
 
 const objName = 'wallet';

@@ -47,7 +47,7 @@ const {
   getWorkerpoolApiUrl,
   setWorkerpoolApiUrl,
 } = require('../../common/modules/workerpool');
-const { lookupAddress } = require('../../common/modules/ens');
+const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-workerpool');

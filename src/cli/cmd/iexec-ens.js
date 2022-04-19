@@ -2,7 +2,13 @@
 
 // const Debug = require('debug');
 const cli = require('commander');
-const ensModule = require('../../common/modules/ens');
+const {
+  getOwner,
+  resolveName,
+  lookupAddress,
+  registerFifsEns,
+  configureResolution,
+} = require('../../common/ens');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -35,7 +41,7 @@ resolve
       const chain = await loadChain(opts.chain, { spinner });
 
       spinner.start('Resolving ENS');
-      const address = await ensModule.resolveName(chain.contracts, name);
+      const address = await resolveName(chain.contracts, name);
       spinner.succeed(
         address
           ? `ENS ${name} resolved to ${address}`
@@ -63,7 +69,7 @@ lookup
       const chain = await loadChain(opts.chain, { spinner });
 
       spinner.start('Looking up for the ENS name');
-      const name = await ensModule.lookupAddress(chain.contracts, address);
+      const name = await lookupAddress(chain.contracts, address);
       spinner.succeed(
         name
           ? `${address} is associated to ENS ${name}`
@@ -79,9 +85,9 @@ lookup
     }
   });
 
-const getOwner = cli.command('get-owner <name>');
-addGlobalOptions(getOwner);
-getOwner
+const getEnsOwner = cli.command('get-owner <name>');
+addGlobalOptions(getEnsOwner);
+getEnsOwner
   .option(...option.chain())
   .description('find the the owner address of an ENS name')
   .action(async (name, opts) => {
@@ -91,7 +97,7 @@ getOwner
       const chain = await loadChain(opts.chain, { spinner });
 
       spinner.start('Finding ENS name owner');
-      const owner = await ensModule.getOwner(chain.contracts, name);
+      const owner = await getOwner(chain.contracts, name);
       spinner.succeed(`ENS ${name} is owned by ${owner}`, {
         raw: {
           owner,
@@ -139,10 +145,7 @@ register
       const targetAddress = forAddress || walletAddress;
 
       if (!force) {
-        const currentEns = await ensModule.lookupAddress(
-          chain.contracts,
-          targetAddress,
-        );
+        const currentEns = await lookupAddress(chain.contracts, targetAddress);
         if (currentEns) {
           await prompt.custom(
             `An ENS (${currentEns}) is already configured for address ${targetAddress}, this configuration will be replaced, do you want to continue?`,
@@ -152,7 +155,7 @@ register
       }
 
       spinner.start('Registering ENS');
-      const { registerTxHash, name } = await ensModule.registerFifsEns(
+      const { registerTxHash, name } = await registerFifsEns(
         chain.contracts,
         label,
         domain,
@@ -169,7 +172,7 @@ register
         setAddrTxHash,
         claimReverseTxHash,
         setNameTxHash,
-      } = await ensModule.configureResolution(
+      } = await configureResolution(
         chain.contracts,
         getPropertyFormChain(chain, 'ensPublicResolver'),
         name,

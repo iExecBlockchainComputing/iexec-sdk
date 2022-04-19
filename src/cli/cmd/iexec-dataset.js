@@ -55,7 +55,7 @@ const {
   isEthAddress,
   getPropertyFormChain,
 } = require('../utils/cli-helper');
-const { lookupAddress } = require('../../common/modules/ens');
+const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-dataset');

@@ -10,93 +10,17 @@ const {
   addressSchema,
   ensDomainSchema,
   ensLabelSchema,
-  textRecordKeySchema,
-  textRecordValueSchema,
 } = require('../utils/validator');
 const { getAddress } = require('../wallet/address');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
-const { ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
 const { NULL_ADDRESS, checkSigner } = require('../utils/utils');
+const { getEnsRegistryAddress } = require('./registry');
+const { getOwner, lookupAddress } = require('./resolution');
 
-const debug = Debug('iexec:ens');
+const debug = Debug('iexec:ens:registration');
 
 const BASE_DOMAIN = 'users.iexec.eth';
-
-const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
-  try {
-    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
-    if (!ensAddress) {
-      throw new ConfigurationError('Network does not support ENS');
-    }
-    return ensAddress;
-  } catch (e) {
-    debug('getEnsRegistryAddress()', e);
-    throw e;
-  }
-};
-
-const checkEns = async (contracts = throwIfMissing()) => {
-  try {
-    await getEnsRegistryAddress(contracts);
-  } catch (e) {
-    debug('checkEns()', e);
-    throw e;
-  }
-};
-
-const getOwner = async (
-  contracts = throwIfMissing(),
-  name = throwIfMissing(),
-) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    const nameHash = utils.namehash(vName);
-    const ensAddress = await getEnsRegistryAddress(contracts);
-    const ensRegistryContract = new Contract(
-      ensAddress,
-      ENSRegistry.abi,
-      contracts.provider,
-    );
-    const owner = await wrapCall(ensRegistryContract.owner(nameHash));
-    return owner;
-  } catch (e) {
-    debug('getOwner()', e);
-    throw e;
-  }
-};
-
-const resolveName = async (
-  contracts = throwIfMissing(),
-  name = throwIfMissing(),
-) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    await checkEns(contracts);
-    const address = await wrapCall(contracts.provider.resolveName(vName));
-    return address;
-  } catch (e) {
-    debug('resolveName()', e);
-    throw e;
-  }
-};
-
-const lookupAddress = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
-  try {
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(address);
-    await checkEns(contracts);
-    const ens = await wrapCall(contracts.provider.lookupAddress(vAddress));
-    return ens;
-  } catch (e) {
-    debug('lookupAddress()', e);
-    throw e;
-  }
-};
 
 const registerFifsEns = async (
   contracts = throwIfMissing(),
@@ -450,83 +374,8 @@ const configureResolution = async (
   }
 };
 
-const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    const vKey = await textRecordKeySchema().validate(key);
-    const node = utils.namehash(vName);
-    const currentResolver = await wrapCall(
-      contracts.provider.getResolver(vName),
-    );
-    const isResolverSet =
-      currentResolver &&
-      currentResolver.address &&
-      currentResolver.address !== NULL_ADDRESS;
-    if (!isResolverSet) {
-      throw Error(`No resolver is configured for ${vName}`);
-    }
-    const resolverContract = new Contract(
-      currentResolver.address,
-      PublicResolver.abi,
-      contracts.provider,
-    );
-    const txt = await wrapCall(resolverContract.text(node, vKey));
-    return txt;
-  } catch (e) {
-    debug('readText()', e);
-    throw e;
-  }
-};
-
-const setTextRecord = async (
-  contracts = throwIfMissing(),
-  name,
-  key,
-  value = '',
-) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    const vKey = await textRecordKeySchema().validate(key);
-    const vValue = await textRecordValueSchema().validate(value);
-    const node = utils.namehash(vName);
-    const currentResolver = await wrapCall(
-      contracts.provider.getResolver(vName),
-    );
-    const isResolverSet =
-      currentResolver &&
-      currentResolver.address &&
-      currentResolver.address !== NULL_ADDRESS;
-    if (!isResolverSet) {
-      throw Error(`No resolver is configured for ${vName}`);
-    }
-    const ownedBy = await getOwner(contracts, vName);
-    const userAddress = await getAddress(contracts);
-    if (ownedBy !== userAddress) {
-      throw Error(
-        `${userAddress} is not authorised to set a text record for ${vName}`,
-      );
-    }
-    const resolverContract = new Contract(
-      currentResolver.address,
-      PublicResolver.abi,
-      contracts.signer,
-    );
-    const tx = await wrapSend(resolverContract.setText(node, vKey, vValue));
-    await wrapWait(tx.wait(contracts.confirms));
-    return tx.hash;
-  } catch (e) {
-    debug('setTextRecord()', e);
-    throw e;
-  }
-};
-
 module.exports = {
-  getOwner,
-  resolveName,
-  lookupAddress,
-  registerFifsEns,
   configureResolution,
   obsConfigureResolution,
-  readTextRecord,
-  setTextRecord,
+  registerFifsEns,
 };
