@@ -52,7 +52,7 @@ const {
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
 } = require('../../common/modules/orderbook');
-const { checkBalance } = require('../../common/modules/account');
+const { checkBalance } = require('../../common/account/balance');
 const { obsDeal } = require('../../common/modules/iexecProcess');
 const {
   NULL_ADDRESS,

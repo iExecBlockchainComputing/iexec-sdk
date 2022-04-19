@@ -2,7 +2,7 @@ const Debug = require('debug');
 const BN = require('bn.js');
 const { getAddress } = require('../wallet/address');
 const { isInWhitelist } = require('../wallet/enterprise');
-const { checkBalance } = require('./account');
+const { checkBalance } = require('../account/balance');
 const {
   checkDeployedApp,
   checkDeployedDataset,

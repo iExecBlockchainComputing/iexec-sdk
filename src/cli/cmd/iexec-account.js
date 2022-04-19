@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const account = require('../../common/modules/account');
+const account = require('../../common/account');
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const {

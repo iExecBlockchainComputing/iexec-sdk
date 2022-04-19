@@ -1,21 +1,18 @@
 const IExecModule = require('./IExecModule');
-const account = require('../common/modules/account');
+const { checkBalance } = require('../common/account/balance');
+const { deposit, withdraw } = require('../common/account/fund');
 
 class IExecAccountModule extends IExecModule {
   constructor(...args) {
     super(...args);
-
     this.checkBalance = async (address) =>
-      account.checkBalance(await this.config.resolveContractsClient(), address);
+      checkBalance(await this.config.resolveContractsClient(), address);
     this.checkBridgedBalance = async (address) =>
-      account.checkBalance(
-        await this.config.resolveBridgedContractsClient(),
-        address,
-      );
+      checkBalance(await this.config.resolveBridgedContractsClient(), address);
     this.deposit = async (nRlcAmount) =>
-      account.deposit(await this.config.resolveContractsClient(), nRlcAmount);
+      deposit(await this.config.resolveContractsClient(), nRlcAmount);
     this.withdraw = async (nRlcAmount) =>
-      account.withdraw(await this.config.resolveContractsClient(), nRlcAmount);
+      withdraw(await this.config.resolveContractsClient(), nRlcAmount);
   }
 }
 
