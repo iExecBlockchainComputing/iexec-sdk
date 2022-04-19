@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const { Contract, utils } = require('ethers');
-const PublicResolver = require('../abi/ens/PublicResolver-min.json');
+const PublicResolver = require('./abi/PublicResolver-min.json');
 const {
   throwIfMissing,
   ensDomainSchema,

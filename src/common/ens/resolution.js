@@ -1,6 +1,6 @@
 const Debug = require('debug');
 const { Contract, utils } = require('ethers');
-const ENSRegistry = require('../abi/ens/ENSRegistry-min.json');
+const ENSRegistry = require('./abi/ENSRegistry-min.json');
 const {
   throwIfMissing,
   addressSchema,

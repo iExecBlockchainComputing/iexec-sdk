@@ -16,8 +16,8 @@ const {
 const { wrapCall } = require('../utils/errorWrappers');
 const { BridgeError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
-const foreignBridgeErcToNativeDesc = require('../abi/bridge/ForeignBridgeErcToNative.json');
-const homeBridgeErcToNativeDesc = require('../abi/bridge/HomeBridgeErcToNative.json');
+const foreignBridgeErcToNativeDesc = require('./abi/ForeignBridgeErcToNative.json');
+const homeBridgeErcToNativeDesc = require('./abi/HomeBridgeErcToNative.json');
 const { getAddress } = require('./address');
 const { getRlcBalance } = require('./balance');
 const { sendRLC } = require('./send');

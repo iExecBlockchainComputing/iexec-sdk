@@ -1,10 +1,10 @@
 const Debug = require('debug');
 const { Contract, utils } = require('ethers');
 const RegistryEntry = require('@iexec/poco/build/contracts-min/RegistryEntry.json');
-const ENSRegistry = require('../abi/ens/ENSRegistry-min.json');
-const FIFSRegistrar = require('../abi/ens/FIFSRegistrar-min.json');
-const PublicResolver = require('../abi/ens/PublicResolver-min.json');
-const ReverseRegistrar = require('../abi/ens/ReverseRegistrar-min.json');
+const ENSRegistry = require('./abi/ENSRegistry-min.json');
+const FIFSRegistrar = require('./abi/FIFSRegistrar-min.json');
+const PublicResolver = require('./abi/PublicResolver-min.json');
+const ReverseRegistrar = require('./abi/ReverseRegistrar-min.json');
 const {
   throwIfMissing,
   addressSchema,
