@@ -12,7 +12,7 @@ const {
 } = require('../utils/validator');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 
-const debug = Debug('iexec:hub:category');
+const debug = Debug('iexec:protocol:category');
 
 const createCategory = async (
   contracts = throwIfMissing(),

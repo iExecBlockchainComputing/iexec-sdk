@@ -21,7 +21,7 @@ const {
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 const { ObjectNotFoundError } = require('../utils/errors');
 
-const debug = Debug('iexec:hub:registries');
+const debug = Debug('iexec:protocol:registries');
 
 const tokenIdToAddress = (tokenId) => {
   const hexTokenId = tokenId.toHexString().substring(2);

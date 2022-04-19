@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const hub = require('../../common/hub');
+const {
+  createCategory,
+  showCategory,
+  countCategory,
+} = require('../../common/protocol/category');
 const {
   addGlobalOptions,
   addWalletLoadOptions,
@@ -68,7 +72,7 @@ create
       }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.creating('category'));
-      const { catid, txHash } = await hub.createCategory(
+      const { catid, txHash } = await createCategory(
         chain.contracts,
         iexecConf[objName],
       );
@@ -84,14 +88,14 @@ const show = cli.command('show <index>');
 addGlobalOptions(show);
 show
   .option(...option.chain())
-  .description(desc.showObj(objName, 'hub'))
+  .description('show category details')
   .action(async (index, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
       const chain = await loadChain(opts.chain, { spinner });
       spinner.start(info.showing('category'));
-      const category = await hub.showCategory(chain.contracts, index);
+      const category = await showCategory(chain.contracts, index);
       category.workClockTimeRef = category.workClockTimeRef.toString();
       spinner.succeed(
         `Category at index ${index} details:${pretty(category)}`,
@@ -106,14 +110,14 @@ const count = cli.command('count');
 addGlobalOptions(count);
 count
   .option(...option.chain())
-  .description(desc.showObj(objName, 'hub'))
+  .description('count protocol categories')
   .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
       const chain = await loadChain(opts.chain, { spinner });
       spinner.start(info.counting('category'));
-      const countBN = await hub.countCategory(chain.contracts);
+      const countBN = await countCategory(chain.contracts);
       spinner.succeed(`iExec hub has a total of ${countBN} category`, {
         raw: { count: countBN.toString() },
       });

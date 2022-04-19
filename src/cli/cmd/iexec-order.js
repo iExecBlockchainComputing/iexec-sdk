@@ -6,7 +6,7 @@ const {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/hub');
+} = require('../../common/protocol/registries');
 const { NULL_ADDRESS } = require('../../common/utils/utils');
 const {
   finalizeCli,

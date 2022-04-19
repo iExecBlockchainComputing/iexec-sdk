@@ -4,7 +4,7 @@ const {
   showDataset,
   showUserDataset,
   countUserDatasets,
-} = require('../common/hub/registries');
+} = require('../common/protocol/registries');
 const secretMgtServ = require('../common/modules/sms');
 const {
   generateAes256Key,

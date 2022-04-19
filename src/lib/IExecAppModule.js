@@ -4,7 +4,7 @@ const {
   showApp,
   showUserApp,
   countUserApps,
-} = require('../common/hub/registries');
+} = require('../common/protocol/registries');
 
 class IExecAppModule extends IExecModule {
   constructor(...args) {

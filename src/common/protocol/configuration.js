@@ -3,7 +3,7 @@ const { ethersBnToBn } = require('../utils/utils');
 const { throwIfMissing } = require('../utils/validator');
 const { wrapCall } = require('../utils/errorWrappers');
 
-const debug = Debug('iexec:hub:protocol');
+const debug = Debug('iexec:protocol:configuration');
 
 const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {

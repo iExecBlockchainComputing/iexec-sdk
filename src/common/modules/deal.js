@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const { defaultAbiCoder, keccak256 } = require('ethers').utils;
-const { showCategory } = require('../hub/category');
-const { getTimeoutRatio } = require('../hub/protocol');
+const { showCategory } = require('../protocol/category');
+const { getTimeoutRatio } = require('../protocol/configuration');
 const {
   cleanRPC,
   bnifyNestedEthersBn,

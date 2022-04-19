@@ -8,7 +8,7 @@ const {
   countUserWorkerpools,
   showWorkerpool,
   showUserWorkerpool,
-} = require('../../common/hub');
+} = require('../../common/protocol/registries');
 const {
   createWorkerpoolorder,
   signWorkerpoolorder,

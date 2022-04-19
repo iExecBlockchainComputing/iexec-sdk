@@ -24,11 +24,11 @@ const {
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-  showCategory,
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/hub');
+} = require('../../common/protocol/registries');
+const { showCategory } = require('../../common/protocol/category');
 const {
   getRemainingVolume,
   createApporder,

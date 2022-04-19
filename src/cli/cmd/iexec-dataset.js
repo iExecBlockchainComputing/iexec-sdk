@@ -10,7 +10,7 @@ const {
   countUserDatasets,
   showDataset,
   showUserDataset,
-} = require('../../common/hub');
+} = require('../../common/protocol/registries');
 const {
   createDatasetorder,
   signDatasetorder,

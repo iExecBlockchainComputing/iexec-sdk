@@ -69,7 +69,7 @@ const desc = {
   userAddress: () => 'custom user address',
   initObj: (objName) => `init a new ${objName}`,
   deployObj: (objName) => `deploy a new ${objName}`,
-  createObj: (objName) => `deploy a new ${objName}`,
+  createObj: (objName) => `create a new ${objName}`,
   publishObj: (objName) =>
     `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
   unpublishObj: (objName) =>

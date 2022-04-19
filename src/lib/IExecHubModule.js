@@ -3,8 +3,8 @@ const {
   createCategory,
   showCategory,
   countCategory,
-} = require('../common/hub/category');
-const { getTimeoutRatio } = require('../common/hub/protocol');
+} = require('../common/protocol/category');
+const { getTimeoutRatio } = require('../common/protocol/configuration');
 
 class IExecHubModule extends IExecModule {
   constructor(...args) {

@@ -4,7 +4,7 @@ const {
   showWorkerpool,
   showUserWorkerpool,
   countUserWorkerpools,
-} = require('../common/hub/registries');
+} = require('../common/protocol/registries');
 const {
   setWorkerpoolApiUrl,
   getWorkerpoolApiUrl,
