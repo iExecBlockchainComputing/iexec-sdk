@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - workerpool API url configuration
+- `iexec task debug <taskid>` to show offchain
 
 ### Changed
 
