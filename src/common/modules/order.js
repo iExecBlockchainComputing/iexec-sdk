@@ -10,7 +10,7 @@ const {
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-} = require('./hub');
+} = require('../hub/registries');
 const { createObjParams } = require('./request-helper');
 const {
   checkEvent,

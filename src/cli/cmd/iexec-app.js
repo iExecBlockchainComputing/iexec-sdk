@@ -28,7 +28,7 @@ const {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/modules/hub');
+} = require('../../common/hub');
 const {
   getRemainingVolume,
   createApporder,

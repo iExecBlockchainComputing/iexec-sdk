@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const hub = require('../../common/modules/hub');
+const hub = require('../../common/hub');
 const {
   addGlobalOptions,
   addWalletLoadOptions,
