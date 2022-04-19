@@ -1,6 +1,8 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { getAddress, isInWhitelist, checkBalances } = require('./wallet');
+const { getAddress } = require('../wallet/address');
+const { isInWhitelist } = require('../wallet/enterprise');
+const { checkBalances } = require('../wallet/balance');
 const {
   checkEvent,
   ethersBnToBn,

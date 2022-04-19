@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const { Buffer } = require('buffer');
 const { keccak256, arrayify } = require('ethers').utils;
-const { getAddress } = require('./wallet');
+const { getAddress } = require('../wallet/address');
 const { httpRequest } = require('../utils/api-utils');
 const {
   addressSchema,

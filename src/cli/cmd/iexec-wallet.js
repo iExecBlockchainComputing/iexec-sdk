@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const wallet = require('../../common/modules/wallet');
+const wallet = require('../../common/wallet');
 const {
   Keystore,
   createAndSave,

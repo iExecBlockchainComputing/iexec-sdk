@@ -13,7 +13,7 @@ const {
   textRecordKeySchema,
   textRecordValueSchema,
 } = require('../utils/validator');
-const { getAddress } = require('./wallet');
+const { getAddress } = require('../wallet/address');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
 const { ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');

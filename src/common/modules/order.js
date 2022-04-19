@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { getAddress, isInWhitelist } = require('./wallet');
+const { getAddress } = require('../wallet/address');
+const { isInWhitelist } = require('../wallet/enterprise');
 const { checkBalance } = require('./account');
 const {
   checkDeployedApp,
