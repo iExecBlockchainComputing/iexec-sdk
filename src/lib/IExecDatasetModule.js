@@ -5,7 +5,8 @@ const {
   showUserDataset,
   countUserDatasets,
 } = require('../common/protocol/registries');
-const secretMgtServ = require('../common/modules/sms');
+const { checkWeb3SecretExists } = require('../common/sms/check');
+const { pushWeb3Secret } = require('../common/sms/push');
 const {
   generateAes256Key,
   encryptAes256Cbc,
@@ -34,13 +35,13 @@ class IExecDatasetModule extends IExecModule {
     this.countUserDatasets = async (address) =>
       countUserDatasets(await this.config.resolveContractsClient(), address);
     this.checkDatasetSecretExists = async (datasetAddress) =>
-      secretMgtServ.checkWeb3SecretExists(
+      checkWeb3SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         datasetAddress,
       );
     this.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
-      secretMgtServ.pushWeb3Secret(
+      pushWeb3Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         datasetAddress,

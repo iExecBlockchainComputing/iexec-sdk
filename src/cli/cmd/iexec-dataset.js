@@ -18,7 +18,8 @@ const {
   unpublishLastDatasetorder,
   unpublishAllDatasetorders,
 } = require('../../common/modules/order');
-const secretMgtServ = require('../../common/modules/sms');
+const { checkWeb3SecretExists } = require('../../common/sms/check');
+const { pushWeb3Secret } = require('../../common/sms/push');
 const { NULL_ADDRESS } = require('../../common/utils/utils');
 const {
   generateAes256Key,
@@ -435,7 +436,7 @@ pushSecret
       debug('secretToPush', secretToPush);
 
       await connectKeystore(chain, keystore);
-      const isPushed = await secretMgtServ.pushWeb3Secret(
+      const isPushed = await pushWeb3Secret(
         contracts,
         sms,
         resourceAddress,
@@ -476,7 +477,7 @@ checkSecret
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
       const sms = getPropertyFormChain(chain, 'sms');
-      const secretIsSet = await secretMgtServ.checkWeb3SecretExists(
+      const secretIsSet = await checkWeb3SecretExists(
         chain.contracts,
         sms,
         resourceAddress,

@@ -10,6 +10,7 @@ const {
 } = require('../utils/validator');
 const { wrapPersonalSign } = require('../utils/errorWrappers');
 const { checkSigner } = require('../utils/utils');
+const { checkWeb2SecretExists } = require('./check');
 
 const debug = Debug('iexec:sms');
 
@@ -36,76 +37,6 @@ const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) =>
     keccak256(Buffer.from(secretKey, 'utf8')),
     keccak256(Buffer.from(secretValue, 'utf8')),
   );
-
-const checkWeb3SecretExists = async (
-  contracts = throwIfMissing(),
-  smsURL = throwIfMissing(),
-  resourceAddress = throwIfMissing(),
-) => {
-  try {
-    const vResourceAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(resourceAddress);
-    const res = await httpRequest('HEAD')({
-      api: smsURL,
-      endpoint: '/secrets/web3',
-      query: {
-        secretAddress: vResourceAddress,
-      },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
-    });
-    if (res.ok) {
-      return true;
-    }
-    if (res.status === 404) {
-      return false;
-    }
-    throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
-    );
-  } catch (error) {
-    debug('checkWeb3SecretExists()', error);
-    throw error;
-  }
-};
-
-const checkWeb2SecretExists = async (
-  contracts = throwIfMissing(),
-  smsURL = throwIfMissing(),
-  ownerAddress = throwIfMissing(),
-  secretName = throwIfMissing(),
-) => {
-  try {
-    const vOwnerAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(ownerAddress);
-    const res = await httpRequest('HEAD')({
-      api: smsURL,
-      endpoint: '/secrets/web2',
-      query: {
-        ownerAddress: vOwnerAddress,
-        secretName,
-      },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
-    });
-    if (res.ok) {
-      return true;
-    }
-    if (res.status === 404) {
-      return false;
-    }
-    throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
-    );
-  } catch (error) {
-    debug('checkWeb2SecretExists()', error);
-    throw error;
-  }
-};
 
 const pushWeb3Secret = async (
   contracts = throwIfMissing(),
@@ -228,6 +159,4 @@ const pushWeb2Secret = async (
 module.exports = {
   pushWeb2Secret,
   pushWeb3Secret,
-  checkWeb3SecretExists,
-  checkWeb2SecretExists,
 };

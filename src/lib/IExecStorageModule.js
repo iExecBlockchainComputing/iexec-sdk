@@ -1,5 +1,7 @@
 const IExecModule = require('./IExecModule');
-const secretMgtServ = require('../common/modules/sms');
+const { checkWeb2SecretExists } = require('../common/sms/check');
+const { pushWeb2Secret } = require('../common/sms/push');
+
 const resultProxyServ = require('../common/modules/result-proxy');
 const { getStorageTokenKeyName } = require('../common/utils/secrets-utils');
 
@@ -13,7 +15,7 @@ class IExecStorageModule extends IExecModule {
         await this.config.resolveResultProxyURL(),
       );
     this.checkStorageTokenExists = async (address, { provider } = {}) =>
-      secretMgtServ.checkWeb2SecretExists(
+      checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         address,
@@ -23,7 +25,7 @@ class IExecStorageModule extends IExecModule {
       token,
       { provider, forceUpdate = false } = {},
     ) =>
-      secretMgtServ.pushWeb2Secret(
+      pushWeb2Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         getStorageTokenKeyName(provider),

@@ -1,4 +1,4 @@
-const { checkWeb2SecretExists } = require('./sms');
+const { checkWeb2SecretExists } = require('../sms/check');
 const {
   NULL_BYTES32,
   NULL_ADDRESS,
