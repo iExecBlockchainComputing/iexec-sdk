@@ -8,9 +8,9 @@ const {
   checkEvent,
   bnNRlcToBnWei,
   bnToEthersBn,
-  NULL_BYTES,
   checkSigner,
 } = require('../utils/utils');
+const { NULL_BYTES } = require('../utils/constant');
 const { nRlcAmountSchema, throwIfMissing } = require('../utils/validator');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 

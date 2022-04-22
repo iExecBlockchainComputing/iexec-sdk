@@ -1,9 +1,6 @@
 const { checkWeb2SecretExists } = require('../sms/check');
-const {
-  NULL_BYTES32,
-  NULL_ADDRESS,
-  checkActiveBitInTag,
-} = require('../utils/utils');
+const { checkActiveBitInTag } = require('../utils/utils');
+const { NULL_ADDRESS, NULL_BYTES32 } = require('../utils/constant');
 const {
   getStorageTokenKeyName,
   reservedSecretKeyName,

@@ -14,7 +14,8 @@ const {
 const { getAddress } = require('../wallet/address');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
 const { Observable, SafeObserver } = require('../utils/reactive');
-const { NULL_ADDRESS, checkSigner } = require('../utils/utils');
+const { checkSigner } = require('../utils/utils');
+const { NULL_ADDRESS } = require('../utils/constant');
 const { getEnsRegistryAddress } = require('./registry');
 const { getOwner, lookupAddress } = require('./resolution');
 

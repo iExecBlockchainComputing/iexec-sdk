@@ -1,23 +1,33 @@
 const IExecModule = require('./IExecModule');
-const deal = require('../common/modules/deal');
-const order = require('../common/modules/order');
-const iexecProcess = require('../common/modules/iexecProcess');
+const {
+  show,
+  computeTaskId,
+  fetchDealsByOrderHash,
+  fetchRequesterDeals,
+  claim,
+} = require('../common/modules/deal');
+const { obsDeal } = require('../common/modules/iexecProcess');
+const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} = require('../common/utils/constant');
 
 class IExecDealModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
     this.show = async (dealid) =>
-      deal.show(await this.config.resolveContractsClient(), dealid);
+      show(await this.config.resolveContractsClient(), dealid);
     this.obsDeal = async (dealid) =>
-      iexecProcess.obsDeal(await this.config.resolveContractsClient(), dealid);
-    this.computeTaskId = (dealid, taskIdx) =>
-      deal.computeTaskId(dealid, taskIdx);
+      obsDeal(await this.config.resolveContractsClient(), dealid);
+    this.computeTaskId = (dealid, taskIdx) => computeTaskId(dealid, taskIdx);
     this.fetchRequesterDeals = async (
       requesterAddress,
       { appAddress, datasetAddress, workerpoolAddress } = {},
     ) =>
-      deal.fetchRequesterDeals(
+      fetchRequesterDeals(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         requesterAddress,
@@ -28,32 +38,32 @@ class IExecDealModule extends IExecModule {
         },
       );
     this.claim = async (dealid) =>
-      deal.claim(await this.config.resolveContractsClient(), dealid);
+      claim(await this.config.resolveContractsClient(), dealid);
     this.fetchDealsByApporder = async (apporderHash) =>
-      order.fetchDealsByOrderHash(
+      fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
-        order.APP_ORDER,
+        APP_ORDER,
         await this.config.resolveChainId(),
         apporderHash,
       );
     this.fetchDealsByDatasetorder = async (datasetorderHash) =>
-      order.fetchDealsByOrderHash(
+      fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
-        order.DATASET_ORDER,
+        DATASET_ORDER,
         await this.config.resolveChainId(),
         datasetorderHash,
       );
     this.fetchDealsByWorkerpoolorder = async (workerpoolorderHash) =>
-      order.fetchDealsByOrderHash(
+      fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
-        order.WORKERPOOL_ORDER,
+        WORKERPOOL_ORDER,
         await this.config.resolveChainId(),
         workerpoolorderHash,
       );
     this.fetchDealsByRequestorder = async (requestorderHash) =>
-      order.fetchDealsByOrderHash(
+      fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
-        order.REQUEST_ORDER,
+        REQUEST_ORDER,
         await this.config.resolveChainId(),
         requestorderHash,
       );

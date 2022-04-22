@@ -9,7 +9,7 @@ const {
 } = require('../utils/validator');
 const { getAddress } = require('../wallet/address');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
-const { NULL_ADDRESS } = require('../utils/utils');
+const { NULL_ADDRESS } = require('../utils/constant');
 const { getOwner } = require('./resolution');
 
 const debug = Debug('iexec:ens:text-record');

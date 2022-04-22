@@ -10,8 +10,9 @@ const {
   sleep,
   bytes32Regex,
   addressRegex,
-  NULL_ADDRESS,
 } = require('../src/common/utils/utils');
+
+const { NULL_ADDRESS } = utils;
 
 console.log('Node version:', process.version);
 
@@ -371,7 +372,7 @@ const getMatchableRequestorder = async (
       requester: address,
       app: apporder.app,
       appmaxprice: apporder.appprice,
-      dataset: datasetorder ? datasetorder.dataset : utils.NULL_ADDRESS,
+      dataset: datasetorder ? datasetorder.dataset : NULL_ADDRESS,
       datasetmaxprice: datasetorder ? datasetorder.datasetprice : 0,
       workerpool: workerpoolorder.workerpool,
       workerpoolmaxprice: workerpoolorder.workerpoolprice,
@@ -487,7 +488,7 @@ describe('[IExec]', () => {
       },
     );
     await expect(
-      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+      iexec.wallet.checkBridgedBalances(NULL_ADDRESS),
     ).rejects.toThrow(
       Error(
         `Missing chainId in bridgedNetworkConf and no default value for your chain ${networkId}`,
@@ -513,7 +514,7 @@ describe('[IExec]', () => {
       },
     );
     await expect(
-      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+      iexec.wallet.checkBridgedBalances(NULL_ADDRESS),
     ).rejects.toThrow(
       Error(
         'Missing rpcURL in bridgedNetworkConf and no default value for bridged chain 123456',
@@ -540,7 +541,7 @@ describe('[IExec]', () => {
       },
     );
     await expect(
-      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+      iexec.wallet.checkBridgedBalances(NULL_ADDRESS),
     ).rejects.toThrow(
       Error(
         'Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain 123456',
@@ -557,7 +558,7 @@ describe('[IExec]', () => {
     });
     // rely on viviani
     await expect(
-      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+      iexec.wallet.checkBridgedBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
 
@@ -580,7 +581,7 @@ describe('[IExec]', () => {
     );
     // relies on viviani
     await expect(
-      iexec.wallet.checkBridgedBalances(utils.NULL_ADDRESS),
+      iexec.wallet.checkBridgedBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
 
@@ -1648,42 +1649,42 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
     },
     DEFAULT_TIMEOUT * 2,
@@ -1716,7 +1717,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
     await expect(
       new IExec(
@@ -1732,7 +1733,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
     await expect(
       new IExec(
@@ -1748,7 +1749,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
 });
@@ -1783,8 +1784,8 @@ describe('[wallet]', () => {
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(initialBalance.wei).toBeInstanceOf(BN);
     expect(initialBalance.nRLC).toBeInstanceOf(BN);
-    await iexec.wallet.sendETH(5, utils.NULL_ADDRESS);
-    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    await iexec.wallet.sendETH(5, NULL_ADDRESS);
+    await iexec.wallet.sendRLC(10, NULL_ADDRESS);
     const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(finalBalance.wei).toBeInstanceOf(BN);
     expect(finalBalance.nRLC).toBeInstanceOf(BN);
@@ -1812,7 +1813,7 @@ describe('[wallet]', () => {
     expect(
       initialBalance.wei.eq(initialBalance.nRLC.mul(new BN(1000000000))),
     ).toBe(true);
-    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    await iexec.wallet.sendRLC(10, NULL_ADDRESS);
     const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(finalBalance.wei).toBeInstanceOf(BN);
     expect(finalBalance.nRLC).toBeInstanceOf(BN);
@@ -3578,8 +3579,8 @@ describe('[app]', () => {
     expect(res.app.appChecksum).toBe(app.checksum);
     expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
 
-    await expect(iexec.app.showApp(utils.NULL_ADDRESS)).rejects.toThrow(
-      new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
+    await expect(iexec.app.showApp(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('app', NULL_ADDRESS, networkId),
     );
   });
 
@@ -3796,8 +3797,8 @@ describe('[dataset]', () => {
     expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
     expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
 
-    await expect(iexec.dataset.showDataset(utils.NULL_ADDRESS)).rejects.toThrow(
-      new errors.ObjectNotFoundError('dataset', utils.NULL_ADDRESS, networkId),
+    await expect(iexec.dataset.showDataset(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('dataset', NULL_ADDRESS, networkId),
     );
   });
 
@@ -4103,14 +4104,8 @@ describe('[workerpool]', () => {
     expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
     expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
 
-    await expect(
-      iexec.workerpool.showWorkerpool(utils.NULL_ADDRESS),
-    ).rejects.toThrow(
-      new errors.ObjectNotFoundError(
-        'workerpool',
-        utils.NULL_ADDRESS,
-        networkId,
-      ),
+    await expect(iexec.workerpool.showWorkerpool(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('workerpool', NULL_ADDRESS, networkId),
     );
   });
 
@@ -4889,7 +4884,7 @@ describe('[order]', () => {
     );
     const order = await iexec.order
       .createRequestorder({
-        app: utils.NULL_ADDRESS,
+        app: NULL_ADDRESS,
         appmaxprice: 0,
         workerpoolmaxprice: 0,
         requester: await iexec.wallet.getAddress(),
@@ -6461,9 +6456,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6631,9 +6626,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6805,9 +6800,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6991,9 +6986,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -7135,9 +7130,9 @@ describe('[orderbook]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -7301,7 +7296,7 @@ describe('[orderbook]', () => {
     for (let i = 0; i < 25; i += 1) {
       await iexec.order
         .signRequestorder(
-          { ...requestorder, workerpool: utils.NULL_ADDRESS },
+          { ...requestorder, workerpool: NULL_ADDRESS },
           { checkRequest: false },
         )
         .then((o) =>

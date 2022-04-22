@@ -14,13 +14,15 @@ const {
 const {
   createDatasetorder,
   signDatasetorder,
+} = require('../../common/market/order');
+const {
   publishDatasetorder,
   unpublishLastDatasetorder,
   unpublishAllDatasetorders,
-} = require('../../common/modules/order');
+} = require('../../common/market/marketplace');
 const { checkWeb3SecretExists } = require('../../common/sms/check');
 const { pushWeb3Secret } = require('../../common/sms/push');
-const { NULL_ADDRESS } = require('../../common/utils/utils');
+const { NULL_ADDRESS, DATASET } = require('../../common/utils/constant');
 const {
   generateAes256Key,
   encryptAes256Cbc,
@@ -61,7 +63,7 @@ const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-dataset');
 
-const objName = 'dataset';
+const objName = DATASET;
 
 cli
   .name('iexec dataset')

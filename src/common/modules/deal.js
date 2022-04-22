@@ -6,7 +6,6 @@ const {
   cleanRPC,
   bnifyNestedEthersBn,
   ethersBnToBn,
-  NULL_ADDRESS,
   BN,
   checkSigner,
 } = require('../utils/utils');
@@ -22,6 +21,13 @@ const {
 } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
+const {
+  NULL_ADDRESS,
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} = require('../utils/constant');
 
 const debug = Debug('iexec:deal');
 
@@ -288,9 +294,46 @@ const claim = async (
   }
 };
 
+const apiDealField = {
+  [APP_ORDER]: 'apporderHash',
+  [DATASET_ORDER]: 'datasetorderHash',
+  [WORKERPOOL_ORDER]: 'workerpoolorderHash',
+  [REQUEST_ORDER]: 'requestorderHash',
+};
+
+const fetchDealsByOrderHash = async (
+  iexecGatewayURL = throwIfMissing(),
+  orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
+  orderHash = throwIfMissing(),
+) => {
+  try {
+    const vChainId = await chainIdSchema().validate(chainId);
+    const vOrderHash = await bytes32Schema().validate(orderHash);
+    const hashName = apiDealField[orderName];
+    const query = {
+      chainId: vChainId,
+      [hashName]: vOrderHash,
+    };
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      query,
+    });
+    if (response.ok && response.deals) {
+      return { count: response.count, deals: response.deals };
+    }
+    throw Error('An error occured while getting deals');
+  } catch (error) {
+    debug('fetchDealsByOrderHash()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   show,
   computeTaskId,
   fetchRequesterDeals,
+  fetchDealsByOrderHash,
   claim,
 };

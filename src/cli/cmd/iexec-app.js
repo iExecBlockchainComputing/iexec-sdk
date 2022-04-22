@@ -39,24 +39,22 @@ const {
   signDatasetorder,
   signWorkerpoolorder,
   signRequestorder,
+  matchOrders,
+} = require('../../common/market/order');
+const {
   publishApporder,
   publishRequestorder,
   unpublishLastApporder,
   unpublishAllApporders,
-  matchOrders,
-  NULL_DATASETORDER,
-  WORKERPOOL_ORDER,
-} = require('../../common/modules/order');
+} = require('../../common/market/marketplace');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
-} = require('../../common/modules/orderbook');
+} = require('../../common/market/orderbook');
 const { checkBalance } = require('../../common/account/balance');
 const { obsDeal } = require('../../common/modules/iexecProcess');
 const {
-  NULL_ADDRESS,
-  NULL_BYTES32,
   encodeTag,
   sumTags,
   checkActiveBitInTag,
@@ -64,6 +62,15 @@ const {
   stringifyNestedBn,
   formatRLC,
 } = require('../../common/utils/utils');
+const {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  NULL_DATASETORDER,
+  WORKERPOOL_ORDER,
+  DATASET,
+  APP,
+  WORKERPOOL,
+} = require('../../common/utils/constant');
 const { paramsKeyName } = require('../../common/utils/params-utils');
 const {
   checkRequestRequirements,
@@ -100,7 +107,7 @@ const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-app');
 
-const objName = 'app';
+const objName = APP;
 
 cli
   .name('iexec app')
@@ -441,7 +448,7 @@ run
       const useDeployedApp = !appAddress;
       const app =
         appAddress ||
-        (await loadDeployedObj('app').then(
+        (await loadDeployedObj(APP).then(
           (deployedApp) => deployedApp && deployedApp[chain.id],
         ));
       if (!app) {
@@ -461,7 +468,7 @@ run
       const dataset =
         useDataset &&
         (useDeployedDataset
-          ? await loadDeployedObj('dataset').then(
+          ? await loadDeployedObj(DATASET).then(
               (deployedDataset) => deployedDataset && deployedDataset[chain.id],
             )
           : opts.dataset);
@@ -488,7 +495,7 @@ run
       const workerpool =
         runOnWorkerpool &&
         (useDeployedWorkerpool
-          ? await loadDeployedObj('workerpool').then(
+          ? await loadDeployedObj(WORKERPOOL).then(
               (deployedWorkerpool) =>
                 deployedWorkerpool && deployedWorkerpool[chain.id],
             )

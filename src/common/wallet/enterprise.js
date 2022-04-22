@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { NULL_BYTES, checkSigner } = require('../utils/utils');
+const { NULL_BYTES } = require('../utils/constant');
+const { checkSigner } = require('../utils/utils');
 const {
   addressSchema,
   nRlcAmountSchema,

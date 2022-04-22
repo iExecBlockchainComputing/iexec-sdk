@@ -4,10 +4,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const { Wallet } = require('ethers');
 const { computePublicKey } = require('ethers').utils;
-const {
-  checksummedAddress,
-  NULL_ADDRESS,
-} = require('../../common/utils/utils');
+const { checksummedAddress } = require('../../common/utils/utils');
+const { NULL_ADDRESS } = require('../../common/utils/constant');
 const {
   saveWalletConf,
   loadWalletConf,

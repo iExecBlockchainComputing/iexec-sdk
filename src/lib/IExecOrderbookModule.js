@@ -1,61 +1,72 @@
 const IExecModule = require('./IExecModule');
-const order = require('../common/modules/order');
-const orderbook = require('../common/modules/orderbook');
+const { fetchPublishedOrderByHash } = require('../common/market/marketplace');
+const {
+  fetchAppOrderbook,
+  fetchDatasetOrderbook,
+  fetchRequestOrderbook,
+  fetchWorkerpoolOrderbook,
+} = require('../common/market/orderbook');
+const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} = require('../common/utils/constant');
 
 class IExecOrderbookModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
     this.fetchApporder = async (apporderHash) =>
-      order.fetchPublishedOrderByHash(
+      fetchPublishedOrderByHash(
         await this.config.resolveIexecGatewayURL(),
-        order.APP_ORDER,
+        APP_ORDER,
         await this.config.resolveChainId(),
         apporderHash,
       );
     this.fetchDatasetorder = async (datasetorderHash) =>
-      order.fetchPublishedOrderByHash(
+      fetchPublishedOrderByHash(
         await this.config.resolveIexecGatewayURL(),
-        order.DATASET_ORDER,
+        DATASET_ORDER,
         await this.config.resolveChainId(),
         datasetorderHash,
       );
     this.fetchWorkerpoolorder = async (workerpoolorderHash) =>
-      order.fetchPublishedOrderByHash(
+      fetchPublishedOrderByHash(
         await this.config.resolveIexecGatewayURL(),
-        order.WORKERPOOL_ORDER,
+        WORKERPOOL_ORDER,
         await this.config.resolveChainId(),
         workerpoolorderHash,
       );
     this.fetchRequestorder = async (requestorderHash) =>
-      order.fetchPublishedOrderByHash(
+      fetchPublishedOrderByHash(
         await this.config.resolveIexecGatewayURL(),
-        order.REQUEST_ORDER,
+        REQUEST_ORDER,
         await this.config.resolveChainId(),
         requestorderHash,
       );
     this.fetchAppOrderbook = async (appAddress, options = {}) =>
-      orderbook.fetchAppOrderbook(
+      fetchAppOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         appAddress,
         options,
       );
     this.fetchDatasetOrderbook = async (datasetAddress, options = {}) =>
-      orderbook.fetchDatasetOrderbook(
+      fetchDatasetOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         datasetAddress,
         options,
       );
     this.fetchWorkerpoolOrderbook = async (options) =>
-      orderbook.fetchWorkerpoolOrderbook(
+      fetchWorkerpoolOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         options,
       );
     this.fetchRequestOrderbook = async (options) =>
-      orderbook.fetchRequestOrderbook(
+      fetchRequestOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         options,

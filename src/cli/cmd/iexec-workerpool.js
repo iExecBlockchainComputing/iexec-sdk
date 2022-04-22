@@ -12,11 +12,14 @@ const {
 const {
   createWorkerpoolorder,
   signWorkerpoolorder,
+} = require('../../common/market/order');
+const {
   publishWorkerpoolorder,
   unpublishLastWorkerpoolorder,
   unpublishAllWorkerpoolorders,
-} = require('../../common/modules/order');
-const { NULL_ADDRESS, stringifyNestedBn } = require('../../common/utils/utils');
+} = require('../../common/market/marketplace');
+const { stringifyNestedBn } = require('../../common/utils/utils');
+const { NULL_ADDRESS, WORKERPOOL } = require('../../common/utils/constant');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -52,7 +55,7 @@ const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-workerpool');
 
-const objName = 'workerpool';
+const objName = WORKERPOOL;
 
 cli
   .name('iexec workerpool')

@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const orderbook = require('../../common/modules/orderbook');
-const { NULL_BYTES32, NULL_ADDRESS } = require('../../common/utils/utils');
+const {
+  fetchAppOrderbook,
+  fetchDatasetOrderbook,
+  fetchRequestOrderbook,
+  fetchWorkerpoolOrderbook,
+} = require('../../common/market/orderbook');
+const { NULL_ADDRESS, NULL_BYTES32 } = require('../../common/utils/constant');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -52,7 +57,7 @@ orderbookApp
         raw,
       } = opts;
 
-      const request = orderbook.fetchAppOrderbook(
+      const request = fetchAppOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         app,
@@ -158,7 +163,7 @@ orderbookDataset
         raw,
       } = opts;
 
-      const request = orderbook.fetchDatasetOrderbook(
+      const request = fetchDatasetOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         dataset,
@@ -268,7 +273,7 @@ orderbookWorkerpool
         raw,
       } = opts;
 
-      const request = orderbook.fetchWorkerpoolOrderbook(
+      const request = fetchWorkerpoolOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         {
@@ -389,7 +394,7 @@ orderbookRequester
         raw,
       } = opts;
 
-      const request = orderbook.fetchRequestOrderbook(
+      const request = fetchRequestOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
         {

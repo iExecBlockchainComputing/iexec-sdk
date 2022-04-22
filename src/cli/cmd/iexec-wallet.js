@@ -7,11 +7,8 @@ const {
   createAndSave,
   importPrivateKeyAndSave,
 } = require('../utils/keystore');
-const {
-  formatEth,
-  formatRLC,
-  NULL_ADDRESS,
-} = require('../../common/utils/utils');
+const { formatEth, formatRLC } = require('../../common/utils/utils');
+const { NULL_ADDRESS } = require('../../common/utils/constant');
 const {
   nRlcAmountSchema,
   weiAmountSchema,

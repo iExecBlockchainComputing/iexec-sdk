@@ -4,10 +4,10 @@ const {
   checkEvent,
   bnifyNestedEthersBn,
   cleanRPC,
-  NULL_BYTES32,
-  NULL_BYTES,
+
   checkSigner,
 } = require('../utils/utils');
+const { NULL_BYTES32, NULL_BYTES } = require('../utils/constant');
 const { bytes32Schema, throwIfMissing } = require('../utils/validator');
 const { ObjectNotFoundError } = require('../utils/errors');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
