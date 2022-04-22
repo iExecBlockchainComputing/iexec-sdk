@@ -74,7 +74,7 @@ const {
 const { paramsKeyName } = require('../../common/utils/params-utils');
 const {
   checkRequestRequirements,
-} = require('../../common/modules/request-helper');
+} = require('../../common/execution/request-helper');
 const {
   finalizeCli,
   addGlobalOptions,

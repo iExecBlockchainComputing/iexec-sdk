@@ -38,7 +38,7 @@ const {
 } = require('../common/market/marketplace');
 const {
   checkRequestRequirements,
-} = require('../common/modules/request-helper');
+} = require('../common/execution/request-helper');
 const { NULL_DATASETORDER } = require('../common/utils/constant');
 
 class IExecOrderModule extends IExecModule {

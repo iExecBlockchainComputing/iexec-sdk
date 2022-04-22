@@ -11,7 +11,7 @@ const {
   getDatasetOwner,
   getWorkerpoolOwner,
 } = require('../protocol/registries');
-const { createObjParams } = require('../modules/request-helper');
+const { createObjParams } = require('../execution/request-helper');
 const {
   checkEvent,
   getEventFromLogs,
