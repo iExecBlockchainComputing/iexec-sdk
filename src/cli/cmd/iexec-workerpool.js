@@ -49,7 +49,7 @@ const { loadChain, connectKeystore } = require('../utils/chains');
 const {
   getWorkerpoolApiUrl,
   setWorkerpoolApiUrl,
-} = require('../../common/modules/workerpool');
+} = require('../../common/execution/workerpool');
 const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
 

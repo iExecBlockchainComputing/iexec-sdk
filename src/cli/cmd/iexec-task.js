@@ -4,12 +4,12 @@ const Debug = require('debug');
 const cli = require('commander');
 const path = require('path');
 const fs = require('fs-extra');
-const taskModule = require('../../common/modules/task');
+const taskModule = require('../../common/execution/task');
 const {
   obsTask,
   fetchTaskResults,
   fetchTaskOffchainInfo,
-} = require('../../common/modules/iexecProcess');
+} = require('../../common/execution/iexecProcess');
 const {
   stringifyNestedBn,
   decryptResult,

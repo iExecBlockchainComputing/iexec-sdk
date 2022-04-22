@@ -1,6 +1,6 @@
 const IExecModule = require('./IExecModule');
-const task = require('../common/modules/task');
-const iexecProcess = require('../common/modules/iexecProcess');
+const task = require('../common/execution/task');
+const iexecProcess = require('../common/execution/iexecProcess');
 
 class IExecTaskModule extends IExecModule {
   constructor(...args) {

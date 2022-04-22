@@ -28,7 +28,7 @@ const {
   unpublishWorkerpoolorder,
   fetchPublishedOrderByHash,
 } = require('../../common/market/marketplace');
-const { fetchDealsByOrderHash } = require('../../common/modules/deal');
+const { fetchDealsByOrderHash } = require('../../common/execution/deal');
 const {
   checkDeployedApp,
   checkDeployedDataset,

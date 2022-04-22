@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const deal = require('../../common/modules/deal');
-const { obsDeal } = require('../../common/modules/iexecProcess');
+const deal = require('../../common/execution/deal');
+const { obsDeal } = require('../../common/execution/iexecProcess');
 const { stringifyNestedBn } = require('../../common/utils/utils');
 const {
   finalizeCli,

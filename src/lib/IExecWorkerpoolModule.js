@@ -8,7 +8,7 @@ const {
 const {
   setWorkerpoolApiUrl,
   getWorkerpoolApiUrl,
-} = require('../common/modules/workerpool');
+} = require('../common/execution/workerpool');
 
 class IExecWorkerpoolModule extends IExecModule {
   constructor(...args) {

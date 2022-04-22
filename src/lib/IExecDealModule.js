@@ -5,8 +5,8 @@ const {
   fetchDealsByOrderHash,
   fetchRequesterDeals,
   claim,
-} = require('../common/modules/deal');
-const { obsDeal } = require('../common/modules/iexecProcess');
+} = require('../common/execution/deal');
+const { obsDeal } = require('../common/execution/iexecProcess');
 const {
   APP_ORDER,
   DATASET_ORDER,
