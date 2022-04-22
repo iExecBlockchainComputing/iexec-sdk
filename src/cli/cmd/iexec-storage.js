@@ -3,7 +3,9 @@
 const cli = require('commander');
 const { checkWeb2SecretExists } = require('../../common/sms/check');
 const { pushWeb2Secret } = require('../../common/sms/push');
-const resultProxyServ = require('../../common/modules/result-proxy');
+const {
+  login: resultProxyLogin,
+} = require('../../common/storage/result-proxy');
 const { getStorageTokenKeyName } = require('../../common/utils/secrets-utils');
 const {
   finalizeCli,
@@ -65,7 +67,7 @@ initStorage
       let token;
       if (providerName === 'default') {
         await connectKeystore(chain, keystore);
-        token = await resultProxyServ.login(contracts, resultProxyURL);
+        token = await resultProxyLogin(contracts, resultProxyURL);
       } else {
         token =
           opts.token ||
