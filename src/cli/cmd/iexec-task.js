@@ -4,12 +4,9 @@ const Debug = require('debug');
 const cli = require('commander');
 const path = require('path');
 const fs = require('fs-extra');
-const taskModule = require('../../common/execution/task');
-const {
-  obsTask,
-  fetchTaskResults,
-  fetchTaskOffchainInfo,
-} = require('../../common/execution/iexecProcess');
+const { show, claim, obsTask } = require('../../common/execution/task');
+const { fetchTaskResults } = require('../../common/execution/result');
+const { fetchTaskOffchainInfo } = require('../../common/execution/debug');
 const {
   stringifyNestedBn,
   decryptResult,
@@ -38,10 +35,10 @@ const objName = 'task';
 
 cli.name('iexec task').usage('<command> [options]');
 
-const show = cli.command('show <taskid>');
-addGlobalOptions(show);
-addWalletLoadOptions(show);
-show
+const showTask = cli.command('show <taskid>');
+addGlobalOptions(showTask);
+addWalletLoadOptions(showTask);
+showTask
   .option(...option.chain())
   .option(...option.watch())
   .option(...option.download())
@@ -86,7 +83,7 @@ show
         });
       }
       const taskResult =
-        taskFinalState || (await taskModule.show(chain.contracts, taskid));
+        taskFinalState || (await show(chain.contracts, taskid));
       spinner.info(`Task status ${taskResult.statusName}`);
       let resultPath;
       if (opts.download) {
@@ -191,7 +188,7 @@ debugTask
     try {
       const chain = await loadChain(opts.chain, { spinner });
       spinner.start('Fetching debug information');
-      const onchainData = await taskModule.show(chain.contracts, taskid);
+      const onchainData = await show(chain.contracts, taskid);
       const offchainData = await fetchTaskOffchainInfo(
         chain.contracts,
         taskid,
@@ -214,10 +211,10 @@ debugTask
     }
   });
 
-const claim = cli.command('claim <taskid>');
-addGlobalOptions(claim);
-addWalletLoadOptions(claim);
-claim
+const claimTask = cli.command('claim <taskid>');
+addGlobalOptions(claimTask);
+addWalletLoadOptions(claimTask);
+claimTask
   .option(...option.chain())
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
@@ -233,7 +230,7 @@ claim
       await connectKeystore(chain, keystore, { txOptions });
 
       spinner.start(info.claiming(objName));
-      const txHash = await taskModule.claim(chain.contracts, taskid);
+      const txHash = await claim(chain.contracts, taskid);
       spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, opts);

@@ -2,13 +2,7 @@ const Debug = require('debug');
 const { defaultAbiCoder, keccak256 } = require('ethers').utils;
 const { showCategory } = require('../protocol/category');
 const { getTimeoutRatio } = require('../protocol/configuration');
-const {
-  cleanRPC,
-  bnifyNestedEthersBn,
-  ethersBnToBn,
-  BN,
-  checkSigner,
-} = require('../utils/utils');
+const { ethersBnToBn, BN, checkSigner } = require('../utils/utils');
 const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
 const {
   chainIdSchema,
@@ -19,17 +13,18 @@ const {
   positiveStrictIntSchema,
   throwIfMissing,
 } = require('../utils/validator');
-const { ObjectNotFoundError } = require('../utils/errors');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 const {
-  NULL_ADDRESS,
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
 } = require('../utils/constant');
+const { viewDeal, viewTask } = require('./common');
+const { obsTask } = require('./task');
+const { Observable, SafeObserver } = require('../utils/reactive');
 
-const debug = Debug('iexec:deal');
+const debug = Debug('iexec:execution:deal');
 
 const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
@@ -126,16 +121,7 @@ const show = async (
 ) => {
   try {
     const vDealid = await bytes32Schema().validate(dealid);
-    const { chainId } = contracts;
-    const iexecContract = contracts.getIExecContract();
-    const deal = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
-    );
-    const dealExists =
-      deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
-    if (!dealExists) {
-      throw new ObjectNotFoundError('deal', dealid, chainId);
-    }
+    const deal = await viewDeal(contracts, dealid);
     const [{ workClockTimeRef }, timeoutRatio] = await Promise.all([
       showCategory(contracts, deal.category),
       getTimeoutRatio(contracts),
@@ -163,22 +149,87 @@ const show = async (
   }
 };
 
-const getTaskStatus = async (
-  contracts = throwIfMissing(),
-  taskid = throwIfMissing(),
-) => {
-  try {
-    const vTaskId = await bytes32Schema().validate(taskid);
-    const iexecContract = contracts.getIExecContract();
-    const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
-    );
-    return new BN(task.status).toNumber();
-  } catch (error) {
-    debug('getTaskStatus()', error);
-    throw error;
-  }
+const obsDealMessages = {
+  DEAL_UPDATED: 'DEAL_UPDATED',
+  DEAL_COMPLETED: 'DEAL_COMPLETED',
+  DEAL_TIMEDOUT: 'DEAL_TIMEDOUT',
 };
+
+const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) =>
+  new Observable((observer) => {
+    const safeObserver = new SafeObserver(observer);
+    let taskWatchers = [];
+
+    const startWatch = async () => {
+      try {
+        const deal = await show(contracts, dealid);
+        const tasks = Object.entries(deal.tasks).reduce(
+          (acc, [idx, taskid]) => {
+            acc[idx] = { idx, taskid };
+            return acc;
+          },
+          {},
+        );
+
+        const callNext = () => {
+          const tasksCopy = { ...tasks };
+          const tasksArray = Object.values(tasksCopy);
+          if (!tasksArray.find(({ status }) => status === undefined)) {
+            let complete = false;
+            const tasksCount = tasksArray.length;
+            const completedTasksCount = tasksArray.filter(
+              (task) => task.status === 3,
+            ).length;
+            const failedTasksCount = tasksArray.filter(
+              (task) => task.taskTimedOut === true,
+            ).length;
+            let message;
+            if (completedTasksCount === tasksCount) {
+              message = obsDealMessages.DEAL_COMPLETED;
+              complete = true;
+            } else if (completedTasksCount + failedTasksCount === tasksCount) {
+              message = obsDealMessages.DEAL_TIMEDOUT;
+              complete = true;
+            } else {
+              message = obsDealMessages.DEAL_UPDATED;
+            }
+            safeObserver.next({
+              message,
+              tasksCount,
+              completedTasksCount,
+              failedTasksCount,
+              deal: { ...deal },
+              tasks: tasksCopy,
+            });
+            if (complete) {
+              safeObserver.complete();
+            }
+          }
+        };
+
+        taskWatchers = Object.entries(tasks).map(([idx, { taskid }]) =>
+          obsTask(contracts, taskid, { dealid }).subscribe({
+            next: ({ task }) => {
+              tasks[idx] = { ...tasks[idx], ...task };
+              callNext();
+            },
+            error: (e) => {
+              safeObserver.error(e);
+              taskWatchers.map((unsub) => unsub());
+            },
+          }),
+        );
+      } catch (e) {
+        safeObserver.error(e);
+      }
+    };
+
+    safeObserver.unsub = () => {
+      taskWatchers.map((unsub) => unsub());
+    };
+    startWatch();
+    return safeObserver.unsubscribe.bind(safeObserver);
+  });
 
 const claim = async (
   contracts = throwIfMissing(),
@@ -203,7 +254,8 @@ const claim = async (
 
     await Promise.all(
       Object.entries(tasks).map(async ([idx, taskid]) => {
-        const taskStatus = await getTaskStatus(contracts, taskid);
+        const task = await viewTask(contracts, taskid, { strict: false });
+        const taskStatus = new BN(task.status).toNumber();
         if (taskStatus === 0) {
           notInitialized.push({ idx, taskid });
         } else if (taskStatus < 3) {
@@ -332,6 +384,7 @@ const fetchDealsByOrderHash = async (
 
 module.exports = {
   show,
+  obsDeal,
   computeTaskId,
   fetchRequesterDeals,
   fetchDealsByOrderHash,

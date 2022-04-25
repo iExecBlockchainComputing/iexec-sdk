@@ -53,7 +53,7 @@ const {
   fetchWorkerpoolOrderbook,
 } = require('../../common/market/orderbook');
 const { checkBalance } = require('../../common/account/balance');
-const { obsDeal } = require('../../common/execution/iexecProcess');
+const { obsDeal } = require('../../common/execution/deal');
 const {
   encodeTag,
   sumTags,

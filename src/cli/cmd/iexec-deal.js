@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const deal = require('../../common/execution/deal');
-const { obsDeal } = require('../../common/execution/iexecProcess');
+const { show, obsDeal, claim } = require('../../common/execution/deal');
 const { stringifyNestedBn } = require('../../common/utils/utils');
 const {
   finalizeCli,
@@ -26,10 +25,10 @@ const objName = 'deal';
 
 cli.name('iexec deal').usage('<command> [options]');
 
-const show = cli.command('show <dealid>');
-addGlobalOptions(show);
-addWalletLoadOptions(show);
-show
+const showDeal = cli.command('show <dealid>');
+addGlobalOptions(showDeal);
+addWalletLoadOptions(showDeal);
+showDeal
   .option(...option.chain())
   .option(...option.watch())
   .description(desc.showObj(objName))
@@ -77,7 +76,7 @@ show
         );
       } else {
         spinner.start(info.showing(objName));
-        const dealResult = await deal.show(chain.contracts, dealid);
+        const dealResult = await show(chain.contracts, dealid);
         result = {
           deal: stringifyNestedBn(dealResult),
         };
@@ -91,10 +90,10 @@ show
     }
   });
 
-const claim = cli.command('claim <dealid>');
-addGlobalOptions(claim);
-addWalletLoadOptions(claim);
-claim
+const claimDeal = cli.command('claim <dealid>');
+addGlobalOptions(claimDeal);
+addWalletLoadOptions(claimDeal);
+claimDeal
   .option(...option.chain())
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
@@ -109,10 +108,7 @@ claim
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.claiming(objName));
-      const { claimed, transactions } = await deal.claim(
-        chain.contracts,
-        dealid,
-      );
+      const { claimed, transactions } = await claim(chain.contracts, dealid);
       spinner.succeed(
         `Deal successfully claimed (${
           Object.keys(claimed).length

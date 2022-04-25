@@ -5,11 +5,10 @@ const {
   workerpoolApiUrlSchema,
 } = require('../utils/validator');
 const { lookupAddress } = require('../ens/resolution');
-const { readTextRecord, setTextRecord } = require('../ens/text-record');
+const { setTextRecord } = require('../ens/text-record');
+const { WORKERPOOL_URL_TEXT_RECORD_KEY } = require('../utils/constant');
 
-const debug = Debug('iexec:workerpool');
-
-const WORKERPOOL_URL_TEXT_RECORD_KEY = 'iexec:workerpool-api:url';
+const debug = Debug('iexec:execution:workerpool');
 
 const setWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
@@ -40,41 +39,6 @@ const setWorkerpoolApiUrl = async (
   }
 };
 
-const getWorkerpoolApiUrl = async (
-  contracts = throwIfMissing(),
-  workerpoolAddress,
-) => {
-  try {
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .label('workerpool address')
-      .validate(workerpoolAddress);
-    const name = await lookupAddress(contracts, vAddress).catch(() => {
-      /** return undefined */
-    });
-    if (!name) {
-      return undefined;
-    }
-    const url = await readTextRecord(
-      contracts,
-      name,
-      WORKERPOOL_URL_TEXT_RECORD_KEY,
-    );
-    const vUrl = await workerpoolApiUrlSchema()
-      .required()
-      .validate(url)
-      .catch(() => {
-        /** return undefined */
-      });
-    return vUrl;
-  } catch (e) {
-    debug('getWorkerpoolApiUrl()', e);
-    throw e;
-  }
-};
-
 module.exports = {
   setWorkerpoolApiUrl,
-  getWorkerpoolApiUrl,
 };

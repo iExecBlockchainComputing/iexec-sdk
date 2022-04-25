@@ -46,10 +46,8 @@ const {
 } = require('../utils/fs');
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
-const {
-  getWorkerpoolApiUrl,
-  setWorkerpoolApiUrl,
-} = require('../../common/execution/workerpool');
+const { setWorkerpoolApiUrl } = require('../../common/execution/workerpool');
+const { getWorkerpoolApiUrl } = require('../../common/execution/debug');
 const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
 

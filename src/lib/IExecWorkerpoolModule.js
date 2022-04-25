@@ -5,10 +5,8 @@ const {
   showUserWorkerpool,
   countUserWorkerpools,
 } = require('../common/protocol/registries');
-const {
-  setWorkerpoolApiUrl,
-  getWorkerpoolApiUrl,
-} = require('../common/execution/workerpool');
+const { setWorkerpoolApiUrl } = require('../common/execution/workerpool');
+const { getWorkerpoolApiUrl } = require('../common/execution/debug');
 
 class IExecWorkerpoolModule extends IExecModule {
   constructor(...args) {
