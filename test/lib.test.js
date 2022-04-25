@@ -9517,7 +9517,11 @@ describe('[ens]', () => {
   });
 
   test('ens.setTextRecord(name, key, value) throw when the name is not owned', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -9529,6 +9533,21 @@ describe('[ens]', () => {
         isNative: false,
       },
     );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
     const label = getId();
     const name = `${label}.users.iexec.eth`;
@@ -9561,7 +9580,11 @@ describe('[ens]', () => {
   });
 
   test('ens.setTextRecord(name, key, value)', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -9573,6 +9596,22 @@ describe('[ens]', () => {
         isNative: false,
       },
     );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
     const { address } = await iexec.workerpool.deployWorkerpool({
       owner: await iexec.wallet.getAddress(),
       description: `workerpool${getId()}`,
@@ -9589,7 +9628,11 @@ describe('[ens]', () => {
   });
 
   test('ens.setTextRecord(name, key)', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -9601,6 +9644,22 @@ describe('[ens]', () => {
         isNative: false,
       },
     );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
     const { address } = await iexec.workerpool.deployWorkerpool({
       owner: await iexec.wallet.getAddress(),
       description: `workerpool${getId()}`,
@@ -9637,7 +9696,11 @@ describe('[ens]', () => {
   });
 
   test('ens.readTextRecord(name, key) record not set', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -9649,6 +9712,22 @@ describe('[ens]', () => {
         isNative: false,
       },
     );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
     const label = getId();
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
@@ -9658,7 +9737,11 @@ describe('[ens]', () => {
   });
 
   test('ens.readTextRecord(name, key)', async () => {
-    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -9670,6 +9753,22 @@ describe('[ens]', () => {
         isNative: false,
       },
     );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
     const { address } = await iexec.workerpool.deployWorkerpool({
       owner: await iexec.wallet.getAddress(),
       description: `workerpool${getId()}`,
