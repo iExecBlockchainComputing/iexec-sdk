@@ -79,20 +79,20 @@ pipeline:
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:5.3.2-alpha.1-token
+    image: iexechub/poco-chaintest:5.3.2-alpha.2-token
     pull: true
 
   native-chain:
-    image: iexechub/poco-chaintest:5.3.2-alpha.1-native
+    image: iexechub/poco-chaintest:5.3.2-alpha.2-native
     pull: true
 
   token-chain-1s:
-    image: iexechub/poco-chaintest:5.3.2-alpha.1-token
+    image: iexechub/poco-chaintest:5.3.2-alpha.2-token
     command: '--miner.blockTime 1'
     pull: true
 
   token-chain-openethereum:
-    image: iexechub/poco-chaintest:5.3.2-alpha.1-token-openethereum
+    image: iexechub/poco-chaintest:5.3.2-alpha.2-token-openethereum
     pull: true
 
   token-sms:
