@@ -31,9 +31,9 @@ const tokenChainUrl = DRONE
 const nativeChainUrl = DRONE
   ? 'http://native-chain:8545'
   : 'http://localhost:18545';
-// parity node (with ws)
-const tokenChainParityUrl = DRONE
-  ? 'http://token-chain-parity:8545'
+// openethereum node (with ws)
+const tokenChainOpenethereumUrl = DRONE
+  ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
 const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
@@ -46,7 +46,6 @@ const iexecGatewayURL = DRONE
   ? 'http://token-gateway:3000'
   : 'http://localhost:13000';
 
-const chainGasPrice = '20000000000';
 const nativeChainGasPrice = '0';
 
 const PRIVATE_KEY =
@@ -199,14 +198,14 @@ const setNativeChain = (options) =>
     'chain.json',
   );
 
-const setTokenChainParity = (options) =>
+const setTokenChainOpenethereum = (options) =>
   saveJSONToFile(
     {
       default: 'dev',
       chains: {
         dev: {
           id: networkId,
-          host: tokenChainParityUrl,
+          host: tokenChainOpenethereumUrl,
           hub: hubAddress,
           sms: smsURL,
           resultProxy: resultProxyURL,
@@ -471,7 +470,6 @@ describe('[Mainchain]', () => {
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec account deposit 10 RLC', async () => {
@@ -512,7 +510,6 @@ describe('[Mainchain]', () => {
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec account withdraw 500', async () => {
@@ -553,7 +550,6 @@ describe('[Mainchain]', () => {
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec account withdraw 5 RLC', async () => {
@@ -594,7 +590,6 @@ describe('[Mainchain]', () => {
     );
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec account show', async () => {
@@ -667,7 +662,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainApp = res.address;
   });
 
@@ -778,7 +772,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDataset = res.address;
   });
 
@@ -890,7 +883,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainWorkerpool = res.address;
   });
 
@@ -1030,7 +1022,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec category create (workClockTimeRef=0)', async () => {
@@ -1045,7 +1036,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainNoDurationCatid = res.catid.toString();
   });
 
@@ -1162,7 +1152,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDealid = res.dealid;
   });
 
@@ -1234,7 +1223,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
     mainchainDealidNoDuration = res.dealid;
   });
 
@@ -1249,7 +1237,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec order cancel --app', async () => {
@@ -1267,7 +1254,6 @@ describe('[Mainchain]', () => {
     expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.apporder.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec order cancel --dataset', async () => {
@@ -1285,7 +1271,6 @@ describe('[Mainchain]', () => {
     expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.datasetorder.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec order cancel --workerpool', async () => {
@@ -1303,7 +1288,6 @@ describe('[Mainchain]', () => {
     expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.workerpoolorder.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec order cancel --request', async () => {
@@ -1323,7 +1307,6 @@ describe('[Mainchain]', () => {
     expect(res.fail).toBeUndefined();
     const tx = await tokenChainRPC.getTransaction(res.requestorder.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec order cancel --app --dataset --workerpool --request (missing orders)', async () => {
@@ -1778,7 +1761,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec task show (claimed)', async () => {
@@ -1831,12 +1813,10 @@ describe('[Mainchain]', () => {
       res.transactions[0].txHash,
     );
     expect(claimArrayTx).toBeDefined();
-    expect(claimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
     const initializeAndClaimArrayTx = await tokenChainRPC.getTransaction(
       res.transactions[0].txHash,
     );
     expect(initializeAndClaimArrayTx).toBeDefined();
-    expect(initializeAndClaimArrayTx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   // send-ether
@@ -1852,7 +1832,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec wallet send-ether', async () => {
@@ -1867,7 +1846,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   // send-RLC
@@ -1883,7 +1861,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec wallet send-RLC 1000000000 nRLC', async () => {
@@ -1898,7 +1875,6 @@ describe('[Mainchain]', () => {
     expect(res.txHash).toBeDefined();
     const tx = await tokenChainRPC.getTransaction(res.txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('[mainchain] iexec wallet sweep', async () => {
@@ -1917,7 +1893,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec app publish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
     const { address } = JSON.parse(
@@ -1945,7 +1921,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec app publish [address] with options', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
     const { address } = JSON.parse(
@@ -1975,7 +1951,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec app unpublish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
     await execAsync(`${iexecPath} app deploy --raw`);
@@ -1997,7 +1973,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec app unpublish [address] --all', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
     const { address } = JSON.parse(
@@ -2026,7 +2002,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec dataset publish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     const { address } = JSON.parse(
@@ -2056,7 +2032,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec dataset publish [address] with options', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     const { address } = JSON.parse(
@@ -2088,7 +2064,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec dataset unpublish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     await execAsync(`${iexecPath} dataset deploy --raw`);
@@ -2110,7 +2086,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec dataset unpublish [address] --all', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     const { address } = JSON.parse(
@@ -2139,7 +2115,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec workerpool publish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} workerpool init`);
     await setWorkerpoolUniqueDescription();
     const { address } = JSON.parse(
@@ -2173,7 +2149,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec workerpool publish [address] with options', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} account deposit 10`);
     await execAsync(`${iexecPath} workerpool init`);
     await setWorkerpoolUniqueDescription();
@@ -2208,7 +2184,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec workerpool unpublish (from deployed)', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} workerpool init`);
     await setWorkerpoolUniqueDescription();
     await execAsync(`${iexecPath} workerpool deploy --raw`);
@@ -2232,7 +2208,7 @@ describe('[Mainchain]', () => {
 
   test('[common] iexec workerpool unpublish [address] --all', async () => {
     await setRichWallet();
-    await setTokenChainParity({ iexecGateway: iexecGatewayURL });
+    await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
     await execAsync(`${iexecPath} workerpool init`);
     await setWorkerpoolUniqueDescription();
     const { address } = JSON.parse(
@@ -3199,7 +3175,7 @@ describe('[Common]', () => {
   describe('[wallet]', () => {
     let importedWalletName;
     let localWalletFileName;
-    let ensLabel = `ens_${getId()}`;
+    const ensLabel = `ens_${getId()}`;
 
     beforeAll(async () => {
       await execAsync('rm wallet.json').catch(() => {});
@@ -3458,7 +3434,7 @@ describe('[Common]', () => {
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('1000000001');
     });
-    test('tx --gas-price 0', async () => {
+    test.skip('tx --gas-price 0', async () => {
       const raw = await execAsync(
         `${iexecPath} account deposit 1 --gas-price 0 --raw`,
       );
@@ -3595,7 +3571,7 @@ describe('[Common]', () => {
 
     test('iexec dataset push-secret', async () => {
       await setRichWallet();
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
       await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
       const randomAddress = getRandomAddress();
@@ -3630,7 +3606,7 @@ describe('[Common]', () => {
 
     test('iexec dataset check-secret', async () => {
       await setRichWallet();
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
       await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
       await execAsync(`${iexecPath} dataset init`);
@@ -3732,7 +3708,7 @@ describe('[Common]', () => {
     }
 
     test('iexec result push-encryption-key', async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       const { privateKey, publicKey, address } = getRandomWallet();
       await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
@@ -3754,7 +3730,7 @@ describe('[Common]', () => {
     });
 
     test('iexec result push-encryption-key --force-update', async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       const { privateKey, publicKey, address } = getRandomWallet();
       await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
@@ -3778,7 +3754,7 @@ describe('[Common]', () => {
     });
 
     test('iexec result push-secret (v4 legacy name)', async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       const { privateKey, publicKey, address } = getRandomWallet();
       await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
@@ -3791,7 +3767,7 @@ describe('[Common]', () => {
     });
 
     test('iexec result check-encryption-key', async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       const { privateKey, publicKey, address } = getRandomWallet();
       const rawUserKey = await execAsync(
         `${iexecPath} result check-encryption-key ${address} --raw`,
@@ -3820,7 +3796,7 @@ describe('[Common]', () => {
     });
 
     test('iexec result check-secret (v4 legacy name)', async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
       const { privateKey, publicKey, address } = getRandomWallet();
       const rawUserKey = await execAsync(
         `${iexecPath} result check-secret ${address} --raw`,
@@ -3893,7 +3869,7 @@ describe('[Common]', () => {
 
   describe('[storage]', () => {
     beforeAll(async () => {
-      await setTokenChainParity();
+      await setTokenChainOpenethereum();
     });
 
     test('iexec storage init', async () => {

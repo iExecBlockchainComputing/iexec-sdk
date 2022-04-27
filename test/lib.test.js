@@ -77,9 +77,9 @@ const nativeChainUrl = DRONE
 const tokenChain1sUrl = DRONE
   ? 'http://token-chain-1s:8545'
   : 'http://localhost:28545';
-// parity node (with ws)
-const tokenChainParityUrl = DRONE
-  ? 'http://token-chain-parity:8545'
+// openethereum node (with ws)
+const tokenChainOpenethereumUrl = DRONE
+  ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
 const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
@@ -91,9 +91,6 @@ const resultProxyURL = DRONE
 const iexecGatewayURL = DRONE
   ? 'http://token-gateway:3000'
   : 'http://localhost:13000';
-
-const chainGasPrice = '20000000000';
-// const nativeChainGasPrice = '0';
 
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 // const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
@@ -407,7 +404,7 @@ describe('[IExec]', () => {
   test('sms required function throw if no smsURL configured', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -430,7 +427,7 @@ describe('[IExec]', () => {
 
   test('resultProxy required function throw if no resultProxyURL configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -451,7 +448,7 @@ describe('[IExec]', () => {
 
   test('bridge required function throw if no bridgeAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -472,7 +469,7 @@ describe('[IExec]', () => {
 
   test('chainId not set in custom bridgedNetworkConf throw on unknown chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -498,7 +495,7 @@ describe('[IExec]', () => {
 
   test('rpcURL not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -524,7 +521,7 @@ describe('[IExec]', () => {
 
   test('bridgeAddress not set in custom bridgedNetworkConf throw on unknown bridged chain', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -564,7 +561,7 @@ describe('[IExec]', () => {
 
   test('chainId set to known chain in bridgedNetworkConf use defaults', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -587,7 +584,7 @@ describe('[IExec]', () => {
 
   test('ensRegistryAddress required function throw if no ensRegistryAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -604,7 +601,7 @@ describe('[IExec]', () => {
 
   test('ensPublicResolverAddress required function throw if no ensPublicResolverAddress configured', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -1473,7 +1470,6 @@ describe('[getSignerFromPrivateKey]', () => {
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('sign tx no value', async () => {
@@ -1513,7 +1509,6 @@ describe('[getSignerFromPrivateKey]', () => {
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('gasPrice option', async () => {
@@ -2225,7 +2220,7 @@ describe('[wallet]', () => {
     );
     await expect(iexec.wallet.sweep(POOR_ADDRESS3)).rejects.toThrow(
       Error(
-        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': processing response error: sender doesn't have enough funds to send tx. The upfront cost is: 725180000000000 and the sender's account only has: ${initialBalance.wei.toString()}`,
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': insufficient funds for intrinsic transaction cost`,
       ),
     );
     const finalBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
@@ -2264,7 +2259,7 @@ describe('[wallet]', () => {
         isNative: false,
       },
     );
-    await iexecRichman.wallet.sendETH('725180000000100', POOR_ADDRESS2);
+    await iexecRichman.wallet.sendETH('55000000000000', POOR_ADDRESS2);
     await iexecRichman.wallet.sendRLC(20, POOR_ADDRESS2);
     const initialBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
     const receiverInitialBalance = await iexec.wallet.checkBalances(
@@ -3867,7 +3862,7 @@ describe('[dataset]', () => {
 
   test('dataset.pushDatasetSecret()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3903,7 +3898,7 @@ describe('[dataset]', () => {
   test('dataset.pushDatasetSecret() (not deployed)', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3927,7 +3922,7 @@ describe('[dataset]', () => {
 
   test('dataset.pushDatasetSecret() (invalid owner)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3959,7 +3954,7 @@ describe('[dataset]', () => {
 
   test('dataset.checkDatasetSecretExists()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6375,7 +6370,7 @@ describe('[order]', () => {
 
   test('order.publishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6395,7 +6390,7 @@ describe('[order]', () => {
 
   test('order.publishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6415,7 +6410,7 @@ describe('[order]', () => {
 
   test('order.publishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6435,7 +6430,7 @@ describe('[order]', () => {
 
   test('order.publishRequestorder() (no checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6473,7 +6468,7 @@ describe('[order]', () => {
 
   test('order.publishRequestorder() (checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
     );
     const iexec = new IExec(
@@ -6489,7 +6484,7 @@ describe('[order]', () => {
       },
     );
     const appOwnerSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppOwner = new IExec(
@@ -6527,7 +6522,7 @@ describe('[order]', () => {
 
   test('order.unpublishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6551,7 +6546,7 @@ describe('[order]', () => {
 
   test('order.unpublishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6577,7 +6572,7 @@ describe('[order]', () => {
 
   test('order.unpublishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6605,7 +6600,7 @@ describe('[order]', () => {
 
   test('order.unpublishRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6649,7 +6644,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6685,7 +6680,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6723,7 +6718,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6764,7 +6759,7 @@ describe('[order]', () => {
   test('order.unpublishLastRequestorder()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       privateKey,
     );
     const iexec = new IExec(
@@ -6779,7 +6774,7 @@ describe('[order]', () => {
       },
     );
     const appDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppDev = new IExec(
@@ -6838,7 +6833,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllApporders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6873,7 +6868,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllDatasetorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6910,7 +6905,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllWorkerpoolorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6950,7 +6945,7 @@ describe('[order]', () => {
   test('order.unpublishAllRequestorders()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       privateKey,
     );
     const iexec = new IExec(
@@ -6965,7 +6960,7 @@ describe('[order]', () => {
       },
     );
     const appDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppDev = new IExec(
@@ -7025,7 +7020,7 @@ describe('[order]', () => {
 describe('[orderbook]', () => {
   test('orderbook.fetchApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7053,7 +7048,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7081,7 +7076,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7109,7 +7104,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7155,7 +7150,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchAppOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7190,7 +7185,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchDatasetOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
 
@@ -7228,7 +7223,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7267,7 +7262,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchRequestOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7324,7 +7319,7 @@ describe('[orderbook]', () => {
 describe('[deal]', () => {
   test('deal.fetchRequesterDeals()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7400,7 +7395,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7443,7 +7438,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7486,7 +7481,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7533,7 +7528,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -8316,7 +8311,7 @@ describe('[storage]', () => {
   test('storage.defaultStorageLogin()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8339,7 +8334,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8365,7 +8360,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (provider: "default")', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8395,7 +8390,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (provider: "dropbox")', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8425,7 +8420,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (forceUpdate)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8453,7 +8448,7 @@ describe('[storage]', () => {
   test('storage.checkStorageTokenExists()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8493,7 +8488,7 @@ describe('[result]', () => {
   test('result.pushResultEncryptionKey()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8519,7 +8514,7 @@ describe('[result]', () => {
   test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -8547,7 +8542,7 @@ describe('[result]', () => {
   test('result.checkResultEncryptionKeyExists()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
