@@ -25,6 +25,7 @@ const sendNativeToken = async (
   contracts = throwIfMissing(),
   value = throwIfMissing(),
   to = throwIfMissing(),
+  { defaultGasPrice } = {},
 ) => {
   try {
     checkSigner(contracts);
@@ -40,7 +41,9 @@ const sendNativeToken = async (
         to: vAddress,
         value: hexValue,
         gasPrice:
-          (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
+          (contracts.txOptions && contracts.txOptions.gasPrice) ||
+          defaultGasPrice ||
+          undefined,
       }),
     );
     await wrapWait(tx.wait(contracts.confirms));
@@ -187,8 +190,8 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
           contracts,
           bnToEthersBn(sweepNative),
           vAddressTo,
+          { defaultGasPrice: gasPrice.toString() },
         );
-        debug('sendNativeTxHash', sendNativeTxHash);
         Object.assign(res, { sendNativeTxHash });
       } catch (error) {
         debug(error);
