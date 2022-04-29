@@ -12,21 +12,56 @@ const {
   ensLabelSchema,
 } = require('../utils/validator');
 const { getAddress } = require('../wallet/address');
+const { checkDeployedObj } = require('../protocol/registries');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
 const { Observable, SafeObserver } = require('../utils/reactive');
 const { checkSigner } = require('../utils/utils');
-const { NULL_ADDRESS } = require('../utils/constant');
+const { NULL_ADDRESS, APP, DATASET, WORKERPOOL } = require('../utils/constant');
 const { getEnsRegistryAddress } = require('./registry');
 const { getOwner, lookupAddress } = require('./resolution');
 
 const debug = Debug('iexec:ens:registration');
 
-const BASE_DOMAIN = 'users.iexec.eth';
+const FIFS_DOMAINS = {
+  [APP]: 'apps.iexec.eth',
+  [DATASET]: 'datasets.iexec.eth',
+  [WORKERPOOL]: 'pools.iexec.eth',
+  default: 'users.iexec.eth',
+};
+
+const getDefaultDomain = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+) => {
+  try {
+    const vAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(address);
+    const [isApp, isDataset, isWorkerpool] = await Promise.all([
+      checkDeployedObj(APP)(contracts, vAddress),
+      checkDeployedObj(DATASET)(contracts, vAddress),
+      checkDeployedObj(WORKERPOOL)(contracts, vAddress),
+    ]);
+    if (isApp) {
+      return FIFS_DOMAINS[APP];
+    }
+    if (isDataset) {
+      return FIFS_DOMAINS[DATASET];
+    }
+    if (isWorkerpool) {
+      return FIFS_DOMAINS[WORKERPOOL];
+    }
+    return FIFS_DOMAINS.default;
+  } catch (error) {
+    debug('getDefaultDomain()', error);
+    throw error;
+  }
+};
 
 const registerFifsEns = async (
   contracts = throwIfMissing(),
   label = throwIfMissing(),
-  domain = BASE_DOMAIN,
+  domain = FIFS_DOMAINS.default,
 ) => {
   try {
     checkSigner(contracts);
@@ -100,7 +135,9 @@ const obsConfigureResolution = (
         checkSigner(contracts);
         const vAddress =
           address !== undefined
-            ? await addressSchema().validate(address)
+            ? await addressSchema({
+                ethProvider: contracts.provider,
+              }).validate(address)
             : await getAddress(contracts);
         const vName = await ensDomainSchema().validate(name);
         const nameHash = utils.namehash(vName);
@@ -333,7 +370,9 @@ const configureResolution = async (
     checkSigner(contracts);
     const vAddress =
       address !== undefined
-        ? await addressSchema().validate(address)
+        ? await addressSchema({ ethProvider: contracts.provider }).validate(
+            address,
+          )
         : await getAddress(contracts);
     const vName = await ensDomainSchema().validate(name);
     const configObserver = await obsConfigureResolution(
@@ -379,4 +418,5 @@ module.exports = {
   configureResolution,
   obsConfigureResolution,
   registerFifsEns,
+  getDefaultDomain,
 };

@@ -680,7 +680,7 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.name).toBe(`${mainchainApp.toLowerCase()}.users.iexec.eth`);
+    expect(res.name).toBe(`${mainchainApp.toLowerCase()}.apps.iexec.eth`);
     expect(res.address).toBe(mainchainApp);
     expect(res.registerTxHash).toMatch(bytes32Regex);
     expect(res.setResolverTxHash).toMatch(bytes32Regex);
@@ -708,7 +708,7 @@ describe('[Mainchain]', () => {
     expect(res.address).toBe(mainchainApp);
     expect(res.app).toBeDefined();
     expect(res.app.owner).toBe(ADDRESS);
-    expect(res.ens).toBe(`${mainchainApp.toLowerCase()}.users.iexec.eth`);
+    expect(res.ens).toBe(`${mainchainApp.toLowerCase()}.apps.iexec.eth`);
   });
 
   test('[mainchain] iexec app show 0 --user [address]', async () => {
@@ -790,7 +790,9 @@ describe('[Mainchain]', () => {
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.name).toBe(`${mainchainDataset.toLowerCase()}.users.iexec.eth`);
+    expect(res.name).toBe(
+      `${mainchainDataset.toLowerCase()}.datasets.iexec.eth`,
+    );
     expect(res.address).toBe(mainchainDataset);
     expect(res.registerTxHash).toMatch(bytes32Regex);
     expect(res.setResolverTxHash).toMatch(bytes32Regex);
@@ -820,7 +822,9 @@ describe('[Mainchain]', () => {
     expect(res.address).toBe(mainchainDataset);
     expect(res.dataset).toBeDefined();
     expect(res.dataset.owner).toBe(ADDRESS);
-    expect(res.ens).toBe(`${mainchainDataset.toLowerCase()}.users.iexec.eth`);
+    expect(res.ens).toBe(
+      `${mainchainDataset.toLowerCase()}.datasets.iexec.eth`,
+    );
   });
 
   test('[mainchain] iexec dataset show 0 --user [address]', async () => {
@@ -905,7 +909,7 @@ describe('[Mainchain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.name).toBe(
-      `${mainchainWorkerpool.toLowerCase()}.users.iexec.eth`,
+      `${mainchainWorkerpool.toLowerCase()}.pools.iexec.eth`,
     );
     expect(res.address).toBe(mainchainWorkerpool);
     expect(res.registerTxHash).toMatch(bytes32Regex);
@@ -945,7 +949,7 @@ describe('[Mainchain]', () => {
     expect(res.workerpool.owner).toBe(ADDRESS);
     expect(res.apiUrl).toBe('https://my-workerpool-0.com');
     expect(res.ens).toBe(
-      `${mainchainWorkerpool.toLowerCase()}.users.iexec.eth`,
+      `${mainchainWorkerpool.toLowerCase()}.pools.iexec.eth`,
     );
   });
 

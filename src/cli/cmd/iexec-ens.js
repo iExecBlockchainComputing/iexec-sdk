@@ -8,6 +8,7 @@ const {
   lookupAddress,
   registerFifsEns,
   configureResolution,
+  getDefaultDomain,
 } = require('../../common/ens');
 const {
   finalizeCli,
@@ -133,8 +134,9 @@ register
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const { domain, force } = opts;
+      const { force } = opts;
       const forAddress = opts.for; // workaround cannot destructure for
+      let { domain } = opts;
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
@@ -155,6 +157,9 @@ register
       }
 
       spinner.start('Registering ENS');
+      if (!domain) {
+        domain = await getDefaultDomain(chain.contracts, targetAddress);
+      }
       const { registerTxHash, name } = await registerFifsEns(
         chain.contracts,
         label,

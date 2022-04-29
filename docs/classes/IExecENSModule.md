@@ -24,6 +24,7 @@ module exposing ENS methods
 
 - [claimName](IExecENSModule.md#claimname)
 - [configureResolution](IExecENSModule.md#configureresolution)
+- [getDefaultDomain](IExecENSModule.md#getdefaultdomain)
 - [getOwner](IExecENSModule.md#getowner)
 - [lookupAddress](IExecENSModule.md#lookupaddress)
 - [obsConfigureResolution](IExecENSModule.md#obsconfigureresolution)
@@ -72,7 +73,7 @@ current IExecConfig
 register a subdomain (label) on an ENS FIFSRegistrar
 
 _NB_:
-- if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth"
+- if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth" (use `getDefaultDomain(address)` to determine the best suited domain for an address)
 - if the user already own the domain, the register transaction will not occur
 
 example:
@@ -136,6 +137,34 @@ console.log('configured resolution:', address, '<=>', name);
 #### Returns
 
 `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
+
+___
+
+### getDefaultDomain
+
+▸ **getDefaultDomain**(`address`): `Promise`<`string`\>
+
+get the default free to use ENS domain given an address
+
+_NB_:
+- the ENS domain is determined by the nature of the address (app, dataset, workerpool, other)
+- the returned ENS domain is controlled by a FIFSRegistrar that allocates subdomains to the first person to claim them
+
+example:
+```js
+const domain = await getDefaultDomain(address);
+console.log('default domain:', domain);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

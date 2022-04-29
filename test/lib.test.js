@@ -255,6 +255,37 @@ const getId = () => {
   return sequenceId;
 };
 
+const deployRandomApp = async (iexec, { owner } = {}) => {
+  const appDeployRes = await iexec.app.deployApp({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `app${getId()}`,
+    type: 'DOCKER',
+    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+    checksum:
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+  });
+  return appDeployRes;
+};
+
+const deployRandomDataset = async (iexec, { owner } = {}) => {
+  const datasetDeployRes = await iexec.dataset.deployDataset({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `dataset${getId()}`,
+    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    checksum:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+  });
+  return datasetDeployRes;
+};
+
+const deployRandomWorkerpool = async (iexec, { owner } = {}) => {
+  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
+    owner: owner || (await iexec.wallet.getAddress()),
+    description: `workerpool${getId()}`,
+  });
+  return workerpoolDeployRes;
+};
+
 const deployAndGetApporder = async (
   iexec,
   {
@@ -266,15 +297,7 @@ const deployAndGetApporder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const appDeployRes = await iexec.app.deployApp({
-    owner: address,
-    name: `app${getId()}`,
-    type: 'DOCKER',
-    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-    checksum:
-      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-  });
+  const appDeployRes = await deployRandomApp(iexec);
   const app = appDeployRes.address;
   const apporder = await iexec.order
     .createApporder({
@@ -301,14 +324,7 @@ const deployAndGetDatasetorder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const datasetDeployRes = await iexec.dataset.deployDataset({
-    owner: address,
-    name: `dataset${getId()}`,
-    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-    checksum:
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-  });
+  const datasetDeployRes = await deployRandomDataset(iexec);
   const dataset = datasetDeployRes.address;
   const datasetorder = await iexec.order
     .createDatasetorder({
@@ -337,11 +353,7 @@ const deployAndGetWorkerpoolorder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
-    owner: address,
-    description: `workerpool${getId()}`,
-  });
+  const workerpoolDeployRes = await deployRandomWorkerpool(iexec);
   const workerpool = workerpoolDeployRes.address;
   const workerpoolorder = await iexec.order
     .createWorkerpoolorder({
@@ -3591,16 +3603,8 @@ describe('[app]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const app = {
-      owner: userAddress,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    };
     const resBeforeDeploy = await iexec.app.countUserApps(userAddress);
-    await iexec.app.deployApp(app);
+    await deployRandomApp(iexec);
     const res = await iexec.app.countUserApps(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -3809,15 +3813,8 @@ describe('[dataset]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const dataset = {
-      owner: userAddress,
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    };
     const resBeforeDeploy = await iexec.dataset.countUserDatasets(userAddress);
-    await iexec.dataset.deployDataset(dataset);
+    await deployRandomDataset(iexec);
     const res = await iexec.dataset.countUserDatasets(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -3935,12 +3932,8 @@ describe('[dataset]', () => {
         smsURL,
       },
     );
-    const datasetDeployRes = await iexec.dataset.deployDataset({
+    const datasetDeployRes = await deployRandomDataset(iexec, {
       owner: POOR_ADDRESS2,
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
     const datasetAddress = datasetDeployRes.address;
     await expect(
@@ -3967,13 +3960,7 @@ describe('[dataset]', () => {
         smsURL,
       },
     );
-    const datasetDeployRes = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
+    const datasetDeployRes = await deployRandomDataset(iexec);
     const datasetAddress = datasetDeployRes.address;
     const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
       datasetAddress,
@@ -4025,11 +4012,7 @@ describe('[workerpool]', () => {
         isNative: false,
       },
     );
-    const workerpool = {
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    };
-    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    const { address } = await deployRandomWorkerpool(iexec);
     const label = address.toLowerCase();
     const domain = 'users.iexec.eth';
     const name = `${label}.${domain}`;
@@ -4055,11 +4038,7 @@ describe('[workerpool]', () => {
         isNative: false,
       },
     );
-    const workerpool = {
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    };
-    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    const { address } = await deployRandomWorkerpool(iexec);
     const resNoApiUrl = await iexec.workerpool.getWorkerpoolApiUrl(address);
     expect(resNoApiUrl).toBe(undefined);
 
@@ -4116,14 +4095,10 @@ describe('[workerpool]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const workerpool = {
-      owner: userAddress,
-      description: `workerpool${getId()}`,
-    };
     const resBeforeDeploy = await iexec.workerpool.countUserWorkerpools(
       userAddress,
     );
-    await iexec.workerpool.deployWorkerpool(workerpool);
+    await deployRandomWorkerpool(iexec);
     const res = await iexec.workerpool.countUserWorkerpools(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -4458,14 +4433,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.app.deployApp({
-      owner: await iexec.wallet.getAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const { address } = await deployRandomApp(iexec);
     const order = await iexec.order.createApporder({
       app: address,
     });
@@ -4490,13 +4458,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
+    const { address } = await deployRandomDataset(iexec);
     const order = await iexec.order.createDatasetorder({
       dataset: address,
     });
@@ -4521,10 +4483,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    });
+    const { address } = await deployRandomWorkerpool(iexec);
     const order = await iexec.order.createWorkerpoolorder({
       workerpool: address,
       category: 5,
@@ -8780,6 +8739,33 @@ describe('[ens]', () => {
     expect(res).toBe(null);
   });
 
+  test('ens.getDefaultDomain(address)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const { address: appAddress } = await deployRandomApp(iexec);
+    const { address: datasetAddress } = await deployRandomDataset(iexec);
+    const { address: workerpoolAddress } = await deployRandomWorkerpool(iexec);
+    const appDomain = await iexec.ens.getDefaultDomain(appAddress);
+    expect(appDomain).toBe('apps.iexec.eth');
+    const datasetDomain = await iexec.ens.getDefaultDomain(datasetAddress);
+    expect(datasetDomain).toBe('datasets.iexec.eth');
+    const workerpoolDomain = await iexec.ens.getDefaultDomain(
+      workerpoolAddress,
+    );
+    expect(workerpoolDomain).toBe('pools.iexec.eth');
+    const defaultDomain = await iexec.ens.getDefaultDomain(getRandomAddress());
+    expect(defaultDomain).toBe('users.iexec.eth');
+  });
+
   test('ens.claimName(label) available name', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
@@ -9036,14 +9022,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const app1 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app1 = await deployRandomApp(iexec);
 
     const label = `address_${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -9069,14 +9048,7 @@ describe('[ens]', () => {
     expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
     expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
 
-    const app2 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app2 = await deployRandomApp(iexec);
 
     const reconfigureRes = await iexec.ens.configureResolution(
       name,
@@ -9130,14 +9102,7 @@ describe('[ens]', () => {
       },
     );
 
-    const app = await iexec.app.deployApp({
-      owner: getRandomAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app = await deployRandomApp(iexec, { owner: getRandomAddress() });
     const label = `address_${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
@@ -9272,23 +9237,9 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const app1 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app1 = await deployRandomApp(iexec);
 
-    const app2 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app2 = await deployRandomApp(iexec);
 
     const label = `address_${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -9400,13 +9351,8 @@ describe('[ens]', () => {
       },
     );
 
-    const app = await iexec.app.deployApp({
+    const app = await deployRandomApp(iexec, {
       owner: getRandomAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     });
     const label = `address_${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -9607,10 +9553,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const { address } = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    });
+    const { address } = await deployRandomWorkerpool(iexec);
     const label = `workerpool_${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
@@ -9655,10 +9598,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const { address } = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    });
+    const { address } = await deployRandomWorkerpool(iexec);
     const label = `workerpool_${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
@@ -9764,10 +9704,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const { address } = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    });
+    const { address } = await deployRandomWorkerpool(iexec);
     const label = `workerpool_${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     const key = `key_${getId()}`;

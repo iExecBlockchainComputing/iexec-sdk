@@ -8,6 +8,7 @@ const {
   registerFifsEns,
   obsConfigureResolution,
   configureResolution,
+  getDefaultDomain,
 } = require('../common/ens/registration');
 const { setTextRecord, readTextRecord } = require('../common/ens/text-record');
 
@@ -21,6 +22,8 @@ class IExecENSModule extends IExecModule {
       resolveName(await this.config.resolveContractsClient(), name);
     this.lookupAddress = async (address) =>
       lookupAddress(await this.config.resolveContractsClient(), address);
+    this.getDefaultDomain = async (address) =>
+      getDefaultDomain(await this.config.resolveContractsClient(), address);
     this.claimName = async (label, domain) =>
       registerFifsEns(
         await this.config.resolveContractsClient(),
