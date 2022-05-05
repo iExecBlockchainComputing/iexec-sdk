@@ -88,7 +88,7 @@ initStorage
         throw Error('Something went wrong');
       }
       spinner.succeed('Storage initialized', {
-        raw: { isInitilized: isPushed, isUpdated },
+        raw: { isInitialized: isPushed, isUpdated },
       });
     } catch (error) {
       handleError(error, cli, opts);
@@ -128,11 +128,11 @@ checkStorage
       );
       if (tokenExists) {
         spinner.succeed('Storage already initialized', {
-          raw: { isInitilized: true },
+          raw: { isInitialized: true },
         });
       } else {
-        spinner.succeed('Storage not initialized', {
-          raw: { isInitilized: false },
+        spinner.succeed('Storage NOT initialized', {
+          raw: { isInitialized: false },
         });
       }
     } catch (error) {

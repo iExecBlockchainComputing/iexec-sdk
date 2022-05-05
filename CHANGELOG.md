@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- fix typo in `iexec storage init --raw` output
+- fix typo in `iexec storage check --raw` output
+
 ## [7.1.0] 2022-04-11
 
 ### Added
