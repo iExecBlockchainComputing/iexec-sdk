@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 - `show` commands display ENS when configured
 - `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
+- fix typo in `iexec storage init --raw` output
+- fix typo in `iexec storage check --raw` output
 
 ## [7.1.0] 2022-04-11
 
