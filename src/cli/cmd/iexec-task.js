@@ -6,7 +6,10 @@ const path = require('path');
 const fs = require('fs-extra');
 const { show, claim, obsTask } = require('../../common/execution/task');
 const { fetchTaskResults } = require('../../common/execution/result');
-const { fetchTaskOffchainInfo } = require('../../common/execution/debug');
+const {
+  fetchTaskOffchainInfo,
+  fetchReplicateStdout,
+} = require('../../common/execution/debug');
 const {
   stringifyNestedBn,
   decryptResult,
@@ -193,18 +196,39 @@ debugTask
         chain.contracts,
         taskid,
       ).catch((e) => {
-        spinner.warn(`Failed to fetch offchain data: ${e.message}`);
+        spinner.warn(`Failed to fetch off-chain data: ${e.message}`);
       });
+
+      const appLogs = await Promise.all(
+        ((offchainData && offchainData.replicates) || []).map((replicate) =>
+          fetchReplicateStdout(chain.contracts, taskid, replicate.walletAddress)
+            .then((logs) => ({
+              worker: replicate.walletAddress,
+              stdout: logs,
+            }))
+            .catch((e) => {
+              spinner.warn(
+                `Failed to fetch app logs for replicate ${replicate.walletAddress}: ${e.message}`,
+              );
+              return { worker: replicate.walletAddress };
+            }),
+        ),
+      );
+
       const raw = {
         onchainData: stringifyNestedBn(onchainData),
         offchainData,
+        appLogs,
       };
       spinner.succeed(`Task ${taskid}:\n`, {
         raw,
       });
-      spinner.info(`on-chain data:\n${pretty(raw.onchainData)}\n`);
+      spinner.info(`On-chain data:\n${pretty(raw.onchainData)}\n`);
       if (raw.offchainData) {
-        spinner.info(`off-chain data:\n${pretty(raw.offchainData)}\n`);
+        spinner.info(`Off-chain data:\n${pretty(raw.offchainData)}`);
+      }
+      if (raw.appLogs.length > 0) {
+        spinner.info(`App logs:\n${pretty(raw.appLogs)}`);
       }
     } catch (error) {
       handleError(error, cli, opts);

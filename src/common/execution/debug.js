@@ -88,7 +88,30 @@ const fetchTaskOffchainInfo = async (
   }
 };
 
+const fetchReplicateStdout = async (
+  contracts = throwIfMissing(),
+  taskid = throwIfMissing(),
+  workerAddress = throwIfMissing(),
+) => {
+  try {
+    const vTaskid = await bytes32Schema().validate(taskid);
+    const vWorkerAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerAddress);
+    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const json = await jsonApi.get({
+      api: apiUrl,
+      endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/stdout`,
+    });
+    return json.stdout;
+  } catch (error) {
+    debug('fetchReplicateStdout()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getWorkerpoolApiUrl,
   fetchTaskOffchainInfo,
+  fetchReplicateStdout,
 };
