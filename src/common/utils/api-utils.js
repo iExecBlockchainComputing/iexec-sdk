@@ -90,6 +90,13 @@ const responseToJson = async (response) => {
       }`,
     );
   }
+  if (!response.ok) {
+    throw Error(
+      `API error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
+  }
   throw new Error('The http response is not of JSON type');
 };
 
