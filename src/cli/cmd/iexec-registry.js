@@ -30,6 +30,7 @@ const {
   IEXEC_FILE_NAME,
   DEPLOYED_FILE_NAME,
 } = require('../utils/fs');
+const { APP, DATASET, WORKERPOOL } = require('../../common/utils/constant');
 
 const debug = Debug('iexec:iexec-registry');
 
@@ -126,20 +127,20 @@ cli.name('iexec registry').usage('<command> [options]');
 
 const LOGO_SIDE = 180;
 const repo = 'https://github.com/iExecBlockchainComputing/';
-const objectNames = ['app', 'workerpool', 'dataset'];
+const objectNames = [APP, WORKERPOOL, DATASET];
 const objectMap = {
-  app: {
-    name: 'app',
+  [APP]: {
+    name: APP,
     validationSchema: dappSchema,
     registry: repo.concat('iexec-dapps-registry'),
   },
-  dataset: {
-    name: 'dataset',
+  [DATASET]: {
+    name: DATASET,
     validationSchema: datasetSchema,
     registry: repo.concat('iexec-datasets-registry'),
   },
-  workerpool: {
-    name: 'workerpool',
+  [WORKERPOOL]: {
+    name: WORKERPOOL,
     validationSchema: workerpoolSchema,
     registry: repo.concat('iexec-pools-registry'),
   },

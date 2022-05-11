@@ -20,6 +20,7 @@ const {
 const { initIExecConf, initChainConf } = require('../utils/fs');
 const { createAndSave } = require('../utils/keystore');
 const { loadChain } = require('../utils/chains');
+const { APP, DATASET, WORKERPOOL } = require('../../common/utils/constant');
 
 cli.description(packageJSON.description).version(packageJSON.version);
 cli.name('iexec').usage('[command] [options]');
@@ -143,9 +144,9 @@ async function main() {
           datasetRegistryAddress,
           workerpoolRegistryAddress,
         ] = await Promise.all([
-          wrapCall(chain.contracts.fetchRegistryAddress('app')),
-          wrapCall(chain.contracts.fetchRegistryAddress('dataset')),
-          wrapCall(chain.contracts.fetchRegistryAddress('workerpool')),
+          wrapCall(chain.contracts.fetchRegistryAddress(APP)),
+          wrapCall(chain.contracts.fetchRegistryAddress(DATASET)),
+          wrapCall(chain.contracts.fetchRegistryAddress(WORKERPOOL)),
         ]);
         const { pocoVersion } = chain.contracts;
 

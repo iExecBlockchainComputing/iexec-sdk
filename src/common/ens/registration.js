@@ -1,85 +1,35 @@
 const Debug = require('debug');
 const { Contract, utils } = require('ethers');
 const RegistryEntry = require('@iexec/poco/build/contracts-min/RegistryEntry.json');
-const ENSRegistry = require('../abi/ens/ENSRegistry-min.json');
-const FIFSRegistrar = require('../abi/ens/FIFSRegistrar-min.json');
-const PublicResolver = require('../abi/ens/PublicResolver-min.json');
-const ReverseRegistrar = require('../abi/ens/ReverseRegistrar-min.json');
+const ENSRegistry = require('./abi/ENSRegistry-min.json');
+const FIFSRegistrar = require('./abi/FIFSRegistrar-min.json');
+const PublicResolver = require('./abi/PublicResolver-min.json');
+const ReverseRegistrar = require('./abi/ReverseRegistrar-min.json');
 const {
   throwIfMissing,
   addressSchema,
   ensDomainSchema,
   ensLabelSchema,
 } = require('../utils/validator');
-const { getAddress } = require('./wallet');
+const { getAddress } = require('../wallet/address');
+const { checkDeployedObj } = require('../protocol/registries');
 const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
-const { ConfigurationError } = require('../utils/errors');
 const { Observable, SafeObserver } = require('../utils/reactive');
-const { NULL_ADDRESS, checkSigner } = require('../utils/utils');
+const { checkSigner } = require('../utils/utils');
+const { NULL_ADDRESS, APP, DATASET, WORKERPOOL } = require('../utils/constant');
+const { getEnsRegistryAddress } = require('./registry');
+const { getOwner, lookupAddress } = require('./resolution');
 
-const debug = Debug('iexec:ens');
+const debug = Debug('iexec:ens:registration');
 
-const BASE_DOMAIN = 'users.iexec.eth';
-
-const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
-  try {
-    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
-    if (!ensAddress) {
-      throw new ConfigurationError('Network does not support ENS');
-    }
-    return ensAddress;
-  } catch (e) {
-    debug('getEnsRegistryAddress()', e);
-    throw e;
-  }
+const FIFS_DOMAINS = {
+  [APP]: 'apps.iexec.eth',
+  [DATASET]: 'datasets.iexec.eth',
+  [WORKERPOOL]: 'pools.iexec.eth',
+  default: 'users.iexec.eth',
 };
 
-const checkEns = async (contracts = throwIfMissing()) => {
-  try {
-    await getEnsRegistryAddress(contracts);
-  } catch (e) {
-    debug('checkEns()', e);
-    throw e;
-  }
-};
-
-const getOwner = async (
-  contracts = throwIfMissing(),
-  name = throwIfMissing(),
-) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    const nameHash = utils.namehash(vName);
-    const ensAddress = await getEnsRegistryAddress(contracts);
-    const ensRegistryContract = new Contract(
-      ensAddress,
-      ENSRegistry.abi,
-      contracts.provider,
-    );
-    const owner = await wrapCall(ensRegistryContract.owner(nameHash));
-    return owner;
-  } catch (e) {
-    debug('getOwner()', e);
-    throw e;
-  }
-};
-
-const resolveName = async (
-  contracts = throwIfMissing(),
-  name = throwIfMissing(),
-) => {
-  try {
-    const vName = await ensDomainSchema().validate(name);
-    await checkEns(contracts);
-    const address = await wrapCall(contracts.provider.resolveName(vName));
-    return address;
-  } catch (e) {
-    debug('resolveName()', e);
-    throw e;
-  }
-};
-
-const lookupAddress = async (
+const getDefaultDomain = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -87,19 +37,31 @@ const lookupAddress = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(address);
-    await checkEns(contracts);
-    const ens = await wrapCall(contracts.provider.lookupAddress(vAddress));
-    return ens;
-  } catch (e) {
-    debug('lookupAddress()', e);
-    throw e;
+    const [isApp, isDataset, isWorkerpool] = await Promise.all([
+      checkDeployedObj(APP)(contracts, vAddress),
+      checkDeployedObj(DATASET)(contracts, vAddress),
+      checkDeployedObj(WORKERPOOL)(contracts, vAddress),
+    ]);
+    if (isApp) {
+      return FIFS_DOMAINS[APP];
+    }
+    if (isDataset) {
+      return FIFS_DOMAINS[DATASET];
+    }
+    if (isWorkerpool) {
+      return FIFS_DOMAINS[WORKERPOOL];
+    }
+    return FIFS_DOMAINS.default;
+  } catch (error) {
+    debug('getDefaultDomain()', error);
+    throw error;
   }
 };
 
 const registerFifsEns = async (
   contracts = throwIfMissing(),
   label = throwIfMissing(),
-  domain = BASE_DOMAIN,
+  domain = FIFS_DOMAINS.default,
 ) => {
   try {
     checkSigner(contracts);
@@ -173,7 +135,9 @@ const obsConfigureResolution = (
         checkSigner(contracts);
         const vAddress =
           address !== undefined
-            ? await addressSchema().validate(address)
+            ? await addressSchema({
+                ethProvider: contracts.provider,
+              }).validate(address)
             : await getAddress(contracts);
         const vName = await ensDomainSchema().validate(name);
         const nameHash = utils.namehash(vName);
@@ -406,7 +370,9 @@ const configureResolution = async (
     checkSigner(contracts);
     const vAddress =
       address !== undefined
-        ? await addressSchema().validate(address)
+        ? await addressSchema({ ethProvider: contracts.provider }).validate(
+            address,
+          )
         : await getAddress(contracts);
     const vName = await ensDomainSchema().validate(name);
     const configObserver = await obsConfigureResolution(
@@ -449,10 +415,8 @@ const configureResolution = async (
 };
 
 module.exports = {
-  getOwner,
-  resolveName,
-  lookupAddress,
-  registerFifsEns,
   configureResolution,
   obsConfigureResolution,
+  registerFifsEns,
+  getDefaultDomain,
 };

@@ -24,6 +24,8 @@ module exposing workerpool methods
 
 - [countUserWorkerpools](IExecWorkerpoolModule.md#countuserworkerpools)
 - [deployWorkerpool](IExecWorkerpoolModule.md#deployworkerpool)
+- [getWorkerpoolApiUrl](IExecWorkerpoolModule.md#getworkerpoolapiurl)
+- [setWorkerpoolApiUrl](IExecWorkerpoolModule.md#setworkerpoolapiurl)
 - [showUserWorkerpool](IExecWorkerpoolModule.md#showuserworkerpool)
 - [showWorkerpool](IExecWorkerpoolModule.md#showworkerpool)
 - [fromConfig](IExecWorkerpoolModule.md#fromconfig)
@@ -113,6 +115,62 @@ console.log('deployed at', address);
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
+
+___
+
+### getWorkerpoolApiUrl
+
+▸ **getWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
+
+read the workerpool API url on the blockchain
+
+_NB_: resolve to `undefined` if the workerpool API url was not declared.
+
+example:
+```js
+const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+console.log('workerpool API url:', url);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `url` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### setWorkerpoolApiUrl
+
+▸ **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
+
+**ONLY WORKERPOOL ENS NAME OWNER**
+
+declare the workerpool API url on the blockchain
+
+_NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
+
+example:
+```js
+const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+console.log('txHash:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `url` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

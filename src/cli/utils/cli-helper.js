@@ -50,8 +50,10 @@ const info = {
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
-  missingAddress: (obj) =>
-    `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  missingAddressOrDeployed: (objName, chainId) =>
+    `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chainId}`,
+  missingEnsForObjectAtAddress: (objName, address) =>
+    `Missing ENS for ${objName} ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
   checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) =>
     `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
@@ -67,7 +69,7 @@ const desc = {
   userAddress: () => 'custom user address',
   initObj: (objName) => `init a new ${objName}`,
   deployObj: (objName) => `deploy a new ${objName}`,
-  createObj: (objName) => `deploy a new ${objName}`,
+  createObj: (objName) => `create a new ${objName}`,
   publishObj: (objName) =>
     `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
   unpublishObj: (objName) =>
@@ -120,6 +122,7 @@ const desc = {
   requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
+  debugTask: () => `show task debug information`,
 };
 
 const option = {

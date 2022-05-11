@@ -10,7 +10,7 @@ const {
   throwIfMissing,
 } = require('../utils/validator');
 
-const debug = Debug('iexec:orderbook');
+const debug = Debug('iexec:market:orderbook');
 
 const fetchAppOrderbook = async (
   contracts = throwIfMissing(),

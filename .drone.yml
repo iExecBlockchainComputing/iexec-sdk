@@ -79,19 +79,20 @@ pipeline:
 
 services:
   token-chain:
-    image: iexechub/poco-chaintest:5.3.0-ganache-update-token
+    image: iexechub/poco-chaintest:5.3.2-token
     pull: true
 
   native-chain:
-    image: iexechub/poco-chaintest:5.3.0-ganache-update-native
+    image: iexechub/poco-chaintest:5.3.2-native
     pull: true
 
   token-chain-1s:
-    image: iexechub/poco-chaintest:5.3.0-ganache-update-token-1s
+    image: iexechub/poco-chaintest:5.3.2-token
+    command: '--miner.blockTime 1'
     pull: true
 
-  token-chain-parity:
-    image: iexechub/poco-chaintest:5.3.0-token-parity
+  token-chain-openethereum:
+    image: iexechub/poco-chaintest:5.3.2-token-openethereum
     pull: true
 
   token-sms:
@@ -99,7 +100,7 @@ services:
     pull: true
     environment:
       - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
       - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.0.0-debug
       - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=02ffe0d4d54bb4c55f00ad4d56c5e53692f8a61cbef17bdd1f45e491f1bb6f65
@@ -115,14 +116,14 @@ services:
     expose:
       - 13300
     depends_on:
-      - token-chain-parity
+      - token-chain-openethereum
 
   token-result-proxy:
     image: iexechub/iexec-result-proxy:7.0.2
     pull: true
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-parity:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-parity:8545
+      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-openethereum:8545
+      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-openethereum:8545
       - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=token-result-proxy-mongo
       - MONGO_PORT=13202
@@ -130,7 +131,7 @@ services:
     expose:
       - 13200
     depends_on:
-      - token-chain-parity
+      - token-chain-openethereum
       - token-result-proxy-mongo
       - ipfs
 
@@ -165,8 +166,8 @@ services:
       - CHAIN=DEV
       - CHAIN_ID=65535
       - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - ETH_WS_HOST=ws://token-chain-parity:8546
-      - ETH_RPC_HOST=http://token-chain-parity:8545
+      - ETH_WS_HOST=ws://token-chain-openethereum:8546
+      - ETH_RPC_HOST=http://token-chain-openethereum:8545
       - MONGO_HOST=gateway-mongo
       - REDIS_HOST=gateway-redis
 
@@ -181,7 +182,7 @@ services:
       - DEBUG_COLORS=true
       - CHAINS=DEV
       - DEV_NATIVE=false
-      - DEV_ETH_RPC_HOST=http://token-chain-parity:8545
+      - DEV_ETH_RPC_HOST=http://token-chain-openethereum:8545
       - DEV_CHAIN_ID=65535
       - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=gateway-mongo

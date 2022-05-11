@@ -34,7 +34,7 @@ const makeHeaders = (method, headers, body) => {
 
 const httpRequest =
   (method) =>
-  async ({ api, endpoint, query = {}, body = {}, headers = {} }) => {
+  async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
     debug(
       'httpRequest()',
       '\nmethod',
@@ -50,9 +50,9 @@ const httpRequest =
       '\nheaders',
       headers,
     );
-    const baseURL = api;
+    const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(method, query);
-    const url = baseURL.concat(endpoint, queryString);
+    const url = baseURL.concat(queryString);
     const response = await fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
@@ -75,9 +75,27 @@ const checkResponseOk = (response) => {
 const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
-    const json = await response.json();
-    if (json.error) throw new Error(`API error: ${json.error}`);
-    if (response.status === 200 && json) return json;
+    if (response.ok) {
+      const json = await response.json();
+      return json;
+    }
+    const errorMessage = await response
+      .json()
+      .then((json) => json && json.error)
+      .catch(() => {});
+    if (errorMessage) throw new Error(`API error: ${errorMessage}`);
+    throw Error(
+      `API error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
+  }
+  if (!response.ok) {
+    throw Error(
+      `API error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
   }
   throw new Error('The http response is not of JSON type');
 };

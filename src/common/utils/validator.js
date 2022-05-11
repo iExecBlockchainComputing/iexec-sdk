@@ -686,6 +686,12 @@ const ensLabelSchema = () =>
       },
     );
 
+const textRecordKeySchema = () => string().required().strict(true);
+
+const textRecordValueSchema = () => string().default('').strict(true);
+
+const workerpoolApiUrlSchema = () => string().url().default('');
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -732,5 +738,8 @@ module.exports = {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
+  workerpoolApiUrlSchema,
   ValidationError,
 };

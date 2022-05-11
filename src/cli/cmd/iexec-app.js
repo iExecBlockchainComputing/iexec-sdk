@@ -24,11 +24,11 @@ const {
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-  showCategory,
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/modules/hub');
+} = require('../../common/protocol/registries');
+const { showCategory } = require('../../common/protocol/category');
 const {
   getRemainingVolume,
   createApporder,
@@ -39,24 +39,22 @@ const {
   signDatasetorder,
   signWorkerpoolorder,
   signRequestorder,
+  matchOrders,
+} = require('../../common/market/order');
+const {
   publishApporder,
   publishRequestorder,
   unpublishLastApporder,
   unpublishAllApporders,
-  matchOrders,
-  NULL_DATASETORDER,
-  WORKERPOOL_ORDER,
-} = require('../../common/modules/order');
+} = require('../../common/market/marketplace');
 const {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
-} = require('../../common/modules/orderbook');
-const { checkBalance } = require('../../common/modules/account');
-const { obsDeal } = require('../../common/modules/iexecProcess');
+} = require('../../common/market/orderbook');
+const { checkBalance } = require('../../common/account/balance');
+const { obsDeal } = require('../../common/execution/deal');
 const {
-  NULL_ADDRESS,
-  NULL_BYTES32,
   encodeTag,
   sumTags,
   checkActiveBitInTag,
@@ -64,10 +62,19 @@ const {
   stringifyNestedBn,
   formatRLC,
 } = require('../../common/utils/utils');
+const {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  NULL_DATASETORDER,
+  WORKERPOOL_ORDER,
+  DATASET,
+  APP,
+  WORKERPOOL,
+} = require('../../common/utils/constant');
 const { paramsKeyName } = require('../../common/utils/params-utils');
 const {
   checkRequestRequirements,
-} = require('../../common/modules/request-helper');
+} = require('../../common/execution/request-helper');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -95,10 +102,12 @@ const {
 } = require('../utils/fs');
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
+const { lookupAddress } = require('../../common/ens/resolution');
+const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-app');
 
-const objName = 'app';
+const objName = APP;
 
 cli
   .name('iexec app')
@@ -201,15 +210,40 @@ show
       spinner.start(info.showing(objName));
 
       let res;
+      let ens;
       if (isAddress) {
-        res = await showApp(chain.contracts, addressOrIndex);
+        [res, ens] = await Promise.all([
+          showApp(chain.contracts, addressOrIndex),
+          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          }),
+        ]);
       } else {
         res = await showUserApp(chain.contracts, addressOrIndex, userAddress);
+        ens = await lookupAddress(chain.contracts, res.objAddress).catch(
+          (e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          },
+        );
       }
       const { app, objAddress } = res;
-      spinner.succeed(`App ${objAddress} details:${pretty(app)}`, {
-        raw: { address: objAddress, app },
-      });
+      spinner.succeed(
+        `App ${objAddress} details:${pretty({
+          ...(ens && { ENS: ens }),
+          ...app,
+        })}`,
+        {
+          raw: { address: objAddress, ens, app },
+        },
+      );
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -273,9 +307,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -342,9 +374,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -418,7 +448,7 @@ run
       const useDeployedApp = !appAddress;
       const app =
         appAddress ||
-        (await loadDeployedObj('app').then(
+        (await loadDeployedObj(APP).then(
           (deployedApp) => deployedApp && deployedApp[chain.id],
         ));
       if (!app) {
@@ -438,7 +468,7 @@ run
       const dataset =
         useDataset &&
         (useDeployedDataset
-          ? await loadDeployedObj('dataset').then(
+          ? await loadDeployedObj(DATASET).then(
               (deployedDataset) => deployedDataset && deployedDataset[chain.id],
             )
           : opts.dataset);
@@ -465,7 +495,7 @@ run
       const workerpool =
         runOnWorkerpool &&
         (useDeployedWorkerpool
-          ? await loadDeployedObj('workerpool').then(
+          ? await loadDeployedObj(WORKERPOOL).then(
               (deployedWorkerpool) =>
                 deployedWorkerpool && deployedWorkerpool[chain.id],
             )

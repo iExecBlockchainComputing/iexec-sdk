@@ -9,13 +9,9 @@ const { getAddress, randomBytes, formatUnits, parseUnits } =
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
 const { ValidationError, ConfigurationError } = require('./errors');
+const { NULL_BYTES32 } = require('./constant');
 
 const debug = Debug('iexec:utils');
-
-const NULL_BYTES = '0x';
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-const NULL_BYTES32 =
-  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
@@ -443,9 +439,6 @@ module.exports = {
   hexToBuffer,
   secToDate,
   getSalt,
-  NULL_BYTES,
-  NULL_ADDRESS,
-  NULL_BYTES32,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   encodeTag,
