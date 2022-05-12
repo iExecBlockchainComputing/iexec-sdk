@@ -11,6 +11,7 @@ export { default as IExecNetworkModule } from './IExecNetworkModule';
 export { default as IExecOrderModule } from './IExecOrderModule';
 export { default as IExecOrderbookModule } from './IExecOrderbookModule';
 export { default as IExecResultModule } from './IExecResultModule';
+export { default as IExecSecretsModule } from './IExecSecretsModule';
 export { default as IExecStorageModule } from './IExecStorageModule';
 export { default as IExecTaskModule } from './IExecTaskModule';
 export { default as IExecWalletModule } from './IExecWalletModule';
