@@ -74,7 +74,40 @@ const checkWeb2SecretExists = async (
   }
 };
 
+const checkRequesterSecretExists = async (
+  contracts = throwIfMissing(),
+  smsURL = throwIfMissing(),
+  requesterAddress = throwIfMissing(),
+  secretName = throwIfMissing(),
+) => {
+  try {
+    const vRequesterAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(requesterAddress);
+    const res = await httpRequest('HEAD')({
+      api: smsURL,
+      endpoint: `/requesters/${vRequesterAddress}/secrets/${secretName}`,
+    }).catch((e) => {
+      debug(e);
+      throw Error(`SMS at ${smsURL} didn't answered`);
+    });
+    if (res.ok) {
+      return true;
+    }
+    if (res.status === 404) {
+      return false;
+    }
+    throw Error(
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
+    );
+  } catch (error) {
+    debug('checkRequesterSecretExists()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   checkWeb3SecretExists,
   checkWeb2SecretExists,
+  checkRequesterSecretExists,
 };

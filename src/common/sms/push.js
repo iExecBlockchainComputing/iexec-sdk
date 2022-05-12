@@ -10,7 +10,10 @@ const {
 } = require('../utils/validator');
 const { wrapPersonalSign } = require('../utils/errorWrappers');
 const { checkSigner } = require('../utils/utils');
-const { checkWeb2SecretExists } = require('./check');
+const {
+  checkWeb2SecretExists,
+  checkRequesterSecretExists,
+} = require('./check');
 
 const debug = Debug('iexec:sms');
 
@@ -156,7 +159,64 @@ const pushWeb2Secret = async (
   }
 };
 
+const pushRequesterSecret = async (
+  contracts = throwIfMissing(),
+  smsURL = throwIfMissing(),
+  secretName = throwIfMissing(),
+  secretValue = throwIfMissing(),
+) => {
+  try {
+    checkSigner(contracts);
+    const requesterAddress = await getAddress(contracts);
+    await stringSchema().validate(secretName, { strict: true });
+    await stringSchema().validate(secretValue, { strict: true });
+    const secretExists = await checkRequesterSecretExists(
+      contracts,
+      smsURL,
+      requesterAddress,
+      secretName,
+    );
+    if (secretExists) {
+      throw Error(
+        `Secret "${secretName}" already exists for ${requesterAddress}`,
+      );
+    }
+    const challenge = getChallengeForSetWeb2Secret(
+      requesterAddress,
+      secretName,
+      secretValue,
+    );
+    const binaryChallenge = arrayify(challenge);
+    const auth = await wrapPersonalSign(
+      contracts.signer.signMessage(binaryChallenge),
+    );
+    const res = await httpRequest('POST')({
+      api: smsURL,
+      endpoint: `/requesters/${requesterAddress}/secrets/${secretName}`,
+      body: secretValue,
+      headers: {
+        Authorization: auth,
+      },
+    }).catch((e) => {
+      debug(e);
+      throw Error(`SMS at ${smsURL} didn't answered`);
+    });
+    if (res.ok) {
+      return {
+        isPushed: true,
+      };
+    }
+    throw Error(
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
+    );
+  } catch (error) {
+    debug('pushRequesterSecret()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   pushWeb2Secret,
   pushWeb3Secret,
+  pushRequesterSecret,
 };
