@@ -8,7 +8,7 @@ const { show, claim, obsTask } = require('../../common/execution/task');
 const { fetchTaskResults } = require('../../common/execution/result');
 const {
   fetchTaskOffchainInfo,
-  fetchReplicateStdout,
+  fetchReplicateLogs,
 } = require('../../common/execution/debug');
 const {
   stringifyNestedBn,
@@ -201,10 +201,11 @@ debugTask
 
       const appLogs = await Promise.all(
         ((offchainData && offchainData.replicates) || []).map((replicate) =>
-          fetchReplicateStdout(chain.contracts, taskid, replicate.walletAddress)
-            .then((logs) => ({
-              worker: replicate.walletAddress,
-              stdout: logs,
+          fetchReplicateLogs(chain.contracts, taskid, replicate.walletAddress)
+            .then(({ stdout, stderr, walletAddress }) => ({
+              worker: walletAddress,
+              stdout,
+              stderr,
             }))
             .catch((e) => {
               spinner.warn(

@@ -88,7 +88,7 @@ const fetchTaskOffchainInfo = async (
   }
 };
 
-const fetchReplicateStdout = async (
+const fetchReplicateLogs = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   workerAddress = throwIfMissing(),
@@ -103,9 +103,9 @@ const fetchReplicateStdout = async (
       api: apiUrl,
       endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/stdout`,
     });
-    return json.stdout;
+    return json;
   } catch (error) {
-    debug('fetchReplicateStdout()', error);
+    debug('fetchReplicateLogs()', error);
     throw error;
   }
 };
@@ -113,5 +113,5 @@ const fetchReplicateStdout = async (
 module.exports = {
   getWorkerpoolApiUrl,
   fetchTaskOffchainInfo,
-  fetchReplicateStdout,
+  fetchReplicateLogs,
 };
