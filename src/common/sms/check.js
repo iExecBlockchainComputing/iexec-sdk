@@ -1,9 +1,14 @@
 const Debug = require('debug');
 const { httpRequest } = require('../utils/api-utils');
-const { addressSchema, throwIfMissing } = require('../utils/validator');
+const {
+  addressSchema,
+  throwIfMissing,
+  positiveIntSchema,
+} = require('../utils/validator');
 
 const debug = Debug('iexec:sms:check');
 
+// used for dataset key
 const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
@@ -38,6 +43,7 @@ const checkWeb3SecretExists = async (
   }
 };
 
+// used for beneficiary key
 const checkWeb2SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
@@ -106,8 +112,42 @@ const checkRequesterSecretExists = async (
   }
 };
 
+const checkAppSecretExists = async (
+  contracts = throwIfMissing(),
+  smsURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+  secretIndex = 0,
+) => {
+  try {
+    const vAppAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress);
+    const vSecretIndex = await positiveIntSchema().validate(secretIndex);
+    const res = await httpRequest('HEAD')({
+      api: smsURL,
+      endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
+    }).catch((e) => {
+      debug(e);
+      throw Error(`SMS at ${smsURL} didn't answered`);
+    });
+    if (res.ok) {
+      return true;
+    }
+    if (res.status === 404) {
+      return false;
+    }
+    throw Error(
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
+    );
+  } catch (error) {
+    debug('checkRequesterSecretExists()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   checkWeb3SecretExists,
   checkWeb2SecretExists,
   checkRequesterSecretExists,
+  checkAppSecretExists,
 };

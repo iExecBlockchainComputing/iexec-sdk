@@ -104,6 +104,8 @@ const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
+const { pushAppSecret } = require('../../common/sms/push');
+const { checkAppSecretExists } = require('../../common/sms/check');
 
 const debug = Debug('iexec:iexec-app');
 
@@ -275,6 +277,100 @@ count
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
         { raw: { count: objCountBN.toString() } },
       );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const checkSecret = cli.command('check-secret [appAddress]');
+addGlobalOptions(checkSecret);
+checkSecret
+  .option(...option.chain())
+  .description(desc.checkSecret())
+  .action(async (objAddress, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+      const resourceAddress =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
+          (deployedObj) => deployedObj && deployedObj[chain.id],
+        ));
+      if (!resourceAddress) {
+        throw Error(
+          'Missing appAddress argument and no app found in "deployed.json"',
+        );
+      }
+      spinner.info(`Checking secret for address ${resourceAddress}`);
+      const sms = getPropertyFormChain(chain, 'sms');
+      const secretIsSet = await checkAppSecretExists(
+        chain.contracts,
+        sms,
+        resourceAddress,
+      );
+      if (secretIsSet) {
+        spinner.succeed(`Secret found for app ${resourceAddress}`, {
+          raw: { isSecretSet: true },
+        });
+      } else {
+        spinner.succeed(`No secret found for app ${resourceAddress}`, {
+          raw: { isSecretSet: false },
+        });
+      }
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const pushSecret = cli.command('push-secret [appAddress]');
+addGlobalOptions(pushSecret);
+addWalletLoadOptions(pushSecret);
+pushSecret
+  .option(...option.chain())
+  .option(...option.secretValue())
+  .description('push the app secret to the secret management service')
+  .action(async (objAddress, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const keystore = Keystore(Object.assign(walletOptions));
+      const chain = await loadChain(opts.chain, { spinner });
+      const { contracts } = chain;
+      const sms = getPropertyFormChain(chain, 'sms');
+      await keystore.accounts();
+      const resourceAddress =
+        objAddress ||
+        (await loadDeployedObj(objName).then(
+          (deployedObj) => deployedObj && deployedObj[chain.id],
+        ));
+      if (!resourceAddress) {
+        throw Error(
+          'Missing appAddress argument and no app found in "deployed.json"',
+        );
+      }
+      spinner.info(`App ${resourceAddress}`);
+      const secretValue =
+        opts.secretValue ||
+        (await prompt.password(`Paste your secret`, {
+          useMask: true,
+        }));
+
+      await connectKeystore(chain, keystore);
+      const { isPushed } = await pushAppSecret(
+        contracts,
+        sms,
+        resourceAddress,
+        secretValue,
+      );
+      if (isPushed) {
+        spinner.succeed('Secret successfully pushed', {
+          raw: {},
+        });
+      } else {
+        throw Error('Something went wrong');
+      }
     } catch (error) {
       handleError(error, cli, opts);
     }

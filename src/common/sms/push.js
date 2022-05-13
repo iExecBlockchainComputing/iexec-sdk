@@ -7,6 +7,7 @@ const {
   addressSchema,
   stringSchema,
   throwIfMissing,
+  positiveIntSchema,
 } = require('../utils/validator');
 const { wrapPersonalSign } = require('../utils/errorWrappers');
 const { checkSigner } = require('../utils/utils');
@@ -40,6 +41,29 @@ const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) =>
     keccak256(Buffer.from(secretKey, 'utf8')),
     keccak256(Buffer.from(secretValue, 'utf8')),
   );
+
+const handleNonUpdatablePushSecret = ({
+  response,
+  signerAddress,
+  targetAddress,
+}) => {
+  if (response.ok) {
+    return true;
+  }
+  if (response.status === 409) {
+    throw Error(
+      `Secret already exists for ${targetAddress} and can't be updated`,
+    );
+  }
+  if (response.status === 401) {
+    throw Error(
+      `Wallet ${signerAddress} is not allowed to set secret for ${targetAddress}`,
+    );
+  }
+  throw Error(
+    `SMS answered with unexpected status: ${response.status} ${response.statusText}`,
+  );
+};
 
 const pushWeb3Secret = async (
   contracts = throwIfMissing(),
@@ -76,22 +100,11 @@ const pushWeb3Secret = async (
       debug(e);
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
-    if (res.ok) {
-      return true;
-    }
-    if (res.status === 409) {
-      throw Error(
-        `Secret already exists for ${vResourceAddress} and can't be updated`,
-      );
-    }
-    if (res.status === 401) {
-      throw Error(
-        `Wallet ${vSignerAddress} is not allowed to set secret for ${vResourceAddress}`,
-      );
-    }
-    throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
-    );
+    return handleNonUpdatablePushSecret({
+      response: res,
+      signerAddress: vSignerAddress,
+      targetAddress: vResourceAddress,
+    });
   } catch (error) {
     debug('pushWeb3Secret()', error);
     throw error;
@@ -215,8 +228,55 @@ const pushRequesterSecret = async (
   }
 };
 
+const pushAppSecret = async (
+  contracts = throwIfMissing(),
+  smsURL = throwIfMissing(),
+  appAddress = throwIfMissing(),
+  secretValue = throwIfMissing(),
+  secretIndex = 0,
+) => {
+  try {
+    checkSigner(contracts);
+    const vSignerAddress = await getAddress(contracts);
+    const vAppAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress);
+    const vSecretIndex = await positiveIntSchema().validate(secretIndex);
+    await stringSchema().validate(secretValue, { strict: true });
+    const challenge = getChallengeForSetWeb2Secret(
+      vAppAddress,
+      vSecretIndex.toString(),
+      secretValue,
+    );
+    const binaryChallenge = arrayify(challenge);
+    const auth = await wrapPersonalSign(
+      contracts.signer.signMessage(binaryChallenge),
+    );
+    const res = await httpRequest('POST')({
+      api: smsURL,
+      endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
+      body: secretValue,
+      headers: {
+        Authorization: auth,
+      },
+    }).catch((e) => {
+      debug(e);
+      throw Error(`SMS at ${smsURL} didn't answered`);
+    });
+    return handleNonUpdatablePushSecret({
+      response: res,
+      signerAddress: vSignerAddress,
+      targetAddress: vAppAddress,
+    });
+  } catch (error) {
+    debug('pushAppSecret()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   pushWeb2Secret,
   pushWeb3Secret,
   pushRequesterSecret,
+  pushAppSecret,
 };
