@@ -300,7 +300,7 @@ sign
           const orderObj = await createRequestorder(
             {
               contracts: chain.contracts,
-              resultProxyURL: chain.resultProxy,
+              resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
             },
             loadedOrder,
           );
@@ -308,7 +308,10 @@ sign
             throw Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipRequestCheck) {
             await checkRequestRequirements(
-              { contracts: chain.contracts, smsURL: chain.sms },
+              {
+                contracts: chain.contracts,
+                smsURL: getPropertyFormChain(chain, 'sms'),
+              },
               orderObj,
             ).catch((e) => {
               throw Error(
@@ -434,7 +437,10 @@ fill
       const computeRequestOrder = async () => {
         await connectKeystore(chain, keystore, { txOptions });
         const unsignedOrder = await createRequestorder(
-          { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+          {
+            contracts: chain.contracts,
+            resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
+          },
           {
             app: appOrder.app,
             appmaxprice: appOrder.appprice || undefined,
@@ -460,7 +466,10 @@ fill
 
       if (!opts.skipRequestCheck) {
         await checkRequestRequirements(
-          { contracts: chain.contracts, smsURL: chain.sms },
+          {
+            contracts: chain.contracts,
+            smsURL: getPropertyFormChain(chain, 'sms'),
+          },
           requestOrder,
         ).catch((e) => {
           throw Error(
@@ -562,7 +571,10 @@ publish
             case REQUEST_ORDER:
               if (!opts.skipRequestCheck) {
                 await checkRequestRequirements(
-                  { contracts: chain.contracts, smsURL: chain.sms },
+                  {
+                    contracts: chain.contracts,
+                    smsURL: getPropertyFormChain(chain, 'sms'),
+                  },
                   orderToPublish,
                 ).catch((e) => {
                   throw Error(
