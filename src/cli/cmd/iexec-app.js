@@ -735,7 +735,10 @@ run
       spinner.info('Creating requestorder');
       await connectKeystore(chain, keystore, { txOptions });
       const requestorderToSign = await createRequestorder(
-        { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+        {
+          contracts: chain.contracts,
+          resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
+        },
         {
           app: apporder.app,
           appmaxprice: apporder.appprice,
@@ -755,7 +758,10 @@ run
       );
       if (!opts.skipRequestCheck) {
         await checkRequestRequirements(
-          { contracts: chain.contracts, smsURL: chain.sms },
+          {
+            contracts: chain.contracts,
+            smsURL: getPropertyFormChain(chain, 'sms'),
+          },
           requestorderToSign,
         ).catch((e) => {
           throw Error(
@@ -1010,7 +1016,10 @@ requestRun
       spinner.info('Creating requestorder');
       await connectKeystore(chain, keystore);
       const requestorderToSign = await createRequestorder(
-        { contracts: chain.contracts, resultProxyURL: chain.resultProxy },
+        {
+          contracts: chain.contracts,
+          resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
+        },
         {
           app,
           appmaxprice: appprice,
@@ -1030,7 +1039,10 @@ requestRun
       );
       if (!opts.skipRequestCheck) {
         await checkRequestRequirements(
-          { contracts: chain.contracts, smsURL: chain.sms },
+          {
+            contracts: chain.contracts,
+            smsURL: getPropertyFormChain(chain, 'sms'),
+          },
           requestorderToSign,
         ).catch((e) => {
           throw Error(
