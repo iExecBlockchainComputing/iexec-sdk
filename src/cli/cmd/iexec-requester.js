@@ -13,6 +13,7 @@ const {
   handleError,
   desc,
   option,
+  prompt,
   Spinner,
   getPropertyFormChain,
 } = require('../utils/cli-helper');
@@ -23,20 +24,20 @@ const { Keystore } = require('../utils/keystore');
 
 cli.name('iexec requester').usage('<command> [options]');
 
-const pushSecret = cli.command('push-secret <name> <value>');
+const pushSecret = cli.command('push-secret <name>');
 addGlobalOptions(pushSecret);
 addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
-  .option(...option.secretPath())
+  .option(...option.secretValue())
   .description(desc.pushResultKey())
-  .action(async (name, value, opts) => {
+  .action(async (name, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
       const walletOptions = await computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
-      const [chain] = await Promise.all([
+      const [chain, address] = await Promise.all([
         loadChain(opts.chain, {
           spinner,
         }),
@@ -46,11 +47,18 @@ pushSecret
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
 
+      spinner.info(`Secret "${name}" for address ${address}`);
+      const secretValue =
+        opts.secretValue ||
+        (await prompt.password(`Paste your secret`, {
+          useMask: true,
+        }));
+
       const { isPushed } = await pushRequesterSecret(
         contracts,
         sms,
         name,
-        value,
+        secretValue,
       );
       if (isPushed) {
         spinner.succeed(`Secret "${name}" successfully pushed`, {
