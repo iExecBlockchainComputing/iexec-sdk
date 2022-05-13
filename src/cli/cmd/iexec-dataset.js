@@ -458,7 +458,6 @@ pushSecret
 
 const checkSecret = cli.command('check-secret [datasetAddress]');
 addGlobalOptions(checkSecret);
-addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
