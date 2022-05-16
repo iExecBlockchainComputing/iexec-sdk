@@ -213,6 +213,7 @@ export interface RequestorderTemplate {
   params: {
     iexec_args?: string;
     iexec_input_files?: string[];
+    iexec_secrets?: Record<number, string>;
     iexec_result_encryption?: boolean;
     iexec_result_storage_provider?: string;
     iexec_result_storage_proxy?: string;
@@ -484,11 +485,26 @@ export default class IExecOrderModule extends IExecModule {
            */
           iexec_input_files?: string[];
           /**
+           * requester secrets to pass to the app
+           *
+           * ```js
+           * const secret = {
+           *   0: 'login', // maps requester named secret "login" to app secret 0
+           *   1: 'password' // maps requester named secret "password" to app secret 1
+           * };
+           * // or
+           * const secret = ['login','password'];
+           * ```
+           *
+           * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
+           */
+          iexec_secrets?: Record<number, string> | string[];
+          /**
            * encrypt results
            *
            * default `false`
            *
-           * _NB_: `iexec_result_encryption: true` is ony available for TEE tasks, use with `tag: ["tee"]`
+           * _NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
            */
           iexec_result_encryption?: boolean;
           /**

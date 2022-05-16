@@ -4481,6 +4481,53 @@ describe('[order]', () => {
     });
   });
 
+  test('order.createRequestorder() with iexec_secrets', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const app = getRandomAddress();
+    const order = await iexec.order.createRequestorder({
+      app,
+      category: 5,
+      params: {
+        iexec_secrets: {
+          0: 'foo',
+        },
+      },
+      tag: ['tee'],
+    });
+    expect(order).toEqual({
+      app,
+      appmaxprice: '0',
+      beneficiary: ADDRESS,
+      callback: '0x0000000000000000000000000000000000000000',
+      category: '5',
+      dataset: '0x0000000000000000000000000000000000000000',
+      datasetmaxprice: '0',
+      params: {
+        iexec_secrets: {
+          0: 'foo',
+        },
+        iexec_result_storage_provider: 'ipfs',
+        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      },
+      requester: ADDRESS,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: '0',
+      volume: '1',
+      workerpool: '0x0000000000000000000000000000000000000000',
+      workerpoolmaxprice: '0',
+    });
+  });
+
   test('order.signApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(

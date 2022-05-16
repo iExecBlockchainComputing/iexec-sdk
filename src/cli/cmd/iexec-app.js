@@ -14,6 +14,7 @@ const {
   paramsStorageProviderSchema,
   paramsEncryptResultSchema,
   nRlcAmountSchema,
+  paramsSecretsArraySchema,
 } = require('../../common/utils/validator');
 const { teeApp } = require('../utils/templates');
 const {
@@ -522,6 +523,7 @@ run
   .option(...orderOption.workerpool())
   .option(...orderOption.requestArgs())
   .option(...orderOption.requestInputFiles())
+  .option(...orderOption.requestSecrets())
   .option(...orderOption.category())
   .option(...orderOption.tag())
   .option(...orderOption.requestStorageProvider())
@@ -620,6 +622,9 @@ run
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
+      const inputParamsSecrets = await paramsSecretsArraySchema().validate(
+        opts.secrets,
+      );
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
       const inputParamsResultEncrytion =
@@ -632,6 +637,9 @@ run
         }),
         ...(inputParamsInputFiles !== undefined && {
           [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+        }),
+        ...(inputParamsSecrets !== undefined && {
+          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
           [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
@@ -1092,6 +1100,9 @@ requestRun
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
+      const inputParamsSecrets = await paramsSecretsArraySchema().validate(
+        opts.secrets,
+      );
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
       const inputParamsResultEncrytion =
@@ -1104,6 +1115,9 @@ requestRun
         }),
         ...(inputParamsInputFiles !== undefined && {
           [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+        }),
+        ...(inputParamsSecrets !== undefined && {
+          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
           [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:

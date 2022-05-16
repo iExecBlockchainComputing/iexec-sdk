@@ -414,6 +414,10 @@ const orderOption = {
     '--args <string>',
     'specify the arguments to pass to the app',
   ],
+  requestSecrets: () => [
+    '--secrets <string>',
+    'specify the requester named secrets to pass to the app (only available for TEE tasks, use with --tag tee)\n* usage: --secrets login,password',
+  ],
   requestInputFiles: () => [
     '--input-files <fileUrl>',
     'specify the URL of input files to be used by the app\n* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip',

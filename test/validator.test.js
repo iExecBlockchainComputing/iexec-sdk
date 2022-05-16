@@ -592,6 +592,115 @@ describe('[objParamsSchema]', () => {
     );
   });
 
+  test('iexec_secrets is not supported outside of TEE context', async () => {
+    await expect(
+      objParamsSchema().validate({
+        iexec_secrets: {},
+        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      }),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets is not supported for non TEE tasks'),
+    );
+  });
+
+  test('iexec_secrets is supported in TEE context', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 0: 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).resolves.toEqual({
+      iexec_secrets: { 0: 'foo' },
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+    });
+  });
+
+  test('iexec_secrets can not be null', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: null,
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_secrets must be a `object` type, but the final value was: `null`.\n If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
+      ),
+    );
+  });
+
+  test('iexec_secrets can be an array', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: ['foo', undefined, undefined, 'bar'],
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).resolves.toEqual({
+      iexec_secrets: { 0: 'foo', 3: 'bar' },
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+    });
+  });
+
+  test('iexec_secrets keys must be positive integers', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { '-1': 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets keys must be positive integers'),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { foo: 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets keys must be positive integers'),
+    );
+  });
+
+  test('iexec_secrets values must be strings', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 0: { foo: 'bar' } },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets values must be strings'),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 0: 1 },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets values must be strings'),
+    );
+  });
+
   test('with iexec_args', async () => {
     await expect(
       objParamsSchema().validate(
