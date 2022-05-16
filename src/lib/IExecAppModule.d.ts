@@ -142,6 +142,32 @@ export default class IExecAppModule extends IExecModule {
     address: Addressish,
   ): Promise<{ objAddress: Address; app: App }>;
   /**
+   * check if a secret exists for the app in the Secret Management Service
+   *
+   * example:
+   * ```js
+   * const isSecretSet = await checkAppSecretExists(appAddress);
+   * console.log('app secret set:', isSecretSet);
+   * ```
+   */
+  checkAppSecretExists(appAddress: Addressish): Promise<boolean>;
+  /**
+   * **SIGNER REQUIRED, ONLY APP OWNER**
+   *
+   * push an application secret to the Secret Management Service
+   *
+   * _NB_:
+   * - pushed secret will be available for the app in `tee` tasks.
+   * - once pushed a secret can not be updated
+   *
+   * example:
+   * ```js
+   * const isPushed = await pushAppSecret(appAddress, "passw0rd");
+   * console.log('pushed App secret:', isPushed);
+   * ```
+   */
+  pushAppSecret(appAddress: Addressish, secretValue: String): Promise<boolean>;
+  /**
    * Create an IExecAppModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecAppModule;

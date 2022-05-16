@@ -94,10 +94,9 @@ push a named secret to the Secret Management Service
 
 _NB_:
 - pushed secrets can be used in `tee` tasks by specifying `iexec_secrets` in the requestorder params.
-- a pushed secret can not be updated
+- once pushed a secret can not be updated
 
 example:
-- init dropbox storage
 ```js
 const { isPushed } = await pushRequesterSecret("my-password", "passw0rd");
 console.log('pushed secret "my-password":', isPushed);

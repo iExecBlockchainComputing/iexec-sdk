@@ -5,6 +5,8 @@ const {
   showUserApp,
   countUserApps,
 } = require('../common/protocol/registries');
+const { checkAppSecretExists } = require('../common/sms/check');
+const { pushAppSecret } = require('../common/sms/push');
 
 class IExecAppModule extends IExecModule {
   constructor(...args) {
@@ -22,6 +24,19 @@ class IExecAppModule extends IExecModule {
       );
     this.countUserApps = async (address) =>
       countUserApps(await this.config.resolveContractsClient(), address);
+    this.checkAppSecretExists = async (appAddress) =>
+      checkAppSecretExists(
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
+        appAddress,
+      );
+    this.pushAppSecret = async (appAddress, appSecret) =>
+      pushAppSecret(
+        await this.config.resolveContractsClient(),
+        await this.config.resolveSmsURL(),
+        appAddress,
+        appSecret,
+      );
   }
 }
 
