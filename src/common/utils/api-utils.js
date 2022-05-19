@@ -57,6 +57,9 @@ const httpRequest =
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
+    }).catch((error) => {
+      debug(`httpRequest() fetch:`, error);
+      throw Error(`Connection to ${baseURL} failed with a network error`);
     });
     return response;
   };
