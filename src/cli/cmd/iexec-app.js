@@ -359,7 +359,7 @@ pushSecret
         }));
 
       await connectKeystore(chain, keystore);
-      const { isPushed } = await pushAppSecret(
+      const isPushed = await pushAppSecret(
         contracts,
         sms,
         resourceAddress,
