@@ -10,7 +10,9 @@ const { readTextRecord } = require('../ens/text-record');
 const { show: dealShow } = require('./deal');
 const { show: taskShow } = require('./task');
 const { WORKERPOOL_URL_TEXT_RECORD_KEY } = require('../utils/constant');
-const { jsonApi } = require('../utils/api-utils');
+const { jsonApi, getAuthorization } = require('../utils/api-utils');
+const { checkSigner } = require('../utils/utils');
+const { getAddress } = require('../wallet/address');
 
 const debug = Debug('iexec:execution:debug');
 
@@ -59,11 +61,11 @@ const getTaskOffchainApiUrl = async (
     if (!workerpool) {
       throw Error(`Cannot find task's workerpool`);
     }
-    const apiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
-    if (!apiUrl) {
+    const workerpoolApiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
+    if (!workerpoolApiUrl) {
       throw Error(`Impossible to resolve API url for workerpool ${workerpool}`);
     }
-    return apiUrl;
+    return workerpoolApiUrl;
   } catch (error) {
     debug('getTaskOffchainApiUrl()', error);
     throw error;
@@ -76,9 +78,9 @@ const fetchTaskOffchainInfo = async (
 ) => {
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
-    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
     const json = await jsonApi.get({
-      api: apiUrl,
+      api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
     });
     return json;
@@ -94,14 +96,21 @@ const fetchReplicateLogs = async (
   workerAddress = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vTaskid = await bytes32Schema().validate(taskid);
     const vWorkerAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(workerAddress);
-    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const userAddress = await getAddress(contracts);
+    const authorization = await getAuthorization(
+      workerpoolApiUrl,
+      '/tasks/logs/challenge',
+    )(contracts.chainId, userAddress, contracts.signer);
     const json = await jsonApi.get({
-      api: apiUrl,
-      endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/stdout`,
+      api: workerpoolApiUrl,
+      endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/logs`,
+      headers: { Authorization: authorization },
     });
     return json;
   } catch (error) {
