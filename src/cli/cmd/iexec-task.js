@@ -8,7 +8,7 @@ const { show, claim, obsTask } = require('../../common/execution/task');
 const { fetchTaskResults } = require('../../common/execution/result');
 const {
   fetchTaskOffchainInfo,
-  fetchReplicateLogs,
+  fetchAllReplicatesLogs,
 } = require('../../common/execution/debug');
 const {
   stringifyNestedBn,
@@ -182,14 +182,24 @@ showTask
 
 const debugTask = cli.command('debug <taskid>');
 addGlobalOptions(debugTask);
+addWalletLoadOptions(debugTask);
 debugTask
   .option(...option.chain())
+  .option('--logs', 'show application logs')
   .description(desc.debugTask())
   .action(async (taskid, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
       const chain = await loadChain(opts.chain, { spinner });
+
+      if (opts.logs) {
+        // Requester wallet authentiation is required to access logs
+        const walletOptions = await computeWalletLoadOptions(opts);
+        const keystore = Keystore(walletOptions);
+        await connectKeystore(chain, keystore);
+      }
+
       spinner.start('Fetching debug information');
       const onchainData = await show(chain.contracts, taskid);
       const offchainData = await fetchTaskOffchainInfo(
@@ -199,22 +209,11 @@ debugTask
         spinner.warn(`Failed to fetch off-chain data: ${e.message}`);
       });
 
-      const appLogs = await Promise.all(
-        ((offchainData && offchainData.replicates) || []).map((replicate) =>
-          fetchReplicateLogs(chain.contracts, taskid, replicate.walletAddress)
-            .then(({ stdout, stderr, walletAddress }) => ({
-              worker: walletAddress,
-              stdout,
-              stderr,
-            }))
-            .catch((e) => {
-              spinner.warn(
-                `Failed to fetch app logs for replicate ${replicate.walletAddress}: ${e.message}`,
-              );
-              return { worker: replicate.walletAddress };
-            }),
-        ),
-      );
+      const appLogs = opts.logs
+        ? await fetchAllReplicatesLogs(chain.contracts, taskid).catch((e) => {
+            spinner.warn(`Failed to fetch app logs: ${e.message}`);
+          })
+        : undefined;
 
       const raw = {
         onchainData: stringifyNestedBn(onchainData),
@@ -228,7 +227,7 @@ debugTask
       if (raw.offchainData) {
         spinner.info(`Off-chain data:\n${pretty(raw.offchainData)}`);
       }
-      if (raw.appLogs.length > 0) {
+      if (raw.appLogs && raw.appLogs.length > 0) {
         spinner.info(`App logs:\n${pretty(raw.appLogs)}`);
       }
     } catch (error) {
