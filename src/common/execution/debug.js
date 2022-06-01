@@ -152,8 +152,8 @@ const fetchAllReplicatesLogs = async (
       endpoint: `/tasks/${vTaskid}/logs`,
       headers: { Authorization: authorization },
     });
-    const { replicateStdoutList = [] } = json;
-    return replicateStdoutList.map(({ walletAddress, stdout, stderr }) => ({
+    const { computeLogsList = [] } = json;
+    return computeLogsList.map(({ walletAddress, stdout, stderr }) => ({
       worker: walletAddress,
       stdout,
       stderr,
