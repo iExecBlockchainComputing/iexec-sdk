@@ -1,6 +1,7 @@
+const Debug = require('debug');
 const { providers } = require('ethers');
 const IExecContractsClient = require('../common/utils/IExecContractsClient');
-const errors = require('../common/utils/errors');
+const { ConfigurationError } = require('../common/utils/errors');
 const {
   EnhancedWallet,
   EnhancedWeb3Signer,
@@ -10,6 +11,8 @@ const {
   isEnterpriseEnabled,
 } = require('../common/utils/config');
 const { getReadOnlyProvider } = require('../common/utils/providers');
+
+const debug = Debug('iexec:IExecConfig');
 
 class IExecConfig {
   constructor(
@@ -31,15 +34,19 @@ class IExecConfig {
       providerOptions,
     } = {},
   ) {
-    if (ethProvider === undefined || ethProvider === null) {
-      throw new errors.ConfigurationError('Missing ethProvider');
+    if (
+      ethProvider === undefined ||
+      ethProvider === null ||
+      ethProvider === ''
+    ) {
+      throw new ConfigurationError('Missing ethProvider');
     }
     const isReadOnlyProvider =
       typeof ethProvider === 'string' || typeof ethProvider === 'number';
     const isEnhancedWalletProvider = ethProvider instanceof EnhancedWallet;
 
-    const networkPromise = (async () => {
-      let disposableProvider;
+    let disposableProvider;
+    try {
       if (isEnhancedWalletProvider) {
         disposableProvider = ethProvider.provider;
       } else if (isReadOnlyProvider) {
@@ -47,17 +54,38 @@ class IExecConfig {
           providers: providerOptions,
         });
       } else {
-        disposableProvider = new providers.Web3Provider(ethProvider);
+        try {
+          disposableProvider = new providers.Web3Provider(ethProvider);
+        } catch (err) {
+          debug('Web3Provider', err);
+          throw Error('Unsupported provider');
+        }
       }
-      const { chainId, name, ensAddress } =
-        await disposableProvider.getNetwork();
+    } catch (err) {
+      throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
+    }
+
+    const networkPromise = (async () => {
+      const { chainId, name, ensAddress } = await disposableProvider
+        .getNetwork()
+        .catch((err) => {
+          throw Error(`Failed to detect network: ${err.message}`);
+        });
       return { chainId, name, ensAddress };
     })();
+
+    networkPromise.catch((err) => {
+      debug('networkPromise', err);
+    });
 
     const chainConfDefaultsPromise = (async () => {
       const { chainId } = await networkPromise;
       return getChainDefaults({ id: chainId, flavour });
     })();
+
+    chainConfDefaultsPromise.catch((err) => {
+      debug('chainConfDefaultsPromise', err);
+    });
 
     const providerAndSignerPromise = (async () => {
       let provider;
@@ -108,20 +136,157 @@ class IExecConfig {
       return { provider, signer };
     })();
 
+    providerAndSignerPromise.catch((err) => {
+      debug('providerAndSignerPromise', err);
+    });
+
     const contractsPromise = (async () => {
       const { chainId } = await networkPromise;
       const { provider, signer } = await providerAndSignerPromise;
-      return new IExecContractsClient({
-        chainId,
-        provider,
-        signer,
-        hubAddress,
-        useGas,
-        confirms,
-        isNative,
+      try {
+        return new IExecContractsClient({
+          chainId,
+          provider,
+          signer,
+          hubAddress,
+          useGas,
+          confirms,
+          isNative,
+          flavour,
+        });
+      } catch (err) {
+        throw new ConfigurationError(
+          `Failed to create contracts client: ${err.message}`,
+        );
+      }
+    })();
+
+    contractsPromise.catch((err) => {
+      debug('contractsPromise', err);
+    });
+
+    const enterpriseSwapContractsPromise = (async () => {
+      const { chainId } = await networkPromise;
+      const { provider, signer } = await providerAndSignerPromise;
+      const hasEnterpriseConf =
+        enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
+      if (!hasEnterpriseConf) {
+        throw new ConfigurationError(
+          `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
+        );
+      }
+      const enterpriseSwapFlavour =
+        flavour === 'enterprise' ? 'standard' : 'enterprise';
+      const enterpriseConf = {
+        ...getChainDefaults({
+          id: chainId,
+          flavour: enterpriseSwapFlavour,
+        }),
+        ...enterpriseSwapConf,
+      };
+      try {
+        return new IExecContractsClient({
+          chainId,
+          provider,
+          signer,
+          hubAddress: enterpriseConf.hubAddress,
+          confirms,
+          isNative: enterpriseConf.isNative,
+          flavour: enterpriseSwapFlavour,
+        });
+      } catch (err) {
+        throw new ConfigurationError(
+          `Failed to create enterprise swap contracts client: ${err.message}`,
+        );
+      }
+    })();
+
+    enterpriseSwapContractsPromise.catch((err) => {
+      debug('enterpriseSwapContractsPromise', err);
+    });
+
+    const bridgedConfPromise = (async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const isBridged =
+        Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
+        chainConfDefaults.bridge;
+      if (!isBridged) {
+        throw new ConfigurationError(
+          `bridgedNetworkConf option not set and no default value for your chain ${chainId}`,
+        );
+      }
+      const bridgedChainId =
+        bridgedNetworkConf.chainId !== undefined
+          ? bridgedNetworkConf.chainId
+          : chainConfDefaults.bridge && chainConfDefaults.bridge.bridgedChainId;
+      if (!bridgedChainId) {
+        throw new ConfigurationError(
+          `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
+        );
+      }
+      const bridgedChainConfDefaults = getChainDefaults({
+        id: bridgedChainId,
         flavour,
       });
+      const bridgedRpcUrl =
+        bridgedNetworkConf.rpcURL !== undefined
+          ? bridgedNetworkConf.rpcURL
+          : bridgedChainConfDefaults.host;
+      if (!bridgedRpcUrl) {
+        throw new ConfigurationError(
+          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
+        );
+      }
+      const bridgedBridgeAddress =
+        bridgedNetworkConf.bridgeAddress !== undefined
+          ? bridgedNetworkConf.bridgeAddress
+          : bridgedChainConfDefaults.bridge &&
+            bridgedChainConfDefaults.bridge.contract;
+      if (!bridgedBridgeAddress) {
+        throw new ConfigurationError(
+          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
+        );
+      }
+      const contracts = await contractsPromise;
+      return {
+        chainId: bridgedChainId,
+        rpcURL: bridgedRpcUrl,
+        isNative:
+          flavour === 'standard' ? !contracts.isNative : contracts.isNative,
+        hubAddress: bridgedNetworkConf.hubAddress,
+        bridgeAddress: bridgedBridgeAddress,
+        network: bridgedChainConfDefaults.network,
+      };
     })();
+
+    bridgedConfPromise.catch((err) => {
+      debug('bridgedConfPromise', err);
+    });
+
+    const bridgedContractsPromise = (async () => {
+      const bridgedConf = await bridgedConfPromise;
+      try {
+        return new IExecContractsClient({
+          chainId: bridgedConf.chainId,
+          provider: getReadOnlyProvider(bridgedConf.rpcURL, {
+            providers: providerOptions,
+            network: bridgedConf.network,
+          }),
+          hubAddress: bridgedConf.hubAddress,
+          confirms,
+          isNative: bridgedConf.isNative,
+          flavour,
+        });
+      } catch (err) {
+        throw new ConfigurationError(
+          `Failed to create bridged contracts client: ${err.message}`,
+        );
+      }
+    })();
+    bridgedContractsPromise.catch((err) => {
+      debug('bridgedContractsPromise', err);
+    });
 
     this.resolveChainId = async () => (await networkPromise).chainId;
 
@@ -130,122 +295,27 @@ class IExecConfig {
       return contracts;
     };
 
-    let _enterpriseSwapContracts;
-    const resolveEnterpriseSwapContracts = async () => {
-      if (!_enterpriseSwapContracts) {
-        const { chainId } = await networkPromise;
-        const { provider, signer } = await providerAndSignerPromise;
-        let enterpriseConf;
-        const hasEnterpriseConf =
-          enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
-        const enterpriseSwapFlavour =
-          flavour === 'enterprise' ? 'standard' : 'enterprise';
-        if (hasEnterpriseConf) {
-          const enterpriseSwapConfDefaults = getChainDefaults({
-            id: chainId,
-            flavour: enterpriseSwapFlavour,
-          });
-          enterpriseConf = {
-            ...enterpriseSwapConfDefaults,
-            ...enterpriseSwapConf,
-          };
-        }
-        _enterpriseSwapContracts = hasEnterpriseConf
-          ? new IExecContractsClient({
-              chainId,
-              provider,
-              signer,
-              hubAddress: enterpriseConf.hubAddress,
-              confirms,
-              isNative: enterpriseConf.isNative,
-              flavour: enterpriseSwapFlavour,
-            })
-          : undefined;
-      }
-      return _enterpriseSwapContracts;
-    };
-
-    let _bridgedConf;
-    const resolveBridgedConf = async () => {
-      if (!_bridgedConf) {
-        const { chainId } = await networkPromise;
-        const chainConfDefaults = await chainConfDefaultsPromise;
-        const contracts = await contractsPromise;
-        const isBridged =
-          Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
-          chainConfDefaults.bridge;
-
-        if (isBridged) {
-          const bridgedChainId =
-            bridgedNetworkConf.chainId !== undefined
-              ? bridgedNetworkConf.chainId
-              : chainConfDefaults.bridge &&
-                chainConfDefaults.bridge.bridgedChainId;
-          if (!bridgedChainId) {
-            throw new errors.ConfigurationError(
-              `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
-            );
-          }
-          const bridgedChainConfDefaults = getChainDefaults({
-            id: bridgedChainId,
-            flavour,
-          });
-          const bridgedRpcUrl =
-            bridgedNetworkConf.rpcURL !== undefined
-              ? bridgedNetworkConf.rpcURL
-              : bridgedChainConfDefaults.host;
-          if (!bridgedRpcUrl) {
-            throw new errors.ConfigurationError(
-              `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
-            );
-          }
-          const bridgedBridgeAddress =
-            bridgedNetworkConf.bridgeAddress !== undefined
-              ? bridgedNetworkConf.bridgeAddress
-              : bridgedChainConfDefaults.bridge &&
-                bridgedChainConfDefaults.bridge.contract;
-          if (!bridgedBridgeAddress) {
-            throw new errors.ConfigurationError(
-              `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
-            );
-          }
-          _bridgedConf = {
-            chainId: bridgedChainId,
-            rpcURL: bridgedRpcUrl,
-            isNative:
-              flavour === 'standard' ? !contracts.isNative : contracts.isNative,
-            hubAddress: bridgedNetworkConf.hubAddress,
-            bridgeAddress: bridgedBridgeAddress,
-            network: bridgedChainConfDefaults.network,
-          };
-        }
-      }
-      return _bridgedConf;
-    };
-
-    let _bridgedContracts;
     this.resolveBridgedContractsClient = async () => {
-      if (!_bridgedContracts) {
-        const chainConfDefaults = await chainConfDefaultsPromise;
-        const isBridged =
-          Object.getOwnPropertyNames(bridgedNetworkConf).length > 0 ||
-          chainConfDefaults.bridge;
-        if (isBridged) {
-          const bridgedConf = await resolveBridgedConf();
-          _bridgedContracts = new IExecContractsClient({
-            chainId: bridgedConf.chainId,
-            provider: getReadOnlyProvider(bridgedConf.rpcURL, {
-              providers: providerOptions,
-              network: bridgedConf.network,
-            }),
-            hubAddress: bridgedConf.hubAddress,
-            confirms,
-            isNative: bridgedConf.isNative,
-            flavour,
-          });
-        }
+      const bridgedContracts = await bridgedContractsPromise;
+      return bridgedContracts;
+    };
+
+    this.resolveStandardContractsClient = async () => {
+      const contracts = await contractsPromise;
+      if (contracts.flavour === 'standard') {
+        return contracts;
       }
-      return _bridgedContracts;
+      const enterpriseSwapContracts = await enterpriseSwapContractsPromise;
+      return enterpriseSwapContracts;
+    };
+
+    this.resolveEnterpriseContractsClient = async () => {
+      const contracts = await contractsPromise;
+      if (contracts.flavour === 'enterprise') {
+        return contracts;
+      }
+      const enterpriseSwapContracts = await enterpriseSwapContractsPromise;
+      return enterpriseSwapContracts;
     };
 
     this.resolveSmsURL = async () => {
@@ -255,7 +325,7 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `smsURL option not set and no default value for your chain ${chainId}`,
       );
     };
@@ -267,7 +337,7 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
     };
@@ -279,7 +349,7 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
       );
     };
@@ -291,7 +361,7 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
       );
     };
@@ -305,13 +375,13 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `bridgeAddress option not set and no default value for your chain ${chainId}`,
       );
     };
 
     this.resolveBridgeBackAddress = async () => {
-      const brigedChainConf = await resolveBridgedConf();
+      const brigedChainConf = await bridgedConfPromise;
       return brigedChainConf.bridgeAddress;
     };
 
@@ -323,44 +393,8 @@ class IExecConfig {
       if (value !== undefined) {
         return value;
       }
-      throw Error(
+      throw new ConfigurationError(
         `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    this.resolveStandardContractsClient = async () => {
-      const { chainId } = await networkPromise;
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'standard') {
-        return contracts;
-      }
-      const enterpriseSwapContracts = await resolveEnterpriseSwapContracts();
-      if (
-        enterpriseSwapContracts &&
-        enterpriseSwapContracts.flavour === 'standard'
-      ) {
-        return enterpriseSwapContracts;
-      }
-      throw Error(
-        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    this.resolveEnterpriseContractsClient = async () => {
-      const { chainId } = await networkPromise;
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'enterprise') {
-        return contracts;
-      }
-      const enterpriseSwapContracts = await resolveEnterpriseSwapContracts();
-      if (
-        enterpriseSwapContracts &&
-        enterpriseSwapContracts.flavour === 'enterprise'
-      ) {
-        return enterpriseSwapContracts;
-      }
-      throw Error(
-        `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
       );
     };
   }
