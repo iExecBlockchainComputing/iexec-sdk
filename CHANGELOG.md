@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- fix unhandled promise rejection when sdk is incorrectly initialized
 - fix typo in `iexec storage init --raw` output
 - fix typo in `iexec storage check --raw` output
 
