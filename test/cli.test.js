@@ -3790,7 +3790,7 @@ describe('[Common]', () => {
       const raw = await execAsync(`${iexecPath} storage init --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(true);
+      expect(res.isInitialized).toBe(true);
       expect(res.isUpdated).toBe(false);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage init --raw`,
@@ -3810,14 +3810,14 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(true);
+      expect(res.isInitialized).toBe(true);
       expect(res.isUpdated).toBe(false);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage init --force-update --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isInitilized).toBe(true);
+      expect(resAlreadyExists.isInitialized).toBe(true);
       expect(resAlreadyExists.isUpdated).toBe(true);
     });
 
@@ -3829,7 +3829,7 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(true);
+      expect(res.isInitialized).toBe(true);
       expect(res.isUpdated).toBe(false);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage init dropbox --token oops --raw`,
@@ -3858,14 +3858,14 @@ describe('[Common]', () => {
       const raw = await execAsync(`${iexecPath} storage check --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(false);
+      expect(res.isInitialized).toBe(false);
       await execAsync(`${iexecPath} storage init --raw`);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage check --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isInitilized).toBe(true);
+      expect(resAlreadyExists.isInitialized).toBe(true);
     });
 
     test('iexec storage check --user', async () => {
@@ -3877,14 +3877,14 @@ describe('[Common]', () => {
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(false);
+      expect(res.isInitialized).toBe(false);
       await execAsync(`${iexecPath} storage init --raw`);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage check --user ${randomAddress} --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isInitilized).toBe(false);
+      expect(resAlreadyExists.isInitialized).toBe(false);
     });
 
     test('iexec storage check dropbox', async () => {
@@ -3893,14 +3893,14 @@ describe('[Common]', () => {
       const raw = await execAsync(`${iexecPath} storage check dropbox --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.isInitilized).toBe(false);
+      expect(res.isInitialized).toBe(false);
       await execAsync(`${iexecPath} storage init dropbox --token oops --raw`);
       const rawAlreadyExists = await execAsync(
         `${iexecPath} storage check dropbox --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isInitilized).toBe(true);
+      expect(resAlreadyExists.isInitialized).toBe(true);
     });
 
     test('iexec storage check unsupported', async () => {

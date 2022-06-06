@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.1.1] 2022-06-06
+
+### Changed
+
+- fix unhandled promise rejection when sdk is incorrectly initialized
+- fix typo in `iexec storage init --raw` output
+- fix typo in `iexec storage check --raw` output
+
 ## [7.1.0] 2022-04-11
 
 ### Added
