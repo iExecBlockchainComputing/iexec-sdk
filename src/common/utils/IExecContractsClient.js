@@ -14,7 +14,7 @@ const appDesc = require('@iexec/poco/build/contracts-min/App.json');
 const workerpoolDesc = require('@iexec/poco/build/contracts-min/Workerpool.json');
 const datasetDesc = require('@iexec/poco/build/contracts-min/Dataset.json');
 
-const debug = Debug('iexec:contracts');
+const debug = Debug('iexec:IExecContractsClient');
 
 const enterpriseHubMap = {
   1: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
@@ -31,43 +31,23 @@ const gasPriceByNetwork = {
   134: '0x0',
 };
 
-const getHubAddress = (chainId, flavour, { strict = true } = {}) => {
-  try {
-    if (flavour === 'enterprise') {
-      if (!enterpriseHubMap[chainId]) {
-        if (strict) {
-          throw Error('Missing iExec proxy configuration');
-        }
-        return undefined;
-      }
+const getHubAddress = (chainId, flavour) => {
+  if (flavour === 'enterprise') {
+    if (enterpriseHubMap[chainId]) {
       return enterpriseHubMap[chainId];
     }
-    if (!iexecProxyNetworks) {
-      if (strict) {
-        throw Error('Missing iExec proxy configuration');
-      }
-      return undefined;
+    throw Error(
+      `Missing iExec enterprise contract default address for chain ${chainId}`,
+    );
+  } else {
+    if (
+      iexecProxyNetworks &&
+      iexecProxyNetworks[chainId] &&
+      iexecProxyNetworks[chainId].address
+    ) {
+      return iexecProxyNetworks[chainId].address;
     }
-    if (!(chainId in iexecProxyNetworks)) {
-      if (strict) {
-        throw Error(
-          `Missing chainId "${chainId}" in iExec proxy configuration`,
-        );
-      }
-      return undefined;
-    }
-    if (!('address' in iexecProxyNetworks[chainId])) {
-      if (strict) {
-        throw Error(
-          `Missing address in iExec proxy configuration for chainId "${chainId}"`,
-        );
-      }
-      return undefined;
-    }
-    return iexecProxyNetworks[chainId].address;
-  } catch (error) {
-    debug('getHubAddress()', error);
-    throw error;
+    throw Error(`Missing iExec contract default address for chain ${chainId}`);
   }
 };
 
@@ -132,11 +112,7 @@ const createClient = ({
 
   const contractsDescMap = getContractsDescMap(isNative, flavour);
 
-  const hubAddress =
-    globalHubAddress ||
-    getHubAddress(chainId, flavour, {
-      strict: true,
-    });
+  const hubAddress = globalHubAddress || getHubAddress(chainId, flavour);
 
   const getContract = (objName, address) => {
     try {
