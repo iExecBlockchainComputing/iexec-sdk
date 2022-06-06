@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## next
 
 ### Added
 
@@ -14,6 +14,12 @@ All notable changes to this project will be documented in this file.
 
 - `show` commands display ENS when configured
 - `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
+
+## [7.1.1] 2022-06-06
+
+### Changed
+
+- fix unhandled promise rejection when sdk is incorrectly initialized
 - fix typo in `iexec storage init --raw` output
 - fix typo in `iexec storage check --raw` output
 
