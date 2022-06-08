@@ -2,7 +2,6 @@ const ethers = require('ethers');
 const Eth = require('web3-eth');
 
 const { utils, IExecConfig, errors } = require('../src/lib');
-const { NULL_ADDRESS } = require('../src/common/utils/utils');
 const IExecContractsClient = require('../src/common/utils/IExecContractsClient');
 
 console.log('Node version:', process.version);
@@ -550,7 +549,7 @@ describe('[IExecConfig]', () => {
               rpcURL: tokenChainUrl,
               chainId: '65535',
               hubAddress,
-              bridgeAddress: NULL_ADDRESS,
+              bridgeAddress: utils.NULL_ADDRESS,
             },
           },
         );
