@@ -3855,7 +3855,7 @@ describe('[order]', () => {
       category: 5,
       params: {
         iexec_secrets: {
-          0: 'foo',
+          1: 'foo',
         },
       },
       tag: ['tee'],
@@ -3870,7 +3870,7 @@ describe('[order]', () => {
       datasetmaxprice: '0',
       params: {
         iexec_secrets: {
-          0: 'foo',
+          1: 'foo',
         },
         iexec_result_storage_provider: 'ipfs',
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',

@@ -15,7 +15,9 @@ const { wrapCall } = require('./errorWrappers');
 
 const debug = Debug('validators');
 
-const intRegex = /^\d+$/;
+const posIntRegex = /^\d+$/;
+
+const posStrictIntRegex = /^[1-9]\d*$/;
 
 const stringNumberSchema = ({ message } = {}) =>
   string()
@@ -23,7 +25,7 @@ const stringNumberSchema = ({ message } = {}) =>
       const trimed = value.replace(/^0+/, '');
       return trimed.length > 0 ? trimed : '0';
     })
-    .matches(intRegex, message || '${originalValue} is not a valid number');
+    .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
 const integerSchema = () => number().integer();
 
@@ -237,7 +239,7 @@ const objParamsSchema = () =>
       .transform((value) => {
         if (Array.isArray(value)) {
           return value.reduce((acc, val, i) => {
-            acc[i] = val;
+            acc[i + 1] = val;
             return acc;
           }, {});
         }
@@ -248,11 +250,11 @@ const objParamsSchema = () =>
         then: object()
           .test(
             'keys-are-int',
-            '${path} keys must be positive integers',
+            '${path} keys must be strictly positive integers',
             (value) => {
               if (
                 value !== undefined &&
-                Object.keys(value).find((key) => !intRegex.test(key))
+                Object.keys(value).find((key) => !posStrictIntRegex.test(key))
               ) {
                 return false;
               }

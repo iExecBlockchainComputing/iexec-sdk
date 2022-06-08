@@ -607,13 +607,13 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         {
-          iexec_secrets: { 0: 'foo' },
+          iexec_secrets: { 1: 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
     ).resolves.toEqual({
-      iexec_secrets: { 0: 'foo' },
+      iexec_secrets: { 1: 'foo' },
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
@@ -645,13 +645,13 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).resolves.toEqual({
-      iexec_secrets: { 0: 'foo', 3: 'bar' },
+      iexec_secrets: { 1: 'foo', 4: 'bar' },
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
-  test('iexec_secrets keys must be positive integers', async () => {
+  test('iexec_secrets keys must be strictly positive integers', async () => {
     await expect(
       objParamsSchema().validate(
         {
@@ -661,7 +661,18 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets keys must be positive integers'),
+      new ValidationError('iexec_secrets keys must be strictly positive integers'),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { '0': 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets keys must be strictly positive integers'),
     );
     await expect(
       objParamsSchema().validate(
@@ -672,7 +683,7 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets keys must be positive integers'),
+      new ValidationError('iexec_secrets keys must be strictly positive integers'),
     );
   });
 
@@ -680,7 +691,7 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         {
-          iexec_secrets: { 0: { foo: 'bar' } },
+          iexec_secrets: { 1: { foo: 'bar' } },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
@@ -691,7 +702,7 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         {
-          iexec_secrets: { 0: 1 },
+          iexec_secrets: { 1: 1 },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
