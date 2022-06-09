@@ -10,7 +10,9 @@ const { readTextRecord } = require('../ens/text-record');
 const { show: dealShow } = require('./deal');
 const { show: taskShow } = require('./task');
 const { WORKERPOOL_URL_TEXT_RECORD_KEY } = require('../utils/constant');
-const { jsonApi } = require('../utils/api-utils');
+const { jsonApi, getAuthorization } = require('../utils/api-utils');
+const { checkSigner } = require('../utils/utils');
+const { getAddress } = require('../wallet/address');
 
 const debug = Debug('iexec:execution:debug');
 
@@ -53,17 +55,18 @@ const getTaskOffchainApiUrl = async (
   taskid = throwIfMissing(),
 ) => {
   try {
-    const { dealid } = await taskShow(contracts, taskid);
+    const vTaskid = await bytes32Schema().validate(taskid);
+    const { dealid } = await taskShow(contracts, vTaskid);
     const deal = await dealShow(contracts, dealid);
     const workerpool = deal.workerpool && deal.workerpool.pointer;
     if (!workerpool) {
       throw Error(`Cannot find task's workerpool`);
     }
-    const apiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
-    if (!apiUrl) {
+    const workerpoolApiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
+    if (!workerpoolApiUrl) {
       throw Error(`Impossible to resolve API url for workerpool ${workerpool}`);
     }
-    return apiUrl;
+    return workerpoolApiUrl;
   } catch (error) {
     debug('getTaskOffchainApiUrl()', error);
     throw error;
@@ -76,9 +79,9 @@ const fetchTaskOffchainInfo = async (
 ) => {
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
-    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
     const json = await jsonApi.get({
-      api: apiUrl,
+      api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
     });
     return json;
@@ -88,24 +91,39 @@ const fetchTaskOffchainInfo = async (
   }
 };
 
-const fetchReplicateStdout = async (
+const fetchAllReplicatesLogs = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  workerAddress = throwIfMissing(),
 ) => {
   try {
+    checkSigner(contracts);
     const vTaskid = await bytes32Schema().validate(taskid);
-    const vWorkerAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerAddress);
-    const apiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const { dealid } = await taskShow(contracts, vTaskid);
+    const { requester } = await dealShow(contracts, dealid);
+    const userAddress = await getAddress(contracts);
+    if (requester !== userAddress) {
+      throw Error(
+        `Only task requester ${requester} can access replicates logs`,
+      );
+    }
+    const authorization = await getAuthorization(
+      workerpoolApiUrl,
+      '/tasks/logs/challenge',
+    )(contracts.chainId, userAddress, contracts.signer);
     const json = await jsonApi.get({
-      api: apiUrl,
-      endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/stdout`,
+      api: workerpoolApiUrl,
+      endpoint: `/tasks/${vTaskid}/logs`,
+      headers: { Authorization: authorization },
     });
-    return json.stdout;
+    const { computeLogsList = [] } = json;
+    return computeLogsList.map(({ walletAddress, stdout, stderr }) => ({
+      worker: walletAddress,
+      stdout,
+      stderr,
+    }));
   } catch (error) {
-    debug('fetchReplicateStdout()', error);
+    debug('fetchAllReplicatesLogs()', error);
     throw error;
   }
 };
@@ -113,5 +131,5 @@ const fetchReplicateStdout = async (
 module.exports = {
   getWorkerpoolApiUrl,
   fetchTaskOffchainInfo,
-  fetchReplicateStdout,
+  fetchAllReplicatesLogs,
 };

@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - workerpool API url configuration
-- `iexec task debug <taskid>` to show offchain
+- `iexec task debug <taskid> [--logs]` to show offchain information
 - `ens.getDefaultDomain(address)` to get the default free to use ENS domain given an address
 
 ### Changed

@@ -539,7 +539,7 @@ iexec task show <taskid> --watch # wait for task to be COMPLETED or CLAIMED
 iexec task show <taskid> --download [fileName] # download the result of a COMPLETED task
 iexec task show <taskid> --download [fileName] --decrypt # download and decrypt the result of a COMPLETED task
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
-iexec task debug <taskid> # show task debug information
+iexec task debug <taskid> --logs # show task debug information and logs
 ```
 
 ## result
