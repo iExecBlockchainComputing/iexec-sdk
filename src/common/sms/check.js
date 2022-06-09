@@ -116,7 +116,7 @@ const checkAppSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-  secretIndex = 0,
+  secretIndex = 1,
 ) => {
   try {
     const vAppAddress = await addressSchema({

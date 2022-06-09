@@ -233,7 +233,7 @@ const pushAppSecret = async (
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   secretValue = throwIfMissing(),
-  secretIndex = 0,
+  secretIndex = 1,
 ) => {
   try {
     checkSigner(contracts);
