@@ -91,42 +91,6 @@ const fetchTaskOffchainInfo = async (
   }
 };
 
-// const fetchReplicateLogs = async (
-//   contracts = throwIfMissing(),
-//   taskid = throwIfMissing(),
-//   workerAddress = throwIfMissing(),
-// ) => {
-//   try {
-//     checkSigner(contracts);
-//     const vTaskid = await bytes32Schema().validate(taskid);
-//     const vWorkerAddress = await addressSchema({
-//       ethProvider: contracts.provider,
-//     }).validate(workerAddress);
-//     const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
-//     const { dealid } = await taskShow(contracts, vTaskid);
-//     const { requester } = await dealShow(contracts, dealid);
-//     const userAddress = await getAddress(contracts);
-//     if (requester !== userAddress) {
-//       throw Error(
-//         `Only task requester ${requester} can access replicates logs`,
-//       );
-//     }
-//     const authorization = await getAuthorization(
-//       workerpoolApiUrl,
-//       '/tasks/logs/challenge',
-//     )(contracts.chainId, userAddress, contracts.signer);
-//     const json = await jsonApi.get({
-//       api: workerpoolApiUrl,
-//       endpoint: `/tasks/${vTaskid}/replicates/${vWorkerAddress.toLowerCase()}/logs`,
-//       headers: { Authorization: authorization },
-//     });
-//     return json;
-//   } catch (error) {
-//     debug('fetchReplicateLogs()', error);
-//     throw error;
-//   }
-// };
-
 const fetchAllReplicatesLogs = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
@@ -168,5 +132,4 @@ module.exports = {
   getWorkerpoolApiUrl,
   fetchTaskOffchainInfo,
   fetchAllReplicatesLogs,
-  // fetchReplicateLogs,
 };
