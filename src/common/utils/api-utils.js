@@ -57,6 +57,9 @@ const httpRequest =
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
+    }).catch((error) => {
+      debug(`httpRequest() fetch:`, error);
+      throw Error(`Connection to ${baseURL} failed with a network error`);
     });
     return response;
   };
@@ -156,8 +159,11 @@ const getAuthorization =
         },
       });
       const typedData = challenge.data || challenge;
-      const { domain, message } = typedData;
-      const { EIP712Domain, ...types } = typedData.types;
+      const { domain, message } = typedData || {};
+      const { EIP712Domain, ...types } = typedData.types || {};
+      if (!domain || !types || !message) {
+        throw Error('Unexpected challenge format');
+      }
       const sign = await wrapSignTypedData(
         // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
         // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
@@ -176,7 +182,7 @@ const getAuthorization =
       return authorization;
     } catch (error) {
       debug('getAuthorization()', error);
-      throw Error('Failed to get authorization');
+      throw Error(`Failed to get authorization: ${error}`);
     }
   };
 
