@@ -1,6 +1,12 @@
 const IExecModule = require('./IExecModule');
-const hub = require('../common/modules/hub');
-const secretMgtServ = require('../common/modules/sms');
+const {
+  deployDataset,
+  showDataset,
+  showUserDataset,
+  countUserDatasets,
+} = require('../common/protocol/registries');
+const { checkWeb3SecretExists } = require('../common/sms/check');
+const { pushWeb3Secret } = require('../common/sms/push');
 const {
   generateAes256Key,
   encryptAes256Cbc,
@@ -17,28 +23,25 @@ class IExecDatasetModule extends IExecModule {
     this.computeEncryptedFileChecksum = (encryptedFile) =>
       sha256Sum(encryptedFile);
     this.deployDataset = async (dataset) =>
-      hub.deployDataset(await this.config.resolveContractsClient(), dataset);
+      deployDataset(await this.config.resolveContractsClient(), dataset);
     this.showDataset = async (address) =>
-      hub.showDataset(await this.config.resolveContractsClient(), address);
+      showDataset(await this.config.resolveContractsClient(), address);
     this.showUserDataset = async (index, userAddress) =>
-      hub.showUserDataset(
+      showUserDataset(
         await this.config.resolveContractsClient(),
         index,
         userAddress,
       );
     this.countUserDatasets = async (address) =>
-      hub.countUserDatasets(
-        await this.config.resolveContractsClient(),
-        address,
-      );
+      countUserDatasets(await this.config.resolveContractsClient(), address);
     this.checkDatasetSecretExists = async (datasetAddress) =>
-      secretMgtServ.checkWeb3SecretExists(
+      checkWeb3SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         datasetAddress,
       );
     this.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
-      secretMgtServ.pushWeb3Secret(
+      pushWeb3Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         datasetAddress,

@@ -98,6 +98,38 @@
         <label id="storage-init-error" class="error"></label>
       </div>
       <hr />
+      <h2>Secrets</h2>
+      <div class="container">
+        <div>
+          <div>
+            <label for="secret-check-name-input">Secret name</label>
+            <input id="secret-check-name-input" type="text" value="foo" />
+          </div>
+          <button id="secret-check-button" disabled>
+            CHECK REQUESTER SECRET
+          </button>
+        </div>
+        <div id="secret-check-output"></div>
+        <div id="secret-check-error" class="error"></div>
+      </div>
+      <div class="container">
+        <div>
+          <div>
+            <label for="secret-push-name-input">Secret name</label>
+            <input id="secret-push-name-input" type="text" value="foo" />
+          </div>
+          <div>
+            <label for="secret-push-value-input">Secret value</label>
+            <input id="secret-push-value-input" type="text" value="bar" />
+          </div>
+          <button id="secret-push-button" disabled>
+            PUSH REQUESTER SECRET
+          </button>
+        </div>
+        <div id="secret-push-output"></div>
+        <div id="secret-push-error" class="error"></div>
+      </div>
+      <hr />
       <h2>Apps</h2>
       <div class="container">
         <div>

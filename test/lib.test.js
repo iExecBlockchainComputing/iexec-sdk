@@ -10,8 +10,9 @@ const {
   sleep,
   bytes32Regex,
   addressRegex,
-  NULL_ADDRESS,
 } = require('../src/common/utils/utils');
+
+const { NULL_ADDRESS } = utils;
 
 console.log('Node version:', process.version);
 
@@ -76,9 +77,9 @@ const nativeChainUrl = DRONE
 const tokenChain1sUrl = DRONE
   ? 'http://token-chain-1s:8545'
   : 'http://localhost:28545';
-// parity node (with ws)
-const tokenChainParityUrl = DRONE
-  ? 'http://token-chain-parity:8545'
+// openethereum node (with ws)
+const tokenChainOpenethereumUrl = DRONE
+  ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
 const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
@@ -90,9 +91,6 @@ const resultProxyURL = DRONE
 const iexecGatewayURL = DRONE
   ? 'http://token-gateway:3000'
   : 'http://localhost:13000';
-
-const chainGasPrice = '20000000000';
-// const nativeChainGasPrice = '0';
 
 const ADDRESS = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 // const PUBLIC_KEY = '0x0463b6265f021cc1f249366d5ade5bcdf7d33debe594e9d94affdf1aa02255928490fc2c96990a386499b66d17565de1c12ba8fb4ae3af7539e6c61aa7f0113edd';
@@ -257,6 +255,37 @@ const getId = () => {
   return sequenceId;
 };
 
+const deployRandomApp = async (iexec, { owner } = {}) => {
+  const appDeployRes = await iexec.app.deployApp({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `app${getId()}`,
+    type: 'DOCKER',
+    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+    checksum:
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+  });
+  return appDeployRes;
+};
+
+const deployRandomDataset = async (iexec, { owner } = {}) => {
+  const datasetDeployRes = await iexec.dataset.deployDataset({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `dataset${getId()}`,
+    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    checksum:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+  });
+  return datasetDeployRes;
+};
+
+const deployRandomWorkerpool = async (iexec, { owner } = {}) => {
+  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
+    owner: owner || (await iexec.wallet.getAddress()),
+    description: `workerpool${getId()}`,
+  });
+  return workerpoolDeployRes;
+};
+
 const deployAndGetApporder = async (
   iexec,
   {
@@ -268,15 +297,7 @@ const deployAndGetApporder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const appDeployRes = await iexec.app.deployApp({
-    owner: address,
-    name: `app${getId()}`,
-    type: 'DOCKER',
-    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-    checksum:
-      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-  });
+  const appDeployRes = await deployRandomApp(iexec);
   const app = appDeployRes.address;
   const apporder = await iexec.order
     .createApporder({
@@ -303,14 +324,7 @@ const deployAndGetDatasetorder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const datasetDeployRes = await iexec.dataset.deployDataset({
-    owner: address,
-    name: `dataset${getId()}`,
-    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-    checksum:
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-  });
+  const datasetDeployRes = await deployRandomDataset(iexec);
   const dataset = datasetDeployRes.address;
   const datasetorder = await iexec.order
     .createDatasetorder({
@@ -339,11 +353,7 @@ const deployAndGetWorkerpoolorder = async (
     tag,
   } = {},
 ) => {
-  const address = await iexec.wallet.getAddress();
-  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
-    owner: address,
-    description: `workerpool${getId()}`,
-  });
+  const workerpoolDeployRes = await deployRandomWorkerpool(iexec);
   const workerpool = workerpoolDeployRes.address;
   const workerpoolorder = await iexec.order
     .createWorkerpoolorder({
@@ -371,7 +381,7 @@ const getMatchableRequestorder = async (
       requester: address,
       app: apporder.app,
       appmaxprice: apporder.appprice,
-      dataset: datasetorder ? datasetorder.dataset : utils.NULL_ADDRESS,
+      dataset: datasetorder ? datasetorder.dataset : NULL_ADDRESS,
       datasetmaxprice: datasetorder ? datasetorder.datasetprice : 0,
       workerpool: workerpoolorder.workerpool,
       workerpoolmaxprice: workerpoolorder.workerpoolprice,
@@ -828,7 +838,6 @@ describe('[getSignerFromPrivateKey]', () => {
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('sign tx no value', async () => {
@@ -868,7 +877,6 @@ describe('[getSignerFromPrivateKey]', () => {
     ).toBe(true);
     const tx = await tokenChainRPC.getTransaction(txHash);
     expect(tx).toBeDefined();
-    expect(tx.gasPrice.toString()).toBe(chainGasPrice);
   });
 
   test('gasPrice option', async () => {
@@ -1004,42 +1012,42 @@ describe('[getSignerFromPrivateKey]', () => {
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumFail,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
           ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
             providers: infuraFailQuorumPass,
           }),
-        }).wallet.checkBalances(utils.NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
     },
     DEFAULT_TIMEOUT * 2,
@@ -1072,7 +1080,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
     await expect(
       new IExec(
@@ -1088,7 +1096,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
     await expect(
       new IExec(
@@ -1104,7 +1112,7 @@ describe('[getSignerFromPrivateKey]', () => {
         {
           hubAddress,
         },
-      ).wallet.checkBalances(utils.NULL_ADDRESS),
+      ).wallet.checkBalances(NULL_ADDRESS),
     ).resolves.toBeDefined();
   });
 });
@@ -1139,8 +1147,8 @@ describe('[wallet]', () => {
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(initialBalance.wei).toBeInstanceOf(BN);
     expect(initialBalance.nRLC).toBeInstanceOf(BN);
-    await iexec.wallet.sendETH(5, utils.NULL_ADDRESS);
-    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    await iexec.wallet.sendETH(5, NULL_ADDRESS);
+    await iexec.wallet.sendRLC(10, NULL_ADDRESS);
     const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(finalBalance.wei).toBeInstanceOf(BN);
     expect(finalBalance.nRLC).toBeInstanceOf(BN);
@@ -1168,7 +1176,7 @@ describe('[wallet]', () => {
     expect(
       initialBalance.wei.eq(initialBalance.nRLC.mul(new BN(1000000000))),
     ).toBe(true);
-    await iexec.wallet.sendRLC(10, utils.NULL_ADDRESS);
+    await iexec.wallet.sendRLC(10, NULL_ADDRESS);
     const finalBalance = await iexec.wallet.checkBalances(ADDRESS);
     expect(finalBalance.wei).toBeInstanceOf(BN);
     expect(finalBalance.nRLC).toBeInstanceOf(BN);
@@ -1580,7 +1588,7 @@ describe('[wallet]', () => {
     );
     await expect(iexec.wallet.sweep(POOR_ADDRESS3)).rejects.toThrow(
       Error(
-        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': processing response error: sender doesn't have enough funds to send tx. The upfront cost is: 725180000000000 and the sender's account only has: ${initialBalance.wei.toString()}`,
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': insufficient funds for intrinsic transaction cost`,
       ),
     );
     const finalBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
@@ -1619,7 +1627,7 @@ describe('[wallet]', () => {
         isNative: false,
       },
     );
-    await iexecRichman.wallet.sendETH('725180000000100', POOR_ADDRESS2);
+    await iexecRichman.wallet.sendETH('55000000000000', POOR_ADDRESS2);
     await iexecRichman.wallet.sendRLC(20, POOR_ADDRESS2);
     const initialBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
     const receiverInitialBalance = await iexec.wallet.checkBalances(
@@ -2934,8 +2942,8 @@ describe('[app]', () => {
     expect(res.app.appChecksum).toBe(app.checksum);
     expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
 
-    await expect(iexec.app.showApp(utils.NULL_ADDRESS)).rejects.toThrow(
-      new errors.ObjectNotFoundError('app', utils.NULL_ADDRESS, networkId),
+    await expect(iexec.app.showApp(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('app', NULL_ADDRESS, networkId),
     );
   });
 
@@ -2951,16 +2959,8 @@ describe('[app]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const app = {
-      owner: userAddress,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    };
     const resBeforeDeploy = await iexec.app.countUserApps(userAddress);
-    await iexec.app.deployApp(app);
+    await deployRandomApp(iexec);
     const res = await iexec.app.countUserApps(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -3009,6 +3009,65 @@ describe('[app]', () => {
     await expect(iexec.app.showUserApp(count, userAddress)).rejects.toThrow(
       Error('app not deployed'),
     );
+  });
+
+  test.skip('app.pushAppSecret()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    const { address } = await deployRandomApp(iexec);
+    const randomWallet = getRandomWallet();
+    const randomIexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainOpenethereumUrl,
+          randomWallet.privateKey,
+        ),
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    await expect(randomIexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
+      Error(
+        `Wallet ${randomWallet.address} is not allowed to set secret for ${address}`,
+      ),
+    );
+    await expect(iexec.app.pushAppSecret(address, 'foo')).resolves.toBe(true);
+    await expect(iexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
+      Error(`Secret already exists for ${address} and can't be updated`),
+    );
+  });
+
+  test.skip('app.checkAppSecretExists()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    const { address } = await deployRandomApp(iexec);
+    await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(false);
+    await iexec.app.pushAppSecret(address, 'foo');
+    await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(true);
   });
 });
 
@@ -3152,8 +3211,8 @@ describe('[dataset]', () => {
     expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
     expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
 
-    await expect(iexec.dataset.showDataset(utils.NULL_ADDRESS)).rejects.toThrow(
-      new errors.ObjectNotFoundError('dataset', utils.NULL_ADDRESS, networkId),
+    await expect(iexec.dataset.showDataset(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('dataset', NULL_ADDRESS, networkId),
     );
   });
 
@@ -3169,15 +3228,8 @@ describe('[dataset]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const dataset = {
-      owner: userAddress,
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    };
     const resBeforeDeploy = await iexec.dataset.countUserDatasets(userAddress);
-    await iexec.dataset.deployDataset(dataset);
+    await deployRandomDataset(iexec);
     const res = await iexec.dataset.countUserDatasets(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -3222,7 +3274,7 @@ describe('[dataset]', () => {
 
   test('dataset.pushDatasetSecret()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3258,7 +3310,7 @@ describe('[dataset]', () => {
   test('dataset.pushDatasetSecret() (not deployed)', async () => {
     const randomAddress = getRandomAddress();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3282,7 +3334,7 @@ describe('[dataset]', () => {
 
   test('dataset.pushDatasetSecret() (invalid owner)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3295,12 +3347,8 @@ describe('[dataset]', () => {
         smsURL,
       },
     );
-    const datasetDeployRes = await iexec.dataset.deployDataset({
+    const datasetDeployRes = await deployRandomDataset(iexec, {
       owner: POOR_ADDRESS2,
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
     });
     const datasetAddress = datasetDeployRes.address;
     await expect(
@@ -3314,7 +3362,7 @@ describe('[dataset]', () => {
 
   test('dataset.checkDatasetSecretExists()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -3327,13 +3375,7 @@ describe('[dataset]', () => {
         smsURL,
       },
     );
-    const datasetDeployRes = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
+    const datasetDeployRes = await deployRandomDataset(iexec);
     const datasetAddress = datasetDeployRes.address;
     const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
       datasetAddress,
@@ -3372,6 +3414,60 @@ describe('[workerpool]', () => {
     );
   });
 
+  test('workerpool.setWorkerpoolApiUrl()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const { address } = await deployRandomWorkerpool(iexec);
+    const label = address.toLowerCase();
+    const domain = 'users.iexec.eth';
+    const name = `${label}.${domain}`;
+    await iexec.ens.claimName(label, domain);
+    await iexec.ens.configureResolution(name, address);
+    const res = await iexec.workerpool.setWorkerpoolApiUrl(
+      address,
+      'https://my-workerpool.com',
+    );
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('workerpool.getWorkerpoolApiUrl()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const { address } = await deployRandomWorkerpool(iexec);
+    const resNoApiUrl = await iexec.workerpool.getWorkerpoolApiUrl(address);
+    expect(resNoApiUrl).toBe(undefined);
+
+    const label = address.toLowerCase();
+    const domain = 'users.iexec.eth';
+    const name = `${label}.${domain}`;
+    await iexec.ens.claimName(label, domain);
+    await iexec.ens.configureResolution(name, address);
+    const apiUrl = 'https://my-workerpool.com';
+    await iexec.workerpool.setWorkerpoolApiUrl(address, apiUrl);
+    const resConfigured = await iexec.workerpool.getWorkerpoolApiUrl(address);
+    expect(resConfigured).toBe(apiUrl);
+  });
+
   test('workerpool.showWorkerpool()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3397,14 +3493,8 @@ describe('[workerpool]', () => {
     expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
     expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
 
-    await expect(
-      iexec.workerpool.showWorkerpool(utils.NULL_ADDRESS),
-    ).rejects.toThrow(
-      new errors.ObjectNotFoundError(
-        'workerpool',
-        utils.NULL_ADDRESS,
-        networkId,
-      ),
+    await expect(iexec.workerpool.showWorkerpool(NULL_ADDRESS)).rejects.toThrow(
+      new errors.ObjectNotFoundError('workerpool', NULL_ADDRESS, networkId),
     );
   });
 
@@ -3420,14 +3510,10 @@ describe('[workerpool]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const workerpool = {
-      owner: userAddress,
-      description: `workerpool${getId()}`,
-    };
     const resBeforeDeploy = await iexec.workerpool.countUserWorkerpools(
       userAddress,
     );
-    await iexec.workerpool.deployWorkerpool(workerpool);
+    await deployRandomWorkerpool(iexec);
     const res = await iexec.workerpool.countUserWorkerpools(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
     expect(res).toBeInstanceOf(BN);
@@ -3751,6 +3837,53 @@ describe('[order]', () => {
     });
   });
 
+  test('order.createRequestorder() with iexec_secrets', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const app = getRandomAddress();
+    const order = await iexec.order.createRequestorder({
+      app,
+      category: 5,
+      params: {
+        iexec_secrets: {
+          1: 'foo',
+        },
+      },
+      tag: ['tee'],
+    });
+    expect(order).toEqual({
+      app,
+      appmaxprice: '0',
+      beneficiary: ADDRESS,
+      callback: '0x0000000000000000000000000000000000000000',
+      category: '5',
+      dataset: '0x0000000000000000000000000000000000000000',
+      datasetmaxprice: '0',
+      params: {
+        iexec_secrets: {
+          1: 'foo',
+        },
+        iexec_result_storage_provider: 'ipfs',
+        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      },
+      requester: ADDRESS,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: '0',
+      volume: '1',
+      workerpool: '0x0000000000000000000000000000000000000000',
+      workerpoolmaxprice: '0',
+    });
+  });
+
   test('order.signApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3762,14 +3895,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.app.deployApp({
-      owner: await iexec.wallet.getAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const { address } = await deployRandomApp(iexec);
     const order = await iexec.order.createApporder({
       app: address,
     });
@@ -3794,13 +3920,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
+    const { address } = await deployRandomDataset(iexec);
     const order = await iexec.order.createDatasetorder({
       dataset: address,
     });
@@ -3825,10 +3945,7 @@ describe('[order]', () => {
         isNative: false,
       },
     );
-    const { address } = await iexec.workerpool.deployWorkerpool({
-      owner: await iexec.wallet.getAddress(),
-      description: `workerpool${getId()}`,
-    });
+    const { address } = await deployRandomWorkerpool(iexec);
     const order = await iexec.order.createWorkerpoolorder({
       workerpool: address,
       category: 5,
@@ -4183,7 +4300,7 @@ describe('[order]', () => {
     );
     const order = await iexec.order
       .createRequestorder({
-        app: utils.NULL_ADDRESS,
+        app: NULL_ADDRESS,
         appmaxprice: 0,
         workerpoolmaxprice: 0,
         requester: await iexec.wallet.getAddress(),
@@ -5674,7 +5791,7 @@ describe('[order]', () => {
 
   test('order.publishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5694,7 +5811,7 @@ describe('[order]', () => {
 
   test('order.publishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5714,7 +5831,7 @@ describe('[order]', () => {
 
   test('order.publishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5734,7 +5851,7 @@ describe('[order]', () => {
 
   test('order.publishRequestorder() (no checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5755,9 +5872,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -5772,7 +5889,7 @@ describe('[order]', () => {
 
   test('order.publishRequestorder() (checkRequest)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
     );
     const iexec = new IExec(
@@ -5788,7 +5905,7 @@ describe('[order]', () => {
       },
     );
     const appOwnerSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppOwner = new IExec(
@@ -5826,7 +5943,7 @@ describe('[order]', () => {
 
   test('order.unpublishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5850,7 +5967,7 @@ describe('[order]', () => {
 
   test('order.unpublishDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5876,7 +5993,7 @@ describe('[order]', () => {
 
   test('order.unpublishWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5904,7 +6021,7 @@ describe('[order]', () => {
 
   test('order.unpublishRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5925,9 +6042,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -5948,7 +6065,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -5984,7 +6101,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6022,7 +6139,7 @@ describe('[order]', () => {
 
   test('order.unpublishLastWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6063,7 +6180,7 @@ describe('[order]', () => {
   test('order.unpublishLastRequestorder()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       privateKey,
     );
     const iexec = new IExec(
@@ -6078,7 +6195,7 @@ describe('[order]', () => {
       },
     );
     const appDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppDev = new IExec(
@@ -6099,9 +6216,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6137,7 +6254,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllApporders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6172,7 +6289,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllDatasetorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6209,7 +6326,7 @@ describe('[order]', () => {
 
   test('order.unpublishAllWorkerpoolorders()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6249,7 +6366,7 @@ describe('[order]', () => {
   test('order.unpublishAllRequestorders()', async () => {
     const { privateKey, address } = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       privateKey,
     );
     const iexec = new IExec(
@@ -6264,7 +6381,7 @@ describe('[order]', () => {
       },
     );
     const appDevSigner = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexecAppDev = new IExec(
@@ -6285,9 +6402,9 @@ describe('[order]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6324,7 +6441,7 @@ describe('[order]', () => {
 describe('[orderbook]', () => {
   test('orderbook.fetchApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6352,7 +6469,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6380,7 +6497,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6408,7 +6525,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6429,9 +6546,9 @@ describe('[orderbook]', () => {
         requester: await iexec.wallet.getAddress(),
         app: apporder.app,
         appmaxprice: apporder.appprice,
-        dataset: utils.NULL_ADDRESS,
+        dataset: NULL_ADDRESS,
         datasetmaxprice: 0,
-        workerpool: utils.NULL_ADDRESS,
+        workerpool: NULL_ADDRESS,
         workerpoolmaxprice: 0,
         category: 1,
         trust: 0,
@@ -6454,7 +6571,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchAppOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6489,7 +6606,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchDatasetOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
 
@@ -6527,7 +6644,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6566,7 +6683,7 @@ describe('[orderbook]', () => {
 
   test('orderbook.fetchRequestOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6595,7 +6712,7 @@ describe('[orderbook]', () => {
     for (let i = 0; i < 25; i += 1) {
       await iexec.order
         .signRequestorder(
-          { ...requestorder, workerpool: utils.NULL_ADDRESS },
+          { ...requestorder, workerpool: NULL_ADDRESS },
           { checkRequest: false },
         )
         .then((o) =>
@@ -6623,7 +6740,7 @@ describe('[orderbook]', () => {
 describe('[deal]', () => {
   test('deal.fetchRequesterDeals()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6699,7 +6816,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6742,7 +6859,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByDatasetorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6785,7 +6902,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByWorkerpoolorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -6832,7 +6949,7 @@ describe('[deal]', () => {
 
   test('deal.fetchDealsByRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       PRIVATE_KEY,
     );
     const iexec = new IExec(
@@ -7615,7 +7732,7 @@ describe('[storage]', () => {
   test('storage.defaultStorageLogin()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7638,7 +7755,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7664,7 +7781,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (provider: "default")', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7694,7 +7811,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (provider: "dropbox")', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7724,7 +7841,7 @@ describe('[storage]', () => {
   test('storage.pushStorageToken() (forceUpdate)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7752,7 +7869,7 @@ describe('[storage]', () => {
   test('storage.checkStorageTokenExists()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7792,7 +7909,7 @@ describe('[result]', () => {
   test('result.pushResultEncryptionKey()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7818,7 +7935,7 @@ describe('[result]', () => {
   test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7846,7 +7963,7 @@ describe('[result]', () => {
   test('result.checkResultEncryptionKeyExists()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainParityUrl,
+      tokenChainOpenethereumUrl,
       randomWallet.privateKey,
     );
     const iexec = new IExec(
@@ -7944,6 +8061,58 @@ describe('[result]', () => {
   });
 });
 
+describe.skip('[secrets]', () => {
+  test('secrets.pushRequesterSecret()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
+    expect(pushRes.isPushed).toBe(true);
+    await expect(
+      iexec.secrets.pushRequesterSecret('foo', 'oops'),
+    ).rejects.toThrow(
+      Error(`Secret "foo" already exists for ${randomWallet.address}`),
+    );
+  });
+
+  test('result.checkRequesterSecretExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    await expect(
+      iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo'),
+    ).resolves.toBe(false);
+    await iexec.secrets.pushRequesterSecret('foo', 'oops');
+    await expect(
+      iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo'),
+    ).resolves.toBe(true);
+  });
+});
+
 describe('[ens]', () => {
   test('resolve ens on iExec mainnet sidechaine', async () => {
     const signer = utils.getSignerFromPrivateKey(
@@ -8020,7 +8189,7 @@ describe('[ens]', () => {
     expect(res).toBe(NULL_ADDRESS);
   });
 
-  test('ens.resoleName(name) known names resolves to address', async () => {
+  test('ens.resolveName(name) known names resolves to address', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
       {
@@ -8082,6 +8251,33 @@ describe('[ens]', () => {
     );
     const res = await iexec.ens.lookupAddress(getRandomAddress());
     expect(res).toBe(null);
+  });
+
+  test('ens.getDefaultDomain(address)', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        isNative: false,
+      },
+    );
+    const { address: appAddress } = await deployRandomApp(iexec);
+    const { address: datasetAddress } = await deployRandomDataset(iexec);
+    const { address: workerpoolAddress } = await deployRandomWorkerpool(iexec);
+    const appDomain = await iexec.ens.getDefaultDomain(appAddress);
+    expect(appDomain).toBe('apps.iexec.eth');
+    const datasetDomain = await iexec.ens.getDefaultDomain(datasetAddress);
+    expect(datasetDomain).toBe('datasets.iexec.eth');
+    const workerpoolDomain = await iexec.ens.getDefaultDomain(
+      workerpoolAddress,
+    );
+    expect(workerpoolDomain).toBe('pools.iexec.eth');
+    const defaultDomain = await iexec.ens.getDefaultDomain(getRandomAddress());
+    expect(defaultDomain).toBe('users.iexec.eth');
   });
 
   test('ens.claimName(label) available name', async () => {
@@ -8340,14 +8536,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const app1 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app1 = await deployRandomApp(iexec);
 
     const label = `address_${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -8373,14 +8562,7 @@ describe('[ens]', () => {
     expect(reconfigureSameRes.setNameTxHash).toBeUndefined();
     expect(reconfigureSameRes.setResolverTxHash).toBeUndefined();
 
-    const app2 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app2 = await deployRandomApp(iexec);
 
     const reconfigureRes = await iexec.ens.configureResolution(
       name,
@@ -8434,14 +8616,7 @@ describe('[ens]', () => {
       },
     );
 
-    const app = await iexec.app.deployApp({
-      owner: getRandomAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app = await deployRandomApp(iexec, { owner: getRandomAddress() });
     const label = `address_${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
@@ -8576,23 +8751,9 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const app1 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app1 = await deployRandomApp(iexec);
 
-    const app2 = await iexec.app.deployApp({
-      owner: wallet.address,
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    });
+    const app2 = await deployRandomApp(iexec);
 
     const label = `address_${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -8704,13 +8865,8 @@ describe('[ens]', () => {
       },
     );
 
-    const app = await iexec.app.deployApp({
+    const app = await deployRandomApp(iexec, {
       owner: getRandomAddress(),
-      name: `app${getId()}`,
-      type: 'DOCKER',
-      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-      checksum:
-        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     });
     const label = `address_${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
@@ -8794,6 +8950,284 @@ describe('[ens]', () => {
         `Target address ${address} is not a contract and don't match current wallet address ${ADDRESS}, impossible to setup ENS resolution`,
       ),
     );
+  });
+
+  test('ens.setTextRecord(name, key, value) throw with unconfigured resolver', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const name = `${getId()}.users.iexec.eth`;
+    await expect(iexec.ens.setTextRecord(name, 'key', 'value')).rejects.toThrow(
+      Error(`No resolver is configured for ${name}`),
+    );
+  });
+
+  test('ens.setTextRecord(name, key, value) throw when the name is not owned', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = getId();
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name);
+
+    const randomWallet = getRandomWallet();
+    const signerNotOwner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      randomWallet.privateKey,
+    );
+    const iexecNotOwner = new IExec(
+      {
+        ethProvider: signerNotOwner,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    await expect(
+      iexecNotOwner.ens.setTextRecord(name, 'key', 'value'),
+    ).rejects.toThrow(
+      Error(
+        `${randomWallet.address} is not authorised to set a text record for ${name}`,
+      ),
+    );
+  });
+
+  test('ens.setTextRecord(name, key, value)', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const { address } = await deployRandomWorkerpool(iexec);
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+
+    const key = `key_${getId()}`;
+    const value = `value_${getId()}`;
+    const res = await iexec.ens.setTextRecord(name, key, value);
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('ens.setTextRecord(name, key)', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const { address } = await deployRandomWorkerpool(iexec);
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+
+    const key = `key_${getId()}`;
+    const res = await iexec.ens.setTextRecord(name, key);
+    expect(res).toMatch(bytes32Regex);
+  });
+
+  test('ens.readTextRecord(name, key) throw with unconfigured resolver', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+    const address = getRandomAddress();
+    const label = `address_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    await expect(iexec.ens.readTextRecord(name, 'key')).rejects.toThrow(
+      Error(`No resolver is configured for ${name}`),
+    );
+  });
+
+  test('ens.readTextRecord(name, key) record not set', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const label = getId();
+    const name = `${label}.users.iexec.eth`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name);
+    const res = await iexec.ens.readTextRecord(name, 'key');
+    expect(res).toBe('');
+  });
+
+  test('ens.readTextRecord(name, key)', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        ensRegistryAddress,
+        ensPublicResolverAddress,
+        isNative: false,
+      },
+    );
+
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainUrl,
+      PRIVATE_KEY,
+    );
+    const richIexec = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        isNative: false,
+      },
+    );
+    await richIexec.wallet.sendETH('0.1 ether', wallet.address);
+
+    const { address } = await deployRandomWorkerpool(iexec);
+    const label = `workerpool_${address.toLowerCase()}`;
+    const name = `${label}.users.iexec.eth`;
+    const key = `key_${getId()}`;
+    const value = `value_${getId()}`;
+    await iexec.ens.claimName(label);
+    await iexec.ens.configureResolution(name, address);
+    await iexec.ens.setTextRecord(name, key, value);
+    const res = await iexec.ens.readTextRecord(name, key);
+    expect(res).toBe(value);
   });
 });
 

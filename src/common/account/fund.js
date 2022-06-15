@@ -1,45 +1,20 @@
 const Debug = require('debug');
 const BN = require('bn.js');
-const { getAddress, isInWhitelist, checkBalances } = require('./wallet');
+const { checkBalance } = require('./balance');
+const { getAddress } = require('../wallet/address');
+const { isInWhitelist } = require('../wallet/enterprise');
+const { checkBalances } = require('../wallet/balance');
 const {
   checkEvent,
-  ethersBnToBn,
   bnNRlcToBnWei,
   bnToEthersBn,
-  NULL_BYTES,
   checkSigner,
 } = require('../utils/utils');
-const {
-  nRlcAmountSchema,
-  addressSchema,
-  throwIfMissing,
-} = require('../utils/validator');
+const { NULL_BYTES } = require('../utils/constant');
+const { nRlcAmountSchema, throwIfMissing } = require('../utils/validator');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
 
-const debug = Debug('iexec:account');
-
-const checkBalance = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
-  try {
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(address);
-    const iexecContract = contracts.getIExecContract();
-    const { stake, locked } = await wrapCall(
-      iexecContract.viewAccount(vAddress),
-    );
-    const balance = {
-      stake: ethersBnToBn(stake),
-      locked: ethersBnToBn(locked),
-    };
-    return balance;
-  } catch (error) {
-    debug('checkBalance()', error);
-    throw error;
-  }
-};
+const debug = Debug('iexec:account:fund');
 
 const deposit = async (
   contracts = throwIfMissing(),
@@ -137,7 +112,6 @@ const withdraw = async (
 };
 
 module.exports = {
-  checkBalance,
   deposit,
   withdraw,
 };

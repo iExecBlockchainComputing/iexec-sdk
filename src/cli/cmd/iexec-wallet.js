@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const wallet = require('../../common/modules/wallet');
+const wallet = require('../../common/wallet');
 const {
   Keystore,
   createAndSave,
   importPrivateKeyAndSave,
 } = require('../utils/keystore');
-const {
-  formatEth,
-  formatRLC,
-  NULL_ADDRESS,
-} = require('../../common/utils/utils');
+const { formatEth, formatRLC } = require('../../common/utils/utils');
+const { NULL_ADDRESS } = require('../../common/utils/constant');
 const {
   nRlcAmountSchema,
   weiAmountSchema,
@@ -35,6 +32,8 @@ const {
   getPropertyFormChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
+const { lookupAddress } = require('../../common/ens/resolution');
+const { ConfigurationError } = require('../../common/utils/errors');
 
 const objName = 'wallet';
 
@@ -151,18 +150,25 @@ show
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
-      const balances = await wallet.checkBalances(
-        chain.contracts,
-        addressToShow,
-      );
+      const [balances, ens] = await Promise.all([
+        wallet.checkBalances(chain.contracts, addressToShow),
+        lookupAddress(chain.contracts, addressToShow).catch((e) => {
+          if (e instanceof ConfigurationError) {
+            /** no ENS */
+          } else {
+            throw e;
+          }
+        }),
+      ]);
+      if (ens) {
+        spinner.info(`ENS: ${ens}`);
+      }
       const displayBalances = {
         ether: chain.contracts.isNative ? undefined : formatEth(balances.wei),
         RLC: formatRLC(balances.nRLC),
       };
       spinner.succeed(
-        `Wallet ${chain.name} balances [${chain.id}]:${pretty(
-          displayBalances,
-        )}`,
+        `Wallet balances [${chain.id}]:${pretty(displayBalances)}`,
         {
           raw: {
             balance: {
@@ -173,6 +179,7 @@ show
                 : balances.wei.toString(),
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
+            ens,
           },
         },
       );

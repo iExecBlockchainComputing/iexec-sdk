@@ -15,13 +15,17 @@ const { wrapCall } = require('./errorWrappers');
 
 const debug = Debug('validators');
 
+const posIntRegex = /^\d+$/;
+
+const posStrictIntRegex = /^[1-9]\d*$/;
+
 const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
       const trimed = value.replace(/^0+/, '');
       return trimed.length > 0 ? trimed : '0';
     })
-    .matches(/^[0-9]*$/, message || '${originalValue} is not a valid number');
+    .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
 const integerSchema = () => number().integer();
 
@@ -231,6 +235,59 @@ const objParamsSchema = () =>
           .required(),
       },
     ),
+    [paramsKeyName.IEXEC_SECRETS]: mixed()
+      .transform((value) => {
+        if (Array.isArray(value)) {
+          return value.reduce((acc, val, i) => {
+            acc[i + 1] = val;
+            return acc;
+          }, {});
+        }
+        return value;
+      })
+      .when('$isTee', {
+        is: true,
+        then: object()
+          .test(
+            'keys-are-int',
+            '${path} keys must be strictly positive integers',
+            (value) => {
+              if (
+                value !== undefined &&
+                Object.keys(value).find((key) => !posStrictIntRegex.test(key))
+              ) {
+                return false;
+              }
+              return true;
+            },
+          )
+          .test(
+            'values-are-string',
+            '${path} values must be strings',
+            (value) => {
+              if (
+                value !== undefined &&
+                Object.values(value).find(
+                  (val) => typeof val !== 'string' || val.length === 0,
+                )
+              ) {
+                return false;
+              }
+              return true;
+            },
+          ),
+        otherwise: mixed().test(
+          'is-not-defined',
+          '${path} is not supported for non TEE tasks',
+          (value) => {
+            if (value === undefined) {
+              return true;
+            }
+            return false;
+          },
+        ),
+      }),
+
     [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
       `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
       {
@@ -288,6 +345,19 @@ const paramsInputFilesArraySchema = () =>
         .url('"${value}" is not a valid URL')
         .required('"${value}" is not a valid URL'),
     );
+
+const paramsSecretsArraySchema = () =>
+  array()
+    .transform((value, originalValue) => {
+      if (Array.isArray(originalValue)) {
+        return originalValue;
+      }
+      if (typeof originalValue === 'string') {
+        return originalValue.split(',');
+      }
+      return value;
+    })
+    .of(string().required('"${value}" is not a valid secret name'));
 
 const paramsEncryptResultSchema = () => boolean();
 
@@ -686,6 +756,12 @@ const ensLabelSchema = () =>
       },
     );
 
+const textRecordKeySchema = () => string().required().strict(true);
+
+const textRecordValueSchema = () => string().default('').strict(true);
+
+const workerpoolApiUrlSchema = () => string().url().default('');
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -715,6 +791,7 @@ module.exports = {
   objParamsSchema,
   paramsArgsSchema,
   paramsInputFilesArraySchema,
+  paramsSecretsArraySchema,
   paramsEncryptResultSchema,
   paramsStorageProviderSchema,
   tagSchema,
@@ -732,5 +809,8 @@ module.exports = {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
+  workerpoolApiUrlSchema,
   ValidationError,
 };

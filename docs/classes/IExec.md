@@ -29,6 +29,7 @@ module exposing all the iExec SDK modules
 - [order](IExec.md#order)
 - [orderbook](IExec.md#orderbook)
 - [result](IExec.md#result)
+- [secrets](IExec.md#secrets)
 - [storage](IExec.md#storage)
 - [task](IExec.md#task)
 - [wallet](IExec.md#wallet)
@@ -148,6 +149,14 @@ ___
 • **result**: [`IExecResultModule`](IExecResultModule.md)
 
 result module
+
+___
+
+### secrets
+
+• **secrets**: [`IExecSecretsModule`](IExecSecretsModule.md)
+
+secrets module
 
 ___
 

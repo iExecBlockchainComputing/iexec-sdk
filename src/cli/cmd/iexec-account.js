@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const account = require('../../common/modules/account');
+const account = require('../../common/account');
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
-const {
-  stringifyNestedBn,
-  formatRLC,
-  NULL_ADDRESS,
-} = require('../../common/utils/utils');
+const { stringifyNestedBn, formatRLC } = require('../../common/utils/utils');
+const { NULL_ADDRESS } = require('../../common/utils/constant');
 const {
   finalizeCli,
   addGlobalOptions,

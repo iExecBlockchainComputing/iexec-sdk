@@ -4,11 +4,12 @@ const Debug = require('debug');
 const cli = require('commander');
 const path = require('path');
 const fs = require('fs-extra');
-const taskModule = require('../../common/modules/task');
+const { show, claim, obsTask } = require('../../common/execution/task');
+const { fetchTaskResults } = require('../../common/execution/result');
 const {
-  obsTask,
-  fetchTaskResults,
-} = require('../../common/modules/iexecProcess');
+  fetchTaskOffchainInfo,
+  fetchAllReplicatesLogs,
+} = require('../../common/execution/debug');
 const {
   stringifyNestedBn,
   decryptResult,
@@ -37,10 +38,10 @@ const objName = 'task';
 
 cli.name('iexec task').usage('<command> [options]');
 
-const show = cli.command('show <taskid>');
-addGlobalOptions(show);
-addWalletLoadOptions(show);
-show
+const showTask = cli.command('show <taskid>');
+addGlobalOptions(showTask);
+addWalletLoadOptions(showTask);
+showTask
   .option(...option.chain())
   .option(...option.watch())
   .option(...option.download())
@@ -85,7 +86,7 @@ show
         });
       }
       const taskResult =
-        taskFinalState || (await taskModule.show(chain.contracts, taskid));
+        taskFinalState || (await show(chain.contracts, taskid));
       spinner.info(`Task status ${taskResult.statusName}`);
       let resultPath;
       if (opts.download) {
@@ -179,10 +180,65 @@ show
     }
   });
 
-const claim = cli.command('claim <taskid>');
-addGlobalOptions(claim);
-addWalletLoadOptions(claim);
-claim
+const debugTask = cli.command('debug <taskid>');
+addGlobalOptions(debugTask);
+addWalletLoadOptions(debugTask);
+debugTask
+  .option(...option.chain())
+  .option('--logs', 'show application logs')
+  .description(desc.debugTask())
+  .action(async (taskid, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const chain = await loadChain(opts.chain, { spinner });
+
+      if (opts.logs) {
+        // Requester wallet authentiation is required to access logs
+        const walletOptions = await computeWalletLoadOptions(opts);
+        const keystore = Keystore(walletOptions);
+        await connectKeystore(chain, keystore);
+      }
+
+      spinner.start('Fetching debug information');
+      const onchainData = await show(chain.contracts, taskid);
+      const offchainData = await fetchTaskOffchainInfo(
+        chain.contracts,
+        taskid,
+      ).catch((e) => {
+        spinner.warn(`Failed to fetch off-chain data: ${e.message}`);
+      });
+
+      const appLogs = opts.logs
+        ? await fetchAllReplicatesLogs(chain.contracts, taskid).catch((e) => {
+            spinner.warn(`Failed to fetch app logs: ${e.message}`);
+          })
+        : undefined;
+
+      const raw = {
+        onchainData: stringifyNestedBn(onchainData),
+        offchainData,
+        appLogs,
+      };
+      spinner.succeed(`Task ${taskid}:\n`, {
+        raw,
+      });
+      spinner.info(`On-chain data:\n${pretty(raw.onchainData)}\n`);
+      if (raw.offchainData) {
+        spinner.info(`Off-chain data:\n${pretty(raw.offchainData)}`);
+      }
+      if (raw.appLogs && raw.appLogs.length > 0) {
+        spinner.info(`App logs:\n${pretty(raw.appLogs)}`);
+      }
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const claimTask = cli.command('claim <taskid>');
+addGlobalOptions(claimTask);
+addWalletLoadOptions(claimTask);
+claimTask
   .option(...option.chain())
   .option(...option.txGasPrice())
   .option(...option.txConfirms())
@@ -198,7 +254,7 @@ claim
       await connectKeystore(chain, keystore, { txOptions });
 
       spinner.start(info.claiming(objName));
-      const txHash = await taskModule.claim(chain.contracts, taskid);
+      const txHash = await claim(chain.contracts, taskid);
       spinner.succeed('Task successfully claimed', { raw: { txHash } });
     } catch (error) {
       handleError(error, cli, opts);

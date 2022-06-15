@@ -11,7 +11,8 @@ const { decryptResult } = require('../../common/utils/utils');
 const {
   getResultEncryptionKeyName,
 } = require('../../common/utils/secrets-utils');
-const secretMgtServ = require('../../common/modules/sms');
+const { checkWeb2SecretExists } = require('../../common/sms/check');
+const { pushWeb2Secret } = require('../../common/sms/push');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -238,7 +239,7 @@ pushSecret
       const publicKey = await fs.readFile(secretFilePath, 'utf8');
       const secretToPush = Buffer.from(publicKey, 'utf8').toString('base64');
       debug('secretToPush', secretToPush);
-      const { isPushed, isUpdated } = await secretMgtServ.pushWeb2Secret(
+      const { isPushed, isUpdated } = await pushWeb2Secret(
         contracts,
         sms,
         getResultEncryptionKeyName(),
@@ -285,7 +286,7 @@ checkSecret
       }
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
-      const secretExists = await secretMgtServ.checkWeb2SecretExists(
+      const secretExists = await checkWeb2SecretExists(
         contracts,
         sms,
         keyAddress,

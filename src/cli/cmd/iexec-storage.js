@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 const cli = require('commander');
-const secretMgtServ = require('../../common/modules/sms');
-const resultProxyServ = require('../../common/modules/result-proxy');
+const { checkWeb2SecretExists } = require('../../common/sms/check');
+const { pushWeb2Secret } = require('../../common/sms/push');
+const {
+  login: resultProxyLogin,
+} = require('../../common/storage/result-proxy');
 const { getStorageTokenKeyName } = require('../../common/utils/secrets-utils');
 const {
   finalizeCli,
@@ -47,7 +50,7 @@ initStorage
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
 
-      const tokenExists = await secretMgtServ.checkWeb2SecretExists(
+      const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
         address,
@@ -64,7 +67,7 @@ initStorage
       let token;
       if (providerName === 'default') {
         await connectKeystore(chain, keystore);
-        token = await resultProxyServ.login(contracts, resultProxyURL);
+        token = await resultProxyLogin(contracts, resultProxyURL);
       } else {
         token =
           opts.token ||
@@ -73,7 +76,7 @@ initStorage
           }));
         await connectKeystore(chain, keystore);
       }
-      const { isPushed, isUpdated } = await secretMgtServ.pushWeb2Secret(
+      const { isPushed, isUpdated } = await pushWeb2Secret(
         contracts,
         smsURL,
         tokenKeyName,
@@ -120,7 +123,7 @@ checkStorage
       spinner.info(
         `Checking ${providerName} storage token for user ${userAdress}`,
       );
-      const tokenExists = await secretMgtServ.checkWeb2SecretExists(
+      const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
         userAdress,

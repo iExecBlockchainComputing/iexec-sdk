@@ -11,6 +11,7 @@ const IExecNetworkModule = require('./IExecNetworkModule');
 const IExecOrderModule = require('./IExecOrderModule');
 const IExecOrderbookModule = require('./IExecOrderbookModule');
 const IExecResultModule = require('./IExecResultModule');
+const IExecSecretsModule = require('./IExecSecretsModule');
 const IExecStorageModule = require('./IExecStorageModule');
 const IExecTaskModule = require('./IExecTaskModule');
 const IExecWalletModule = require('./IExecWalletModule');
@@ -33,6 +34,7 @@ const sdk = {
   IExecOrderModule,
   IExecOrderbookModule,
   IExecResultModule,
+  IExecSecretsModule,
   IExecStorageModule,
   IExecTaskModule,
   IExecWalletModule,

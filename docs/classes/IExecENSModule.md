@@ -24,10 +24,13 @@ module exposing ENS methods
 
 - [claimName](IExecENSModule.md#claimname)
 - [configureResolution](IExecENSModule.md#configureresolution)
+- [getDefaultDomain](IExecENSModule.md#getdefaultdomain)
 - [getOwner](IExecENSModule.md#getowner)
 - [lookupAddress](IExecENSModule.md#lookupaddress)
 - [obsConfigureResolution](IExecENSModule.md#obsconfigureresolution)
+- [readTextRecord](IExecENSModule.md#readtextrecord)
 - [resolveName](IExecENSModule.md#resolvename)
+- [setTextRecord](IExecENSModule.md#settextrecord)
 - [fromConfig](IExecENSModule.md#fromconfig)
 
 ## Constructors
@@ -70,7 +73,7 @@ current IExecConfig
 register a subdomain (label) on an ENS FIFSRegistrar
 
 _NB_:
-- if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth"
+- if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth" (use `getDefaultDomain(address)` to determine the best suited domain for an address)
 - if the user already own the domain, the register transaction will not occur
 
 example:
@@ -134,6 +137,34 @@ console.log('configured resolution:', address, '<=>', name);
 #### Returns
 
 `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
+
+___
+
+### getDefaultDomain
+
+▸ **getDefaultDomain**(`address`): `Promise`<`string`\>
+
+get the default free to use ENS domain given an address
+
+_NB_:
+- the ENS domain is determined by the nature of the address (app, dataset, workerpool, other)
+- the returned ENS domain is controlled by a FIFSRegistrar that allocates subdomains to the first person to claim them
+
+example:
+```js
+const domain = await getDefaultDomain(address);
+console.log('default domain:', domain);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 
@@ -241,6 +272,31 @@ configureResolutionObservable.subscribe({
 
 ___
 
+### readTextRecord
+
+▸ **readTextRecord**(`name`, `key`): `Promise`<`string`\>
+
+read an ENS text record associated to an ENS name
+
+example:
+```js
+const value = await readTextRecord('me.users.iexec.eth', 'email');
+console.log('email record:', value);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
 ### resolveName
 
 ▸ **resolveName**(`name`): `Promise`<`string`\>
@@ -258,6 +314,41 @@ console.log('me.users.iexec.eth:', address);
 | Name | Type |
 | :------ | :------ |
 | `name` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### setTextRecord
+
+▸ **setTextRecord**(`name`, `key`, `value?`): `Promise`<`string`\>
+
+**ONLY ENS NAME OWNER**
+
+set a text record associated to an ENS name
+
+_NB_:
+- if value is not specified, the text record is reset to `""`
+
+example:
+```js
+const txHash = setTextRecord(
+  'me.users.iexec.eth',
+  'email',
+  'me@iex.ec'
+);
+console.log('txHash:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
+| `value?` | `string` |
 
 #### Returns
 

@@ -1,10 +1,10 @@
 const Debug = require('debug');
-const { getAddress } = require('./wallet');
+const { getAddress } = require('../wallet/address');
 const { getAuthorization, httpRequest } = require('../utils/api-utils');
 const { throwIfMissing } = require('../utils/validator');
 const { checkSigner } = require('../utils/utils');
 
-const debug = Debug('iexec:result-proxy');
+const debug = Debug('iexec:storage:result-proxy');
 
 const login = async (
   contracts = throwIfMissing(),

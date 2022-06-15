@@ -84,6 +84,31 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "internalType": "bytes32", "name": "node", "type": "bytes32" },
+        { "internalType": "string", "name": "key", "type": "string" },
+        { "internalType": "string", "name": "value", "type": "string" }
+      ],
+      "name": "setText",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        { "internalType": "bytes32", "name": "node", "type": "bytes32" },
+        { "internalType": "string", "name": "key", "type": "string" }
+      ],
+      "name": "text",
+      "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
     }
   ],
   "network": {}

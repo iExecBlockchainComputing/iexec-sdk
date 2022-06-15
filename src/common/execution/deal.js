@@ -1,14 +1,8 @@
 const Debug = require('debug');
 const { defaultAbiCoder, keccak256 } = require('ethers').utils;
-const { showCategory, getTimeoutRatio } = require('./hub');
-const {
-  cleanRPC,
-  bnifyNestedEthersBn,
-  ethersBnToBn,
-  NULL_ADDRESS,
-  BN,
-  checkSigner,
-} = require('../utils/utils');
+const { showCategory } = require('../protocol/category');
+const { getTimeoutRatio } = require('../protocol/configuration');
+const { ethersBnToBn, BN, checkSigner } = require('../utils/utils');
 const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
 const {
   chainIdSchema,
@@ -19,10 +13,18 @@ const {
   positiveStrictIntSchema,
   throwIfMissing,
 } = require('../utils/validator');
-const { ObjectNotFoundError } = require('../utils/errors');
 const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
+const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} = require('../utils/constant');
+const { viewDeal, viewTask } = require('./common');
+const { obsTask } = require('./task');
+const { Observable, SafeObserver } = require('../utils/reactive');
 
-const debug = Debug('iexec:deal');
+const debug = Debug('iexec:execution:deal');
 
 const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
@@ -119,16 +121,7 @@ const show = async (
 ) => {
   try {
     const vDealid = await bytes32Schema().validate(dealid);
-    const { chainId } = contracts;
-    const iexecContract = contracts.getIExecContract();
-    const deal = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
-    );
-    const dealExists =
-      deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
-    if (!dealExists) {
-      throw new ObjectNotFoundError('deal', dealid, chainId);
-    }
+    const deal = await viewDeal(contracts, dealid);
     const [{ workClockTimeRef }, timeoutRatio] = await Promise.all([
       showCategory(contracts, deal.category),
       getTimeoutRatio(contracts),
@@ -156,22 +149,87 @@ const show = async (
   }
 };
 
-const getTaskStatus = async (
-  contracts = throwIfMissing(),
-  taskid = throwIfMissing(),
-) => {
-  try {
-    const vTaskId = await bytes32Schema().validate(taskid);
-    const iexecContract = contracts.getIExecContract();
-    const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
-    );
-    return new BN(task.status).toNumber();
-  } catch (error) {
-    debug('getTaskStatus()', error);
-    throw error;
-  }
+const obsDealMessages = {
+  DEAL_UPDATED: 'DEAL_UPDATED',
+  DEAL_COMPLETED: 'DEAL_COMPLETED',
+  DEAL_TIMEDOUT: 'DEAL_TIMEDOUT',
 };
+
+const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) =>
+  new Observable((observer) => {
+    const safeObserver = new SafeObserver(observer);
+    let taskWatchers = [];
+
+    const startWatch = async () => {
+      try {
+        const deal = await show(contracts, dealid);
+        const tasks = Object.entries(deal.tasks).reduce(
+          (acc, [idx, taskid]) => {
+            acc[idx] = { idx, taskid };
+            return acc;
+          },
+          {},
+        );
+
+        const callNext = () => {
+          const tasksCopy = { ...tasks };
+          const tasksArray = Object.values(tasksCopy);
+          if (!tasksArray.find(({ status }) => status === undefined)) {
+            let complete = false;
+            const tasksCount = tasksArray.length;
+            const completedTasksCount = tasksArray.filter(
+              (task) => task.status === 3,
+            ).length;
+            const failedTasksCount = tasksArray.filter(
+              (task) => task.taskTimedOut === true,
+            ).length;
+            let message;
+            if (completedTasksCount === tasksCount) {
+              message = obsDealMessages.DEAL_COMPLETED;
+              complete = true;
+            } else if (completedTasksCount + failedTasksCount === tasksCount) {
+              message = obsDealMessages.DEAL_TIMEDOUT;
+              complete = true;
+            } else {
+              message = obsDealMessages.DEAL_UPDATED;
+            }
+            safeObserver.next({
+              message,
+              tasksCount,
+              completedTasksCount,
+              failedTasksCount,
+              deal: { ...deal },
+              tasks: tasksCopy,
+            });
+            if (complete) {
+              safeObserver.complete();
+            }
+          }
+        };
+
+        taskWatchers = Object.entries(tasks).map(([idx, { taskid }]) =>
+          obsTask(contracts, taskid, { dealid }).subscribe({
+            next: ({ task }) => {
+              tasks[idx] = { ...tasks[idx], ...task };
+              callNext();
+            },
+            error: (e) => {
+              safeObserver.error(e);
+              taskWatchers.map((unsub) => unsub());
+            },
+          }),
+        );
+      } catch (e) {
+        safeObserver.error(e);
+      }
+    };
+
+    safeObserver.unsub = () => {
+      taskWatchers.map((unsub) => unsub());
+    };
+    startWatch();
+    return safeObserver.unsubscribe.bind(safeObserver);
+  });
 
 const claim = async (
   contracts = throwIfMissing(),
@@ -196,7 +254,8 @@ const claim = async (
 
     await Promise.all(
       Object.entries(tasks).map(async ([idx, taskid]) => {
-        const taskStatus = await getTaskStatus(contracts, taskid);
+        const task = await viewTask(contracts, taskid, { strict: false });
+        const taskStatus = new BN(task.status).toNumber();
         if (taskStatus === 0) {
           notInitialized.push({ idx, taskid });
         } else if (taskStatus < 3) {
@@ -287,9 +346,47 @@ const claim = async (
   }
 };
 
+const apiDealField = {
+  [APP_ORDER]: 'apporderHash',
+  [DATASET_ORDER]: 'datasetorderHash',
+  [WORKERPOOL_ORDER]: 'workerpoolorderHash',
+  [REQUEST_ORDER]: 'requestorderHash',
+};
+
+const fetchDealsByOrderHash = async (
+  iexecGatewayURL = throwIfMissing(),
+  orderName = throwIfMissing(),
+  chainId = throwIfMissing(),
+  orderHash = throwIfMissing(),
+) => {
+  try {
+    const vChainId = await chainIdSchema().validate(chainId);
+    const vOrderHash = await bytes32Schema().validate(orderHash);
+    const hashName = apiDealField[orderName];
+    const query = {
+      chainId: vChainId,
+      [hashName]: vOrderHash,
+    };
+    const response = await jsonApi.get({
+      api: iexecGatewayURL,
+      endpoint: '/deals',
+      query,
+    });
+    if (response.ok && response.deals) {
+      return { count: response.count, deals: response.deals };
+    }
+    throw Error('An error occured while getting deals');
+  } catch (error) {
+    debug('fetchDealsByOrderHash()', error);
+    throw error;
+  }
+};
+
 module.exports = {
   show,
+  obsDeal,
   computeTaskId,
   fetchRequesterDeals,
+  fetchDealsByOrderHash,
   claim,
 };

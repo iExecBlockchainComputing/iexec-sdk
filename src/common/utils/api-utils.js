@@ -34,7 +34,7 @@ const makeHeaders = (method, headers, body) => {
 
 const httpRequest =
   (method) =>
-  async ({ api, endpoint, query = {}, body = {}, headers = {} }) => {
+  async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
     debug(
       'httpRequest()',
       '\nmethod',
@@ -50,13 +50,16 @@ const httpRequest =
       '\nheaders',
       headers,
     );
-    const baseURL = api;
+    const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(method, query);
-    const url = baseURL.concat(endpoint, queryString);
+    const url = baseURL.concat(queryString);
     const response = await fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
+    }).catch((error) => {
+      debug(`httpRequest() fetch:`, error);
+      throw Error(`Connection to ${baseURL} failed with a network error`);
     });
     return response;
   };
@@ -75,9 +78,27 @@ const checkResponseOk = (response) => {
 const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
-    const json = await response.json();
-    if (json.error) throw new Error(`API error: ${json.error}`);
-    if (response.status === 200 && json) return json;
+    if (response.ok) {
+      const json = await response.json();
+      return json;
+    }
+    const errorMessage = await response
+      .json()
+      .then((json) => json && json.error)
+      .catch(() => {});
+    if (errorMessage) throw new Error(`API error: ${errorMessage}`);
+    throw Error(
+      `API error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
+  }
+  if (!response.ok) {
+    throw Error(
+      `API error: ${response.status} ${
+        response.statusText ? response.statusText : ''
+      }`,
+    );
   }
   throw new Error('The http response is not of JSON type');
 };
@@ -138,8 +159,11 @@ const getAuthorization =
         },
       });
       const typedData = challenge.data || challenge;
-      const { domain, message } = typedData;
-      const { EIP712Domain, ...types } = typedData.types;
+      const { domain, message } = typedData || {};
+      const { EIP712Domain, ...types } = typedData.types || {};
+      if (!domain || !types || !message) {
+        throw Error('Unexpected challenge format');
+      }
       const sign = await wrapSignTypedData(
         // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
         // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
@@ -158,7 +182,7 @@ const getAuthorization =
       return authorization;
     } catch (error) {
       debug('getAuthorization()', error);
-      throw Error('Failed to get authorization');
+      throw Error(`Failed to get authorization: ${error}`);
     }
   };
 

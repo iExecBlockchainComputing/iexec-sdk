@@ -24,6 +24,26 @@ const storageInitButton = document.getElementById('storage-init-button');
 const storageInitError = document.getElementById('storage-init-error');
 const storageCheckOutput = document.getElementById('storage-check-output');
 const storageCheckError = document.getElementById('storage-check-error');
+const requesterSecretCheckNameInput = document.getElementById(
+  'secret-check-name-input',
+);
+const requesterSecretCheckButton = document.getElementById(
+  'secret-check-button',
+);
+const requesterSecretCheckOutput = document.getElementById(
+  'secret-check-output',
+);
+const requesterSecretCheckError = document.getElementById('secret-check-error');
+const requesterSecretPushNameInput = document.getElementById(
+  'secret-push-name-input',
+);
+const requesterSecretPushValueInput = document.getElementById(
+  'secret-push-value-input',
+);
+const requesterSecretPushButton = document.getElementById('secret-push-button');
+const requesterSecretPushOutput = document.getElementById('secret-push-output');
+const requesterSecretPushError = document.getElementById('secret-push-error');
+
 const appsShowInput = document.getElementById('apps-address-input');
 const appsShowButton = document.getElementById('apps-show-button');
 const appsShowError = document.getElementById('apps-show-error');
@@ -157,6 +177,41 @@ const initStorage = (iexec) => async () => {
     storageInitError.innerText = error;
   } finally {
     storageInitButton.disabled = false;
+  }
+};
+
+const checkRequesterSecret = (iexec) => async () => {
+  try {
+    requesterSecretCheckButton.disabled = true;
+    requesterSecretCheckOutput.innerText = '';
+    requesterSecretCheckError.innerText = '';
+    const secretName = requesterSecretCheckNameInput.value;
+    const isSecretSet = await iexec.secrets.checkRequesterSecretExists(
+      await iexec.wallet.getAddress(),
+      secretName,
+    );
+    requesterSecretCheckOutput.innerText = isSecretSet
+      ? `secret "${secretName}" set`
+      : `secret "${secretName}" no set`;
+  } catch (error) {
+    requesterSecretCheckError.innerText = error.message;
+  } finally {
+    requesterSecretCheckButton.disabled = false;
+  }
+};
+
+const pushRequesterSecret = (iexec) => async () => {
+  try {
+    requesterSecretPushButton.disabled = true;
+    requesterSecretPushError.innerText = '';
+    const secretName = requesterSecretPushNameInput.value;
+    const secretValue = requesterSecretPushValueInput.value;
+    await iexec.secrets.pushRequesterSecret(secretName, secretValue);
+    requesterSecretPushOutput.innerText = `secret "${secretName}" set`;
+  } catch (error) {
+    requesterSecretPushError.innerText = error;
+  } finally {
+    requesterSecretPushButton.disabled = false;
   }
 };
 
@@ -329,6 +384,14 @@ const init = async () => {
     walletBTMButton.addEventListener('click', bridgeToMainchain(iexec));
     walletBTSButton.addEventListener('click', bridgeToSidechain(iexec));
     storageInitButton.addEventListener('click', initStorage(iexec));
+    requesterSecretCheckButton.addEventListener(
+      'click',
+      checkRequesterSecret(iexec),
+    );
+    requesterSecretPushButton.addEventListener(
+      'click',
+      pushRequesterSecret(iexec),
+    );
     appsShowButton.addEventListener('click', showApp(iexec));
     buyBuyButton.addEventListener('click', buyComputation(iexec));
     previousDealsButton.addEventListener('click', showPreviousDeals(iexec));
@@ -340,6 +403,8 @@ const init = async () => {
     walletBTMButton.disabled = false;
     walletBTSButton.disabled = false;
     storageInitButton.disabled = false;
+    requesterSecretCheckButton.disabled = false;
+    requesterSecretPushButton.disabled = false;
     appsShowButton.disabled = false;
     buyBuyButton.disabled = false;
     previousDealsButton.disabled = false;
