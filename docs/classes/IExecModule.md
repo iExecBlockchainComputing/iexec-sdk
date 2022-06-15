@@ -30,6 +30,8 @@ module base
 
   ↳ [`IExecResultModule`](IExecResultModule.md)
 
+  ↳ [`IExecSecretsModule`](IExecSecretsModule.md)
+
   ↳ [`IExecStorageModule`](IExecStorageModule.md)
 
   ↳ [`IExecTaskModule`](IExecTaskModule.md)

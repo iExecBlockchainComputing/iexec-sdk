@@ -25,6 +25,7 @@
 - [IExecOrderModule](classes/IExecOrderModule.md)
 - [IExecOrderbookModule](classes/IExecOrderbookModule.md)
 - [IExecResultModule](classes/IExecResultModule.md)
+- [IExecSecretsModule](classes/IExecSecretsModule.md)
 - [IExecStorageModule](classes/IExecStorageModule.md)
 - [IExecTaskModule](classes/IExecTaskModule.md)
 - [IExecWalletModule](classes/IExecWalletModule.md)

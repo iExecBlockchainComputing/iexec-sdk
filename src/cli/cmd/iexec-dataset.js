@@ -413,12 +413,12 @@ pushSecret
         (await loadDeployedObj(objName).then(
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
-      debug('resourceAddress', resourceAddress);
       if (!resourceAddress) {
         throw Error(
           'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
+      spinner.info(`Dataset ${resourceAddress}`);
 
       let secretFilePath;
       if (opts.secretPath) {
@@ -458,7 +458,6 @@ pushSecret
 
 const checkSecret = cli.command('check-secret [datasetAddress]');
 addGlobalOptions(checkSecret);
-addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())

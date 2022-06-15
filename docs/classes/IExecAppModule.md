@@ -22,8 +22,10 @@ module exposing app methods
 
 ### Methods
 
+- [checkAppSecretExists](IExecAppModule.md#checkappsecretexists)
 - [countUserApps](IExecAppModule.md#countuserapps)
 - [deployApp](IExecAppModule.md#deployapp)
+- [pushAppSecret](IExecAppModule.md#pushappsecret)
 - [showApp](IExecAppModule.md#showapp)
 - [showUserApp](IExecAppModule.md#showuserapp)
 - [fromConfig](IExecAppModule.md#fromconfig)
@@ -60,6 +62,30 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### checkAppSecretExists
+
+▸ **checkAppSecretExists**(`appAddress`): `Promise`<`boolean`\>
+
+check if a secret exists for the app in the Secret Management Service
+
+example:
+```js
+const isSecretSet = await checkAppSecretExists(appAddress);
+console.log('app secret set:', isSecretSet);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+___
 
 ### countUserApps
 
@@ -125,6 +151,37 @@ console.log('deployed at', address);
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
+
+___
+
+### pushAppSecret
+
+▸ **pushAppSecret**(`appAddress`, `secretValue`): `Promise`<`boolean`\>
+
+**SIGNER REQUIRED, ONLY APP OWNER**
+
+push an application secret to the Secret Management Service
+
+_NB_:
+- pushed secret will be available for the app in `tee` tasks.
+- once pushed a secret can not be updated
+
+example:
+```js
+const isPushed = await pushAppSecret(appAddress, "passw0rd");
+console.log('pushed App secret:', isPushed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `secretValue` | `String` |
+
+#### Returns
+
+`Promise`<`boolean`\>
 
 ___
 

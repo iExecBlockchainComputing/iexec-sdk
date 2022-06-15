@@ -96,6 +96,8 @@ async function main() {
 
   cli.command('workerpool', 'manage iExec workerpools');
 
+  cli.command('requester', 'commands for the requester');
+
   cli.command('order', 'manage iExec marketplace orders');
 
   cli.command('orderbook', 'show marketplace orderbook');

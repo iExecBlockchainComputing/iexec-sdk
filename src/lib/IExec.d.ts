@@ -10,6 +10,7 @@ import IExecNetworkModule from './IExecNetworkModule';
 import IExecOrderModule from './IExecOrderModule';
 import IExecOrderbookModule from './IExecOrderbookModule';
 import IExecResultModule from './IExecResultModule';
+import IExecSecretsModule from './IExecSecretsModule';
 import IExecStorageModule from './IExecStorageModule';
 import IExecTaskModule from './IExecTaskModule';
 import IExecWalletModule from './IExecWalletModule';
@@ -59,6 +60,10 @@ export default class IExec extends IExecModule {
    * result module
    */
   result: IExecResultModule;
+  /**
+   * secrets module
+   */
+  secrets: IExecSecretsModule;
   /**
    * storage module
    */

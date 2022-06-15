@@ -9,6 +9,7 @@ const IExecNetworkModule = require('./IExecNetworkModule');
 const IExecOrderModule = require('./IExecOrderModule');
 const IExecOrderbookModule = require('./IExecOrderbookModule');
 const IExecResultModule = require('./IExecResultModule');
+const IExecSecretsModule = require('./IExecSecretsModule');
 const IExecStorageModule = require('./IExecStorageModule');
 const IExecTaskModule = require('./IExecTaskModule');
 const IExecWalletModule = require('./IExecWalletModule');
@@ -29,6 +30,7 @@ class IExec extends IExecModule {
     this.orderbook = IExecOrderbookModule.fromConfig(this.config);
     this.task = IExecTaskModule.fromConfig(this.config);
     this.result = IExecResultModule.fromConfig(this.config);
+    this.secrets = IExecSecretsModule.fromConfig(this.config);
     this.storage = IExecStorageModule.fromConfig(this.config);
     this.ens = IExecENSModule.fromConfig(this.config);
     this.network = IExecNetworkModule.fromConfig(this.config);

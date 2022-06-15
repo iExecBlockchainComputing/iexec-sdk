@@ -36,7 +36,8 @@
     "IExecWorkerpoolModule/",
     "IExecTaskModule/",
     "errors/",
-    "utils/"
+    "utils/",
+    "IExecSecretsModule/"
   ],
   "repository": {
     "type": "git",

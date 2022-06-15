@@ -3010,6 +3010,65 @@ describe('[app]', () => {
       Error('app not deployed'),
     );
   });
+
+  test.skip('app.pushAppSecret()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    const { address } = await deployRandomApp(iexec);
+    const randomWallet = getRandomWallet();
+    const randomIexec = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainOpenethereumUrl,
+          randomWallet.privateKey,
+        ),
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    await expect(randomIexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
+      Error(
+        `Wallet ${randomWallet.address} is not allowed to set secret for ${address}`,
+      ),
+    );
+    await expect(iexec.app.pushAppSecret(address, 'foo')).resolves.toBe(true);
+    await expect(iexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
+      Error(`Secret already exists for ${address} and can't be updated`),
+    );
+  });
+
+  test.skip('app.checkAppSecretExists()', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        smsURL,
+      },
+    );
+    const { address } = await deployRandomApp(iexec);
+    await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(false);
+    await iexec.app.pushAppSecret(address, 'foo');
+    await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(true);
+  });
 });
 
 describe('[dataset]', () => {
@@ -3775,6 +3834,53 @@ describe('[order]', () => {
       volume: '5',
       workerpool,
       workerpoolmaxprice: '100000000',
+    });
+  });
+
+  test('order.createRequestorder() with iexec_secrets', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        resultProxyURL: 'https://result-proxy.iex.ec',
+      },
+    );
+    const app = getRandomAddress();
+    const order = await iexec.order.createRequestorder({
+      app,
+      category: 5,
+      params: {
+        iexec_secrets: {
+          1: 'foo',
+        },
+      },
+      tag: ['tee'],
+    });
+    expect(order).toEqual({
+      app,
+      appmaxprice: '0',
+      beneficiary: ADDRESS,
+      callback: '0x0000000000000000000000000000000000000000',
+      category: '5',
+      dataset: '0x0000000000000000000000000000000000000000',
+      datasetmaxprice: '0',
+      params: {
+        iexec_secrets: {
+          1: 'foo',
+        },
+        iexec_result_storage_provider: 'ipfs',
+        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      },
+      requester: ADDRESS,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      trust: '0',
+      volume: '1',
+      workerpool: '0x0000000000000000000000000000000000000000',
+      workerpoolmaxprice: '0',
     });
   });
 
@@ -7952,6 +8058,58 @@ describe('[result]', () => {
     expect(err).toEqual(
       new Error('Failed to decrypt results key with beneficiary key'),
     );
+  });
+});
+
+describe.skip('[secrets]', () => {
+  test('secrets.pushRequesterSecret()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
+    expect(pushRes.isPushed).toBe(true);
+    await expect(
+      iexec.secrets.pushRequesterSecret('foo', 'oops'),
+    ).rejects.toThrow(
+      Error(`Secret "foo" already exists for ${randomWallet.address}`),
+    );
+  });
+
+  test('result.checkRequesterSecretExists()', async () => {
+    const randomWallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      randomWallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        isNative: false,
+        smsURL,
+      },
+    );
+    await expect(
+      iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo'),
+    ).resolves.toBe(false);
+    await iexec.secrets.pushRequesterSecret('foo', 'oops');
+    await expect(
+      iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo'),
+    ).resolves.toBe(true);
   });
 });
 

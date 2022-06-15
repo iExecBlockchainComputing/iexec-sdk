@@ -280,7 +280,7 @@ const requestorderTemplate = await createRequestorder({
 | `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
 | `overrides.dataset?` | `string` | dataset to use  default none |
 | `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task  default `0` |
-| `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string`  } | execution parameters |
+| `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\> \| `string`[]  } | execution parameters |
 | `overrides.requester?` | `string` | requester  default connected wallet address |
 | `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtimes with specified tags  default `[]` |
 | `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust  default `0` |

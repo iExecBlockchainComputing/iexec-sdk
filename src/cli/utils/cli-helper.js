@@ -324,6 +324,7 @@ const option = {
     '--token <token>',
     'storage provider authorization token (unsafe)',
   ],
+  secretValue: () => ['--secret-value <secretValue>', 'secret value (unsafe)'],
   skipRequestCheck: () => [
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
@@ -412,6 +413,10 @@ const orderOption = {
   requestArgs: () => [
     '--args <string>',
     'specify the arguments to pass to the app',
+  ],
+  requestSecrets: () => [
+    '--secrets <string>',
+    'specify the requester named secrets to pass to the app (only available for TEE tasks, use with --tag tee)\n* usage: --secrets login,password',
   ],
   requestInputFiles: () => [
     '--input-files <fileUrl>',

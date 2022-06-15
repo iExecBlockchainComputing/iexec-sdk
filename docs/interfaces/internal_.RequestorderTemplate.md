@@ -82,6 +82,7 @@ ___
 | `iexec_result_encryption?` | `boolean` |
 | `iexec_result_storage_provider?` | `string` |
 | `iexec_result_storage_proxy?` | `string` |
+| `iexec_secrets?` | `Record`<`number`, `string`\> |
 
 ___
 
