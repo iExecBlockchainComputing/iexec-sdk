@@ -8230,11 +8230,17 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
+        ensPublicResolverAddress,
         isNative: false,
       },
     );
-    const res = await iexec.ens.lookupAddress('admin.iexec.eth');
-    expect(res).toBe('admin.iexec.eth');
+    const label = `ens_${getId()}`;
+    const domain = 'users.iexec.eth';
+    const name = `${label}.${domain}`;
+    await iexec.ens.claimName(label, domain);
+    await iexec.ens.configureResolution(name);
+    const res = await iexec.ens.lookupAddress(name);
+    expect(res).toBe(name);
   });
 
   test('ens.lookupAddress(address) no reverse resolution', async () => {
