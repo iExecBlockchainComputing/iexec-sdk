@@ -22,6 +22,7 @@ pipeline:
     commands:
       - apt update
       - apt install xxd
+      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
@@ -38,6 +39,7 @@ pipeline:
     commands:
       - apt update
       - apt install xxd
+      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
