@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 - `show` commands display ENS when configured
 - `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
+- [DEPRECATED] Node 12 support will be droped
 
 ## [7.1.1] 2022-06-06
 
