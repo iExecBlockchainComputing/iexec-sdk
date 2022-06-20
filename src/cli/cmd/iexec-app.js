@@ -13,8 +13,8 @@ const {
   paramsInputFilesArraySchema,
   paramsStorageProviderSchema,
   paramsEncryptResultSchema,
+  paramsRequesterSecretsSchema,
   nRlcAmountSchema,
-  paramsSecretsArraySchema,
 } = require('../../common/utils/validator');
 const { teeApp } = require('../utils/templates');
 const {
@@ -104,7 +104,10 @@ const {
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { lookupAddress } = require('../../common/ens/resolution');
-const { ConfigurationError } = require('../../common/utils/errors');
+const {
+  ConfigurationError,
+  ValidationError,
+} = require('../../common/utils/errors');
 const { pushAppSecret } = require('../../common/sms/push');
 const { checkAppSecretExists } = require('../../common/sms/check');
 
@@ -622,9 +625,28 @@ run
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
-      const inputParamsSecrets = await paramsSecretsArraySchema().validate(
-        opts.secrets,
-      );
+
+      const inputParamsSecrets =
+        opts.secret &&
+        (await paramsRequesterSecretsSchema()
+          .label('requester secret')
+          .validate(
+            opts.secret.reduce((mappings, currMapping) => {
+              const separatorIndex = currMapping.indexOf('=');
+              if (separatorIndex === -1) {
+                throw new ValidationError(
+                  `'${currMapping}' is not a valid secret mapping syntax (must be <appSecretKey>=<requesterSecretName>)`,
+                  currMapping,
+                );
+              }
+              return {
+                ...mappings,
+                [currMapping.slice(0, separatorIndex)]: currMapping.slice(
+                  separatorIndex + 1,
+                ),
+              };
+            }, {}),
+          ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
       const inputParamsResultEncrytion =
@@ -1106,9 +1128,27 @@ requestRun
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
-      const inputParamsSecrets = await paramsSecretsArraySchema().validate(
-        opts.secrets,
-      );
+      const inputParamsSecrets =
+        opts.secret &&
+        (await paramsRequesterSecretsSchema()
+          .label('requester secret')
+          .validate(
+            opts.secret.reduce((mappings, currMapping) => {
+              const separatorIndex = currMapping.indexOf('=');
+              if (separatorIndex === -1) {
+                throw new ValidationError(
+                  `'${currMapping}' is not a valid secret mapping syntax (must be <appSecretKey>=<requesterSecretName>)`,
+                  currMapping,
+                );
+              }
+              return {
+                ...mappings,
+                [currMapping.slice(0, separatorIndex)]: currMapping.slice(
+                  separatorIndex + 1,
+                ),
+              };
+            }, {}),
+          ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
       const inputParamsResultEncrytion =

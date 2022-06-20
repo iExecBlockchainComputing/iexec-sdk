@@ -515,14 +515,14 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('"" is not a valid URL'),
+      new ValidationError('[0] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
     await expect(
       paramsInputFilesArraySchema().validate('example.com/foo.txt'),
     ).rejects.toThrow(
-      new ValidationError('"example.com/foo.txt" is not a valid URL'),
+      new ValidationError('[0] "example.com/foo.txt" is not a valid URL'),
     );
   });
   test('empty array', async () => {
@@ -587,7 +587,7 @@ describe('[objParamsSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_provider "foo" is not supported for TEE tasks use one of supported storage providers (ipfs, dropbox)',
+        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (ipfs, dropbox)',
       ),
     );
   });
@@ -635,23 +635,7 @@ describe('[objParamsSchema]', () => {
     );
   });
 
-  test('iexec_secrets can be an array', async () => {
-    await expect(
-      objParamsSchema().validate(
-        {
-          iexec_secrets: ['foo', undefined, undefined, 'bar'],
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-        },
-        { context: { isTee: true } },
-      ),
-    ).resolves.toEqual({
-      iexec_secrets: { 1: 'foo', 4: 'bar' },
-      iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-    });
-  });
-
-  test('iexec_secrets keys must be strictly positive integers', async () => {
+  test('iexec_secrets mapping keys must be strictly positive integers', async () => {
     await expect(
       objParamsSchema().validate(
         {
@@ -661,18 +645,22 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets keys must be strictly positive integers'),
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
     await expect(
       objParamsSchema().validate(
         {
-          iexec_secrets: { '0': 'foo' },
+          iexec_secrets: { 0: 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets keys must be strictly positive integers'),
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
     await expect(
       objParamsSchema().validate(
@@ -683,11 +671,13 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets keys must be strictly positive integers'),
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
   });
 
-  test('iexec_secrets values must be strings', async () => {
+  test('iexec_secrets mapping names must be strings', async () => {
     await expect(
       objParamsSchema().validate(
         {
@@ -697,7 +687,7 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets values must be strings'),
+      new ValidationError('iexec_secrets mapping names must be strings'),
     );
     await expect(
       objParamsSchema().validate(
@@ -708,7 +698,7 @@ describe('[objParamsSchema]', () => {
         { context: { isTee: true } },
       ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets values must be strings'),
+      new ValidationError('iexec_secrets mapping names must be strings'),
     );
   });
 
@@ -761,7 +751,7 @@ describe('[objParamsSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_input_files[1] https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf is not a valid URL',
+        'iexec_input_files[1] "https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
       ),
     );
   });
