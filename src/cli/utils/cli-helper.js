@@ -415,8 +415,8 @@ const orderOption = {
     'specify the arguments to pass to the app',
   ],
   requestSecrets: () => [
-    '--secrets <string>',
-    'specify the requester named secrets to pass to the app (only available for TEE tasks, use with --tag tee)\n* usage: --secrets login,password',
+    '--secret <secretMapping...>',
+    'specify the requester secrets mappings (<appSecretKey>=<requesterSecretName>) to use in the app (only available for TEE tasks, use with --tag tee)\n* usage: \n  * [command] [args] --secret 1=login 2=password\n  * [command] [args] --secret 1=login --secret 2=password\n  * [command] --secret 1=login --secret 2=password -- [args]\n* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list\n',
   ],
   requestInputFiles: () => [
     '--input-files <fileUrl>',

@@ -46,7 +46,7 @@
 - [Workerpool](../interfaces/internal_.Workerpool.md)
 - [WorkerpoolorderTemplate](../interfaces/internal_.WorkerpoolorderTemplate.md)
 
-### Type aliases
+### Type Aliases
 
 - [BNish](internal_.md#bnish)
 - [Bytes32](internal_.md#bytes32)
@@ -56,7 +56,7 @@
 - [Tag](internal_.md#tag)
 - [WeiAmount](internal_.md#weiamount)
 
-## Type aliases
+## Type Aliases
 
 ### BNish
 

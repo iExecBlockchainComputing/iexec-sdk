@@ -489,16 +489,14 @@ export default class IExecOrderModule extends IExecModule {
            *
            * ```js
            * const secret = {
-           *   0: 'login', // maps requester named secret "login" to app secret 0
-           *   1: 'password' // maps requester named secret "password" to app secret 1
+           *   1: 'login', // maps requester named secret "login" to app secret 1
+           *   2: 'password' // maps requester named secret "password" to app secret 2
            * };
-           * // or
-           * const secret = ['login','password'];
            * ```
            *
            * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
            */
-          iexec_secrets?: Record<number, string> | string[];
+          iexec_secrets?: Record<number, string>;
           /**
            * encrypt results
            *
