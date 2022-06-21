@@ -234,7 +234,7 @@ iexec account show # make sure you have enough staked RCL to buy computation
 ### Buy computation at market price on the Marketplace
 
 ```bash
-iexec app run [address] [--dataset [address] --args <args> --category <id>] # run an iExec application at market price
+iexec app run [address] [--dataset [address] --args <args> --category <id> --input-files <fileURLs> --secret <secretMapping...>] # run an iExec application at market price
 ```
 
 see [app run available options](#app-run)
@@ -242,7 +242,7 @@ see [app run available options](#app-run)
 ### Or Buy computation at limit price on the Marketplace
 
 ```bash
-iexec app request-execution [address] [--dataset [address] --args <args> --category <id>] # publish a requestorder on the Marketplace and get an orderHash
+iexec app request-execution [address] [--dataset [address] --args <args> --category <id> --input-files <fileURLs> --secret <secretMapping...>] # publish a requestorder on the Marketplace and get an orderHash
 iexec order show --request <orderHash> --deals # show your order on the Marketplace and check the deals
 ```
 
@@ -300,6 +300,7 @@ iexec account withdraw 1000 # withdraw RLC from your account to your wallet
 - [task](#task)
 - [storage](#storage)
 - [result](#result)
+- [requester](#requester)
 - [ens](#ens)
 - [category](#category)
 - [registry](#registry)
@@ -417,6 +418,7 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 --callback <address> # specify the callback address of the request
 --args <string> # specify the arguments to pass to the app
 --input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--secret <secretMapping> # specify the requester secrets mappings (<appSecretKey>=<requesterSecretName>) to use in the app (only available for TEE tasks, use with --tag tee)
 --encrypt-result # encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)
 --storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
 --skip-request-check # skip request validity checks, this may result in task execution fail
@@ -441,6 +443,7 @@ iexec app request-execution <appAddress> [options] # request an iExec applicatio
 --callback <address> # specify the callback address of the request
 --args <string> # specify the arguments to pass to the app
 --input-files <fileUrl...> # specify the URL of input files to be used by the app (usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip)
+--secret <secretMapping> # specify the requester secrets mappings (<appSecretKey>=<requesterSecretName>) to use in the app (only available for TEE tasks, use with --tag tee)
 --encrypt-result # encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)
 --storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
 --skip-request-check # skip request validity checks, this may result in task execution fail
@@ -540,6 +543,15 @@ iexec task show <taskid> --download [fileName] # download the result of a COMPLE
 iexec task show <taskid> --download [fileName] --decrypt # download and decrypt the result of a COMPLETED task
 iexec task claim <taskid> # claim a task requested by the user if the final deadline is reached and the task is still not COMPLETED
 iexec task debug <taskid> --logs # show task debug information and logs
+```
+
+## requester
+
+```bash
+# OPTIONS
+# --chain <chainName>
+iexec push-secret <secretName> # push a requester named secret to the secret management service
+iexec check-secret <secretName> [requesterAddress] # check if a secret exists in the secret management service
 ```
 
 ## result

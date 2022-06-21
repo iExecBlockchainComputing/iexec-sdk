@@ -24,14 +24,14 @@ const { Keystore } = require('../utils/keystore');
 
 cli.name('iexec requester').usage('<command> [options]');
 
-const pushSecret = cli.command('push-secret <name>');
+const pushSecret = cli.command('push-secret <secretName>');
 addGlobalOptions(pushSecret);
 addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
-  .description(desc.pushResultKey())
-  .action(async (name, opts) => {
+  .description(desc.pushRequesterSecret())
+  .action(async (secretName, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -47,7 +47,7 @@ pushSecret
       const { contracts } = chain;
       const sms = getPropertyFormChain(chain, 'sms');
 
-      spinner.info(`Secret "${name}" for address ${address}`);
+      spinner.info(`Secret "${secretName}" for address ${address}`);
       const secretValue =
         opts.secretValue ||
         (await prompt.password(`Paste your secret`, {
@@ -57,12 +57,12 @@ pushSecret
       const { isPushed } = await pushRequesterSecret(
         contracts,
         sms,
-        name,
+        secretName,
         secretValue,
       );
       if (isPushed) {
-        spinner.succeed(`Secret "${name}" successfully pushed`, {
-          raw: { isPushed, name },
+        spinner.succeed(`Secret "${secretName}" successfully pushed`, {
+          raw: { isPushed, name: secretName },
         });
       } else {
         throw Error('Something went wrong');
@@ -72,13 +72,13 @@ pushSecret
     }
   });
 
-const checkSecret = cli.command('check-secret <name> [address]');
+const checkSecret = cli.command('check-secret <secretName> [requesterAddress]');
 addGlobalOptions(checkSecret);
 addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
   .description(desc.checkSecret())
-  .action(async (name, address, opts) => {
+  .action(async (secretName, requesterAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
@@ -89,13 +89,13 @@ checkSecret
       const chain = await loadChain(opts.chain, {
         spinner,
       });
-      let keyAddress;
-      if (address) {
-        keyAddress = address;
+      let address;
+      if (requesterAddress) {
+        address = requesterAddress;
       } else {
-        [keyAddress] = await keystore.accounts();
+        [address] = await keystore.accounts();
         spinner.info(
-          `Checking secret "${name}" exists for wallet ${keyAddress}`,
+          `Checking secret "${secretName}" exists for wallet ${address}`,
         );
       }
       const { contracts } = chain;
@@ -103,17 +103,20 @@ checkSecret
       const secretExists = await checkRequesterSecretExists(
         contracts,
         sms,
-        keyAddress,
-        name,
+        address,
+        secretName,
       );
       if (secretExists) {
-        spinner.succeed(`Secret "${name}" found for address ${keyAddress}`, {
-          raw: { isSet: true, name },
+        spinner.succeed(`Secret "${secretName}" found for address ${address}`, {
+          raw: { isSet: true, name: secretName },
         });
       } else {
-        spinner.succeed(`No secret "${name}" found for address ${keyAddress}`, {
-          raw: { isSet: false, name },
-        });
+        spinner.succeed(
+          `No secret "${secretName}" found for address ${address}`,
+          {
+            raw: { isSet: false, name: secretName },
+          },
+        );
       }
     } catch (error) {
       handleError(error, cli, opts);

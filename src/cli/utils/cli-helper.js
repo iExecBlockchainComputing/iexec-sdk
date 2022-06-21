@@ -102,6 +102,8 @@ const desc = {
     'push the dataset secret to the secret management service (default push the last secret generated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () =>
     'push the public encryption key to the secret management service',
+  pushRequesterSecret: () =>
+    'push a requester named secret to the secret management service',
   checkSecret: () =>
     'check if a secret exists in the secret management service',
   encryptDataset: () =>
