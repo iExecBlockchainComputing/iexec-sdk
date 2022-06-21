@@ -1069,6 +1069,7 @@ requestRun
   .option(...orderOption.workerpoolprice())
   .option(...orderOption.requestArgs())
   .option(...orderOption.requestInputFiles())
+  .option(...orderOption.requestSecrets())
   .option(...orderOption.category())
   .option(...orderOption.tag())
   .option(...orderOption.volume())
