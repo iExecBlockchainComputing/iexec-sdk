@@ -193,12 +193,7 @@ const checkEvent = (eventName, events) => {
 };
 
 const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
-  let eventFound;
-  events.forEach((event) => {
-    if (event.event === eventName) {
-      eventFound = event;
-    }
-  });
+  const eventFound = events.find((event) => event.event === eventName);
   if (!eventFound) {
     if (strict) throw new Error(`Unknown event ${eventName}`);
     return {};
