@@ -4037,7 +4037,7 @@ describe('[order]', () => {
     });
   });
 
-  test('order.signRequestorder() (checkRequest dataset encryption)', async () => {
+  test('order.signRequestorder() (checkRequest dataset encryption key)', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
@@ -4096,7 +4096,7 @@ describe('[order]', () => {
         .then(iexecDatasetConsumer.order.signRequestorder),
     ).rejects.toThrow(
       Error(
-        `Dataset encryption key not set for ${dataset}. Dataset decryption will fail.`,
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       ),
     );
 
@@ -4114,6 +4114,77 @@ describe('[order]', () => {
           tag: ['tee'],
         })
         .then(iexecDatasetConsumer.order.signRequestorder),
+    ).resolves.toBeDefined();
+  });
+
+  test.skip('order.signRequestorder() (checkRequest requester secrets)', async () => {
+    const wallet = getRandomWallet();
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      wallet.privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    await iexec.storage
+      .defaultStorageLogin()
+      .then(iexec.storage.pushStorageToken);
+
+    // non requester secret pass
+    await expect(
+      iexec.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          tag: ['tee'],
+        })
+        .then(iexec.order.signRequestorder),
+    ).resolves.toBeDefined();
+
+    // unset secret fail
+    await iexec.secrets.pushRequesterSecret('foo', 'secret');
+    await expect(
+      iexec.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          tag: ['tee'],
+          params: {
+            iexec_secrets: {
+              1: 'foo',
+              2: 'bar',
+            },
+          },
+        })
+        .then(iexec.order.signRequestorder),
+    ).rejects.toThrow(
+      Error(
+        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisionning will fail.`,
+      ),
+    );
+    // set secrets pass
+    await iexec.secrets.pushRequesterSecret('bar', 'secret');
+    await expect(
+      iexec.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          tag: ['tee'],
+          params: {
+            iexec_secrets: {
+              1: 'foo',
+              2: 'bar',
+            },
+          },
+        })
+        .then(iexec.order.signRequestorder),
     ).resolves.toBeDefined();
   });
 

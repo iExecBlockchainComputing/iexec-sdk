@@ -9,7 +9,9 @@ All notable changes to this project will be documented in this file.
 - workerpool API url configuration
 - `iexec task debug <taskid> [--logs]` to show offchain information
 - `ens.getDefaultDomain(address)` to get the default free to use ENS domain given an address
+- support for requester secrets
 - check dataset secret exists on requestorder check
+- check requester secret exists on requestorder check
 
 ### Changed
 
