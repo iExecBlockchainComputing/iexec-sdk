@@ -427,7 +427,6 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const res = await iexec.hub.createCategory({
@@ -449,7 +448,6 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const owner = await iexec.wallet.getAddress();
@@ -496,7 +494,6 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const owner = await iexec.wallet.getAddress();
@@ -542,7 +539,6 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const owner = await iexec.wallet.getAddress();
@@ -598,7 +594,7 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -653,7 +649,7 @@ describe('[workflow]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -811,7 +807,6 @@ describe('[getSignerFromPrivateKey]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const senderInitialBalances = await iexec.wallet.checkBalances(
@@ -850,7 +845,6 @@ describe('[getSignerFromPrivateKey]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const senderInitialBalances = await iexec.wallet.checkBalances(
@@ -892,7 +886,6 @@ describe('[getSignerFromPrivateKey]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const senderInitialBalances = await iexec.wallet.checkBalances(
@@ -955,7 +948,6 @@ describe('[getSignerFromPrivateKey]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
 
@@ -1127,7 +1119,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const res = await iexec.wallet.getAddress();
@@ -1142,7 +1133,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1223,7 +1213,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1254,7 +1243,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1306,7 +1294,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1335,7 +1322,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1452,7 +1438,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(ADDRESS);
@@ -1485,7 +1470,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
 
@@ -1504,7 +1488,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(iexec.wallet.sendRLC(5, POOR_ADDRESS3)).rejects.toThrow(
@@ -1519,7 +1502,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const iexec = new IExec(
@@ -1531,7 +1513,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('10000000000000000', POOR_ADDRESS2);
@@ -1566,7 +1547,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const iexec = new IExec(
@@ -1578,7 +1558,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH(100, POOR_ADDRESS2);
@@ -1613,7 +1592,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const iexec = new IExec(
@@ -1625,7 +1603,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('55000000000000', POOR_ADDRESS2);
@@ -1730,7 +1707,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     const iexec = new IExec(
@@ -1744,7 +1720,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH(
@@ -1798,7 +1773,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(
@@ -1829,7 +1803,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(
@@ -1854,7 +1827,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -1869,7 +1841,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -1883,7 +1855,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -1926,7 +1898,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -1941,7 +1912,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -1955,7 +1926,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -2000,7 +1971,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -2015,7 +1985,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -2029,7 +1999,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -2074,7 +2044,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -2089,7 +2058,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -2103,7 +2072,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -2146,7 +2115,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -2161,7 +2129,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -2187,7 +2155,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await iexecRichman.wallet.sendETH('0.01 ether', randomWallet.address);
@@ -2204,7 +2171,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -2228,7 +2195,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress: enterpriseHubAddress,
         },
@@ -2253,7 +2220,7 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
+
         enterpriseSwapConf: {
           hubAddress,
         },
@@ -2278,7 +2245,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(iexecEnterprise.wallet.wrapEnterpriseRLC(5)).rejects.toThrow(
@@ -2298,7 +2264,6 @@ describe('[wallet]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await expect(iexecStandard.wallet.unwrapEnterpriseRLC(5)).rejects.toThrow(
@@ -2316,7 +2281,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2342,7 +2306,6 @@ describe('[account]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     const initialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2391,7 +2354,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2420,7 +2382,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2453,7 +2414,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2576,7 +2536,6 @@ describe('[account]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     const accountInitialBalance = await iexec.account.checkBalance(ADDRESS);
@@ -2611,7 +2570,6 @@ describe('[account]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(iexec.account.deposit(5)).rejects.toThrow(
@@ -2627,7 +2585,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexec.account.deposit(10);
@@ -2657,7 +2614,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexec.account.deposit(10000);
@@ -2689,7 +2645,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await iexec.account.deposit(10);
@@ -2812,7 +2767,6 @@ describe('[account]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await expect(iexec.account.withdraw(0)).rejects.toThrow(
@@ -2830,7 +2784,6 @@ describe('[account]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await iexec.account.deposit(10);
@@ -2866,7 +2819,6 @@ describe('[account]', () => {
       },
       {
         hubAddress: enterpriseHubAddress,
-        isNative: false,
       },
     );
     await expect(iexec.account.withdraw(5)).rejects.toThrow(
@@ -2884,7 +2836,6 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const app = {
@@ -2912,7 +2863,6 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const app = {
@@ -2956,7 +2906,6 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -2976,7 +2925,6 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -3081,7 +3029,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const key = iexec.dataset.generateEncryptionKey();
@@ -3097,7 +3044,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const key = iexec.dataset.generateEncryptionKey();
@@ -3137,7 +3083,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const key = iexec.dataset.generateEncryptionKey();
@@ -3165,7 +3110,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const dataset = {
@@ -3192,7 +3136,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const dataset = {
@@ -3225,7 +3168,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -3245,7 +3187,6 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -3284,7 +3225,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -3320,7 +3261,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -3344,7 +3285,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -3372,7 +3313,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -3399,7 +3340,6 @@ describe('[workerpool]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const workerpool = {
@@ -3425,7 +3365,6 @@ describe('[workerpool]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     const { address } = await deployRandomWorkerpool(iexec);
@@ -3451,7 +3390,6 @@ describe('[workerpool]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     const { address } = await deployRandomWorkerpool(iexec);
@@ -3477,7 +3415,6 @@ describe('[workerpool]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const workerpool = {
@@ -3507,7 +3444,6 @@ describe('[workerpool]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -3529,7 +3465,6 @@ describe('[workerpool]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const userAddress = await iexec.wallet.getAddress();
@@ -3564,7 +3499,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const app = getRandomAddress();
@@ -3590,7 +3524,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const app = getRandomAddress();
@@ -3625,7 +3558,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const dataset = getRandomAddress();
@@ -3651,7 +3583,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const dataset = getRandomAddress();
@@ -3686,7 +3617,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const workerpool = getRandomAddress();
@@ -3715,7 +3645,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const workerpool = getRandomAddress();
@@ -3754,7 +3683,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -3792,7 +3721,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -3846,7 +3775,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -3893,7 +3822,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const { address } = await deployRandomApp(iexec);
@@ -3918,7 +3846,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const { address } = await deployRandomDataset(iexec);
@@ -3943,7 +3870,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const { address } = await deployRandomWorkerpool(iexec);
@@ -3963,7 +3889,7 @@ describe('[order]', () => {
 
   test('order.signRequestorder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
+      tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
     );
     const iexec = new IExec(
@@ -3972,7 +3898,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -3995,7 +3920,7 @@ describe('[order]', () => {
 
   test('order.signRequestorder() (checkRequest default storage)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
+      tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
     );
     const iexec = new IExec(
@@ -4004,13 +3929,12 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
         resultProxyURL,
         smsURL,
       },
     );
     const order = await iexec.order.createRequestorder({
-      app: POOR_ADDRESS2,
+      app: getRandomAddress(),
       category: 5,
     });
 
@@ -4043,13 +3967,13 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL,
         smsURL,
       },
     );
     const order = await iexec.order.createRequestorder({
-      app: POOR_ADDRESS2,
+      app: getRandomAddress(),
       category: 5,
       tag: ['tee'],
       params: {
@@ -4076,7 +4000,7 @@ describe('[order]', () => {
 
   test('order.signRequestorder() (checkRequest with encryption)', async () => {
     const signer = utils.getSignerFromPrivateKey(
-      tokenChainUrl,
+      tokenChainOpenethereumUrl,
       getRandomWallet().privateKey,
     );
     const iexec = new IExec(
@@ -4085,13 +4009,12 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
         resultProxyURL,
         smsURL,
       },
     );
     const order = await iexec.order.createRequestorder({
-      app: POOR_ADDRESS2,
+      app: getRandomAddress(),
       category: 5,
       params: { iexec_result_encryption: true },
     });
@@ -4202,7 +4125,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await iexec.order.createApporder({
@@ -4229,7 +4151,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await iexec.order.createDatasetorder({
@@ -4256,7 +4177,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await iexec.order.createWorkerpoolorder({
@@ -4284,7 +4204,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -4315,7 +4235,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await deployAndGetApporder(iexec);
@@ -4335,7 +4254,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await deployAndGetDatasetorder(iexec);
@@ -4355,7 +4273,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     const order = await deployAndGetWorkerpoolorder(iexec);
@@ -4375,7 +4292,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -4405,7 +4322,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -4419,7 +4336,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
 
@@ -5022,7 +4938,6 @@ describe('[order]', () => {
         },
         {
           hubAddress: enterpriseHubAddress,
-          isNative: false,
         },
       );
       await iexecRichman.wallet.sendRLC('10 RLC', requesterWallet.address);
@@ -5043,7 +4958,7 @@ describe('[order]', () => {
         },
         {
           hubAddress: enterpriseHubAddress,
-          isNative: false,
+
           resultProxyURL: 'https://result-proxy.iex.ec',
         },
       );
@@ -5059,7 +4974,6 @@ describe('[order]', () => {
         },
         {
           hubAddress: enterpriseHubAddress,
-          isNative: false,
         },
       );
       const appDevSigner = utils.getSignerFromPrivateKey(
@@ -5074,7 +4988,6 @@ describe('[order]', () => {
         },
         {
           hubAddress: enterpriseHubAddress,
-          isNative: false,
         },
       );
       const datasetDevSigner = utils.getSignerFromPrivateKey(
@@ -5089,7 +5002,6 @@ describe('[order]', () => {
         },
         {
           hubAddress: enterpriseHubAddress,
-          isNative: false,
         },
       );
 
@@ -5795,7 +5707,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
         resultProxyURL,
       },
@@ -5812,7 +5724,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
         resultProxyURL,
       },
@@ -5827,7 +5739,6 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
 
@@ -5881,7 +5792,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -5901,7 +5812,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -5921,7 +5832,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -5941,7 +5852,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -5979,7 +5890,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         smsURL,
         resultProxyURL,
@@ -5995,7 +5906,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         smsURL,
         resultProxyURL,
@@ -6033,7 +5944,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6057,7 +5968,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6083,7 +5994,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6111,7 +6022,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6155,7 +6066,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6191,7 +6102,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6229,7 +6140,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6270,7 +6181,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6285,7 +6196,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6344,7 +6255,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6379,7 +6290,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6416,7 +6327,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6456,7 +6367,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6471,7 +6382,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6531,7 +6442,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6559,7 +6470,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6587,7 +6498,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6615,7 +6526,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6661,7 +6572,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6697,7 +6608,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6734,7 +6645,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
       },
     );
@@ -6773,7 +6684,7 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
         smsURL: 'https://sms.iex.ec',
@@ -6830,7 +6741,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6906,7 +6817,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6949,7 +6860,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -6992,7 +6903,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -7039,7 +6950,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
@@ -7079,7 +6990,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -7253,7 +7164,7 @@ describe('[deal]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -7467,7 +7378,7 @@ describe('[task]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -7621,7 +7532,7 @@ describe('[task]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL: 'https://result-proxy.iex.ec',
       },
     );
@@ -7822,7 +7733,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         resultProxyURL,
       },
     );
@@ -7845,7 +7756,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -7871,7 +7782,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -7901,7 +7812,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -7931,7 +7842,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -7959,7 +7870,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -7999,7 +7910,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -8025,7 +7936,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -8053,7 +7964,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -8155,7 +8066,7 @@ describe.skip('[secrets]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -8180,7 +8091,7 @@ describe.skip('[secrets]', () => {
       },
       {
         hubAddress,
-        isNative: false,
+
         smsURL,
       },
     );
@@ -8230,7 +8141,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const balance = await iexec.wallet.checkBalances('admin.iexec.eth');
@@ -8247,7 +8157,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const res = await iexec.ens.getOwner('admin.iexec.eth');
@@ -8263,7 +8172,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const res = await iexec.ens.getOwner('unregistered.iexec.eth');
@@ -8279,7 +8187,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const res = await iexec.ens.resolveName('admin.iexec.eth');
@@ -8295,7 +8202,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const res = await iexec.ens.resolveName('unknown.eth');
@@ -8312,7 +8218,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     const label = `ens_${getId()}`;
@@ -8333,7 +8238,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const res = await iexec.ens.lookupAddress(getRandomAddress());
@@ -8349,7 +8253,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
     const { address: appAddress } = await deployRandomApp(iexec);
@@ -8380,7 +8283,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
 
@@ -8394,7 +8296,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8424,7 +8325,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
 
@@ -8438,7 +8338,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8469,7 +8368,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
 
@@ -8483,7 +8381,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8510,7 +8407,6 @@ describe('[ens]', () => {
       {
         hubAddress,
         ensRegistryAddress,
-        isNative: false,
       },
     );
 
@@ -8524,7 +8420,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8552,7 +8447,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8566,7 +8460,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8604,7 +8497,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8618,7 +8510,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8676,7 +8567,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8699,7 +8589,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8727,7 +8616,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8757,7 +8645,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8771,7 +8658,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8819,7 +8705,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8833,7 +8718,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -8902,7 +8786,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -8948,7 +8831,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9001,7 +8883,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9049,7 +8930,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     const name = `${getId()}.users.iexec.eth`;
@@ -9072,7 +8952,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9086,7 +8965,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -9109,7 +8987,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     await expect(
@@ -9135,7 +9012,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9149,7 +9025,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -9180,7 +9055,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9194,7 +9068,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -9220,7 +9093,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
     const address = getRandomAddress();
@@ -9245,7 +9117,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9259,7 +9130,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
@@ -9286,7 +9156,6 @@ describe('[ens]', () => {
         hubAddress,
         ensRegistryAddress,
         ensPublicResolverAddress,
-        isNative: false,
       },
     );
 
@@ -9300,7 +9169,6 @@ describe('[ens]', () => {
       },
       {
         hubAddress,
-        isNative: false,
       },
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
