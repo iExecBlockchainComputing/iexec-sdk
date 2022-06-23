@@ -212,11 +212,7 @@ const secToDate = (secs) => {
   return t;
 };
 
-const getSalt = () => {
-  const hex = BigNumber.from(randomBytes(32)).toHexString().substring(2);
-  const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
-  return salt;
-};
+const getSalt = () => `0x${Buffer.from(randomBytes(32)).toString('hex')}`;
 
 const TAG_MAP = {
   tee: 1,
