@@ -4114,6 +4114,86 @@ describe('[order]', () => {
     });
   });
 
+  test('order.signRequestorder() (checkRequest dataset encryption)', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      getRandomWallet().privateKey,
+    );
+    const richSigner = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      PRIVATE_KEY,
+    );
+    const iexecDatasetProvider = new IExec(
+      {
+        ethProvider: richSigner,
+      },
+      {
+        hubAddress,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    const iexecDatasetConsumer = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        resultProxyURL,
+        smsURL,
+      },
+    );
+    await iexecDatasetConsumer.storage
+      .defaultStorageLogin()
+      .then(iexecDatasetConsumer.storage.pushStorageToken);
+    const { address: dataset } = await deployRandomDataset(
+      iexecDatasetProvider,
+    );
+
+    // non tee pass
+    await expect(
+      iexecDatasetConsumer.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          dataset,
+        })
+        .then(iexecDatasetConsumer.order.signRequestorder),
+    ).resolves.toBeDefined();
+
+    // tee fail without secret
+    await expect(
+      iexecDatasetConsumer.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          dataset,
+          tag: ['tee'],
+        })
+        .then(iexecDatasetConsumer.order.signRequestorder),
+    ).rejects.toThrow(
+      Error(
+        `Dataset encryption key not set for ${dataset}. Dataset decryption will fail.`,
+      ),
+    );
+
+    // tee pass with secret
+    await iexecDatasetProvider.dataset.pushDatasetSecret(
+      dataset,
+      iexecDatasetProvider.dataset.generateEncryptionKey(),
+    );
+    await expect(
+      iexecDatasetConsumer.order
+        .createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+          dataset,
+          tag: ['tee'],
+        })
+        .then(iexecDatasetConsumer.order.signRequestorder),
+    ).resolves.toBeDefined();
+  });
+
   test('order.hashApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
