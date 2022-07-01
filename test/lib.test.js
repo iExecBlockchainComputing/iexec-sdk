@@ -2960,7 +2960,7 @@ describe('[app]', () => {
     );
   });
 
-  test.skip('app.pushAppSecret()', async () => {
+  test('app.pushAppSecret()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       PRIVATE_KEY,
@@ -2999,7 +2999,7 @@ describe('[app]', () => {
     );
   });
 
-  test.skip('app.checkAppSecretExists()', async () => {
+  test('app.checkAppSecretExists()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       PRIVATE_KEY,
@@ -4117,7 +4117,7 @@ describe('[order]', () => {
     ).resolves.toBeDefined();
   });
 
-  test.skip('order.signRequestorder() (checkRequest requester secrets)', async () => {
+  test('order.signRequestorder() (checkRequest requester secrets)', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
@@ -8124,7 +8124,7 @@ describe('[result]', () => {
   });
 });
 
-describe.skip('[secrets]', () => {
+describe('[secrets]', () => {
   test('secrets.pushRequesterSecret()', async () => {
     const randomWallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
