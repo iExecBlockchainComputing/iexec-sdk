@@ -4,6 +4,8 @@ const {
   showApp,
   showUserApp,
   countUserApps,
+  predictAppAddress,
+  checkDeployedApp,
 } = require('../common/protocol/registries');
 const { checkAppSecretExists } = require('../common/sms/check');
 const { pushAppSecret } = require('../common/sms/push');
@@ -37,6 +39,10 @@ class IExecAppModule extends IExecModule {
         appAddress,
         appSecret,
       );
+    this.predictAppAddress = async (app) =>
+      predictAppAddress(await this.config.resolveContractsClient(), app);
+    this.checkDeployedApp = async (address) =>
+      checkDeployedApp(await this.config.resolveContractsClient(), address);
   }
 }
 

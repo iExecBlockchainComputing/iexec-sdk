@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - support for requester secrets
 - check dataset secret exists on requestorder check
 - check requester secret exists on requestorder check
+- app/dataset/workerpool predict address methods
+- app/dataset/workerpool check deployed methods
 
 ### Changed
 

@@ -23,11 +23,13 @@ module exposing dataset methods
 ### Methods
 
 - [checkDatasetSecretExists](IExecDatasetModule.md#checkdatasetsecretexists)
+- [checkDeployedDataset](IExecDatasetModule.md#checkdeployeddataset)
 - [computeEncryptedFileChecksum](IExecDatasetModule.md#computeencryptedfilechecksum)
 - [countUserDatasets](IExecDatasetModule.md#countuserdatasets)
 - [deployDataset](IExecDatasetModule.md#deploydataset)
 - [encrypt](IExecDatasetModule.md#encrypt)
 - [generateEncryptionKey](IExecDatasetModule.md#generateencryptionkey)
+- [predictDatasetAddress](IExecDatasetModule.md#predictdatasetaddress)
 - [pushDatasetSecret](IExecDatasetModule.md#pushdatasetsecret)
 - [showDataset](IExecDatasetModule.md#showdataset)
 - [showUserDataset](IExecDatasetModule.md#showuserdataset)
@@ -87,6 +89,30 @@ console.log('secret exists:', isSecretSet);
 #### Returns
 
 `Promise`<`boolean`\>
+
+___
+
+### checkDeployedDataset
+
+▸ **checkDeployedDataset**(`datasetAddress`): `Promise`<`Boolean`\>
+
+check if an dataset is deployed at a given address
+
+example:
+```js
+const isDeployed = await checkDeployedDataset(address);
+console.log('dataset deployed', isDeployed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
+
+#### Returns
+
+`Promise`<`Boolean`\>
 
 ___
 
@@ -170,13 +196,9 @@ console.log('deployed at', address);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `dataset` | `Object` | - |
-| `dataset.checksum` | `string` | sha256sum of the file |
-| `dataset.multiaddr` | [`Multiaddress`](../modules/internal_.md#multiaddress) | dataset file download address |
-| `dataset.name` | `string` | a name for the dataset |
-| `dataset.owner` | `string` | the dataset owner |
+| Name | Type |
+| :------ | :------ |
+| `dataset` | [`DatasetDeploymentArgs`](../interfaces/internal_.DatasetDeploymentArgs.md) |
 
 #### Returns
 
@@ -239,6 +261,35 @@ console.log('encryption key:', encryptionKey);
 #### Returns
 
 `string`
+
+___
+
+### predictDatasetAddress
+
+▸ **predictDatasetAddress**(`dataset`): `Promise`<`string`\>
+
+predict the dataset contract address given the dataset deployment arguments
+
+example:
+```js
+const address = await predictDatasetAddress({
+ owner: address,
+ name: 'cat.jpeg',
+ multiaddr: '/ipfs/Qmd286K6pohQcTKYqnS1YhWrCiS4gz7Xi34sdwMe9USZ7u',
+ checksum: '0x84a3f860d54f3f5f65e91df081c8d776e8bcfb5fbc234afce2f0d7e9d26e160d',
+});
+console.log('address', address);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dataset` | [`DatasetDeploymentArgs`](../interfaces/internal_.DatasetDeploymentArgs.md) |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

@@ -2,6 +2,17 @@ import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { Address, Addressish, BN, BNish, TxHash } from './types';
 
+export interface WorkerpoolDeploymentArgs {
+  /**
+   * the workerpool owner
+   */
+  owner: Addressish;
+  /**
+   * a description for the workerpool
+   */
+  description: string;
+}
+
 /**
  * IExec workerpool
  */
@@ -34,16 +45,34 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('deployed at', address);
    * ```
    */
-  deployWorkerpool(workerpool: {
-    /**
-     * the workerpool owner
-     */
-    owner: Addressish;
-    /**
-     * a description for the workerpool
-     */
-    description: string;
-  }): Promise<{ address: Address; txHash: TxHash }>;
+  deployWorkerpool(
+    workerpool: WorkerpoolDeploymentArgs,
+  ): Promise<{ address: Address; txHash: TxHash }>;
+  /**
+   * predict the workerpool contract address given the workerpool deployment arguments
+   *
+   * example:
+   * ```js
+   * const address = await predictWorkerpoolAddress({
+   *  owner: address,
+   *  description: 'My workerpool',
+   * });
+   * console.log('address', address);
+   * ```
+   */
+  predictWorkerpoolAddress(
+    workerpool: WorkerpoolDeploymentArgs,
+  ): Promise<Address>;
+  /**
+   * check if an workerpool is deployed at a given address
+   *
+   * example:
+   * ```js
+   * const isDeployed = await checkDeployedWorkerpool(address);
+   * console.log('workerpool deployed', isDeployed);
+   * ```
+   */
+  checkDeployedWorkerpool(workerpoolAddress: Addressish): Promise<Boolean>;
   /**
    * show a deployed workerpool details
    *

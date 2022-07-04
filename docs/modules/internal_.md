@@ -17,6 +17,7 @@
 ### Interfaces
 
 - [App](../interfaces/internal_.App.md)
+- [AppDeploymentArgs](../interfaces/internal_.AppDeploymentArgs.md)
 - [ApporderTemplate](../interfaces/internal_.ApporderTemplate.md)
 - [Category](../interfaces/internal_.Category.md)
 - [ConsumableApporder](../interfaces/internal_.ConsumableApporder.md)
@@ -24,6 +25,7 @@
 - [ConsumableRequestorder](../interfaces/internal_.ConsumableRequestorder.md)
 - [ConsumableWorkerpoolorder](../interfaces/internal_.ConsumableWorkerpoolorder.md)
 - [Dataset](../interfaces/internal_.Dataset.md)
+- [DatasetDeploymentArgs](../interfaces/internal_.DatasetDeploymentArgs.md)
 - [DatasetorderTemplate](../interfaces/internal_.DatasetorderTemplate.md)
 - [HashableApporder](../interfaces/internal_.HashableApporder.md)
 - [HashableDatasetorder](../interfaces/internal_.HashableDatasetorder.md)
@@ -44,6 +46,7 @@
 - [SignedRequestorder](../interfaces/internal_.SignedRequestorder.md)
 - [SignedWorkerpoolorder](../interfaces/internal_.SignedWorkerpoolorder.md)
 - [Workerpool](../interfaces/internal_.Workerpool.md)
+- [WorkerpoolDeploymentArgs](../interfaces/internal_.WorkerpoolDeploymentArgs.md)
 - [WorkerpoolorderTemplate](../interfaces/internal_.WorkerpoolorderTemplate.md)
 
 ### Type Aliases

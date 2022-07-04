@@ -82,11 +82,10 @@ const createArgs = {
   [WORKERPOOL]: ['owner', 'description'],
 };
 
-const deployObj =
+const predictObjAddress =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
     try {
-      checkSigner(contracts);
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
@@ -95,6 +94,22 @@ const deployObj =
       const predictedAddress = await wrapCall(
         registryContract[predictFonctionName](...args),
       );
+      return predictedAddress;
+    } catch (error) {
+      debug('predictObjAddress()', error);
+      throw error;
+    }
+  };
+
+const deployObj =
+  (objName = throwIfMissing()) =>
+  async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
+    try {
+      checkSigner(contracts);
+      const registryContract = await wrapCall(
+        contracts.fetchRegistryContract(objName),
+      );
+      const predictedAddress = await predictObjAddress(objName)(contracts, obj);
       const isDeployed = await checkDeployedObj(objName)(
         contracts,
         predictedAddress,
@@ -106,6 +121,7 @@ const deployObj =
           )} already deployed at address ${predictedAddress}`,
         );
       }
+      const args = createArgs[objName].map((e) => obj[e]);
       const createFonctionName = 'create'.concat(toUpperFirst(objName));
       const tx = await wrapSend(
         registryContract[createFonctionName](...args, contracts.txOptions),
@@ -123,6 +139,24 @@ const deployObj =
       throw error;
     }
   };
+
+const predictAppAddress = async (contracts, app) =>
+  predictObjAddress(APP)(
+    contracts,
+    await appSchema({ ethProvider: contracts.provider }).validate(app),
+  );
+const predictDatasetAddress = async (contracts, dataset) =>
+  predictObjAddress(DATASET)(
+    contracts,
+    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
+  );
+const predictWorkerpoolAddress = async (contracts, workerpool) =>
+  predictObjAddress(WORKERPOOL)(
+    contracts,
+    await workerpoolSchema({ ethProvider: contracts.provider }).validate(
+      workerpool,
+    ),
+  );
 
 const deployApp = async (contracts, app) =>
   deployObj(APP)(
@@ -407,6 +441,9 @@ const showUserWorkerpool = async (
 };
 
 module.exports = {
+  predictAppAddress,
+  predictDatasetAddress,
+  predictWorkerpoolAddress,
   checkDeployedObj,
   checkDeployedApp,
   checkDeployedDataset,

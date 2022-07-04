@@ -4,6 +4,8 @@ const {
   showDataset,
   showUserDataset,
   countUserDatasets,
+  predictDatasetAddress,
+  checkDeployedDataset,
 } = require('../common/protocol/registries');
 const { checkWeb3SecretExists } = require('../common/sms/check');
 const { pushWeb3Secret } = require('../common/sms/push');
@@ -47,6 +49,13 @@ class IExecDatasetModule extends IExecModule {
         datasetAddress,
         datasetSecret,
       );
+    this.predictDatasetAddress = async (dataset) =>
+      predictDatasetAddress(
+        await this.config.resolveContractsClient(),
+        dataset,
+      );
+    this.checkDeployedDataset = async (address) =>
+      checkDeployedDataset(await this.config.resolveContractsClient(), address);
   }
 }
 

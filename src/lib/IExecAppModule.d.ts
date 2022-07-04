@@ -10,6 +10,53 @@ import {
   TxHash,
 } from './types';
 
+export interface AppDeploymentArgs {
+  /**
+   * the app owner
+   */
+  owner: Addressish;
+  /**
+   * a name for the app
+   */
+  name: string;
+  /**
+   * only 'DOCKER' is supported
+   */
+  type: string;
+  /**
+   * app image address
+   */
+  multiaddr: Multiaddress;
+  /**
+   * app image digest
+   */
+  checksum: Bytes32;
+  /**
+   * optional for TEE apps only, specify the TEE protocol to use
+   */
+  mrenclave?: {
+    /**
+     * only "SCONE" is supported
+     */
+    provider: string;
+    /**
+     * provider's protocol version
+     */
+    version: string;
+    /**
+     * app entrypoint path
+     */
+    entrypoint: string;
+    /**
+     * dedicated memory in bytes
+     */
+    heapSize: number;
+    /**
+     * app tee fingerprint
+     */
+    fingerprint: string;
+  };
+}
 /**
  * IExec app
  */
@@ -61,53 +108,35 @@ export default class IExecAppModule extends IExecModule {
    * console.log('deployed at', address);
    * ```
    */
-  deployApp(app: {
-    /**
-     * the app owner
-     */
-    owner: Addressish;
-    /**
-     * a name for the app
-     */
-    name: string;
-    /**
-     * only 'DOCKER' is supported
-     */
-    type: string;
-    /**
-     * app image address
-     */
-    multiaddr: Multiaddress;
-    /**
-     * app image digest
-     */
-    checksum: Bytes32;
-    /**
-     * optional for TEE apps only, specify the TEE protocol to use
-     */
-    mrenclave?: {
-      /**
-       * only "SCONE" is supported
-       */
-      provider: string;
-      /**
-       * provider's protocol version
-       */
-      version: string;
-      /**
-       * app entrypoint path
-       */
-      entrypoint: string;
-      /**
-       * dedicated memory in bytes
-       */
-      heapSize: number;
-      /**
-       * app tee fingerprint
-       */
-      fingerprint: string;
-    };
-  }): Promise<{ address: Address; txHash: TxHash }>;
+  deployApp(
+    app: AppDeploymentArgs,
+  ): Promise<{ address: Address; txHash: TxHash }>;
+  /**
+   * predict the app contract address given the app deployment arguments
+   *
+   * example:
+   * ```js
+   * const address = await predictAppAddress({
+   *  owner: address,
+   *  name: 'My app',
+   *  type: 'DOCKER',
+   *  multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+   *  checksum: '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+   * });
+   * console.log('address', address);
+   * ```
+   */
+  predictAppAddress(app: AppDeploymentArgs): Promise<Address>;
+  /**
+   * check if an app is deployed at a given address
+   *
+   * example:
+   * ```js
+   * const isDeployed = await checkDeployedApp(address);
+   * console.log('app deployed', isDeployed);
+   * ```
+   */
+  checkDeployedApp(appAddress: Addressish): Promise<Boolean>;
   /**
    * show a deployed app details
    *

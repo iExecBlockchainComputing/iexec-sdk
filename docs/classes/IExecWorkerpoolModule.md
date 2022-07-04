@@ -22,9 +22,11 @@ module exposing workerpool methods
 
 ### Methods
 
+- [checkDeployedWorkerpool](IExecWorkerpoolModule.md#checkdeployedworkerpool)
 - [countUserWorkerpools](IExecWorkerpoolModule.md#countuserworkerpools)
 - [deployWorkerpool](IExecWorkerpoolModule.md#deployworkerpool)
 - [getWorkerpoolApiUrl](IExecWorkerpoolModule.md#getworkerpoolapiurl)
+- [predictWorkerpoolAddress](IExecWorkerpoolModule.md#predictworkerpooladdress)
 - [setWorkerpoolApiUrl](IExecWorkerpoolModule.md#setworkerpoolapiurl)
 - [showUserWorkerpool](IExecWorkerpoolModule.md#showuserworkerpool)
 - [showWorkerpool](IExecWorkerpoolModule.md#showworkerpool)
@@ -62,6 +64,30 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### checkDeployedWorkerpool
+
+▸ **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`<`Boolean`\>
+
+check if an workerpool is deployed at a given address
+
+example:
+```js
+const isDeployed = await checkDeployedWorkerpool(address);
+console.log('workerpool deployed', isDeployed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+
+#### Returns
+
+`Promise`<`Boolean`\>
+
+___
 
 ### countUserWorkerpools
 
@@ -106,11 +132,9 @@ console.log('deployed at', address);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `workerpool` | `Object` | - |
-| `workerpool.description` | `string` | a description for the workerpool |
-| `workerpool.owner` | `string` | the workerpool owner |
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
@@ -138,6 +162,33 @@ console.log('workerpool API url:', url);
 | :------ | :------ |
 | `workerpoolAddress` | `string` |
 | `url` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### predictWorkerpoolAddress
+
+▸ **predictWorkerpoolAddress**(`workerpool`): `Promise`<`string`\>
+
+predict the workerpool contract address given the workerpool deployment arguments
+
+example:
+```js
+const address = await predictWorkerpoolAddress({
+ owner: address,
+ description: 'My workerpool',
+});
+console.log('address', address);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 

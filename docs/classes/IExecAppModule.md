@@ -23,8 +23,10 @@ module exposing app methods
 ### Methods
 
 - [checkAppSecretExists](IExecAppModule.md#checkappsecretexists)
+- [checkDeployedApp](IExecAppModule.md#checkdeployedapp)
 - [countUserApps](IExecAppModule.md#countuserapps)
 - [deployApp](IExecAppModule.md#deployapp)
+- [predictAppAddress](IExecAppModule.md#predictappaddress)
 - [pushAppSecret](IExecAppModule.md#pushappsecret)
 - [showApp](IExecAppModule.md#showapp)
 - [showUserApp](IExecAppModule.md#showuserapp)
@@ -87,6 +89,30 @@ console.log('app secret set:', isSecretSet);
 
 ___
 
+### checkDeployedApp
+
+▸ **checkDeployedApp**(`appAddress`): `Promise`<`Boolean`\>
+
+check if an app is deployed at a given address
+
+example:
+```js
+const isDeployed = await checkDeployedApp(address);
+console.log('app deployed', isDeployed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+
+#### Returns
+
+`Promise`<`Boolean`\>
+
+___
+
 ### countUserApps
 
 ▸ **countUserApps**(`userAddress`): `Promise`<`BN`\>
@@ -133,24 +159,43 @@ console.log('deployed at', address);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `app` | `Object` | - |
-| `app.checksum` | `string` | app image digest |
-| `app.mrenclave?` | `Object` | optional for TEE apps only, specify the TEE protocol to use |
-| `app.mrenclave.entrypoint` | `string` | app entrypoint path |
-| `app.mrenclave.fingerprint` | `string` | app tee fingerprint |
-| `app.mrenclave.heapSize` | `number` | dedicated memory in bytes |
-| `app.mrenclave.provider` | `string` | only "SCONE" is supported |
-| `app.mrenclave.version` | `string` | provider's protocol version |
-| `app.multiaddr` | [`Multiaddress`](../modules/internal_.md#multiaddress) | app image address |
-| `app.name` | `string` | a name for the app |
-| `app.owner` | `string` | the app owner |
-| `app.type` | `string` | only 'DOCKER' is supported |
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
 
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
+
+___
+
+### predictAppAddress
+
+▸ **predictAppAddress**(`app`): `Promise`<`string`\>
+
+predict the app contract address given the app deployment arguments
+
+example:
+```js
+const address = await predictAppAddress({
+ owner: address,
+ name: 'My app',
+ type: 'DOCKER',
+ multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+ checksum: '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+});
+console.log('address', address);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

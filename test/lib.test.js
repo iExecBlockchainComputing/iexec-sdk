@@ -2855,6 +2855,57 @@ describe('[app]', () => {
     );
   });
 
+  test('app.predictAppAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const app = {
+      owner: await iexec.wallet.getAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    };
+    const res = await iexec.app.predictAppAddress(app);
+    const { address } = await iexec.app.deployApp(app);
+    expect(res).toBe(address);
+  });
+
+  test('app.predictAppAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const app = {
+      owner: await iexec.wallet.getAddress(),
+      name: `app${getId()}`,
+      type: 'DOCKER',
+      multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+      checksum:
+        '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    };
+    const predictedAddress = await iexec.app.predictAppAddress(app);
+    await expect(iexec.app.checkDeployedApp(predictedAddress)).resolves.toBe(
+      false,
+    );
+    await iexec.app.deployApp(app);
+    await expect(iexec.app.checkDeployedApp(predictedAddress)).resolves.toBe(
+      true,
+    );
+  });
+
   test('app.showApp()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3128,6 +3179,55 @@ describe('[dataset]', () => {
     );
   });
 
+  test('dataset.predictDatasetAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const dataset = {
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const res = await iexec.dataset.predictDatasetAddress(dataset);
+    const { address } = await iexec.dataset.deployDataset(dataset);
+    expect(res).toBe(address);
+  });
+
+  test('dataset.predictDatasetAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const dataset = {
+      owner: await iexec.wallet.getAddress(),
+      name: `dataset${getId()}`,
+      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+      checksum:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+    const predictedAddress = await iexec.dataset.predictDatasetAddress(dataset);
+    await expect(
+      iexec.dataset.checkDeployedDataset(predictedAddress),
+    ).resolves.toBe(false);
+    await iexec.dataset.deployDataset(dataset);
+    await expect(
+      iexec.dataset.checkDeployedDataset(predictedAddress),
+    ).resolves.toBe(true);
+  });
+
   test('dataset.showDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3353,6 +3453,51 @@ describe('[workerpool]', () => {
     await expect(iexec.workerpool.deployWorkerpool(workerpool)).rejects.toThrow(
       Error(`Workerpool already deployed at address ${res.address}`),
     );
+  });
+
+  test('workerpool.predictWorkerpoolAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const res = await iexec.workerpool.predictWorkerpoolAddress(workerpool);
+    const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
+    expect(res).toBe(address);
+  });
+
+  test('workerpool.predictWorkerpoolAddress()', async () => {
+    const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+      },
+    );
+    const workerpool = {
+      owner: await iexec.wallet.getAddress(),
+      description: `workerpool${getId()}`,
+    };
+    const predictedAddress = await iexec.workerpool.predictWorkerpoolAddress(
+      workerpool,
+    );
+    await expect(
+      iexec.workerpool.checkDeployedWorkerpool(predictedAddress),
+    ).resolves.toBe(false);
+    await iexec.workerpool.deployWorkerpool(workerpool);
+    await expect(
+      iexec.workerpool.checkDeployedWorkerpool(predictedAddress),
+    ).resolves.toBe(true);
   });
 
   test('workerpool.setWorkerpoolApiUrl()', async () => {

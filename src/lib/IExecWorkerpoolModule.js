@@ -4,6 +4,8 @@ const {
   showWorkerpool,
   showUserWorkerpool,
   countUserWorkerpools,
+  predictWorkerpoolAddress,
+  checkDeployedWorkerpool,
 } = require('../common/protocol/registries');
 const { setWorkerpoolApiUrl } = require('../common/execution/workerpool');
 const { getWorkerpoolApiUrl } = require('../common/execution/debug');
@@ -34,6 +36,16 @@ class IExecWorkerpoolModule extends IExecModule {
       getWorkerpoolApiUrl(
         await this.config.resolveContractsClient(),
         workerpoolAddress,
+      );
+    this.predictWorkerpoolAddress = async (workerpool) =>
+      predictWorkerpoolAddress(
+        await this.config.resolveContractsClient(),
+        workerpool,
+      );
+    this.checkDeployedWorkerpool = async (address) =>
+      checkDeployedWorkerpool(
+        await this.config.resolveContractsClient(),
+        address,
       );
   }
 }
