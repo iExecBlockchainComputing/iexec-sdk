@@ -2,6 +2,17 @@ import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
 import { Address, Addressish, BN, BNish, TxHash } from './types';
 
+export interface WorkerpoolDeploymentArgs {
+  /**
+   * the workerpool owner
+   */
+  owner: Addressish;
+  /**
+   * a description for the workerpool
+   */
+  description: string;
+}
+
 /**
  * IExec workerpool
  */
@@ -34,16 +45,34 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('deployed at', address);
    * ```
    */
-  deployWorkerpool(workerpool: {
-    /**
-     * the workerpool owner
-     */
-    owner: Addressish;
-    /**
-     * a description for the workerpool
-     */
-    description: string;
-  }): Promise<{ address: Address; txHash: TxHash }>;
+  deployWorkerpool(
+    workerpool: WorkerpoolDeploymentArgs,
+  ): Promise<{ address: Address; txHash: TxHash }>;
+  /**
+   * predict the workerpool contract address given the workerpool deployment arguments
+   *
+   * example:
+   * ```js
+   * const address = await predictWorkerpoolAddress({
+   *  owner: address,
+   *  description: 'My workerpool',
+   * });
+   * console.log('address', address);
+   * ```
+   */
+  predictWorkerpoolAddress(
+    workerpool: WorkerpoolDeploymentArgs,
+  ): Promise<Address>;
+  /**
+   * check if an workerpool is deployed at a given address
+   *
+   * example:
+   * ```js
+   * const isDeployed = await checkDeployedWorkerpool(address);
+   * console.log('workerpool deployed', isDeployed);
+   * ```
+   */
+  checkDeployedWorkerpool(workerpoolAddress: Addressish): Promise<Boolean>;
   /**
    * show a deployed workerpool details
    *
@@ -79,6 +108,38 @@ export default class IExecWorkerpoolModule extends IExecModule {
     index: BNish,
     address: Addressish,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
+  /**
+   * **ONLY WORKERPOOL ENS NAME OWNER**
+   *
+   * declare the workerpool API url on the blockchain
+   *
+   * _NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
+   *
+   * example:
+   * ```js
+   * const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+   * console.log('txHash:', txHash);
+   * ```
+   */
+  setWorkerpoolApiUrl(
+    workerpoolAddress: Addressish,
+    url: string,
+  ): Promise<TxHash>;
+  /**
+   * read the workerpool API url on the blockchain
+   *
+   * _NB_: resolve to `undefined` if the workerpool API url was not declared.
+   *
+   * example:
+   * ```js
+   * const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+   * console.log('workerpool API url:', url);
+   * ```
+   */
+  getWorkerpoolApiUrl(
+    workerpoolAddress: Addressish,
+    url: string,
+  ): Promise<string | undefined>;
   /**
    * Create an IExecWorkerpoolModule instance using an IExecConfig instance
    */

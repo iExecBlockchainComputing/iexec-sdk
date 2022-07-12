@@ -2,6 +2,7 @@ const Debug = require('debug');
 const fs = require('fs-extra');
 const path = require('path');
 const { object, string, number, boolean, lazy } = require('yup');
+const { APP, DATASET } = require('../../common/utils/constant');
 const {
   addressSchema,
   chainIdSchema,
@@ -283,8 +284,8 @@ const initArray = async (arrayName, { array } = {}) => {
 
 const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   try {
-    if (objName === 'app') await initObj('buyConf');
-    if (objName === 'dataset') await initArray('dapps');
+    if (objName === APP) await initObj('buyConf');
+    if (objName === DATASET) await initArray('dapps');
     const iexecConf = await loadIExecConf();
     iexecConf[objName] =
       obj || templates.overwriteObject(templates[objName], overwrite);

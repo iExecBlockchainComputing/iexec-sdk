@@ -22,8 +22,12 @@ module exposing workerpool methods
 
 ### Methods
 
+- [checkDeployedWorkerpool](IExecWorkerpoolModule.md#checkdeployedworkerpool)
 - [countUserWorkerpools](IExecWorkerpoolModule.md#countuserworkerpools)
 - [deployWorkerpool](IExecWorkerpoolModule.md#deployworkerpool)
+- [getWorkerpoolApiUrl](IExecWorkerpoolModule.md#getworkerpoolapiurl)
+- [predictWorkerpoolAddress](IExecWorkerpoolModule.md#predictworkerpooladdress)
+- [setWorkerpoolApiUrl](IExecWorkerpoolModule.md#setworkerpoolapiurl)
 - [showUserWorkerpool](IExecWorkerpoolModule.md#showuserworkerpool)
 - [showWorkerpool](IExecWorkerpoolModule.md#showworkerpool)
 - [fromConfig](IExecWorkerpoolModule.md#fromconfig)
@@ -40,7 +44,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
+| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -60,6 +64,30 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### checkDeployedWorkerpool
+
+▸ **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`<`Boolean`\>
+
+check if an workerpool is deployed at a given address
+
+example:
+```js
+const isDeployed = await checkDeployedWorkerpool(address);
+console.log('workerpool deployed', isDeployed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+
+#### Returns
+
+`Promise`<`Boolean`\>
+
+___
 
 ### countUserWorkerpools
 
@@ -104,15 +132,96 @@ console.log('deployed at', address);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `workerpool` | `Object` | - |
-| `workerpool.description` | `string` | a description for the workerpool |
-| `workerpool.owner` | `string` | the workerpool owner |
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
+
+___
+
+### getWorkerpoolApiUrl
+
+▸ **getWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
+
+read the workerpool API url on the blockchain
+
+_NB_: resolve to `undefined` if the workerpool API url was not declared.
+
+example:
+```js
+const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+console.log('workerpool API url:', url);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `url` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### predictWorkerpoolAddress
+
+▸ **predictWorkerpoolAddress**(`workerpool`): `Promise`<`string`\>
+
+predict the workerpool contract address given the workerpool deployment arguments
+
+example:
+```js
+const address = await predictWorkerpoolAddress({
+ owner: address,
+ description: 'My workerpool',
+});
+console.log('address', address);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### setWorkerpoolApiUrl
+
+▸ **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
+
+**ONLY WORKERPOOL ENS NAME OWNER**
+
+declare the workerpool API url on the blockchain
+
+_NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
+
+example:
+```js
+const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+console.log('txHash:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `url` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

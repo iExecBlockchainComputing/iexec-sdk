@@ -10,6 +10,25 @@ import {
   TxHash,
 } from './types';
 
+export interface DatasetDeploymentArgs {
+  /**
+   * the dataset owner
+   */
+  owner: Addressish;
+  /**
+   * a name for the dataset
+   */
+  name: string;
+  /**
+   * dataset file download address
+   */
+  multiaddr: Multiaddress;
+  /**
+   * sha256sum of the file
+   */
+  checksum: Bytes32;
+}
+
 /**
  * IExec dataset
  */
@@ -52,24 +71,34 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('deployed at', address);
    * ```
    */
-  deployDataset(dataset: {
-    /**
-     * the dataset owner
-     */
-    owner: Addressish;
-    /**
-     * a name for the dataset
-     */
-    name: string;
-    /**
-     * dataset file download address
-     */
-    multiaddr: Multiaddress;
-    /**
-     * sha256sum of the file
-     */
-    checksum: Bytes32;
-  }): Promise<{ address: Address; txHash: TxHash }>;
+  deployDataset(
+    dataset: DatasetDeploymentArgs,
+  ): Promise<{ address: Address; txHash: TxHash }>;
+  /**
+   * predict the dataset contract address given the dataset deployment arguments
+   *
+   * example:
+   * ```js
+   * const address = await predictDatasetAddress({
+   *  owner: address,
+   *  name: 'cat.jpeg',
+   *  multiaddr: '/ipfs/Qmd286K6pohQcTKYqnS1YhWrCiS4gz7Xi34sdwMe9USZ7u',
+   *  checksum: '0x84a3f860d54f3f5f65e91df081c8d776e8bcfb5fbc234afce2f0d7e9d26e160d',
+   * });
+   * console.log('address', address);
+   * ```
+   */
+  predictDatasetAddress(dataset: DatasetDeploymentArgs): Promise<Address>;
+  /**
+   * check if an dataset is deployed at a given address
+   *
+   * example:
+   * ```js
+   * const isDeployed = await checkDeployedDataset(address);
+   * console.log('dataset deployed', isDeployed);
+   * ```
+   */
+  checkDeployedDataset(datasetAddress: Addressish): Promise<Boolean>;
   /**
    * show a deployed dataset details
    *

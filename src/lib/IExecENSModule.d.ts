@@ -105,10 +105,24 @@ export default class IExecENSModule extends IExecModule {
    */
   lookupAddress(address: Address): Promise<ENS | null>;
   /**
+   * get the default free to use ENS domain given an address
+   *
+   * _NB_:
+   * - the ENS domain is determined by the nature of the address (app, dataset, workerpool, other)
+   * - the returned ENS domain is controlled by a FIFSRegistrar that allocates subdomains to the first person to claim them
+   *
+   * example:
+   * ```js
+   * const domain = await getDefaultDomain(address);
+   * console.log('default domain:', domain);
+   * ```
+   */
+  getDefaultDomain(address: Address): Promise<ENS>;
+  /**
    * register a subdomain (label) on an ENS FIFSRegistrar
    *
    * _NB_:
-   * - if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth"
+   * - if specifier, the domain must be controlled by a FIFSRegistrar, default "users.iexec.eth" (use `getDefaultDomain(address)` to determine the best suited domain for an address)
    * - if the user already own the domain, the register transaction will not occur
    *
    * example:
@@ -122,7 +136,7 @@ export default class IExecENSModule extends IExecModule {
    */
   claimName(
     label: string,
-    domain?: string,
+    domain?: ENS,
   ): Promise<{ registeredName: ENS; registerTxHash?: TxHash }>;
   /**
    * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
@@ -204,6 +218,35 @@ export default class IExecENSModule extends IExecModule {
     setAddrTxHash?: TxHash;
     setNameTxHash?: TxHash;
   }>;
+  /**
+   * read an ENS text record associated to an ENS name
+   *
+   * example:
+   * ```js
+   * const value = await readTextRecord('me.users.iexec.eth', 'email');
+   * console.log('email record:', value);
+   * ```
+   */
+  readTextRecord(name: ENS, key: string): Promise<string>;
+  /**
+   * **ONLY ENS NAME OWNER**
+   *
+   * set a text record associated to an ENS name
+   *
+   * _NB_:
+   * - if value is not specified, the text record is reset to `""`
+   *
+   * example:
+   * ```js
+   * const txHash = setTextRecord(
+   *   'me.users.iexec.eth',
+   *   'email',
+   *   'me@iex.ec'
+   * );
+   * console.log('txHash:', txHash);
+   * ```
+   */
+  setTextRecord(name: ENS, key: string, value?: string): Promise<TxHash>;
   /**
    * Create an IExecENSModule instance using an IExecConfig instance
    */

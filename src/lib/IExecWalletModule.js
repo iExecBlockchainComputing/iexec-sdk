@@ -1,31 +1,36 @@
 const IExecModule = require('./IExecModule');
-const wallet = require('../common/modules/wallet');
+const { getAddress } = require('../common/wallet/address');
+const { checkBalances } = require('../common/wallet/balance');
+const { sendETH, sendRLC, sweep } = require('../common/wallet/send');
+const {
+  bridgeToMainchain,
+  bridgeToSidechain,
+  obsBridgeToMainchain,
+  obsBridgeToSidechain,
+} = require('../common/wallet/bridge');
+const {
+  wrapEnterpriseRLC,
+  unwrapEnterpriseRLC,
+} = require('../common/wallet/enterprise');
 
 class IExecWalletModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
     this.getAddress = async () =>
-      wallet.getAddress(await this.config.resolveContractsClient());
+      getAddress(await this.config.resolveContractsClient());
     this.checkBalances = async (address) =>
-      wallet.checkBalances(await this.config.resolveContractsClient(), address);
+      checkBalances(await this.config.resolveContractsClient(), address);
     this.checkBridgedBalances = async (address) =>
-      wallet.checkBalances(
-        await this.config.resolveBridgedContractsClient(),
-        address,
-      );
+      checkBalances(await this.config.resolveBridgedContractsClient(), address);
     this.sendETH = async (weiAmount, to) =>
-      wallet.sendETH(await this.config.resolveContractsClient(), weiAmount, to);
+      sendETH(await this.config.resolveContractsClient(), weiAmount, to);
     this.sendRLC = async (nRlcAmount, to) =>
-      wallet.sendRLC(
-        await this.config.resolveContractsClient(),
-        nRlcAmount,
-        to,
-      );
+      sendRLC(await this.config.resolveContractsClient(), nRlcAmount, to);
     this.sweep = async (to) =>
-      wallet.sweep(await this.config.resolveContractsClient(), to);
+      sweep(await this.config.resolveContractsClient(), to);
     this.bridgeToSidechain = async (nRlcAmount) =>
-      wallet.bridgeToSidechain(
+      bridgeToSidechain(
         await this.config.resolveContractsClient(),
         await this.config.resolveBridgeAddress(),
         nRlcAmount,
@@ -35,7 +40,7 @@ class IExecWalletModule extends IExecModule {
         },
       );
     this.bridgeToMainchain = async (nRlcAmount) =>
-      wallet.bridgeToMainchain(
+      bridgeToMainchain(
         await this.config.resolveContractsClient(),
         await this.config.resolveBridgeAddress(),
         nRlcAmount,
@@ -45,7 +50,7 @@ class IExecWalletModule extends IExecModule {
         },
       );
     this.obsBridgeToSidechain = async (nRlcAmount) =>
-      wallet.obsBridgeToSidechain(
+      obsBridgeToSidechain(
         await this.config.resolveContractsClient(),
         await this.config.resolveBridgeAddress(),
         nRlcAmount,
@@ -55,7 +60,7 @@ class IExecWalletModule extends IExecModule {
         },
       );
     this.obsBridgeToMainchain = async (nRlcAmount) =>
-      wallet.obsBridgeToMainchain(
+      obsBridgeToMainchain(
         await this.config.resolveContractsClient(),
         await this.config.resolveBridgeAddress(),
         nRlcAmount,
@@ -65,13 +70,13 @@ class IExecWalletModule extends IExecModule {
         },
       );
     this.wrapEnterpriseRLC = async (nRlcAmount) =>
-      wallet.wrapEnterpriseRLC(
+      wrapEnterpriseRLC(
         await this.config.resolveStandardContractsClient(),
         await this.config.resolveEnterpriseContractsClient(),
         nRlcAmount,
       );
     this.unwrapEnterpriseRLC = async (nRlcAmount) =>
-      wallet.unwrapEnterpriseRLC(
+      unwrapEnterpriseRLC(
         await this.config.resolveEnterpriseContractsClient(),
         nRlcAmount,
       );

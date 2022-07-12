@@ -1,13 +1,46 @@
 #!/usr/bin/env node
 const Debug = require('debug');
 const cli = require('commander');
-const order = require('../../common/modules/order');
+const {
+  createApporder,
+  createDatasetorder,
+  createRequestorder,
+  createWorkerpoolorder,
+  signApporder,
+  signDatasetorder,
+  signRequestorder,
+  signWorkerpoolorder,
+  cancelApporder,
+  cancelDatasetorder,
+  cancelRequestorder,
+  cancelWorkerpoolorder,
+  computeOrderHash,
+  matchOrders,
+} = require('../../common/market/order');
+const {
+  publishApporder,
+  publishDatasetorder,
+  publishRequestorder,
+  publishWorkerpoolorder,
+  unpublishApporder,
+  unpublishDatasetorder,
+  unpublishRequestorder,
+  unpublishWorkerpoolorder,
+  fetchPublishedOrderByHash,
+} = require('../../common/market/marketplace');
+const { fetchDealsByOrderHash } = require('../../common/execution/deal');
 const {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/modules/hub');
-const { NULL_ADDRESS } = require('../../common/utils/utils');
+} = require('../../common/protocol/registries');
+const {
+  NULL_ADDRESS,
+  APP,
+  DATASET,
+  WORKERPOOL,
+  REQUEST,
+} = require('../../common/utils/constant');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -27,7 +60,7 @@ const {
 } = require('../utils/cli-helper');
 const {
   checkRequestRequirements,
-} = require('../../common/modules/request-helper');
+} = require('../../common/execution/request-helper');
 const {
   loadIExecConf,
   initOrderObj,
@@ -37,6 +70,12 @@ const {
 } = require('../utils/fs');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { Keystore } = require('../utils/keystore');
+const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} = require('../../common/utils/constant');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -78,7 +117,7 @@ init
         try {
           spinner.start(`Creating ${orderName}`);
           const overwrite = {};
-          if (resourceName === 'request') {
+          if (resourceName === REQUEST) {
             const keystore = Keystore(
               Object.assign(walletOptions, { isSigner: false }),
             );
@@ -104,10 +143,10 @@ init
         }
       };
 
-      if (opts.app || initAll) await initOrder('app');
-      if (opts.dataset || initAll) await initOrder('dataset');
-      if (opts.workerpool || initAll) await initOrder('workerpool');
-      if (opts.request || initAll) await initOrder('request');
+      if (opts.app || initAll) await initOrder(APP);
+      if (opts.dataset || initAll) await initOrder(DATASET);
+      if (opts.workerpool || initAll) await initOrder(WORKERPOOL);
+      if (opts.request || initAll) await initOrder(REQUEST);
 
       if (failed.length === 0) {
         spinner.succeed(
@@ -163,20 +202,14 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.apporder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(order.APP_ORDER, 'app'));
+            throw new Error(info.missingOrder(APP_ORDER, 'app'));
           }
-          const orderObj = await order.createApporder(
-            chain.contracts,
-            loadedOrder,
-          );
+          const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
-          const signedOrder = await order.signApporder(
-            chain.contracts,
-            orderObj,
-          );
+          const signedOrder = await signApporder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
-            order.APP_ORDER,
+            APP_ORDER,
             chain.id,
             signedOrder,
           );
@@ -194,20 +227,17 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.datasetorder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(order.DATASET_ORDER, 'dataset'));
+            throw new Error(info.missingOrder(DATASET_ORDER, 'dataset'));
           }
-          const orderObj = await order.createDatasetorder(
+          const orderObj = await createDatasetorder(
             chain.contracts,
             loadedOrder,
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw Error(`No dataset deployed at address ${orderObj.dataset}`);
-          const signedOrder = await order.signDatasetorder(
-            chain.contracts,
-            orderObj,
-          );
+          const signedOrder = await signDatasetorder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
-            order.DATASET_ORDER,
+            DATASET_ORDER,
             chain.id,
             signedOrder,
           );
@@ -227,11 +257,9 @@ sign
           const loadedOrder =
             iexecConf.order && iexecConf.order.workerpoolorder;
           if (!loadedOrder) {
-            throw new Error(
-              info.missingOrder(order.WORKERPOOL_ORDER, 'workerpool'),
-            );
+            throw new Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
           }
-          const orderObj = await order.createWorkerpoolorder(
+          const orderObj = await createWorkerpoolorder(
             chain.contracts,
             loadedOrder,
           );
@@ -244,12 +272,12 @@ sign
             throw Error(
               `No workerpool deployed at address ${orderObj.workerpool}`,
             );
-          const signedOrder = await order.signWorkerpoolorder(
+          const signedOrder = await signWorkerpoolorder(
             chain.contracts,
             orderObj,
           );
           const { saved, fileName } = await saveSignedOrder(
-            order.WORKERPOOL_ORDER,
+            WORKERPOOL_ORDER,
             chain.id,
             signedOrder,
           );
@@ -267,9 +295,9 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.requestorder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(order.REQUEST_ORDER, 'request'));
+            throw new Error(info.missingOrder(REQUEST_ORDER, 'request'));
           }
-          const orderObj = await order.createRequestorder(
+          const orderObj = await createRequestorder(
             {
               contracts: chain.contracts,
               resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
@@ -295,12 +323,9 @@ sign
               );
             });
           }
-          const signedOrder = await order.signRequestorder(
-            chain.contracts,
-            orderObj,
-          );
+          const signedOrder = await signRequestorder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
-            order.REQUEST_ORDER,
+            REQUEST_ORDER,
             chain.id,
             signedOrder,
           );
@@ -367,7 +392,7 @@ fill
           spinner.info(
             `Fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
-          const orderRes = await order.fetchPublishedOrderByHash(
+          const orderRes = await fetchPublishedOrderByHash(
             getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
@@ -383,20 +408,20 @@ fill
         throw Error(`Invalid ${orderName} hash`);
       };
       const appOrder = opts.app
-        ? await getOrderByHash(order.APP_ORDER, opts.app)
+        ? await getOrderByHash(APP_ORDER, opts.app)
         : signedOrders[chain.id].apporder;
       const datasetOrder = opts.dataset
-        ? await getOrderByHash(order.DATASET_ORDER, opts.dataset)
+        ? await getOrderByHash(DATASET_ORDER, opts.dataset)
         : signedOrders[chain.id].datasetorder;
       const workerpoolOrder = opts.workerpool
-        ? await getOrderByHash(order.WORKERPOOL_ORDER, opts.workerpool)
+        ? await getOrderByHash(WORKERPOOL_ORDER, opts.workerpool)
         : signedOrders[chain.id].workerpoolorder;
       let requestOrderInput;
       if (requestOnTheFly) {
         requestOrderInput = undefined;
       } else {
         requestOrderInput = opts.request
-          ? await getOrderByHash(order.REQUEST_ORDER, opts.request)
+          ? await getOrderByHash(REQUEST_ORDER, opts.request)
           : signedOrders[chain.id].requestorder;
       }
 
@@ -411,7 +436,7 @@ fill
 
       const computeRequestOrder = async () => {
         await connectKeystore(chain, keystore, { txOptions });
-        const unsignedOrder = await order.createRequestorder(
+        const unsignedOrder = await createRequestorder(
           {
             contracts: chain.contracts,
             resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
@@ -428,15 +453,9 @@ fill
           },
         );
         if (!opts.force) {
-          await prompt.signGeneratedOrder(
-            order.REQUEST_ORDER,
-            pretty(unsignedOrder),
-          );
+          await prompt.signGeneratedOrder(REQUEST_ORDER, pretty(unsignedOrder));
         }
-        const signed = await order.signRequestorder(
-          chain.contracts,
-          unsignedOrder,
-        );
+        const signed = await signRequestorder(chain.contracts, unsignedOrder);
         return signed;
       };
 
@@ -465,7 +484,7 @@ fill
 
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.filling(objName));
-      const { dealid, volume, txHash } = await order.matchOrders(
+      const { dealid, volume, txHash } = await matchOrders(
         chain.contracts,
         appOrder,
         useDataset ? datasetOrder : undefined,
@@ -528,28 +547,28 @@ publish
 
           let orderHash;
           switch (orderName) {
-            case order.APP_ORDER:
-              orderHash = await order.publishApporder(
+            case APP_ORDER:
+              orderHash = await publishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
-            case order.DATASET_ORDER:
-              orderHash = await order.publishDatasetorder(
+            case DATASET_ORDER:
+              orderHash = await publishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
-            case order.WORKERPOOL_ORDER:
-              orderHash = await order.publishWorkerpoolorder(
+            case WORKERPOOL_ORDER:
+              orderHash = await publishWorkerpoolorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
-            case order.REQUEST_ORDER:
+            case REQUEST_ORDER:
               if (!opts.skipRequestCheck) {
                 await checkRequestRequirements(
                   {
@@ -567,7 +586,7 @@ publish
                   );
                 });
               }
-              orderHash = await order.publishRequestorder(
+              orderHash = await publishRequestorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderToPublish,
@@ -584,10 +603,10 @@ publish
         }
       };
 
-      if (opts.app) await publishOrder(order.APP_ORDER);
-      if (opts.dataset) await publishOrder(order.DATASET_ORDER);
-      if (opts.workerpool) await publishOrder(order.WORKERPOOL_ORDER);
-      if (opts.request) await publishOrder(order.REQUEST_ORDER);
+      if (opts.app) await publishOrder(APP_ORDER);
+      if (opts.dataset) await publishOrder(DATASET_ORDER);
+      if (opts.workerpool) await publishOrder(WORKERPOOL_ORDER);
+      if (opts.request) await publishOrder(REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully published', {
@@ -650,7 +669,7 @@ unpublish
                 `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
               );
             }
-            orderHashToUnpublish = await order.computeOrderHash(
+            orderHashToUnpublish = await computeOrderHash(
               chain.contracts,
               orderName,
               orderToUnpublish,
@@ -666,29 +685,29 @@ unpublish
           spinner.start(`Unpublishing ${orderName}`);
           let unpublished;
           switch (orderName) {
-            case order.APP_ORDER:
-              unpublished = await order.unpublishApporder(
+            case APP_ORDER:
+              unpublished = await unpublishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
-            case order.DATASET_ORDER:
-              unpublished = await order.unpublishDatasetorder(
+            case DATASET_ORDER:
+              unpublished = await unpublishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
-            case order.WORKERPOOL_ORDER:
-              unpublished = await order.unpublishWorkerpoolorder(
+            case WORKERPOOL_ORDER:
+              unpublished = await unpublishWorkerpoolorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
-            case order.REQUEST_ORDER:
-              unpublished = await order.unpublishRequestorder(
+            case REQUEST_ORDER:
+              unpublished = await unpublishRequestorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
@@ -705,11 +724,11 @@ unpublish
         }
       };
 
-      if (opts.app) await unpublishOrder(order.APP_ORDER, opts.app);
-      if (opts.dataset) await unpublishOrder(order.DATASET_ORDER, opts.dataset);
+      if (opts.app) await unpublishOrder(APP_ORDER, opts.app);
+      if (opts.dataset) await unpublishOrder(DATASET_ORDER, opts.dataset);
       if (opts.workerpool)
-        await unpublishOrder(order.WORKERPOOL_ORDER, opts.workerpool);
-      if (opts.request) await unpublishOrder(order.REQUEST_ORDER, opts.request);
+        await unpublishOrder(WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await unpublishOrder(REQUEST_ORDER, opts.request);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully unpublished', {
@@ -771,27 +790,23 @@ cancel
           spinner.start(`Canceling ${orderName}`);
           let cancelTx;
           switch (orderName) {
-            case order.APP_ORDER:
+            case APP_ORDER:
+              cancelTx = (await cancelApporder(chain.contracts, orderToCancel))
+                .txHash;
+              break;
+            case DATASET_ORDER:
               cancelTx = (
-                await order.cancelApporder(chain.contracts, orderToCancel)
+                await cancelDatasetorder(chain.contracts, orderToCancel)
               ).txHash;
               break;
-            case order.DATASET_ORDER:
+            case WORKERPOOL_ORDER:
               cancelTx = (
-                await order.cancelDatasetorder(chain.contracts, orderToCancel)
+                await cancelWorkerpoolorder(chain.contracts, orderToCancel)
               ).txHash;
               break;
-            case order.WORKERPOOL_ORDER:
+            case REQUEST_ORDER:
               cancelTx = (
-                await order.cancelWorkerpoolorder(
-                  chain.contracts,
-                  orderToCancel,
-                )
-              ).txHash;
-              break;
-            case order.REQUEST_ORDER:
-              cancelTx = (
-                await order.cancelRequestorder(chain.contracts, orderToCancel)
+                await cancelRequestorder(chain.contracts, orderToCancel)
               ).txHash;
               break;
             default:
@@ -804,10 +819,10 @@ cancel
         }
       };
 
-      if (opts.app) await cancelOrder(order.APP_ORDER);
-      if (opts.dataset) await cancelOrder(order.DATASET_ORDER);
-      if (opts.workerpool) await cancelOrder(order.WORKERPOOL_ORDER);
-      if (opts.request) await cancelOrder(order.REQUEST_ORDER);
+      if (opts.app) await cancelOrder(APP_ORDER);
+      if (opts.dataset) await cancelOrder(DATASET_ORDER);
+      if (opts.workerpool) await cancelOrder(WORKERPOOL_ORDER);
+      if (opts.request) await cancelOrder(REQUEST_ORDER);
 
       if (failed.length === 0) {
         spinner.succeed('Successfully canceled', {
@@ -860,7 +875,7 @@ show
                 `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
               );
             }
-            orderHash = await order.computeOrderHash(
+            orderHash = await computeOrderHash(
               chain.contracts,
               orderName,
               signedOrder,
@@ -870,7 +885,7 @@ show
           }
           isBytes32(orderHash);
           spinner.start(info.showing(orderName));
-          const orderToShow = await order.fetchPublishedOrderByHash(
+          const orderToShow = await fetchPublishedOrderByHash(
             getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
@@ -878,7 +893,7 @@ show
           );
           let deals;
           if (opts.deals) {
-            deals = await order.fetchDealsByOrderHash(
+            deals = await fetchDealsByOrderHash(
               getPropertyFormChain(chain, 'iexecGateway'),
               orderName,
               chain.id,
@@ -909,11 +924,10 @@ show
         }
       };
 
-      if (opts.app) await showOrder(order.APP_ORDER, opts.app);
-      if (opts.dataset) await showOrder(order.DATASET_ORDER, opts.dataset);
-      if (opts.workerpool)
-        await showOrder(order.WORKERPOOL_ORDER, opts.workerpool);
-      if (opts.request) await showOrder(order.REQUEST_ORDER, opts.request);
+      if (opts.app) await showOrder(APP_ORDER, opts.app);
+      if (opts.dataset) await showOrder(DATASET_ORDER, opts.dataset);
+      if (opts.workerpool) await showOrder(WORKERPOOL_ORDER, opts.workerpool);
+      if (opts.request) await showOrder(REQUEST_ORDER, opts.request);
       if (failed.length === 0) {
         spinner.succeed('Successfully found', {
           raw: success,

@@ -15,13 +15,17 @@ const { wrapCall } = require('./errorWrappers');
 
 const debug = Debug('validators');
 
+const posIntRegex = /^\d+$/;
+
+const posStrictIntRegex = /^[1-9]\d*$/;
+
 const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
       const trimed = value.replace(/^0+/, '');
       return trimed.length > 0 ? trimed : '0';
     })
-    .matches(/^[0-9]*$/, message || '${originalValue} is not a valid number');
+    .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
 const integerSchema = () => number().integer();
 
@@ -203,13 +207,69 @@ const signed = () => ({
 
 const catidSchema = () => uint256Schema();
 
+const paramsArgsSchema = () => string();
+
+const paramsInputFilesArraySchema = () =>
+  array()
+    .transform((value, originalValue) => {
+      if (Array.isArray(originalValue)) {
+        return originalValue;
+      }
+      if (typeof originalValue === 'string') {
+        return originalValue.split(',');
+      }
+      return value;
+    })
+    .of(
+      string()
+        .url('${path} "${value}" is not a valid URL')
+        .required('${path} "${value}" is not a valid URL'),
+    );
+
+const paramsEncryptResultSchema = () => boolean();
+
+const paramsStorageProviderSchema = () =>
+  string().oneOf(
+    storageProviders(),
+    '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
+  );
+
+const paramsRequesterSecretsSchema = () =>
+  object()
+    .test(
+      'keys-are-int',
+      '${path} mapping keys must be strictly positive integers',
+      (value) => {
+        if (
+          value !== undefined &&
+          Object.keys(value).find((key) => !posStrictIntRegex.test(key))
+        ) {
+          return false;
+        }
+        return true;
+      },
+    )
+    .test(
+      'values-are-string',
+      '${path} mapping names must be strings',
+      (value) => {
+        if (
+          value !== undefined &&
+          Object.values(value).find(
+            (val) => typeof val !== 'string' || val.length === 0,
+          )
+        ) {
+          return false;
+        }
+        return true;
+      },
+    );
+
 const objParamsSchema = () =>
   object({
-    [paramsKeyName.IEXEC_ARGS]: string(),
-    [paramsKeyName.IEXEC_INPUT_FILES]: array().of(
-      string().url('${path} ${originalValue} is not a valid URL'),
-    ),
-    [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: boolean(),
+    [paramsKeyName.IEXEC_ARGS]: paramsArgsSchema(),
+    [paramsKeyName.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
       {
@@ -219,10 +279,7 @@ const objParamsSchema = () =>
           .default('ipfs')
           .when('$isTee', {
             is: true,
-            then: string().oneOf(
-              storageProviders(),
-              '${path} "${value}" is not supported for TEE tasks use one of supported storage providers (${values})',
-            ),
+            then: paramsStorageProviderSchema(),
             otherwise: string().oneOf(
               ['ipfs'],
               '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
@@ -231,6 +288,20 @@ const objParamsSchema = () =>
           .required(),
       },
     ),
+    [paramsKeyName.IEXEC_SECRETS]: mixed().when('$isTee', {
+      is: true,
+      then: paramsRequesterSecretsSchema(),
+      otherwise: mixed().test(
+        'is-not-defined',
+        '${path} is not supported for non TEE tasks',
+        (value) => {
+          if (value === undefined) {
+            return true;
+          }
+          return false;
+        },
+      ),
+    }),
     [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
       `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
       {
@@ -269,33 +340,6 @@ const paramsSchema = () =>
         }
       },
     );
-
-const paramsArgsSchema = () => string();
-
-const paramsInputFilesArraySchema = () =>
-  array()
-    .transform((value, originalValue) => {
-      if (Array.isArray(originalValue)) {
-        return originalValue;
-      }
-      if (typeof originalValue === 'string') {
-        return originalValue.split(',');
-      }
-      return value;
-    })
-    .of(
-      string()
-        .url('"${value}" is not a valid URL')
-        .required('"${value}" is not a valid URL'),
-    );
-
-const paramsEncryptResultSchema = () => boolean();
-
-const paramsStorageProviderSchema = () =>
-  string().oneOf(
-    storageProviders(),
-    '"${value}" is not a valid storage provider use one of ${values}',
-  );
 
 const tagSchema = () =>
   mixed()
@@ -686,6 +730,12 @@ const ensLabelSchema = () =>
       },
     );
 
+const textRecordKeySchema = () => string().required().strict(true);
+
+const textRecordValueSchema = () => string().default('').strict(true);
+
+const workerpoolApiUrlSchema = () => string().url().default('');
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -715,6 +765,7 @@ module.exports = {
   objParamsSchema,
   paramsArgsSchema,
   paramsInputFilesArraySchema,
+  paramsRequesterSecretsSchema,
   paramsEncryptResultSchema,
   paramsStorageProviderSchema,
   tagSchema,
@@ -732,5 +783,8 @@ module.exports = {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
+  workerpoolApiUrlSchema,
   ValidationError,
 };

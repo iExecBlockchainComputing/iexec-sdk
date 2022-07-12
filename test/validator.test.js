@@ -35,6 +35,9 @@ const {
   fileBufferSchema,
   ensDomainSchema,
   ensLabelSchema,
+  textRecordKeySchema,
+  textRecordValueSchema,
+  workerpoolApiUrlSchema,
   ValidationError,
 } = require('../src/common/utils/validator');
 
@@ -512,14 +515,14 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('"" is not a valid URL'),
+      new ValidationError('[0] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
     await expect(
       paramsInputFilesArraySchema().validate('example.com/foo.txt'),
     ).rejects.toThrow(
-      new ValidationError('"example.com/foo.txt" is not a valid URL'),
+      new ValidationError('[0] "example.com/foo.txt" is not a valid URL'),
     );
   });
   test('empty array', async () => {
@@ -584,8 +587,118 @@ describe('[objParamsSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_provider "foo" is not supported for TEE tasks use one of supported storage providers (ipfs, dropbox)',
+        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (ipfs, dropbox)',
       ),
+    );
+  });
+
+  test('iexec_secrets is not supported outside of TEE context', async () => {
+    await expect(
+      objParamsSchema().validate({
+        iexec_secrets: {},
+        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+      }),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets is not supported for non TEE tasks'),
+    );
+  });
+
+  test('iexec_secrets is supported in TEE context', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 1: 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).resolves.toEqual({
+      iexec_secrets: { 1: 'foo' },
+      iexec_result_storage_provider: 'ipfs',
+      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+    });
+  });
+
+  test('iexec_secrets can not be null', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: null,
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_secrets must be a `object` type, but the final value was: `null`.\n If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
+      ),
+    );
+  });
+
+  test('iexec_secrets mapping keys must be strictly positive integers', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { '-1': 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 0: 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { foo: 'foo' },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
+    );
+  });
+
+  test('iexec_secrets mapping names must be strings', async () => {
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 1: { foo: 'bar' } },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets mapping names must be strings'),
+    );
+    await expect(
+      objParamsSchema().validate(
+        {
+          iexec_secrets: { 1: 1 },
+          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
+        },
+        { context: { isTee: true } },
+      ),
+    ).rejects.toThrow(
+      new ValidationError('iexec_secrets mapping names must be strings'),
     );
   });
 
@@ -638,7 +751,7 @@ describe('[objParamsSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_input_files[1] https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf is not a valid URL',
+        'iexec_input_files[1] "https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
       ),
     );
   });
@@ -1103,6 +1216,76 @@ describe('[ensDomainSchema]', () => {
   test('throw with empty labels', async () => {
     await expect(ensDomainSchema().validate('foo..bar.eth')).rejects.toThrow(
       'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)',
+    );
+  });
+});
+
+describe('[textRecordKeySchema]', () => {
+  test('" "', async () => {
+    const res = await textRecordKeySchema().validate(' ');
+    expect(res).toBe(' ');
+  });
+  test('throw with empty string', async () => {
+    await expect(textRecordKeySchema().validate('')).rejects.toThrow(
+      'this is a required field',
+    );
+  });
+  test('throw with string coercible value', async () => {
+    await expect(textRecordKeySchema().validate(1)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `1`.',
+    );
+  });
+});
+
+describe('[textRecordValueSchema]', () => {
+  test('" "', async () => {
+    const res = await textRecordValueSchema().validate(' ');
+    expect(res).toBe(' ');
+  });
+  test('allow undefined', async () => {
+    const res = await textRecordValueSchema().validate();
+    expect(res).toBe(undefined);
+  });
+  test('allow empty string', async () => {
+    const res = await textRecordValueSchema().validate('');
+    expect(res).toBe('');
+  });
+  test('throw with null', async () => {
+    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `null`.',
+    );
+  });
+  test('throw with string coercible value', async () => {
+    await expect(textRecordValueSchema().validate(1)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `1`.',
+    );
+  });
+});
+
+describe('[workerpoolApiUrlSchema]', () => {
+  test('allow IP with port', async () => {
+    const res = await workerpoolApiUrlSchema().validate(
+      'http://192.168.0.1:8080',
+    );
+    expect(res).toBe('http://192.168.0.1:8080');
+  });
+  test('allow url', async () => {
+    const res = await workerpoolApiUrlSchema().validate(
+      'https://my-workerpool.com',
+    );
+    expect(res).toBe('https://my-workerpool.com');
+  });
+  test('allow undefined', async () => {
+    const res = await workerpoolApiUrlSchema().validate();
+    expect(res).toBe('');
+  });
+  test('allow empty string', async () => {
+    const res = await workerpoolApiUrlSchema().validate('');
+    expect(res).toBe('');
+  });
+  test('throw with null', async () => {
+    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+      'this must be a `string` type, but the final value was: `null`.',
     );
   });
 });

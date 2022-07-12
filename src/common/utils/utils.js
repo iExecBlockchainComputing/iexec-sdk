@@ -9,13 +9,9 @@ const { getAddress, randomBytes, formatUnits, parseUnits } =
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
 const { ValidationError, ConfigurationError } = require('./errors');
+const { NULL_BYTES32 } = require('./constant');
 
 const debug = Debug('iexec:utils');
-
-const NULL_BYTES = '0x';
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-const NULL_BYTES32 =
-  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
@@ -197,12 +193,7 @@ const checkEvent = (eventName, events) => {
 };
 
 const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
-  let eventFound;
-  events.forEach((event) => {
-    if (event.event === eventName) {
-      eventFound = event;
-    }
-  });
+  const eventFound = events.find((event) => event.event === eventName);
   if (!eventFound) {
     if (strict) throw new Error(`Unknown event ${eventName}`);
     return {};
@@ -216,11 +207,7 @@ const secToDate = (secs) => {
   return t;
 };
 
-const getSalt = () => {
-  const hex = BigNumber.from(randomBytes(32)).toHexString().substring(2);
-  const salt = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
-  return salt;
-};
+const getSalt = () => `0x${Buffer.from(randomBytes(32)).toString('hex')}`;
 
 const TAG_MAP = {
   tee: 1,
@@ -443,9 +430,6 @@ module.exports = {
   hexToBuffer,
   secToDate,
   getSalt,
-  NULL_BYTES,
-  NULL_ADDRESS,
-  NULL_BYTES32,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   encodeTag,

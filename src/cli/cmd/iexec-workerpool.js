@@ -8,15 +8,18 @@ const {
   countUserWorkerpools,
   showWorkerpool,
   showUserWorkerpool,
-} = require('../../common/modules/hub');
+} = require('../../common/protocol/registries');
 const {
   createWorkerpoolorder,
   signWorkerpoolorder,
+} = require('../../common/market/order');
+const {
   publishWorkerpoolorder,
   unpublishLastWorkerpoolorder,
   unpublishAllWorkerpoolorders,
-} = require('../../common/modules/order');
-const { NULL_ADDRESS, stringifyNestedBn } = require('../../common/utils/utils');
+} = require('../../common/market/marketplace');
+const { stringifyNestedBn } = require('../../common/utils/utils');
+const { NULL_ADDRESS, WORKERPOOL } = require('../../common/utils/constant');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -43,10 +46,14 @@ const {
 } = require('../utils/fs');
 const { Keystore } = require('../utils/keystore');
 const { loadChain, connectKeystore } = require('../utils/chains');
+const { setWorkerpoolApiUrl } = require('../../common/execution/workerpool');
+const { getWorkerpoolApiUrl } = require('../../common/execution/debug');
+const { lookupAddress } = require('../../common/ens/resolution');
+const { ConfigurationError } = require('../../common/utils/errors');
 
 const debug = Debug('iexec:iexec-workerpool');
 
-const objName = 'workerpool';
+const objName = WORKERPOOL;
 
 cli
   .name('iexec workerpool')
@@ -116,6 +123,49 @@ deploy
     }
   });
 
+const setApiUrl = cli.command('set-api-url <apiUrl> [workerpoolAddress]');
+addGlobalOptions(setApiUrl);
+addWalletLoadOptions(setApiUrl);
+setApiUrl
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .description('declare the workerpool API URL on the blockchain')
+  .action(async (url, workerpoolAddress, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
+      const address =
+        workerpoolAddress ||
+        (await loadDeployedObj(objName).then(
+          (deployedObj) => deployedObj && deployedObj[chain.id],
+        ));
+      if (!address) {
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+      }
+      const ens = await lookupAddress(chain.contracts, address);
+      if (!ens) {
+        throw Error(info.missingEnsForObjectAtAddress(objName, address));
+      }
+
+      await connectKeystore(chain, keystore, { txOptions });
+      spinner.start(`Setting API URL for workerpool ${address}`);
+      const txHash = await setWorkerpoolApiUrl(chain.contracts, address, url);
+      spinner.succeed(
+        `API URL "${url}" is set for ${objName} at address ${address}`,
+        {
+          raw: { address, url, txHash },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
 const show = cli.command('show [addressOrIndex]');
 addGlobalOptions(show);
 addWalletLoadOptions(show);
@@ -144,24 +194,54 @@ show
       if (!isAddress && !userAddress)
         throw Error(`Missing option ${option.user()[0]} or wallet`);
 
-      if (!addressOrIndex) throw Error(info.missingAddress(objName));
+      if (!addressOrIndex)
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
 
       spinner.start(info.showing(objName));
-      let res;
+      let showInfo;
+      let ens;
+      let apiUrl;
       if (isAddress) {
-        res = await showWorkerpool(chain.contracts, addressOrIndex);
+        [showInfo, ens, apiUrl] = await Promise.all([
+          showWorkerpool(chain.contracts, addressOrIndex),
+          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          }),
+          getWorkerpoolApiUrl(chain.contracts, addressOrIndex),
+        ]);
       } else {
-        res = await showUserWorkerpool(
+        showInfo = await showUserWorkerpool(
           chain.contracts,
           addressOrIndex,
           userAddress,
         );
+        [ens, apiUrl] = await Promise.all([
+          lookupAddress(chain.contracts, showInfo.objAddress).catch((e) => {
+            if (e instanceof ConfigurationError) {
+              /** no ENS */
+            } else {
+              throw e;
+            }
+          }),
+          getWorkerpoolApiUrl(chain.contracts, showInfo.objAddress),
+        ]);
       }
-      const { workerpool, objAddress } = res;
+      const { workerpool, objAddress } = showInfo;
       const cleanObj = stringifyNestedBn(workerpool);
-      spinner.succeed(`Workerpool ${objAddress} details:${pretty(cleanObj)}`, {
-        raw: { address: objAddress, workerpool: cleanObj },
-      });
+      spinner.succeed(
+        `Workerpool ${objAddress} details:${pretty({
+          ...(ens && { ENS: ens }),
+          ...cleanObj,
+          url: apiUrl,
+        })}`,
+        {
+          raw: { address: objAddress, workerpool: cleanObj, ens, apiUrl },
+        },
+      );
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -232,9 +312,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -309,9 +387,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(
-          `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chain.id}`,
-        );
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {

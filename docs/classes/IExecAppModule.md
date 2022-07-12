@@ -22,8 +22,12 @@ module exposing app methods
 
 ### Methods
 
+- [checkAppSecretExists](IExecAppModule.md#checkappsecretexists)
+- [checkDeployedApp](IExecAppModule.md#checkdeployedapp)
 - [countUserApps](IExecAppModule.md#countuserapps)
 - [deployApp](IExecAppModule.md#deployapp)
+- [predictAppAddress](IExecAppModule.md#predictappaddress)
+- [pushAppSecret](IExecAppModule.md#pushappsecret)
 - [showApp](IExecAppModule.md#showapp)
 - [showUserApp](IExecAppModule.md#showuserapp)
 - [fromConfig](IExecAppModule.md#fromconfig)
@@ -40,7 +44,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
+| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -60,6 +64,54 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### checkAppSecretExists
+
+▸ **checkAppSecretExists**(`appAddress`): `Promise`<`boolean`\>
+
+check if a secret exists for the app in the Secret Management Service
+
+example:
+```js
+const isSecretSet = await checkAppSecretExists(appAddress);
+console.log('app secret set:', isSecretSet);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+___
+
+### checkDeployedApp
+
+▸ **checkDeployedApp**(`appAddress`): `Promise`<`Boolean`\>
+
+check if an app is deployed at a given address
+
+example:
+```js
+const isDeployed = await checkDeployedApp(address);
+console.log('app deployed', isDeployed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+
+#### Returns
+
+`Promise`<`Boolean`\>
+
+___
 
 ### countUserApps
 
@@ -107,24 +159,74 @@ console.log('deployed at', address);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `app` | `Object` | - |
-| `app.checksum` | `string` | app image digest |
-| `app.mrenclave?` | `Object` | optional for TEE apps only, specify the TEE protocol to use |
-| `app.mrenclave.entrypoint` | `string` | app entrypoint path |
-| `app.mrenclave.fingerprint` | `string` | app tee fingerprint |
-| `app.mrenclave.heapSize` | `number` | dedicated memory in bytes |
-| `app.mrenclave.provider` | `string` | only "SCONE" is supported |
-| `app.mrenclave.version` | `string` | provider's protocol version |
-| `app.multiaddr` | [`Multiaddress`](../modules/internal_.md#multiaddress) | app image address |
-| `app.name` | `string` | a name for the app |
-| `app.owner` | `string` | the app owner |
-| `app.type` | `string` | only 'DOCKER' is supported |
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
 
 #### Returns
 
 `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
+
+___
+
+### predictAppAddress
+
+▸ **predictAppAddress**(`app`): `Promise`<`string`\>
+
+predict the app contract address given the app deployment arguments
+
+example:
+```js
+const address = await predictAppAddress({
+ owner: address,
+ name: 'My app',
+ type: 'DOCKER',
+ multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+ checksum: '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+});
+console.log('address', address);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### pushAppSecret
+
+▸ **pushAppSecret**(`appAddress`, `secretValue`): `Promise`<`boolean`\>
+
+**SIGNER REQUIRED, ONLY APP OWNER**
+
+push an application secret to the Secret Management Service
+
+_NB_:
+- pushed secret will be available for the app in `tee` tasks.
+- once pushed a secret can not be updated
+
+example:
+```js
+const isPushed = await pushAppSecret(appAddress, "passw0rd");
+console.log('pushed App secret:', isPushed);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `secretValue` | `String` |
+
+#### Returns
+
+`Promise`<`boolean`\>
 
 ___
 

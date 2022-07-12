@@ -30,6 +30,8 @@ module base
 
   ↳ [`IExecResultModule`](IExecResultModule.md)
 
+  ↳ [`IExecSecretsModule`](IExecSecretsModule.md)
+
   ↳ [`IExecStorageModule`](IExecStorageModule.md)
 
   ↳ [`IExecTaskModule`](IExecTaskModule.md)
@@ -64,7 +66,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
+| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 ## Properties

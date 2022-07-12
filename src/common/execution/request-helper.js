@@ -1,9 +1,10 @@
-const { checkWeb2SecretExists } = require('./sms');
 const {
-  NULL_BYTES32,
-  NULL_ADDRESS,
-  checkActiveBitInTag,
-} = require('../utils/utils');
+  checkWeb2SecretExists,
+  checkWeb3SecretExists,
+  checkRequesterSecretExists,
+} = require('../sms/check');
+const { checkActiveBitInTag } = require('../utils/utils');
+const { NULL_ADDRESS, NULL_BYTES32 } = require('../utils/constant');
 const {
   getStorageTokenKeyName,
   reservedSecretKeyName,
@@ -51,14 +52,17 @@ const checkRequestRequirements = async (
   requestorder = throwIfMissing(),
 ) => {
   await requestorderSchema().validate(requestorder);
-  const params = await createObjParams({
-    params: requestorder.params,
-    tag: requestorder.tag,
-    callback: requestorder.callback,
+  const { tag, dataset, callback, params, requester } = requestorder;
+  const paramsObj = await createObjParams({
+    params,
+    tag,
+    callback,
     noCast: true,
   });
+  const isTee = checkActiveBitInTag(tag, 1);
+
   // check encryption key
-  if (params[paramsKeyName.IEXEC_RESULT_ENCRYPTION] === true) {
+  if (paramsObj[paramsKeyName.IEXEC_RESULT_ENCRYPTION] === true) {
     const isEncryptionKeySet = await checkWeb2SecretExists(
       contracts,
       smsURL,
@@ -73,24 +77,57 @@ const checkRequestRequirements = async (
   }
   // check storage token
   if (
-    params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'ipfs' ||
-    params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'dropbox'
+    paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'ipfs' ||
+    paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'dropbox'
   ) {
     const isStorageTokenSet = await checkWeb2SecretExists(
       contracts,
       smsURL,
-      requestorder.requester,
+      requester,
       getStorageTokenKeyName(
-        params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER],
+        paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER],
       ),
     );
     if (!isStorageTokenSet) {
       throw Error(
         `Requester storage token is not set for selected provider "${
-          params[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]
+          paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]
         }". Result archive upload will fail.`,
       );
     }
+  }
+  // check tee dataset encryption key
+  if (dataset && dataset !== NULL_ADDRESS && isTee) {
+    const isDatasetSecretSet = await checkWeb3SecretExists(
+      contracts,
+      smsURL,
+      dataset,
+    );
+    if (!isDatasetSecretSet) {
+      throw Error(
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
+      );
+    }
+  }
+  // check requester secrets
+  if (paramsObj[paramsKeyName.IEXEC_SECRETS]) {
+    await Promise.all(
+      Object.values(paramsObj[paramsKeyName.IEXEC_SECRETS]).map(
+        async (secretName) => {
+          const isSecetSet = await checkRequesterSecretExists(
+            contracts,
+            smsURL,
+            requester,
+            secretName,
+          );
+          if (!isSecetSet) {
+            throw Error(
+              `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisionning will fail.`,
+            );
+          }
+        },
+      ),
+    );
   }
   return true;
 };

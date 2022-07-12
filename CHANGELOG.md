@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.0] 2022-07-05
+
+### Added
+
+- workerpool API url configuration
+- `iexec task debug <taskid> [--logs]` to show offchain information
+- `ens.getDefaultDomain(address)` to get the default free to use ENS domain given an address
+- support for requester secrets
+- check dataset secret exists on requestorder check
+- check requester secret exists on requestorder check
+- app/dataset/workerpool predict address methods
+- app/dataset/workerpool check deployed methods
+
+### Changed
+
+- `show` commands display ENS when configured
+- `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
+- [DEPRECATED] Node 12 support will be droped
+
 ## [7.1.1] 2022-06-06
 
 ### Changed

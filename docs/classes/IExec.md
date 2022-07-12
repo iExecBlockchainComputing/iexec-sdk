@@ -29,6 +29,7 @@ module exposing all the iExec SDK modules
 - [order](IExec.md#order)
 - [orderbook](IExec.md#orderbook)
 - [result](IExec.md#result)
+- [secrets](IExec.md#secrets)
 - [storage](IExec.md#storage)
 - [task](IExec.md#task)
 - [wallet](IExec.md#wallet)
@@ -50,7 +51,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
+| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -148,6 +149,14 @@ ___
 • **result**: [`IExecResultModule`](IExecResultModule.md)
 
 result module
+
+___
+
+### secrets
+
+• **secrets**: [`IExecSecretsModule`](IExecSecretsModule.md)
+
+secrets module
 
 ___
 

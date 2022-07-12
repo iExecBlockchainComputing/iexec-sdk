@@ -69,7 +69,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
+| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -214,7 +214,7 @@ const apporderTemplate = await createApporder({app: appAddress});
 | `overrides.appprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset  default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -244,7 +244,7 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 | `overrides.dataset` | `string` | - |
 | `overrides.datasetprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -280,9 +280,9 @@ const requestorderTemplate = await createRequestorder({
 | `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
 | `overrides.dataset?` | `string` | dataset to use  default none |
 | `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task  default `0` |
-| `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string`  } | execution parameters |
+| `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\>  } | execution parameters |
 | `overrides.requester?` | `string` | requester  default connected wallet address |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
 | `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust  default `0` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpool?` | `string` | run one sprecified workerpool  default run on any workerpool |
@@ -314,7 +314,7 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 | `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset  default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | proposed tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | proposed tags  default `[]` |
 | `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | proposed trust  default `0` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpool` | `string` | - |

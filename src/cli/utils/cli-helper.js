@@ -50,8 +50,10 @@ const info = {
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
-  missingAddress: (obj) =>
-    `${obj} address not provided to CLI AND missing in "deployed.json"`,
+  missingAddressOrDeployed: (objName, chainId) =>
+    `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chainId}`,
+  missingEnsForObjectAtAddress: (objName, address) =>
+    `Missing ENS for ${objName} ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
   checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) =>
     `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
@@ -67,7 +69,7 @@ const desc = {
   userAddress: () => 'custom user address',
   initObj: (objName) => `init a new ${objName}`,
   deployObj: (objName) => `deploy a new ${objName}`,
-  createObj: (objName) => `deploy a new ${objName}`,
+  createObj: (objName) => `create a new ${objName}`,
   publishObj: (objName) =>
     `publish a ${objName}order on the marketplace to make the ${objName} publicly available (use options to set custom usage restriction)`,
   unpublishObj: (objName) =>
@@ -100,6 +102,8 @@ const desc = {
     'push the dataset secret to the secret management service (default push the last secret generated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () =>
     'push the public encryption key to the secret management service',
+  pushRequesterSecret: () =>
+    'push a requester named secret to the secret management service',
   checkSecret: () =>
     'check if a secret exists in the secret management service',
   encryptDataset: () =>
@@ -120,6 +124,7 @@ const desc = {
   requestRun: () => 'request an iExec application execution at limit price',
   initStorage: () => 'initialize the remote storage',
   checkStorage: () => 'check if the remote storage is initialized',
+  debugTask: () => `show task debug information`,
 };
 
 const option = {
@@ -321,6 +326,7 @@ const option = {
     '--token <token>',
     'storage provider authorization token (unsafe)',
   ],
+  secretValue: () => ['--secret-value <secretValue>', 'secret value (unsafe)'],
   skipRequestCheck: () => [
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
@@ -409,6 +415,10 @@ const orderOption = {
   requestArgs: () => [
     '--args <string>',
     'specify the arguments to pass to the app',
+  ],
+  requestSecrets: () => [
+    '--secret <secretMapping...>',
+    'specify the requester secrets mappings (<appSecretKey>=<requesterSecretName>) to use in the app (only available for TEE tasks, use with --tag tee)\n* usage: \n  * [command] [args] --secret 1=login 2=password\n  * [command] [args] --secret 1=login --secret 2=password\n  * [command] --secret 1=login --secret 2=password -- [args]\n* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list\n',
   ],
   requestInputFiles: () => [
     '--input-files <fileUrl>',

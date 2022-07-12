@@ -1,5 +1,6 @@
 const IExecModule = require('./IExecModule');
-const secretMgtServ = require('../common/modules/sms');
+const { checkWeb2SecretExists } = require('../common/sms/check');
+const { pushWeb2Secret } = require('../common/sms/push');
 const { getResultEncryptionKeyName } = require('../common/utils/secrets-utils');
 
 class IExecResultModule extends IExecModule {
@@ -7,7 +8,7 @@ class IExecResultModule extends IExecModule {
     super(...args);
 
     this.checkResultEncryptionKeyExists = async (address) =>
-      secretMgtServ.checkWeb2SecretExists(
+      checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         address,
@@ -17,7 +18,7 @@ class IExecResultModule extends IExecModule {
       publicKey,
       { forceUpdate = false } = {},
     ) =>
-      secretMgtServ.pushWeb2Secret(
+      pushWeb2Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         getResultEncryptionKeyName(),
