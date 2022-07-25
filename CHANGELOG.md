@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- [DEPRECATED] request param `iexec_developer_logger` was removed from iExec worker, using this param no longer have an effect. `iexec_developer_logger` will be removed in a next version.
+
 ## [7.2.1] 2022-07-25
 
 ## Changed

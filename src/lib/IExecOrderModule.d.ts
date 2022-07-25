@@ -520,6 +520,8 @@ export default class IExecOrderModule extends IExecModule {
            */
           iexec_result_storage_proxy?: string;
           /**
+           * [deprecated]
+           *
            * enable debug logs
            *
            * default false
