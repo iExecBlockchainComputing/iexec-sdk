@@ -142,6 +142,7 @@ Additionaly the [IExec](./classes/IExec.md) module exposes all the following lis
 - [IExecOrderModule](./classes/IExecOrderModule.md) exposes **order** methods
 - [IExecOrderbookModule](./classes/IExecOrderbookModule.md) exposes **orderbook** methods
 - [IExecResultModule](./classes/IExecResultModule.md) exposes **result** methods
+- [IExecSecretsModule](./classes/IExecSecretsModule.md) exposes **secrets** methods
 - [IExecStorageModule](./classes/IExecStorageModule.md) exposes **storage** methods
 - [IExecTaskModule](./classes/IExecTaskModule.md) exposes **task** methods
 - [IExecWalletModule](./classes/IExecWalletModule.md) exposes **wallet** methods
