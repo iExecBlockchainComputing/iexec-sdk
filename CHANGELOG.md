@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.1] 2022-07-25
+
+## Changed
+
+- TypeScript fixes
+
 ## [7.2.0] 2022-07-05
 
 ### Added
