@@ -164,11 +164,11 @@ export default class IExecOrderbookModule extends IExecModule {
       /**
        * filter by minimum tag required
        */
-      minTag: Tag | HumanSingleTag[];
+      minTag?: Tag | HumanSingleTag[];
       /**
        * filter by maximun tag accepted
        */
-      maxTag: Tag | HumanSingleTag[];
+      maxTag?: Tag | HumanSingleTag[];
     },
   ): Promise<PaginableOrders<PublishedApporder>>;
   /**
@@ -205,11 +205,11 @@ export default class IExecOrderbookModule extends IExecModule {
       /**
        * filter by minimum tag required
        */
-      minTag: Tag | HumanSingleTag[];
+      minTag?: Tag | HumanSingleTag[];
       /**
        * filter by maximun tag accepted
        */
-      maxTag: Tag | HumanSingleTag[];
+      maxTag?: Tag | HumanSingleTag[];
     },
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
@@ -236,7 +236,7 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * include orders restricted to specified app
      */
-    app: Addressish;
+    app?: Addressish;
     /**
      * include orders restricted to specified dataset
      */
@@ -252,15 +252,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by minimum tag required
      */
-    minTag: Tag | HumanSingleTag[];
+    minTag?: Tag | HumanSingleTag[];
     /**
      * filter by maximun tag offered
      */
-    maxTag: Tag | HumanSingleTag[];
+    maxTag?: Tag | HumanSingleTag[];
     /**
      * filter by minimum trust required
      */
-    minTrust: BNish;
+    minTrust?: BNish;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find the best paying request orders for computing resource.
@@ -286,7 +286,7 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * include orders restricted to specified app
      */
-    app: Addressish;
+    app?: Addressish;
     /**
      * include orders restricted to specified dataset
      */
@@ -302,15 +302,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by minimum tag required
      */
-    minTag: Tag | HumanSingleTag[];
+    minTag?: Tag | HumanSingleTag[];
     /**
      * filter by maximun tag accepted
      */
-    maxTag: Tag | HumanSingleTag[];
+    maxTag?: Tag | HumanSingleTag[];
     /**
      * filter by maximum trust required
      */
-    maxTrust: BNish;
+    maxTrust?: BNish;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find a published apporder by orderHash.

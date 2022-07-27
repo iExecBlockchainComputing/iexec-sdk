@@ -314,7 +314,7 @@ const objParamsSchema = () =>
         otherwise: string().notRequired(),
       },
     ),
-    [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(),
+    [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
 const paramsSchema = () =>
