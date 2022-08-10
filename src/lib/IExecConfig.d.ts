@@ -98,7 +98,7 @@ export interface IExecConfigOptions {
   /**
    * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
    */
-  providerOptions: ProviderOptions;
+  providerOptions?: ProviderOptions;
 }
 
 /**

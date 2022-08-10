@@ -122,7 +122,7 @@ ___
 
 ### providerOptions
 
-• **providerOptions**: [`ProviderOptions`](internal_.ProviderOptions.md)
+• `Optional` **providerOptions**: [`ProviderOptions`](internal_.ProviderOptions.md)
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 
