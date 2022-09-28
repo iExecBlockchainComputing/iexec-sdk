@@ -94,6 +94,7 @@ const {
   isEthAddress,
   renderTasksStatus,
   getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const {
   loadIExecConf,
@@ -307,7 +308,7 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
       const secretIsSet = await checkAppSecretExists(
         chain.contracts,
         sms,
@@ -342,7 +343,7 @@ pushSecret
       const keystore = Keystore(Object.assign(walletOptions));
       const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
       await keystore.accounts();
       const resourceAddress =
         objAddress ||
@@ -916,7 +917,7 @@ run
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -1222,7 +1223,7 @@ requestRun
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain),
           },
           requestorderToSign,
         ).catch((e) => {

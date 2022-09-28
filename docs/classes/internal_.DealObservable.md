@@ -44,7 +44,7 @@ data:
 | message | comment |
 | --- | --- |
 | `DEAL_UPDATED` | sent every time a task status changes |
-| `DEAL_COMPLETED` | sent once all tasks are complteted |
+| `DEAL_COMPLETED` | sent once all tasks are completed |
 | `DEAL_TIMEDOUT` | sent once the timeout is reached before all tasks completion |
 
 #### Parameters
@@ -70,7 +70,7 @@ data:
 | message | comment |
 | --- | --- |
 | `DEAL_UPDATED` | sent every time a task status changes |
-| `DEAL_COMPLETED` | sent once all tasks are complteted |
+| `DEAL_COMPLETED` | sent once all tasks are completed |
 | `DEAL_TIMEDOUT` | sent once the timeout is reached before all tasks completion |
 
 ##### Returns

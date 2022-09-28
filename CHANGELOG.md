@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## next
+
+### Changed
+
+- SMS URL resolution depends on TEE framework (default `scone`)
+- SMS URL override in `IExecConfig` or `chain.json`accepts `Record<TeeFramework,Url> | string`
+
 ## [7.2.2] 2022-09-05
 
 ### Changed

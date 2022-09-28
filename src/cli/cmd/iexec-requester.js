@@ -15,7 +15,7 @@ const {
   option,
   prompt,
   Spinner,
-  getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { Keystore } = require('../utils/keystore');
@@ -45,7 +45,7 @@ pushSecret
       ]);
       await connectKeystore(chain, keystore);
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
 
       spinner.info(`Secret "${secretName}" for address ${address}`);
       const secretValue =
@@ -99,7 +99,7 @@ checkSecret
         );
       }
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
       const secretExists = await checkRequesterSecretExists(
         contracts,
         sms,

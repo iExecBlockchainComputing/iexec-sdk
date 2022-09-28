@@ -234,7 +234,7 @@ ___
 
 ▸ **fetchRequesterDeals**(`requesterAddress`, `filters?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
-fetch the latest deals of the requester optionaly filtered by specified filters.
+fetch the latest deals of the requester optionally filtered by specified filters.
 
 _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
 

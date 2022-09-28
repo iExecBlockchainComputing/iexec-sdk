@@ -14,7 +14,7 @@
 
   ↳ [`TaskObservable`](internal_.TaskObservable.md)
 
-  ↳ [`BrigdeObservable`](internal_.BrigdeObservable.md)
+  ↳ [`BridgeObservable`](internal_.BridgeObservable.md)
 
 ## Table of contents
 

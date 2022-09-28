@@ -160,7 +160,9 @@ export default class IExecConfig {
   /**
    * resolve the current SMS URL
    */
-  resolveSmsURL(): Promise<string>;
+  resolveSmsURL(options?: {
+    teeFramework?: 'scone' | 'gramine';
+  }): Promise<string>;
   /**
    * resolve the current result proxy URL
    */

@@ -706,7 +706,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 - `chains` set the available chains
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value), this key accepts a string or a mapping TEE framework - SMS url.
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
@@ -726,7 +726,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "standard",
@@ -742,7 +744,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-sidechain": {
       "host": "http://localhost:18545",
       "id": "123456",
-      "sms": "http://localhost:15000",
+      "sms": {
+        "scone": "http://localhost:15000"
+      },
       "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
@@ -757,7 +761,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-enterprise": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "enterprise",

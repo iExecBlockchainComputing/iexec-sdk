@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { string, number, object, mixed, boolean, array } = require('yup');
+const { string, number, object, mixed, boolean, array, lazy } = require('yup');
 const { getAddress, namehash } = require('ethers').utils;
 const {
   humanToMultiaddrBuffer,
@@ -12,6 +12,7 @@ const {
 const { paramsKeyName, storageProviders } = require('./params-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
+const { TEE_FRAMEWORKS } = require('./constant');
 
 const debug = Debug('validators');
 
@@ -740,6 +741,27 @@ const textRecordValueSchema = () => string().default('').strict(true);
 
 const workerpoolApiUrlSchema = () => string().url().default('');
 
+const basicUrlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
+
+const smsUrlOrMapSchema = () =>
+  lazy((stringOrMap) => {
+    switch (typeof stringOrMap) {
+      case 'string':
+        return basicUrlSchema().required();
+      case 'object':
+        return object({
+          [TEE_FRAMEWORKS.SCONE]: basicUrlSchema(),
+          [TEE_FRAMEWORKS.GRAMINE]: basicUrlSchema(),
+        })
+          .noUnknown(true)
+          .nullable(false)
+          .strict(true);
+      default:
+        return basicUrlSchema();
+    }
+  });
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -790,5 +812,6 @@ module.exports = {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
+  smsUrlOrMapSchema,
   ValidationError,
 };

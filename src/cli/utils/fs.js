@@ -6,6 +6,7 @@ const { APP, DATASET } = require('../../common/utils/constant');
 const {
   addressSchema,
   chainIdSchema,
+  smsUrlOrMapSchema,
 } = require('../../common/utils/validator');
 const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
@@ -19,7 +20,7 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // todo address
     ensPublicResolver: string(), // todo address
-    sms: string(),
+    sms: smsUrlOrMapSchema(),
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),

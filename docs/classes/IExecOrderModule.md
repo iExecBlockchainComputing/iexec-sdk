@@ -214,7 +214,7 @@ const apporderTemplate = await createApporder({app: appAddress});
 | `overrides.appprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset  default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -244,7 +244,7 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 | `overrides.dataset` | `string` | - |
 | `overrides.datasetprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -282,10 +282,10 @@ const requestorderTemplate = await createRequestorder({
 | `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task  default `0` |
 | `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\>  } | execution parameters |
 | `overrides.requester?` | `string` | requester  default connected wallet address |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust  default `0` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
-| `overrides.workerpool?` | `string` | run one sprecified workerpool  default run on any workerpool |
+| `overrides.workerpool?` | `string` | run one specified workerpool  default run on any workerpool |
 | `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | workerpool max price per task  default `0` |
 
 #### Returns
@@ -519,7 +519,7 @@ ___
 
 publish a requestorder on the off-chain marketplace making it available for other users
 
-_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
 
 example:
 ```js
@@ -627,7 +627,7 @@ ___
 
 sign a requestorder template to create a valid order
 
-_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
 
 example:
 ```js

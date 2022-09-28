@@ -9,10 +9,10 @@ example:
 // create the configuration
 const config = new IExecConfig({ ethProvider: window.ethereum });
 
-// instanciate iExec SDK
+// instantiate iExec SDK
 const iexec = IExec.fromConfig(config);
 
-// or instanciate IExecModules sharing the same configuration
+// or instantiate IExecModules sharing the same configuration
 const account = IExecAccountModule.fromConfig(config);
 const wallet = IExecWalletModule.fromConfig(config);
 ```
@@ -192,9 +192,16 @@ ___
 
 ### resolveSmsURL
 
-▸ **resolveSmsURL**(): `Promise`<`string`\>
+▸ **resolveSmsURL**(`options?`): `Promise`<`string`\>
 
 resolve the current SMS URL
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options?` | `Object` |
+| `options.teeFramework?` | ``"scone"`` \| ``"gramine"`` |
 
 #### Returns
 

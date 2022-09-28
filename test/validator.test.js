@@ -38,6 +38,7 @@ const {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
+  smsUrlOrMapSchema,
   ValidationError,
 } = require('../src/common/utils/validator');
 
@@ -1284,8 +1285,67 @@ describe('[workerpoolApiUrlSchema]', () => {
     expect(res).toBe('');
   });
   test('throw with null', async () => {
-    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+    await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
       'this must be a `string` type, but the final value was: `null`.',
     );
+  });
+});
+
+describe('[smsUrlOrMapSchema]', () => {
+  test('allow IP with port', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://192.168.0.1:8080');
+    expect(res).toBe('http://192.168.0.1:8080');
+  });
+  test('allow url', async () => {
+    const res = await smsUrlOrMapSchema().validate('https://my-sms.com');
+    expect(res).toBe('https://my-sms.com');
+  });
+  test('allow docker url', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://my-sms');
+    expect(res).toBe('http://my-sms');
+  });
+  test('allow undefined', async () => {
+    const res = await smsUrlOrMapSchema().validate();
+    expect(res).toBe(undefined);
+  });
+  test('allow Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      scone: 'http://scone-sms',
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('allow partial Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('throw with empty string', async () => {
+    await expect(smsUrlOrMapSchema().validate('')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with null', async () => {
+    await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
+      'this must be a `object` type, but the final value was: `null`.',
+    );
+  });
+  test('throw with invalid url', async () => {
+    await expect(smsUrlOrMapSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with unknown TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ foo: 'https://my-sms.com' }),
+    ).rejects.toThrow('this field has unspecified keys: foo');
+  });
+  test('throw with invalid url on a TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ scone: 'foo' }),
+    ).rejects.toThrow('scone is not a valid url');
   });
 });
