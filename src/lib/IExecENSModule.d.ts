@@ -63,7 +63,7 @@ declare class ENSConfigurationObservable extends Observable {
      */
     error: (error: Error) => any;
   }): /**
-   * `cancel: () => void` method, calling this method cancels the subscribtion and stops the configuration
+   * `cancel: () => void` method, calling this method cancels the subscription and stops the configuration
    *
    * no callback is fired after calling this method
    */
@@ -131,7 +131,7 @@ export default class IExecENSModule extends IExecModule {
    *   'me',
    *   'users.iexec.eth',
    * );
-   * console.log('regitered:', name);
+   * console.log('registered:', name);
    * ```
    */
   claimName(
@@ -160,7 +160,7 @@ export default class IExecENSModule extends IExecModule {
    * configureResolutionObservable.subscribe({
    *   error: console.error,
    *   next: ({ message, ...rest }) =>
-   *     console.log(`${message} ${JSON.strigify(rest)}`),
+   *     console.log(`${message} ${JSON.stringify(rest)}`),
    *   completed: () => console.log('resolution configured'),
    * });
    * ```
@@ -173,7 +173,7 @@ export default class IExecENSModule extends IExecModule {
    * configureResolutionObservable.subscribe({
    *   error: console.error,
    *   next: ({ message, ...rest }) =>
-   *     console.log(`${message} ${JSON.strigify(rest)}`),
+   *     console.log(`${message} ${JSON.stringify(rest)}`),
    *   completed: () => console.log('resolution configured'),
    * });
    * ```

@@ -310,7 +310,7 @@ export default class IExecOrderModule extends IExecModule {
      */
     volume?: BNish;
     /**
-     * restrict usage to runtimes with specified tags
+     * restrict usage to runtime with specified tags
      *
      * default `[]`
      */
@@ -357,7 +357,7 @@ export default class IExecOrderModule extends IExecModule {
      */
     volume?: BNish;
     /**
-     * restrict usage to runtimes with specified tags
+     * restrict usage to runtime with specified tags
      *
      * default `[]`
      */
@@ -466,7 +466,7 @@ export default class IExecOrderModule extends IExecModule {
      */
     dataset?: Addressish;
     /**
-     * run one sprecified workerpool
+     * run one specified workerpool
      *
      * default run on any workerpool
      */
@@ -554,7 +554,7 @@ export default class IExecOrderModule extends IExecModule {
      */
     volume?: BNish;
     /**
-     * restrict usage to runtimes with specified tags
+     * restrict usage to runtime with specified tags
      *
      * default `[]`
      */
@@ -622,7 +622,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign a requestorder template to create a valid order
    *
-   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
    *
    * example:
    * ```js
@@ -779,7 +779,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a requestorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
    *
    * example:
    * ```js
