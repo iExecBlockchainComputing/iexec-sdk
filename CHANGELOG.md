@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## next
 
+### Added
+
+- `defaultTeeFramework` option for `IExecConfig` for choosing the default TEE framework to use
+
 ### Changed
 
 - SMS URL resolution depends on TEE framework (default `scone`)

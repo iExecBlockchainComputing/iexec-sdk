@@ -93,6 +93,22 @@ describe('[IExecConfig]', () => {
       });
     });
 
+    describe('throw Invalid option defaultTeeFramework', () => {
+      test('IExecConfig({ ethProvider }, { defaultTeeFramework: "foo" })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { defaultTeeFramework: 'foo' },
+          );
+        expect(createConfig).toThrow(
+          Error(
+            'Invalid defaultTeeFramework: this is not a valid TEE framework',
+          ),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
     describe('read-only ethProvider from network name', () => {
       test('IExecConfig({ ethProvider: "mainnet" })', async () => {
         const config = new IExecConfig({ ethProvider: 'mainnet' });
@@ -902,6 +918,22 @@ describe('[IExecConfig]', () => {
       }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
       expect(defaultSms).toBe(sconeSms);
       expect(defaultSms).not.toBe(gramineSms);
+    });
+    test('success override defaultTeeFramework', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const defaultSmsTeeFrameworkOverride = await new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
+      ).resolveSmsURL();
+      const gramineSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
+      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
     });
     test('success smsURL object override per teeFramework', async () => {
       const smsMap = {

@@ -84,6 +84,10 @@ export interface IExecConfigOptions {
    */
   smsURL?: Record<'scone' | 'gramine', string> | string;
   /**
+   * override the TEE framework to use when as default
+   */
+  defaultTeeFramework?: 'scone' | 'gramine';
+  /**
    * override the IPFS gateway URL to target a custom instance
    */
   ipfsGatewayURL?: string;

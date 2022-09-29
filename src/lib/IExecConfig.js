@@ -12,7 +12,10 @@ const {
   TEE_FRAMEWORKS,
 } = require('../common/utils/config');
 const { getReadOnlyProvider } = require('../common/utils/providers');
-const { smsUrlOrMapSchema } = require('../common/utils/validator');
+const {
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
+} = require('../common/utils/validator');
 
 const debug = Debug('iexec:IExecConfig');
 
@@ -29,10 +32,11 @@ class IExecConfig {
       bridgeAddress,
       bridgedNetworkConf = {},
       enterpriseSwapConf = {},
-      resultProxyURL,
       smsURL,
+      resultProxyURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      defaultTeeFramework,
       providerOptions,
     } = {},
   ) {
@@ -67,11 +71,21 @@ class IExecConfig {
       throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
     }
 
-    let smsUrlOrMap;
+    let vSmsUrlOrMap;
     try {
-      smsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
+      vSmsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
     } catch (err) {
       throw new ConfigurationError(`Invalid smsURL: ${err.message}`);
+    }
+
+    let vDefaultTeeFramework;
+    try {
+      vDefaultTeeFramework =
+        teeFrameworkSchema().validateSync(defaultTeeFramework);
+    } catch (err) {
+      throw new ConfigurationError(
+        `Invalid defaultTeeFramework: ${err.message}`,
+      );
     }
 
     const networkPromise = (async () => {
@@ -328,13 +342,13 @@ class IExecConfig {
     };
 
     this.resolveSmsURL = async ({
-      teeFramework = TEE_FRAMEWORKS.SCONE,
+      teeFramework = vDefaultTeeFramework || TEE_FRAMEWORKS.SCONE,
     } = {}) => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value =
-        (typeof smsUrlOrMap === 'string' && smsUrlOrMap) ||
-        (typeof smsUrlOrMap === 'object' && smsUrlOrMap[teeFramework]) ||
+        (typeof vSmsUrlOrMap === 'string' && vSmsUrlOrMap) ||
+        (typeof vSmsUrlOrMap === 'object' && vSmsUrlOrMap[teeFramework]) ||
         (chainConfDefaults.sms && chainConfDefaults.sms[teeFramework]);
       if (value !== undefined) {
         return value;
