@@ -808,6 +808,7 @@ module.exports = {
   positiveIntSchema,
   positiveStrictIntSchema,
   mrenclaveSchema,
+  objMrenclaveSchema,
   appTypeSchema,
   appSchema,
   datasetSchema,

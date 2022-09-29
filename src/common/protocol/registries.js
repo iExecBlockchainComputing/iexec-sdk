@@ -5,6 +5,7 @@ const {
   datasetSchema,
   workerpoolSchema,
   uint256Schema,
+  objMrenclaveSchema,
   throwIfMissing,
 } = require('../utils/validator');
 const {
@@ -440,6 +441,21 @@ const showUserWorkerpool = async (
   return { objAddress, workerpool: clean };
 };
 
+const resolveTeeFrameworkFromApp = async (app, { strict = true } = {}) => {
+  if (app.appMREnclave) {
+    try {
+      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
+      return mrenclave.provider;
+    } catch (err) {
+      debug('resolveTeeFrameworkFromApp()', err);
+      if (strict) {
+        throw Error('Failed to resolve TEE framework from app');
+      }
+    }
+  }
+  return undefined;
+};
+
 module.exports = {
   predictAppAddress,
   predictDatasetAddress,
@@ -468,4 +484,5 @@ module.exports = {
   countUserApps,
   countUserDatasets,
   countUserWorkerpools,
+  resolveTeeFrameworkFromApp,
 };
