@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- `defaultTeeFramework` option for `IExecConfig` for choosing the default TEE framework to use
+- `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
 
 ### Changed
 
