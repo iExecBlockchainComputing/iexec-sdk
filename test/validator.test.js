@@ -2,6 +2,7 @@ const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -40,6 +41,7 @@ const {
   workerpoolApiUrlSchema,
   smsUrlOrMapSchema,
   ValidationError,
+  teeFrameworkSchema,
 } = require('../src/common/utils/validator');
 
 const { INFURA_PROJECT_ID } = process.env;
@@ -1347,5 +1349,29 @@ describe('[smsUrlOrMapSchema]', () => {
     await expect(
       smsUrlOrMapSchema().validate({ scone: 'foo' }),
     ).rejects.toThrow('scone is not a valid url');
+  });
+});
+
+describe('[teeFrameworkSchema]', () => {
+  test('allow known TEE frameworks', async () => {
+    await expect(
+      teeFrameworkSchema().validate(TEE_FRAMEWORKS.SCONE),
+    ).resolves.toBe(TEE_FRAMEWORKS.SCONE);
+    await expect(
+      teeFrameworkSchema().validate(TEE_FRAMEWORKS.GRAMINE),
+    ).resolves.toBe(TEE_FRAMEWORKS.GRAMINE);
+  });
+  test('allow undefined', async () => {
+    await expect(teeFrameworkSchema().validate()).resolves.toBe(undefined);
+  });
+  test('throw with unknown TEE framework', async () => {
+    await expect(teeFrameworkSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid TEE framework',
+    );
+  });
+  test('throw with empty string', async () => {
+    await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
+      'this is not a valid TEE framework',
+    );
   });
 });

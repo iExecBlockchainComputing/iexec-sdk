@@ -762,6 +762,10 @@ const smsUrlOrMapSchema = () =>
     }
   });
 
+const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
+const teeFrameworkSchema = () =>
+  string().oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -813,5 +817,6 @@ module.exports = {
   textRecordValueSchema,
   workerpoolApiUrlSchema,
   smsUrlOrMapSchema,
+  teeFrameworkSchema,
   ValidationError,
 };

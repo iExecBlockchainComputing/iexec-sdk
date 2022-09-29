@@ -11,6 +11,7 @@
 - [bridgeAddress](internal_.IExecConfigOptions.md#bridgeaddress)
 - [bridgedNetworkConf](internal_.IExecConfigOptions.md#bridgednetworkconf)
 - [confirms](internal_.IExecConfigOptions.md#confirms)
+- [defaultTeeFramework](internal_.IExecConfigOptions.md#defaultteeframework)
 - [ensPublicResolverAddress](internal_.IExecConfigOptions.md#enspublicresolveraddress)
 - [ensRegistryAddress](internal_.IExecConfigOptions.md#ensregistryaddress)
 - [enterpriseSwapConf](internal_.IExecConfigOptions.md#enterpriseswapconf)
@@ -55,6 +56,14 @@ ___
 • `Optional` **confirms**: `boolean`
 
 number of block to wait for transactions confirmation (default 1)
+
+___
+
+### defaultTeeFramework
+
+• `Optional` **defaultTeeFramework**: ``"scone"`` \| ``"gramine"``
+
+override the TEE framework to use when as default
 
 ___
 

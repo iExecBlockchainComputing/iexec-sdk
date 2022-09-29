@@ -37,6 +37,10 @@ const tokenChainOpenethereumUrl = DRONE
   : 'http://localhost:9545';
 // secret management service
 const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+
+const smsMap = {
+  scone: smsURL,
+};
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -130,7 +134,7 @@ const setTokenChain = (options) =>
           id: networkId,
           host: tokenChainUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -150,7 +154,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           id: networkId,
           host: tokenChainUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -163,7 +167,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           host: tokenChainUrl,
           hub: enterpriseHubAddress,
           flavour: 'enterprise',
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -187,7 +191,7 @@ const setNativeChain = (options) =>
           hub: hubAddress,
           native: true,
           useGas: false,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -207,7 +211,7 @@ const setTokenChainOpenethereum = (options) =>
           id: networkId,
           host: tokenChainOpenethereumUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
