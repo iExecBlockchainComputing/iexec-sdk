@@ -7,6 +7,7 @@ const {
   addressSchema,
   chainIdSchema,
   smsUrlOrMapSchema,
+  teeFrameworkSchema,
 } = require('../../common/utils/validator');
 const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
@@ -27,6 +28,7 @@ const chainConfSchema = () =>
     native: boolean(),
     useGas: boolean().default(true),
     flavour: string().oneOf(['standard', 'enterprise']),
+    defaultTeeFramework: teeFrameworkSchema(),
     bridge: object({
       bridgedChainName: string().required(),
       contract: addressSchema().required(),

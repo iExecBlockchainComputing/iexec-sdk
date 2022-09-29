@@ -817,20 +817,27 @@ const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
   return value;
 };
 
-const getSmsUrlFromChain = (
-  chain,
-  { teeFramework = TEE_FRAMEWORKS.SCONE, strict = true } = {},
-) => {
+const getDefaultTeeFrameworkFromChain = (chain) =>
+  getPropertyFormChain(chain, 'defaultTeeFramework', { strict: false }) ||
+  TEE_FRAMEWORKS.SCONE;
+
+const getSmsUrlFromChain = (chain, { teeFramework, strict = true } = {}) => {
+  const selectedTeeFramework =
+    teeFramework ||
+    getDefaultTeeFrameworkFromChain(chain, 'defaultTeeFramework');
   let smsUrl;
   const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
   if (typeof smsUrlOrMap === 'string') {
     smsUrl = smsUrlOrMap;
-  } else if (typeof smsUrlOrMap === 'object' && smsUrlOrMap[teeFramework]) {
-    smsUrl = smsUrlOrMap[teeFramework];
+  } else if (
+    typeof smsUrlOrMap === 'object' &&
+    smsUrlOrMap[selectedTeeFramework]
+  ) {
+    smsUrl = smsUrlOrMap[selectedTeeFramework];
   }
   if (smsUrl === undefined && strict)
     throw Error(
-      `Missing sms for tee framework ${teeFramework} in "chain.json" for chain ${chain.id}`,
+      `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`,
     );
   return smsUrl;
 };
