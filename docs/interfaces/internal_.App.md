@@ -29,7 +29,7 @@ ___
 
 ### mrenclave
 
-• `Optional` **mrenclave**: `string`
+• `Optional` **mrenclave**: `string` \| { `entrypoint`: `string` ; `fingerprint`: `string` ; `heapSize`: `number` ; `provider`: ``"SCONE"`` \| ``"GRAMINE"`` ; `version`: `string`  }
 
 optional for TEE apps only, specify the TEE protocol to use
 
