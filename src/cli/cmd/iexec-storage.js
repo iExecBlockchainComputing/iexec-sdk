@@ -19,6 +19,7 @@ const {
   prompt,
   Spinner,
   getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { Keystore } = require('../utils/keystore');
@@ -44,7 +45,7 @@ initStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getPropertyFormChain(chain, 'sms');
+      const smsURL = getSmsUrlFromChain(chain);
       const resultProxyURL = getPropertyFormChain(chain, 'resultProxy');
 
       const providerName = provider || 'default';
@@ -116,7 +117,7 @@ checkStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getPropertyFormChain(chain, 'sms');
+      const smsURL = getSmsUrlFromChain(chain);
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAdress = opts.user || address;

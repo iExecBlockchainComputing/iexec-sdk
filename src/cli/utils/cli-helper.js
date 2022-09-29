@@ -12,6 +12,7 @@ const {
   positiveStrictIntSchema,
 } = require('../../common/utils/validator');
 const { storageProviders } = require('../../common/utils/params-utils');
+const { TEE_FRAMEWORKS } = require('../../common/utils/config');
 
 const debug = Debug('help');
 
@@ -816,6 +817,24 @@ const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
   return value;
 };
 
+const getSmsUrlFromChain = (
+  chain,
+  { teeFramework = TEE_FRAMEWORKS.SCONE, strict = true } = {},
+) => {
+  let smsUrl;
+  const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
+  if (typeof smsUrlOrMap === 'string') {
+    smsUrl = smsUrlOrMap;
+  } else if (typeof smsUrlOrMap === 'object' && smsUrlOrMap[teeFramework]) {
+    smsUrl = smsUrlOrMap[teeFramework];
+  }
+  if (smsUrl === undefined && strict)
+    throw Error(
+      `Missing sms for tee framework ${teeFramework} in "chain.json" for chain ${chain.id}`,
+    );
+  return smsUrl;
+};
+
 const handleError = (error, cli, opts) => {
   debug('error', error);
   const spinner = Spinner(opts);
@@ -991,6 +1010,7 @@ module.exports = {
   option,
   orderOption,
   getPropertyFormChain,
+  getSmsUrlFromChain,
   addGlobalOptions,
   addWalletCreateOptions,
   addWalletLoadOptions,

@@ -75,10 +75,10 @@ decrypt an encrypted result file
 example:
 ```js
 // somehow load the beneficiary RSA private key
-const beneficaryKey = await loadBeneficiaryKey();
+const beneficiaryKey = await loadBeneficiaryKey();
 const response = await iexec.task.fetchResults('0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19');
 const encFileBuffer = await response.arrayBuffer();
-const decryptedFileBuffer = await decryptResult(encFileBuffer, beneficaryKey);
+const decryptedFileBuffer = await decryptResult(encFileBuffer, beneficiaryKey);
 const binary = new Blob([decryptedFileBuffer]);
 ```
 

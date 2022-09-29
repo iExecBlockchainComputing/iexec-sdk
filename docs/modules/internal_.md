@@ -6,7 +6,7 @@
 
 ### Classes
 
-- [BrigdeObservable](../classes/internal_.BrigdeObservable.md)
+- [BridgeObservable](../classes/internal_.BridgeObservable.md)
 - [DealObservable](../classes/internal_.DealObservable.md)
 - [ENSConfigurationObservable](../classes/internal_.ENSConfigurationObservable.md)
 - [EnhancedWallet](../classes/internal_.EnhancedWallet.md)

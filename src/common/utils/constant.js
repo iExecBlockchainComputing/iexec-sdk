@@ -26,6 +26,11 @@ const NULL_DATASETORDER = {
 
 const WORKERPOOL_URL_TEXT_RECORD_KEY = 'iexec:workerpool-api:url';
 
+const TEE_FRAMEWORKS = {
+  SCONE: 'scone',
+  GRAMINE: 'gramine',
+};
+
 module.exports = {
   APP,
   DATASET,
@@ -40,4 +45,5 @@ module.exports = {
   NULL_BYTES32,
   NULL_DATASETORDER,
   WORKERPOOL_URL_TEXT_RECORD_KEY,
+  TEE_FRAMEWORKS,
 };

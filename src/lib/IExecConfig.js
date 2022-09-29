@@ -9,8 +9,10 @@ const {
 const {
   getChainDefaults,
   isEnterpriseEnabled,
+  TEE_FRAMEWORKS,
 } = require('../common/utils/config');
 const { getReadOnlyProvider } = require('../common/utils/providers');
+const { smsUrlOrMapSchema } = require('../common/utils/validator');
 
 const debug = Debug('iexec:IExecConfig');
 
@@ -63,6 +65,13 @@ class IExecConfig {
       }
     } catch (err) {
       throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
+    }
+
+    let smsUrlOrMap;
+    try {
+      smsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid smsURL: ${err.message}`);
     }
 
     const networkPromise = (async () => {
@@ -318,10 +327,15 @@ class IExecConfig {
       return enterpriseSwapContracts;
     };
 
-    this.resolveSmsURL = async () => {
+    this.resolveSmsURL = async ({
+      teeFramework = TEE_FRAMEWORKS.SCONE,
+    } = {}) => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = smsURL || chainConfDefaults.sms;
+      const value =
+        (typeof smsUrlOrMap === 'string' && smsUrlOrMap) ||
+        (typeof smsUrlOrMap === 'object' && smsUrlOrMap[teeFramework]) ||
+        (chainConfDefaults.sms && chainConfDefaults.sms[teeFramework]);
       if (value !== undefined) {
         return value;
       }

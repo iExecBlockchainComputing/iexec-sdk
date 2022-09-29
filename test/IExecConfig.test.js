@@ -3,6 +3,7 @@ const Eth = require('web3-eth');
 
 const { utils, IExecConfig, errors } = require('../src/lib');
 const IExecContractsClient = require('../src/common/utils/IExecContractsClient');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 console.log('Node version:', process.version);
 
@@ -73,6 +74,20 @@ describe('[IExecConfig]', () => {
         const createConfig = () => new IExecConfig({ ethProvider: {} });
         expect(createConfig).toThrow(
           Error('Invalid ethProvider: Unsupported provider'),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
+    describe('throw Invalid option smsURL', () => {
+      test('IExecConfig({ ethProvider }, { smsURL: { foo: "https://foo.com" } })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { smsURL: { foo: 'https://foo.com' } },
+          );
+        expect(createConfig).toThrow(
+          Error('Invalid smsURL: this field has unspecified keys: foo'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -875,17 +890,73 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success smsURL override', async () => {
+    test('success default resolves to scone', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const sconeSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const gramineSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSms).toBe(sconeSms);
+      expect(defaultSms).not.toBe(gramineSms);
+    });
+    test('success smsURL object override per teeFramework', async () => {
+      const smsMap = {
+        scone: 'http://foo.io',
+        gramine: 'http://bar.io',
+      };
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: smsMap },
+      );
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(smsMap.scone);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
+    });
+    test('success smsURL object override only one teeFramework', async () => {
+      const sconeDefaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const smsMap = {
+        gramine: 'http://bar.io',
+      };
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: smsMap },
+      );
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(sconeDefaultSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
+    });
+    test('success smsURL string override all teeFramework', async () => {
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
         { smsURL },
       );
-      const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(config.resolveSmsURL()).resolves.toBe(smsURL);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(smsURL);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsURL);
     });
-    test('success with smsURL on custom chain', async () => {
+    test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,

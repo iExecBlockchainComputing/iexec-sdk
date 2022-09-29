@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { string, number, object, mixed, boolean, array } = require('yup');
+const { string, number, object, mixed, boolean, array, lazy } = require('yup');
 const { getAddress, namehash } = require('ethers').utils;
 const {
   humanToMultiaddrBuffer,
@@ -12,6 +12,7 @@ const {
 const { paramsKeyName, storageProviders } = require('./params-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
+const { TEE_FRAMEWORKS } = require('./constant');
 
 const debug = Debug('validators');
 
@@ -22,8 +23,8 @@ const posStrictIntRegex = /^[1-9]\d*$/;
 const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
-      const trimed = value.replace(/^0+/, '');
-      return trimed.length > 0 ? trimed : '0';
+      const trimmed = value.replace(/^0+/, '');
+      return trimmed.length > 0 ? trimmed : '0';
     })
     .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
@@ -50,7 +51,7 @@ const hexnumberSchema = () =>
 const uint256Schema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
-const amontErrorMessage = ({ originalValue }) =>
+const amountErrorMessage = ({ originalValue }) =>
   `${
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
   } is not a valid amount`;
@@ -60,7 +61,7 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -71,25 +72,27 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseRLC(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
 const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -100,18 +103,20 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseEth(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
 const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
@@ -736,6 +741,27 @@ const textRecordValueSchema = () => string().default('').strict(true);
 
 const workerpoolApiUrlSchema = () => string().url().default('');
 
+const basicUrlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
+
+const smsUrlOrMapSchema = () =>
+  lazy((stringOrMap) => {
+    switch (typeof stringOrMap) {
+      case 'string':
+        return basicUrlSchema().required();
+      case 'object':
+        return object({
+          [TEE_FRAMEWORKS.SCONE]: basicUrlSchema(),
+          [TEE_FRAMEWORKS.GRAMINE]: basicUrlSchema(),
+        })
+          .noUnknown(true)
+          .nullable(false)
+          .strict(true);
+      default:
+        return basicUrlSchema();
+    }
+  });
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -786,5 +812,6 @@ module.exports = {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
+  smsUrlOrMapSchema,
   ValidationError,
 };

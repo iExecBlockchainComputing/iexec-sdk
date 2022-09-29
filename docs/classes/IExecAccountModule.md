@@ -65,7 +65,7 @@ current IExecConfig
 
 ▸ **checkBalance**(`address`): `Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
 
-check the account balance of specified address (stake is availlable nRLC, locked is escowed nRLC)
+check the account balance of specified address (stake is available nRLC, locked is escrowed nRLC)
 
 example:
 ```js

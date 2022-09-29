@@ -57,6 +57,7 @@ const {
   isBytes32,
   prompt,
   getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const {
   checkRequestRequirements,
@@ -310,7 +311,7 @@ sign
             await checkRequestRequirements(
               {
                 contracts: chain.contracts,
-                smsURL: getPropertyFormChain(chain, 'sms'),
+                smsURL: getSmsUrlFromChain(chain),
               },
               orderObj,
             ).catch((e) => {
@@ -468,7 +469,7 @@ fill
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain),
           },
           requestOrder,
         ).catch((e) => {
@@ -573,7 +574,7 @@ publish
                 await checkRequestRequirements(
                   {
                     contracts: chain.contracts,
-                    smsURL: getPropertyFormChain(chain, 'sms'),
+                    smsURL: getSmsUrlFromChain(chain),
                   },
                   orderToPublish,
                 ).catch((e) => {

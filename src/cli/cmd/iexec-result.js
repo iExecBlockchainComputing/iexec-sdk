@@ -29,7 +29,7 @@ const {
   DEFAULT_DECRYPTED_RESULTS_NAME,
   publicKeyName,
   privateKeyName,
-  getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { saveTextToFile } = require('../utils/fs');
@@ -222,7 +222,7 @@ pushSecret
       ]);
       await connectKeystore(chain, keystore);
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
 
       debug('address', address);
 
@@ -285,7 +285,7 @@ checkSecret
         spinner.info(`Checking encryption key exists for wallet ${keyAddress}`);
       }
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain);
       const secretExists = await checkWeb2SecretExists(
         contracts,
         sms,
