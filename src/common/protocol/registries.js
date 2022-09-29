@@ -91,9 +91,9 @@ const predictObjAddress =
         contracts.fetchRegistryContract(objName),
       );
       const args = createArgs[objName].map((e) => obj[e]);
-      const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
+      const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
       const predictedAddress = await wrapCall(
-        registryContract[predictFonctionName](...args),
+        registryContract[predictFunctionName](...args),
       );
       return predictedAddress;
     } catch (error) {
@@ -123,9 +123,9 @@ const deployObj =
         );
       }
       const args = createArgs[objName].map((e) => obj[e]);
-      const createFonctionName = 'create'.concat(toUpperFirst(objName));
+      const createFunctionName = 'create'.concat(toUpperFirst(objName));
       const tx = await wrapSend(
-        registryContract[createFonctionName](...args, contracts.txOptions),
+        registryContract[createFunctionName](...args, contracts.txOptions),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.events, {
