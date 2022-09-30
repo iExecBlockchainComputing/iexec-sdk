@@ -114,15 +114,15 @@ const checkRequestRequirements = async (
     await Promise.all(
       Object.values(paramsObj[paramsKeyName.IEXEC_SECRETS]).map(
         async (secretName) => {
-          const isSecetSet = await checkRequesterSecretExists(
+          const isSecretSet = await checkRequesterSecretExists(
             contracts,
             smsURL,
             requester,
             secretName,
           );
-          if (!isSecetSet) {
+          if (!isSecretSet) {
             throw Error(
-              `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisionning will fail.`,
+              `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisioning will fail.`,
             );
           }
         },

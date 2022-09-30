@@ -4321,7 +4321,7 @@ describe('[order]', () => {
         .then(iexec.order.signRequestorder),
     ).rejects.toThrow(
       Error(
-        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisionning will fail.`,
+        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisioning will fail.`,
       ),
     );
     // set secrets pass
