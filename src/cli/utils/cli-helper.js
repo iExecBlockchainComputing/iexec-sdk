@@ -255,12 +255,12 @@ const option = {
   ],
   maxTag: () => [
     '--max-tag <tag>',
-    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+    'specify maximum tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
   ],
   tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
   minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
   minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
-  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximum trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
