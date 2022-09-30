@@ -36,10 +36,16 @@ const tokenChainOpenethereumUrl = DRONE
   ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
+const gramineSms = DRONE
+  ? 'http://token-sms-gramine:13300'
+  : 'http://localhost:13302';
 
 const smsMap = {
-  scone: smsURL,
+  scone: sconeSms,
+  gramine: gramineSms,
 };
 // result proxy
 const resultProxyURL = DRONE

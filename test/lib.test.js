@@ -11,6 +11,7 @@ const {
   bytes32Regex,
   addressRegex,
 } = require('../src/common/utils/utils');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 const { NULL_ADDRESS } = utils;
 
@@ -82,7 +83,18 @@ const tokenChainOpenethereumUrl = DRONE
   ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
+const gramineSms = DRONE
+  ? 'http://token-sms-gramine:13300'
+  : 'http://localhost:13302';
+
+const smsMap = {
+  [TEE_FRAMEWORKS.SCONE]: sconeSms,
+  [TEE_FRAMEWORKS.GRAMINE]: gramineSms,
+};
+
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -3022,7 +3034,7 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const { address } = await deployRandomApp(iexec);
@@ -3036,7 +3048,7 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await expect(randomIexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
@@ -3061,7 +3073,7 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const { address } = await deployRandomApp(iexec);
@@ -3326,7 +3338,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await iexec.dataset.deployDataset({
@@ -3362,7 +3374,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await expect(
@@ -3386,7 +3398,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await deployRandomDataset(iexec, {
@@ -3413,8 +3425,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await deployRandomDataset(iexec);
@@ -4075,7 +4086,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4112,9 +4123,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4155,7 +4165,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4198,7 +4208,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const iexecDatasetConsumer = new IExec(
@@ -4208,7 +4218,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await iexecDatasetConsumer.storage
@@ -4275,7 +4285,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await iexec.storage
@@ -5923,8 +5933,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -5941,7 +5950,7 @@ describe('[order]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -6106,9 +6115,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -6122,9 +6130,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -7972,8 +7979,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops');
@@ -7998,8 +8004,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8028,8 +8033,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8058,8 +8062,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8086,8 +8089,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
@@ -8126,8 +8128,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.result.pushResultEncryptionKey('oops');
@@ -8152,8 +8153,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
@@ -8180,8 +8180,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
@@ -8282,8 +8281,7 @@ describe('[secrets]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
@@ -8307,8 +8305,7 @@ describe('[secrets]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await expect(
@@ -8610,7 +8607,7 @@ describe('[ens]', () => {
     );
   });
 
-  test('ens.claimName(label, domain) no registar', async () => {
+  test('ens.claimName(label, domain) no registrar', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainUrl,
