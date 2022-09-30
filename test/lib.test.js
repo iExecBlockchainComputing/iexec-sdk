@@ -267,7 +267,7 @@ const getId = () => {
   return sequenceId;
 };
 
-const deployRandomApp = async (iexec, { owner } = {}) => {
+const deployRandomApp = async (iexec, { owner, teeFramework } = {}) => {
   const appDeployRes = await iexec.app.deployApp({
     owner: owner || (await iexec.wallet.getAddress()),
     name: `app${getId()}`,
@@ -275,6 +275,13 @@ const deployRandomApp = async (iexec, { owner } = {}) => {
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    mrenclave: teeFramework && {
+      provider: teeFramework,
+      version: 'v1',
+      entrypoint: 'entrypoint.sh',
+      heapSize: 4096,
+      fingerprint: 'fingerprint',
+    },
   });
   return appDeployRes;
 };
@@ -3037,7 +3044,9 @@ describe('[app]', () => {
         smsURL: smsMap,
       },
     );
-    const { address } = await deployRandomApp(iexec);
+    const { address } = await deployRandomApp(iexec, {
+      teeFramework: 'gramine',
+    });
     const randomWallet = getRandomWallet();
     const randomIexec = new IExec(
       {
@@ -3051,15 +3060,28 @@ describe('[app]', () => {
         smsURL: smsMap,
       },
     );
+    // only owner can push secret
     await expect(randomIexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
       Error(
         `Wallet ${randomWallet.address} is not allowed to set secret for ${address}`,
       ),
     );
+    // infer teeFramework to use
     await expect(iexec.app.pushAppSecret(address, 'foo')).resolves.toBe(true);
+    // can't update existing secret
     await expect(iexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
       Error(`Secret already exists for ${address} and can't be updated`),
     );
+    // check inferred teeFramework with teeFramework option
+    await expect(
+      iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'gramine' }),
+    ).rejects.toThrow(
+      Error(`Secret already exists for ${address} and can't be updated`),
+    );
+    // check teeFramework option
+    await expect(
+      iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'scone' }),
+    ).resolves.toBe(true);
   });
 
   test('app.checkAppSecretExists()', async () => {
@@ -3076,10 +3098,21 @@ describe('[app]', () => {
         smsURL: smsMap,
       },
     );
-    const { address } = await deployRandomApp(iexec);
+    const { address } = await deployRandomApp(iexec, {
+      teeFramework: 'gramine',
+    });
     await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(false);
     await iexec.app.pushAppSecret(address, 'foo');
+    // infer teeFramework to use
     await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(true);
+    // check inferred teeFramework with teeFramework option
+    await expect(
+      iexec.app.checkAppSecretExists(address, { teeFramework: 'gramine' }),
+    ).resolves.toBe(true);
+    // check teeFramework option
+    await expect(
+      iexec.app.checkAppSecretExists(address, { teeFramework: 'scone' }),
+    ).resolves.toBe(false);
   });
 });
 

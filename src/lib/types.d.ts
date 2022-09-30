@@ -135,6 +135,11 @@ type Tag = Bytes32 | HumanSingleTag[];
 type Multiaddress = string | Buffer;
 
 /**
+ * Trusted Execution Environment name
+ */
+type TeeFramework = 'scone' | 'gramine';
+
+/**
  * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
  */
 interface ProviderOptions {
@@ -185,5 +190,6 @@ export {
   HumanSingleTag,
   Tag,
   Multiaddress,
+  TeeFramework,
   ProviderOptions,
 };

@@ -57,6 +57,7 @@
 - [Multiaddress](internal_.md#multiaddress)
 - [NRLCAmount](internal_.md#nrlcamount)
 - [Tag](internal_.md#tag)
+- [TeeFramework](internal_.md#teeframework)
 - [WeiAmount](internal_.md#weiamount)
 
 ## Type Aliases
@@ -144,6 +145,14 @@ example:
 const onlyTeeTag = ['tee'];
 const teePlusGpuTags = ['tee','gpu'];
 ```
+
+___
+
+### TeeFramework
+
+Ƭ **TeeFramework**: ``"scone"`` \| ``"gramine"``
+
+Trusted Execution Environment name
 
 ___
 
