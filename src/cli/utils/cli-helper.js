@@ -220,7 +220,7 @@ const option = {
   force: () => ['--force', 'force perform action without prompting user'],
   showPrivateKey: () => [
     '--show-private-key',
-    'allow displaying walletprivate key',
+    'allow displaying wallet private key',
   ],
   watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
