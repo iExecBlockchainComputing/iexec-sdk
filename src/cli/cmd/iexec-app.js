@@ -328,7 +328,7 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      let { teeFramework } = opts;
+      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
       if (!teeFramework) {
         const { app } = await showApp(chain.contracts, resourceAddress);
         teeFramework = await resolveTeeFrameworkFromApp(app);
@@ -381,7 +381,7 @@ pushSecret
         );
       }
       spinner.info(`App ${resourceAddress}`);
-      let { teeFramework } = opts;
+      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
       if (!teeFramework) {
         const { app } = await showApp(chain.contracts, resourceAddress);
         teeFramework = await resolveTeeFrameworkFromApp(app);
