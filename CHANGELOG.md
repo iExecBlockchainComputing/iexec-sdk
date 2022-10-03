@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 
 - SMS URL resolution depends on TEE framework (default `scone`)
 - SMS URL override in `IExecConfig` or `chain.json` accepts `Record<TeeFramework,Url> | string`
+- `iexec app push-secret` & `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
+- `iexec app check-secret` & `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
 
 ## [7.2.2] 2022-09-05
 
