@@ -148,7 +148,7 @@ const objectMap = {
 
 const validate = cli.command('validate <object>');
 addGlobalOptions(validate);
-validate.description(desc.validateRessource()).action(async (objName, opts) => {
+validate.description(desc.validateResource()).action(async (objName, opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
