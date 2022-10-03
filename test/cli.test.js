@@ -5,6 +5,7 @@ const path = require('path');
 const BN = require('bn.js');
 const { execAsync } = require('./test-utils');
 const { bytes32Regex } = require('../src/common/utils/utils');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 console.log('Node version:', process.version);
 
@@ -776,6 +777,76 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.count).toBeDefined();
     expect(res.count).not.toBe('0');
+  });
+
+  test('[common] app secret', async () => {
+    await setTokenChainOpenethereum();
+    await setRichWallet();
+    await execAsync(`${iexecPath} app init --tee-framework gramine --raw`);
+    await setAppUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} app deploy --raw`),
+    );
+
+    // anyone can check-secret
+    await removeWallet();
+    const checkNotPushed = JSON.parse(
+      await execAsync(`${iexecPath} app check-secret ${address} --raw`),
+    );
+    expect(checkNotPushed.ok).toBe(true);
+    expect(checkNotPushed.isSecretSet).toBe(false);
+    // only owner can push
+    await setPoorWallet1();
+    const pushUnauthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --raw`,
+      ).catch((err) => err.message),
+    );
+    expect(pushUnauthorized.ok).toBe(false);
+    await setRichWallet();
+    const pushAuthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --raw`,
+      ),
+    );
+    expect(pushAuthorized.ok).toBe(true);
+    // cannot update app secret
+    const pushUpdate = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret ${address} --secret-value bar --raw`,
+      ).catch((err) => err.message),
+    );
+    expect(pushUpdate.ok).toBe(false);
+    // check pushed
+    await removeWallet();
+    const checkPushed = JSON.parse(
+      await execAsync(`${iexecPath} app check-secret ${address} --raw`),
+    );
+    expect(checkPushed.ok).toBe(true);
+    expect(checkPushed.isSecretSet).toBe(true);
+    // check secret TEE framework override
+    const checkOtherFramework = JSON.parse(
+      await execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(checkOtherFramework.ok).toBe(true);
+    expect(checkOtherFramework.isSecretSet).toBe(false);
+    // push secret TEE framework override
+    await setRichWallet();
+    const pushOtherFrameworkAuthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(pushOtherFrameworkAuthorized.ok).toBe(true);
+    const checkOtherFrameworkPushed = JSON.parse(
+      await execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(checkOtherFrameworkPushed.ok).toBe(true);
+    expect(checkOtherFrameworkPushed.isSecretSet).toBe(true);
   });
 
   // DATASET
@@ -3255,7 +3326,7 @@ describe('[Common]', () => {
       expect(res.fileName).toBeDefined();
     });
 
-    test('iexec wallet show --wallet-addres <address>', async () => {
+    test('iexec wallet show --wallet-address <address>', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
       );
