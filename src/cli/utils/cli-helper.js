@@ -330,6 +330,10 @@ const option = {
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
   ],
+  teeFramework: () => [
+    `--tee-framework <${listOfChoices(Object.values(TEE_FRAMEWORKS))}>`,
+    'specify the TEE framework to use',
+  ],
 };
 
 const orderOption = {
@@ -1015,6 +1019,7 @@ module.exports = {
   option,
   orderOption,
   getPropertyFormChain,
+  getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,
   addGlobalOptions,
   addWalletCreateOptions,

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
+- `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
 
 ### Changed
 

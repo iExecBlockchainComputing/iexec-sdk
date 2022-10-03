@@ -15,8 +15,9 @@ const {
   paramsEncryptResultSchema,
   paramsRequesterSecretsSchema,
   nRlcAmountSchema,
+  teeFrameworkSchema,
 } = require('../../common/utils/validator');
-const { teeApp } = require('../utils/templates');
+const { sconeTeeApp, gramineTeeApp } = require('../utils/templates');
 const {
   deployApp,
   showApp,
@@ -28,6 +29,7 @@ const {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
+  resolveTeeFrameworkFromApp,
 } = require('../../common/protocol/registries');
 const { showCategory } = require('../../common/protocol/category');
 const {
@@ -71,6 +73,7 @@ const {
   DATASET,
   APP,
   WORKERPOOL,
+  TEE_FRAMEWORKS,
 } = require('../../common/utils/constant');
 const { paramsKeyName } = require('../../common/utils/params-utils');
 const {
@@ -94,6 +97,7 @@ const {
   isEthAddress,
   renderTasksStatus,
   getPropertyFormChain,
+  getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const {
@@ -125,6 +129,7 @@ const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init.option(...option.initTee());
+init.option(...option.teeFramework());
 init.description(desc.initObj(objName)).action(async (opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
@@ -132,8 +137,22 @@ init.description(desc.initObj(objName)).action(async (opts) => {
     const walletOptions = await computeWalletLoadOptions(opts);
     const keystore = Keystore({ ...walletOptions, isSigner: false });
     const [address] = await keystore.accounts();
+
+    const teeFramework =
+      (await teeFrameworkSchema().validate(opts.teeFramework)) ||
+      (opts.tee &&
+        getDefaultTeeFrameworkFromChain(
+          await loadChain(opts.chain, { spinner }),
+        ));
+    let teeTemplate = {};
+    if (teeFramework === TEE_FRAMEWORKS.SCONE) {
+      teeTemplate = sconeTeeApp;
+    }
+    if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
+      teeTemplate = gramineTeeApp;
+    }
     const { saved, fileName } = await initObj(objName, {
-      overwrite: { ...(opts.tee && teeApp), owner: address },
+      overwrite: { ...teeTemplate, owner: address },
     });
     spinner.succeed(
       `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
@@ -291,6 +310,7 @@ const checkSecret = cli.command('check-secret [appAddress]');
 addGlobalOptions(checkSecret);
 checkSecret
   .option(...option.chain())
+  .option(...option.teeFramework())
   .description(desc.checkSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -308,7 +328,12 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const sms = getSmsUrlFromChain(chain);
+      let { teeFramework } = opts;
+      if (!teeFramework) {
+        const { app } = await showApp(chain.contracts, resourceAddress);
+        teeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      const sms = getSmsUrlFromChain(chain, { teeFramework });
       const secretIsSet = await checkAppSecretExists(
         chain.contracts,
         sms,
@@ -334,6 +359,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
+  .option(...option.teeFramework())
   .description('push the app secret to the secret management service')
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -343,7 +369,6 @@ pushSecret
       const keystore = Keystore(Object.assign(walletOptions));
       const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
-      const sms = getSmsUrlFromChain(chain);
       await keystore.accounts();
       const resourceAddress =
         objAddress ||
@@ -356,6 +381,12 @@ pushSecret
         );
       }
       spinner.info(`App ${resourceAddress}`);
+      let { teeFramework } = opts;
+      if (!teeFramework) {
+        const { app } = await showApp(chain.contracts, resourceAddress);
+        teeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      const sms = getSmsUrlFromChain(chain, { teeFramework });
       const secretValue =
         opts.secretValue ||
         (await prompt.password(`Paste your secret`, {
@@ -650,7 +681,7 @@ run
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
-      const inputParamsResultEncrytion =
+      const inputParamsResultEncryption =
         await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
@@ -668,8 +699,8 @@ run
           [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
-        ...(inputParamsResultEncrytion !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
+        ...(inputParamsResultEncryption !== undefined && {
+          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncryption,
         }),
       };
       debug('params', params);
@@ -1153,7 +1184,7 @@ requestRun
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
-      const inputParamsResultEncrytion =
+      const inputParamsResultEncryption =
         await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
@@ -1171,8 +1202,8 @@ requestRun
           [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
-        ...(inputParamsResultEncrytion !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
+        ...(inputParamsResultEncryption !== undefined && {
+          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncryption,
         }),
       };
       debug('params', params);
