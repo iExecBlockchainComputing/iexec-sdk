@@ -8031,6 +8031,11 @@ describe('[storage]', () => {
         `Secret "iexec-result-iexec-ipfs-token" already exists for ${randomWallet.address}`,
       ),
     );
+    const pushForTeeFramework = await iexec.storage.pushStorageToken('oops', {
+      teeFramework: 'gramine',
+    });
+    expect(pushForTeeFramework.isPushed).toBe(true);
+    expect(pushForTeeFramework.isUpdated).toBe(false);
   });
 
   test('storage.pushStorageToken() (provider: "default")', async () => {
@@ -8153,6 +8158,17 @@ describe('[storage]', () => {
         provider: 'test',
       }),
     ).rejects.toThrow(Error('"test" not supported'));
+    const unsetForTeeFramework = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { teeFramework: 'gramine' },
+    );
+    expect(unsetForTeeFramework).toBe(false);
+    await iexec.storage.pushStorageToken('oops', { teeFramework: 'gramine' });
+    const setForTeeFramework = await iexec.storage.checkStorageTokenExists(
+      randomWallet.address,
+      { teeFramework: 'gramine' },
+    );
+    expect(setForTeeFramework).toBe(true);
   });
 });
 

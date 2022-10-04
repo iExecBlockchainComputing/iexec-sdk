@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - SMS URL override in `IExecConfig` or `chain.json` accepts `Record<TeeFramework,Url> | string`
 - `iexec app push-secret` & `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
 - `iexec app check-secret` & `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
+- `iexec storage init` & `storage.pushStorageToken(appAddress)` use the default TEE framework if not specified
+- `iexec storage check` & `app.checkStorageTokenExists(appAddress, secret)` use the default TEE framework if not specified
 
 ## [7.2.2] 2022-09-05
 
