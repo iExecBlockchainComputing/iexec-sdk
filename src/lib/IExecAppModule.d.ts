@@ -7,6 +7,7 @@ import {
   BNish,
   Bytes32,
   Multiaddress,
+  TeeFramework,
   TxHash,
 } from './types';
 
@@ -84,7 +85,15 @@ export interface App {
   /**
    * optional for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: string;
+  mrenclave?:
+    | string
+    | {
+        provider: 'SCONE' | 'GRAMINE';
+        version: string;
+        entrypoint: string;
+        heapSize: number;
+        fingerprint: string;
+      };
 }
 
 /**
@@ -178,8 +187,14 @@ export default class IExecAppModule extends IExecModule {
    * const isSecretSet = await checkAppSecretExists(appAddress);
    * console.log('app secret set:', isSecretSet);
    * ```
+   * _NB_:
+   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
+   *
    */
-  checkAppSecretExists(appAddress: Addressish): Promise<boolean>;
+  checkAppSecretExists(
+    appAddress: Addressish,
+    options?: { teeFramework?: TeeFramework },
+  ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
    *
@@ -188,6 +203,7 @@ export default class IExecAppModule extends IExecModule {
    * _NB_:
    * - pushed secret will be available for the app in `tee` tasks.
    * - once pushed a secret can not be updated
+   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
    *
    * example:
    * ```js
@@ -195,7 +211,11 @@ export default class IExecAppModule extends IExecModule {
    * console.log('pushed App secret:', isPushed);
    * ```
    */
-  pushAppSecret(appAddress: Addressish, secretValue: String): Promise<boolean>;
+  pushAppSecret(
+    appAddress: Addressish,
+    secretValue: String,
+    options?: { teeFramework?: TeeFramework },
+  ): Promise<boolean>;
   /**
    * Create an IExecAppModule instance using an IExecConfig instance
    */

@@ -21,7 +21,7 @@ const app = {
     '0xa28d8ae83ae586b4c8addd60413a8302798891411a8f87b5f0987050d0d73816',
 };
 
-const teeApp = {
+const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'tee-python-hello-world',
   type: 'DOCKER',
@@ -30,6 +30,24 @@ const teeApp = {
     '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
   mrenclave: {
     provider: 'SCONE',
+    version: 'v5',
+    entrypoint: 'python /app/app.py',
+    heapSize: 1073741824,
+    fingerprint:
+      'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+  },
+};
+
+// todo update once gramine format is known
+const gramineTeeApp = {
+  owner: '0x0000000000000000000000000000000000000000',
+  name: 'tee-python-hello-world',
+  type: 'DOCKER',
+  multiaddr: 'nexus.iex.ec/tee-python-hello-world:6.2.0',
+  checksum:
+    '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
+  mrenclave: {
+    provider: 'GRAMINE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
@@ -172,7 +190,8 @@ const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
 module.exports = {
   main,
   app,
-  teeApp,
+  sconeTeeApp,
+  gramineTeeApp,
   dataset,
   workerpool,
   category,

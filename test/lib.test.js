@@ -11,6 +11,7 @@ const {
   bytes32Regex,
   addressRegex,
 } = require('../src/common/utils/utils');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 const { NULL_ADDRESS } = utils;
 
@@ -82,7 +83,18 @@ const tokenChainOpenethereumUrl = DRONE
   ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
+const gramineSms = DRONE
+  ? 'http://token-sms-gramine:13300'
+  : 'http://localhost:13302';
+
+const smsMap = {
+  [TEE_FRAMEWORKS.SCONE]: sconeSms,
+  [TEE_FRAMEWORKS.GRAMINE]: gramineSms,
+};
+
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -255,7 +267,7 @@ const getId = () => {
   return sequenceId;
 };
 
-const deployRandomApp = async (iexec, { owner } = {}) => {
+const deployRandomApp = async (iexec, { owner, teeFramework } = {}) => {
   const appDeployRes = await iexec.app.deployApp({
     owner: owner || (await iexec.wallet.getAddress()),
     name: `app${getId()}`,
@@ -263,6 +275,13 @@ const deployRandomApp = async (iexec, { owner } = {}) => {
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    mrenclave: teeFramework && {
+      provider: teeFramework,
+      version: 'v1',
+      entrypoint: 'entrypoint.sh',
+      heapSize: 4096,
+      fingerprint: 'fingerprint',
+    },
   });
   return appDeployRes;
 };
@@ -3022,10 +3041,12 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
-    const { address } = await deployRandomApp(iexec);
+    const { address } = await deployRandomApp(iexec, {
+      teeFramework: 'gramine',
+    });
     const randomWallet = getRandomWallet();
     const randomIexec = new IExec(
       {
@@ -3036,18 +3057,31 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
+    // only owner can push secret
     await expect(randomIexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
       Error(
         `Wallet ${randomWallet.address} is not allowed to set secret for ${address}`,
       ),
     );
+    // infer teeFramework to use
     await expect(iexec.app.pushAppSecret(address, 'foo')).resolves.toBe(true);
+    // can't update existing secret
     await expect(iexec.app.pushAppSecret(address, 'foo')).rejects.toThrow(
       Error(`Secret already exists for ${address} and can't be updated`),
     );
+    // check inferred teeFramework with teeFramework option
+    await expect(
+      iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'gramine' }),
+    ).rejects.toThrow(
+      Error(`Secret already exists for ${address} and can't be updated`),
+    );
+    // check teeFramework option
+    await expect(
+      iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'scone' }),
+    ).resolves.toBe(true);
   });
 
   test('app.checkAppSecretExists()', async () => {
@@ -3061,13 +3095,24 @@ describe('[app]', () => {
       },
       {
         hubAddress,
-        smsURL,
+        smsURL: smsMap,
       },
     );
-    const { address } = await deployRandomApp(iexec);
+    const { address } = await deployRandomApp(iexec, {
+      teeFramework: 'gramine',
+    });
     await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(false);
     await iexec.app.pushAppSecret(address, 'foo');
+    // infer teeFramework to use
     await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(true);
+    // check inferred teeFramework with teeFramework option
+    await expect(
+      iexec.app.checkAppSecretExists(address, { teeFramework: 'gramine' }),
+    ).resolves.toBe(true);
+    // check teeFramework option
+    await expect(
+      iexec.app.checkAppSecretExists(address, { teeFramework: 'scone' }),
+    ).resolves.toBe(false);
   });
 });
 
@@ -3326,7 +3371,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await iexec.dataset.deployDataset({
@@ -3362,7 +3407,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await expect(
@@ -3386,7 +3431,7 @@ describe('[dataset]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await deployRandomDataset(iexec, {
@@ -3413,8 +3458,7 @@ describe('[dataset]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const datasetDeployRes = await deployRandomDataset(iexec);
@@ -4075,7 +4119,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4112,9 +4156,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4155,7 +4198,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const order = await iexec.order.createRequestorder({
@@ -4198,7 +4241,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const iexecDatasetConsumer = new IExec(
@@ -4208,7 +4251,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await iexecDatasetConsumer.storage
@@ -4275,7 +4318,7 @@ describe('[order]', () => {
       {
         hubAddress,
         resultProxyURL,
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await iexec.storage
@@ -4311,7 +4354,7 @@ describe('[order]', () => {
         .then(iexec.order.signRequestorder),
     ).rejects.toThrow(
       Error(
-        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisionning will fail.`,
+        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisioning will fail.`,
       ),
     );
     // set secrets pass
@@ -5923,8 +5966,7 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -5941,7 +5983,7 @@ describe('[order]', () => {
       {
         hubAddress,
 
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -6106,9 +6148,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -6122,9 +6163,8 @@ describe('[order]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
-        smsURL,
+        smsURL: smsMap,
         resultProxyURL,
       },
     );
@@ -7972,8 +8012,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops');
@@ -7998,8 +8037,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8028,8 +8066,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8058,8 +8095,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.storage.pushStorageToken('oops', {
@@ -8086,8 +8122,7 @@ describe('[storage]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const withoutSecretRes = await iexec.storage.checkStorageTokenExists(
@@ -8126,8 +8161,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.result.pushResultEncryptionKey('oops');
@@ -8152,8 +8186,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
@@ -8180,8 +8213,7 @@ describe('[result]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const withoutSecretRes = await iexec.result.checkResultEncryptionKeyExists(
@@ -8282,8 +8314,7 @@ describe('[secrets]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
@@ -8307,8 +8338,7 @@ describe('[secrets]', () => {
       },
       {
         hubAddress,
-
-        smsURL,
+        smsURL: smsMap,
       },
     );
     await expect(
@@ -8610,7 +8640,7 @@ describe('[ens]', () => {
     );
   });
 
-  test('ens.claimName(label, domain) no registar', async () => {
+  test('ens.claimName(label, domain) no registrar', async () => {
     const wallet = getRandomWallet();
     const signer = utils.getSignerFromPrivateKey(
       tokenChainUrl,

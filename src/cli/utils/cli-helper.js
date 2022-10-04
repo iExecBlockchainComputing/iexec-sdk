@@ -92,7 +92,7 @@ const desc = {
     '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
-  validateRessource: () =>
+  validateResource: () =>
     'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
@@ -133,7 +133,7 @@ const option = {
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   user: () => ['--user <address>', desc.userAddress()],
-  initTee: () => ['--tee', 'use the Trused Execution Environment template'],
+  initTee: () => ['--tee', 'use the Trusted Execution Environment template'],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
   initWorkerpoolOrder: () => ['--workerpool', 'init a workerpool sell order'],
@@ -220,7 +220,7 @@ const option = {
   force: () => ['--force', 'force perform action without prompting user'],
   showPrivateKey: () => [
     '--show-private-key',
-    'allow displaying walletprivate key',
+    'allow displaying wallet private key',
   ],
   watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
@@ -257,12 +257,12 @@ const option = {
   ],
   maxTag: () => [
     '--max-tag <tag>',
-    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+    'specify maximum tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
   ],
   tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
   minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
   minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
-  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximum trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
@@ -331,6 +331,10 @@ const option = {
   skipRequestCheck: () => [
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
+  ],
+  teeFramework: () => [
+    `--tee-framework <${listOfChoices(Object.values(TEE_FRAMEWORKS))}>`,
+    'specify the TEE framework to use',
   ],
 };
 
@@ -1017,6 +1021,7 @@ module.exports = {
   option,
   orderOption,
   getPropertyFormChain,
+  getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,
   addGlobalOptions,
   addWalletCreateOptions,

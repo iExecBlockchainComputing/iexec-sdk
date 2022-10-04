@@ -1,7 +1,7 @@
 import IExecContractsClient from '../common/utils/IExecContractsClient';
 import { EnhancedWallet } from '../common/utils/signers';
 import { ExternalProvider } from '@ethersproject/providers';
-import { ProviderOptions } from './types';
+import { ProviderOptions, TeeFramework } from './types';
 
 export interface IExecConfigArgs {
   /**
@@ -82,11 +82,11 @@ export interface IExecConfigOptions {
   /**
    * override the SMS URL to target a custom instance
    */
-  smsURL?: Record<'scone' | 'gramine', string> | string;
+  smsURL?: Record<TeeFramework, string> | string;
   /**
    * override the TEE framework to use when as default
    */
-  defaultTeeFramework?: 'scone' | 'gramine';
+  defaultTeeFramework?: TeeFramework;
   /**
    * override the IPFS gateway URL to target a custom instance
    */
@@ -164,9 +164,7 @@ export default class IExecConfig {
   /**
    * resolve the current SMS URL
    */
-  resolveSmsURL(options?: {
-    teeFramework?: 'scone' | 'gramine';
-  }): Promise<string>;
+  resolveSmsURL(options?: { teeFramework?: TeeFramework }): Promise<string>;
   /**
    * resolve the current result proxy URL
    */

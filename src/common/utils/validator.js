@@ -20,6 +20,12 @@ const posIntRegex = /^\d+$/;
 
 const posStrictIntRegex = /^[1-9]\d*$/;
 
+const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
+const teeFrameworkSchema = () =>
+  string()
+    .transform((name) => name.toLowerCase())
+    .oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
+
 const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
@@ -515,7 +521,7 @@ const multiaddressSchema = () =>
 
 const objMrenclaveSchema = () =>
   object({
-    provider: string().required(),
+    provider: teeFrameworkSchema().required(),
     version: string().required(),
     entrypoint: string().required(),
     heapSize: positiveIntSchema().required(),
@@ -750,10 +756,12 @@ const smsUrlOrMapSchema = () =>
       case 'string':
         return basicUrlSchema().required();
       case 'object':
-        return object({
-          [TEE_FRAMEWORKS.SCONE]: basicUrlSchema(),
-          [TEE_FRAMEWORKS.GRAMINE]: basicUrlSchema(),
-        })
+        return object(
+          teeFrameworksList.reduce(
+            (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
+            {},
+          ),
+        )
           .noUnknown(true)
           .nullable(false)
           .strict(true);
@@ -761,10 +769,6 @@ const smsUrlOrMapSchema = () =>
         return basicUrlSchema();
     }
   });
-
-const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
-const teeFrameworkSchema = () =>
-  string().oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
 
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
@@ -804,6 +808,7 @@ module.exports = {
   positiveIntSchema,
   positiveStrictIntSchema,
   mrenclaveSchema,
+  objMrenclaveSchema,
   appTypeSchema,
   appSchema,
   datasetSchema,

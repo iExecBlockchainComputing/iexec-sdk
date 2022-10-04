@@ -1175,6 +1175,19 @@ describe('[mrenclaveSchema]', () => {
       new ValidationError('entrypoint is a required field'),
     );
   });
+  test('throw when provider is not a valid TEE framework', async () => {
+    const obj = {
+      provider: 'FOO',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('provider is not a valid TEE framework'),
+    );
+  });
 });
 
 describe('[ensLabelSchema]', () => {
@@ -1354,12 +1367,14 @@ describe('[smsUrlOrMapSchema]', () => {
 
 describe('[teeFrameworkSchema]', () => {
   test('allow known TEE frameworks', async () => {
-    await expect(
-      teeFrameworkSchema().validate(TEE_FRAMEWORKS.SCONE),
-    ).resolves.toBe(TEE_FRAMEWORKS.SCONE);
-    await expect(
-      teeFrameworkSchema().validate(TEE_FRAMEWORKS.GRAMINE),
-    ).resolves.toBe(TEE_FRAMEWORKS.GRAMINE);
+    await Promise.all(
+      Object.values(TEE_FRAMEWORKS).map(async (name) => {
+        await expect(teeFrameworkSchema().validate(name)).resolves.toBe(name);
+        await expect(
+          teeFrameworkSchema().validate(name.toUpperCase()),
+        ).resolves.toBe(name);
+      }),
+    );
   });
   test('allow undefined', async () => {
     await expect(teeFrameworkSchema().validate()).resolves.toBe(undefined);

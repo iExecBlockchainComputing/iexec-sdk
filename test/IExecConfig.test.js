@@ -23,7 +23,9 @@ const nativeChainUrl = DRONE
   ? 'http://native-chain:8545'
   : 'http://localhost:18545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -910,14 +912,14 @@ describe('[IExecConfig]', () => {
       const defaultSms = await new IExecConfig({
         ethProvider: 'bellecour',
       }).resolveSmsURL();
-      const sconeSms = await new IExecConfig({
+      const sconeSmsUrl = await new IExecConfig({
         ethProvider: 'bellecour',
       }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const gramineSms = await new IExecConfig({
+      const gramineSmsUrl = await new IExecConfig({
         ethProvider: 'bellecour',
       }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSms).toBe(sconeSms);
-      expect(defaultSms).not.toBe(gramineSms);
+      expect(defaultSms).toBe(sconeSmsUrl);
+      expect(defaultSms).not.toBe(gramineSmsUrl);
     });
     test('success override defaultTeeFramework', async () => {
       const defaultSms = await new IExecConfig({
@@ -978,25 +980,25 @@ describe('[IExecConfig]', () => {
         {
           ethProvider: 'bellecour',
         },
-        { smsURL },
+        { smsURL: sconeSms },
       );
-      await expect(config.resolveSmsURL()).resolves.toBe(smsURL);
+      await expect(config.resolveSmsURL()).resolves.toBe(sconeSms);
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsURL);
+      ).resolves.toBe(sconeSms);
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsURL);
+      ).resolves.toBe(sconeSms);
     });
     test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
         },
-        { smsURL },
+        { smsURL: sconeSms },
       );
       const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(promise).resolves.toBe(sconeSms);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
