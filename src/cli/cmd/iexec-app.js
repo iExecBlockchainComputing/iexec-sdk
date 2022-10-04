@@ -99,6 +99,7 @@ const {
   getPropertyFormChain,
   getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,
+  optionCreator,
 } = require('../utils/cli-helper');
 const {
   loadIExecConf,
@@ -128,42 +129,44 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init.option(...option.initTee());
-init.option(...option.teeFramework());
-init.description(desc.initObj(objName)).action(async (opts) => {
-  await checkUpdate(opts);
-  const spinner = Spinner(opts);
-  try {
-    const walletOptions = await computeWalletLoadOptions(opts);
-    const keystore = Keystore({ ...walletOptions, isSigner: false });
-    const [address] = await keystore.accounts();
+init
+  .option(...option.initTee())
+  .addOption(optionCreator.teeFramework())
+  .description(desc.initObj(objName))
+  .action(async (opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [address] = await keystore.accounts();
 
-    const teeFramework =
-      (await teeFrameworkSchema().validate(opts.teeFramework)) ||
-      (opts.tee &&
-        getDefaultTeeFrameworkFromChain(
-          await loadChain(opts.chain, { spinner }),
-        ));
-    let teeTemplate = {};
-    if (teeFramework === TEE_FRAMEWORKS.SCONE) {
-      teeTemplate = sconeTeeApp;
+      const teeFramework =
+        (await teeFrameworkSchema().validate(opts.teeFramework)) ||
+        (opts.tee &&
+          getDefaultTeeFrameworkFromChain(
+            await loadChain(opts.chain, { spinner }),
+          ));
+      let teeTemplate = {};
+      if (teeFramework === TEE_FRAMEWORKS.SCONE) {
+        teeTemplate = sconeTeeApp;
+      }
+      if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
+        teeTemplate = gramineTeeApp;
+      }
+      const { saved, fileName } = await initObj(objName, {
+        overwrite: { ...teeTemplate, owner: address },
+      });
+      spinner.succeed(
+        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+        { raw: { app: saved } },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
     }
-    if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
-      teeTemplate = gramineTeeApp;
-    }
-    const { saved, fileName } = await initObj(objName, {
-      overwrite: { ...teeTemplate, owner: address },
-    });
-    spinner.succeed(
-      `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-        saved,
-      )}`,
-      { raw: { app: saved } },
-    );
-  } catch (error) {
-    handleError(error, cli, opts);
-  }
-});
+  });
 
 const deploy = cli.command('deploy');
 addGlobalOptions(deploy);
@@ -310,7 +313,7 @@ const checkSecret = cli.command('check-secret [appAddress]');
 addGlobalOptions(checkSecret);
 checkSecret
   .option(...option.chain())
-  .option(...option.teeFramework())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -359,7 +362,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
-  .option(...option.teeFramework())
+  .addOption(optionCreator.teeFramework())
   .description('push the app secret to the secret management service')
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);

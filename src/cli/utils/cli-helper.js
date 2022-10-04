@@ -1,4 +1,5 @@
 const Debug = require('debug');
+const { Option } = require('commander');
 const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
@@ -332,10 +333,14 @@ const option = {
     '--skip-request-check',
     'skip request validity checks, this may result in task execution fail',
   ],
-  teeFramework: () => [
-    `--tee-framework <${listOfChoices(Object.values(TEE_FRAMEWORKS))}>`,
-    'specify the TEE framework to use',
-  ],
+};
+
+const optionCreator = {
+  teeFramework: () =>
+    new Option(
+      `--tee-framework <name>`,
+      'specify the TEE framework to use',
+    ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
 const orderOption = {
@@ -1020,6 +1025,7 @@ module.exports = {
   desc,
   option,
   orderOption,
+  optionCreator,
   getPropertyFormChain,
   getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,

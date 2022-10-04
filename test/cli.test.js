@@ -1976,6 +1976,12 @@ describe('[Mainchain]', () => {
     );
     expect(checkPushed.ok).toBe(true);
     expect(checkPushed.isSecretSet).toBe(true);
+    // check secret TEE framework validation
+    await expect(
+      execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework foo --raw`,
+      ),
+    ).rejects.toThrow();
     // check secret TEE framework override
     const checkOtherFramework = JSON.parse(
       await execAsync(
