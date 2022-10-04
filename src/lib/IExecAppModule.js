@@ -10,6 +10,7 @@ const {
 } = require('../common/protocol/registries');
 const { checkAppSecretExists } = require('../common/sms/check');
 const { pushAppSecret } = require('../common/sms/push');
+const { teeFrameworkSchema } = require('../common/utils/validator');
 
 class IExecAppModule extends IExecModule {
   constructor(...args) {
@@ -28,7 +29,9 @@ class IExecAppModule extends IExecModule {
     this.countUserApps = async (address) =>
       countUserApps(await this.config.resolveContractsClient(), address);
     this.checkAppSecretExists = async (appAddress, { teeFramework } = {}) => {
-      let appTeeFramework = teeFramework;
+      let appTeeFramework = await teeFrameworkSchema()
+        .label('teeFramework')
+        .validate(teeFramework);
       if (appTeeFramework === undefined) {
         const { app } = await showApp(
           await this.config.resolveContractsClient(),
@@ -47,7 +50,9 @@ class IExecAppModule extends IExecModule {
       appSecret,
       { teeFramework } = {},
     ) => {
-      let appTeeFramework = teeFramework;
+      let appTeeFramework = await teeFrameworkSchema()
+        .label('teeFramework')
+        .validate(teeFramework);
       if (appTeeFramework === undefined) {
         const { app } = await showApp(
           await this.config.resolveContractsClient(),

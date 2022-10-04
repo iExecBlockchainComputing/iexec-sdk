@@ -3082,6 +3082,10 @@ describe('[app]', () => {
     await expect(
       iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'scone' }),
     ).resolves.toBe(true);
+    // validate teeFramework
+    await expect(
+      iexec.app.pushAppSecret(address, 'foo', { teeFramework: 'foo' }),
+    ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
   });
 
   test('app.checkAppSecretExists()', async () => {
@@ -3113,6 +3117,10 @@ describe('[app]', () => {
     await expect(
       iexec.app.checkAppSecretExists(address, { teeFramework: 'scone' }),
     ).resolves.toBe(false);
+    // validate teeFramework
+    await expect(
+      iexec.app.checkAppSecretExists(address, { teeFramework: 'foo' }),
+    ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
   });
 });
 
