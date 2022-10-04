@@ -114,7 +114,7 @@ const desc = {
     "for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum",
   generateKeys: () =>
     'generate a beneficiary key pair to encrypt and decrypt the results',
-  decryptResults: () => 'decrypt encrypted results with beneficary key',
+  decryptResults: () => 'decrypt encrypted results with beneficiary key',
   bridgeToSidechain: () =>
     'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () =>
@@ -144,14 +144,14 @@ const option = {
   signAppOrder: () => ['--app', 'sign an selling apporder'],
   signDatasetOrder: () => ['--dataset', 'sign a selling datasetorder'],
   signWorkerpoolOrder: () => ['--workerpool', 'sign a selling workerpoolorder'],
-  signRequestOrder: () => ['--request', 'sign a buying userorder'],
+  signRequestOrder: () => ['--request', 'sign a buying requestorder'],
   cancelAppOrder: () => ['--app', 'cancel a signed apporder'],
   cancelDatasetOrder: () => ['--dataset', 'cancel a signed datasetorder'],
   cancelWorkerpoolOrder: () => [
     '--workerpool',
     'cancel a signed workerpoolorder',
   ],
-  cancelRequestOrder: () => ['--request', 'cancel a signed userorder'],
+  cancelRequestOrder: () => ['--request', 'cancel a signed requestorder'],
   publishAppOrder: () => [
     '--app',
     'publish a signed apporder on iExec marketplace',
@@ -211,7 +211,7 @@ const option = {
   ],
   fillRequestParams: () => [
     '--params <json>',
-    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
@@ -422,7 +422,7 @@ const orderOption = {
   ],
   params: () => [
     '--params <json>',
-    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+    'specify the params of the request\n* usage: --params \'{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   requestArgs: () => [
     '--args <string>',
@@ -504,15 +504,15 @@ const promptConfirmedPassword = async (
 ) => {
   const pw1 = await promptPassword(message, { strict: false });
   const pw2 = await promptPassword(confirmation, {
-    error: 'Password missmatch',
+    error: 'Password mismatch',
   });
   if (pw1 === pw2) return pw1;
-  throw Error('Password missmatch');
+  throw Error('Password mismatch');
 };
 
 const prompt = {
   password: (message, options) => promptPassword(message, options),
-  confimedPassword: (message, confirmation) =>
+  confirmedPassword: (message, confirmation) =>
     promptConfirmedPassword(message, confirmation),
   custom: question,
   create: (file) => question(`You don't have a ${file} yet, create one?`),
@@ -680,7 +680,7 @@ const computeWalletCreateOptions = async (opts) => {
         'Option --password may be unsafe, make sure to know what you do',
       );
     } else if (!opts.unencrypted) {
-      pw = await prompt.confimedPassword(
+      pw = await prompt.confirmedPassword(
         'Please choose a password for wallet encryption',
       );
     }
@@ -688,7 +688,7 @@ const computeWalletCreateOptions = async (opts) => {
       throw Error('Missing wallet password');
     }
     if (pw && opts.unencrypted) {
-      spinner.warn('Option --unencrypted will be ingnored');
+      spinner.warn('Option --unencrypted will be ignored');
     }
     if (opts.unencrypted) {
       spinner.warn(
@@ -921,9 +921,9 @@ const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initilResultsCount, totalCount) =>
-      `Results (${initilResultsCount + 1} to ${
-        initilResultsCount + callResults.length
+    createResultsMessage = (callResults, initialResultsCount, totalCount) =>
+      `Results (${initialResultsCount + 1} to ${
+        initialResultsCount + callResults.length
       }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
     spinner,
     raw = false,

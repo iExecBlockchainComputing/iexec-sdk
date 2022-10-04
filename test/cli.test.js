@@ -2900,28 +2900,28 @@ describe('[Sidechain]', () => {
     expect(res.requestorder).toBeDefined();
     expect(res.requestorder.txHash).toBeDefined();
     expect(res.fail).toBeUndefined();
-    const cancelAppordertx = await nativeChainRPC.getTransaction(
+    const cancelApporderTx = await nativeChainRPC.getTransaction(
       res.apporder.txHash,
     );
-    expect(cancelAppordertx).toBeDefined();
-    expect(cancelAppordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
-    const cancelDatasetordertx = await nativeChainRPC.getTransaction(
+    expect(cancelApporderTx).toBeDefined();
+    expect(cancelApporderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    const cancelDatasetorderTx = await nativeChainRPC.getTransaction(
       res.datasetorder.txHash,
     );
-    expect(cancelDatasetordertx).toBeDefined();
-    expect(cancelDatasetordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
-    const cancelWorkerpoolordertx = await nativeChainRPC.getTransaction(
+    expect(cancelDatasetorderTx).toBeDefined();
+    expect(cancelDatasetorderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    const cancelWorkerpoolorderTx = await nativeChainRPC.getTransaction(
       res.workerpoolorder.txHash,
     );
-    expect(cancelWorkerpoolordertx).toBeDefined();
-    expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(
+    expect(cancelWorkerpoolorderTx).toBeDefined();
+    expect(cancelWorkerpoolorderTx.gasPrice.toString()).toBe(
       nativeChainGasPrice,
     );
-    const cancelRequestordertx = await nativeChainRPC.getTransaction(
+    const cancelRequestorderTx = await nativeChainRPC.getTransaction(
       res.requestorder.txHash,
     );
-    expect(cancelRequestordertx).toBeDefined();
-    expect(cancelRequestordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    expect(cancelRequestorderTx).toBeDefined();
+    expect(cancelRequestorderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
   });
 
   test('[sidechain] iexec deal show', async () => {
@@ -4228,7 +4228,7 @@ describe('[Common]', () => {
       });
     });
 
-    test('no "native" overwites in templates', async () => {
+    test('no "native" overwrites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
       expect(chains.goerli.native).toBeUndefined();
       expect(chains.mainnet.native).toBeUndefined();

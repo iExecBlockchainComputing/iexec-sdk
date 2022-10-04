@@ -137,7 +137,7 @@ class IExecConfig {
           // case FallbackProvider can not override
           if (ensRegistryAddress) {
             console.warn(
-              'IExec: ensRegistyAddress option is not supported when using a default provider',
+              'IExec: ensRegistryAddress option is not supported when using a default provider',
             );
           }
           signer = ethProvider;
@@ -412,8 +412,8 @@ class IExecConfig {
     };
 
     this.resolveBridgeBackAddress = async () => {
-      const brigedChainConf = await bridgedConfPromise;
-      return brigedChainConf.bridgeAddress;
+      const bridgedChainConf = await bridgedConfPromise;
+      return bridgedChainConf.bridgeAddress;
     };
 
     this.resolveEnsPublicResolverAddress = async () => {

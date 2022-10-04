@@ -120,14 +120,14 @@ checkStorage
       const smsURL = getSmsUrlFromChain(chain);
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
-      const userAdress = opts.user || address;
+      const userAddress = opts.user || address;
       spinner.info(
-        `Checking ${providerName} storage token for user ${userAdress}`,
+        `Checking ${providerName} storage token for user ${userAddress}`,
       );
       const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
-        userAdress,
+        userAddress,
         tokenKeyName,
       );
       if (tokenExists) {

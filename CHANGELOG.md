@@ -135,7 +135,7 @@ All notable changes to this project will be documented in this file.
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
 - removed `mrenclave` from app default template
-- `iexec appr run --watch` and `iexec deal show --watch` added tasks status details
+- `iexec run --watch` and `iexec deal show --watch` added tasks status details
 
 ### Removed
 
@@ -427,9 +427,9 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.createObj()` is replaced by dedicated methods of `IExec`: `app.deployApp()`, `dataset.deployDataset()`, `workerpool.deployWorkerpool()`
 - [DEPRECATED] `hub.countObj()` is replaced by dedicated methods of `IExec`: `app.countUserApps()`, `dataset.countUserDatasets()`, `workerpool.countUserWorkerpools()`
 - [DEPRECATED] `hub.showObj()` is replaced by dedicated methods of `IExec`: `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
-- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAdress` use `IExec` methods `app.showUserApp(index, userAddress)` or `app.showApp(appAddress)`
-- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAdress` please use `IExec` method `dataset.showUserDataset(index, userAddress)` or `dataset.showDataset(contracts, datasetAddress)`
-- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAdress` please use `IExec` method `workerpool.showUserWorkerpool(index, userAddress)` or `workerpool.showWorkerpool(workerpoolAddress)`
+- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` use `IExec` methods `app.showUserApp(index, userAddress)` or `app.showApp(appAddress)`
+- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` please use `IExec` method `dataset.showUserDataset(index, userAddress)` or `dataset.showDataset(contracts, datasetAddress)`
+- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` please use `IExec` method `workerpool.showUserWorkerpool(index, userAddress)` or `workerpool.showWorkerpool(workerpoolAddress)`
 - [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAddress` is no longer required, please use `IExec` method `task.claim(taskid)`
 - [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAddress` is no longer required, please use `IExec` method `task.fetchResults(taskid, options)`
 - Update `multiaddr@6.1.0` to `multiaddr@7.1.0`: `/ipfs` protocol 421 is now displayed `/p2p`

@@ -642,7 +642,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(false);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -696,7 +696,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(true);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -744,7 +744,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('success with enterpriseSwapConf on custom entreprise chain', async () => {
+    test('success with enterpriseSwapConf on custom enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -763,7 +763,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -775,7 +775,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown enterprise chain', async () => {
+    test('throw on unknown enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -871,7 +871,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,

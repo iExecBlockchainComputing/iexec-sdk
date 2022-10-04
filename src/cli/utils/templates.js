@@ -2,7 +2,7 @@ const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 
 const main = {
   description:
-    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
+    'My iExec resource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
   license: 'MIT',
   author: '?',
   social: {
@@ -74,7 +74,7 @@ const dataset = {
 };
 
 const compatibleDapp = {
-  name: 'Recomanded-dapp-for-MyDataset',
+  name: 'Recommended-dapp-for-MyDataset',
   addresses: {
     5: '0x0000000000000000000000000000000000000000',
   },
