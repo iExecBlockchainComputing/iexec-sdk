@@ -346,10 +346,13 @@ class IExecConfig {
     } = {}) => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
+      const vTeeFramework = await teeFrameworkSchema()
+        .label('teeFramework')
+        .validate(teeFramework);
       const value =
         (typeof vSmsUrlOrMap === 'string' && vSmsUrlOrMap) ||
-        (typeof vSmsUrlOrMap === 'object' && vSmsUrlOrMap[teeFramework]) ||
-        (chainConfDefaults.sms && chainConfDefaults.sms[teeFramework]);
+        (typeof vSmsUrlOrMap === 'object' && vSmsUrlOrMap[vTeeFramework]) ||
+        (chainConfDefaults.sms && chainConfDefaults.sms[vTeeFramework]);
       if (value !== undefined) {
         return value;
       }

@@ -1020,6 +1020,16 @@ describe('[IExecConfig]', () => {
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });
+    test('throw with invalid TEE framework', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveSmsURL({ teeFramework: 'foo' });
+      await expect(promise).rejects.toThrow(
+        Error(`teeFramework is not a valid TEE framework`),
+      );
+      await expect(promise).rejects.toThrow(errors.ValidationError);
+    });
   });
 
   describe('resolveResultProxyURL()', () => {
