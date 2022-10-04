@@ -4,12 +4,16 @@ const {
   checkRequesterSecretExists,
 } = require('../sms/check');
 const { checkActiveBitInTag } = require('../utils/utils');
-const { NULL_ADDRESS, NULL_BYTES32 } = require('../utils/constant');
+const {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  IEXEC_REQUEST_PARAMS,
+  STORAGE_PROVIDERS,
+} = require('../utils/constant');
 const {
   getStorageTokenKeyName,
   reservedSecretKeyName,
 } = require('../utils/secrets-utils');
-const { paramsKeyName } = require('../utils/params-utils');
 const {
   objParamsSchema,
   requestorderSchema,
@@ -62,7 +66,7 @@ const checkRequestRequirements = async (
   const isTee = checkActiveBitInTag(tag, 1);
 
   // check encryption key
-  if (paramsObj[paramsKeyName.IEXEC_RESULT_ENCRYPTION] === true) {
+  if (paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION] === true) {
     const isEncryptionKeySet = await checkWeb2SecretExists(
       contracts,
       smsURL,
@@ -77,21 +81,23 @@ const checkRequestRequirements = async (
   }
   // check storage token
   if (
-    paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'ipfs' ||
-    paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER] === 'dropbox'
+    paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
+      STORAGE_PROVIDERS.IPFS ||
+    paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
+      STORAGE_PROVIDERS.DROPBOX
   ) {
     const isStorageTokenSet = await checkWeb2SecretExists(
       contracts,
       smsURL,
       requester,
       getStorageTokenKeyName(
-        paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER],
+        paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER],
       ),
     );
     if (!isStorageTokenSet) {
       throw Error(
         `Requester storage token is not set for selected provider "${
-          paramsObj[paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]
+          paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]
         }". Result archive upload will fail.`,
       );
     }
@@ -110,9 +116,9 @@ const checkRequestRequirements = async (
     }
   }
   // check requester secrets
-  if (paramsObj[paramsKeyName.IEXEC_SECRETS]) {
+  if (paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]) {
     await Promise.all(
-      Object.values(paramsObj[paramsKeyName.IEXEC_SECRETS]).map(
+      Object.values(paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]).map(
         async (secretName) => {
           const isSecretSet = await checkRequesterSecretExists(
             contracts,

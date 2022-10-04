@@ -31,6 +31,21 @@ const TEE_FRAMEWORKS = {
   GRAMINE: 'gramine',
 };
 
+const STORAGE_PROVIDERS = {
+  IPFS: 'ipfs',
+  DROPBOX: 'dropbox',
+};
+
+const IEXEC_REQUEST_PARAMS = {
+  IEXEC_ARGS: 'iexec_args',
+  IEXEC_INPUT_FILES: 'iexec_input_files',
+  IEXEC_SECRETS: 'iexec_secrets',
+  IEXEC_RESULT_ENCRYPTION: 'iexec_result_encryption',
+  IEXEC_RESULT_STORAGE_PROVIDER: 'iexec_result_storage_provider',
+  IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
+  IEXEC_DEVELOPER_LOGGER: 'iexec_developer_logger',
+};
+
 module.exports = {
   APP,
   DATASET,
@@ -46,4 +61,6 @@ module.exports = {
   NULL_DATASETORDER,
   WORKERPOOL_URL_TEXT_RECORD_KEY,
   TEE_FRAMEWORKS,
+  STORAGE_PROVIDERS,
+  IEXEC_REQUEST_PARAMS,
 };

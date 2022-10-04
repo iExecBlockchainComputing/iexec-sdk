@@ -1,4 +1,4 @@
-const { paramsKeyName } = require('../../common/utils/params-utils');
+const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 
 const main = {
   description:
@@ -58,7 +58,7 @@ const gramineTeeApp = {
 
 const buyConf = {
   params: {
-    [paramsKeyName.IEXEC_ARGS]: '',
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
   },
   tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
   trust: '0',
@@ -132,9 +132,9 @@ const order = {
     beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
     callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {
-      [paramsKeyName.IEXEC_ARGS]: '',
-      [paramsKeyName.IEXEC_INPUT_FILES]: [],
-      [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
+      [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
+      [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: [],
+      [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
     },
   },
 };

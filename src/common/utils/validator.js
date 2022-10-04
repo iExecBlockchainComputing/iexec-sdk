@@ -9,10 +9,13 @@ const {
   parseRLC,
   parseEth,
 } = require('./utils');
-const { paramsKeyName, storageProviders } = require('./params-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
-const { TEE_FRAMEWORKS } = require('./constant');
+const {
+  TEE_FRAMEWORKS,
+  IEXEC_REQUEST_PARAMS,
+  STORAGE_PROVIDERS,
+} = require('./constant');
 
 const debug = Debug('validators');
 
@@ -241,7 +244,7 @@ const paramsEncryptResultSchema = () => boolean();
 
 const paramsStorageProviderSchema = () =>
   string().oneOf(
-    storageProviders(),
+    Object.values(STORAGE_PROVIDERS),
     '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
   );
 
@@ -278,28 +281,28 @@ const paramsRequesterSecretsSchema = () =>
 
 const objParamsSchema = () =>
   object({
-    [paramsKeyName.IEXEC_ARGS]: paramsArgsSchema(),
-    [paramsKeyName.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
-    [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
       {
         is: true,
         then: string().notRequired(),
         otherwise: string()
-          .default('ipfs')
+          .default(STORAGE_PROVIDERS.IPFS)
           .when('$isTee', {
             is: true,
             then: paramsStorageProviderSchema(),
             otherwise: string().oneOf(
-              ['ipfs'],
+              [STORAGE_PROVIDERS.IPFS],
               '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
             ),
           })
           .required(),
       },
     ),
-    [paramsKeyName.IEXEC_SECRETS]: mixed().when('$isTee', {
+    [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', {
       is: true,
       then: paramsRequesterSecretsSchema(),
       otherwise: mixed().test(
@@ -313,19 +316,21 @@ const objParamsSchema = () =>
         },
       ),
     }),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-      `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
+      `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
       {
-        is: 'ipfs',
+        is: STORAGE_PROVIDERS.IPFS,
         then: string()
           .when('$resultProxyURL', (resultProxyURL, schema) =>
             schema.default(resultProxyURL),
           )
-          .required('${path} is required field with "ipfs" storage'),
+          .required(
+            `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
+          ),
         otherwise: string().notRequired(),
       },
     ),
-    [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
+    [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
 const paramsSchema = () =>

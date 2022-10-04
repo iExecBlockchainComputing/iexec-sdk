@@ -656,10 +656,10 @@ describe('[Mainchain]', () => {
     expect(res.app.mrenclave.provider).toBe('SCONE');
   });
 
-  test('[common] iexec app init --tee-framework Gramine)', async () => {
+  test('[common] iexec app init --tee-framework gramine)', async () => {
     await removeWallet();
     const raw = await execAsync(
-      `${iexecPath} app init --tee-framework Gramine --raw`,
+      `${iexecPath} app init --tee-framework gramine --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);

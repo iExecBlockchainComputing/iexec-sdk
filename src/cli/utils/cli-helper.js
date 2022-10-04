@@ -12,8 +12,10 @@ const {
   weiAmountSchema,
   positiveStrictIntSchema,
 } = require('../../common/utils/validator');
-const { storageProviders } = require('../../common/utils/params-utils');
-const { TEE_FRAMEWORKS } = require('../../common/utils/config');
+const {
+  TEE_FRAMEWORKS,
+  STORAGE_PROVIDERS,
+} = require('../../common/utils/constant');
 
 const debug = Debug('help');
 
@@ -439,7 +441,7 @@ const orderOption = {
     'encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)',
   ],
   requestStorageProvider: () => [
-    `--storage-provider <${listOfChoices(storageProviders())}>`,
+    `--storage-provider <${listOfChoices(Object.values(STORAGE_PROVIDERS))}>`,
     'specify the storage to use to store the result archive',
   ],
 };

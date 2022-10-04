@@ -75,7 +75,7 @@ const {
   WORKERPOOL,
   TEE_FRAMEWORKS,
 } = require('../../common/utils/constant');
-const { paramsKeyName } = require('../../common/utils/params-utils');
+const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 const {
   checkRequestRequirements,
 } = require('../../common/execution/request-helper');
@@ -690,20 +690,21 @@ run
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
-          [paramsKeyName.IEXEC_ARGS]: inputParamsArgs,
+          [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
         }),
         ...(inputParamsInputFiles !== undefined && {
-          [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+          [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsSecrets !== undefined && {
-          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
+          [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
         ...(inputParamsResultEncryption !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncryption,
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]:
+            inputParamsResultEncryption,
         }),
       };
       debug('params', params);
@@ -1193,20 +1194,21 @@ requestRun
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
-          [paramsKeyName.IEXEC_ARGS]: inputParamsArgs,
+          [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
         }),
         ...(inputParamsInputFiles !== undefined && {
-          [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+          [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsSecrets !== undefined && {
-          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
+          [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
         ...(inputParamsResultEncryption !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncryption,
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]:
+            inputParamsResultEncryption,
         }),
       };
       debug('params', params);

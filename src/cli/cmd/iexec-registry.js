@@ -6,7 +6,7 @@ const fs = require('fs-extra');
 const { object, array, string } = require('yup');
 const sizeOf = require('image-size');
 const path = require('path');
-const { paramsKeyName } = require('../../common/utils/params-utils');
+const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 const {
   chainIdSchema,
   addressSchema,
@@ -60,7 +60,7 @@ const baseSchema = () =>
 const buyConfSchema = () =>
   object({
     params: object({
-      [paramsKeyName.IEXEC_ARGS]: string(),
+      [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: string(),
     })
       .required()
       .noUnknown()
