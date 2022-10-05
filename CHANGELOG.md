@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
 - `iexec app check-secret` & `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
 - `iexec storage init` & `storage.pushStorageToken(appAddress)` use the default TEE framework if not specified
 - `iexec storage check` & `app.checkStorageTokenExists(appAddress, secret)` use the default TEE framework if not specified
+- `iexec requester check-secret <name>` & `secrets.checkRequesterSecretExists(name)` use the default TEE framework if not specified
+- `iexec requester push-secret <name>` & `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
 
 ## [7.2.2] 2022-09-05
 
