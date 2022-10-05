@@ -8348,6 +8348,12 @@ describe('[secrets]', () => {
     ).rejects.toThrow(
       Error(`Secret "foo" already exists for ${randomWallet.address}`),
     );
+    const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
+      'foo',
+      'oops',
+      { teeFramework: TEE_FRAMEWORKS.GRAMINE },
+    );
+    expect(pushForTeeFrameworkRes.isPushed).toBe(true);
   });
 
   test('result.checkRequesterSecretExists()', async () => {
@@ -8372,6 +8378,11 @@ describe('[secrets]', () => {
     await expect(
       iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo'),
     ).resolves.toBe(true);
+    await expect(
+      iexec.secrets.checkRequesterSecretExists(randomWallet.address, 'foo', {
+        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+      }),
+    ).resolves.toBe(false);
   });
 });
 
