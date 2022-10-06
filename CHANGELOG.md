@@ -13,12 +13,14 @@ All notable changes to this project will be documented in this file.
 
 - SMS URL resolution depends on TEE framework (default `scone`)
 - SMS URL override in `IExecConfig` or `chain.json` accepts `Record<TeeFramework,Url> | string`
-- `iexec app push-secret` & `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
-- `iexec app check-secret` & `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
-- `iexec storage init` & `storage.pushStorageToken(appAddress)` use the default TEE framework if not specified
-- `iexec storage check` & `app.checkStorageTokenExists(appAddress, secret)` use the default TEE framework if not specified
-- `iexec requester check-secret <name>` & `secrets.checkRequesterSecretExists(name)` use the default TEE framework if not specified
-- `iexec requester push-secret <name>` & `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
+- `iexec app push-secret` and `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
+- `iexec app check-secret` and `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
+- `iexec storage init` and `storage.pushStorageToken(appAddress)` use the default TEE framework if not specified
+- `iexec storage check` and `app.checkStorageTokenExists(appAddress, secret)` use the default TEE framework if not specified
+- `iexec requester check-secret <name>` and `secrets.checkRequesterSecretExists(name)` use the default TEE framework if not specified
+- `iexec requester push-secret <name>` and `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
+- `iexec result check-encryption-key` and `result.checkResultEncryptionKeyExists(address)` use the default TEE framework if not specified
+- `iexec result push-encryption-key` and `result.pushResultEncryptionKey(value)` use the default TEE framework if not specified
 
 ## [7.2.2] 2022-09-05
 
@@ -99,7 +101,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution on iExec sidechains and custom networks
-- ENS methods in CLI & lib:
+- ENS methods in CLI and lib:
   - `iexec ens resolve <name>` and `iexec.ens.resolveName(name)`
   - `iexec ens lookup <address>` and `iexec.ens.lookupAddress(address)`
   - `iexec ens get-owner <name>` and `iexec.ens.getOwner(name)`
@@ -268,15 +270,15 @@ All notable changes to this project will be documented in this file.
 - `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
 - `--watch` option added to `iexec deal show <dealid>` allow to watch execution status changes
 - default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
-- support for units in `parseEth()` & `parseRLC()` methods
+- support for units in `parseEth()` and `parseRLC()` methods
 
 ### Changed
 
-- [BREAKING] `iexec app show <index>` & `app.showUserApp(index)` first index is `0` previously was `1`
-- [BREAKING] `iexec dataset show <index>` & `dataset.showUserDataset(index)` first index is `0` previously was `1`
-- [BREAKING] `iexec workerpool show <index>` & `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec app show <index>` and `app.showUserApp(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec dataset show <index>` and `dataset.showUserDataset(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec workerpool show <index>` and `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
-- [BREAKING] `iexec task show` & `task.show(taskid)` returned `task.results` is an object previously was url or hexString
+- [BREAKING] `iexec task show` and `task.show(taskid)` returned `task.results` is an object previously was url or hexString
 - [BREAKING] `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
 - [BREAKING] `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
@@ -287,7 +289,7 @@ All notable changes to this project will be documented in this file.
 - access to the blockchain through ethers default provider
 - standardized CLI messages format
 - fixed mutation in order sign methods
-- fixed `iexec wallet sweep` & `wallet.sweep()`
+- fixed `iexec wallet sweep` and `wallet.sweep()`
 - fixed method name `iexec.order.publishWorkerpoolorder()`
 - fixed method name `iexec.order.unpublishWorkerpoolorder()`
 
