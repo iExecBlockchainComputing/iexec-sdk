@@ -8196,6 +8196,21 @@ describe('[result]', () => {
         `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
       ),
     );
+    await expect(
+      iexec.result.pushResultEncryptionKey('oops', {
+        teeFramework: TEE_FRAMEWORKS.SCONE,
+      }),
+    ).rejects.toThrow(
+      Error(
+        `Secret "iexec-result-encryption-public-key" already exists for ${randomWallet.address}`,
+      ),
+    );
+    const pushForTeeFrameworkRes = await iexec.result.pushResultEncryptionKey(
+      'oops',
+      { teeFramework: TEE_FRAMEWORKS.GRAMINE },
+    );
+    expect(pushForTeeFrameworkRes.isPushed).toBe(true);
+    expect(pushForTeeFrameworkRes.isUpdated).toBe(false);
   });
 
   test('result.pushResultEncryptionKey() (forceUpdate)', async () => {
@@ -8249,6 +8264,16 @@ describe('[result]', () => {
       randomWallet.address,
     );
     expect(withSecretRes).toBe(true);
+    const withSecretForTeeFrameworkRes =
+      await iexec.result.checkResultEncryptionKeyExists(randomWallet.address, {
+        teeFramework: TEE_FRAMEWORKS.SCONE,
+      });
+    expect(withSecretForTeeFrameworkRes).toBe(true);
+    const withoutSecretForTeeFrameworkRes =
+      await iexec.result.checkResultEncryptionKeyExists(randomWallet.address, {
+        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+      });
+    expect(withoutSecretForTeeFrameworkRes).toBe(false);
   });
 
   test('result.decryptResult()', async () => {
