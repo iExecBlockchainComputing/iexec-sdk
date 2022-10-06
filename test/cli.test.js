@@ -3930,8 +3930,7 @@ describe('[Common]', () => {
 
     test('iexec result push-encryption-key', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      const { address } = await setWallet();
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -3948,12 +3947,26 @@ describe('[Common]', () => {
       ).catch((e) => e.message);
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(false);
+      const rawAlreadyExistsForTeeFramework = await execAsync(
+        `${iexecPath} result push-encryption-key --tee-framework scone --raw`,
+      ).catch((e) => e.message);
+      const resAlreadyExistsForTeeFramework = JSON.parse(
+        rawAlreadyExistsForTeeFramework,
+      );
+      expect(resAlreadyExistsForTeeFramework.ok).toBe(false);
+      const resNotExistsForTeeFramework = JSON.parse(
+        await execAsync(
+          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`,
+        ),
+      );
+      expect(resNotExistsForTeeFramework.ok).toBe(true);
+      expect(resNotExistsForTeeFramework.isPushed).toBe(true);
+      expect(resNotExistsForTeeFramework.isUpdated).toBe(false);
     });
 
     test('iexec result push-encryption-key --force-update', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      const { address } = await setWallet();
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -3989,14 +4002,14 @@ describe('[Common]', () => {
 
     test('iexec result check-encryption-key', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
+      const { privateKey, address } = getRandomWallet();
       const rawUserKey = await execAsync(
         `${iexecPath} result check-encryption-key ${address} --raw`,
       );
       const resUserKey = JSON.parse(rawUserKey);
       expect(resUserKey.ok).toBe(true);
       expect(resUserKey.isEncryptionKeySet).toBe(false);
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      await setWallet(privateKey);
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -4008,12 +4021,26 @@ describe('[Common]', () => {
       expect(resMyKey.ok).toBe(true);
       expect(resMyKey.isEncryptionKeySet).toBe(false);
       await execAsync(`${iexecPath} result push-encryption-key --raw`);
-      const rawAlreadyExists = await execAsync(
+      const rawExists = await execAsync(
         `${iexecPath} result check-encryption-key --raw`,
       );
-      const resAlreadyExists = JSON.parse(rawAlreadyExists);
-      expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
+      const resExists = JSON.parse(rawExists);
+      expect(resExists.ok).toBe(true);
+      expect(resExists.isEncryptionKeySet).toBe(true);
+
+      const rawExistsOnTeeFramework = await execAsync(
+        `${iexecPath} result check-encryption-key --tee-framework scone --raw`,
+      );
+      const resExistsOnTeeFramework = JSON.parse(rawExistsOnTeeFramework);
+      expect(resExistsOnTeeFramework.ok).toBe(true);
+      expect(resExistsOnTeeFramework.isEncryptionKeySet).toBe(true);
+
+      const rawNotExistsOnTeeFramework = await execAsync(
+        `${iexecPath} result check-encryption-key --tee-framework gramine --raw`,
+      );
+      const resNotExistsOnTeeFramework = JSON.parse(rawNotExistsOnTeeFramework);
+      expect(resNotExistsOnTeeFramework.ok).toBe(true);
+      expect(resNotExistsOnTeeFramework.isEncryptionKeySet).toBe(false);
     });
 
     test('iexec result check-secret (v4 legacy name)', async () => {
