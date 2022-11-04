@@ -3400,13 +3400,7 @@ describe('[dataset]', () => {
     ).rejects.toThrow(
       Error(`Secret already exists for ${datasetAddress} and can't be updated`),
     );
-    const newDatasetDeployRes = await iexec.dataset.deployDataset({
-      owner: await iexec.wallet.getAddress(),
-      name: `dataset${getId()}`,
-      multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
-      checksum:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-    });
+    const newDatasetDeployRes = await deployRandomDataset(iexec);
     const newDatasetAddress = newDatasetDeployRes.address;
     await expect(
       iexec.dataset.pushDatasetSecret(newDatasetAddress, 'oops', {
