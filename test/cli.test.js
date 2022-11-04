@@ -3914,7 +3914,7 @@ describe('[Common]', () => {
         execAsync(
           `${iexecPath} dataset check-secret ${getRandomAddress()} --tee-framework foo --raw`,
         ),
-      ).rejects.toBeInstanceOf(Error);
+      ).rejects.toThrow();
     });
   });
 
