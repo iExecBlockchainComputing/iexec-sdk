@@ -70,7 +70,7 @@ current IExecConfig
 
 ### checkDatasetSecretExists
 
-▸ **checkDatasetSecretExists**(`datasetAddress`): `Promise`<`boolean`\>
+▸ **checkDatasetSecretExists**(`datasetAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a the dataset secret exists in the Secret Management Service
 
@@ -85,6 +85,8 @@ console.log('secret exists:', isSecretSet);
 | Name | Type |
 | :------ | :------ |
 | `datasetAddress` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -295,7 +297,7 @@ ___
 
 ### pushDatasetSecret
 
-▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`): `Promise`<`boolean`\>
+▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`, `options?`): `Promise`<`boolean`\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
@@ -315,6 +317,8 @@ console.log('secret pushed:', pushed);
 | :------ | :------ |
 | `datasetAddress` | `string` |
 | `encryptionKey` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
