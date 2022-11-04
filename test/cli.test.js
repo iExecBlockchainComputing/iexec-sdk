@@ -3833,7 +3833,7 @@ describe('[Common]', () => {
         execAsync(
           `${iexecPath} dataset push-secret ${address2} --tee-framework foo --raw`,
         ),
-      ).rejects.toBeInstanceOf(Error);
+      ).rejects.toThrow();
       const resPush2 = JSON.parse(
         await execAsync(
           `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
