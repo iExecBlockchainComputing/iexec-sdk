@@ -3474,7 +3474,7 @@ describe('[dataset]', () => {
     );
   });
 
-  test.only('dataset.checkDatasetSecretExists()', async () => {
+  test('dataset.checkDatasetSecretExists()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       PRIVATE_KEY,
@@ -3505,11 +3505,11 @@ describe('[dataset]', () => {
     await iexec.dataset.pushDatasetSecret(datasetAddressGramine, 'oops', {
       teeFramework: TEE_FRAMEWORKS.GRAMINE,
     });
-    const wrogTeeRes = await iexec.dataset.checkDatasetSecretExists(
+    const wrongTeeRes = await iexec.dataset.checkDatasetSecretExists(
       datasetAddressGramine,
       { teeFramework: TEE_FRAMEWORKS.SCONE },
     );
-    expect(wrogTeeRes).toBe(false);
+    expect(wrongTeeRes).toBe(false);
     const GoodTeeRes = await iexec.dataset.checkDatasetSecretExists(
       datasetAddressGramine,
       { teeFramework: TEE_FRAMEWORKS.GRAMINE },
