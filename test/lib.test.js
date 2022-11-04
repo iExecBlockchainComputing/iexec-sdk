@@ -3510,11 +3510,11 @@ describe('[dataset]', () => {
       { teeFramework: TEE_FRAMEWORKS.SCONE },
     );
     expect(wrongTeeRes).toBe(false);
-    const GoodTeeRes = await iexec.dataset.checkDatasetSecretExists(
+    const goodTeeRes = await iexec.dataset.checkDatasetSecretExists(
       datasetAddressGramine,
       { teeFramework: TEE_FRAMEWORKS.GRAMINE },
     );
-    expect(GoodTeeRes).toBe(true);
+    expect(goodTeeRes).toBe(true);
   });
 });
 
