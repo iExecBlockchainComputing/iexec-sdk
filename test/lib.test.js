@@ -9669,9 +9669,9 @@ describe('[utils]', () => {
     test('decodeTag unknown bit tag', () => {
       expect(() =>
         utils.decodeTag(
-          '0x0000000000000000000000000000000000000000000000000000000000000002',
+          '0x000000000000000000000000000000000000000000000000000000000000000a',
         ),
-      ).toThrow('Unknown bit 2');
+      ).toThrow(Error('Unknown bit 4 in tag'));
     });
   });
 
