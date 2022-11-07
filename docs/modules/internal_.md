@@ -142,8 +142,9 @@ task tag used to specify the runtime
 
 example:
 ```js
-const onlyTeeTag = ['tee'];
-const teePlusGpuTags = ['tee','gpu'];
+const gpuTag = ['gpu'];
+const sconeTeeTag = ['tee', 'scone'];
+const gramineTeeTag = ['tee', 'gramine'];
 ```
 
 ___

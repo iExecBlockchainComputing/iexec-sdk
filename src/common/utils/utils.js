@@ -212,6 +212,10 @@ const getSalt = () => `0x${Buffer.from(randomBytes(32)).toString('hex')}`;
 const TAG_MAP = {
   tee: 1,
   1: 'tee',
+  scone: 2,
+  2: 'scone',
+  gramine: 3,
+  3: 'gramine',
   gpu: 9,
   9: 'gpu',
 };

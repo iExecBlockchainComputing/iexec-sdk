@@ -118,8 +118,9 @@ type HumanSingleTag = string;
  *
  * example:
  * ```js
- * const onlyTeeTag = ['tee'];
- * const teePlusGpuTags = ['tee','gpu'];
+ * const gpuTag = ['gpu'];
+ * const sconeTeeTag = ['tee', 'scone'];
+ * const gramineTeeTag = ['tee', 'gramine'];
  * ```
  */
 type Tag = Bytes32 | HumanSingleTag[];
