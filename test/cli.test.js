@@ -666,7 +666,7 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.app).toBeDefined();
     expect(res.app.mrenclave).toBeDefined();
-    expect(res.app.mrenclave.provider).toBe('SCONE');
+    expect(res.app.mrenclave.framework).toBe('SCONE');
   });
 
   test('[common] iexec app init --tee-framework gramine)', async () => {
@@ -678,7 +678,7 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.app).toBeDefined();
     expect(res.app.mrenclave).toBeDefined();
-    expect(res.app.mrenclave.provider).toBe('GRAMINE');
+    expect(res.app.mrenclave.framework).toBe('GRAMINE');
   });
 
   test('[common] iexec app init --tee-framework scone)', async () => {
@@ -690,7 +690,7 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.app).toBeDefined();
     expect(res.app.mrenclave).toBeDefined();
-    expect(res.app.mrenclave.provider).toBe('SCONE');
+    expect(res.app.mrenclave.framework).toBe('SCONE');
   });
 
   test('[common] iexec app init (+ wallet)', async () => {

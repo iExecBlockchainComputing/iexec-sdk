@@ -37,11 +37,11 @@ export interface AppDeploymentArgs {
    */
   mrenclave?: {
     /**
-     * only "SCONE" is supported
+     * TEE framework name
      */
-    provider: string;
+    framework: TeeFramework;
     /**
-     * provider's protocol version
+     * framework's protocol version
      */
     version: string;
     /**
@@ -88,7 +88,7 @@ export interface App {
   mrenclave?:
     | string
     | {
-        provider: 'SCONE' | 'GRAMINE';
+        framework: 'SCONE' | 'GRAMINE';
         version: string;
         entrypoint: string;
         heapSize: number;

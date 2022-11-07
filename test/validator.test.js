@@ -1020,7 +1020,7 @@ describe('[fileBufferSchema]', () => {
 describe('[mrenclaveSchema]', () => {
   test('valid obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1033,7 +1033,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('valid string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1047,7 +1047,7 @@ describe('[mrenclaveSchema]', () => {
   test('valid bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1093,7 +1093,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1107,7 +1107,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1122,7 +1122,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when unexpected key is found in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1145,12 +1145,12 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('provider is a required field'),
+      new ValidationError('framework is a required field'),
     );
   });
   test('throw when a key is missing in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
       fingerprint:
@@ -1163,7 +1163,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when a key is missing in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         heapSize: 1073741824,
         fingerprint:
@@ -1175,9 +1175,9 @@ describe('[mrenclaveSchema]', () => {
       new ValidationError('entrypoint is a required field'),
     );
   });
-  test('throw when provider is not a valid TEE framework', async () => {
+  test('throw when framework is not a valid TEE framework', async () => {
     const obj = {
-      provider: 'FOO',
+      framework: 'FOO',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1185,7 +1185,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('provider is not a valid TEE framework'),
+      new ValidationError('framework is not a valid TEE framework'),
     );
   });
 });

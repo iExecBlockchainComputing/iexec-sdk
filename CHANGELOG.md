@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - `iexec requester push-secret <name>` and `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
 - `iexec result check-encryption-key` and `result.checkResultEncryptionKeyExists(address)` use the default TEE framework if not specified
 - `iexec result push-encryption-key` and `result.pushResultEncryptionKey(value)` use the default TEE framework if not specified
+- TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
 
 ## [7.2.2] 2022-09-05
 

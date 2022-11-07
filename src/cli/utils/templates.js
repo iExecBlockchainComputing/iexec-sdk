@@ -29,7 +29,7 @@ const sconeTeeApp = {
   checksum:
     '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
   mrenclave: {
-    provider: 'SCONE',
+    framework: 'SCONE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
@@ -47,7 +47,7 @@ const gramineTeeApp = {
   checksum:
     '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
   mrenclave: {
-    provider: 'GRAMINE',
+    framework: 'GRAMINE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
