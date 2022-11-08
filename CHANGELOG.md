@@ -6,11 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Adding `teeFramework` option on dataset `push` and `check` secret 
-- `iexec dataset push/check secret` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the dataset secret
-  
-### Added
-
 - `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
 - `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
 
@@ -26,6 +21,8 @@ All notable changes to this project will be documented in this file.
 - `iexec requester push-secret <name>` and `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
 - `iexec result check-encryption-key` and `result.checkResultEncryptionKeyExists(address)` use the default TEE framework if not specified
 - `iexec result push-encryption-key` and `result.pushResultEncryptionKey(value)` use the default TEE framework if not specified
+- `iexec dataset check-secret` and `dataset.checkDatasetSecretExists(datasetAddress)` use the default TEE framework if not specified
+- `iexec dataset push-secret` and `dataset.pushDatasetSecret(datasetAddress, encryptionKey)` use the default TEE framework if not specified
 
 ## [7.2.2] 2022-09-05
 
