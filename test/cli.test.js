@@ -3794,7 +3794,7 @@ describe('[Common]', () => {
       await setRichWallet();
       await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-      await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+      await execAsync('echo oops > ./.secrets/datasets/dataset.key');
       const randomAddress = getRandomAddress();
       const resPushNotAllowed = JSON.parse(
         await execAsync(
@@ -3823,13 +3823,36 @@ describe('[Common]', () => {
       expect(resAlreadyExists.error.message).toBe(
         `Secret already exists for ${address} and can't be updated`,
       );
+      // new dataset to push secret on another TEE framework
+      await execAsync(`${iexecPath} dataset init`);
+      await setDatasetUniqueName();
+      const { address: address2 } = JSON.parse(
+        await execAsync(`${iexecPath} dataset deploy --raw`),
+      );
+      await expect(
+        execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework foo --raw`,
+        ),
+      ).rejects.toThrow();
+      const resPush2 = JSON.parse(
+        await execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ),
+      );
+      expect(resPush2.ok).toBe(true);
+      const resAlreadyExists2 = JSON.parse(
+        await execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ).catch((e) => e.message),
+      );
+      expect(resAlreadyExists2.ok).toBe(false);
     });
 
     test('iexec dataset check-secret', async () => {
       await setRichWallet();
       await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-      await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+      await execAsync('echo oops > ./.secrets/datasets/dataset.key');
       await execAsync(`${iexecPath} dataset init`);
       await setDatasetUniqueName();
       await execAsync(`${iexecPath} dataset deploy --raw`);
@@ -3851,6 +3874,47 @@ describe('[Common]', () => {
       const resRandomDataset = JSON.parse(rawRandomDataset);
       expect(resRandomDataset.ok).toBe(true);
       expect(resRandomDataset.isSecretSet).toBe(false);
+
+      // testing on gramine dataset
+
+      await execAsync(`${iexecPath} dataset init`);
+      await setDatasetUniqueName();
+      await execAsync(`${iexecPath} dataset deploy --raw`);
+      const resMyDataset2 = JSON.parse(
+        await execAsync(`${iexecPath} dataset check-secret --raw`),
+      );
+      expect(resMyDataset2.ok).toBe(true);
+      expect(resMyDataset2.isSecretSet).toBe(false);
+
+      await execAsync(
+        `${iexecPath} dataset push-secret --tee-framework gramine --raw`,
+      );
+      const rawWrongTee = await execAsync(
+        `${iexecPath} dataset check-secret --raw`,
+      );
+      const resWrongTee = JSON.parse(rawWrongTee);
+      expect(resWrongTee.ok).toBe(true);
+      expect(resWrongTee.isSecretSet).toBe(false);
+
+      const rawGoodTee = await execAsync(
+        `${iexecPath} dataset check-secret --tee-framework gramine --raw`,
+      );
+      const resGoodTee = JSON.parse(rawGoodTee);
+      expect(resGoodTee.ok).toBe(true);
+      expect(resGoodTee.isSecretSet).toBe(true);
+
+      const rawRandomDataset2 = await execAsync(
+        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
+      );
+      const resRandomDataset2 = JSON.parse(rawRandomDataset2);
+      expect(resRandomDataset2.ok).toBe(true);
+      expect(resRandomDataset2.isSecretSet).toBe(false);
+
+      await expect(
+        execAsync(
+          `${iexecPath} dataset check-secret ${getRandomAddress()} --tee-framework foo --raw`,
+        ),
+      ).rejects.toThrow();
     });
   });
 

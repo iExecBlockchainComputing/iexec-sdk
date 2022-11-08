@@ -3400,6 +3400,19 @@ describe('[dataset]', () => {
     ).rejects.toThrow(
       Error(`Secret already exists for ${datasetAddress} and can't be updated`),
     );
+    const newDatasetDeployRes = await deployRandomDataset(iexec);
+    const newDatasetAddress = newDatasetDeployRes.address;
+    await expect(
+      iexec.dataset.pushDatasetSecret(newDatasetAddress, 'oops', {
+        teeFramework: 'Wrong TEE',
+      }),
+    ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
+
+    await expect(
+      iexec.dataset.pushDatasetSecret(newDatasetAddress, 'oops', {
+        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+      }),
+    ).resolves.toBe(true);
   });
 
   test('dataset.pushDatasetSecret() (not deployed)', async () => {
@@ -3480,6 +3493,22 @@ describe('[dataset]', () => {
       datasetAddress,
     );
     expect(withSecretRes).toBe(true);
+
+    const datasetDeployedGramine = await deployRandomDataset(iexec);
+    const datasetAddressGramine = datasetDeployedGramine.address;
+    await iexec.dataset.pushDatasetSecret(datasetAddressGramine, 'oops', {
+      teeFramework: TEE_FRAMEWORKS.GRAMINE,
+    });
+    const wrongTeeRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddressGramine,
+      { teeFramework: TEE_FRAMEWORKS.SCONE },
+    );
+    expect(wrongTeeRes).toBe(false);
+    const goodTeeRes = await iexec.dataset.checkDatasetSecretExists(
+      datasetAddressGramine,
+      { teeFramework: TEE_FRAMEWORKS.GRAMINE },
+    );
+    expect(goodTeeRes).toBe(true);
   });
 });
 
