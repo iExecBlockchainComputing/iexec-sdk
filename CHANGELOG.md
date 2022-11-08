@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
 - `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
+- tee framework tags 'scone' & 'gramine'
 
 ### Changed
 
@@ -23,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - `iexec result push-encryption-key` and `result.pushResultEncryptionKey(value)` use the default TEE framework if not specified
 - `iexec dataset check-secret` and `dataset.checkDatasetSecretExists(datasetAddress)` use the default TEE framework if not specified
 - `iexec dataset push-secret` and `dataset.pushDatasetSecret(datasetAddress, encryptionKey)` use the default TEE framework if not specified
+- TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
 
 ## [7.2.2] 2022-09-05
 

@@ -526,7 +526,7 @@ const multiaddressSchema = () =>
 
 const objMrenclaveSchema = () =>
   object({
-    provider: teeFrameworkSchema().required(),
+    framework: teeFrameworkSchema().required(),
     version: string().required(),
     entrypoint: string().required(),
     heapSize: positiveIntSchema().required(),

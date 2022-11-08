@@ -4,7 +4,7 @@ const BN = require('bn.js');
 const JSZip = require('jszip');
 const NodeRSA = require('node-rsa');
 const aesjs = require('aes-js');
-const { getAddress, randomBytes, formatUnits, parseUnits } =
+const { getAddress, randomBytes, formatUnits, parseUnits, hexlify } =
   require('ethers').utils;
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
@@ -164,7 +164,7 @@ const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
 
 const cleanRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
-  const cleanObj = keys.reduce((accu, curr) => {
+  const cleanObj = keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
       let value;
       if (
@@ -177,9 +177,9 @@ const cleanRPC = (rpcObj) => {
       } else {
         value = rpcObj[curr];
       }
-      return Object.assign(accu, { [curr]: value });
+      return Object.assign(acc, { [curr]: value });
     }
-    return accu;
+    return acc;
   }, {});
   return cleanObj;
 };
@@ -207,11 +207,15 @@ const secToDate = (secs) => {
   return t;
 };
 
-const getSalt = () => `0x${Buffer.from(randomBytes(32)).toString('hex')}`;
+const getSalt = () => hexlify(randomBytes(32));
 
 const TAG_MAP = {
   tee: 1,
   1: 'tee',
+  scone: 2,
+  2: 'scone',
+  gramine: 3,
+  3: 'gramine',
   gpu: 9,
   9: 'gpu',
 };
@@ -229,14 +233,14 @@ const encodeTag = (tags) => {
     '',
   );
   const hex = new BN(binString, 2).toString('hex');
-  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
+  const encodedTag = NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
   return encodedTag;
 };
 
 const decodeTag = (tag) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
-  const binString = new BN(tag.substr(2), 'hex').toString(2);
+  const binString = new BN(tag.substring(2), 'hex').toString(2);
   const tags = [];
   for (let i = 1; i < binString.length + 1; i += 1) {
     const current = binString.charAt(binString.length - i);
@@ -254,7 +258,7 @@ const sumTags = (tagArray) => {
   const binStringArray = tagArray.map((hexTag) => {
     if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex))
       throw new ValidationError('tag must be bytes32 hex string');
-    return new BN(hexTag.substr(2), 'hex').toString(2);
+    return new BN(hexTag.substring(2), 'hex').toString(2);
   });
   let summedTagsBinString = '';
   for (let i = 1; i < 256; i += 1) {
@@ -267,7 +271,7 @@ const sumTags = (tagArray) => {
     summedTagsBinString = currentBit + summedTagsBinString;
   }
   const hex = new BN(summedTagsBinString, 2).toString('hex');
-  const encodedTag = NULL_BYTES32.substr(0, 66 - hex.length).concat(hex);
+  const encodedTag = NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
   return encodedTag;
 };
 

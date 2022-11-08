@@ -276,7 +276,7 @@ const deployRandomApp = async (iexec, { owner, teeFramework } = {}) => {
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     mrenclave: teeFramework && {
-      provider: teeFramework,
+      framework: teeFramework,
       version: 'v1',
       entrypoint: 'entrypoint.sh',
       heapSize: 4096,
@@ -2943,7 +2943,7 @@ describe('[app]', () => {
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       mrenclave: {
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: 'python /app/app.py',
         heapSize: 1073741824,
@@ -3006,7 +3006,7 @@ describe('[app]', () => {
       checksum:
         '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       mrenclave: {
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: 'python /app/app.py',
         heapSize: 1073741824,
@@ -9698,9 +9698,9 @@ describe('[utils]', () => {
     test('decodeTag unknown bit tag', () => {
       expect(() =>
         utils.decodeTag(
-          '0x0000000000000000000000000000000000000000000000000000000000000002',
+          '0x000000000000000000000000000000000000000000000000000000000000000a',
         ),
-      ).toThrow('Unknown bit 2');
+      ).toThrow(Error('Unknown bit 4 in tag'));
     });
   });
 

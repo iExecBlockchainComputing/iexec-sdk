@@ -445,7 +445,7 @@ const resolveTeeFrameworkFromApp = async (app, { strict = true } = {}) => {
   if (app.appMREnclave) {
     try {
       const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
-      return mrenclave.provider;
+      return mrenclave.framework;
     } catch (err) {
       debug('resolveTeeFrameworkFromApp()', err);
       if (strict) {
