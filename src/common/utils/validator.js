@@ -385,7 +385,8 @@ const tagSchema = () =>
       ({ originalValue, value }) =>
         `${originalValue} is not a valid tag. ${value}`,
       (value) => {
-        if (value.substr(0, 2) !== '0x') return false;
+        if (typeof value !== 'string' || value.substring(0, 2) !== '0x')
+          return false;
         return true;
       },
     )

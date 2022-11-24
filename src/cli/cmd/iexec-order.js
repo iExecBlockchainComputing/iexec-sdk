@@ -61,7 +61,7 @@ const {
 } = require('../utils/cli-helper');
 const {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
+} = require('../../common/execution/order-helper');
 const {
   loadIExecConf,
   initOrderObj,

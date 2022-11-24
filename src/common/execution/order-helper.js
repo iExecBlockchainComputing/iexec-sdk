@@ -3,12 +3,13 @@ const {
   checkWeb3SecretExists,
   checkRequesterSecretExists,
 } = require('../sms/check');
-const { checkActiveBitInTag } = require('../utils/utils');
+const { checkActiveBitInTag, TAG_MAP } = require('../utils/utils');
 const {
   NULL_ADDRESS,
   NULL_BYTES32,
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
+  TEE_FRAMEWORKS,
 } = require('../utils/constant');
 const {
   getStorageTokenKeyName,
@@ -18,7 +19,58 @@ const {
   objParamsSchema,
   requestorderSchema,
   throwIfMissing,
+  datasetorderSchema,
+  apporderSchema,
+  tagSchema,
 } = require('../utils/validator');
+const {
+  resolveTeeFrameworkFromApp,
+  showApp,
+} = require('../protocol/registries');
+
+const checkTag = (tag) => {
+  const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
+  const isScone = checkActiveBitInTag(tag, TAG_MAP.scone);
+  const isGramine = checkActiveBitInTag(tag, TAG_MAP.gramine);
+  if (isTee) {
+    if (!isScone && !isGramine) {
+      throw Error(
+        `'tee' tag must be used with a tee framework (${Object.values(
+          TEE_FRAMEWORKS,
+        )
+          .map((name) => `'${name}'`)
+          .join('|')})`,
+      );
+    }
+    if (isScone && isGramine) {
+      throw Error(
+        `tee framework tags are exclusive (${Object.values(TEE_FRAMEWORKS)
+          .map((name) => `'${name}'`)
+          .join('|')})`,
+      );
+    }
+  } else {
+    if (isScone) {
+      throw Error(`'${TEE_FRAMEWORKS.SCONE}' tag must be used with 'tee' tag`);
+    }
+    if (isGramine) {
+      throw Error(
+        `'${TEE_FRAMEWORKS.GRAMINE}' tag must be used with 'tee' tag`,
+      );
+    }
+  }
+};
+
+const resolveTeeFrameworkFromTag = (tag) => {
+  checkTag(tag);
+  if (checkActiveBitInTag(tag, TAG_MAP.scone)) {
+    return TEE_FRAMEWORKS.SCONE;
+  }
+  if (checkActiveBitInTag(tag, TAG_MAP.gramine)) {
+    return TEE_FRAMEWORKS.GRAMINE;
+  }
+  return undefined;
+};
 
 const createObjParams = async ({
   params = {},
@@ -39,7 +91,7 @@ const createObjParams = async ({
   } else {
     inputParams = params;
   }
-  const isTee = checkActiveBitInTag(tag, 1);
+  const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
   const isCallback = callback !== NULL_ADDRESS;
   const objParams = await objParamsSchema().validate(inputParams, {
     strict: noCast,
@@ -55,8 +107,9 @@ const checkRequestRequirements = async (
   } = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) => {
-  await requestorderSchema().validate(requestorder);
-  const { tag, dataset, callback, params, requester } = requestorder;
+  const vRequestorder = await requestorderSchema().validate(requestorder);
+  const { tag, dataset, callback, params, requester, beneficiary } =
+    vRequestorder;
   const paramsObj = await createObjParams({
     params,
     tag,
@@ -65,12 +118,14 @@ const checkRequestRequirements = async (
   });
   const isTee = checkActiveBitInTag(tag, 1);
 
+  checkTag(tag);
+
   // check encryption key
   if (paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION] === true) {
     const isEncryptionKeySet = await checkWeb2SecretExists(
       contracts,
       smsURL,
-      requestorder.beneficiary,
+      beneficiary,
       reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
     );
     if (!isEncryptionKeySet) {
@@ -135,10 +190,60 @@ const checkRequestRequirements = async (
       ),
     );
   }
-  return true;
+};
+
+const checkDatasetRequirements = async (
+  {
+    contracts = throwIfMissing(),
+    smsURL = throwIfMissing(),
+  } = throwIfMissing(),
+  datasetorder = throwIfMissing(),
+  { tagOverride } = {},
+) => {
+  const vDatasetorder = await datasetorderSchema().validate(datasetorder);
+  const { tag, dataset } = vDatasetorder;
+  checkTag(tag);
+  const isTee = checkActiveBitInTag(
+    tagOverride ? await tagSchema().validate(tagOverride) : tag,
+    TAG_MAP.tee,
+  );
+  // check tee dataset encryption key
+  if (dataset && dataset !== NULL_ADDRESS && isTee) {
+    const isDatasetSecretSet = await checkWeb3SecretExists(
+      contracts,
+      smsURL,
+      dataset,
+    );
+    if (!isDatasetSecretSet) {
+      throw Error(
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
+      );
+    }
+  }
+};
+
+const checkAppRequirements = async (
+  { contracts = throwIfMissing() } = throwIfMissing(),
+  apporder = throwIfMissing(),
+  { tagOverride } = {},
+) => {
+  const vApporder = await apporderSchema().validate(apporder);
+  const { tag, app } = vApporder;
+  const tagTeeFramework = resolveTeeFrameworkFromTag(
+    tagOverride ? await tagSchema().validate(tagOverride) : tag,
+  );
+  const appTeeFramework = await showApp(contracts, app).then((res) =>
+    resolveTeeFrameworkFromApp(res.app, { strict: false }),
+  );
+  if (appTeeFramework !== tagTeeFramework) {
+    throw Error('Tag mismatch the TEE framework specified by app');
+  }
 };
 
 module.exports = {
+  resolveTeeFrameworkFromTag,
   createObjParams,
   checkRequestRequirements,
+  checkDatasetRequirements,
+  checkAppRequirements,
 };

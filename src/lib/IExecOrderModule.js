@@ -38,8 +38,17 @@ const {
 } = require('../common/market/marketplace');
 const {
   checkRequestRequirements,
-} = require('../common/execution/request-helper');
+  resolveTeeFrameworkFromTag,
+  checkAppRequirements,
+  checkDatasetRequirements,
+} = require('../common/execution/order-helper');
 const { NULL_DATASETORDER } = require('../common/utils/constant');
+const {
+  requestorderSchema,
+  apporderSchema,
+  datasetorderSchema,
+} = require('../common/utils/validator');
+const { sumTags } = require('../common/utils/utils');
 
 class IExecOrderModule extends IExecModule {
   constructor(...args) {
@@ -79,12 +88,39 @@ class IExecOrderModule extends IExecModule {
         await this.config.resolveContractsClient(),
         requestorder,
       );
-    this.signApporder = async (apporder) =>
-      signApporder(await this.config.resolveContractsClient(), apporder);
-    this.signDatasetorder = async (datasetorder) =>
+    this.signApporder = async (apporder, { preflightCheck = true } = {}) =>
+      signApporder(
+        await this.config.resolveContractsClient(),
+        preflightCheck === true
+          ? await checkAppRequirements(
+              {
+                contracts: await this.config.resolveContractsClient(),
+              },
+              apporder,
+            ).then(() => apporder)
+          : apporder,
+      );
+    this.signDatasetorder = async (
+      datasetorder,
+      { preflightCheck = true } = {},
+    ) =>
       signDatasetorder(
         await this.config.resolveContractsClient(),
-        datasetorder,
+        preflightCheck === true
+          ? await checkDatasetRequirements(
+              {
+                contracts: await this.config.resolveContractsClient(),
+                smsURL: await this.config.resolveSmsURL({
+                  teeFramework: resolveTeeFrameworkFromTag(
+                    (
+                      await datasetorderSchema().validate(datasetorder)
+                    ).tag,
+                  ),
+                }),
+              },
+              datasetorder,
+            ).then(() => datasetorder)
+          : datasetorder,
       );
     this.signWorkerpoolorder = async (workerpoolorder) =>
       signWorkerpoolorder(
@@ -93,15 +129,21 @@ class IExecOrderModule extends IExecModule {
       );
     this.signRequestorder = async (
       requestorder,
-      { checkRequest = true } = {},
+      { preflightCheck = true } = {},
     ) =>
       signRequestorder(
         await this.config.resolveContractsClient(),
-        checkRequest === true
+        preflightCheck === true
           ? await checkRequestRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL(),
+                smsURL: await this.config.resolveSmsURL({
+                  teeFramework: resolveTeeFrameworkFromTag(
+                    (
+                      await requestorderSchema().validate(requestorder)
+                    ).tag,
+                  ),
+                }),
               },
               requestorder,
             ).then(() => requestorder)
@@ -127,17 +169,44 @@ class IExecOrderModule extends IExecModule {
         await this.config.resolveContractsClient(),
         signedRequestorder,
       );
-    this.publishApporder = async (signedApporder) =>
+    this.publishApporder = async (
+      signedApporder,
+      { preflightCheck = true } = {},
+    ) =>
       publishApporder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        signedApporder,
+        preflightCheck === true
+          ? await checkAppRequirements(
+              {
+                contracts: await this.config.resolveContractsClient(),
+              },
+              signedApporder,
+            ).then(() => signedApporder)
+          : signedApporder,
       );
-    this.publishDatasetorder = async (signedDatasetorder) =>
+    this.publishDatasetorder = async (
+      signedDatasetorder,
+      { preflightCheck = true } = {},
+    ) =>
       publishDatasetorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        signedDatasetorder,
+        preflightCheck === true
+          ? await checkDatasetRequirements(
+              {
+                contracts: await this.config.resolveContractsClient(),
+                smsURL: await this.config.resolveSmsURL({
+                  teeFramework: resolveTeeFrameworkFromTag(
+                    (
+                      await datasetorderSchema().validate(signedDatasetorder)
+                    ).tag,
+                  ),
+                }),
+              },
+              signedDatasetorder,
+            ).then(() => signedDatasetorder)
+          : signedDatasetorder,
       );
     this.publishWorkerpoolorder = async (signedWorkerpoolorder) =>
       publishWorkerpoolorder(
@@ -147,16 +216,22 @@ class IExecOrderModule extends IExecModule {
       );
     this.publishRequestorder = async (
       signedRequestorder,
-      { checkRequest = true } = {},
+      { preflightCheck = true } = {},
     ) =>
       publishRequestorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        checkRequest === true
-          ? await checkRequestRequirements(
+        preflightCheck === true
+          ? await await checkRequestRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL(),
+                smsURL: await this.config.resolveSmsURL({
+                  teeFramework: resolveTeeFrameworkFromTag(
+                    (
+                      await requestorderSchema().validate(signedRequestorder)
+                    ).tag,
+                  ),
+                }),
               },
               signedRequestorder,
             ).then(() => signedRequestorder)
@@ -239,23 +314,61 @@ class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
       },
-      { checkRequest = true } = {},
-    ) =>
-      matchOrders(
+      { preflightCheck = true } = {},
+    ) => {
+      if (preflightCheck === true) {
+        const resolvedTag = sumTags([
+          (
+            await requestorderSchema()
+              .label('requestorder')
+              .validate(requestorder)
+          ).tag,
+          (await apporderSchema().label('apporder').validate(apporder)).tag,
+          (
+            await datasetorderSchema()
+              .label('datasetorder')
+              .validate(datasetorder)
+          ).tag,
+        ]);
+        return matchOrders(
+          await this.config.resolveContractsClient(),
+          await checkAppRequirements(
+            {
+              contracts: await this.config.resolveContractsClient(),
+            },
+            apporder,
+            { tagOverride: resolvedTag },
+          ).then(() => apporder),
+          await checkDatasetRequirements(
+            {
+              contracts: await this.config.resolveContractsClient(),
+              smsURL: await this.config.resolveSmsURL({
+                teeFramework: resolveTeeFrameworkFromTag(resolvedTag),
+              }),
+            },
+            datasetorder,
+            { tagOverride: resolvedTag },
+          ).then(() => datasetorder),
+          workerpoolorder,
+          await checkRequestRequirements(
+            {
+              contracts: await this.config.resolveContractsClient(),
+              smsURL: await this.config.resolveSmsURL({
+                teeFramework: resolveTeeFrameworkFromTag(resolvedTag),
+              }),
+            },
+            requestorder,
+          ).then(() => requestorder),
+        );
+      }
+      return matchOrders(
         await this.config.resolveContractsClient(),
         apporder,
         datasetorder,
         workerpoolorder,
-        checkRequest === true
-          ? await checkRequestRequirements(
-              {
-                contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL(),
-              },
-              requestorder,
-            ).then(() => requestorder)
-          : requestorder,
+        requestorder,
       );
+    };
   }
 }
 

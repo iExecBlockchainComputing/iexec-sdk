@@ -436,6 +436,7 @@ module.exports = {
   getSalt,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
+  TAG_MAP,
   encodeTag,
   decodeTag,
   sumTags,

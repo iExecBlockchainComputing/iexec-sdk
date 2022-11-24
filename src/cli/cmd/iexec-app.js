@@ -78,7 +78,7 @@ const {
 const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 const {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
+} = require('../../common/execution/order-helper');
 const {
   finalizeCli,
   addGlobalOptions,

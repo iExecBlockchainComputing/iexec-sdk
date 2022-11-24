@@ -583,17 +583,24 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign an apporder template to create a valid order
    *
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   *
    * example:
    * ```js
    * const apporderTemplate = await createApporder({app: appAddress});
    * const apporder = await signApporder(apporderTemplate);
    * ```
    */
-  signApporder(apporderTemplate: ApporderTemplate): Promise<SignedApporder>;
+  signApporder(
+    apporderTemplate: ApporderTemplate,
+    options?: { preflightCheck?: boolean },
+  ): Promise<SignedApporder>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * sign a datasetorder template to create a valid order
+   *
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -603,6 +610,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signDatasetorder(
     datasetorderTemplate: DatasetorderTemplate,
+    options?: { preflightCheck?: boolean },
   ): Promise<SignedDatasetorder>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
@@ -622,7 +630,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign a requestorder template to create a valid order
    *
-   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -636,7 +644,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signRequestorder(
     requestorderTemplate: RequestorderTemplate,
-    options?: { checkRequest?: boolean },
+    options?: { preflightCheck?: boolean },
   ): Promise<SignedRequestorder>;
   /**
    * compute the hash of an apporder
@@ -741,17 +749,26 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish an apporder on the off-chain marketplace making it available for other users
    *
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   *
    * example:
    * ```js
    * const orderHash = await publishApporder(apporder);
    * console.log('published order hash:', orderHash);
    * ```
    */
-  publishApporder(apporder: ConsumableApporder): Promise<OrderHash>;
+  publishApporder(
+    apporder: ConsumableApporder,
+    options?: {
+      preflightCheck?: boolean;
+    },
+  ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * publish a datasetorder on the off-chain marketplace making it available for other users
+   *
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -759,7 +776,12 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('published order hash:', orderHash);
    * ```
    */
-  publishDatasetorder(datasetorder: ConsumableDatasetorder): Promise<OrderHash>;
+  publishDatasetorder(
+    datasetorder: ConsumableDatasetorder,
+    options?: {
+      preflightCheck?: boolean;
+    },
+  ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
    *
@@ -779,7 +801,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a requestorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -789,7 +811,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   publishRequestorder(
     requestorder: ConsumableRequestorder,
-    options?: { checkRequest?: boolean },
+    options?: { preflightCheck?: boolean },
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY APPORDER SIGNER**
@@ -968,7 +990,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * make a deal on-chain with compatible orders to trigger the off-chain computation.
    *
-   * _NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+   * _NB_: preflight checks are performed on the orders before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * ```js
    * const { dealid, txHash } = await matchOrders({
@@ -987,7 +1009,7 @@ export default class IExecOrderModule extends IExecModule {
       requestorder: ConsumableRequestorder;
     },
     options?: {
-      checkRequest?: boolean;
+      preflightCheck?: boolean;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**
