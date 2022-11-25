@@ -822,6 +822,15 @@ const matchOrders = async (
         signedRequestorderSchema().validate(requestOrder),
       ]);
 
+    // check resulting tag
+    await tagSchema()
+      .validate(sumTags([vAppOrder.tag, vDatasetOrder.tag, vRequestOrder.tag]))
+      .catch((e) => {
+        throw new Error(
+          `Matching order would produce an invalid deal tag. ${e.message}`,
+        );
+      });
+
     // check matchability
     const matchableVolume = await getMatchableVolume(
       contracts,
