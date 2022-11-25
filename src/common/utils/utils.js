@@ -242,7 +242,7 @@ const decodeTag = (tag) => {
     throw new ValidationError('tag must be bytes32 hex string');
   const binString = new BN(tag.substring(2), 'hex').toString(2);
   const tags = [];
-  for (let i = 0; i < binString.length + 1; i += 1) {
+  for (let i = 0; i < binString.length; i += 1) {
     const current = binString.charAt(binString.length - i - 1);
     if (current === '1') {
       const currentTag = TAG_MAP[i];
@@ -285,7 +285,7 @@ const findMissingBitsInTag = (tag, requiredTag) => {
     2,
   );
   const missingBits = [];
-  for (let i = 1; i <= requiredTagBinString.length; i += 1) {
+  for (let i = 0; i < requiredTagBinString.length; i += 1) {
     if (
       requiredTagBinString.charAt(requiredTagBinString.length - i - 1) ===
         '1' &&
