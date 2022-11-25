@@ -22,6 +22,7 @@ const {
   checkActiveBitInTag,
   tagBitToHuman,
   checkSigner,
+  TAG_MAP,
 } = require('../utils/utils');
 const { hashEIP712 } = require('../utils/sig-utils');
 const {
@@ -687,7 +688,7 @@ const getMatchableVolume = async (
       1,
     );
     if (teeAppRequired) {
-      if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
+      if (!checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
         throw Error('Missing tag [tee] in apporder');
       }
     }

@@ -9,7 +9,7 @@ const { getAddress, randomBytes, formatUnits, parseUnits, hexlify } =
 const { BigNumber } = require('ethers');
 const { multiaddr } = require('multiaddr');
 const { ValidationError, ConfigurationError } = require('./errors');
-const { NULL_BYTES32 } = require('./constant');
+const { NULL_BYTES32, TEE_FRAMEWORKS } = require('./constant');
 
 const debug = Debug('iexec:utils');
 
@@ -210,15 +210,15 @@ const secToDate = (secs) => {
 const getSalt = () => hexlify(randomBytes(32));
 
 const TAG_MAP = {
-  tee: 1,
-  1: 'tee',
-  scone: 2,
-  2: 'scone',
-  gramine: 3,
-  3: 'gramine',
-  gpu: 9,
-  9: 'gpu',
+  tee: 0,
+  [TEE_FRAMEWORKS.SCONE]: 1,
+  [TEE_FRAMEWORKS.GRAMINE]: 2,
+  gpu: 8,
 };
+Object.assign(
+  TAG_MAP,
+  Object.fromEntries(Object.entries(TAG_MAP).map(([k, v]) => [v, k])),
+);
 
 const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
@@ -226,7 +226,7 @@ const encodeTag = (tags) => {
     if (tag === '') return;
     if (TAG_MAP[tag] === undefined || typeof TAG_MAP[tag] !== 'number')
       throw new ValidationError(`Unknown tag ${tag}`);
-    binaryTags[TAG_MAP[tag] - 1] = true;
+    binaryTags[TAG_MAP[tag]] = true;
   });
   const binString = binaryTags.reduce(
     (acc, curr) => (curr ? `1${acc}` : `0${acc}`),
@@ -242,8 +242,8 @@ const decodeTag = (tag) => {
     throw new ValidationError('tag must be bytes32 hex string');
   const binString = new BN(tag.substring(2), 'hex').toString(2);
   const tags = [];
-  for (let i = 1; i < binString.length + 1; i += 1) {
-    const current = binString.charAt(binString.length - i);
+  for (let i = 0; i < binString.length + 1; i += 1) {
+    const current = binString.charAt(binString.length - i - 1);
     if (current === '1') {
       const currentTag = TAG_MAP[i];
       if (currentTag === undefined || typeof currentTag !== 'string')
@@ -261,10 +261,10 @@ const sumTags = (tagArray) => {
     return new BN(hexTag.substring(2), 'hex').toString(2);
   });
   let summedTagsBinString = '';
-  for (let i = 1; i < 256; i += 1) {
+  for (let i = 0; i < 255; i += 1) {
     let currentBit = '0';
     binStringArray.forEach((binString) => {
-      if (binString.charAt(binString.length - i) === '1') {
+      if (binString.charAt(binString.length - i - 1) === '1') {
         currentBit = '1';
       }
     });
@@ -276,19 +276,20 @@ const sumTags = (tagArray) => {
 };
 
 const findMissingBitsInTag = (tag, requiredTag) => {
-  debug('requiredTag', requiredTag);
-  debug('tag', tag);
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
   if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag))
     throw new ValidationError('requiredTag must be bytes32 hex string');
-  const tagBinString = new BN(tag.substr(2), 'hex').toString(2);
-  const requiredTagBinString = new BN(requiredTag.substr(2), 'hex').toString(2);
+  const tagBinString = new BN(tag.substring(2), 'hex').toString(2);
+  const requiredTagBinString = new BN(requiredTag.substring(2), 'hex').toString(
+    2,
+  );
   const missingBits = [];
   for (let i = 1; i <= requiredTagBinString.length; i += 1) {
     if (
-      requiredTagBinString.charAt(requiredTagBinString.length - i) === '1' &&
-      tagBinString.charAt(tagBinString.length - i) !== '1'
+      requiredTagBinString.charAt(requiredTagBinString.length - i - 1) ===
+        '1' &&
+      tagBinString.charAt(tagBinString.length - i - 1) !== '1'
     ) {
       missingBits.push(i);
     }
@@ -299,14 +300,14 @@ const findMissingBitsInTag = (tag, requiredTag) => {
 const checkActiveBitInTag = (tag, bit) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
-  if (typeof bit !== 'number' || bit < 1 || bit > 256)
+  if (typeof bit !== 'number' || bit < 0 || bit > 255)
     throw new ValidationError('Invalid bit tag');
-  const binString = new BN(tag.substr(2), 'hex').toString(2);
-  return binString.charAt(binString.length - bit) === '1';
+  const binString = new BN(tag.substring(2), 'hex').toString(2);
+  return binString.charAt(binString.length - bit - 1) === '1';
 };
 
 const tagBitToHuman = (bit) => {
-  if (typeof bit !== 'number' || bit < 1 || bit > 256)
+  if (typeof bit !== 'number' || bit < 0 || bit > 255)
     throw new ValidationError('Invalid bit tag');
   return TAG_MAP[bit] || bit;
 };

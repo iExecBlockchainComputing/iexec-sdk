@@ -10030,7 +10030,7 @@ describe('[utils]', () => {
         utils.decodeTag(
           '0x000000000000000000000000000000000000000000000000000000000000000a',
         ),
-      ).toThrow(Error('Unknown bit 4 in tag'));
+      ).toThrow(Error('Unknown bit 3 in tag'));
     });
   });
 

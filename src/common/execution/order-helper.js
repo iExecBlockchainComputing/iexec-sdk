@@ -116,7 +116,7 @@ const checkRequestRequirements = async (
     callback,
     noCast: true,
   });
-  const isTee = checkActiveBitInTag(tag, 1);
+  const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
 
   checkTag(tag);
 
