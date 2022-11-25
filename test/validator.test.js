@@ -857,10 +857,10 @@ describe('[tagSchema]', () => {
   test('bytes 32 tags', async () => {
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000103',
       ),
     ).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown bytes 32 tag is allowed', async () => {
@@ -873,8 +873,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('array of tags', async () => {
-    await expect(tagSchema().validate(['tee', 'gpu'])).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate(['tee', 'scone', 'gpu'])).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('empty tag', async () => {
@@ -888,8 +888,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('comma separated tags', async () => {
-    await expect(tagSchema().validate('gpu,tee')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate('gpu,tee,scone')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown tag in array', async () => {
@@ -900,6 +900,56 @@ describe('[tagSchema]', () => {
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
       new ValidationError('foo is not a valid tag. Unknown tag foo'),
+    );
+  });
+  test('invalid tee tag', async () => {
+    await expect(tagSchema().validate('tee')).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(tagSchema().validate('scone')).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('gramine')).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000004',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000007',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
     );
   });
 });

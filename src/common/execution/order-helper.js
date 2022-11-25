@@ -28,45 +28,12 @@ const {
   showApp,
 } = require('../protocol/registries');
 
-const checkTag = (tag) => {
-  const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
-  const isScone = checkActiveBitInTag(tag, TAG_MAP.scone);
-  const isGramine = checkActiveBitInTag(tag, TAG_MAP.gramine);
-  if (isTee) {
-    if (!isScone && !isGramine) {
-      throw Error(
-        `'tee' tag must be used with a tee framework (${Object.values(
-          TEE_FRAMEWORKS,
-        )
-          .map((name) => `'${name}'`)
-          .join('|')})`,
-      );
-    }
-    if (isScone && isGramine) {
-      throw Error(
-        `tee framework tags are exclusive (${Object.values(TEE_FRAMEWORKS)
-          .map((name) => `'${name}'`)
-          .join('|')})`,
-      );
-    }
-  } else {
-    if (isScone) {
-      throw Error(`'${TEE_FRAMEWORKS.SCONE}' tag must be used with 'tee' tag`);
-    }
-    if (isGramine) {
-      throw Error(
-        `'${TEE_FRAMEWORKS.GRAMINE}' tag must be used with 'tee' tag`,
-      );
-    }
-  }
-};
-
-const resolveTeeFrameworkFromTag = (tag) => {
-  checkTag(tag);
-  if (checkActiveBitInTag(tag, TAG_MAP.scone)) {
+const resolveTeeFrameworkFromTag = async (tag) => {
+  const vTag = await tagSchema().validate(tag);
+  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
   }
-  if (checkActiveBitInTag(tag, TAG_MAP.gramine)) {
+  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.GRAMINE])) {
     return TEE_FRAMEWORKS.GRAMINE;
   }
   return undefined;
@@ -117,8 +84,6 @@ const checkRequestRequirements = async (
     noCast: true,
   });
   const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
-
-  checkTag(tag);
 
   // check encryption key
   if (paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION] === true) {
@@ -202,7 +167,6 @@ const checkDatasetRequirements = async (
 ) => {
   const vDatasetorder = await datasetorderSchema().validate(datasetorder);
   const { tag, dataset } = vDatasetorder;
-  checkTag(tag);
   const isTee = checkActiveBitInTag(
     tagOverride ? await tagSchema().validate(tagOverride) : tag,
     TAG_MAP.tee,
@@ -229,7 +193,7 @@ const checkAppRequirements = async (
 ) => {
   const vApporder = await apporderSchema().validate(apporder);
   const { tag, app } = vApporder;
-  const tagTeeFramework = resolveTeeFrameworkFromTag(
+  const tagTeeFramework = await resolveTeeFrameworkFromTag(
     tagOverride ? await tagSchema().validate(tagOverride) : tag,
   );
   const appTeeFramework = await showApp(contracts, app).then((res) =>

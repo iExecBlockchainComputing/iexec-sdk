@@ -111,7 +111,7 @@ class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
-                  teeFramework: resolveTeeFrameworkFromTag(
+                  teeFramework: await resolveTeeFrameworkFromTag(
                     (
                       await datasetorderSchema().validate(datasetorder)
                     ).tag,
@@ -138,7 +138,7 @@ class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
-                  teeFramework: resolveTeeFrameworkFromTag(
+                  teeFramework: await resolveTeeFrameworkFromTag(
                     (
                       await requestorderSchema().validate(requestorder)
                     ).tag,
@@ -197,7 +197,7 @@ class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
-                  teeFramework: resolveTeeFrameworkFromTag(
+                  teeFramework: await resolveTeeFrameworkFromTag(
                     (
                       await datasetorderSchema().validate(signedDatasetorder)
                     ).tag,
@@ -226,7 +226,7 @@ class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
-                  teeFramework: resolveTeeFrameworkFromTag(
+                  teeFramework: await resolveTeeFrameworkFromTag(
                     (
                       await requestorderSchema().validate(signedRequestorder)
                     ).tag,
@@ -343,7 +343,7 @@ class IExecOrderModule extends IExecModule {
             {
               contracts: await this.config.resolveContractsClient(),
               smsURL: await this.config.resolveSmsURL({
-                teeFramework: resolveTeeFrameworkFromTag(resolvedTag),
+                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
             },
             datasetorder,
@@ -354,7 +354,7 @@ class IExecOrderModule extends IExecModule {
             {
               contracts: await this.config.resolveContractsClient(),
               smsURL: await this.config.resolveSmsURL({
-                teeFramework: resolveTeeFrameworkFromTag(resolvedTag),
+                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
             },
             requestorder,
