@@ -1210,6 +1210,25 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder.dataset).toBeDefined();
     expect(res.workerpoolorder.workerpool).toBeDefined();
     expect(res.requestorder.app).toBeDefined();
+
+    await editRequestorder({
+      tag: ['tee', 'scone'],
+    });
+    await editWorkerpoolorder({
+      tag: ['tee'],
+    });
+    await editApporder({ tag: ['tee', 'scone'] });
+    await editDatasetorder({ tag: ['tee', 'scone'] });
+    const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
+      JSON.parse,
+    );
+    expect(failRes.ok).toBe(false);
+    expect(failRes.fail).toStrictEqual([
+      'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+      `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${mainchainDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
+      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      'requestorder: Request requirements check failed: Requester storage token is not set for selected provider "ipfs". Result archive upload will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+    ]);
   });
 
   test('[mainchain] iexec order fill', async () => {
@@ -2078,6 +2097,11 @@ describe('[Mainchain]', () => {
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} app deploy --raw`),
     );
+    await expect(
+      execAsync(
+        `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --force --raw`,
+      ),
+    ).rejects.toThrow('Tag mismatch the TEE framework specified by app');
     const raw = await execAsync(
       `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --force --raw`,
     );
@@ -2188,6 +2212,13 @@ describe('[Mainchain]', () => {
     await setDatasetUniqueName();
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} dataset deploy --raw`),
+    );
+    await expect(
+      execAsync(
+        `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${POOR_ADDRESS1} --force --raw`,
+      ),
+    ).rejects.toThrow(
+      `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
     );
     const raw = await execAsync(
       `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --app-restrict ${POOR_ADDRESS1} --force --raw`,
