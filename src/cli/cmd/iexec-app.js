@@ -16,6 +16,9 @@ const {
   paramsRequesterSecretsSchema,
   nRlcAmountSchema,
   teeFrameworkSchema,
+  datasetorderSchema,
+  apporderSchema,
+  requestorderSchema,
 } = require('../../common/utils/validator');
 const { sconeTeeApp, gramineTeeApp } = require('../utils/templates');
 const {
@@ -64,6 +67,7 @@ const {
   BN,
   stringifyNestedBn,
   formatRLC,
+  TAG_MAP,
 } = require('../../common/utils/utils');
 const {
   NULL_ADDRESS,
@@ -78,7 +82,10 @@ const {
 const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 const {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
+  checkDatasetRequirements,
+  resolveTeeFrameworkFromTag,
+  checkAppRequirements,
+} = require('../../common/execution/order-helper');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -428,6 +435,7 @@ publish
   .option(...orderOption.datasetrestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
+  .option(...option.skipPreflightCheck())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
@@ -464,6 +472,9 @@ publish
         requesterrestrict: opts.requesterRestrict,
       };
       const orderToSign = await createApporder(chain.contracts, overrides);
+      if (!opts.skipPreflightCheck) {
+        await checkAppRequirements({ contracts: chain.contracts }, orderToSign);
+      }
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
@@ -570,7 +581,7 @@ run
   .option(...orderOption.trust())
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -751,7 +762,7 @@ run
           return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
-        const teeAppRequired = checkActiveBitInTag(tag, 1);
+        const teeAppRequired = checkActiveBitInTag(tag, TAG_MAP.tee);
         const { orders } = await fetchAppOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
@@ -948,11 +959,59 @@ run
           params,
         },
       );
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
+        const resolvedTag = sumTags([
+          (
+            await requestorderSchema()
+              .label('requestorder')
+              .validate(requestorderToSign)
+          ).tag,
+          (await apporderSchema().label('apporder').validate(apporder)).tag,
+          (
+            await datasetorderSchema()
+              .label('datasetorder')
+              .validate(datasetorder)
+          ).tag,
+        ]);
+        await checkAppRequirements(
+          {
+            contracts: chain.contracts,
+          },
+          apporder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `App requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
+        await checkDatasetRequirements(
+          {
+            contracts: chain.contracts,
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
+          },
+          datasetorder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `Dataset requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain),
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -960,8 +1019,8 @@ run
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }
@@ -1115,7 +1174,7 @@ requestRun
   .option(...orderOption.trust())
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.requestRun())
   .action(async (app, opts) => {
     await checkUpdate(opts);
@@ -1255,7 +1314,7 @@ requestRun
           params,
         },
       );
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
@@ -1267,8 +1326,8 @@ requestRun
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }

@@ -24,7 +24,7 @@ const deposit = async (
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
-      throw Error('Deposit amount must be greather than 0');
+      throw Error('Deposit amount must be greater than 0');
     if (contracts.flavour === 'enterprise') {
       await isInWhitelist(contracts, await getAddress(contracts), {
         strict: true,
@@ -85,7 +85,7 @@ const withdraw = async (
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
-      throw Error('Withdraw amount must be greather than 0');
+      throw Error('Withdraw amount must be greater than 0');
     if (contracts.flavour === 'enterprise') {
       await isInWhitelist(contracts, await getAddress(contracts), {
         strict: true,

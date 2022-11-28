@@ -8,6 +8,8 @@ const {
   bytes32Regex,
   parseRLC,
   parseEth,
+  checkActiveBitInTag,
+  TAG_MAP,
 } = require('./utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
@@ -365,27 +367,27 @@ const tagSchema = () =>
           const bytes32Tag = encodeTag(value);
           return bytes32Tag;
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
       if (typeof value === 'string') {
         const lowerCase = value.toLowerCase();
-        if (lowerCase.substr(0, 2) === '0x') return lowerCase;
+        if (lowerCase.substring(0, 2) === '0x') return lowerCase;
         try {
           const bytes32Tag = encodeTag(value.split(','));
           return bytes32Tag;
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
-      return 'Invalid tag';
+      return Error('Invalid tag');
     })
     .test(
       'no-transform-error',
       ({ originalValue, value }) =>
-        `${originalValue} is not a valid tag. ${value}`,
+        `${originalValue} is not a valid tag. ${value.message}`,
       (value) => {
-        if (value.substr(0, 2) !== '0x') return false;
+        if (value instanceof Error) return false;
         return true;
       },
     )
@@ -393,12 +395,57 @@ const tagSchema = () =>
       'is-bytes32',
       '${originalValue} is not a valid bytes32 hexstring',
       async (value) => {
+        if (value instanceof Error) {
+          return true;
+        }
         try {
           await bytes32Schema().validate(value);
           return true;
         } catch (e) {
           return false;
         }
+      },
+    )
+    .test(
+      'is-valid-tee-tag',
+      '${originalValue} has a invalid tee combination',
+      (value, { createError }) => {
+        if (value instanceof Error) {
+          return true;
+        }
+        const isTee = checkActiveBitInTag(value, TAG_MAP.tee);
+        const teeFrameworks = Object.values(TEE_FRAMEWORKS).filter(
+          (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework]),
+        );
+        try {
+          if (isTee) {
+            if (teeFrameworks.length < 1) {
+              throw Error(
+                `'tee' tag must be used with a tee framework (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+            if (teeFrameworks.length > 1) {
+              throw Error(
+                `tee framework tags are exclusive (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+          } else if (teeFrameworks.length > 0) {
+            throw Error(
+              `'${teeFrameworks[0]}' tag must be used with 'tee' tag`,
+            );
+          }
+        } catch (e) {
+          return createError({ message: e.message });
+        }
+        return true;
       },
     );
 

@@ -62,6 +62,10 @@ const {
 } = require('../utils/cli-helper');
 const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
+const {
+  checkDatasetRequirements,
+  resolveTeeFrameworkFromTag,
+} = require('../../common/execution/order-helper');
 
 const debug = Debug('iexec:iexec-dataset');
 
@@ -518,6 +522,7 @@ publish
   .option(...orderOption.apprestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
+  .option(...option.skipPreflightCheck())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
@@ -554,6 +559,15 @@ publish
         requesterrestrict: opts.requesterRestrict,
       };
       const orderToSign = await createDatasetorder(chain.contracts, overrides);
+      if (!opts.skipPreflightCheck) {
+        const sms = getSmsUrlFromChain(chain, {
+          teeFramework: await resolveTeeFrameworkFromTag(orderToSign.tag),
+        });
+        await checkDatasetRequirements(
+          { contracts: chain.contracts, smsURL: sms },
+          orderToSign,
+        );
+      }
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }

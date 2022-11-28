@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
 - `iexec dataset check-secret` and `dataset.checkDatasetSecretExists(datasetAddress)` use the default TEE framework if not specified
 - `iexec dataset push-secret` and `dataset.pushDatasetSecret(datasetAddress, encryptionKey)` use the default TEE framework if not specified
 - TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
+- [BREAKING] 'tee' tag must be combined with a tee framework tag ('scone' or 'gramine')
+- [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
+- [BREAKING] `--skip-request-check` option is replaced by ``--skip-preflight-check`
 
 ## [7.2.2] 2022-09-05
 

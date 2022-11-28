@@ -331,9 +331,9 @@ const option = {
     'storage provider authorization token (unsafe)',
   ],
   secretValue: () => ['--secret-value <secretValue>', 'secret value (unsafe)'],
-  skipRequestCheck: () => [
-    '--skip-request-check',
-    'skip request validity checks, this may result in task execution fail',
+  skipPreflightCheck: () => [
+    '--skip-preflight-check',
+    'skip preflight check, this may result in task execution fail',
   ],
 };
 

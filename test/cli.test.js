@@ -272,33 +272,50 @@ const setWorkerpoolUniqueDescription = async () => {
   return description;
 };
 
+const editOrder = (orderName) => async (override) => {
+  const iexecJson = await loadJSONFile('iexec.json');
+  iexecJson.order[orderName] = {
+    ...iexecJson.order[orderName],
+    ...Object.fromEntries(
+      Object.entries(override).filter((e) => e[1] !== undefined),
+    ),
+  };
+  await saveJSONToFile(iexecJson, 'iexec.json');
+};
+
 const editRequestorder = async ({
   app,
   dataset,
   workerpool,
   category,
   volume,
-}) => {
-  if (!app || !dataset || !workerpool) throw Error('missing precondition');
-  const iexecJson = await loadJSONFile('iexec.json');
-  iexecJson.order.requestorder.app = app;
-  iexecJson.order.requestorder.dataset = dataset;
-  iexecJson.order.requestorder.workerpool = workerpool;
-  iexecJson.order.requestorder.category =
-    category || iexecJson.order.requestorder.category;
-  iexecJson.order.requestorder.volume =
-    volume || iexecJson.order.requestorder.volume;
-  await saveJSONToFile(iexecJson, 'iexec.json');
-};
+  tag,
+}) =>
+  editOrder('requestorder')({
+    app,
+    dataset,
+    workerpool,
+    category,
+    volume,
+    tag,
+  });
 
-const editWorkerpoolorder = async ({ category, volume }) => {
-  const iexecJson = await loadJSONFile('iexec.json');
-  iexecJson.order.workerpoolorder.category =
-    category || iexecJson.order.workerpoolorder.category;
-  iexecJson.order.workerpoolorder.volume =
-    volume || iexecJson.order.workerpoolorder.volume;
-  await saveJSONToFile(iexecJson, 'iexec.json');
-};
+const editWorkerpoolorder = async ({ category, volume, tag }) =>
+  editOrder('workerpoolorder')({
+    category,
+    volume,
+    tag,
+  });
+
+const editApporder = async ({ tag }) =>
+  editOrder('apporder')({
+    tag,
+  });
+
+const editDatasetorder = async ({ tag }) =>
+  editOrder('datasetorder')({
+    tag,
+  });
 
 const initializeTask = async (wallet, hub, dealid, idx) => {
   const hubContract = new ethers.Contract(
@@ -1170,6 +1187,7 @@ describe('[Mainchain]', () => {
 
   // edit order
   test('[mainchain] iexec order sign', async () => {
+    await execAsync(`${iexecPath} order init`);
     await editRequestorder({
       app: mainchainApp,
       dataset: mainchainDataset,
@@ -1180,7 +1198,7 @@ describe('[Mainchain]', () => {
       category: '0',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --raw --skip-request-check`,
+      `${iexecPath} order sign --raw --skip-preflight-check`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1192,11 +1210,30 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder.dataset).toBeDefined();
     expect(res.workerpoolorder.workerpool).toBeDefined();
     expect(res.requestorder.app).toBeDefined();
+
+    await editRequestorder({
+      tag: ['tee', 'scone'],
+    });
+    await editWorkerpoolorder({
+      tag: ['tee'],
+    });
+    await editApporder({ tag: ['tee', 'scone'] });
+    await editDatasetorder({ tag: ['tee', 'scone'] });
+    const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
+      JSON.parse,
+    );
+    expect(failRes.ok).toBe(false);
+    expect(failRes.fail).toStrictEqual([
+      'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+      `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${mainchainDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
+      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      'requestorder: Request requirements check failed: Requester storage token is not set for selected provider "ipfs". Result archive upload will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+    ]);
   });
 
   test('[mainchain] iexec order fill', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1209,6 +1246,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --app', async () => {
+    await execAsync(`${iexecPath} order init --app`);
     const raw = await execAsync(`${iexecPath} order sign --app --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1220,6 +1258,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --dataset', async () => {
+    await execAsync(`${iexecPath} order init --dataset`);
     const raw = await execAsync(`${iexecPath} order sign --dataset --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1231,6 +1270,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --workerpool', async () => {
+    await execAsync(`${iexecPath} order init --workerpool`);
     await editWorkerpoolorder({
       category: mainchainNoDurationCatid,
       volume: '6',
@@ -1246,6 +1286,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --request', async () => {
+    await execAsync(`${iexecPath} order init --request`);
     await editRequestorder({
       app: mainchainApp,
       dataset: mainchainDataset,
@@ -1254,7 +1295,7 @@ describe('[Mainchain]', () => {
       volume: '5',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --request --skip-request-check --raw`,
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1267,7 +1308,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1281,7 +1322,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill --params <params> --force', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-request-check --force --raw`,
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1345,7 +1386,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order cancel --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --request --skip-request-check --raw`,
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --request --force --raw`,
@@ -1389,7 +1430,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1437,7 +1478,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1488,7 +1529,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,scone,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1518,14 +1559,14 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
     expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
   });
 
-  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1539,7 +1580,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1571,7 +1612,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
     expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000000000000000000000000000003',
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
@@ -1589,7 +1630,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-preflight-check --force --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -2056,8 +2097,13 @@ describe('[Mainchain]', () => {
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} app deploy --raw`),
     );
+    await expect(
+      execAsync(
+        `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --force --raw`,
+      ),
+    ).rejects.toThrow('Tag mismatch the TEE framework specified by app');
     const raw = await execAsync(
-      `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee --force --raw`,
+      `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2069,7 +2115,7 @@ describe('[Mainchain]', () => {
       app: address,
       appprice: 100000000,
       volume: 100,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       datasetrestrict: NULL_ADDRESS,
       workerpoolrestrict: NULL_ADDRESS,
       requesterrestrict: NULL_ADDRESS,
@@ -2167,8 +2213,15 @@ describe('[Mainchain]', () => {
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} dataset deploy --raw`),
     );
+    await expect(
+      execAsync(
+        `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${POOR_ADDRESS1} --force --raw`,
+      ),
+    ).rejects.toThrow(
+      `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
+    );
     const raw = await execAsync(
-      `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --app-restrict ${POOR_ADDRESS1} --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2182,7 +2235,7 @@ describe('[Mainchain]', () => {
       dataset: address,
       datasetprice: 100000000,
       volume: 100,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       apprestrict: POOR_ADDRESS1,
       workerpoolrestrict: NULL_ADDRESS,
       requesterrestrict: NULL_ADDRESS,
@@ -2286,7 +2339,7 @@ describe('[Mainchain]', () => {
       await execAsync(`${iexecPath} workerpool deploy --raw`),
     );
     const raw = await execAsync(
-      `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
+      `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee,scone --trust 20 --category 1 --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2300,7 +2353,7 @@ describe('[Mainchain]', () => {
       workerpool: address,
       workerpoolprice: 2,
       volume: 5,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
       trust: 20,
       category: 1,
       apprestrict: NULL_ADDRESS,
@@ -2931,7 +2984,7 @@ describe('[Sidechain]', () => {
       category: '0',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --skip-request-check --raw`,
+      `${iexecPath} order sign --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2947,7 +3000,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order fill', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2972,9 +3025,9 @@ describe('[Sidechain]', () => {
       category: sidechainNoDurationCatid,
       volume: '5',
     });
-    await execAsync(`${iexecPath} order sign --skip-request-check --raw`);
+    await execAsync(`${iexecPath} order sign --skip-preflight-check --raw`);
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2989,7 +3042,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --app --dataset --workerpool --request --skip-request-check --force --raw`,
+      `${iexecPath} order sign --app --dataset --workerpool --request --skip-preflight-check --force --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
