@@ -64,8 +64,8 @@ const providerOptions = {
   ...(ALCHEMY_API_KEY && { alchemy: ALCHEMY_API_KEY }),
 };
 
-const goerliHost = 'goerli';
-const vivianiHost = 'https://viviani.iex.ec';
+const mainnetHost = 'mainnet';
+const bellecourHost = 'https://bellecour.iex.ec';
 
 // 1 block / tx
 const tokenChainUrl = DRONE
@@ -1028,42 +1028,42 @@ describe('[getSignerFromPrivateKey]', () => {
       };
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumFail,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: alchemyFailQuorumPass,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumFail,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: etherscanFailQuorumPass,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: infuraFailQuorumFail,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
       ).rejects.toThrow();
       await expect(
         new IExec({
-          ethProvider: utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY, {
+          ethProvider: utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY, {
             providers: infuraFailQuorumPass,
           }),
         }).wallet.checkBalances(NULL_ADDRESS),
@@ -1207,7 +1207,7 @@ describe('[wallet]', () => {
   });
 
   test('wallet.checkBridgedBalances() (token)', async () => {
-    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY);
     const iexec = new IExec({
       ethProvider: signer,
     });
@@ -1217,7 +1217,7 @@ describe('[wallet]', () => {
   });
 
   test('wallet.checkBridgedBalances() (native)', async () => {
-    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(bellecourHost, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -2348,7 +2348,7 @@ describe('[account]', () => {
   });
 
   test('account.checkBridgedBalance() (token)', async () => {
-    const signer = utils.getSignerFromPrivateKey(goerliHost, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(mainnetHost, PRIVATE_KEY);
     const iexec = new IExec({
       ethProvider: signer,
     });
@@ -2358,7 +2358,7 @@ describe('[account]', () => {
   });
 
   test('account.checkBridgedBalance() (native)', async () => {
-    const signer = utils.getSignerFromPrivateKey(vivianiHost, PRIVATE_KEY);
+    const signer = utils.getSignerFromPrivateKey(bellecourHost, PRIVATE_KEY);
     const iexec = new IExec(
       {
         ethProvider: signer,
@@ -8759,24 +8759,8 @@ describe('[secrets]', () => {
 });
 
 describe('[ens]', () => {
-  test('resolve ens on iExec mainnet sidechaine', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      'https://bellecour.iex.ec',
-      PRIVATE_KEY,
-    );
-    const iexec = new IExec({
-      ethProvider: signer,
-    });
-    const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
-    expect(balance.wei).toBeInstanceOf(BN);
-    expect(balance.nRLC).toBeInstanceOf(BN);
-  });
-
-  test('resolve ens on iExec testnet sidechaine', async () => {
-    const signer = utils.getSignerFromPrivateKey(
-      'https://viviani.iex.ec',
-      PRIVATE_KEY,
-    );
+  test('resolve ens on iExec mainnet sidechain', async () => {
+    const signer = utils.getSignerFromPrivateKey(bellecourHost, PRIVATE_KEY);
     const iexec = new IExec({
       ethProvider: signer,
     });

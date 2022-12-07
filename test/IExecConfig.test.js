@@ -125,19 +125,6 @@ describe('[IExecConfig]', () => {
         expect(network.name).toBe('homestead');
         expect(network.ensAddress).toBeDefined();
       });
-      test('IExecConfig({ ethProvider: "goerli" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'goerli' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
-        expect(network.ensAddress).toBeDefined();
-      });
       test('IExecConfig({ ethProvider: "bellecour" })', async () => {
         const config = new IExecConfig({ ethProvider: 'bellecour' });
         const { provider, signer, chainId } =
@@ -149,19 +136,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "viviani" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'viviani' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: "kovan" })', () => {
@@ -187,19 +161,6 @@ describe('[IExecConfig]', () => {
         expect(network.name).toBe('homestead');
         expect(network.ensAddress).toBeDefined();
       });
-      test('IExecConfig({ ethProvider: "5" })', async () => {
-        const config = new IExecConfig({ ethProvider: '5' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
-        expect(network.ensAddress).toBeDefined();
-      });
       test('IExecConfig({ ethProvider: "134" })', async () => {
         const config = new IExecConfig({ ethProvider: '134' });
         const { provider, signer, chainId } =
@@ -211,19 +172,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "133" })', async () => {
-        const config = new IExecConfig({ ethProvider: '133' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('IExecConfig({ ethProvider: 1 })', async () => {
@@ -239,19 +187,6 @@ describe('[IExecConfig]', () => {
         expect(network.name).toBe('homestead');
         expect(network.ensAddress).toBeDefined();
       });
-      test('IExecConfig({ ethProvider: 5 })', async () => {
-        const config = new IExecConfig({ ethProvider: 5 });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
-        expect(network.ensAddress).toBeDefined();
-      });
       test('IExecConfig({ ethProvider: 134 })', async () => {
         const config = new IExecConfig({ ethProvider: 134 });
         const { provider, signer, chainId } =
@@ -263,19 +198,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: 133 })', async () => {
-        const config = new IExecConfig({ ethProvider: 133 });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: 42 })', () => {

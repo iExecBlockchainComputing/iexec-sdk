@@ -22,12 +22,11 @@ const enterpriseHubMap = {
 };
 
 const nativeNetworks = {
-  standard: ['133', '134'],
+  standard: ['134'],
   enterprise: [],
 };
 
 const gasPriceByNetwork = {
-  133: '0x0',
   134: '0x0',
 };
 

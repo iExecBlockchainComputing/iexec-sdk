@@ -146,38 +146,11 @@ const category = {
 };
 
 const chains = {
-  default: 'viviani',
+  default: 'bellecour',
   chains: {
-    // dev: {
-    //   host: 'http://localhost:8545',
-    //   id: '65535',
-    //   sms: 'http://localhost:5000',
-    //   resultProxy: 'http://localhost:8089',
-    //   ipfsGateway: 'http://localhost:8080',
-    //   flavour: 'standard',
-    //   hub: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    //   enterprise: {
-    //     enterpriseSwapChainName: 'dev-enterprise',
-    //   },
-    // },
-    // 'dev-enterprise': {
-    //   host: 'http://localhost:8545',
-    //   id: '65535',
-    //   sms: 'http://localhost:5000',
-    //   resultProxy: 'http://localhost:8089',
-    //   ipfsGateway: 'http://localhost:8080',
-    //   flavour: 'enterprise',
-    //   hub: '0xb80C02d24791fA92fA8983f15390274698A75D23',
-    //   enterprise: {
-    //     enterpriseSwapChainName: 'dev',
-    //   },
-    // },
-    goerli: {},
-    viviani: {},
     mainnet: {},
     bellecour: {},
     enterprise: {},
-    'enterprise-testnet': {},
   },
 };
 

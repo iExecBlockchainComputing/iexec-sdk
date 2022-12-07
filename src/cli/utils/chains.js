@@ -14,31 +14,21 @@ const debug = Debug('iexec:chains');
 
 const CHAIN_ALIASES_MAP = {
   1: 'mainnet',
-  5: 'goerli',
-  133: 'viviani',
   134: 'bellecour',
 };
 
 const CHAIN_NAME_MAP = {
   1: { id: '1', flavour: 'standard' },
   mainnet: { id: '1', flavour: 'standard' },
-  5: { id: '5', flavour: 'standard' },
-  goerli: { id: '5', flavour: 'standard' },
-  133: { id: '133', flavour: 'standard' },
-  viviani: { id: '133', flavour: 'standard' },
   134: { id: '134', flavour: 'standard' },
   bellecour: { id: '134', flavour: 'standard' },
   enterprise: { id: '1', flavour: 'enterprise' },
-  'enterprise-testnet': { id: '5', flavour: 'enterprise' },
 };
 
 const ENTERPRISE_SWAP_MAP = {
   1: 'enterprise',
   mainnet: 'enterprise',
-  5: 'enterprise-testnet',
-  goerli: 'enterprise-testnet',
   enterprise: 'mainnet',
-  'enterprise-testnet': 'goerli',
 };
 
 const createChainFromConf = (
@@ -137,9 +127,6 @@ const loadChain = async (
       } else {
         throw Error(`Missing "${chainsConf.default}" chain in "chain.json"`);
       }
-    } else if (chainsConf.chains && chainsConf.chains.goerli) {
-      name = 'goerli';
-      loadedConf = chainsConf.chain.goerli;
     }
     if (!name)
       throw Error('Missing chain parameter. Check your "chain.json" file');

@@ -27,7 +27,13 @@ All notable changes to this project will be documented in this file.
 - TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
 - [BREAKING] 'tee' tag must be combined with a tee framework tag ('scone' or 'gramine')
 - [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
-- [BREAKING] `--skip-request-check` option is replaced by ``--skip-preflight-check`
+- [BREAKING] `--skip-request-check` option is replaced by `--skip-preflight-check`
+- [BREAKING] bellecour is now the default chain initialized in `chain.json` when running `iexec init`
+
+### Removed
+
+- [BREAKING] viviani is no longer available in the default configuration
+- [BREAKING] goerli is no longer available in the default configuration
 
 ## [7.2.2] 2022-09-05
 
