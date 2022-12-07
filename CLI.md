@@ -2,7 +2,7 @@
 
 # iExec SDK CLI
 
-Use the iExec decentralised marketplace for off-chain computing from your terminal.
+Use the iExec decentralized marketplace for off-chain computing from your terminal.
 
 ## Content
 
@@ -119,7 +119,7 @@ iexec storage init # initialize your remote storage
 > Check your current host:
 > `iexec info`
 
-## SDK CLI for Dapp developpers
+## SDK CLI for Dapp developers
 
 First go through [Init project](#Init-project)
 
@@ -154,10 +154,10 @@ First go through [Init project](#Init-project)
 ### Encrypt your dataset
 
 ```bash
-cp 'myAwsomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
+cp 'myAwesomeDataset.file' ./datasets/original # copy your dataset file or folder into the dataset/original/ folder
 iexec dataset encrypt # generate a secret key for each file or folder in dataset/original/ and encrypt it, also output the encrypted file checksum to use for deployment.
-cat ./.secrets/dataset/myAwsomeDataset.file.secret # this is the secret key for decrypting the dataset
-cat ./datasets/encrypted/myAwsomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
+cat ./.secrets/dataset/myAwesomeDataset.file.secret # this is the secret key for decrypting the dataset
+cat ./datasets/encrypted/myAwesomeDataset.file.enc # this is the encrypted dataset, you must share this file at a public url
 ```
 
 ### Deploy your dataset
@@ -171,7 +171,7 @@ iexec dataset show # show details of deployed dataset
 
 ## Securely share the dataset secret key
 
-**Disclaimer:** The secrets pushed in the Secreet Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it.
+**Disclaimer:** The secrets pushed in the Secret Management Service will be shared with the worker to process the dataset in the therms your specify in the dataset order. Make sure to always double check your selling policy in the dataset order before signing it.
 
 ```bash
 iexec dataset push-secret # Push the secret in the Secret Management Service (sms)
@@ -223,7 +223,7 @@ iexec deal show <dealid> # show the detail of the deal you concludes
 
 First go through [Init project](#init-project)
 
-### Top up your iExec account to buy compution
+### Top up your iExec account to buy computation
 
 ```bash
 iexec account show # show your iExec account
@@ -258,7 +258,7 @@ iexec task show <taskid> --download [fileName] # download the result of your COM
 ### Use results encryption
 
 ```bash
-iexec result generate-encryption-keypair # generate private/public RSA keypair for result encryption
+iexec result generate-encryption-keypair # generate private/public RSA key pair for result encryption
 iexec result push-encryption-key # share the public RSA key with the secret management service, all your results will be encrypted with this key
 # Go through the normal buy process  and download the result of the computation #
 iexec result decrypt [encryptedResultsFilePath] # decrypt the result with the private RSA key
@@ -422,7 +422,7 @@ iexec app run [appAddress] [options] # run an iExec application at market price 
 --encrypt-result # encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)
 --storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
 --skip-request-check # skip request validity checks, this may result in task execution fail
---params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}')
 --watch # watch execution status changes
 ```
 
@@ -447,7 +447,7 @@ iexec app request-execution <appAddress> [options] # request an iExec applicatio
 --encrypt-result # encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)
 --storage-provider <"ipfs"|"dropbox"> # specify the storage to use to store the result archive
 --skip-request-check # skip request validity checks, this may result in task execution fail
---params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}')
+--params <json> # specify the params of the request, this option is reserved to an advanced usage (usage: --params '{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}')
 ```
 
 ## dataset
@@ -516,7 +516,7 @@ iexec orderbook requester --category <id> # show the best requestorders publishe
 iexec orderbook requester [address] --category <id> # filters the result on requester
 iexec orderbook workerpool --category <id> # show the best workerpools published on the Marketplace for the specified category
 iexec orderbook workerpool [address] --category <id> # filters the result on workerpool
-iexec orderbook workerpool --category <id> --require-tag <...tags> # show the best workerpools published on the Marketplace matchin the specified tags
+iexec orderbook workerpool --category <id> --require-tag <...tags> # show the best workerpools published on the Marketplace matching the specified tags
 iexec orderbook app <address> # show the best apporders published on the Marketplace for the specified app
 iexec orderbook app <address> --dataset <address> --requester <address> --workerpool <address> # filter on specific dataset, requester, workerpool
 iexec orderbook dataset <address> # show the best datasetorders published on the Marketplace for the specified dataset
@@ -559,11 +559,11 @@ iexec check-secret <secretName> [requesterAddress] # check if a secret exists in
 ```bash
 # OPTIONS
 # --chain <chainName>
-iexec result generate-encryption-keypair # generate a beneficiary keypair to encrypt and decrypt the results
+iexec result generate-encryption-keypair # generate a beneficiary key pair to encrypt and decrypt the results
 iexec result push-encryption-key # push the encryption key for the beneficiary
 iexec result push-encryption-key --force-update # push the encryption key for the beneficiary, update if exists
 iexec result push-encryption-key --secret-file [secretPath] # specify a file path for reading the secret
-iexec result decrypt [encryptedResultsPath] # decrypt encrypted results with beneficary key
+iexec result decrypt [encryptedResultsPath] # decrypt encrypted results with beneficiary key
 iexec result check-encryption-key [userAddress] # check if a encryption key exists for the user
 ```
 
@@ -692,7 +692,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "beneficiary": "0x0000000000000000000000000000000000000000",
       "callback": "0x0000000000000000000000000000000000000000",
-      "params": "{ cmdline: '--help' }"
+      "params": "{ \"iexec_args\": \"--help\" }"
     }
   }
 }
@@ -706,7 +706,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 - `chains` set the available chains
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value), this key accepts a string or a mapping TEE framework - SMS url.
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
@@ -726,7 +726,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "standard",
@@ -742,7 +744,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-sidechain": {
       "host": "http://localhost:18545",
       "id": "123456",
-      "sms": "http://localhost:15000",
+      "sms": {
+        "scone": "http://localhost:15000"
+      },
       "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
@@ -757,7 +761,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-enterprise": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "enterprise",
@@ -786,7 +792,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ## deployed.json
 
-The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a command without specifying a resource address (exemple: `iexec app show` will show the app in `deployed.json`).
+The `deployed.json` file, located in iExec project, locally stores your latest deployed resources address. These address are used when you run a command without specifying a resource address (example: `iexec app show` will show the app in `deployed.json`).
 
 ```json
 {
@@ -868,14 +874,14 @@ The `orders.json` file, located in iExec project, locally stores your latest sig
 
 ## ./secrets/
 
-This folder is created when running `iexec result generate-encryption-keypair` or `ìexec dataset init --tee` and is intended to store credentials generated by the iexec SDK CLI.
+This folder is created when running `iexec result generate-encryption-keypair` or `iexec dataset init --tee` and is intended to store credentials generated by the iexec SDK CLI.
 
 ### ./secrets/beneficiary/
 
-This folder stores the keypair to use for result encryption and decryption.
-A keypair is generated when running `iexec result generate-encryption-keypair`
-Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `ìexec result push-encryption-key`
-Private keys name follow the pattern _userAddress_\_key this should never be shared with third party, the private key is used by the SDK CLI to decrypt a result when running `ìexec result decrypt`.
+This folder stores the key pair to use for result encryption and decryption.
+A key pair is generated when running `iexec result generate-encryption-keypair`
+Public keys name follow the pattern _userAddress_\_key.pub , this key is shared with the workers when running `iexec result push-encryption-key`
+Private keys name follow the pattern _userAddress_\_key this should never be shared with third party, the private key is used by the SDK CLI to decrypt a result when running `iexec result decrypt`.
 
 ### ./secrets/datasets/
 
@@ -885,7 +891,7 @@ The key file is named after the dataset file name, last key generated is also st
 
 ## ./datasets/
 
-This folder is created when running `ìexec dataset init --tee` and is intended to store datasets files.
+This folder is created when running `iexec dataset init --tee` and is intended to store datasets files.
 
 ### ./datasets/original/
 
@@ -896,7 +902,7 @@ Paste your original dataset files in this folder and run `iexec dataset encrypt`
 This folder stores the encrypted datasets files.
 An encrypted dataset file is created for each dataset file when running `iexec dataset encrypt`.
 The encrypted dataset file is named after the dataset file name.
-The encrypted dataset files must be upload on a public file system and referenced in multriaddr when running `iexec dataset deploy`.
+The encrypted dataset files must be upload on a public file system and referenced in multiaddr when running `iexec dataset deploy`.
 
 ---
 

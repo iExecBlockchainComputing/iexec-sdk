@@ -3,6 +3,7 @@ const Eth = require('web3-eth');
 
 const { utils, IExecConfig, errors } = require('../src/lib');
 const IExecContractsClient = require('../src/common/utils/IExecContractsClient');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 console.log('Node version:', process.version);
 
@@ -22,7 +23,9 @@ const nativeChainUrl = DRONE
   ? 'http://native-chain:8545'
   : 'http://localhost:18545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -73,6 +76,36 @@ describe('[IExecConfig]', () => {
         const createConfig = () => new IExecConfig({ ethProvider: {} });
         expect(createConfig).toThrow(
           Error('Invalid ethProvider: Unsupported provider'),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
+    describe('throw Invalid option smsURL', () => {
+      test('IExecConfig({ ethProvider }, { smsURL: { foo: "https://foo.com" } })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { smsURL: { foo: 'https://foo.com' } },
+          );
+        expect(createConfig).toThrow(
+          Error('Invalid smsURL: this field has unspecified keys: foo'),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
+    describe('throw Invalid option defaultTeeFramework', () => {
+      test('IExecConfig({ ethProvider }, { defaultTeeFramework: "foo" })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { defaultTeeFramework: 'foo' },
+          );
+        expect(createConfig).toThrow(
+          Error(
+            'Invalid defaultTeeFramework: this is not a valid TEE framework',
+          ),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -609,7 +642,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(false);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -663,7 +696,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(true);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -711,7 +744,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('success with enterpriseSwapConf on custom entreprise chain', async () => {
+    test('success with enterpriseSwapConf on custom enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -730,7 +763,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -742,7 +775,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown enterprise chain', async () => {
+    test('throw on unknown enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -838,7 +871,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -875,25 +908,97 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success smsURL override', async () => {
+    test('success default resolves to scone', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const sconeSmsUrl = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const gramineSmsUrl = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSms).toBe(sconeSmsUrl);
+      expect(defaultSms).not.toBe(gramineSmsUrl);
+    });
+    test('success override defaultTeeFramework', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const defaultSmsTeeFrameworkOverride = await new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
+      ).resolveSmsURL();
+      const gramineSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
+      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
+    });
+    test('success smsURL object override per teeFramework', async () => {
+      const smsMap = {
+        scone: 'http://foo.io',
+        gramine: 'http://bar.io',
+      };
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { smsURL },
+        { smsURL: smsMap },
       );
-      const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(smsMap.scone);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
     });
-    test('success with smsURL on custom chain', async () => {
+    test('success smsURL object override only one teeFramework', async () => {
+      const sconeDefaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const smsMap = {
+        gramine: 'http://bar.io',
+      };
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: smsMap },
+      );
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(sconeDefaultSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
+    });
+    test('success smsURL string override all teeFramework', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: sconeSms },
+      );
+      await expect(config.resolveSmsURL()).resolves.toBe(sconeSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(sconeSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(sconeSms);
+    });
+    test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
         },
-        { smsURL },
+        { smsURL: sconeSms },
       );
       const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(promise).resolves.toBe(sconeSms);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
@@ -914,6 +1019,16 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
+    });
+    test('throw with invalid TEE framework', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveSmsURL({ teeFramework: 'foo' });
+      await expect(promise).rejects.toThrow(
+        Error(`teeFramework is not a valid TEE framework`),
+      );
+      await expect(promise).rejects.toThrow(errors.ValidationError);
     });
   });
 

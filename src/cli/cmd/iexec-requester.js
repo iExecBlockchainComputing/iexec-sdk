@@ -15,7 +15,8 @@ const {
   option,
   prompt,
   Spinner,
-  getPropertyFormChain,
+  getSmsUrlFromChain,
+  optionCreator,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { Keystore } = require('../utils/keystore');
@@ -30,6 +31,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
+  .addOption(optionCreator.teeFramework())
   .description(desc.pushRequesterSecret())
   .action(async (secretName, opts) => {
     await checkUpdate(opts);
@@ -45,8 +47,9 @@ pushSecret
       ]);
       await connectKeystore(chain, keystore);
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
-
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       spinner.info(`Secret "${secretName}" for address ${address}`);
       const secretValue =
         opts.secretValue ||
@@ -77,6 +80,7 @@ addGlobalOptions(checkSecret);
 addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (secretName, requesterAddress, opts) => {
     await checkUpdate(opts);
@@ -99,7 +103,9 @@ checkSecret
         );
       }
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const secretExists = await checkRequesterSecretExists(
         contracts,
         sms,

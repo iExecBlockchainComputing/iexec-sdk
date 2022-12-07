@@ -116,14 +116,14 @@ ___
 
 ▸ **getTimeoutRatio**(): `Promise`<`BN`\>
 
-get the current `TimoutRatio`
+get the current `TimeoutRatio`
 
-`TimoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimoutRatio * workClockTimeRef)
+`TimeoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimeoutRatio * workClockTimeRef)
 
 example:
 ```js
-const timoutRatio = await getTimeoutRatio();
-console.log('timoutRatio:', timoutRatio);
+const timeoutRatio = await getTimeoutRatio();
+console.log('timeoutRatio:', timeoutRatio);
 ```
 
 #### Returns

@@ -6,7 +6,7 @@
 
 ### Classes
 
-- [BrigdeObservable](../classes/internal_.BrigdeObservable.md)
+- [BridgeObservable](../classes/internal_.BridgeObservable.md)
 - [DealObservable](../classes/internal_.DealObservable.md)
 - [ENSConfigurationObservable](../classes/internal_.ENSConfigurationObservable.md)
 - [EnhancedWallet](../classes/internal_.EnhancedWallet.md)
@@ -57,6 +57,7 @@
 - [Multiaddress](internal_.md#multiaddress)
 - [NRLCAmount](internal_.md#nrlcamount)
 - [Tag](internal_.md#tag)
+- [TeeFramework](internal_.md#teeframework)
 - [WeiAmount](internal_.md#weiamount)
 
 ## Type Aliases
@@ -141,9 +142,18 @@ task tag used to specify the runtime
 
 example:
 ```js
-const onlyTeeTag = ['tee'];
-const teePlusGpuTags = ['tee','gpu'];
+const gpuTag = ['gpu'];
+const sconeTeeTag = ['tee', 'scone'];
+const gramineTeeTag = ['tee', 'gramine'];
 ```
+
+___
+
+### TeeFramework
+
+Ƭ **TeeFramework**: ``"scone"`` \| ``"gramine"``
+
+Trusted Execution Environment name
 
 ___
 

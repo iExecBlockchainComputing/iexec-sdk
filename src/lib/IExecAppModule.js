@@ -6,6 +6,7 @@ const {
   countUserApps,
   predictAppAddress,
   checkDeployedApp,
+  resolveTeeFrameworkFromApp,
 } = require('../common/protocol/registries');
 const { checkAppSecretExists } = require('../common/sms/check');
 const { pushAppSecret } = require('../common/sms/push');
@@ -26,19 +27,41 @@ class IExecAppModule extends IExecModule {
       );
     this.countUserApps = async (address) =>
       countUserApps(await this.config.resolveContractsClient(), address);
-    this.checkAppSecretExists = async (appAddress) =>
-      checkAppSecretExists(
+    this.checkAppSecretExists = async (appAddress, { teeFramework } = {}) => {
+      let appTeeFramework = teeFramework;
+      if (appTeeFramework === undefined) {
+        const { app } = await showApp(
+          await this.config.resolveContractsClient(),
+          appAddress,
+        );
+        appTeeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      return checkAppSecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework: appTeeFramework }),
         appAddress,
       );
-    this.pushAppSecret = async (appAddress, appSecret) =>
-      pushAppSecret(
+    };
+    this.pushAppSecret = async (
+      appAddress,
+      appSecret,
+      { teeFramework } = {},
+    ) => {
+      let appTeeFramework = teeFramework;
+      if (appTeeFramework === undefined) {
+        const { app } = await showApp(
+          await this.config.resolveContractsClient(),
+          appAddress,
+        );
+        appTeeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      return pushAppSecret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework: appTeeFramework }),
         appAddress,
         appSecret,
       );
+    };
     this.predictAppAddress = async (app) =>
       predictAppAddress(await this.config.resolveContractsClient(), app);
     this.checkDeployedApp = async (address) =>

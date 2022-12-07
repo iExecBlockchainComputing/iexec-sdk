@@ -214,7 +214,7 @@ const apporderTemplate = await createApporder({app: appAddress});
 | `overrides.appprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset  default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -244,7 +244,7 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 | `overrides.dataset` | `string` | - |
 | `overrides.datasetprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task  default `0` |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester  default no restrict |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool  default no restrict |
 
@@ -282,10 +282,10 @@ const requestorderTemplate = await createRequestorder({
 | `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task  default `0` |
 | `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\>  } | execution parameters |
 | `overrides.requester?` | `string` | requester  default connected wallet address |
-| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtimes with specified tags  default `[]` |
+| `overrides.tag?` | `string`[] \| [`Tag`](../modules/internal_.md#tag) | restrict usage to runtime with specified tags  default `[]` |
 | `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust  default `0` |
 | `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order  default `1` |
-| `overrides.workerpool?` | `string` | run one sprecified workerpool  default run on any workerpool |
+| `overrides.workerpool?` | `string` | run one specified workerpool  default run on any workerpool |
 | `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | workerpool max price per task  default `0` |
 
 #### Returns
@@ -430,7 +430,7 @@ ___
 
 make a deal on-chain with compatible orders to trigger the off-chain computation.
 
-_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+_NB_: preflight checks are performed on the orders before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 ```js
 const { dealid, txHash } = await matchOrders({
@@ -451,7 +451,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 | `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
 | `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
 | `options?` | `Object` |
-| `options.checkRequest?` | `boolean` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -461,11 +461,13 @@ ___
 
 ### publishApporder
 
-▸ **publishApporder**(`apporder`): `Promise`<`string`\>
+▸ **publishApporder**(`apporder`, `options?`): `Promise`<`string`\>
 
 **SIGNER REQUIRED, ONLY APP OWNER**
 
 publish an apporder on the off-chain marketplace making it available for other users
+
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -478,6 +480,8 @@ console.log('published order hash:', orderHash);
 | Name | Type |
 | :------ | :------ |
 | `apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
+| `options?` | `Object` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -487,11 +491,13 @@ ___
 
 ### publishDatasetorder
 
-▸ **publishDatasetorder**(`datasetorder`): `Promise`<`string`\>
+▸ **publishDatasetorder**(`datasetorder`, `options?`): `Promise`<`string`\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
 publish a datasetorder on the off-chain marketplace making it available for other users
+
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -504,6 +510,8 @@ console.log('published order hash:', orderHash);
 | Name | Type |
 | :------ | :------ |
 | `datasetorder` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
+| `options?` | `Object` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -519,7 +527,7 @@ ___
 
 publish a requestorder on the off-chain marketplace making it available for other users
 
-_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -533,7 +541,7 @@ console.log('published order hash:', orderHash);
 | :------ | :------ |
 | `requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
 | `options?` | `Object` |
-| `options.checkRequest?` | `boolean` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -569,11 +577,13 @@ ___
 
 ### signApporder
 
-▸ **signApporder**(`apporderTemplate`): `Promise`<[`SignedApporder`](../interfaces/internal_.SignedApporder.md)\>
+▸ **signApporder**(`apporderTemplate`, `options?`): `Promise`<[`SignedApporder`](../interfaces/internal_.SignedApporder.md)\>
 
 **ONLY APP OWNER**
 
 sign an apporder template to create a valid order
+
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -586,6 +596,8 @@ const apporder = await signApporder(apporderTemplate);
 | Name | Type |
 | :------ | :------ |
 | `apporderTemplate` | [`ApporderTemplate`](../interfaces/internal_.ApporderTemplate.md) |
+| `options?` | `Object` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -595,11 +607,13 @@ ___
 
 ### signDatasetorder
 
-▸ **signDatasetorder**(`datasetorderTemplate`): `Promise`<[`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md)\>
+▸ **signDatasetorder**(`datasetorderTemplate`, `options?`): `Promise`<[`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md)\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
 sign a datasetorder template to create a valid order
+
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -612,6 +626,8 @@ const datasetorder = await signDatasetorder(datasetorderTemplate);
 | Name | Type |
 | :------ | :------ |
 | `datasetorderTemplate` | [`DatasetorderTemplate`](../interfaces/internal_.DatasetorderTemplate.md) |
+| `options?` | `Object` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 
@@ -627,7 +643,7 @@ ___
 
 sign a requestorder template to create a valid order
 
-_NB_: advanced checks are performed on the requestorder before signing (this helps detecting inconsistancies and prevent creating always failing tasks). these checks can be disabled by passing the option `checkRequest: false`
+_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -645,7 +661,7 @@ const requestorder = await signRequestorder(requestorderTemplate);
 | :------ | :------ |
 | `requestorderTemplate` | [`RequestorderTemplate`](../interfaces/internal_.RequestorderTemplate.md) |
 | `options?` | `Object` |
-| `options.checkRequest?` | `boolean` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 

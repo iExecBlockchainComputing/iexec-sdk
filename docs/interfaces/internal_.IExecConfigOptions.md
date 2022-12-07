@@ -11,6 +11,7 @@
 - [bridgeAddress](internal_.IExecConfigOptions.md#bridgeaddress)
 - [bridgedNetworkConf](internal_.IExecConfigOptions.md#bridgednetworkconf)
 - [confirms](internal_.IExecConfigOptions.md#confirms)
+- [defaultTeeFramework](internal_.IExecConfigOptions.md#defaultteeframework)
 - [ensPublicResolverAddress](internal_.IExecConfigOptions.md#enspublicresolveraddress)
 - [ensRegistryAddress](internal_.IExecConfigOptions.md#ensregistryaddress)
 - [enterpriseSwapConf](internal_.IExecConfigOptions.md#enterpriseswapconf)
@@ -43,9 +44,9 @@ override the bridged network configuration
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `bridgeAddress?` | `string` | bridge contract address on bridgde network |
+| `bridgeAddress?` | `string` | bridge contract address on bridged network |
 | `chainId?` | `string` \| `number` | bridged network chainId |
-| `hubAddress?` | `string` | IExec contract address on bridgde network |
+| `hubAddress?` | `string` | IExec contract address on bridged network |
 | `rpcURL?` | `string` | bridged network node url |
 
 ___
@@ -55,6 +56,14 @@ ___
 • `Optional` **confirms**: `boolean`
 
 number of block to wait for transactions confirmation (default 1)
+
+___
+
+### defaultTeeFramework
+
+• `Optional` **defaultTeeFramework**: [`TeeFramework`](../modules/internal_.md#teeframework)
+
+override the TEE framework to use when as default
 
 ___
 
@@ -84,7 +93,7 @@ override the enterprise configuration
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `hubAddress?` | `string` | IExec enerprise contract address |
+| `hubAddress?` | `string` | IExec enterprise contract address |
 
 ___
 
@@ -138,7 +147,7 @@ ___
 
 ### smsURL
 
-• `Optional` **smsURL**: `string`
+• `Optional` **smsURL**: `string` \| `Record`<[`TeeFramework`](../modules/internal_.md#teeframework), `string`\>
 
 override the SMS URL to target a custom instance
 

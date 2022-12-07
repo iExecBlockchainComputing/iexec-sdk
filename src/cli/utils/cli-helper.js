@@ -1,4 +1,5 @@
 const Debug = require('debug');
+const { Option } = require('commander');
 const Ora = require('ora');
 const inquirer = require('inquirer');
 const prettyjson = require('prettyjson');
@@ -11,7 +12,10 @@ const {
   weiAmountSchema,
   positiveStrictIntSchema,
 } = require('../../common/utils/validator');
-const { storageProviders } = require('../../common/utils/params-utils');
+const {
+  TEE_FRAMEWORKS,
+  STORAGE_PROVIDERS,
+} = require('../../common/utils/constant');
 
 const debug = Debug('help');
 
@@ -91,7 +95,7 @@ const desc = {
     '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
-  validateRessource: () =>
+  validateResource: () =>
     'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
@@ -110,7 +114,7 @@ const desc = {
     "for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum",
   generateKeys: () =>
     'generate a beneficiary key pair to encrypt and decrypt the results',
-  decryptResults: () => 'decrypt encrypted results with beneficary key',
+  decryptResults: () => 'decrypt encrypted results with beneficiary key',
   bridgeToSidechain: () =>
     'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () =>
@@ -132,7 +136,7 @@ const option = {
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   user: () => ['--user <address>', desc.userAddress()],
-  initTee: () => ['--tee', 'use the Trused Execution Environment template'],
+  initTee: () => ['--tee', 'use the Trusted Execution Environment template'],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
   initWorkerpoolOrder: () => ['--workerpool', 'init a workerpool sell order'],
@@ -140,14 +144,14 @@ const option = {
   signAppOrder: () => ['--app', 'sign an selling apporder'],
   signDatasetOrder: () => ['--dataset', 'sign a selling datasetorder'],
   signWorkerpoolOrder: () => ['--workerpool', 'sign a selling workerpoolorder'],
-  signRequestOrder: () => ['--request', 'sign a buying userorder'],
+  signRequestOrder: () => ['--request', 'sign a buying requestorder'],
   cancelAppOrder: () => ['--app', 'cancel a signed apporder'],
   cancelDatasetOrder: () => ['--dataset', 'cancel a signed datasetorder'],
   cancelWorkerpoolOrder: () => [
     '--workerpool',
     'cancel a signed workerpoolorder',
   ],
-  cancelRequestOrder: () => ['--request', 'cancel a signed userorder'],
+  cancelRequestOrder: () => ['--request', 'cancel a signed requestorder'],
   publishAppOrder: () => [
     '--app',
     'publish a signed apporder on iExec marketplace',
@@ -207,7 +211,7 @@ const option = {
   ],
   fillRequestParams: () => [
     '--params <json>',
-    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+    'specify the params of the request, existing request order will be ignored\n* usage: --params \'{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   appRunWatch: () => ['--watch', 'watch execution status changes'],
   to: () => ['--to <address>', 'receiver address'],
@@ -219,7 +223,7 @@ const option = {
   force: () => ['--force', 'force perform action without prompting user'],
   showPrivateKey: () => [
     '--show-private-key',
-    'allow displaying walletprivate key',
+    'allow displaying wallet private key',
   ],
   watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
@@ -256,12 +260,12 @@ const option = {
   ],
   maxTag: () => [
     '--max-tag <tag>',
-    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+    'specify maximum tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
   ],
   tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
   minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
   minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
-  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximum trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
@@ -327,10 +331,18 @@ const option = {
     'storage provider authorization token (unsafe)',
   ],
   secretValue: () => ['--secret-value <secretValue>', 'secret value (unsafe)'],
-  skipRequestCheck: () => [
-    '--skip-request-check',
-    'skip request validity checks, this may result in task execution fail',
+  skipPreflightCheck: () => [
+    '--skip-preflight-check',
+    'skip preflight check, this may result in task execution fail',
   ],
+};
+
+const optionCreator = {
+  teeFramework: () =>
+    new Option(
+      `--tee-framework <name>`,
+      'specify the TEE framework to use',
+    ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
 const orderOption = {
@@ -410,7 +422,7 @@ const orderOption = {
   ],
   params: () => [
     '--params <json>',
-    'specify the params of the request\n* usage: --params \'{"iexec_args":"dostuff","iexec_input_files":["https://example.com/file.zip"]}\'',
+    'specify the params of the request\n* usage: --params \'{"iexec_args":"do stuff","iexec_input_files":["https://example.com/file.zip"]}\'',
   ],
   requestArgs: () => [
     '--args <string>',
@@ -429,7 +441,7 @@ const orderOption = {
     'encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)',
   ],
   requestStorageProvider: () => [
-    `--storage-provider <${listOfChoices(storageProviders())}>`,
+    `--storage-provider <${listOfChoices(Object.values(STORAGE_PROVIDERS))}>`,
     'specify the storage to use to store the result archive',
   ],
 };
@@ -492,15 +504,15 @@ const promptConfirmedPassword = async (
 ) => {
   const pw1 = await promptPassword(message, { strict: false });
   const pw2 = await promptPassword(confirmation, {
-    error: 'Password missmatch',
+    error: 'Password mismatch',
   });
   if (pw1 === pw2) return pw1;
-  throw Error('Password missmatch');
+  throw Error('Password mismatch');
 };
 
 const prompt = {
   password: (message, options) => promptPassword(message, options),
-  confimedPassword: (message, confirmation) =>
+  confirmedPassword: (message, confirmation) =>
     promptConfirmedPassword(message, confirmation),
   custom: question,
   create: (file) => question(`You don't have a ${file} yet, create one?`),
@@ -668,7 +680,7 @@ const computeWalletCreateOptions = async (opts) => {
         'Option --password may be unsafe, make sure to know what you do',
       );
     } else if (!opts.unencrypted) {
-      pw = await prompt.confimedPassword(
+      pw = await prompt.confirmedPassword(
         'Please choose a password for wallet encryption',
       );
     }
@@ -676,7 +688,7 @@ const computeWalletCreateOptions = async (opts) => {
       throw Error('Missing wallet password');
     }
     if (pw && opts.unencrypted) {
-      spinner.warn('Option --unencrypted will be ingnored');
+      spinner.warn('Option --unencrypted will be ignored');
     }
     if (opts.unencrypted) {
       spinner.warn(
@@ -816,6 +828,31 @@ const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
   return value;
 };
 
+const getDefaultTeeFrameworkFromChain = (chain) =>
+  getPropertyFormChain(chain, 'defaultTeeFramework', { strict: false }) ||
+  TEE_FRAMEWORKS.SCONE;
+
+const getSmsUrlFromChain = (chain, { teeFramework, strict = true } = {}) => {
+  const selectedTeeFramework =
+    teeFramework ||
+    getDefaultTeeFrameworkFromChain(chain, 'defaultTeeFramework');
+  let smsUrl;
+  const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
+  if (typeof smsUrlOrMap === 'string') {
+    smsUrl = smsUrlOrMap;
+  } else if (
+    typeof smsUrlOrMap === 'object' &&
+    smsUrlOrMap[selectedTeeFramework]
+  ) {
+    smsUrl = smsUrlOrMap[selectedTeeFramework];
+  }
+  if (smsUrl === undefined && strict)
+    throw Error(
+      `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`,
+    );
+  return smsUrl;
+};
+
 const handleError = (error, cli, opts) => {
   debug('error', error);
   const spinner = Spinner(opts);
@@ -884,9 +921,9 @@ const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initilResultsCount, totalCount) =>
-      `Results (${initilResultsCount + 1} to ${
-        initilResultsCount + callResults.length
+    createResultsMessage = (callResults, initialResultsCount, totalCount) =>
+      `Results (${initialResultsCount + 1} to ${
+        initialResultsCount + callResults.length
       }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
     spinner,
     raw = false,
@@ -990,7 +1027,10 @@ module.exports = {
   desc,
   option,
   orderOption,
+  optionCreator,
   getPropertyFormChain,
+  getDefaultTeeFrameworkFromChain,
+  getSmsUrlFromChain,
   addGlobalOptions,
   addWalletCreateOptions,
   addWalletLoadOptions,

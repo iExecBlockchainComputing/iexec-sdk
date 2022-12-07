@@ -5,6 +5,7 @@ const path = require('path');
 const BN = require('bn.js');
 const { execAsync } = require('./test-utils');
 const { bytes32Regex } = require('../src/common/utils/utils');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 
 console.log('Node version:', process.version);
 
@@ -36,7 +37,17 @@ const tokenChainOpenethereumUrl = DRONE
   ? 'http://token-chain-openethereum:8545'
   : 'http://localhost:9545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
+const gramineSms = DRONE
+  ? 'http://token-sms-gramine:13300'
+  : 'http://localhost:13302';
+
+const smsMap = {
+  scone: sconeSms,
+  gramine: gramineSms,
+};
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -121,6 +132,19 @@ const setPoorWallet1 = () =>
     'wallet.json',
   );
 
+const setWallet = async (privateKey) => {
+  const wallet = privateKey
+    ? new ethers.Wallet(privateKey)
+    : ethers.Wallet.createRandom();
+  const jsonWallet = {
+    privateKey: wallet.privateKey,
+    publicKey: wallet.publicKey,
+    address: wallet.address,
+  };
+  await saveJSONToFile(jsonWallet, 'wallet.json');
+  return jsonWallet;
+};
+
 const setTokenChain = (options) =>
   saveJSONToFile(
     {
@@ -130,7 +154,7 @@ const setTokenChain = (options) =>
           id: networkId,
           host: tokenChainUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -150,7 +174,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           id: networkId,
           host: tokenChainUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -163,7 +187,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
           host: tokenChainUrl,
           hub: enterpriseHubAddress,
           flavour: 'enterprise',
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -187,7 +211,7 @@ const setNativeChain = (options) =>
           hub: hubAddress,
           native: true,
           useGas: false,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -207,7 +231,7 @@ const setTokenChainOpenethereum = (options) =>
           id: networkId,
           host: tokenChainOpenethereumUrl,
           hub: hubAddress,
-          sms: smsURL,
+          sms: smsMap,
           resultProxy: resultProxyURL,
           ensRegistry: ensRegistryAddress,
           ensPublicResolver: ensPublicResolverAddress,
@@ -248,33 +272,50 @@ const setWorkerpoolUniqueDescription = async () => {
   return description;
 };
 
+const editOrder = (orderName) => async (override) => {
+  const iexecJson = await loadJSONFile('iexec.json');
+  iexecJson.order[orderName] = {
+    ...iexecJson.order[orderName],
+    ...Object.fromEntries(
+      Object.entries(override).filter((e) => e[1] !== undefined),
+    ),
+  };
+  await saveJSONToFile(iexecJson, 'iexec.json');
+};
+
 const editRequestorder = async ({
   app,
   dataset,
   workerpool,
   category,
   volume,
-}) => {
-  if (!app || !dataset || !workerpool) throw Error('missing precondition');
-  const iexecJson = await loadJSONFile('iexec.json');
-  iexecJson.order.requestorder.app = app;
-  iexecJson.order.requestorder.dataset = dataset;
-  iexecJson.order.requestorder.workerpool = workerpool;
-  iexecJson.order.requestorder.category =
-    category || iexecJson.order.requestorder.category;
-  iexecJson.order.requestorder.volume =
-    volume || iexecJson.order.requestorder.volume;
-  await saveJSONToFile(iexecJson, 'iexec.json');
-};
+  tag,
+}) =>
+  editOrder('requestorder')({
+    app,
+    dataset,
+    workerpool,
+    category,
+    volume,
+    tag,
+  });
 
-const editWorkerpoolorder = async ({ category, volume }) => {
-  const iexecJson = await loadJSONFile('iexec.json');
-  iexecJson.order.workerpoolorder.category =
-    category || iexecJson.order.workerpoolorder.category;
-  iexecJson.order.workerpoolorder.volume =
-    volume || iexecJson.order.workerpoolorder.volume;
-  await saveJSONToFile(iexecJson, 'iexec.json');
-};
+const editWorkerpoolorder = async ({ category, volume, tag }) =>
+  editOrder('workerpoolorder')({
+    category,
+    volume,
+    tag,
+  });
+
+const editApporder = async ({ tag }) =>
+  editOrder('apporder')({
+    tag,
+  });
+
+const editDatasetorder = async ({ tag }) =>
+  editOrder('datasetorder')({
+    tag,
+  });
 
 const initializeTask = async (wallet, hub, dealid, idx) => {
   const hubContract = new ethers.Contract(
@@ -642,6 +683,31 @@ describe('[Mainchain]', () => {
     expect(res.ok).toBe(true);
     expect(res.app).toBeDefined();
     expect(res.app.mrenclave).toBeDefined();
+    expect(res.app.mrenclave.framework).toBe('SCONE');
+  });
+
+  test('[common] iexec app init --tee-framework gramine)', async () => {
+    await removeWallet();
+    const raw = await execAsync(
+      `${iexecPath} app init --tee-framework gramine --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.app).toBeDefined();
+    expect(res.app.mrenclave).toBeDefined();
+    expect(res.app.mrenclave.framework).toBe('GRAMINE');
+  });
+
+  test('[common] iexec app init --tee-framework scone)', async () => {
+    await removeWallet();
+    const raw = await execAsync(
+      `${iexecPath} app init --tee-framework scone --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.app).toBeDefined();
+    expect(res.app.mrenclave).toBeDefined();
+    expect(res.app.mrenclave.framework).toBe('SCONE');
   });
 
   test('[common] iexec app init (+ wallet)', async () => {
@@ -1121,6 +1187,7 @@ describe('[Mainchain]', () => {
 
   // edit order
   test('[mainchain] iexec order sign', async () => {
+    await execAsync(`${iexecPath} order init`);
     await editRequestorder({
       app: mainchainApp,
       dataset: mainchainDataset,
@@ -1131,7 +1198,7 @@ describe('[Mainchain]', () => {
       category: '0',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --raw --skip-request-check`,
+      `${iexecPath} order sign --raw --skip-preflight-check`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1143,11 +1210,30 @@ describe('[Mainchain]', () => {
     expect(res.datasetorder.dataset).toBeDefined();
     expect(res.workerpoolorder.workerpool).toBeDefined();
     expect(res.requestorder.app).toBeDefined();
+
+    await editRequestorder({
+      tag: ['tee', 'scone'],
+    });
+    await editWorkerpoolorder({
+      tag: ['tee'],
+    });
+    await editApporder({ tag: ['tee', 'scone'] });
+    await editDatasetorder({ tag: ['tee', 'scone'] });
+    const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
+      JSON.parse,
+    );
+    expect(failRes.ok).toBe(false);
+    expect(failRes.fail).toStrictEqual([
+      'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+      `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${mainchainDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
+      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      'requestorder: Request requirements check failed: Requester storage token is not set for selected provider "ipfs". Result archive upload will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+    ]);
   });
 
   test('[mainchain] iexec order fill', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1160,6 +1246,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --app', async () => {
+    await execAsync(`${iexecPath} order init --app`);
     const raw = await execAsync(`${iexecPath} order sign --app --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1171,6 +1258,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --dataset', async () => {
+    await execAsync(`${iexecPath} order init --dataset`);
     const raw = await execAsync(`${iexecPath} order sign --dataset --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1182,6 +1270,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --workerpool', async () => {
+    await execAsync(`${iexecPath} order init --workerpool`);
     await editWorkerpoolorder({
       category: mainchainNoDurationCatid,
       volume: '6',
@@ -1197,6 +1286,7 @@ describe('[Mainchain]', () => {
   });
 
   test('[mainchain] iexec order sign --request', async () => {
+    await execAsync(`${iexecPath} order init --request`);
     await editRequestorder({
       app: mainchainApp,
       dataset: mainchainDataset,
@@ -1205,7 +1295,7 @@ describe('[Mainchain]', () => {
       volume: '5',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --request --skip-request-check --raw`,
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1218,7 +1308,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill (BoT 5)', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1232,7 +1322,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order fill --params <params> --force', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-request-check --force --raw`,
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1296,7 +1386,7 @@ describe('[Mainchain]', () => {
 
   test('[mainchain] iexec order cancel --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --request --skip-request-check --raw`,
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --request --force --raw`,
@@ -1340,7 +1430,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1388,7 +1478,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1439,7 +1529,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,scone,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${POOR_ADDRESS1} --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1469,14 +1559,14 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
     expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
     expect(resDeal.deal.tasks['0']).toBeDefined();
   });
 
-  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee', async () => {
+  test('[common] iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone', async () => {
     const deployed = {
       app: {
         [networkId]: mainchainApp,
@@ -1490,7 +1580,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1522,7 +1612,7 @@ describe('[Mainchain]', () => {
     expect(resDeal.deal.botFirst).toBe('0');
     expect(resDeal.deal.botSize).toBe('1');
     expect(resDeal.deal.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000000000000000000000000000003',
     );
     expect(resDeal.deal.trust).toBe('1');
     expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
@@ -1540,7 +1630,7 @@ describe('[Mainchain]', () => {
     };
     await saveJSONToFile(deployed, 'deployed.json');
     const raw = await execAsync(
-      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-request-check --force --raw`,
+      `${iexecPath} app run --workerpool deployed --category ${mainchainNoDurationCatid} --watch --skip-preflight-check --force --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -1895,6 +1985,82 @@ describe('[Mainchain]', () => {
     expect(res.errors).toBeUndefined();
   });
 
+  test('[common] app secret', async () => {
+    await setTokenChainOpenethereum();
+    await setRichWallet();
+    await execAsync(`${iexecPath} app init --tee-framework gramine --raw`);
+    await setAppUniqueName();
+    const { address } = JSON.parse(
+      await execAsync(`${iexecPath} app deploy --raw`),
+    );
+
+    // anyone can check-secret
+    await removeWallet();
+    const checkNotPushed = JSON.parse(
+      await execAsync(`${iexecPath} app check-secret ${address} --raw`),
+    );
+    expect(checkNotPushed.ok).toBe(true);
+    expect(checkNotPushed.isSecretSet).toBe(false);
+    // only owner can push
+    await setPoorWallet1();
+    const pushUnauthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --raw`,
+      ).catch((err) => err.message),
+    );
+    expect(pushUnauthorized.ok).toBe(false);
+    await setRichWallet();
+    const pushAuthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --raw`,
+      ),
+    );
+    expect(pushAuthorized.ok).toBe(true);
+    // cannot update app secret
+    const pushUpdate = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret ${address} --secret-value bar --raw`,
+      ).catch((err) => err.message),
+    );
+    expect(pushUpdate.ok).toBe(false);
+    // check pushed
+    await removeWallet();
+    const checkPushed = JSON.parse(
+      await execAsync(`${iexecPath} app check-secret ${address} --raw`),
+    );
+    expect(checkPushed.ok).toBe(true);
+    expect(checkPushed.isSecretSet).toBe(true);
+    // check secret TEE framework validation
+    await expect(
+      execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework foo --raw`,
+      ),
+    ).rejects.toThrow();
+    // check secret TEE framework override
+    const checkOtherFramework = JSON.parse(
+      await execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(checkOtherFramework.ok).toBe(true);
+    expect(checkOtherFramework.isSecretSet).toBe(false);
+    // push secret TEE framework override
+    await setRichWallet();
+    const pushOtherFrameworkAuthorized = JSON.parse(
+      await execAsync(
+        `${iexecPath} app push-secret  ${address} --secret-value foo --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(pushOtherFrameworkAuthorized.ok).toBe(true);
+    const checkOtherFrameworkPushed = JSON.parse(
+      await execAsync(
+        `${iexecPath} app check-secret ${address} --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
+      ),
+    );
+    expect(checkOtherFrameworkPushed.ok).toBe(true);
+    expect(checkOtherFrameworkPushed.isSecretSet).toBe(true);
+  });
+
   test('[common] iexec app publish (from deployed)', async () => {
     await setRichWallet();
     await setTokenChainOpenethereum({ iexecGateway: iexecGatewayURL });
@@ -1931,8 +2097,13 @@ describe('[Mainchain]', () => {
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} app deploy --raw`),
     );
+    await expect(
+      execAsync(
+        `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --force --raw`,
+      ),
+    ).rejects.toThrow('Tag mismatch the TEE framework specified by app');
     const raw = await execAsync(
-      `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --tag tee --force --raw`,
+      `${iexecPath} app publish ${address} --price 0.1 RLC --volume 100 --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -1944,7 +2115,7 @@ describe('[Mainchain]', () => {
       app: address,
       appprice: 100000000,
       volume: 100,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       datasetrestrict: NULL_ADDRESS,
       workerpoolrestrict: NULL_ADDRESS,
       requesterrestrict: NULL_ADDRESS,
@@ -2042,8 +2213,15 @@ describe('[Mainchain]', () => {
     const { address } = JSON.parse(
       await execAsync(`${iexecPath} dataset deploy --raw`),
     );
+    await expect(
+      execAsync(
+        `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${POOR_ADDRESS1} --force --raw`,
+      ),
+    ).rejects.toThrow(
+      `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
+    );
     const raw = await execAsync(
-      `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --tag tee --app-restrict ${POOR_ADDRESS1} --force --raw`,
+      `${iexecPath} dataset publish ${address} --price 0.1 RLC --volume 100 --app-restrict ${POOR_ADDRESS1} --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2057,7 +2235,7 @@ describe('[Mainchain]', () => {
       dataset: address,
       datasetprice: 100000000,
       volume: 100,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
       apprestrict: POOR_ADDRESS1,
       workerpoolrestrict: NULL_ADDRESS,
       requesterrestrict: NULL_ADDRESS,
@@ -2161,7 +2339,7 @@ describe('[Mainchain]', () => {
       await execAsync(`${iexecPath} workerpool deploy --raw`),
     );
     const raw = await execAsync(
-      `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee --trust 20 --category 1 --force --raw`,
+      `${iexecPath} workerpool publish ${address} --price 0.000000002 RLC --volume 5 --tag tee,scone --trust 20 --category 1 --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2175,7 +2353,7 @@ describe('[Mainchain]', () => {
       workerpool: address,
       workerpoolprice: 2,
       volume: 5,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
       trust: 20,
       category: 1,
       apprestrict: NULL_ADDRESS,
@@ -2237,6 +2415,98 @@ describe('[Mainchain]', () => {
     ).catch((e) => e.message);
     const resErr = JSON.parse(rawErr);
     expect(resErr.ok).toBe(false);
+  });
+
+  // REQUESTER
+  test('[common] requester secret', async () => {
+    await setTokenChainOpenethereum();
+    const { privateKey, address } = await setWallet();
+    // check own
+    const checkOwnNotPushed = JSON.parse(
+      await execAsync(`${iexecPath} requester check-secret foo --raw`),
+    );
+    expect(checkOwnNotPushed.ok).toBe(true);
+    expect(checkOwnNotPushed.name).toBe('foo');
+    expect(checkOwnNotPushed.isSet).toBe(false);
+
+    // push
+    const push = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester push-secret foo --secret-value FOO --raw`,
+      ),
+    );
+    expect(push.ok).toBe(true);
+    expect(push.name).toBe('foo');
+    expect(push.isPushed).toBe(true);
+    // cannot update requester secret
+    const pushUpdate = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester push-secret foo --secret-value FOOD --raw`,
+      ).catch((err) => err.message),
+    );
+    expect(pushUpdate.ok).toBe(false);
+
+    // check own pushed
+    const checkOwnPushed = JSON.parse(
+      await execAsync(`${iexecPath} requester check-secret foo --raw`),
+    );
+    expect(checkOwnPushed.ok).toBe(true);
+    expect(checkOwnPushed.name).toBe('foo');
+    expect(checkOwnPushed.isSet).toBe(true);
+
+    // anyone can check-secret
+    await removeWallet();
+    const checkPushed = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester check-secret foo ${address} --raw`,
+      ),
+    );
+    expect(checkPushed.ok).toBe(true);
+    expect(checkPushed.name).toBe('foo');
+    expect(checkPushed.isSet).toBe(true);
+
+    const checkNotPushed = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester check-secret FOO ${address} --raw`,
+      ),
+    );
+    expect(checkNotPushed.ok).toBe(true);
+    expect(checkNotPushed.name).toBe('FOO');
+    expect(checkNotPushed.isSet).toBe(false);
+
+    // check secret TEE framework validation
+    await expect(
+      execAsync(
+        `${iexecPath} requester check-secret foo ${address} --tee-framework tee --raw`,
+      ),
+    ).rejects.toThrow();
+
+    // check secret TEE framework override
+    const checkOtherFramework = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester check-secret foo ${address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
+      ),
+    );
+    expect(checkOtherFramework.ok).toBe(true);
+    expect(checkOtherFramework.name).toBe('foo');
+    expect(checkOtherFramework.isSet).toBe(false);
+
+    // push secret TEE framework override
+    await setWallet(privateKey);
+    const pushOtherFramework = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester push-secret foo --secret-value foo --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
+      ),
+    );
+    expect(pushOtherFramework.ok).toBe(true);
+    const checkOtherFrameworkPushed = JSON.parse(
+      await execAsync(
+        `${iexecPath} requester check-secret foo ${address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
+      ),
+    );
+    expect(checkOtherFrameworkPushed.ok).toBe(true);
+    expect(checkOtherFrameworkPushed.name).toBe('foo');
+    expect(checkOtherFrameworkPushed.isSet).toBe(true);
   });
 });
 
@@ -2714,7 +2984,7 @@ describe('[Sidechain]', () => {
       category: '0',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --skip-request-check --raw`,
+      `${iexecPath} order sign --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2730,7 +3000,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order fill', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2755,9 +3025,9 @@ describe('[Sidechain]', () => {
       category: sidechainNoDurationCatid,
       volume: '5',
     });
-    await execAsync(`${iexecPath} order sign --skip-request-check --raw`);
+    await execAsync(`${iexecPath} order sign --skip-preflight-check --raw`);
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-request-check --raw`,
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -2772,7 +3042,7 @@ describe('[Sidechain]', () => {
 
   test('[sidechain] iexec order cancel --app --dataset --workerpool --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --app --dataset --workerpool --request --skip-request-check --force --raw`,
+      `${iexecPath} order sign --app --dataset --workerpool --request --skip-preflight-check --force --raw`,
     );
     const raw = await execAsync(
       `${iexecPath} order cancel --app --dataset --workerpool --request --force --raw`,
@@ -2788,28 +3058,28 @@ describe('[Sidechain]', () => {
     expect(res.requestorder).toBeDefined();
     expect(res.requestorder.txHash).toBeDefined();
     expect(res.fail).toBeUndefined();
-    const cancelAppordertx = await nativeChainRPC.getTransaction(
+    const cancelApporderTx = await nativeChainRPC.getTransaction(
       res.apporder.txHash,
     );
-    expect(cancelAppordertx).toBeDefined();
-    expect(cancelAppordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
-    const cancelDatasetordertx = await nativeChainRPC.getTransaction(
+    expect(cancelApporderTx).toBeDefined();
+    expect(cancelApporderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    const cancelDatasetorderTx = await nativeChainRPC.getTransaction(
       res.datasetorder.txHash,
     );
-    expect(cancelDatasetordertx).toBeDefined();
-    expect(cancelDatasetordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
-    const cancelWorkerpoolordertx = await nativeChainRPC.getTransaction(
+    expect(cancelDatasetorderTx).toBeDefined();
+    expect(cancelDatasetorderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    const cancelWorkerpoolorderTx = await nativeChainRPC.getTransaction(
       res.workerpoolorder.txHash,
     );
-    expect(cancelWorkerpoolordertx).toBeDefined();
-    expect(cancelWorkerpoolordertx.gasPrice.toString()).toBe(
+    expect(cancelWorkerpoolorderTx).toBeDefined();
+    expect(cancelWorkerpoolorderTx.gasPrice.toString()).toBe(
       nativeChainGasPrice,
     );
-    const cancelRequestordertx = await nativeChainRPC.getTransaction(
+    const cancelRequestorderTx = await nativeChainRPC.getTransaction(
       res.requestorder.txHash,
     );
-    expect(cancelRequestordertx).toBeDefined();
-    expect(cancelRequestordertx.gasPrice.toString()).toBe(nativeChainGasPrice);
+    expect(cancelRequestorderTx).toBeDefined();
+    expect(cancelRequestorderTx.gasPrice.toString()).toBe(nativeChainGasPrice);
   });
 
   test('[sidechain] iexec deal show', async () => {
@@ -3220,7 +3490,7 @@ describe('[Common]', () => {
       expect(res.fileName).toBeDefined();
     });
 
-    test('iexec wallet show --wallet-addres <address>', async () => {
+    test('iexec wallet show --wallet-address <address>', async () => {
       const raw = await execAsync(
         `${iexecPath} wallet show --password test --wallet-address ${ADDRESS} --raw`,
       );
@@ -3577,7 +3847,7 @@ describe('[Common]', () => {
       await setRichWallet();
       await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-      await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+      await execAsync('echo oops > ./.secrets/datasets/dataset.key');
       const randomAddress = getRandomAddress();
       const resPushNotAllowed = JSON.parse(
         await execAsync(
@@ -3606,13 +3876,36 @@ describe('[Common]', () => {
       expect(resAlreadyExists.error.message).toBe(
         `Secret already exists for ${address} and can't be updated`,
       );
+      // new dataset to push secret on another TEE framework
+      await execAsync(`${iexecPath} dataset init`);
+      await setDatasetUniqueName();
+      const { address: address2 } = JSON.parse(
+        await execAsync(`${iexecPath} dataset deploy --raw`),
+      );
+      await expect(
+        execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework foo --raw`,
+        ),
+      ).rejects.toThrow();
+      const resPush2 = JSON.parse(
+        await execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ),
+      );
+      expect(resPush2.ok).toBe(true);
+      const resAlreadyExists2 = JSON.parse(
+        await execAsync(
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ).catch((e) => e.message),
+      );
+      expect(resAlreadyExists2.ok).toBe(false);
     });
 
     test('iexec dataset check-secret', async () => {
       await setRichWallet();
       await setTokenChainOpenethereum();
       await execAsync('mkdir -p .secrets/datasets/').catch(() => {});
-      await execAsync('echo oops > ./.secrets/datasets/dataset.secret');
+      await execAsync('echo oops > ./.secrets/datasets/dataset.key');
       await execAsync(`${iexecPath} dataset init`);
       await setDatasetUniqueName();
       await execAsync(`${iexecPath} dataset deploy --raw`);
@@ -3634,6 +3927,47 @@ describe('[Common]', () => {
       const resRandomDataset = JSON.parse(rawRandomDataset);
       expect(resRandomDataset.ok).toBe(true);
       expect(resRandomDataset.isSecretSet).toBe(false);
+
+      // testing on gramine dataset
+
+      await execAsync(`${iexecPath} dataset init`);
+      await setDatasetUniqueName();
+      await execAsync(`${iexecPath} dataset deploy --raw`);
+      const resMyDataset2 = JSON.parse(
+        await execAsync(`${iexecPath} dataset check-secret --raw`),
+      );
+      expect(resMyDataset2.ok).toBe(true);
+      expect(resMyDataset2.isSecretSet).toBe(false);
+
+      await execAsync(
+        `${iexecPath} dataset push-secret --tee-framework gramine --raw`,
+      );
+      const rawWrongTee = await execAsync(
+        `${iexecPath} dataset check-secret --raw`,
+      );
+      const resWrongTee = JSON.parse(rawWrongTee);
+      expect(resWrongTee.ok).toBe(true);
+      expect(resWrongTee.isSecretSet).toBe(false);
+
+      const rawGoodTee = await execAsync(
+        `${iexecPath} dataset check-secret --tee-framework gramine --raw`,
+      );
+      const resGoodTee = JSON.parse(rawGoodTee);
+      expect(resGoodTee.ok).toBe(true);
+      expect(resGoodTee.isSecretSet).toBe(true);
+
+      const rawRandomDataset2 = await execAsync(
+        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
+      );
+      const resRandomDataset2 = JSON.parse(rawRandomDataset2);
+      expect(resRandomDataset2.ok).toBe(true);
+      expect(resRandomDataset2.isSecretSet).toBe(false);
+
+      await expect(
+        execAsync(
+          `${iexecPath} dataset check-secret ${getRandomAddress()} --tee-framework foo --raw`,
+        ),
+      ).rejects.toThrow();
     });
   });
 
@@ -3713,8 +4047,7 @@ describe('[Common]', () => {
 
     test('iexec result push-encryption-key', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      const { address } = await setWallet();
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -3731,12 +4064,26 @@ describe('[Common]', () => {
       ).catch((e) => e.message);
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(false);
+      const rawAlreadyExistsForTeeFramework = await execAsync(
+        `${iexecPath} result push-encryption-key --tee-framework scone --raw`,
+      ).catch((e) => e.message);
+      const resAlreadyExistsForTeeFramework = JSON.parse(
+        rawAlreadyExistsForTeeFramework,
+      );
+      expect(resAlreadyExistsForTeeFramework.ok).toBe(false);
+      const resNotExistsForTeeFramework = JSON.parse(
+        await execAsync(
+          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`,
+        ),
+      );
+      expect(resNotExistsForTeeFramework.ok).toBe(true);
+      expect(resNotExistsForTeeFramework.isPushed).toBe(true);
+      expect(resNotExistsForTeeFramework.isUpdated).toBe(false);
     });
 
     test('iexec result push-encryption-key --force-update', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      const { address } = await setWallet();
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -3772,14 +4119,14 @@ describe('[Common]', () => {
 
     test('iexec result check-encryption-key', async () => {
       await setTokenChainOpenethereum();
-      const { privateKey, publicKey, address } = getRandomWallet();
+      const { privateKey, address } = getRandomWallet();
       const rawUserKey = await execAsync(
         `${iexecPath} result check-encryption-key ${address} --raw`,
       );
       const resUserKey = JSON.parse(rawUserKey);
       expect(resUserKey.ok).toBe(true);
       expect(resUserKey.isEncryptionKeySet).toBe(false);
-      await saveJSONToFile({ privateKey, publicKey, address }, 'wallet.json');
+      await setWallet(privateKey);
       await execAsync('mkdir -p .secrets/beneficiary/').catch(() => {});
       await execAsync(
         `cp ./inputs/beneficiaryKeys/key.pub ./.secrets/beneficiary/${address}_key.pub`,
@@ -3791,12 +4138,26 @@ describe('[Common]', () => {
       expect(resMyKey.ok).toBe(true);
       expect(resMyKey.isEncryptionKeySet).toBe(false);
       await execAsync(`${iexecPath} result push-encryption-key --raw`);
-      const rawAlreadyExists = await execAsync(
+      const rawExists = await execAsync(
         `${iexecPath} result check-encryption-key --raw`,
       );
-      const resAlreadyExists = JSON.parse(rawAlreadyExists);
-      expect(resAlreadyExists.ok).toBe(true);
-      expect(resAlreadyExists.isEncryptionKeySet).toBe(true);
+      const resExists = JSON.parse(rawExists);
+      expect(resExists.ok).toBe(true);
+      expect(resExists.isEncryptionKeySet).toBe(true);
+
+      const rawExistsOnTeeFramework = await execAsync(
+        `${iexecPath} result check-encryption-key --tee-framework scone --raw`,
+      );
+      const resExistsOnTeeFramework = JSON.parse(rawExistsOnTeeFramework);
+      expect(resExistsOnTeeFramework.ok).toBe(true);
+      expect(resExistsOnTeeFramework.isEncryptionKeySet).toBe(true);
+
+      const rawNotExistsOnTeeFramework = await execAsync(
+        `${iexecPath} result check-encryption-key --tee-framework gramine --raw`,
+      );
+      const resNotExistsOnTeeFramework = JSON.parse(rawNotExistsOnTeeFramework);
+      expect(resNotExistsOnTeeFramework.ok).toBe(true);
+      expect(resNotExistsOnTeeFramework.isEncryptionKeySet).toBe(false);
     });
 
     test('iexec result check-secret (v4 legacy name)', async () => {
@@ -3892,6 +4253,13 @@ describe('[Common]', () => {
       expect(resAlreadyExists.error.message).toBe(
         'default storage is already initialized, use --force-update option to update your storage token',
       );
+      const rawInitWithTeeFramework = await execAsync(
+        `${iexecPath} storage init --tee-framework gramine --raw`,
+      );
+      const resInitWithTeeFramework = JSON.parse(rawInitWithTeeFramework);
+      expect(resInitWithTeeFramework.ok).toBe(true);
+      expect(resInitWithTeeFramework.isInitialized).toBe(true);
+      expect(resInitWithTeeFramework.isUpdated).toBe(false);
     });
 
     test('iexec storage init --force-update', async () => {
@@ -3958,6 +4326,12 @@ describe('[Common]', () => {
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
       expect(resAlreadyExists.isInitialized).toBe(true);
+      const rawWithTeeFramework = await execAsync(
+        `${iexecPath} storage check --tee-framework gramine --raw`,
+      );
+      const resWithTeeFramework = JSON.parse(rawWithTeeFramework);
+      expect(resWithTeeFramework.ok).toBe(true);
+      expect(resWithTeeFramework.isInitialized).toBe(false);
     });
 
     test('iexec storage check --user', async () => {
@@ -4116,7 +4490,7 @@ describe('[Common]', () => {
       });
     });
 
-    test('no "native" overwites in templates', async () => {
+    test('no "native" overwrites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
       expect(chains.goerli.native).toBeUndefined();
       expect(chains.mainnet.native).toBeUndefined();

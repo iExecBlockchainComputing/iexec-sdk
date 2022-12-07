@@ -57,10 +57,14 @@ const {
   isBytes32,
   prompt,
   getPropertyFormChain,
+  getSmsUrlFromChain,
 } = require('../utils/cli-helper');
 const {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
+  resolveTeeFrameworkFromTag,
+  checkDatasetRequirements,
+  checkAppRequirements,
+} = require('../../common/execution/order-helper');
 const {
   loadIExecConf,
   initOrderObj,
@@ -76,6 +80,12 @@ const {
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
 } = require('../../common/utils/constant');
+const { sumTags } = require('../../lib/utils');
+const {
+  requestorderSchema,
+  apporderSchema,
+  datasetorderSchema,
+} = require('../../common/utils/validator');
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -175,7 +185,7 @@ sign
   .option(...option.signDatasetOrder())
   .option(...option.signWorkerpoolOrder())
   .option(...option.signRequestOrder())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.sign())
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -207,6 +217,22 @@ sign
           const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
+          if (!opts.skipPreflightCheck) {
+            await checkAppRequirements(
+              {
+                contracts: chain.contracts,
+              },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `App requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
+              );
+            });
+          }
           const signedOrder = await signApporder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
             APP_ORDER,
@@ -235,6 +261,25 @@ sign
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw Error(`No dataset deployed at address ${orderObj.dataset}`);
+          if (!opts.skipPreflightCheck) {
+            await checkDatasetRequirements(
+              {
+                contracts: chain.contracts,
+                smsURL: getSmsUrlFromChain(chain, {
+                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
+                }),
+              },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `Dataset requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
+              );
+            });
+          }
           const signedOrder = await signDatasetorder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
             DATASET_ORDER,
@@ -306,11 +351,13 @@ sign
           );
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
-          if (!opts.skipRequestCheck) {
+          if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
                 contracts: chain.contracts,
-                smsURL: getPropertyFormChain(chain, 'sms'),
+                smsURL: getSmsUrlFromChain(chain, {
+                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
+                }),
               },
               orderObj,
             ).catch((e) => {
@@ -318,8 +365,8 @@ sign
                 `Request requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
-                  option.skipRequestCheck()[0]
-                } to skip request requirement check)`,
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
               );
             });
           }
@@ -370,7 +417,7 @@ fill
   .option(...option.fillWorkerpoolOrder())
   .option(...option.fillRequestOrder())
   .option(...option.fillRequestParams())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -464,11 +511,59 @@ fill
         throw new Error('Missing requestorder');
       }
 
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
+        const resolvedTag = sumTags([
+          (
+            await requestorderSchema()
+              .label('requestorder')
+              .validate(requestOrder)
+          ).tag,
+          (await apporderSchema().label('apporder').validate(appOrder)).tag,
+          (
+            await datasetorderSchema()
+              .label('datasetorder')
+              .validate(datasetOrder)
+          ).tag,
+        ]);
+        await checkAppRequirements(
+          {
+            contracts: chain.contracts,
+          },
+          appOrder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `App requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
+        await checkDatasetRequirements(
+          {
+            contracts: chain.contracts,
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
+          },
+          datasetOrder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `Dataset requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
           },
           requestOrder,
         ).catch((e) => {
@@ -476,8 +571,8 @@ fill
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }
@@ -510,7 +605,7 @@ publish
   .option(...option.publishDatasetOrder())
   .option(...option.publishWorkerpoolOrder())
   .option(...option.publishRequestOrder())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.publish(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -548,6 +643,22 @@ publish
           let orderHash;
           switch (orderName) {
             case APP_ORDER:
+              if (!opts.skipPreflightCheck) {
+                await checkAppRequirements(
+                  {
+                    contracts: chain.contracts,
+                  },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `App requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
+                  );
+                });
+              }
               orderHash = await publishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
@@ -555,6 +666,27 @@ publish
               );
               break;
             case DATASET_ORDER:
+              if (!opts.skipPreflightCheck) {
+                await checkDatasetRequirements(
+                  {
+                    contracts: chain.contracts,
+                    smsURL: getSmsUrlFromChain(chain, {
+                      teeFramework: await resolveTeeFrameworkFromTag(
+                        orderToPublish.tag,
+                      ),
+                    }),
+                  },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `Dataset requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
+                  );
+                });
+              }
               orderHash = await publishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
@@ -569,11 +701,15 @@ publish
               );
               break;
             case REQUEST_ORDER:
-              if (!opts.skipRequestCheck) {
+              if (!opts.skipPreflightCheck) {
                 await checkRequestRequirements(
                   {
                     contracts: chain.contracts,
-                    smsURL: getPropertyFormChain(chain, 'sms'),
+                    smsURL: getSmsUrlFromChain(chain, {
+                      teeFramework: await resolveTeeFrameworkFromTag(
+                        orderToPublish.tag,
+                      ),
+                    }),
                   },
                   orderToPublish,
                 ).catch((e) => {
@@ -581,8 +717,8 @@ publish
                     `Request requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
-                      option.skipRequestCheck()[0]
-                    } to skip request requirement check)`,
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
                   );
                 });
               }

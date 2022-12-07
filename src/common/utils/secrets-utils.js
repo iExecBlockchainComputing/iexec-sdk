@@ -1,3 +1,5 @@
+const { STORAGE_PROVIDERS } = require('./constant');
+
 const reservedSecretKeyName = {
   // result encryption
   IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY: 'iexec-result-encryption-public-key',
@@ -10,9 +12,9 @@ const getStorageTokenKeyName = (provider) => {
   switch (provider) {
     case undefined:
     case 'default':
-    case 'ipfs':
+    case STORAGE_PROVIDERS.IPFS:
       return reservedSecretKeyName.IEXEC_RESULT_IEXEC_IPFS_TOKEN;
-    case 'dropbox':
+    case STORAGE_PROVIDERS.DROPBOX:
       return reservedSecretKeyName.IEXEC_RESULT_DROPBOX_TOKEN;
     default:
       throw Error(`"${provider}" not supported`);

@@ -5,6 +5,7 @@ const {
   datasetSchema,
   workerpoolSchema,
   uint256Schema,
+  objMrenclaveSchema,
   throwIfMissing,
 } = require('../utils/validator');
 const {
@@ -90,9 +91,9 @@ const predictObjAddress =
         contracts.fetchRegistryContract(objName),
       );
       const args = createArgs[objName].map((e) => obj[e]);
-      const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
+      const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
       const predictedAddress = await wrapCall(
-        registryContract[predictFonctionName](...args),
+        registryContract[predictFunctionName](...args),
       );
       return predictedAddress;
     } catch (error) {
@@ -122,9 +123,9 @@ const deployObj =
         );
       }
       const args = createArgs[objName].map((e) => obj[e]);
-      const createFonctionName = 'create'.concat(toUpperFirst(objName));
+      const createFunctionName = 'create'.concat(toUpperFirst(objName));
       const tx = await wrapSend(
-        registryContract[createFonctionName](...args, contracts.txOptions),
+        registryContract[createFunctionName](...args, contracts.txOptions),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.events, {
@@ -440,6 +441,21 @@ const showUserWorkerpool = async (
   return { objAddress, workerpool: clean };
 };
 
+const resolveTeeFrameworkFromApp = async (app, { strict = true } = {}) => {
+  if (app.appMREnclave) {
+    try {
+      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
+      return mrenclave.framework;
+    } catch (err) {
+      debug('resolveTeeFrameworkFromApp()', err);
+      if (strict) {
+        throw Error('Failed to resolve TEE framework from app');
+      }
+    }
+  }
+  return undefined;
+};
+
 module.exports = {
   predictAppAddress,
   predictDatasetAddress,
@@ -468,4 +484,5 @@ module.exports = {
   countUserApps,
   countUserDatasets,
   countUserWorkerpools,
+  resolveTeeFrameworkFromApp,
 };

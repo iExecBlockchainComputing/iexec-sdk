@@ -2,6 +2,7 @@ const BN = require('bn.js');
 const { getDefaultProvider } = require('ethers');
 const fs = require('fs-extra');
 const path = require('path');
+const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
 const {
   // throwIfMissing,
   // stringSchema,
@@ -38,7 +39,9 @@ const {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
+  smsUrlOrMapSchema,
   ValidationError,
+  teeFrameworkSchema,
 } = require('../src/common/utils/validator');
 
 const { INFURA_PROJECT_ID } = process.env;
@@ -854,10 +857,10 @@ describe('[tagSchema]', () => {
   test('bytes 32 tags', async () => {
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000103',
       ),
     ).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown bytes 32 tag is allowed', async () => {
@@ -870,8 +873,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('array of tags', async () => {
-    await expect(tagSchema().validate(['tee', 'gpu'])).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate(['tee', 'scone', 'gpu'])).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('empty tag', async () => {
@@ -885,8 +888,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('comma separated tags', async () => {
-    await expect(tagSchema().validate('gpu,tee')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate('gpu,tee,scone')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown tag in array', async () => {
@@ -897,6 +900,56 @@ describe('[tagSchema]', () => {
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
       new ValidationError('foo is not a valid tag. Unknown tag foo'),
+    );
+  });
+  test('invalid tee tag', async () => {
+    await expect(tagSchema().validate('tee')).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(tagSchema().validate('scone')).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('gramine')).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000004',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000007',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
     );
   });
 });
@@ -1017,7 +1070,7 @@ describe('[fileBufferSchema]', () => {
 describe('[mrenclaveSchema]', () => {
   test('valid obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1030,7 +1083,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('valid string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1044,7 +1097,7 @@ describe('[mrenclaveSchema]', () => {
   test('valid bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1090,7 +1143,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1104,7 +1157,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1119,7 +1172,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when unexpected key is found in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1142,12 +1195,12 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('provider is a required field'),
+      new ValidationError('framework is a required field'),
     );
   });
   test('throw when a key is missing in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
       fingerprint:
@@ -1160,7 +1213,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when a key is missing in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         heapSize: 1073741824,
         fingerprint:
@@ -1170,6 +1223,19 @@ describe('[mrenclaveSchema]', () => {
     );
     await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
       new ValidationError('entrypoint is a required field'),
+    );
+  });
+  test('throw when framework is not a valid TEE framework', async () => {
+    const obj = {
+      framework: 'FOO',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('framework is not a valid TEE framework'),
     );
   });
 });
@@ -1284,8 +1350,93 @@ describe('[workerpoolApiUrlSchema]', () => {
     expect(res).toBe('');
   });
   test('throw with null', async () => {
-    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
+    await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
       'this must be a `string` type, but the final value was: `null`.',
+    );
+  });
+});
+
+describe('[smsUrlOrMapSchema]', () => {
+  test('allow IP with port', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://192.168.0.1:8080');
+    expect(res).toBe('http://192.168.0.1:8080');
+  });
+  test('allow url', async () => {
+    const res = await smsUrlOrMapSchema().validate('https://my-sms.com');
+    expect(res).toBe('https://my-sms.com');
+  });
+  test('allow docker url', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://my-sms');
+    expect(res).toBe('http://my-sms');
+  });
+  test('allow undefined', async () => {
+    const res = await smsUrlOrMapSchema().validate();
+    expect(res).toBe(undefined);
+  });
+  test('allow Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      scone: 'http://scone-sms',
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('allow partial Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('throw with empty string', async () => {
+    await expect(smsUrlOrMapSchema().validate('')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with null', async () => {
+    await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
+      'this must be a `object` type, but the final value was: `null`.',
+    );
+  });
+  test('throw with invalid url', async () => {
+    await expect(smsUrlOrMapSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with unknown TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ foo: 'https://my-sms.com' }),
+    ).rejects.toThrow('this field has unspecified keys: foo');
+  });
+  test('throw with invalid url on a TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ scone: 'foo' }),
+    ).rejects.toThrow('scone is not a valid url');
+  });
+});
+
+describe('[teeFrameworkSchema]', () => {
+  test('allow known TEE frameworks', async () => {
+    await Promise.all(
+      Object.values(TEE_FRAMEWORKS).map(async (name) => {
+        await expect(teeFrameworkSchema().validate(name)).resolves.toBe(name);
+        await expect(
+          teeFrameworkSchema().validate(name.toUpperCase()),
+        ).resolves.toBe(name);
+      }),
+    );
+  });
+  test('allow undefined', async () => {
+    await expect(teeFrameworkSchema().validate()).resolves.toBe(undefined);
+  });
+  test('throw with unknown TEE framework', async () => {
+    await expect(teeFrameworkSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid TEE framework',
+    );
+  });
+  test('throw with empty string', async () => {
+    await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
+      'this is not a valid TEE framework',
     );
   });
 });

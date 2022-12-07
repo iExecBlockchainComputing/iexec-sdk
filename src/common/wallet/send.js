@@ -198,7 +198,7 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         errors.push(`Failed to transfert native token': ${error.message}`);
       }
     } else {
-      const err = 'Tx fees are greather than wallet balance';
+      const err = 'Tx fees are greater than wallet balance';
       debug(err);
       errors.push(`Failed to transfert native token': ${err}`);
     }

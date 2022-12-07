@@ -11,7 +11,7 @@ const {
   getDatasetOwner,
   getWorkerpoolOwner,
 } = require('../protocol/registries');
-const { createObjParams } = require('../execution/request-helper');
+const { createObjParams } = require('../execution/order-helper');
 const {
   checkEvent,
   getEventFromLogs,
@@ -22,6 +22,7 @@ const {
   checkActiveBitInTag,
   tagBitToHuman,
   checkSigner,
+  TAG_MAP,
 } = require('../utils/utils');
 const { hashEIP712 } = require('../utils/sig-utils');
 const {
@@ -687,7 +688,7 @@ const getMatchableVolume = async (
       1,
     );
     if (teeAppRequired) {
-      if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
+      if (!checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
         throw Error('Missing tag [tee] in apporder');
       }
     }
@@ -729,7 +730,7 @@ const getMatchableVolume = async (
       : stake.div(requiredStakePerTask);
     if (workerpoolStakedVolume.isZero()) {
       throw Error(
-        `workerpool required stake (${requiredStakePerTask}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
+        `workerpool required stake (${requiredStakePerTask}) is greater than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
     }
 
@@ -821,6 +822,15 @@ const matchOrders = async (
         signedRequestorderSchema().validate(requestOrder),
       ]);
 
+    // check resulting tag
+    await tagSchema()
+      .validate(sumTags([vAppOrder.tag, vDatasetOrder.tag, vRequestOrder.tag]))
+      .catch((e) => {
+        throw new Error(
+          `Matching order would produce an invalid deal tag. ${e.message}`,
+        );
+      });
+
     // check matchability
     const matchableVolume = await getMatchableVolume(
       contracts,
@@ -841,12 +851,12 @@ const matchOrders = async (
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
-          `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+          `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
         );
       }
       if (stake.lt(totalCost)) {
         throw new Error(
-          `Total cost for ${matchableVolume} tasks (${totalCost}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
+          `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
         );
       }
     };

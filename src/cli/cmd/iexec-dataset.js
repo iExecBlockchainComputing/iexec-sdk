@@ -57,9 +57,15 @@ const {
   prompt,
   isEthAddress,
   getPropertyFormChain,
+  getSmsUrlFromChain,
+  optionCreator,
 } = require('../utils/cli-helper');
 const { lookupAddress } = require('../../common/ens/resolution');
 const { ConfigurationError } = require('../../common/utils/errors');
+const {
+  checkDatasetRequirements,
+  resolveTeeFrameworkFromTag,
+} = require('../../common/execution/order-helper');
 
 const debug = Debug('iexec:iexec-dataset');
 
@@ -396,6 +402,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretPath())
+  .addOption(optionCreator.teeFramework())
   .description(desc.pushDatasetSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -405,7 +412,9 @@ pushSecret
       const keystore = Keystore(Object.assign(walletOptions));
       const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const [address] = await keystore.accounts();
       debug('address', address);
       const resourceAddress =
@@ -460,6 +469,7 @@ const checkSecret = cli.command('check-secret [datasetAddress]');
 addGlobalOptions(checkSecret);
 checkSecret
   .option(...option.chain())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -477,7 +487,9 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const secretIsSet = await checkWeb3SecretExists(
         chain.contracts,
         sms,
@@ -510,6 +522,7 @@ publish
   .option(...orderOption.apprestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
+  .option(...option.skipPreflightCheck())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
@@ -546,6 +559,15 @@ publish
         requesterrestrict: opts.requesterRestrict,
       };
       const orderToSign = await createDatasetorder(chain.contracts, overrides);
+      if (!opts.skipPreflightCheck) {
+        const sms = getSmsUrlFromChain(chain, {
+          teeFramework: await resolveTeeFrameworkFromTag(orderToSign.tag),
+        });
+        await checkDatasetRequirements(
+          { contracts: chain.contracts, smsURL: sms },
+          orderToSign,
+        );
+      }
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }

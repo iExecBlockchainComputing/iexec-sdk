@@ -1,5 +1,5 @@
 const Debug = require('debug');
-const { string, number, object, mixed, boolean, array } = require('yup');
+const { string, number, object, mixed, boolean, array, lazy } = require('yup');
 const { getAddress, namehash } = require('ethers').utils;
 const {
   humanToMultiaddrBuffer,
@@ -8,10 +8,16 @@ const {
   bytes32Regex,
   parseRLC,
   parseEth,
+  checkActiveBitInTag,
+  TAG_MAP,
 } = require('./utils');
-const { paramsKeyName, storageProviders } = require('./params-utils');
 const { ValidationError } = require('./errors');
 const { wrapCall } = require('./errorWrappers');
+const {
+  TEE_FRAMEWORKS,
+  IEXEC_REQUEST_PARAMS,
+  STORAGE_PROVIDERS,
+} = require('./constant');
 
 const debug = Debug('validators');
 
@@ -19,11 +25,17 @@ const posIntRegex = /^\d+$/;
 
 const posStrictIntRegex = /^[1-9]\d*$/;
 
+const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
+const teeFrameworkSchema = () =>
+  string()
+    .transform((name) => name.toLowerCase())
+    .oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
+
 const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
-      const trimed = value.replace(/^0+/, '');
-      return trimed.length > 0 ? trimed : '0';
+      const trimmed = value.replace(/^0+/, '');
+      return trimmed.length > 0 ? trimmed : '0';
     })
     .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
@@ -50,7 +62,7 @@ const hexnumberSchema = () =>
 const uint256Schema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
-const amontErrorMessage = ({ originalValue }) =>
+const amountErrorMessage = ({ originalValue }) =>
   `${
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
   } is not a valid amount`;
@@ -60,7 +72,7 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -71,25 +83,27 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseRLC(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
 const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -100,18 +114,20 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseEth(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
 const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
@@ -230,7 +246,7 @@ const paramsEncryptResultSchema = () => boolean();
 
 const paramsStorageProviderSchema = () =>
   string().oneOf(
-    storageProviders(),
+    Object.values(STORAGE_PROVIDERS),
     '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
   );
 
@@ -267,28 +283,28 @@ const paramsRequesterSecretsSchema = () =>
 
 const objParamsSchema = () =>
   object({
-    [paramsKeyName.IEXEC_ARGS]: paramsArgsSchema(),
-    [paramsKeyName.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
-    [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
       {
         is: true,
         then: string().notRequired(),
         otherwise: string()
-          .default('ipfs')
+          .default(STORAGE_PROVIDERS.IPFS)
           .when('$isTee', {
             is: true,
             then: paramsStorageProviderSchema(),
             otherwise: string().oneOf(
-              ['ipfs'],
+              [STORAGE_PROVIDERS.IPFS],
               '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
             ),
           })
           .required(),
       },
     ),
-    [paramsKeyName.IEXEC_SECRETS]: mixed().when('$isTee', {
+    [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', {
       is: true,
       then: paramsRequesterSecretsSchema(),
       otherwise: mixed().test(
@@ -302,19 +318,21 @@ const objParamsSchema = () =>
         },
       ),
     }),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-      `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
+      `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
       {
-        is: 'ipfs',
+        is: STORAGE_PROVIDERS.IPFS,
         then: string()
           .when('$resultProxyURL', (resultProxyURL, schema) =>
             schema.default(resultProxyURL),
           )
-          .required('${path} is required field with "ipfs" storage'),
+          .required(
+            `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
+          ),
         otherwise: string().notRequired(),
       },
     ),
-    [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
+    [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
 const paramsSchema = () =>
@@ -349,27 +367,27 @@ const tagSchema = () =>
           const bytes32Tag = encodeTag(value);
           return bytes32Tag;
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
       if (typeof value === 'string') {
         const lowerCase = value.toLowerCase();
-        if (lowerCase.substr(0, 2) === '0x') return lowerCase;
+        if (lowerCase.substring(0, 2) === '0x') return lowerCase;
         try {
           const bytes32Tag = encodeTag(value.split(','));
           return bytes32Tag;
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
-      return 'Invalid tag';
+      return Error('Invalid tag');
     })
     .test(
       'no-transform-error',
       ({ originalValue, value }) =>
-        `${originalValue} is not a valid tag. ${value}`,
+        `${originalValue} is not a valid tag. ${value.message}`,
       (value) => {
-        if (value.substr(0, 2) !== '0x') return false;
+        if (value instanceof Error) return false;
         return true;
       },
     )
@@ -377,12 +395,57 @@ const tagSchema = () =>
       'is-bytes32',
       '${originalValue} is not a valid bytes32 hexstring',
       async (value) => {
+        if (value instanceof Error) {
+          return true;
+        }
         try {
           await bytes32Schema().validate(value);
           return true;
         } catch (e) {
           return false;
         }
+      },
+    )
+    .test(
+      'is-valid-tee-tag',
+      '${originalValue} has a invalid tee combination',
+      (value, { createError }) => {
+        if (value instanceof Error) {
+          return true;
+        }
+        const isTee = checkActiveBitInTag(value, TAG_MAP.tee);
+        const teeFrameworks = Object.values(TEE_FRAMEWORKS).filter(
+          (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework]),
+        );
+        try {
+          if (isTee) {
+            if (teeFrameworks.length < 1) {
+              throw Error(
+                `'tee' tag must be used with a tee framework (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+            if (teeFrameworks.length > 1) {
+              throw Error(
+                `tee framework tags are exclusive (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+          } else if (teeFrameworks.length > 0) {
+            throw Error(
+              `'${teeFrameworks[0]}' tag must be used with 'tee' tag`,
+            );
+          }
+        } catch (e) {
+          return createError({ message: e.message });
+        }
+        return true;
       },
     );
 
@@ -510,7 +573,7 @@ const multiaddressSchema = () =>
 
 const objMrenclaveSchema = () =>
   object({
-    provider: string().required(),
+    framework: teeFrameworkSchema().required(),
     version: string().required(),
     entrypoint: string().required(),
     heapSize: positiveIntSchema().required(),
@@ -736,6 +799,29 @@ const textRecordValueSchema = () => string().default('').strict(true);
 
 const workerpoolApiUrlSchema = () => string().url().default('');
 
+const basicUrlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
+
+const smsUrlOrMapSchema = () =>
+  lazy((stringOrMap) => {
+    switch (typeof stringOrMap) {
+      case 'string':
+        return basicUrlSchema().required();
+      case 'object':
+        return object(
+          teeFrameworksList.reduce(
+            (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
+            {},
+          ),
+        )
+          .noUnknown(true)
+          .nullable(false)
+          .strict(true);
+      default:
+        return basicUrlSchema();
+    }
+  });
+
 const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };
@@ -774,6 +860,7 @@ module.exports = {
   positiveIntSchema,
   positiveStrictIntSchema,
   mrenclaveSchema,
+  objMrenclaveSchema,
   appTypeSchema,
   appSchema,
   datasetSchema,
@@ -786,5 +873,7 @@ module.exports = {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
   ValidationError,
 };

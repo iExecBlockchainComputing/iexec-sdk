@@ -6,6 +6,8 @@ const { APP, DATASET } = require('../../common/utils/constant');
 const {
   addressSchema,
   chainIdSchema,
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
 } = require('../../common/utils/validator');
 const { prompt, info } = require('./cli-helper');
 const templates = require('./templates');
@@ -19,13 +21,14 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // todo address
     ensPublicResolver: string(), // todo address
-    sms: string(),
+    sms: smsUrlOrMapSchema(),
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
     native: boolean(),
     useGas: boolean().default(true),
     flavour: string().oneOf(['standard', 'enterprise']),
+    defaultTeeFramework: teeFrameworkSchema(),
     bridge: object({
       bridgedChainName: string().required(),
       contract: addressSchema().required(),

@@ -1,30 +1,30 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / BrigdeObservable
+[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / BridgeObservable
 
-# Class: BrigdeObservable
+# Class: BridgeObservable
 
-[{internal}](../modules/internal_.md).BrigdeObservable
+[{internal}](../modules/internal_.md).BridgeObservable
 
 ## Hierarchy
 
 - [`Observable`](internal_.Observable.md)
 
-  ↳ **`BrigdeObservable`**
+  ↳ **`BridgeObservable`**
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](internal_.BrigdeObservable.md#constructor)
+- [constructor](internal_.BridgeObservable.md#constructor)
 
 ### Methods
 
-- [subscribe](internal_.BrigdeObservable.md#subscribe)
+- [subscribe](internal_.BridgeObservable.md#subscribe)
 
 ## Constructors
 
 ### constructor
 
-• **new BrigdeObservable**()
+• **new BridgeObservable**()
 
 #### Inherited from
 

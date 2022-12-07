@@ -1,8 +1,8 @@
-const { paramsKeyName } = require('../../common/utils/params-utils');
+const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 
 const main = {
   description:
-    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
+    'My iExec resource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
   license: 'MIT',
   author: '?',
   social: {
@@ -21,7 +21,7 @@ const app = {
     '0xa28d8ae83ae586b4c8addd60413a8302798891411a8f87b5f0987050d0d73816',
 };
 
-const teeApp = {
+const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'tee-python-hello-world',
   type: 'DOCKER',
@@ -29,7 +29,25 @@ const teeApp = {
   checksum:
     '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
   mrenclave: {
-    provider: 'SCONE',
+    framework: 'SCONE',
+    version: 'v5',
+    entrypoint: 'python /app/app.py',
+    heapSize: 1073741824,
+    fingerprint:
+      'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+  },
+};
+
+// todo update once gramine format is known
+const gramineTeeApp = {
+  owner: '0x0000000000000000000000000000000000000000',
+  name: 'tee-python-hello-world',
+  type: 'DOCKER',
+  multiaddr: 'nexus.iex.ec/tee-python-hello-world:6.2.0',
+  checksum:
+    '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
+  mrenclave: {
+    framework: 'GRAMINE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
@@ -40,7 +58,7 @@ const teeApp = {
 
 const buyConf = {
   params: {
-    [paramsKeyName.IEXEC_ARGS]: '',
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
   },
   tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
   trust: '0',
@@ -56,7 +74,7 @@ const dataset = {
 };
 
 const compatibleDapp = {
-  name: 'Recomanded-dapp-for-MyDataset',
+  name: 'Recommended-dapp-for-MyDataset',
   addresses: {
     5: '0x0000000000000000000000000000000000000000',
   },
@@ -114,9 +132,9 @@ const order = {
     beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
     callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {
-      [paramsKeyName.IEXEC_ARGS]: '',
-      [paramsKeyName.IEXEC_INPUT_FILES]: [],
-      [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
+      [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
+      [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: [],
+      [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
     },
   },
 };
@@ -172,7 +190,8 @@ const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
 module.exports = {
   main,
   app,
-  teeApp,
+  sconeTeeApp,
+  gramineTeeApp,
   dataset,
   workerpool,
   category,

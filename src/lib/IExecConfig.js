@@ -9,8 +9,13 @@ const {
 const {
   getChainDefaults,
   isEnterpriseEnabled,
+  TEE_FRAMEWORKS,
 } = require('../common/utils/config');
 const { getReadOnlyProvider } = require('../common/utils/providers');
+const {
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
+} = require('../common/utils/validator');
 
 const debug = Debug('iexec:IExecConfig');
 
@@ -27,10 +32,11 @@ class IExecConfig {
       bridgeAddress,
       bridgedNetworkConf = {},
       enterpriseSwapConf = {},
-      resultProxyURL,
       smsURL,
+      resultProxyURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      defaultTeeFramework,
       providerOptions,
     } = {},
   ) {
@@ -63,6 +69,23 @@ class IExecConfig {
       }
     } catch (err) {
       throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
+    }
+
+    let vSmsUrlOrMap;
+    try {
+      vSmsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid smsURL: ${err.message}`);
+    }
+
+    let vDefaultTeeFramework;
+    try {
+      vDefaultTeeFramework =
+        teeFrameworkSchema().validateSync(defaultTeeFramework);
+    } catch (err) {
+      throw new ConfigurationError(
+        `Invalid defaultTeeFramework: ${err.message}`,
+      );
     }
 
     const networkPromise = (async () => {
@@ -114,7 +137,7 @@ class IExecConfig {
           // case FallbackProvider can not override
           if (ensRegistryAddress) {
             console.warn(
-              'IExec: ensRegistyAddress option is not supported when using a default provider',
+              'IExec: ensRegistryAddress option is not supported when using a default provider',
             );
           }
           signer = ethProvider;
@@ -318,10 +341,18 @@ class IExecConfig {
       return enterpriseSwapContracts;
     };
 
-    this.resolveSmsURL = async () => {
+    this.resolveSmsURL = async ({
+      teeFramework = vDefaultTeeFramework || TEE_FRAMEWORKS.SCONE,
+    } = {}) => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = smsURL || chainConfDefaults.sms;
+      const vTeeFramework = await teeFrameworkSchema()
+        .label('teeFramework')
+        .validate(teeFramework);
+      const value =
+        (typeof vSmsUrlOrMap === 'string' && vSmsUrlOrMap) ||
+        (typeof vSmsUrlOrMap === 'object' && vSmsUrlOrMap[vTeeFramework]) ||
+        (chainConfDefaults.sms && chainConfDefaults.sms[vTeeFramework]);
       if (value !== undefined) {
         return value;
       }
@@ -381,8 +412,8 @@ class IExecConfig {
     };
 
     this.resolveBridgeBackAddress = async () => {
-      const brigedChainConf = await bridgedConfPromise;
-      return brigedChainConf.bridgeAddress;
+      const bridgedChainConf = await bridgedConfPromise;
+      return bridgedChainConf.bridgeAddress;
     };
 
     this.resolveEnsPublicResolverAddress = async () => {

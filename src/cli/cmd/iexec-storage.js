@@ -19,6 +19,8 @@ const {
   prompt,
   Spinner,
   getPropertyFormChain,
+  getSmsUrlFromChain,
+  optionCreator,
 } = require('../utils/cli-helper');
 const { loadChain, connectKeystore } = require('../utils/chains');
 const { Keystore } = require('../utils/keystore');
@@ -32,6 +34,7 @@ initStorage
   .option(...option.chain())
   .option(...option.forceUpdateSecret())
   .option(...option.storageToken())
+  .addOption(optionCreator.teeFramework())
   .description(desc.initStorage())
   .action(async (provider, opts) => {
     await checkUpdate(opts);
@@ -44,7 +47,9 @@ initStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getPropertyFormChain(chain, 'sms');
+      const smsURL = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const resultProxyURL = getPropertyFormChain(chain, 'resultProxy');
 
       const providerName = provider || 'default';
@@ -104,6 +109,7 @@ addWalletLoadOptions(checkStorage);
 checkStorage
   .option(...option.chain())
   .option(...option.user())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkStorage())
   .action(async (provider, opts) => {
     await checkUpdate(opts);
@@ -116,17 +122,19 @@ checkStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getPropertyFormChain(chain, 'sms');
+      const smsURL = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
-      const userAdress = opts.user || address;
+      const userAddress = opts.user || address;
       spinner.info(
-        `Checking ${providerName} storage token for user ${userAdress}`,
+        `Checking ${providerName} storage token for user ${userAddress}`,
       );
       const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
-        userAdress,
+        userAddress,
         tokenKeyName,
       );
       if (tokenExists) {

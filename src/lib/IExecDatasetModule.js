@@ -36,16 +36,23 @@ class IExecDatasetModule extends IExecModule {
       );
     this.countUserDatasets = async (address) =>
       countUserDatasets(await this.config.resolveContractsClient(), address);
-    this.checkDatasetSecretExists = async (datasetAddress) =>
+    this.checkDatasetSecretExists = async (
+      datasetAddress,
+      { teeFramework } = {},
+    ) =>
       checkWeb3SecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         datasetAddress,
       );
-    this.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
+    this.pushDatasetSecret = async (
+      datasetAddress,
+      datasetSecret,
+      { teeFramework } = {},
+    ) =>
       pushWeb3Secret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         datasetAddress,
         datasetSecret,
       );

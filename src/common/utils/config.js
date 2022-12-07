@@ -1,3 +1,5 @@
+const { TEE_FRAMEWORKS } = require('./constant');
+
 const hostMap = {
   1: 'mainnet',
   5: 'goerli',
@@ -44,14 +46,32 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: 'https://v7.sms.mainnet.iex.ec',
-    5: 'https://v7.sms.goerli.iex.ec',
-    133: 'https://v7.sms.viviani.iex.ec',
-    134: 'https://v7.sms.bellecour.iex.ec',
+    1: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.mainnet.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
+    5: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.goerli.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
+    133: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.viviani.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
+    134: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.bellecour.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
   },
   enterprise: {
-    1: 'https://v7.sms-enterprise.mainnet.iex.ec',
-    5: 'https://v7.sms-enterprise.goerli.iex.ec',
+    1: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms-enterprise.mainnet.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
+    5: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms-enterprise.goerli.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+    },
   },
 };
 
@@ -141,4 +161,5 @@ module.exports = {
   getId,
   getChainDefaults,
   isEnterpriseEnabled,
+  TEE_FRAMEWORKS,
 };

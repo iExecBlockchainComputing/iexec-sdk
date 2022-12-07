@@ -10,7 +10,7 @@ import {
 } from './types';
 import { Observable } from '../common/utils/reactive';
 
-declare class BrigdeObservable extends Observable {
+declare class BridgeObservable extends Observable {
   /**
    * subscribe and start the bridge process to transfer tokens from one chain to another until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned cancel method.
    *
@@ -66,7 +66,7 @@ declare class BrigdeObservable extends Observable {
      */
     error: (error: Error) => any;
   }): /**
-   * `cancel: () => void` method, calling this method cancels the subscribtion
+   * `cancel: () => void` method, calling this method cancels the subscription
    *
    * no callback is fired after calling this method
    */
@@ -207,7 +207,7 @@ export default class IExecWalletModule extends IExecModule {
    * });
    * ```
    */
-  obsBridgeToSidechain(nRLCAmount: NRLCAmount): Promise<BrigdeObservable>;
+  obsBridgeToSidechain(nRLCAmount: NRLCAmount): Promise<BridgeObservable>;
   /**
    * **SIGNER REQUIRED**
    *
@@ -223,7 +223,7 @@ export default class IExecWalletModule extends IExecModule {
    * });
    * ```
    */
-  obsBridgeToMainchain(nRLCAmount: NRLCAmount): Promise<BrigdeObservable>;
+  obsBridgeToMainchain(nRLCAmount: NRLCAmount): Promise<BridgeObservable>;
   /**
    * **SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
    *

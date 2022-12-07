@@ -25,7 +25,7 @@ declare class DealObservable extends Observable {
    * | message | comment |
    * | --- | --- |
    * | `DEAL_UPDATED` | sent every time a task status changes |
-   * | `DEAL_COMPLETED` | sent once all tasks are complteted |
+   * | `DEAL_COMPLETED` | sent once all tasks are completed |
    * | `DEAL_TIMEDOUT` | sent once the timeout is reached before all tasks completion |
    */
   subscribe(callbacks: {
@@ -36,7 +36,7 @@ declare class DealObservable extends Observable {
      * | message | comment |
      * | --- | --- |
      * | `DEAL_UPDATED` | sent every time a task status changes |
-     * | `DEAL_COMPLETED` | sent once all tasks are complteted |
+     * | `DEAL_COMPLETED` | sent once all tasks are completed |
      * | `DEAL_TIMEDOUT` | sent once the timeout is reached before all tasks completion |
      */
     next: (data: {
@@ -98,7 +98,7 @@ declare class DealObservable extends Observable {
      */
     error: (error: Error) => any;
   }): /**
-   * `unsubscribe: () => void` method, calling this method cancels the subscribtion
+   * `unsubscribe: () => void` method, calling this method cancels the subscription
    *
    * no callback is fired after calling this method
    */
@@ -230,7 +230,7 @@ export default class IExecDealModule extends IExecModule {
     claimed: Record<TaskIndex, Taskid>;
   }>;
   /**
-   * fetch the latest deals of the requester optionaly filtered by specified filters.
+   * fetch the latest deals of the requester optionally filtered by specified filters.
    *
    * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
    *

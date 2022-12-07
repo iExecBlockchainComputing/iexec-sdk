@@ -36,7 +36,7 @@ export class ObjectNotFoundError extends Error {
   chainId?: string;
 }
 /**
- * BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfert confirmation.
+ * BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfer confirmation.
  */
 export class BridgeError extends Error {
   sendTxHash?: string;

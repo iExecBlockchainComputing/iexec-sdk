@@ -118,8 +118,9 @@ type HumanSingleTag = string;
  *
  * example:
  * ```js
- * const onlyTeeTag = ['tee'];
- * const teePlusGpuTags = ['tee','gpu'];
+ * const gpuTag = ['gpu'];
+ * const sconeTeeTag = ['tee', 'scone'];
+ * const gramineTeeTag = ['tee', 'gramine'];
  * ```
  */
 type Tag = Bytes32 | HumanSingleTag[];
@@ -133,6 +134,11 @@ type Tag = Bytes32 | HumanSingleTag[];
  * ```
  */
 type Multiaddress = string | Buffer;
+
+/**
+ * Trusted Execution Environment name
+ */
+type TeeFramework = 'scone' | 'gramine';
 
 /**
  * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
@@ -185,5 +191,6 @@ export {
   HumanSingleTag,
   Tag,
   Multiaddress,
+  TeeFramework,
   ProviderOptions,
 };

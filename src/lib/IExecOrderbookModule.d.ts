@@ -166,7 +166,7 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       minTag?: Tag | HumanSingleTag[];
       /**
-       * filter by maximun tag accepted
+       * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
     },
@@ -207,7 +207,7 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       minTag?: Tag | HumanSingleTag[];
       /**
-       * filter by maximun tag accepted
+       * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
     },
@@ -254,7 +254,7 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     minTag?: Tag | HumanSingleTag[];
     /**
-     * filter by maximun tag offered
+     * filter by maximum tag offered
      */
     maxTag?: Tag | HumanSingleTag[];
     /**
@@ -304,7 +304,7 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     minTag?: Tag | HumanSingleTag[];
     /**
-     * filter by maximun tag accepted
+     * filter by maximum tag accepted
      */
     maxTag?: Tag | HumanSingleTag[];
     /**

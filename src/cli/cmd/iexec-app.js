@@ -15,8 +15,12 @@ const {
   paramsEncryptResultSchema,
   paramsRequesterSecretsSchema,
   nRlcAmountSchema,
+  teeFrameworkSchema,
+  datasetorderSchema,
+  apporderSchema,
+  requestorderSchema,
 } = require('../../common/utils/validator');
-const { teeApp } = require('../utils/templates');
+const { sconeTeeApp, gramineTeeApp } = require('../utils/templates');
 const {
   deployApp,
   showApp,
@@ -28,6 +32,7 @@ const {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
+  resolveTeeFrameworkFromApp,
 } = require('../../common/protocol/registries');
 const { showCategory } = require('../../common/protocol/category');
 const {
@@ -62,6 +67,7 @@ const {
   BN,
   stringifyNestedBn,
   formatRLC,
+  TAG_MAP,
 } = require('../../common/utils/utils');
 const {
   NULL_ADDRESS,
@@ -71,11 +77,15 @@ const {
   DATASET,
   APP,
   WORKERPOOL,
+  TEE_FRAMEWORKS,
 } = require('../../common/utils/constant');
-const { paramsKeyName } = require('../../common/utils/params-utils');
+const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
 const {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
+  checkDatasetRequirements,
+  resolveTeeFrameworkFromTag,
+  checkAppRequirements,
+} = require('../../common/execution/order-helper');
 const {
   finalizeCli,
   addGlobalOptions,
@@ -94,6 +104,9 @@ const {
   isEthAddress,
   renderTasksStatus,
   getPropertyFormChain,
+  getDefaultTeeFrameworkFromChain,
+  getSmsUrlFromChain,
+  optionCreator,
 } = require('../utils/cli-helper');
 const {
   loadIExecConf,
@@ -123,27 +136,44 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init.option(...option.initTee());
-init.description(desc.initObj(objName)).action(async (opts) => {
-  await checkUpdate(opts);
-  const spinner = Spinner(opts);
-  try {
-    const walletOptions = await computeWalletLoadOptions(opts);
-    const keystore = Keystore({ ...walletOptions, isSigner: false });
-    const [address] = await keystore.accounts();
-    const { saved, fileName } = await initObj(objName, {
-      overwrite: { ...(opts.tee && teeApp), owner: address },
-    });
-    spinner.succeed(
-      `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-        saved,
-      )}`,
-      { raw: { app: saved } },
-    );
-  } catch (error) {
-    handleError(error, cli, opts);
-  }
-});
+init
+  .option(...option.initTee())
+  .addOption(optionCreator.teeFramework())
+  .description(desc.initObj(objName))
+  .action(async (opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = await computeWalletLoadOptions(opts);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [address] = await keystore.accounts();
+
+      const teeFramework =
+        (await teeFrameworkSchema().validate(opts.teeFramework)) ||
+        (opts.tee &&
+          getDefaultTeeFrameworkFromChain(
+            await loadChain(opts.chain, { spinner }),
+          ));
+      let teeTemplate = {};
+      if (teeFramework === TEE_FRAMEWORKS.SCONE) {
+        teeTemplate = sconeTeeApp;
+      }
+      if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
+        teeTemplate = gramineTeeApp;
+      }
+      const { saved, fileName } = await initObj(objName, {
+        overwrite: { ...teeTemplate, owner: address },
+      });
+      spinner.succeed(
+        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+          saved,
+        )}`,
+        { raw: { app: saved } },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
 
 const deploy = cli.command('deploy');
 addGlobalOptions(deploy);
@@ -290,6 +320,7 @@ const checkSecret = cli.command('check-secret [appAddress]');
 addGlobalOptions(checkSecret);
 checkSecret
   .option(...option.chain())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -307,7 +338,12 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      const sms = getPropertyFormChain(chain, 'sms');
+      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
+      if (!teeFramework) {
+        const { app } = await showApp(chain.contracts, resourceAddress);
+        teeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      const sms = getSmsUrlFromChain(chain, { teeFramework });
       const secretIsSet = await checkAppSecretExists(
         chain.contracts,
         sms,
@@ -333,6 +369,7 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
+  .addOption(optionCreator.teeFramework())
   .description('push the app secret to the secret management service')
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -342,7 +379,6 @@ pushSecret
       const keystore = Keystore(Object.assign(walletOptions));
       const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
       await keystore.accounts();
       const resourceAddress =
         objAddress ||
@@ -355,6 +391,12 @@ pushSecret
         );
       }
       spinner.info(`App ${resourceAddress}`);
+      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
+      if (!teeFramework) {
+        const { app } = await showApp(chain.contracts, resourceAddress);
+        teeFramework = await resolveTeeFrameworkFromApp(app);
+      }
+      const sms = getSmsUrlFromChain(chain, { teeFramework });
       const secretValue =
         opts.secretValue ||
         (await prompt.password(`Paste your secret`, {
@@ -393,6 +435,7 @@ publish
   .option(...orderOption.datasetrestrict())
   .option(...orderOption.workerpoolrestrict())
   .option(...orderOption.requesterrestrict())
+  .option(...option.skipPreflightCheck())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
@@ -429,6 +472,9 @@ publish
         requesterrestrict: opts.requesterRestrict,
       };
       const orderToSign = await createApporder(chain.contracts, overrides);
+      if (!opts.skipPreflightCheck) {
+        await checkAppRequirements({ contracts: chain.contracts }, orderToSign);
+      }
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
@@ -535,7 +581,7 @@ run
   .option(...orderOption.trust())
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -649,26 +695,27 @@ run
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
-      const inputParamsResultEncrytion =
+      const inputParamsResultEncryption =
         await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
-          [paramsKeyName.IEXEC_ARGS]: inputParamsArgs,
+          [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
         }),
         ...(inputParamsInputFiles !== undefined && {
-          [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+          [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsSecrets !== undefined && {
-          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
+          [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
-        ...(inputParamsResultEncrytion !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
+        ...(inputParamsResultEncryption !== undefined && {
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]:
+            inputParamsResultEncryption,
         }),
       };
       debug('params', params);
@@ -715,7 +762,7 @@ run
           return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
-        const teeAppRequired = checkActiveBitInTag(tag, 1);
+        const teeAppRequired = checkActiveBitInTag(tag, TAG_MAP.tee);
         const { orders } = await fetchAppOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
@@ -912,11 +959,59 @@ run
           params,
         },
       );
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
+        const resolvedTag = sumTags([
+          (
+            await requestorderSchema()
+              .label('requestorder')
+              .validate(requestorderToSign)
+          ).tag,
+          (await apporderSchema().label('apporder').validate(apporder)).tag,
+          (
+            await datasetorderSchema()
+              .label('datasetorder')
+              .validate(datasetorder)
+          ).tag,
+        ]);
+        await checkAppRequirements(
+          {
+            contracts: chain.contracts,
+          },
+          apporder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `App requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
+        await checkDatasetRequirements(
+          {
+            contracts: chain.contracts,
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
+          },
+          datasetorder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `Dataset requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -924,8 +1019,8 @@ run
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }
@@ -1079,7 +1174,7 @@ requestRun
   .option(...orderOption.trust())
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.requestRun())
   .action(async (app, opts) => {
     await checkUpdate(opts);
@@ -1152,26 +1247,27 @@ requestRun
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
-      const inputParamsResultEncrytion =
+      const inputParamsResultEncryption =
         await paramsEncryptResultSchema().validate(opts.encryptResult);
 
       const params = {
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
-          [paramsKeyName.IEXEC_ARGS]: inputParamsArgs,
+          [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
         }),
         ...(inputParamsInputFiles !== undefined && {
-          [paramsKeyName.IEXEC_INPUT_FILES]: inputParamsInputFiles,
+          [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
         }),
         ...(inputParamsSecrets !== undefined && {
-          [paramsKeyName.IEXEC_SECRETS]: inputParamsSecrets,
+          [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: inputParamsSecrets,
         }),
         ...(inputParamsStorageProvider !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]:
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]:
             inputParamsStorageProvider,
         }),
-        ...(inputParamsResultEncrytion !== undefined && {
-          [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: inputParamsResultEncrytion,
+        ...(inputParamsResultEncryption !== undefined && {
+          [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]:
+            inputParamsResultEncryption,
         }),
       };
       debug('params', params);
@@ -1218,11 +1314,11 @@ requestRun
           params,
         },
       );
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -1230,8 +1326,8 @@ requestRun
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }
