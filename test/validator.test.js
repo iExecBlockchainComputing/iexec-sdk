@@ -1241,18 +1241,23 @@ describe('[mrenclaveSchema]', () => {
 });
 
 describe('[ensLabelSchema]', () => {
-  test('unicode', async () => {
-    const res = await ensLabelSchema().validate('a@α');
-    expect(res).toBe('a@α');
+  test('valid', async () => {
+    await expect(ensLabelSchema().validate('a')).resolves.toBe('a');
+    await expect(ensLabelSchema().validate('🦄')).resolves.toBe('🦄');
+    await expect(ensLabelSchema().validate('a-b')).resolves.toBe('a-b');
+    await expect(ensLabelSchema().validate('α')).resolves.toBe('α');
   });
   test('throw with uppercase', async () => {
-    await expect(ensLabelSchema().validate('A@α')).rejects.toThrow(
-      'A@α is not a valid ENS label (label cannot contain uppercase characters)',
+    await expect(ensLabelSchema().validate('A')).rejects.toThrow(
+      'A is not a valid ENS label (label cannot contain uppercase characters)',
     );
   });
-  test('throw with unicode unsupported', async () => {
-    await expect(ensLabelSchema().validate('🦄&🦄')).rejects.toThrow(
-      '🦄&🦄 is not a valid ENS label (label cannot contain unsupported characters)',
+  test('throw with unsupported characters', async () => {
+    await expect(ensLabelSchema().validate('&')).rejects.toThrow(
+      '& is not a valid ENS label (label cannot contain unsupported characters)',
+    );
+    await expect(ensLabelSchema().validate('@')).rejects.toThrow(
+      '@ is not a valid ENS label (label cannot contain unsupported characters)',
     );
   });
   test('throw with dot', async () => {
@@ -1263,20 +1268,25 @@ describe('[ensLabelSchema]', () => {
 });
 
 describe('[ensDomainSchema]', () => {
-  test('unicode', async () => {
-    const res = await ensDomainSchema().validate('foo.a@α.bar.eth');
-    expect(res).toBe('foo.a@α.bar.eth');
+  test('valid', async () => {
+    await expect(ensDomainSchema().validate('foo.a-b.bar.eth')).resolves.toBe(
+      'foo.a-b.bar.eth',
+    );
+    await expect(
+      ensDomainSchema().validate('foo.🦄🦄🦄.bar.eth'),
+    ).resolves.toBe('foo.🦄🦄🦄.bar.eth');
   });
   test('throw with uppercase', async () => {
-    await expect(ensDomainSchema().validate('foo.A@α.bar.eth')).rejects.toThrow(
-      'foo.A@α.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
+    await expect(ensDomainSchema().validate('foo.Abc.bar.eth')).rejects.toThrow(
+      'foo.Abc.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
     );
   });
-  test('throw with unicode unsupported', async () => {
-    await expect(
-      ensDomainSchema().validate('foo.🦄&🦄.bar.eth'),
-    ).rejects.toThrow(
-      'foo.🦄&🦄.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
+  test('throw with unsupported characters', async () => {
+    await expect(ensDomainSchema().validate('foo.a&b.bar.eth')).rejects.toThrow(
+      'foo.a&b.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
+    );
+    await expect(ensDomainSchema().validate('foo.a@a.bar.eth')).rejects.toThrow(
+      'foo.a@a.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
     );
   });
   test('throw with empty labels', async () => {
