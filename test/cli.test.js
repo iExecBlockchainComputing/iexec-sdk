@@ -3449,7 +3449,7 @@ describe('[Common]', () => {
   describe('[wallet]', () => {
     let importedWalletName;
     let localWalletFileName;
-    const ensLabel = `ens_${getId()}`;
+    const ensLabel = `ens-${getId()}`;
 
     beforeAll(async () => {
       await execAsync('rm wallet.json').catch(() => {});

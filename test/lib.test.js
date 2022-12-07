@@ -8873,7 +8873,7 @@ describe('[ens]', () => {
         ensPublicResolverAddress,
       },
     );
-    const label = `ens_${getId()}`;
+    const label = `ens-${getId()}`;
     const domain = 'users.iexec.eth';
     const name = `${label}.${domain}`;
     await iexec.ens.claimName(label, domain);
@@ -8953,7 +8953,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const label = `wallet-${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     const res = await iexec.ens.claimName(label);
 
@@ -8995,7 +8995,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const label = `wallet-${wallet.address.toLowerCase()}`;
     const domain = 'iexec.eth';
     const name = `${label}.${domain}`;
     const res = await iexec.ens.claimName(label, domain);
@@ -9117,7 +9117,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const label = `wallet-${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9169,7 +9169,7 @@ describe('[ens]', () => {
 
     const app1 = await deployRandomApp(iexec);
 
-    const label = `address_${wallet.address.toLowerCase()}`;
+    const label = `address-${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9246,7 +9246,7 @@ describe('[ens]', () => {
     );
 
     const app = await deployRandomApp(iexec, { owner: getRandomAddress() });
-    const label = `address_${app.address.toLowerCase()}`;
+    const label = `address-${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9273,7 +9273,7 @@ describe('[ens]', () => {
     );
 
     const address = getRandomAddress();
-    const label = `address_${address.toLowerCase()}`;
+    const label = `address-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9315,7 +9315,7 @@ describe('[ens]', () => {
     );
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
-    const label = `wallet_${wallet.address.toLowerCase()}`;
+    const label = `wallet-${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9379,7 +9379,7 @@ describe('[ens]', () => {
 
     const app2 = await deployRandomApp(iexec);
 
-    const label = `address_${wallet.address.toLowerCase()}`;
+    const label = `address-${wallet.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9490,7 +9490,7 @@ describe('[ens]', () => {
     const app = await deployRandomApp(iexec, {
       owner: getRandomAddress(),
     });
-    const label = `address_${app.address.toLowerCase()}`;
+    const label = `address-${app.address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9540,7 +9540,7 @@ describe('[ens]', () => {
     );
 
     const address = getRandomAddress();
-    const label = `address_${address.toLowerCase()}`;
+    const label = `address-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
 
@@ -9683,7 +9683,7 @@ describe('[ens]', () => {
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
     const { address } = await deployRandomWorkerpool(iexec);
-    const label = `workerpool_${address.toLowerCase()}`;
+    const label = `workerpool-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
     await iexec.ens.configureResolution(name, address);
@@ -9726,7 +9726,7 @@ describe('[ens]', () => {
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
     const { address } = await deployRandomWorkerpool(iexec);
-    const label = `workerpool_${address.toLowerCase()}`;
+    const label = `workerpool-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await iexec.ens.claimName(label);
     await iexec.ens.configureResolution(name, address);
@@ -9749,7 +9749,7 @@ describe('[ens]', () => {
       },
     );
     const address = getRandomAddress();
-    const label = `address_${address.toLowerCase()}`;
+    const label = `address-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     await expect(iexec.ens.readTextRecord(name, 'key')).rejects.toThrow(
       Error(`No resolver is configured for ${name}`),
@@ -9827,7 +9827,7 @@ describe('[ens]', () => {
     await richIexec.wallet.sendETH('0.1 ether', wallet.address);
 
     const { address } = await deployRandomWorkerpool(iexec);
-    const label = `workerpool_${address.toLowerCase()}`;
+    const label = `workerpool-${address.toLowerCase()}`;
     const name = `${label}.users.iexec.eth`;
     const key = `key_${getId()}`;
     const value = `value_${getId()}`;
