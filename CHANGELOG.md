@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 
 - [BREAKING] viviani is no longer available in the default configuration
 - [BREAKING] goerli is no longer available in the default configuration
+- [BREAKING] removed now useless faucet commands `iexec wallet get-RLC` and `iexec wallet get-ether`
 
 ## [7.2.2] 2022-09-05
 
