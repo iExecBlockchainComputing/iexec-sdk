@@ -10,44 +10,53 @@ IExec app
 
 ### Properties
 
-- [checksum](internal_.App.md#checksum)
-- [mrenclave](internal_.App.md#mrenclave)
-- [multiaddr](internal_.App.md#multiaddr)
-- [name](internal_.App.md#name)
+- [appChecksum](internal_.App.md#appchecksum)
+- [appMrenclave](internal_.App.md#appmrenclave)
+- [appMultiaddr](internal_.App.md#appmultiaddr)
+- [appName](internal_.App.md#appname)
+- [appType](internal_.App.md#apptype)
 - [owner](internal_.App.md#owner)
-- [type](internal_.App.md#type)
+- [registry](internal_.App.md#registry)
 
 ## Properties
 
-### checksum
+### appChecksum
 
-• **checksum**: `string`
+• **appChecksum**: `string`
 
 app image digest
 
 ___
 
-### mrenclave
+### appMrenclave
 
-• `Optional` **mrenclave**: `string` \| { `entrypoint`: `string` ; `fingerprint`: `string` ; `framework`: ``"SCONE"`` \| ``"GRAMINE"`` ; `heapSize`: `number` ; `version`: `string`  }
+• **appMrenclave**: `string` \| { `entrypoint`: `string` ; `fingerprint`: `string` ; `framework`: ``"SCONE"`` \| ``"GRAMINE"`` ; `heapSize`: `number` ; `version`: `string`  }
 
-optional for TEE apps only, specify the TEE protocol to use
+for TEE apps only, specify the TEE protocol to use
 
 ___
 
-### multiaddr
+### appMultiaddr
 
-• **multiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
+• **appMultiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
 
 app image address
 
 ___
 
-### name
+### appName
 
-• **name**: `string`
+• **appName**: `string`
 
 a name for the app
+
+___
+
+### appType
+
+• **appType**: `string`
+
+only 'DOCKER' is supported
 
 ___
 
@@ -59,8 +68,8 @@ the app owner
 
 ___
 
-### type
+### registry
 
-• **type**: `string`
+• **registry**: `string`
 
-only 'DOCKER' is supported
+app registry address

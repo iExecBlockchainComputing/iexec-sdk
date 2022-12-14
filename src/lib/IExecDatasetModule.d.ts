@@ -41,15 +41,19 @@ export interface Dataset {
   /**
    * a name for the dataset
    */
-  name: string;
+  datasetName: string;
   /**
    * dataset file download address
    */
-  multiaddr: Multiaddress;
+  datasetMultiaddr: Multiaddress;
   /**
    * sha256sum of the file
    */
-  checksum: Bytes32;
+  datasetChecksum: Bytes32;
+  /**
+   * dataset registry address
+   */
+  registry: Address;
 }
 
 /**

@@ -69,23 +69,23 @@ export interface App {
   /**
    * a name for the app
    */
-  name: string;
+  appName: string;
   /**
    * only 'DOCKER' is supported
    */
-  type: string;
+  appType: string;
   /**
    * app image address
    */
-  multiaddr: Multiaddress;
+  appMultiaddr: Multiaddress;
   /**
    * app image digest
    */
-  checksum: Bytes32;
+  appChecksum: Bytes32;
   /**
-   * optional for TEE apps only, specify the TEE protocol to use
+   * for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?:
+  appMrenclave:
     | string
     | {
         framework: 'SCONE' | 'GRAMINE';
@@ -94,6 +94,10 @@ export interface App {
         heapSize: number;
         fingerprint: string;
       };
+  /**
+   * app registry address
+   */
+  registry: Address;
 }
 
 /**

@@ -29,6 +29,12 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
 - [BREAKING] `--skip-request-check` option is replaced by ``--skip-preflight-check`
 
+## [7.2.3] 2022-12-14
+
+### Changed
+
+- TypeScript fixes
+
 ## [7.2.2] 2022-09-05
 
 ### Changed
