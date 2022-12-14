@@ -10,32 +10,33 @@ IExec dataset
 
 ### Properties
 
-- [checksum](internal_.Dataset.md#checksum)
-- [multiaddr](internal_.Dataset.md#multiaddr)
-- [name](internal_.Dataset.md#name)
+- [datasetChecksum](internal_.Dataset.md#datasetchecksum)
+- [datasetMultiaddr](internal_.Dataset.md#datasetmultiaddr)
+- [datasetName](internal_.Dataset.md#datasetname)
 - [owner](internal_.Dataset.md#owner)
+- [registry](internal_.Dataset.md#registry)
 
 ## Properties
 
-### checksum
+### datasetChecksum
 
-• **checksum**: `string`
+• **datasetChecksum**: `string`
 
 sha256sum of the file
 
 ___
 
-### multiaddr
+### datasetMultiaddr
 
-• **multiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
+• **datasetMultiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
 
 dataset file download address
 
 ___
 
-### name
+### datasetName
 
-• **name**: `string`
+• **datasetName**: `string`
 
 a name for the dataset
 
@@ -46,3 +47,11 @@ ___
 • **owner**: `string`
 
 the dataset owner
+
+___
+
+### registry
+
+• **registry**: `string`
+
+dataset registry address

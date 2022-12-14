@@ -24,7 +24,13 @@ export interface Workerpool {
   /**
    * a description of the workerpool
    */
-  description: string;
+  workerpoolDescription: string;
+  schedulerRewardRatioPolicy: BN;
+  workerStakeRatioPolicy: BN;
+  /**
+   * workerpool registry address
+   */
+  registry: Address;
 }
 
 /**

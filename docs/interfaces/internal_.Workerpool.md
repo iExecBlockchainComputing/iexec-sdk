@@ -10,21 +10,44 @@ IExec workerpool
 
 ### Properties
 
-- [description](internal_.Workerpool.md#description)
 - [owner](internal_.Workerpool.md#owner)
+- [registry](internal_.Workerpool.md#registry)
+- [schedulerRewardRatioPolicy](internal_.Workerpool.md#schedulerrewardratiopolicy)
+- [workerStakeRatioPolicy](internal_.Workerpool.md#workerstakeratiopolicy)
+- [workerpoolDescription](internal_.Workerpool.md#workerpooldescription)
 
 ## Properties
-
-### description
-
-• **description**: `string`
-
-a description of the workerpool
-
-___
 
 ### owner
 
 • **owner**: `string`
 
 the workerpool owner
+
+___
+
+### registry
+
+• **registry**: `string`
+
+workerpool registry address
+
+___
+
+### schedulerRewardRatioPolicy
+
+• **schedulerRewardRatioPolicy**: `BN`
+
+___
+
+### workerStakeRatioPolicy
+
+• **workerStakeRatioPolicy**: `BN`
+
+___
+
+### workerpoolDescription
+
+• **workerpoolDescription**: `string`
+
+a description of the workerpool
