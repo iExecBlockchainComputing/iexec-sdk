@@ -68,23 +68,27 @@ export interface App {
   /**
    * a name for the app
    */
-  name: string;
+  appName: string;
   /**
    * only 'DOCKER' is supported
    */
-  type: string;
+  appType: string;
   /**
    * app image address
    */
-  multiaddr: Multiaddress;
+  appMultiaddr: Multiaddress;
   /**
    * app image digest
    */
-  checksum: Bytes32;
+  appChecksum: Bytes32;
   /**
-   * optional for TEE apps only, specify the TEE protocol to use
+   * for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: string;
+  appMrenclave: string;
+  /**
+   * app registry address
+   */
+  registry: Address;
 }
 
 /**
