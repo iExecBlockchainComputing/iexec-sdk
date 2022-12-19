@@ -64,12 +64,11 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet get-RLC # ask iExec faucet for RLC
 iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+> _NB:_ iExec SDK CLI access the public blockchain (mainnet) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
 > Default API keys for backend services are provided for convenience.
 > As these keys are shared accross all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
@@ -107,10 +106,6 @@ iexec storage init # initialize your remote storage
 >       "mainnet": {
 >         "id": "1",
 >         "host": "http://localhost:8545"
->       },
->       "goerli": {
->         "id": "5",
->         "host": "http://localhost:58545"
 >       }
 >    }
 > }
@@ -312,7 +307,7 @@ iexec --version
 iexec --help
 iexec app --help
 iexec orderbook --help
-iexec info --chain viviani
+iexec info --chain bellecour
 ```
 
 ## Global options
@@ -356,8 +351,6 @@ iexec init --skip-wallet # skip the wallet creation step
 iexec wallet create # create a new encrypted wallet
 iexec wallet create --unencrypted # create unencrypted wallet.json (not recommended)
 iexec wallet import <privateKey> # create an encrypted wallet from a privateKey
-iexec wallet get-ETH # ask ETH from faucets
-iexec wallet get-RLC # ask RLC from faucets
 iexec wallet show [address] # optional address to show other people's wallet
 iexec wallet show --show-private-key # allow displaying wallet private key
 iexec wallet send-ether <amount> [unit] --to <address> # send ether amount (in ether or specified unit) to the specified eth address
@@ -721,7 +714,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ```json
 {
-  "default": "viviani",
+  "default": "bellecour",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
@@ -772,8 +765,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
         "enterpriseSwapChainName": "dev"
       }
     },
-    "goerli": {},
-    "viviani": {},
     "mainnet": {},
     "bellecour": {},
     "enterprise": {}

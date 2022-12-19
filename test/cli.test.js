@@ -22,9 +22,6 @@ console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 const mainnetHost = INFURA_PROJECT_ID
   ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
   : 'mainnet';
-const goerliHost = INFURA_PROJECT_ID
-  ? `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-  : 'goerli';
 // 1 block / tx
 const tokenChainUrl = DRONE
   ? 'http://token-chain:8545'
@@ -4483,7 +4480,6 @@ describe('[Common]', () => {
               ...(obj.chains && obj.chains.mainnet),
               host: mainnetHost,
             },
-            goerli: { ...(obj.chains && obj.chains.goerli), host: goerliHost },
           },
         };
         saveJSONToFile(chainJson, 'chain.json');
@@ -4492,7 +4488,6 @@ describe('[Common]', () => {
 
     test('no "native" overwrites in templates', async () => {
       const { chains } = await loadJSONFile('chain.json');
-      expect(chains.goerli.native).toBeUndefined();
       expect(chains.mainnet.native).toBeUndefined();
       expect(chains.bellecour.native).toBeUndefined();
     });
@@ -4502,20 +4497,6 @@ describe('[Common]', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.useNative).toBe(false);
-    });
-
-    test('goerli is not native', async () => {
-      const raw = await execAsync(`${iexecPath} info --chain goerli --raw`);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.useNative).toBe(false);
-    });
-
-    test('viviani is native', async () => {
-      const raw = await execAsync(`${iexecPath} info --chain viviani --raw`);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.useNative).toBe(true);
     });
 
     test('bellecour is native', async () => {
@@ -4564,7 +4545,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).rejects.toThrow();
         await saveJSONToFile(
           {
@@ -4574,7 +4557,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).resolves.toBeDefined();
 
         await saveJSONToFile(
@@ -4585,7 +4570,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).rejects.toThrow();
         await saveJSONToFile(
           {
@@ -4595,7 +4582,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).resolves.toBeDefined();
 
         await saveJSONToFile(
@@ -4606,7 +4595,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).rejects.toThrow();
         await saveJSONToFile(
           {
@@ -4616,7 +4607,9 @@ describe('[Common]', () => {
           'chain.json',
         );
         await expect(
-          execAsync(`${iexecPath} wallet show ${ADDRESS} --chain goerli --raw`),
+          execAsync(
+            `${iexecPath} wallet show ${ADDRESS} --chain mainnet --raw`,
+          ),
         ).resolves.toBeDefined();
       },
       DEFAULT_TIMEOUT * 2,
