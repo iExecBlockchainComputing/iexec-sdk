@@ -36,6 +36,12 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] goerli is no longer available in the default configuration
 - [BREAKING] removed now useless faucet commands `iexec wallet get-RLC` and `iexec wallet get-ether`
 
+## [7.2.4] 2023-01-12
+
+### Changed
+
+- fix `iexec orderbook` raw pagination
+
 ## [7.2.3] 2022-12-14
 
 ### Changed

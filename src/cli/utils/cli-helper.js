@@ -958,6 +958,7 @@ const displayPaginableRequest = async (
             processResponse,
             createResultsMessage,
             spinner,
+            raw,
           },
           { results, count },
         );
