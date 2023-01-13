@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.4] 2023-01-12
+
+### Changed
+
+- fix `iexec orderbook` raw pagination
+
 ## [7.2.3] 2022-12-14
 
 ### Changed
