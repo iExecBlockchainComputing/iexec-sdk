@@ -48,14 +48,14 @@ const jsonDocToMd = (jsonDoc) => {
 
   const sanitizeStringForMd = (str) =>
     str
-      .replaceAll('_', '\\_')
-      .replaceAll('*', '\\*')
-      .replaceAll('<', '\\<')
-      .replaceAll('>', '\\>')
-      .replaceAll('[', '\\[')
-      .replaceAll(']', '\\]')
-      .replaceAll('|', '\\|')
-      .replaceAll(EOL, '<br/>');
+      .replace(/_/g, '\\_')
+      .replace(/\*/g, '\\*')
+      .replace(/</g, '\\<')
+      .replace(/>/g, '\\>')
+      .replace(/\[/g, '\\[')
+      .replace(/\]/g, '\\]')
+      .replace(/\|/g, '\\|')
+      .replace(/\n/g, '<br/>');
 
   const getMdTable = (dataArray, headers) => {
     let mdTable = `| ${headers
