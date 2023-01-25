@@ -130,4 +130,5 @@ const jsonDocToMd = (jsonDoc) => {
     fsPromises.readFile(DOC_TEMPLATE, { encoding: 'utf8' }),
   ]);
   await fsPromises.writeFile(DOC_OUT, template.replace(PLACEHOLDER, generated));
+  console.log(`generated ${CMD} CLI doc in ${DOC_OUT}`);
 })();
