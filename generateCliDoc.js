@@ -96,12 +96,16 @@ const jsonDocToMd = (jsonDoc) => {
   const createMdDoc = ({
     // name,
     fullName,
+    alias,
     description,
     options,
     subCommands,
   }) => {
     let mdDoc = '';
     mdDoc += getMdHeader(fullName, { level: fullName.split(' ').length });
+    if (alias) {
+      mdDoc += `_Alias: ${sanitizeStringForMd(alias)}_${EOL}${EOL}`;
+    }
     if (description) {
       mdDoc += `${sanitizeStringForMd(description)}${EOL}${EOL}`;
     }

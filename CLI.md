@@ -401,6 +401,8 @@ Options:
 
 #### iexec wallet get-ether
 
+_Alias: getETH_
+
 apply for test ether from pre-registered faucets
 
 Options:
@@ -432,6 +434,8 @@ Options:
 | --chain \<name\> | chain name from "chain.json" |
 
 #### iexec wallet send-ether
+
+_Alias: sendETH_
 
 send ether to an address (default unit ether)
 
@@ -1653,6 +1657,8 @@ Commands:
 
 #### iexec result generate-encryption-keypair
 
+_Alias: generate-keys_
+
 generate a beneficiary key pair to encrypt and decrypt the results
 
 Options:
@@ -1688,6 +1694,8 @@ Options:
 
 #### iexec result push-encryption-key
 
+_Alias: push-secret_
+
 push the public encryption key to the secret management service
 
 Options:
@@ -1705,6 +1713,8 @@ Options:
 | --secret-path \<secretPath\> | push the secret from a file |
 
 #### iexec result check-encryption-key
+
+_Alias: check-secret_
 
 check if a secret exists in the secret management service
 
