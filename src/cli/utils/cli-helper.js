@@ -30,7 +30,7 @@ const finalizeCli = (cli) => {
         options: processOptions(cli.options),
         subCommands: cli.commands.map((x) => ({
           name: x.name(),
-          alias: cli.alias(),
+          alias: x.alias(),
           description: x.description() || undefined,
           options: processOptions(x.options),
         })),
