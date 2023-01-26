@@ -22,16 +22,25 @@ const finalizeCli = (cli) => {
         flags: o.flags,
         description: o.description,
       }));
-
+    const getUsage = (cmd) => {
+      const OPTIONS = '[options]';
+      const usage = cmd.usage();
+      if (!usage.includes(OPTIONS)) {
+        return usage;
+      }
+      return `${usage.replace(OPTIONS, '').trim()} ${OPTIONS}`.trim();
+    };
     console.log(
       JSON.stringify({
         name: cli.name(),
         description: cli.description() || undefined,
+        usage: getUsage(cli),
         options: processOptions(cli.options),
         subCommands: cli.commands.map((x) => ({
           name: x.name(),
           alias: x.alias(),
           description: x.description() || undefined,
+          usage: getUsage(x),
           options: processOptions(x.options),
         })),
       }),

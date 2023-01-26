@@ -98,6 +98,7 @@ const jsonDocToMd = (jsonDoc) => {
     fullName,
     alias,
     description,
+    usage,
     options,
     subCommands,
   }) => {
@@ -108,6 +109,10 @@ const jsonDocToMd = (jsonDoc) => {
     }
     if (description) {
       mdDoc += `${sanitizeStringForMd(description)}${EOL}${EOL}`;
+    }
+    if (usage) {
+      mdDoc += `Usage:${EOL}${EOL}`;
+      mdDoc += `\`\`\`sh${EOL}${fullName} ${usage}${EOL}\`\`\`${EOL}${EOL}`;
     }
     if (options && options.length > 0) {
       mdDoc += `Options:${EOL}${EOL}`;

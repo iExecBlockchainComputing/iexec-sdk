@@ -290,6 +290,12 @@ iexec account withdraw 1000 # withdraw RLC from your account to your wallet
 
 iExec SDK
 
+Usage:
+
+```sh
+iexec [command] [options]
+```
+
 Options:
 
 | option | description |
@@ -320,6 +326,12 @@ Commands:
 
 init a new project
 
+Usage:
+
+```sh
+iexec init [options]
+```
+
 Options:
 
 | option | description |
@@ -335,6 +347,12 @@ Options:
 ### iexec wallet
 
 manage local ethereum wallet
+
+Usage:
+
+```sh
+iexec wallet <command> [options]
+```
 
 Commands:
 
@@ -356,6 +374,12 @@ Commands:
 
 create a new wallet
 
+Usage:
+
+```sh
+iexec wallet create [options]
+```
+
 Options:
 
 | option | description |
@@ -371,6 +395,12 @@ Options:
 
 import a wallet from an ethereum private key
 
+Usage:
+
+```sh
+iexec wallet import <privateKey> [options]
+```
+
 Options:
 
 | option | description |
@@ -385,6 +415,12 @@ Options:
 #### iexec wallet show
 
 show address wallet details
+
+Usage:
+
+```sh
+iexec wallet show [address] [options]
+```
 
 Options:
 
@@ -405,6 +441,12 @@ _Alias: getETH_
 
 apply for test ether from pre-registered faucets
 
+Usage:
+
+```sh
+iexec wallet get-ether [options]
+```
+
 Options:
 
 | option | description |
@@ -420,6 +462,12 @@ Options:
 #### iexec wallet get-RLC
 
 apply for test RLC from iExec faucet
+
+Usage:
+
+```sh
+iexec wallet get-RLC [options]
+```
 
 Options:
 
@@ -438,6 +486,12 @@ Options:
 _Alias: sendETH_
 
 send ether to an address (default unit ether)
+
+Usage:
+
+```sh
+iexec wallet send-ether <amount> [unit] [options]
+```
 
 Options:
 
@@ -459,6 +513,12 @@ Options:
 
 send RLC to an address (default unit RLC)
 
+Usage:
+
+```sh
+iexec wallet send-RLC <amount> [unit] [options]
+```
+
 Options:
 
 | option | description |
@@ -478,6 +538,12 @@ Options:
 #### iexec wallet sweep
 
 send all ether and RLC to an address
+
+Usage:
+
+```sh
+iexec wallet sweep [options]
+```
 
 Options:
 
@@ -499,6 +565,12 @@ Options:
 
 send RLC from the mainchain to the sidechain (default unit nRLC)
 
+Usage:
+
+```sh
+iexec wallet bridge-to-sidechain <amount> [unit] [options]
+```
+
 Options:
 
 | option | description |
@@ -517,6 +589,12 @@ Options:
 #### iexec wallet bridge-to-mainchain
 
 send RLC from the sidechain to the mainchain (default unit nRLC)
+
+Usage:
+
+```sh
+iexec wallet bridge-to-mainchain <amount> [unit] [options]
+```
 
 Options:
 
@@ -537,6 +615,12 @@ Options:
 
 swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC
 
+Usage:
+
+```sh
+iexec wallet swap-RLC-for-eRLC <amount> [unit] [options]
+```
+
 Options:
 
 | option | description |
@@ -556,6 +640,12 @@ Options:
 
 swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC
 
+Usage:
+
+```sh
+iexec wallet swap-eRLC-for-RLC <amount> [unit] [options]
+```
+
 Options:
 
 | option | description |
@@ -574,6 +664,12 @@ Options:
 #### iexec wallet sendRLC
 
 \[DEPRECATED see send-RLC\] send RLC to an address (WARNING! default unit nRLC)
+
+Usage:
+
+```sh
+iexec wallet sendRLC <amount> [unit] [options]
+```
 
 Options:
 
@@ -595,6 +691,12 @@ Options:
 
 manage iExec account
 
+Usage:
+
+```sh
+iexec account <command> [options]
+```
+
 Commands:
 
 - [deposit](#iexec-account-deposit)
@@ -604,6 +706,12 @@ Commands:
 #### iexec account deposit
 
 deposit RLC onto your iExec account (default unit nRLC)
+
+Usage:
+
+```sh
+iexec account deposit <amount> [unit] [options]
+```
 
 Options:
 
@@ -623,6 +731,12 @@ Options:
 
 withdraw RLC from your iExec account (default unit nRLC)
 
+Usage:
+
+```sh
+iexec account withdraw <amount> [unit] [options]
+```
+
 Options:
 
 | option | description |
@@ -641,6 +755,12 @@ Options:
 
 show account iExec details
 
+Usage:
+
+```sh
+iexec account show [address] [options]
+```
+
 Options:
 
 | option | description |
@@ -656,6 +776,12 @@ Options:
 ### iexec app
 
 manage iExec apps
+
+Usage:
+
+```sh
+iexec app <command> [options]
+```
 
 Commands:
 
@@ -674,6 +800,12 @@ Commands:
 
 init a new app
 
+Usage:
+
+```sh
+iexec app init [options]
+```
+
 Options:
 
 | option | description |
@@ -689,6 +821,12 @@ Options:
 #### iexec app deploy
 
 deploy a new app
+
+Usage:
+
+```sh
+iexec app deploy [options]
+```
 
 Options:
 
@@ -708,6 +846,12 @@ Options:
 
 show user app details
 
+Usage:
+
+```sh
+iexec app show [addressOrIndex] [options]
+```
+
 Options:
 
 | option | description |
@@ -724,6 +868,12 @@ Options:
 #### iexec app count
 
 get user app count
+
+Usage:
+
+```sh
+iexec app count [options]
+```
 
 Options:
 
@@ -742,6 +892,12 @@ Options:
 
 check if a secret exists in the secret management service
 
+Usage:
+
+```sh
+iexec app check-secret [appAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -753,6 +909,12 @@ Options:
 #### iexec app push-secret
 
 push the app secret to the secret management service
+
+Usage:
+
+```sh
+iexec app push-secret [appAddress] [options]
+```
 
 Options:
 
@@ -770,6 +932,12 @@ Options:
 #### iexec app publish
 
 publish a apporder on the marketplace to make the app publicly available (use options to set custom usage restriction)
+
+Usage:
+
+```sh
+iexec app publish [appAddress] [options]
+```
 
 Options:
 
@@ -794,6 +962,12 @@ Options:
 
 unpublish last published apporder for from the marketplace
 
+Usage:
+
+```sh
+iexec app unpublish [appAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -811,6 +985,12 @@ Options:
 #### iexec app run
 
 run an iExec application at market price (default run last deployed app)
+
+Usage:
+
+```sh
+iexec app run [appAddress] [options]
+```
 
 Options:
 
@@ -845,6 +1025,12 @@ Options:
 #### iexec app request-execution
 
 request an iExec application execution at limit price
+
+Usage:
+
+```sh
+iexec app request-execution <appAddress> [options]
+```
 
 Options:
 
@@ -881,6 +1067,12 @@ Options:
 
 manage iExec datasets
 
+Usage:
+
+```sh
+iexec dataset <command> [options]
+```
+
 Commands:
 
 - [init](#iexec-dataset-init)
@@ -896,6 +1088,12 @@ Commands:
 #### iexec dataset init
 
 init a new dataset
+
+Usage:
+
+```sh
+iexec dataset init [options]
+```
 
 Options:
 
@@ -917,6 +1115,12 @@ Options:
 
 deploy a new dataset
 
+Usage:
+
+```sh
+iexec dataset deploy [options]
+```
+
 Options:
 
 | option | description |
@@ -935,6 +1139,12 @@ Options:
 
 show user dataset details
 
+Usage:
+
+```sh
+iexec dataset show [addressOrIndex] [options]
+```
+
 Options:
 
 | option | description |
@@ -951,6 +1161,12 @@ Options:
 #### iexec dataset count
 
 get user dataset count
+
+Usage:
+
+```sh
+iexec dataset count [options]
+```
 
 Options:
 
@@ -969,6 +1185,12 @@ Options:
 
 for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum
 
+Usage:
+
+```sh
+iexec dataset encrypt [options]
+```
+
 Options:
 
 | option | description |
@@ -983,6 +1205,12 @@ Options:
 #### iexec dataset push-secret
 
 push the dataset secret to the secret management service (default push the last secret generated, use --secret-path \<secretPath\> to overwrite)
+
+Usage:
+
+```sh
+iexec dataset push-secret [datasetAddress] [options]
+```
 
 Options:
 
@@ -1001,6 +1229,12 @@ Options:
 
 check if a secret exists in the secret management service
 
+Usage:
+
+```sh
+iexec dataset check-secret [datasetAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -1012,6 +1246,12 @@ Options:
 #### iexec dataset publish
 
 publish a datasetorder on the marketplace to make the dataset publicly available (use options to set custom usage restriction)
+
+Usage:
+
+```sh
+iexec dataset publish [datasetAddress] [options]
+```
 
 Options:
 
@@ -1036,6 +1276,12 @@ Options:
 
 unpublish last published datasetorder for from the marketplace
 
+Usage:
+
+```sh
+iexec dataset unpublish [datasetAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -1054,6 +1300,12 @@ Options:
 
 manage iExec workerpools
 
+Usage:
+
+```sh
+iexec workerpool <command> [options]
+```
+
 Commands:
 
 - [init](#iexec-workerpool-init)
@@ -1067,6 +1319,12 @@ Commands:
 #### iexec workerpool init
 
 init a new workerpool
+
+Usage:
+
+```sh
+iexec workerpool init [options]
+```
 
 Options:
 
@@ -1082,6 +1340,12 @@ Options:
 #### iexec workerpool deploy
 
 deploy a new workerpool
+
+Usage:
+
+```sh
+iexec workerpool deploy [options]
+```
 
 Options:
 
@@ -1101,6 +1365,12 @@ Options:
 
 declare the workerpool API URL on the blockchain
 
+Usage:
+
+```sh
+iexec workerpool set-api-url <apiUrl> [workerpoolAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -1119,6 +1389,12 @@ Options:
 
 show user workerpool details
 
+Usage:
+
+```sh
+iexec workerpool show [addressOrIndex] [options]
+```
+
 Options:
 
 | option | description |
@@ -1136,6 +1412,12 @@ Options:
 
 get user workerpool count
 
+Usage:
+
+```sh
+iexec workerpool count [options]
+```
+
 Options:
 
 | option | description |
@@ -1152,6 +1434,12 @@ Options:
 #### iexec workerpool publish
 
 publish a workerpoolorder on the marketplace to make the workerpool publicly available (use options to set custom usage restriction)
+
+Usage:
+
+```sh
+iexec workerpool publish [workerpoolAddress] [options]
+```
 
 Options:
 
@@ -1178,6 +1466,12 @@ Options:
 
 unpublish last published workerpoolorder for from the marketplace
 
+Usage:
+
+```sh
+iexec workerpool unpublish [workerpoolAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -1196,6 +1490,12 @@ Options:
 
 commands for the requester
 
+Usage:
+
+```sh
+iexec requester <command> [options]
+```
+
 Commands:
 
 - [push-secret](#iexec-requester-push-secret)
@@ -1204,6 +1504,12 @@ Commands:
 #### iexec requester push-secret
 
 push a requester named secret to the secret management service
+
+Usage:
+
+```sh
+iexec requester push-secret <secretName> [options]
+```
 
 Options:
 
@@ -1222,6 +1528,12 @@ Options:
 
 check if a secret exists in the secret management service
 
+Usage:
+
+```sh
+iexec requester check-secret <secretName> [requesterAddress] [options]
+```
+
 Options:
 
 | option | description |
@@ -1238,6 +1550,12 @@ Options:
 
 manage iExec marketplace orders
 
+Usage:
+
+```sh
+iexec order <command> [options]
+```
+
 Commands:
 
 - [init](#iexec-order-init)
@@ -1251,6 +1569,12 @@ Commands:
 #### iexec order init
 
 init a new order
+
+Usage:
+
+```sh
+iexec order init [options]
+```
 
 Options:
 
@@ -1271,6 +1595,12 @@ Options:
 #### iexec order sign
 
 sign orders from "iexec.json" and store them into "orders.json"
+
+Usage:
+
+```sh
+iexec order sign [options]
+```
 
 Options:
 
@@ -1293,6 +1623,12 @@ Options:
 #### iexec order fill
 
 fill an order to execute a work
+
+Usage:
+
+```sh
+iexec order fill [options]
+```
 
 Options:
 
@@ -1319,6 +1655,12 @@ Options:
 
 publish a signed order
 
+Usage:
+
+```sh
+iexec order publish [options]
+```
+
 Options:
 
 | option | description |
@@ -1341,6 +1683,12 @@ Options:
 
 unpublish a signed order
 
+Usage:
+
+```sh
+iexec order unpublish [options]
+```
+
 Options:
 
 | option | description |
@@ -1361,6 +1709,12 @@ Options:
 #### iexec order cancel
 
 cancel an order
+
+Usage:
+
+```sh
+iexec order cancel [options]
+```
 
 Options:
 
@@ -1385,6 +1739,12 @@ Options:
 
 show marketplace order details
 
+Usage:
+
+```sh
+iexec order show [options]
+```
+
 Options:
 
 | option | description |
@@ -1402,6 +1762,12 @@ Options:
 
 show marketplace orderbook
 
+Usage:
+
+```sh
+iexec orderbook <command> [options]
+```
+
 Commands:
 
 - [app](#iexec-orderbook-app)
@@ -1412,6 +1778,12 @@ Commands:
 #### iexec orderbook app
 
 show marketplace app orderbook details
+
+Usage:
+
+```sh
+iexec orderbook app <address> [options]
+```
 
 Options:
 
@@ -1432,6 +1804,12 @@ Options:
 
 show marketplace dataset orderbook details
 
+Usage:
+
+```sh
+iexec orderbook dataset <address> [options]
+```
+
 Options:
 
 | option | description |
@@ -1450,6 +1828,12 @@ Options:
 #### iexec orderbook workerpool
 
 show marketplace workerpools orderbook details
+
+Usage:
+
+```sh
+iexec orderbook workerpool [address] [options]
+```
 
 Options:
 
@@ -1471,6 +1855,12 @@ Options:
 #### iexec orderbook requester
 
 show marketplace requesters orderbook details
+
+Usage:
+
+```sh
+iexec orderbook requester [address] [options]
+```
 
 Options:
 
@@ -1494,6 +1884,12 @@ Options:
 
 manage iExec deals
 
+Usage:
+
+```sh
+iexec deal <command> [options]
+```
+
 Commands:
 
 - [show](#iexec-deal-show)
@@ -1502,6 +1898,12 @@ Commands:
 #### iexec deal show
 
 show user deal details
+
+Usage:
+
+```sh
+iexec deal show <dealid> [options]
+```
 
 Options:
 
@@ -1519,6 +1921,12 @@ Options:
 #### iexec deal claim
 
 claim a deal that is not COMPLETED
+
+Usage:
+
+```sh
+iexec deal claim <dealid> [options]
+```
 
 Options:
 
@@ -1538,6 +1946,12 @@ Options:
 
 manage iExec tasks
 
+Usage:
+
+```sh
+iexec task <command> [options]
+```
+
 Commands:
 
 - [show](#iexec-task-show)
@@ -1547,6 +1961,12 @@ Commands:
 #### iexec task show
 
 show user task details
+
+Usage:
+
+```sh
+iexec task show <taskid> [options]
+```
 
 Options:
 
@@ -1569,6 +1989,12 @@ Options:
 
 show task debug information
 
+Usage:
+
+```sh
+iexec task debug <taskid> [options]
+```
+
 Options:
 
 | option | description |
@@ -1585,6 +2011,12 @@ Options:
 #### iexec task claim
 
 claim a task that is not COMPLETED
+
+Usage:
+
+```sh
+iexec task claim <taskid> [options]
+```
 
 Options:
 
@@ -1604,6 +2036,12 @@ Options:
 
 manage remote storage
 
+Usage:
+
+```sh
+iexec storage <command> [options]
+```
+
 Commands:
 
 - [init](#iexec-storage-init)
@@ -1612,6 +2050,12 @@ Commands:
 #### iexec storage init
 
 initialize the remote storage
+
+Usage:
+
+```sh
+iexec storage init [provider] [options]
+```
 
 Options:
 
@@ -1631,6 +2075,12 @@ Options:
 
 check if the remote storage is initialized
 
+Usage:
+
+```sh
+iexec storage check [provider] [options]
+```
+
 Options:
 
 | option | description |
@@ -1648,6 +2098,12 @@ Options:
 
 manage results encryption
 
+Usage:
+
+```sh
+iexec result <command> [options]
+```
+
 Commands:
 
 - [generate-encryption-keypair](#iexec-result-generate-encryption-keypair)
@@ -1660,6 +2116,12 @@ Commands:
 _Alias: generate-keys_
 
 generate a beneficiary key pair to encrypt and decrypt the results
+
+Usage:
+
+```sh
+iexec result generate-encryption-keypair [options]
+```
 
 Options:
 
@@ -1677,6 +2139,12 @@ Options:
 #### iexec result decrypt
 
 decrypt encrypted results with beneficiary key
+
+Usage:
+
+```sh
+iexec result decrypt [encryptedResultsPath] [options]
+```
 
 Options:
 
@@ -1698,6 +2166,12 @@ _Alias: push-secret_
 
 push the public encryption key to the secret management service
 
+Usage:
+
+```sh
+iexec result push-encryption-key [options]
+```
+
 Options:
 
 | option | description |
@@ -1718,6 +2192,12 @@ _Alias: check-secret_
 
 check if a secret exists in the secret management service
 
+Usage:
+
+```sh
+iexec result check-encryption-key [address] [options]
+```
+
 Options:
 
 | option | description |
@@ -1734,6 +2214,12 @@ Options:
 
 manage ENS names
 
+Usage:
+
+```sh
+iexec ens <command> [options]
+```
+
 Commands:
 
 - [resolve](#iexec-ens-resolve)
@@ -1744,6 +2230,12 @@ Commands:
 #### iexec ens resolve
 
 resolve an ENS name to an address
+
+Usage:
+
+```sh
+iexec ens resolve <name> [options]
+```
 
 Options:
 
@@ -1757,6 +2249,12 @@ Options:
 
 lookup for the ENS name of an address
 
+Usage:
+
+```sh
+iexec ens lookup <address> [options]
+```
+
 Options:
 
 | option | description |
@@ -1769,6 +2267,12 @@ Options:
 
 find the the owner address of an ENS name
 
+Usage:
+
+```sh
+iexec ens get-owner <name> [options]
+```
+
 Options:
 
 | option | description |
@@ -1780,6 +2284,12 @@ Options:
 #### iexec ens register
 
 register an ENS if needed and setup both ENS resolution and reverse resolution
+
+Usage:
+
+```sh
+iexec ens register <label> [options]
+```
 
 Options:
 
@@ -1802,6 +2312,12 @@ Options:
 
 manage iExec categories
 
+Usage:
+
+```sh
+iexec category <command> [options]
+```
+
 Commands:
 
 - [init](#iexec-category-init)
@@ -1813,6 +2329,12 @@ Commands:
 
 init a new category
 
+Usage:
+
+```sh
+iexec category init [options]
+```
+
 Options:
 
 | option | description |
@@ -1823,6 +2345,12 @@ Options:
 #### iexec category create
 
 create a new category
+
+Usage:
+
+```sh
+iexec category create [options]
+```
 
 Options:
 
@@ -1842,6 +2370,12 @@ Options:
 
 show category details
 
+Usage:
+
+```sh
+iexec category show <index> [options]
+```
+
 Options:
 
 | option | description |
@@ -1853,6 +2387,12 @@ Options:
 #### iexec category count
 
 count protocol categories
+
+Usage:
+
+```sh
+iexec category count [options]
+```
 
 Options:
 
@@ -1866,6 +2406,12 @@ Options:
 
 interact with iExec registry
 
+Usage:
+
+```sh
+iexec registry <command> [options]
+```
+
 Commands:
 
 - [validate](#iexec-registry-validate)
@@ -1873,6 +2419,12 @@ Commands:
 #### iexec registry validate
 
 validate an app/dataset/workerpool description before submitting it to the iExec registry
+
+Usage:
+
+```sh
+iexec registry validate <object> [options]
+```
 
 Options:
 
@@ -1884,6 +2436,12 @@ Options:
 ### iexec info
 
 show iExec contracts addresses
+
+Usage:
+
+```sh
+iexec info [options]
+```
 
 Options:
 
