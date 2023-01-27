@@ -20,6 +20,38 @@ const {
 const debug = Debug('help');
 
 const finalizeCli = (cli) => {
+  if (process.env.GENERATE_DOC) {
+    const processOptions = (options) =>
+      options.map((o) => ({
+        flags: o.flags,
+        description: o.description,
+      }));
+    const getUsage = (cmd) => {
+      const OPTIONS = '[options]';
+      const usage = cmd.usage();
+      if (!usage.includes(OPTIONS)) {
+        return usage;
+      }
+      return `${usage.replace(OPTIONS, '').trim()} ${OPTIONS}`.trim();
+    };
+    console.log(
+      JSON.stringify({
+        name: cli.name(),
+        description: cli.description() || undefined,
+        usage: getUsage(cli),
+        options: processOptions(cli.options),
+        subCommands: cli.commands.map((x) => ({
+          name: x.name(),
+          alias: x.alias(),
+          description: x.description() || undefined,
+          usage: getUsage(x),
+          options: processOptions(x.options),
+        })),
+      }),
+    );
+    process.exit();
+  }
+
   cli.showHelpAfterError();
   cli.addHelpText(
     'afterAll',
@@ -201,7 +233,7 @@ const option = {
   ],
   fillWorkerpoolOrder: () => [
     '--workerpool <orderHash>',
-    'specify the wokerpool order from the marketplace to fill',
+    'specify the workerpool order from the marketplace to fill',
   ],
   fillRequestOrder: () => [
     '--request <orderHash>',
@@ -879,11 +911,11 @@ const pretty = (obj, options) => lb(prettyjson.render(obj, options));
 
 const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
-  const prettyObj = keys.reduce((accu, curr) => {
+  const prettyObj = keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
-      return Object.assign(accu, { [curr]: rpcObj[curr].toString() });
+      return Object.assign(acc, { [curr]: rpcObj[curr].toString() });
     }
-    return accu;
+    return acc;
   }, {});
   return pretty(prettyObj);
 };
