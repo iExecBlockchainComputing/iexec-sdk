@@ -762,7 +762,15 @@ run
           return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
-        const teeAppRequired = checkActiveBitInTag(tag, TAG_MAP.tee);
+        const minTags = [];
+        if (checkActiveBitInTag(tag, TAG_MAP.tee)) {
+          minTags.push('tee');
+        }
+        Object.values(TEE_FRAMEWORKS).forEach((teeFrameworkTag) => {
+          if (checkActiveBitInTag(tag, TAG_MAP[teeFrameworkTag])) {
+            minTags.push(teeFrameworkTag);
+          }
+        });
         const { orders } = await fetchAppOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
@@ -771,7 +779,7 @@ run
             requester,
             ...(useDataset && { dataset }),
             ...(runOnWorkerpool && { workerpool }),
-            ...(teeAppRequired && { minTag: encodeTag(['tee']) }),
+            ...{ minTag: encodeTag(minTags) },
             maxTag: tag,
           },
         );
