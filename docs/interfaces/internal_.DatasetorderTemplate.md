@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / DatasetorderTemplate
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / DatasetorderTemplate
 
 # Interface: DatasetorderTemplate
 
-[{internal}](../modules/internal_.md).DatasetorderTemplate
+[<internal>](../modules/internal_.md).DatasetorderTemplate
 
 sell order for a dataset
 

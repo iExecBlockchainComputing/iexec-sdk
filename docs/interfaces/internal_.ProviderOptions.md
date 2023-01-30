@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ProviderOptions
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ProviderOptions
 
 # Interface: ProviderOptions
 
-[{internal}](../modules/internal_.md).ProviderOptions
+[<internal>](../modules/internal_.md).ProviderOptions
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 

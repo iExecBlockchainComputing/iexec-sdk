@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / BridgeObservable
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / BridgeObservable
 
 # Class: BridgeObservable
 
-[{internal}](../modules/internal_.md).BridgeObservable
+[<internal>](../modules/internal_.md).BridgeObservable
 
 ## Hierarchy
 

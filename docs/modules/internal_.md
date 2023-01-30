@@ -1,6 +1,6 @@
-[iexec](../README.md) / [Exports](../modules.md) / {internal}
+[iexec](../README.md) / [Exports](../modules.md) / <internal\>
 
-# Namespace: {internal}
+# Module: <internal\>
 
 ## Table of contents
 

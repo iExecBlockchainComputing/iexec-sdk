@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / HashableRequestorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / HashableRequestorder
 
 # Interface: HashableRequestorder
 
-[{internal}](../modules/internal_.md).HashableRequestorder
+[<internal>](../modules/internal_.md).HashableRequestorder
 
 buy order for computing tasks
 

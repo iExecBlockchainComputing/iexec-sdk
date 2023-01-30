@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / HashableWorkerpoolorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / HashableWorkerpoolorder
 
 # Interface: HashableWorkerpoolorder
 
-[{internal}](../modules/internal_.md).HashableWorkerpoolorder
+[<internal>](../modules/internal_.md).HashableWorkerpoolorder
 
 sell order for computing power
 

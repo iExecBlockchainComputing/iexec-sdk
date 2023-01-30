@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / DatasetDeploymentArgs
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / DatasetDeploymentArgs
 
 # Interface: DatasetDeploymentArgs
 
-[{internal}](../modules/internal_.md).DatasetDeploymentArgs
+[<internal>](../modules/internal_.md).DatasetDeploymentArgs
 
 ## Table of contents
 

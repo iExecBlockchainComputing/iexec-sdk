@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / PublishedWorkerpoolorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / PublishedWorkerpoolorder
 
 # Interface: PublishedWorkerpoolorder
 
-[{internal}](../modules/internal_.md).PublishedWorkerpoolorder
+[<internal>](../modules/internal_.md).PublishedWorkerpoolorder
 
 published sell order for computing power
 

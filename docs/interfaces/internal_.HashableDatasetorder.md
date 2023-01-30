@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / HashableDatasetorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / HashableDatasetorder
 
 # Interface: HashableDatasetorder
 
-[{internal}](../modules/internal_.md).HashableDatasetorder
+[<internal>](../modules/internal_.md).HashableDatasetorder
 
 sell order for a dataset
 

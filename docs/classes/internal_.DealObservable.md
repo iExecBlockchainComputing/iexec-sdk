@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / DealObservable
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / DealObservable
 
 # Class: DealObservable
 
-[{internal}](../modules/internal_.md).DealObservable
+[<internal>](../modules/internal_.md).DealObservable
 
 ## Hierarchy
 

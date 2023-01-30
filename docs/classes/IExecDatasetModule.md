@@ -47,7 +47,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -145,7 +145,7 @@ const checksum = await computeEncryptedFileChecksum(
 
 | Name | Type |
 | :------ | :------ |
-| `encryptedFile` | `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
+| `encryptedFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
 
 #### Returns
 
@@ -237,7 +237,7 @@ const binary = new Blob([encryptedDataset]);
 
 | Name | Type |
 | :------ | :------ |
-| `datasetFile` | `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
+| `datasetFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
 | `encyptionKey` | `string` |
 
 #### Returns

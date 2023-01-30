@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ConsumableApporder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ConsumableApporder
 
 # Interface: ConsumableApporder
 
-[{internal}](../modules/internal_.md).ConsumableApporder
+[<internal>](../modules/internal_.md).ConsumableApporder
 
 signed sell order for an app
 

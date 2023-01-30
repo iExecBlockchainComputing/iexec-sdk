@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / SignedRequestorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / SignedRequestorder
 
 # Interface: SignedRequestorder
 
-[{internal}](../modules/internal_.md).SignedRequestorder
+[<internal>](../modules/internal_.md).SignedRequestorder
 
 signed buy order for computing tasks
 
