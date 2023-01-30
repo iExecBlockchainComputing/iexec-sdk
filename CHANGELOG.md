@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
 - [BREAKING] `--skip-request-check` option is replaced by `--skip-preflight-check`
 - [BREAKING] bellecour is now the default chain initialized in `chain.json` when running `iexec init`
+- [BREAKING] drop support for node 12
 
 ### Removed
 
