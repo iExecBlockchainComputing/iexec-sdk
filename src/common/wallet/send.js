@@ -6,18 +6,18 @@ import {
   bnToEthersBn,
   bnNRlcToBnWei,
   checkSigner,
-} from '../utils/utils';
+} from '../utils/utils.js';
 import {
   addressSchema,
   uint256Schema,
   nRlcAmountSchema,
   weiAmountSchema,
   throwIfMissing,
-} from '../utils/validator';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
-import { getAddress } from './address';
-import { getEthBalance, getRlcBalance, checkBalances } from './balance';
-import { isInWhitelist } from './enterprise';
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { getAddress } from './address.js';
+import { getEthBalance, getRlcBalance, checkBalances } from './balance.js';
+import { isInWhitelist } from './enterprise.js';
 
 const debug = Debug('iexec:wallet:send');
 
@@ -172,7 +172,7 @@ export const sweep = async (
           Object.assign(res, { sendERC20TxHash });
         } catch (error) {
           debug('error', error);
-          errors.push(`Failed to transfert ERC20': ${error.message}`);
+          errors.push(`Failed to transfer ERC20': ${error.message}`);
           throw Error(
             `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
           );
@@ -198,12 +198,12 @@ export const sweep = async (
         Object.assign(res, { sendNativeTxHash });
       } catch (error) {
         debug(error);
-        errors.push(`Failed to transfert native token': ${error.message}`);
+        errors.push(`Failed to transfer native token': ${error.message}`);
       }
     } else {
       const err = 'Tx fees are greater than wallet balance';
       debug(err);
-      errors.push(`Failed to transfert native token': ${err}`);
+      errors.push(`Failed to transfer native token': ${err}`);
     }
     if (errors.length > 0) Object.assign(res, { errors });
     return res;

@@ -1,4 +1,4 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   deployDataset,
   showDataset,
@@ -6,14 +6,14 @@ import {
   countUserDatasets,
   predictDatasetAddress,
   checkDeployedDataset,
-} from '../common/protocol/registries';
-import { checkWeb3SecretExists } from '../common/sms/check';
-import { pushWeb3Secret } from '../common/sms/push';
+} from '../common/protocol/registries.js';
+import { checkWeb3SecretExists } from '../common/sms/check.js';
+import { pushWeb3Secret } from '../common/sms/push.js';
 import {
   generateAes256Key,
   encryptAes256Cbc,
   sha256Sum,
-} from '../common/utils/encryption-utils';
+} from '../common/utils/encryption-utils.js';
 
 export default class IExecDatasetModule extends IExecModule {
   constructor(...args) {

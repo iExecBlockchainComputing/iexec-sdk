@@ -4,15 +4,15 @@ import {
   addressSchema,
   workerpoolApiUrlSchema,
   bytes32Schema,
-} from '../utils/validator';
-import { lookupAddress } from '../ens/resolution';
-import { readTextRecord } from '../ens/text-record';
-import { show as dealShow } from './deal';
-import { show as taskShow } from './task';
-import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant';
-import { jsonApi, getAuthorization } from '../utils/api-utils';
-import { checkSigner } from '../utils/utils';
-import { getAddress } from '../wallet/address';
+} from '../utils/validator.js';
+import { lookupAddress } from '../ens/resolution.js';
+import { readTextRecord } from '../ens/text-record.js';
+import { show as dealShow } from './deal.js';
+import { show as taskShow } from './task.js';
+import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
+import { jsonApi, getAuthorization } from '../utils/api-utils.js';
+import { checkSigner } from '../utils/utils.js';
+import { getAddress } from '../wallet/address.js';
 
 const debug = Debug('iexec:execution:debug');
 

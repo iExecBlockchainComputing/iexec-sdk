@@ -1,7 +1,7 @@
 import Debug from 'debug';
-import { ethersBnToBn } from '../utils/utils';
-import { throwIfMissing } from '../utils/validator';
-import { wrapCall } from '../utils/errorWrappers';
+import { ethersBnToBn } from '../utils/utils.js';
+import { throwIfMissing } from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:protocol:configuration');
 

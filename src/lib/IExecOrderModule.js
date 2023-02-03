@@ -1,4 +1,4 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   createApporder,
   createDatasetorder,
@@ -17,7 +17,7 @@ import {
   cancelRequestorder,
   cancelWorkerpoolorder,
   matchOrders,
-} from '../common/market/order';
+} from '../common/market/order.js';
 import {
   publishApporder,
   publishDatasetorder,
@@ -35,20 +35,20 @@ import {
   unpublishLastWorkerpoolorder,
   unpublishRequestorder,
   unpublishWorkerpoolorder,
-} from '../common/market/marketplace';
+} from '../common/market/marketplace.js';
 import {
   checkRequestRequirements,
   resolveTeeFrameworkFromTag,
   checkAppRequirements,
   checkDatasetRequirements,
-} from '../common/execution/order-helper';
-import { NULL_DATASETORDER } from '../common/utils/constant';
+} from '../common/execution/order-helper.js';
+import { NULL_DATASETORDER } from '../common/utils/constant.js';
 import {
   requestorderSchema,
   apporderSchema,
   datasetorderSchema,
-} from '../common/utils/validator';
-import { sumTags } from '../common/utils/utils';
+} from '../common/utils/validator.js';
+import { sumTags } from '../common/utils/utils.js';
 
 export default class IExecOrderModule extends IExecModule {
   constructor(...args) {

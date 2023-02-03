@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const { checkWeb2SecretExists } = require('../../common/sms/check');
-const { pushWeb2Secret } = require('../../common/sms/push');
-const {
-  login: resultProxyLogin,
-} = require('../../common/storage/result-proxy');
-const { getStorageTokenKeyName } = require('../../common/utils/secrets-utils');
-const {
+import { program as cli } from 'commander';
+import { checkWeb2SecretExists } from '../../common/sms/check.js';
+import { pushWeb2Secret } from '../../common/sms/push.js';
+import { login as resultProxyLogin } from '../../common/storage/result-proxy.js';
+import { getStorageTokenKeyName } from '../../common/utils/secrets-utils.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -21,9 +19,9 @@ const {
   getPropertyFormChain,
   getSmsUrlFromChain,
   optionCreator,
-} = require('../utils/cli-helper');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
+} from '../utils/cli-helper.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
 
 cli.name('iexec storage').usage('<command> [options]');
 

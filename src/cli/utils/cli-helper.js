@@ -1,25 +1,25 @@
-const Debug = require('debug');
-const { Option } = require('commander');
-const Ora = require('ora');
-const inquirer = require('inquirer');
-const prettyjson = require('prettyjson');
-const BN = require('bn.js');
-const path = require('path');
-const checkForUpdate = require('update-check');
-const isDocker = require('is-docker');
-const packageJSON = require('../../../package.json');
-const {
+import Debug from 'debug';
+import { Option } from 'commander';
+import Ora from 'ora';
+import inquirer from 'inquirer';
+import { render } from 'prettyjson';
+import BN from 'bn.js';
+import { isAbsolute, join } from 'path';
+import checkForUpdate from 'update-check';
+import isDocker from 'is-docker';
+import {
   weiAmountSchema,
   positiveStrictIntSchema,
-} = require('../../common/utils/validator');
-const {
+} from '../../common/utils/validator.js';
+import {
   TEE_FRAMEWORKS,
   STORAGE_PROVIDERS,
-} = require('../../common/utils/constant');
+} from '../../common/utils/constant.js';
+import packageJSON, { version } from '../../common/generated/sdk/package.js';
 
 const debug = Debug('help');
 
-const finalizeCli = (cli) => {
+export const finalizeCli = (cli) => {
   if (process.env.GENERATE_DOC) {
     const processOptions = (options) =>
       options.map((o) => ({
@@ -66,7 +66,7 @@ const listOfChoices = (arrayOfChoices, init = '') =>
     init,
   );
 
-const info = {
+export const info = {
   missingConfFile: (fileName) =>
     `Missing "${fileName}" file, did you forget to run "iexec init"?`,
   checkBalance: (currency) => `Checking ${currency} balances...`,
@@ -99,7 +99,7 @@ const info = {
     `${orderName} signed and saved in ${fileName}, you can share it: `,
 };
 
-const desc = {
+export const desc = {
   raw: () => 'use raw output',
   chainName: () => 'chain name from "chain.json"',
   userAddress: () => 'custom user address',
@@ -161,7 +161,7 @@ const desc = {
   debugTask: () => `show task debug information`,
 };
 
-const option = {
+export const option = {
   quiet: () => ['--quiet', 'stop prompting updates'],
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
@@ -367,7 +367,7 @@ const option = {
   ],
 };
 
-const optionCreator = {
+export const optionCreator = {
   teeFramework: () =>
     new Option(
       `--tee-framework <name>`,
@@ -375,7 +375,7 @@ const optionCreator = {
     ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
-const orderOption = {
+export const orderOption = {
   app: ({ allowDeployed = true } = {}) => [
     `--app <${
       allowDeployed ? listOfChoices(['deployed'], 'address') : 'address'
@@ -476,18 +476,18 @@ const orderOption = {
   ],
 };
 
-const addGlobalOptions = (cli) => {
+export const addGlobalOptions = (cli) => {
   cli.option(...option.raw());
   cli.option(...option.quiet());
 };
 
-const addWalletCreateOptions = (cli) => {
+export const addWalletCreateOptions = (cli) => {
   cli.option(...option.password());
   cli.option(...option.unencrypted());
   cli.option(...option.keystoredir());
 };
 
-const addWalletLoadOptions = (cli) => {
+export const addWalletLoadOptions = (cli) => {
   cli.option(...option.password());
   cli.option(...option.walletFileName());
   cli.option(...option.walletAddress());
@@ -540,7 +540,7 @@ const promptConfirmedPassword = async (
   throw Error('Password mismatch');
 };
 
-const prompt = {
+export const prompt = {
   password: (message, options) => promptPassword(message, options),
   confirmedPassword: (message, confirmation) =>
     promptConfirmedPassword(message, confirmation),
@@ -664,7 +664,7 @@ const oraOptions = {
   },
 };
 
-const Spinner = (opts) => {
+export const Spinner = (opts) => {
   if (opts && opts.raw) {
     const nothing = () => {};
     const succeed = (message, { raw = {} } = {}) =>
@@ -683,7 +683,7 @@ const Spinner = (opts) => {
   return Ora(oraOptions);
 };
 
-const checkUpdate = async (opts) => {
+export const checkUpdate = async (opts) => {
   if (opts && !opts.quiet && !opts.raw) {
     const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
     const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
@@ -694,13 +694,13 @@ const checkUpdate = async (opts) => {
       const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
       const spin = Spinner(opts);
       spin.info(
-        `iExec SDK update available ${packageJSON.version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
+        `iExec SDK update available ${version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
       );
     }
   }
 };
 
-const computeWalletCreateOptions = async (opts) => {
+export const computeWalletCreateOptions = async (opts) => {
   const spinner = Spinner(opts);
   try {
     let pw;
@@ -750,7 +750,7 @@ const computeWalletCreateOptions = async (opts) => {
   }
 };
 
-const computeWalletLoadOptions = (opts) => {
+export const computeWalletLoadOptions = (opts) => {
   try {
     const global =
       (opts && opts.keystoredir && opts.keystoredir === 'global') ||
@@ -791,24 +791,24 @@ const datasetsFolderName = 'datasets';
 const originalDatasetFolderName = 'original';
 const encryptedDatasetFolderName = 'encrypted';
 
-const createEncFolderPaths = (opts = {}) => {
+export const createEncFolderPaths = (opts = {}) => {
   const absolutePath = (relativeOrAbsolutePath) =>
-    path.isAbsolute(relativeOrAbsolutePath)
+    isAbsolute(relativeOrAbsolutePath)
       ? relativeOrAbsolutePath
-      : path.join(process.cwd(), relativeOrAbsolutePath);
+      : join(process.cwd(), relativeOrAbsolutePath);
 
   const datasetSecretsFolderPath = opts.datasetKeystoredir
     ? absolutePath(opts.datasetKeystoredir)
-    : path.join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
+    : join(process.cwd(), secretsFolderName, datasetSecretsFolderName);
   const beneficiarySecretsFolderPath = opts.beneficiaryKeystoredir
     ? absolutePath(opts.beneficiaryKeystoredir)
-    : path.join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
+    : join(process.cwd(), secretsFolderName, beneficiarySecretsFolderName);
   const originalDatasetFolderPath = opts.originalDatasetDir
     ? absolutePath(opts.originalDatasetDir)
-    : path.join(process.cwd(), datasetsFolderName, originalDatasetFolderName);
+    : join(process.cwd(), datasetsFolderName, originalDatasetFolderName);
   const encryptedDatasetFolderPath = opts.encryptedDatasetDir
     ? absolutePath(opts.encryptedDatasetDir)
-    : path.join(process.cwd(), datasetsFolderName, encryptedDatasetFolderName);
+    : join(process.cwd(), datasetsFolderName, encryptedDatasetFolderName);
 
   const paths = {
     datasetSecretsFolderPath,
@@ -820,12 +820,12 @@ const createEncFolderPaths = (opts = {}) => {
   return paths;
 };
 
-const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
-const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
-const publicKeyName = (address) => `${address}_key.pub`;
-const privateKeyName = (address) => `${address}_key`;
+export const DEFAULT_ENCRYPTED_RESULTS_NAME = 'encryptedResults.zip';
+export const DEFAULT_DECRYPTED_RESULTS_NAME = 'results.zip';
+export const publicKeyName = (address) => `${address}_key.pub`;
+export const privateKeyName = (address) => `${address}_key`;
 
-const computeTxOptions = async (opts) => {
+export const computeTxOptions = async (opts) => {
   let gasPrice;
   let confirms;
   if (opts.gasPrice) {
@@ -851,18 +851,25 @@ const computeTxOptions = async (opts) => {
   return { gasPrice, confirms };
 };
 
-const getPropertyFormChain = (chain, property, { strict = true } = {}) => {
+export const getPropertyFormChain = (
+  chain,
+  property,
+  { strict = true } = {},
+) => {
   const value = chain[property];
   if (value === undefined && strict)
     throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
   return value;
 };
 
-const getDefaultTeeFrameworkFromChain = (chain) =>
+export const getDefaultTeeFrameworkFromChain = (chain) =>
   getPropertyFormChain(chain, 'defaultTeeFramework', { strict: false }) ||
   TEE_FRAMEWORKS.SCONE;
 
-const getSmsUrlFromChain = (chain, { teeFramework, strict = true } = {}) => {
+export const getSmsUrlFromChain = (
+  chain,
+  { teeFramework, strict = true } = {},
+) => {
   const selectedTeeFramework =
     teeFramework ||
     getDefaultTeeFrameworkFromChain(chain, 'defaultTeeFramework');
@@ -883,7 +890,7 @@ const getSmsUrlFromChain = (chain, { teeFramework, strict = true } = {}) => {
   return smsUrl;
 };
 
-const handleError = (error, cli, opts) => {
+export const handleError = (error, cli, opts) => {
   debug('error', error);
   const spinner = Spinner(opts);
   const lastCommandName = cli.rawArgs[2] || '';
@@ -903,13 +910,13 @@ const handleError = (error, cli, opts) => {
   process.exit(1);
 };
 
-const lbb = (str = '') => `\n${str}`;
-const lba = (str = '') => `${str}\n`;
-const lb = (str) => lba(lbb(str));
+export const lbb = (str = '') => `\n${str}`;
+export const lba = (str = '') => `${str}\n`;
+export const lb = (str) => lba(lbb(str));
 
-const pretty = (obj, options) => lb(prettyjson.render(obj, options));
+export const pretty = (obj, options) => lb(render(obj, options));
 
-const prettyRPC = (rpcObj) => {
+export const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
   const prettyObj = keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
@@ -920,12 +927,12 @@ const prettyRPC = (rpcObj) => {
   return pretty(prettyObj);
 };
 
-const isEthAddress = (address, { strict = false } = {}) => {
+export const isEthAddress = (address, { strict = false } = {}) => {
   const isHexString =
     typeof address === 'string' && address.substr(0, 2) === '0x';
   const isEns =
     typeof address === 'string' &&
-    address.substr(address.length - 4, 4) === '.eth';
+    address.substring(address.length - 4) === '.eth';
   const isAddress = isEns || (isHexString && address.length === 42);
   if (!isAddress && strict) {
     throw Error(`Address ${address} is not a valid Ethereum address`);
@@ -933,7 +940,7 @@ const isEthAddress = (address, { strict = false } = {}) => {
   return isAddress;
 };
 
-const isBytes32 = (str, { strict = false } = {}) => {
+export const isBytes32 = (str, { strict = false } = {}) => {
   if (
     typeof str !== 'string' ||
     str.length !== 66 ||
@@ -945,7 +952,7 @@ const isBytes32 = (str, { strict = false } = {}) => {
   return true;
 };
 
-const displayPaginableRequest = async (
+export const displayPaginableRequest = async (
   {
     request,
     processResponse = (res) => res,
@@ -1004,7 +1011,10 @@ const displayPaginableRequest = async (
   return { results, count: totalCount };
 };
 
-const renderTasksStatus = (tasksStatusMap, { detailed = false } = {}) => {
+export const renderTasksStatus = (
+  tasksStatusMap,
+  { detailed = false } = {},
+) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
     (task) => task.status !== 3 && !task.taskTimedOut,
@@ -1047,40 +1057,4 @@ const renderTasksStatus = (tasksStatusMap, { detailed = false } = {}) => {
         )}`
       : '';
   return `${completedMsg}${failedMsg}${statusMsg}`;
-};
-
-module.exports = {
-  finalizeCli,
-  checkUpdate,
-  Spinner,
-  handleError,
-  info,
-  desc,
-  option,
-  orderOption,
-  optionCreator,
-  getPropertyFormChain,
-  getDefaultTeeFrameworkFromChain,
-  getSmsUrlFromChain,
-  addGlobalOptions,
-  addWalletCreateOptions,
-  addWalletLoadOptions,
-  computeWalletCreateOptions,
-  computeWalletLoadOptions,
-  computeTxOptions,
-  createEncFolderPaths,
-  DEFAULT_ENCRYPTED_RESULTS_NAME,
-  DEFAULT_DECRYPTED_RESULTS_NAME,
-  publicKeyName,
-  privateKeyName,
-  prompt,
-  pretty,
-  prettyRPC,
-  isEthAddress,
-  isBytes32,
-  lbb,
-  lba,
-  lb,
-  renderTasksStatus,
-  displayPaginableRequest,
 };

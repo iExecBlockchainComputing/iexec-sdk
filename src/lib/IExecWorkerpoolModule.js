@@ -1,4 +1,4 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   deployWorkerpool,
   showWorkerpool,
@@ -6,9 +6,9 @@ import {
   countUserWorkerpools,
   predictWorkerpoolAddress,
   checkDeployedWorkerpool,
-} from '../common/protocol/registries';
-import { setWorkerpoolApiUrl } from '../common/execution/workerpool';
-import { getWorkerpoolApiUrl } from '../common/execution/debug';
+} from '../common/protocol/registries.js';
+import { setWorkerpoolApiUrl } from '../common/execution/workerpool.js';
+import { getWorkerpoolApiUrl } from '../common/execution/debug.js';
 
 export default class IExecWorkerpoolModule extends IExecModule {
   constructor(...args) {

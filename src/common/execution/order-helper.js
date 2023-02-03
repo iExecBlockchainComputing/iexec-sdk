@@ -2,19 +2,19 @@ import {
   checkWeb2SecretExists,
   checkWeb3SecretExists,
   checkRequesterSecretExists,
-} from '../sms/check';
-import { checkActiveBitInTag, TAG_MAP } from '../utils/utils';
+} from '../sms/check.js';
+import { checkActiveBitInTag, TAG_MAP } from '../utils/utils.js';
 import {
   NULL_ADDRESS,
   NULL_BYTES32,
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
   TEE_FRAMEWORKS,
-} from '../utils/constant';
+} from '../utils/constant.js';
 import {
   getStorageTokenKeyName,
   reservedSecretKeyName,
-} from '../utils/secrets-utils';
+} from '../utils/secrets-utils.js';
 import {
   objParamsSchema,
   requestorderSchema,
@@ -22,8 +22,8 @@ import {
   datasetorderSchema,
   apporderSchema,
   tagSchema,
-} from '../utils/validator';
-import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries';
+} from '../utils/validator.js';
+import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema().validate(tag);

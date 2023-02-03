@@ -1,19 +1,32 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const wallet = require('../../common/wallet');
-const {
+import { program as cli } from 'commander';
+import { checkBalances } from '../../common/wallet/balance.js';
+import {
+  sendETH as walletSendETH,
+  sendRLC as walletSendRLC,
+  sweep as walletSweep,
+} from '../../common/wallet/send.js';
+import {
+  bridgeToSidechain as walletBridgeToSidechain,
+  bridgeToMainchain as walletBridgeToMainchain,
+} from '../../common/wallet/bridge.js';
+import {
+  wrapEnterpriseRLC as walletWrapEnterpriseRLC,
+  unwrapEnterpriseRLC as walletUnwrapEnterpriseRLC,
+} from '../../common/wallet/enterprise.js';
+import {
   Keystore,
   createAndSave,
   importPrivateKeyAndSave,
-} = require('../utils/keystore');
-const { formatEth, formatRLC } = require('../../common/utils/utils');
-const { NULL_ADDRESS } = require('../../common/utils/constant');
-const {
+} from '../utils/keystore.js';
+import { formatEth, formatRLC } from '../../common/utils/utils.js';
+import { NULL_ADDRESS } from '../../common/utils/constant.js';
+import {
   nRlcAmountSchema,
   weiAmountSchema,
-} = require('../../common/utils/validator');
-const {
+} from '../../common/utils/validator.js';
+import {
   addGlobalOptions,
   addWalletCreateOptions,
   computeWalletCreateOptions,
@@ -30,10 +43,10 @@ const {
   pretty,
   info,
   getPropertyFormChain,
-} = require('../utils/cli-helper');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { lookupAddress } = require('../../common/ens/resolution');
-const { ConfigurationError } = require('../../common/utils/errors');
+} from '../utils/cli-helper.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { lookupAddress } from '../../common/ens/resolution.js';
+import { ConfigurationError } from '../../common/utils/errors.js';
 
 const objName = 'wallet';
 
@@ -151,7 +164,7 @@ show
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
       const [balances, ens] = await Promise.all([
-        wallet.checkBalances(chain.contracts, addressToShow),
+        checkBalances(chain.contracts, addressToShow),
         lookupAddress(chain.contracts, addressToShow).catch((e) => {
           if (e instanceof ConfigurationError) {
             /** no ENS */
@@ -226,7 +239,7 @@ sendETH
         chain.name
       } ether from ${address} to ${opts.to}`;
       spinner.start(`Sending ${message}...`);
-      const txHash = await wallet.sendETH(chain.contracts, weiAmount, opts.to);
+      const txHash = await walletSendETH(chain.contracts, weiAmount, opts.to);
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
           amount: weiAmount,
@@ -279,7 +292,7 @@ sendRLC
       } RLC from ${address} to ${opts.to}`;
       spinner.start(`Sending ${message}...`);
 
-      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, opts.to);
+      const txHash = await walletSendRLC(chain.contracts, nRlcAmount, opts.to);
 
       spinner.succeed(`Sent ${message}\n`, {
         raw: {
@@ -325,7 +338,7 @@ sweep
         );
       }
       spinner.start('Sweeping wallet...');
-      const { sendNativeTxHash, sendERC20TxHash, errors } = await wallet.sweep(
+      const { sendNativeTxHash, sendERC20TxHash, errors } = await walletSweep(
         chain.contracts,
         opts.to,
       );
@@ -403,7 +416,7 @@ bridgeToSidechain
         chain.name
       } RLC to ${bridgeAddress}`;
       spinner.start(`Sending ${message}...`);
-      const { sendTxHash, receiveTxHash } = await wallet.bridgeToSidechain(
+      const { sendTxHash, receiveTxHash } = await walletBridgeToSidechain(
         chain.contracts,
         bridgeAddress,
         nRlcAmount,
@@ -490,7 +503,7 @@ bridgeToMainchain
         chain.name
       } RLC to ${bridgeAddress}`;
       spinner.start(`Sending ${message}...`);
-      const { sendTxHash, receiveTxHash } = await wallet.bridgeToMainchain(
+      const { sendTxHash, receiveTxHash } = await walletBridgeToMainchain(
         chain.contracts,
         bridgeAddress,
         nRlcAmount,
@@ -569,7 +582,7 @@ wrapEnterpriseRLC
       const message = `${formatRLC(nRlcAmount)} RLC into eRLC`;
       spinner.start(`Wrapping ${message}...`);
 
-      const txHash = await wallet.wrapEnterpriseRLC(
+      const txHash = await walletWrapEnterpriseRLC(
         standardContracts,
         enterpriseContracts,
         nRlcAmount,
@@ -627,7 +640,7 @@ unwrapEnterpriseRLC
       const message = `${formatRLC(nRlcAmount)} eRLC into RLC`;
       spinner.start(`Unwrapping ${message}...`);
 
-      const txHash = await wallet.unwrapEnterpriseRLC(
+      const txHash = await walletUnwrapEnterpriseRLC(
         enterpriseContracts,
         nRlcAmount,
       );
@@ -680,7 +693,7 @@ sendNRLC
       } RLC from ${address} to ${opts.to}`;
       spinner.start(`Sending ${message}...`);
 
-      const txHash = await wallet.sendRLC(chain.contracts, nRlcAmount, opts.to);
+      const txHash = await walletSendRLC(chain.contracts, nRlcAmount, opts.to);
 
       spinner.succeed(`Sent ${message}\n`, {
         raw: {

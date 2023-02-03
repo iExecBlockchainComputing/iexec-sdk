@@ -1,14 +1,14 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
-import { checkEvent, checkSigner, FETCH_INTERVAL } from '../utils/utils';
-import { NULL_BYTES } from '../utils/constant';
-import { bytes32Schema, throwIfMissing } from '../utils/validator';
-import { ObjectNotFoundError } from '../utils/errors';
-import { wrapSend, wrapWait } from '../utils/errorWrappers';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { viewDeal, viewTask } from './common';
-import { showCategory } from '../protocol/category';
-import { getTimeoutRatio } from '../protocol/configuration';
+import { checkEvent, checkSigner, FETCH_INTERVAL } from '../utils/utils.js';
+import { NULL_BYTES } from '../utils/constant.js';
+import { bytes32Schema, throwIfMissing } from '../utils/validator.js';
+import { ObjectNotFoundError } from '../utils/errors.js';
+import { wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+import { viewDeal, viewTask } from './common.js';
+import { showCategory } from '../protocol/category.js';
+import { getTimeoutRatio } from '../protocol/configuration.js';
 
 const debug = Debug('iexec:execution:task');
 

@@ -1,4 +1,4 @@
-import IExecConfig from './IExecConfig';
+import IExecConfig from './IExecConfig.js';
 
 export default class IExecModule {
   constructor(...args) {

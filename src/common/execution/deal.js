@@ -1,9 +1,9 @@
 import Debug from 'debug';
 import { utils } from 'ethers';
-import { showCategory } from '../protocol/category';
-import { getTimeoutRatio } from '../protocol/configuration';
-import { ethersBnToBn, BN, checkSigner } from '../utils/utils';
-import { jsonApi, wrapPaginableRequest } from '../utils/api-utils';
+import { showCategory } from '../protocol/category.js';
+import { getTimeoutRatio } from '../protocol/configuration.js';
+import { ethersBnToBn, BN, checkSigner } from '../utils/utils.js';
+import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
 import {
   chainIdSchema,
   addressSchema,
@@ -12,17 +12,17 @@ import {
   positiveIntSchema,
   positiveStrictIntSchema,
   throwIfMissing,
-} from '../utils/validator';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} from '../utils/constant';
-import { viewDeal, viewTask } from './common';
-import { obsTask } from './task';
-import { Observable, SafeObserver } from '../utils/reactive';
+} from '../utils/constant.js';
+import { viewDeal, viewTask } from './common.js';
+import { obsTask } from './task.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
 
 const { defaultAbiCoder, keccak256 } = utils;
 

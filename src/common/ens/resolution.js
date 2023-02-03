@@ -1,13 +1,13 @@
 import Debug from 'debug';
 import { Contract, utils } from 'ethers';
-import { abi } from './abi/ENSRegistry-min.json';
+import { abi } from '../generated/@ensdomains/registry/ENSRegistry.js';
 import {
   throwIfMissing,
   addressSchema,
   ensDomainSchema,
-} from '../utils/validator';
-import { wrapCall } from '../utils/errorWrappers';
-import { getEnsRegistryAddress, checkEns } from './registry';
+} from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { getEnsRegistryAddress, checkEns } from './registry.js';
 
 const debug = Debug('iexec:ens:resolution');
 

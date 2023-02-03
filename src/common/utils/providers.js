@@ -1,5 +1,5 @@
 import { getDefaultProvider, providers } from 'ethers';
-import { getChainDefaults, getId } from './config';
+import { getChainDefaults, getId } from './config.js';
 
 export const getReadOnlyProvider = (host, options = {}) => {
   const providerOptions = options.providers || {};

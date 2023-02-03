@@ -1,6 +1,6 @@
-import IExecModule from './IExecModule';
-import { checkRequesterSecretExists } from '../common/sms/check';
-import { pushRequesterSecret } from '../common/sms/push';
+import IExecModule from './IExecModule.js';
+import { checkRequesterSecretExists } from '../common/sms/check.js';
+import { pushRequesterSecret } from '../common/sms/push.js';
 
 export default class IExecSecretModule extends IExecModule {
   constructor(...args) {

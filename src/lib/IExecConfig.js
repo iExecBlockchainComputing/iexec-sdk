@@ -1,15 +1,18 @@
 import Debug from 'debug';
 import { providers } from 'ethers';
-import IExecContractsClient from '../common/utils/IExecContractsClient';
-import { ConfigurationError } from '../common/utils/errors';
-import { EnhancedWallet, EnhancedWeb3Signer } from '../common/utils/signers';
-import { getChainDefaults, isEnterpriseEnabled } from '../common/utils/config';
-import { TEE_FRAMEWORKS } from '../common/utils/constant';
-import { getReadOnlyProvider } from '../common/utils/providers';
+import IExecContractsClient from '../common/utils/IExecContractsClient.js';
+import { ConfigurationError } from '../common/utils/errors.js';
+import { EnhancedWallet, EnhancedWeb3Signer } from '../common/utils/signers.js';
+import {
+  getChainDefaults,
+  isEnterpriseEnabled,
+} from '../common/utils/config.js';
+import { TEE_FRAMEWORKS } from '../common/utils/constant.js';
+import { getReadOnlyProvider } from '../common/utils/providers.js';
 import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
-} from '../common/utils/validator';
+} from '../common/utils/validator.js';
 
 const debug = Debug('iexec:IExecConfig');
 

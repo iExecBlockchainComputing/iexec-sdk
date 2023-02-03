@@ -1,7 +1,12 @@
-import { Wallet, Signer, BigNumber, providers as _providers } from 'ethers';
-import { getReadOnlyProvider } from './providers';
+import {
+  Wallet,
+  Signer,
+  BigNumber,
+  providers as ethersProviders,
+} from 'ethers';
+import { getReadOnlyProvider } from './providers.js';
 
-const { Web3Provider } = _providers;
+const { Web3Provider } = ethersProviders;
 
 export class EnhancedWallet extends Wallet {
   constructor(privateKey, provider, options = {}) {

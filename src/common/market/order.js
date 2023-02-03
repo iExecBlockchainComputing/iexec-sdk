@@ -1,8 +1,8 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import { getAddress } from '../wallet/address';
-import { isInWhitelist } from '../wallet/enterprise';
-import { checkBalance } from '../account/balance';
+import { getAddress } from '../wallet/address.js';
+import { isInWhitelist } from '../wallet/enterprise.js';
+import { checkBalance } from '../account/balance.js';
 import {
   checkDeployedApp,
   checkDeployedDataset,
@@ -10,8 +10,8 @@ import {
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-} from '../protocol/registries';
-import { createObjParams } from '../execution/order-helper';
+} from '../protocol/registries.js';
+import { createObjParams } from '../execution/order-helper.js';
 import {
   checkEvent,
   getEventFromLogs,
@@ -23,8 +23,8 @@ import {
   tagBitToHuman,
   checkSigner,
   TAG_MAP,
-} from '../utils/utils';
-import { hashEIP712 } from '../utils/sig-utils';
+} from '../utils/utils.js';
+import { hashEIP712 } from '../utils/sig-utils.js';
 import {
   NULL_BYTES,
   NULL_BYTES32,
@@ -34,7 +34,7 @@ import {
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
   NULL_DATASETORDER,
-} from '../utils/constant';
+} from '../utils/constant.js';
 import {
   addressSchema,
   apporderSchema,
@@ -53,13 +53,13 @@ import {
   uint256Schema,
   nRlcAmountSchema,
   throwIfMissing,
-} from '../utils/validator';
+} from '../utils/validator.js';
 import {
   wrapCall,
   wrapSend,
   wrapWait,
   wrapSignTypedData,
-} from '../utils/errorWrappers';
+} from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -188,7 +188,7 @@ const getContractOwner = async (
   return objDesc[orderName].ownerMethod(contracts, contractAddress);
 };
 
-const computeOrderHash = async (
+export const computeOrderHash = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),

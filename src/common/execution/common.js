@@ -1,9 +1,9 @@
 import Debug from 'debug';
-import { NULL_ADDRESS, NULL_BYTES32 } from '../utils/constant';
-import { ObjectNotFoundError } from '../utils/errors';
-import { wrapCall } from '../utils/errorWrappers';
-import { bnifyNestedEthersBn, cleanRPC } from '../utils/utils';
-import { throwIfMissing, bytes32Schema } from '../utils/validator';
+import { NULL_ADDRESS, NULL_BYTES32 } from '../utils/constant.js';
+import { ObjectNotFoundError } from '../utils/errors.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { bnifyNestedEthersBn, cleanRPC } from '../utils/utils.js';
+import { throwIfMissing, bytes32Schema } from '../utils/validator.js';
 
 const debug = Debug('iexec:execution:common');
 

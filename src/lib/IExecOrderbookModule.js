@@ -1,17 +1,17 @@
-import IExecModule from './IExecModule';
-import { fetchPublishedOrderByHash } from '../common/market/marketplace';
+import IExecModule from './IExecModule.js';
+import { fetchPublishedOrderByHash } from '../common/market/marketplace.js';
 import {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchRequestOrderbook,
   fetchWorkerpoolOrderbook,
-} from '../common/market/orderbook';
+} from '../common/market/orderbook.js';
 import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} from '../common/utils/constant';
+} from '../common/utils/constant.js';
 
 export default class IExecOrderbookModule extends IExecModule {
   constructor(...args) {

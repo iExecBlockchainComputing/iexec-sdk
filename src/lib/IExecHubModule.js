@@ -1,10 +1,10 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   createCategory,
   showCategory,
   countCategory,
-} from '../common/protocol/category';
-import { getTimeoutRatio } from '../common/protocol/configuration';
+} from '../common/protocol/category.js';
+import { getTimeoutRatio } from '../common/protocol/configuration.js';
 
 export default class IExecHubModule extends IExecModule {
   constructor(...args) {

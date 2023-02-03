@@ -1,17 +1,17 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
 import { utils } from 'ethers';
-import { getAddress } from '../wallet/address';
-import { httpRequest } from '../utils/api-utils';
+import { getAddress } from '../wallet/address.js';
+import { httpRequest } from '../utils/api-utils.js';
 import {
   addressSchema,
   stringSchema,
   throwIfMissing,
   positiveIntSchema,
-} from '../utils/validator';
-import { wrapPersonalSign } from '../utils/errorWrappers';
-import { checkSigner } from '../utils/utils';
-import { checkWeb2SecretExists, checkRequesterSecretExists } from './check';
+} from '../utils/validator.js';
+import { wrapPersonalSign } from '../utils/errorWrappers.js';
+import { checkSigner } from '../utils/utils.js';
+import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
 
 const { keccak256, arrayify } = utils;
 

@@ -1,4 +1,4 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   deployApp,
   showApp,
@@ -7,9 +7,9 @@ import {
   predictAppAddress,
   checkDeployedApp,
   resolveTeeFrameworkFromApp,
-} from '../common/protocol/registries';
-import { checkAppSecretExists } from '../common/sms/check';
-import { pushAppSecret } from '../common/sms/push';
+} from '../common/protocol/registries.js';
+import { checkAppSecretExists } from '../common/sms/check.js';
+import { pushAppSecret } from '../common/sms/push.js';
 
 export default class IExecAppModule extends IExecModule {
   constructor(...args) {

@@ -2,7 +2,7 @@ import {
   Web3ProviderCallError,
   Web3ProviderSendError,
   Web3ProviderSignMessageError,
-} from './errors';
+} from './errors.js';
 
 const PROCESSING_RESPONSE_ERROR = 'processing response error';
 

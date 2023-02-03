@@ -1,17 +1,17 @@
 import Debug from 'debug';
-import { networks as iexecProxyNetworks } from '@iexec/poco/build/contracts-min/ERC1538Proxy.json';
-import rlcDesc from 'rlc-faucet-contract/build/contracts/RLC.json';
-import erlcDesc from '@iexec/erlc/build/contracts-min/ERLCTokenSwap.json';
 import { Contract } from 'ethers';
-import { version as pocoVersion } from '@iexec/poco/package.json';
-import iexecTokenDesc from '@iexec/poco/build/contracts-min/IexecInterfaceToken.json';
-import iexecNativeDesc from '@iexec/poco/build/contracts-min/IexecInterfaceNative.json';
-import appRegistryDesc from '@iexec/poco/build/contracts-min/AppRegistry.json';
-import workerpoolRegistryDesc from '@iexec/poco/build/contracts-min/WorkerpoolRegistry.json';
-import datasetRegistryDesc from '@iexec/poco/build/contracts-min/DatasetRegistry.json';
-import appDesc from '@iexec/poco/build/contracts-min/App.json';
-import workerpoolDesc from '@iexec/poco/build/contracts-min/Workerpool.json';
-import datasetDesc from '@iexec/poco/build/contracts-min/Dataset.json';
+import { version as pocoVersion } from '../generated/@iexec/poco/package.js';
+import { networks as iexecProxyNetworks } from '../generated/@iexec/poco/ERC1538Proxy.js';
+import iexecTokenDesc from '../generated/@iexec/poco/IexecInterfaceToken.js';
+import iexecNativeDesc from '../generated/@iexec/poco/IexecInterfaceNative.js';
+import appRegistryDesc from '../generated/@iexec/poco/AppRegistry.js';
+import workerpoolRegistryDesc from '../generated/@iexec/poco/WorkerpoolRegistry.js';
+import datasetRegistryDesc from '../generated/@iexec/poco/DatasetRegistry.js';
+import appDesc from '../generated/@iexec/poco/App.js';
+import workerpoolDesc from '../generated/@iexec/poco/Workerpool.js';
+import datasetDesc from '../generated/@iexec/poco/Dataset.js';
+import rlcDesc from '../generated/@iexec/rlc/RLC.js';
+import erlcDesc from '../generated/@iexec/erlc/ERLCTokenSwap.js';
 
 const debug = Debug('iexec:IExecContractsClient');
 

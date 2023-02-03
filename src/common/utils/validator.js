@@ -10,14 +10,14 @@ import {
   parseEth,
   checkActiveBitInTag,
   TAG_MAP,
-} from './utils';
-import { ValidationError } from './errors';
-import { wrapCall } from './errorWrappers';
+} from './utils.js';
+import { ValidationError } from './errors.js';
+import { wrapCall } from './errorWrappers.js';
 import {
   TEE_FRAMEWORKS,
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
-} from './constant';
+} from './constant.js';
 
 const { getAddress, namehash } = utils;
 

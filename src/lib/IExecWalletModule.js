@@ -1,17 +1,17 @@
-import IExecModule from './IExecModule';
-import { getAddress } from '../common/wallet/address';
-import { checkBalances } from '../common/wallet/balance';
-import { sendETH, sendRLC, sweep } from '../common/wallet/send';
+import IExecModule from './IExecModule.js';
+import { getAddress } from '../common/wallet/address.js';
+import { checkBalances } from '../common/wallet/balance.js';
+import { sendETH, sendRLC, sweep } from '../common/wallet/send.js';
 import {
   bridgeToMainchain,
   bridgeToSidechain,
   obsBridgeToMainchain,
   obsBridgeToSidechain,
-} from '../common/wallet/bridge';
+} from '../common/wallet/bridge.js';
 import {
   wrapEnterpriseRLC,
   unwrapEnterpriseRLC,
-} from '../common/wallet/enterprise';
+} from '../common/wallet/enterprise.js';
 
 export default class IExecWalletModule extends IExecModule {
   constructor(...args) {

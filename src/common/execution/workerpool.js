@@ -3,10 +3,10 @@ import {
   throwIfMissing,
   addressSchema,
   workerpoolApiUrlSchema,
-} from '../utils/validator';
-import { lookupAddress } from '../ens/resolution';
-import { setTextRecord } from '../ens/text-record';
-import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant';
+} from '../utils/validator.js';
+import { lookupAddress } from '../ens/resolution.js';
+import { setTextRecord } from '../ens/text-record.js';
+import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
 
 const debug = Debug('iexec:execution:workerpool');
 

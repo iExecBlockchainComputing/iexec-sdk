@@ -1,10 +1,10 @@
 import Debug from 'debug';
-import { httpRequest } from '../utils/api-utils';
+import { httpRequest } from '../utils/api-utils.js';
 import {
   addressSchema,
   throwIfMissing,
   positiveIntSchema,
-} from '../utils/validator';
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:sms:check');
 

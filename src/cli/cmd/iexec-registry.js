@@ -1,21 +1,20 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
-const cli = require('commander');
-const fs = require('fs-extra');
-const { object, array, string } = require('yup');
-const sizeOf = require('image-size');
-const path = require('path');
-const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import fsExtra from 'fs-extra';
+import { object, array, string } from 'yup';
+import sizeOf from 'image-size';
+import { join, extname } from 'path';
+import {
   chainIdSchema,
   addressSchema,
   bytes32Schema,
   appTypeSchema,
   uint256Schema,
   mrenclaveSchema,
-} = require('../../common/utils/validator');
-const {
+} from '../../common/utils/validator.js';
+import {
   finalizeCli,
   addGlobalOptions,
   checkUpdate,
@@ -23,14 +22,21 @@ const {
   desc,
   Spinner,
   pretty,
-} = require('../utils/cli-helper');
-const {
+} from '../utils/cli-helper.js';
+import {
   loadDeployedConf,
   loadIExecConf,
   IEXEC_FILE_NAME,
   DEPLOYED_FILE_NAME,
-} = require('../utils/fs');
-const { APP, DATASET, WORKERPOOL } = require('../../common/utils/constant');
+} from '../utils/fs.js';
+import {
+  APP,
+  DATASET,
+  WORKERPOOL,
+  IEXEC_REQUEST_PARAMS,
+} from '../../common/utils/constant.js';
+
+const { readFile } = fsExtra;
 
 const debug = Debug('iexec:iexec-registry');
 
@@ -171,10 +177,10 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
       failed.push(`${IEXEC_FILE_NAME}: ${confError.message}`);
     }
     // validate logo file
-    const logoPath = path.join(process.cwd(), iexecConf.logo);
+    const logoPath = join(process.cwd(), iexecConf.logo);
     let logoFile;
     try {
-      logoFile = await fs.readFile(logoPath);
+      logoFile = await readFile(logoPath);
       const logoSize = sizeOf(logoFile);
       debug('logoSize', logoSize);
       if (!(logoSize.width === LOGO_SIDE && logoSize.height === LOGO_SIDE)) {
@@ -182,7 +188,7 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
           `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`,
         );
       }
-      const logoExt = path.extname(iexecConf.logo).substr(1);
+      const logoExt = extname(iexecConf.logo).substr(1);
       if (!(logoSize.type === logoExt)) {
         throw Error(`Extension mismatch: ${logoSize.type} =/= ${logoExt}`);
       }

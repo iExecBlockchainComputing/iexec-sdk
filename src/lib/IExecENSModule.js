@@ -1,12 +1,16 @@
-import IExecModule from './IExecModule';
-import { getOwner, resolveName, lookupAddress } from '../common/ens/resolution';
+import IExecModule from './IExecModule.js';
+import {
+  getOwner,
+  resolveName,
+  lookupAddress,
+} from '../common/ens/resolution.js';
 import {
   registerFifsEns,
   obsConfigureResolution,
   configureResolution,
   getDefaultDomain,
-} from '../common/ens/registration';
-import { setTextRecord, readTextRecord } from '../common/ens/text-record';
+} from '../common/ens/registration.js';
+import { setTextRecord, readTextRecord } from '../common/ens/text-record.js';
 
 export default class IExecENSModule extends IExecModule {
   constructor(...args) {

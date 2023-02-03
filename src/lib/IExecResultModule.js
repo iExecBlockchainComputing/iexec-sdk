@@ -1,7 +1,7 @@
-import IExecModule from './IExecModule';
-import { checkWeb2SecretExists } from '../common/sms/check';
-import { pushWeb2Secret } from '../common/sms/push';
-import { getResultEncryptionKeyName } from '../common/utils/secrets-utils';
+import IExecModule from './IExecModule.js';
+import { checkWeb2SecretExists } from '../common/sms/check.js';
+import { pushWeb2Secret } from '../common/sms/push.js';
+import { getResultEncryptionKeyName } from '../common/utils/secrets-utils.js';
 
 export default class IExecResultModule extends IExecModule {
   constructor(...args) {

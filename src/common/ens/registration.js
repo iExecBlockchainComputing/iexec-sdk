@@ -1,24 +1,24 @@
 import Debug from 'debug';
 import { Contract, utils } from 'ethers';
-import { abi } from '@iexec/poco/build/contracts-min/RegistryEntry.json';
-import { abi as ENSRegistryAbi } from './abi/ENSRegistry-min.json';
-import { abi as FIFSRegistrarAbi } from './abi/FIFSRegistrar-min.json';
-import { abi as PublicResolverAbi } from './abi/PublicResolver-min.json';
-import { abi as ReverseRegistrarAbi } from './abi/ReverseRegistrar-min.json';
+import { abi as RegistryEntryAbi } from '../generated/@iexec/poco/RegistryEntry.js';
+import { abi as ENSRegistryAbi } from '../generated/@ensdomains/registry/ENSRegistry.js';
+import { abi as FIFSRegistrarAbi } from '../generated/@ensdomains/registry/FIFSRegistrar.js';
+import { abi as ReverseRegistrarAbi } from '../generated/@ensdomains/registry/ReverseRegistrar.js';
+import { abi as PublicResolverAbi } from '../generated/@ensdomains/resolvers/PublicResolver.js';
 import {
   throwIfMissing,
   addressSchema,
   ensDomainSchema,
   ensLabelSchema,
-} from '../utils/validator';
-import { getAddress } from '../wallet/address';
-import { checkDeployedObj } from '../protocol/registries';
-import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { checkSigner } from '../utils/utils';
-import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant';
-import { getEnsRegistryAddress } from './registry';
-import { getOwner, lookupAddress } from './resolution';
+} from '../utils/validator.js';
+import { getAddress } from '../wallet/address.js';
+import { checkDeployedObj } from '../protocol/registries.js';
+import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+import { checkSigner } from '../utils/utils.js';
+import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant.js';
+import { getEnsRegistryAddress } from './registry.js';
+import { getOwner, lookupAddress } from './resolution.js';
 
 const debug = Debug('iexec:ens:registration');
 
@@ -170,7 +170,7 @@ export const obsConfigureResolution = (
         if (addressIsContract) {
           const registryEntryContract = new Contract(
             vAddress,
-            abi,
+            RegistryEntryAbi,
             contracts.signer,
           );
           const entryOwner = await wrapCall(registryEntryContract.owner());
@@ -291,7 +291,7 @@ export const obsConfigureResolution = (
             // set name for iExec NFTs
             const registryEntryContract = new Contract(
               vAddress,
-              abi,
+              RegistryEntryAbi,
               contracts.signer,
             );
             safeObserver.next({

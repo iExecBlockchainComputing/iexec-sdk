@@ -1,11 +1,11 @@
 import { Buffer } from 'buffer';
 import { utils } from 'ethers';
-import { ModeOfOperation } from 'aes-js';
+import aesJs from 'aes-js';
 import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
   throwIfMissing,
-} from './validator';
+} from './validator.js';
 
 const { randomBytes, sha256 } = utils;
 
@@ -24,7 +24,7 @@ export const encryptAes256Cbc = async (
 
   const ivBuffer = Buffer.from(randomBytes(16));
 
-  const aesCbc = new ModeOfOperation.cbc(keyBuffer, ivBuffer);
+  const aesCbc = new aesJs.ModeOfOperation.cbc(keyBuffer, ivBuffer);
 
   const pkcs7PaddingLength = 16 - (fileBuffer.length % 16);
   const pkcs7PaddingBuffer = Buffer.alloc(
@@ -34,9 +34,9 @@ export const encryptAes256Cbc = async (
 
   const paddedFileBuffer = Buffer.concat([fileBuffer, pkcs7PaddingBuffer]);
 
-  const encyptedFileBuffer = Buffer.from(aesCbc.encrypt(paddedFileBuffer));
+  const encryptedFileBuffer = Buffer.from(aesCbc.encrypt(paddedFileBuffer));
 
-  const ivEncryptedFileBuffer = Buffer.concat([ivBuffer, encyptedFileBuffer]);
+  const ivEncryptedFileBuffer = Buffer.concat([ivBuffer, encryptedFileBuffer]);
 
   return ivEncryptedFileBuffer;
 };

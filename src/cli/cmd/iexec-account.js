@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const account = require('../../common/account');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { stringifyNestedBn, formatRLC } = require('../../common/utils/utils');
-const { NULL_ADDRESS } = require('../../common/utils/constant');
-const {
+import { program as cli } from 'commander';
+import {
+  deposit as accountDeposit,
+  withdraw as accountWithdraw,
+} from '../../common/account/fund.js';
+import { checkBalance } from '../../common/account/balance.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { stringifyNestedBn, formatRLC } from '../../common/utils/utils.js';
+import { NULL_ADDRESS } from '../../common/utils/constant.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -19,7 +23,7 @@ const {
   Spinner,
   info,
   pretty,
-} = require('../utils/cli-helper');
+} from '../utils/cli-helper.js';
 
 const objName = 'account';
 
@@ -43,7 +47,7 @@ deposit
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.depositing());
-      const depositRes = await account.deposit(chain.contracts, [amount, unit]);
+      const depositRes = await accountDeposit(chain.contracts, [amount, unit]);
       spinner.succeed(info.deposited(formatRLC(depositRes.amount)), {
         raw: { amount: depositRes.amount, txHash: depositRes.txHash },
       });
@@ -70,7 +74,7 @@ withdraw
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.withdrawing());
-      const res = await account.withdraw(chain.contracts, [amount, unit]);
+      const res = await accountWithdraw(chain.contracts, [amount, unit]);
       spinner.succeed(info.withdrawn(formatRLC(res.amount)), {
         raw: { amount: res.amount, txHash: res.txHash },
       });
@@ -115,7 +119,7 @@ show
       const chain = await loadChain(opts.chain, { spinner });
 
       spinner.start(info.checkBalance('iExec account'));
-      const balances = await account.checkBalance(chain.contracts, userAddress);
+      const balances = await checkBalance(chain.contracts, userAddress);
       const cleanBalance = stringifyNestedBn(balances);
       spinner.succeed(
         `Account balances (RLC):${pretty({

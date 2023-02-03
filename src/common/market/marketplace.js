@@ -1,13 +1,13 @@
 import Debug from 'debug';
-import { getAddress } from '../wallet/address';
-import { checkSigner } from '../utils/utils';
+import { getAddress } from '../wallet/address.js';
+import { checkSigner } from '../utils/utils.js';
 import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} from '../utils/constant';
-import { jsonApi, getAuthorization } from '../utils/api-utils';
+} from '../utils/constant.js';
+import { jsonApi, getAuthorization } from '../utils/api-utils.js';
 import {
   addressSchema,
   signedApporderSchema,
@@ -17,7 +17,7 @@ import {
   chainIdSchema,
   bytes32Schema,
   throwIfMissing,
-} from '../utils/validator';
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:market:marketplace');
 
@@ -63,7 +63,7 @@ const publishOrder = async (
     if (response.ok && response.published && response.published.orderHash) {
       return response.published.orderHash;
     }
-    throw Error('An error occured while publishing order');
+    throw Error('An error occurred while publishing order');
   } catch (error) {
     debug('publishOrder()', error);
     throw error;
@@ -164,7 +164,7 @@ const unpublishOrder = async (
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
-    throw new Error('An error occured while unpublishing order');
+    throw new Error('An error occurred while unpublishing order');
   } catch (error) {
     debug('unpublishOrder()', error);
     throw error;

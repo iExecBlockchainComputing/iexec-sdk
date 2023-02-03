@@ -1590,7 +1590,7 @@ describe('[wallet]', () => {
     );
     await expect(iexec.wallet.sweep(POOR_ADDRESS3)).rejects.toThrow(
       Error(
-        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': insufficient funds for intrinsic transaction cost`,
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfer ERC20': insufficient funds for intrinsic transaction cost`,
       ),
     );
     const finalBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
@@ -1642,7 +1642,7 @@ describe('[wallet]', () => {
     expect(res.sendERC20TxHash).toMatch(bytes32Regex);
     expect(res.errors.length).toBe(1);
     expect(res.errors[0]).toBe(
-      "Failed to transfert native token': Tx fees are greater than wallet balance",
+      "Failed to transfer native token': Tx fees are greater than wallet balance",
     );
     expect(initialBalance.wei.gt(new BN(0))).toBe(true);
     expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);

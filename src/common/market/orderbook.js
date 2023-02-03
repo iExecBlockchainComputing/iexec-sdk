@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { jsonApi, wrapPaginableRequest } from '../utils/api-utils';
+import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
 import {
   addressSchema,
   chainIdSchema,
@@ -8,7 +8,7 @@ import {
   positiveStrictIntSchema,
   tagSchema,
   throwIfMissing,
-} from '../utils/validator';
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:market:orderbook');
 

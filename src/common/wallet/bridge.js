@@ -7,20 +7,20 @@ import {
   bnNRlcToBnWei,
   formatRLC,
   checkSigner,
-} from '../utils/utils';
+} from '../utils/utils.js';
 import {
   addressSchema,
   nRlcAmountSchema,
   throwIfMissing,
-} from '../utils/validator';
-import { wrapCall } from '../utils/errorWrappers';
-import { BridgeError } from '../utils/errors';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { abi as ForeignBridgeErcToNativeAbi } from './abi/ForeignBridgeErcToNative.json';
-import { abi as HomeBridgeErcToNativeAbi } from './abi/HomeBridgeErcToNative.json';
-import { getAddress } from './address';
-import { getRlcBalance } from './balance';
-import { sendRLC } from './send';
+} from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { BridgeError } from '../utils/errors.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+import { abi as ForeignBridgeErcToNativeAbi } from './abi/ForeignBridgeErcToNative.js';
+import { abi as HomeBridgeErcToNativeAbi } from './abi/HomeBridgeErcToNative.js';
+import { getAddress } from './address.js';
+import { getRlcBalance } from './balance.js';
+import { sendRLC } from './send.js';
 
 const debug = Debug('iexec:wallet:bridge');
 

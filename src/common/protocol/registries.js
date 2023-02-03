@@ -7,7 +7,7 @@ import {
   uint256Schema,
   objMrenclaveSchema,
   throwIfMissing,
-} from '../utils/validator';
+} from '../utils/validator.js';
 import {
   getEventFromLogs,
   checkSigner,
@@ -17,10 +17,10 @@ import {
   multiaddrHexToHuman,
   hexToBuffer,
   BN,
-} from '../utils/utils';
-import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
-import { ObjectNotFoundError } from '../utils/errors';
+} from '../utils/utils.js';
+import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { ObjectNotFoundError } from '../utils/errors.js';
 
 const debug = Debug('iexec:protocol:registries');
 

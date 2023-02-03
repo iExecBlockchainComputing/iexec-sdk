@@ -1,8 +1,8 @@
 import Debug from 'debug';
-import { getAddress } from '../wallet/address';
-import { getAuthorization, httpRequest } from '../utils/api-utils';
-import { throwIfMissing } from '../utils/validator';
-import { checkSigner } from '../utils/utils';
+import { getAddress } from '../wallet/address.js';
+import { getAuthorization, httpRequest } from '../utils/api-utils.js';
+import { throwIfMissing } from '../utils/validator.js';
+import { checkSigner } from '../utils/utils.js';
 
 const debug = Debug('iexec:storage:result-proxy');
 

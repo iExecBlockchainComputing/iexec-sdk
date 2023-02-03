@@ -4,13 +4,13 @@ import {
   bnifyNestedEthersBn,
   getEventFromLogs,
   checkSigner,
-} from '../utils/utils';
+} from '../utils/utils.js';
 import {
   uint256Schema,
   categorySchema,
   throwIfMissing,
-} from '../utils/validator';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:protocol:category');
 
@@ -59,8 +59,8 @@ export const showCategory = async (
     const categoryRPC = await wrapCall(iexecContract.viewCategory(vIndex));
     const categoryPropNames = ['name', 'description', 'workClockTimeRef'];
     const category = categoryRPC.reduce(
-      (accu, curr, i) =>
-        Object.assign(accu, {
+      (acc, curr, i) =>
+        Object.assign(acc, {
           [categoryPropNames[i]]: curr,
         }),
       {},

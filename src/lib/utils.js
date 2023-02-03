@@ -8,6 +8,6 @@ export {
   decodeTag,
   sumTags,
   decryptResult,
-} from '../common/utils/utils';
-export { NULL_ADDRESS, NULL_BYTES32 } from '../common/utils/constant';
-export { getSignerFromPrivateKey } from '../common/utils/signers';
+} from '../common/utils/utils.js';
+export { NULL_ADDRESS, NULL_BYTES32 } from '../common/utils/constant.js';
+export { getSignerFromPrivateKey } from '../common/utils/signers.js';

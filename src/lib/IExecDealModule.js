@@ -1,4 +1,4 @@
-import IExecModule from './IExecModule';
+import IExecModule from './IExecModule.js';
 import {
   show,
   computeTaskId,
@@ -6,13 +6,13 @@ import {
   fetchRequesterDeals,
   claim,
   obsDeal,
-} from '../common/execution/deal';
+} from '../common/execution/deal.js';
 import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} from '../common/utils/constant';
+} from '../common/utils/constant.js';
 
 export default class IExecDealModule extends IExecModule {
   constructor(...args) {

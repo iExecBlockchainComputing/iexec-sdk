@@ -1,6 +1,6 @@
-const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
+import { IEXEC_REQUEST_PARAMS } from '../../common/utils/constant.js';
 
-const main = {
+export const main = {
   description:
     'My iExec resource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
   license: 'MIT',
@@ -12,7 +12,7 @@ const main = {
   logo: 'logo.png',
 };
 
-const app = {
+export const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'python-hello-world',
   type: 'DOCKER',
@@ -21,7 +21,7 @@ const app = {
     '0xa28d8ae83ae586b4c8addd60413a8302798891411a8f87b5f0987050d0d73816',
 };
 
-const sconeTeeApp = {
+export const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'tee-python-hello-world',
   type: 'DOCKER',
@@ -39,7 +39,7 @@ const sconeTeeApp = {
 };
 
 // todo update once gramine format is known
-const gramineTeeApp = {
+export const gramineTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'tee-python-hello-world',
   type: 'DOCKER',
@@ -56,7 +56,7 @@ const gramineTeeApp = {
   },
 };
 
-const buyConf = {
+export const buyConf = {
   params: {
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
   },
@@ -65,7 +65,7 @@ const buyConf = {
   callback: '0x0000000000000000000000000000000000000000',
 };
 
-const dataset = {
+export const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
   multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
@@ -73,7 +73,7 @@ const dataset = {
     '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
-const compatibleDapp = {
+export const compatibleDapp = {
   name: 'Recommended-dapp-for-MyDataset',
   addresses: {
     5: '0x0000000000000000000000000000000000000000',
@@ -81,14 +81,14 @@ const compatibleDapp = {
   buyConf,
 };
 
-const dapps = [compatibleDapp];
+export const dapps = [compatibleDapp];
 
-const workerpool = {
+export const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
 };
 
-const order = {
+export const order = {
   apporder: {
     app: '0x0000000000000000000000000000000000000000',
     appprice: '0',
@@ -139,13 +139,13 @@ const order = {
   },
 };
 
-const category = {
+export const category = {
   name: 'XXL',
   description: 'new hub category',
   workClockTimeRef: '100',
 };
 
-const chains = {
+export const chains = {
   default: 'bellecour',
   chains: {
     mainnet: {},
@@ -154,23 +154,18 @@ const chains = {
   },
 };
 
-const createOrder = (orderName, overwrite = {}) => ({
+export const createOrder = (orderName, overwrite = {}) => ({
   ...order[orderName],
   ...overwrite,
 });
-const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
+export const overwriteObject = (obj, overwrite = {}) => ({
+  ...obj,
+  ...overwrite,
+});
 
-module.exports = {
-  main,
+export default {
   app,
-  sconeTeeApp,
-  gramineTeeApp,
   dataset,
   workerpool,
   category,
-  buyConf,
-  dapps,
-  chains,
-  overwriteObject,
-  createOrder,
 };

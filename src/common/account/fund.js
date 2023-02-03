@@ -1,18 +1,18 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import { checkBalance } from './balance';
-import { getAddress } from '../wallet/address';
-import { isInWhitelist } from '../wallet/enterprise';
-import { checkBalances } from '../wallet/balance';
+import { checkBalance } from './balance.js';
+import { getAddress } from '../wallet/address.js';
+import { isInWhitelist } from '../wallet/enterprise.js';
+import { checkBalances } from '../wallet/balance.js';
 import {
   checkEvent,
   bnNRlcToBnWei,
   bnToEthersBn,
   checkSigner,
-} from '../utils/utils';
-import { NULL_BYTES } from '../utils/constant';
-import { nRlcAmountSchema, throwIfMissing } from '../utils/validator';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
+} from '../utils/utils.js';
+import { NULL_BYTES } from '../utils/constant.js';
+import { nRlcAmountSchema, throwIfMissing } from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:account:fund');
 

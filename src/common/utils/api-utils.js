@@ -1,8 +1,8 @@
 import Debug from 'debug';
 import fetch from 'cross-fetch';
 import { stringify } from 'query-string';
-import { hashEIP712 } from './sig-utils';
-import { wrapSignTypedData } from './errorWrappers';
+import { hashEIP712 } from './sig-utils.js';
+import { wrapSignTypedData } from './errorWrappers.js';
 
 const debug = Debug('iexec:api-utils');
 

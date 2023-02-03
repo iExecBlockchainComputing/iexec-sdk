@@ -1,7 +1,7 @@
 import Debug from 'debug';
-import { throwIfMissing } from '../utils/validator';
-import { wrapCall } from '../utils/errorWrappers';
-import { ConfigurationError } from '../utils/errors';
+import { throwIfMissing } from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { ConfigurationError } from '../utils/errors.js';
 
 const debug = Debug('iexec:ens:registry');
 

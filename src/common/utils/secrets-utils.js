@@ -1,4 +1,4 @@
-import { STORAGE_PROVIDERS } from './constant';
+import { STORAGE_PROVIDERS } from './constant.js';
 
 export const reservedSecretKeyName = {
   // result encryption

@@ -1,11 +1,11 @@
-const semver = require('semver');
-const ethers = require('ethers');
-const fs = require('fs-extra');
-const path = require('path');
-const BN = require('bn.js');
-const { execAsync } = require('./test-utils');
-const { bytes32Regex } = require('../src/common/utils/utils');
-const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
+import { gt } from 'semver';
+import { providers, Wallet, Contract } from 'ethers';
+import { readFile, writeFile, pathExists, remove } from 'fs-extra';
+import { join } from 'path';
+import BN from 'bn.js';
+import { execAsync } from './test-utils';
+import { bytes32Regex } from '../src/common/utils/utils';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
 
 console.log('Node version:', process.version);
 
@@ -86,28 +86,28 @@ console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
 
-const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
-const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
+const tokenChainRPC = new providers.JsonRpcProvider(tokenChainUrl);
+const tokenChainWallet = new Wallet(PRIVATE_KEY, tokenChainRPC);
 
-const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
-const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
+const nativeChainRPC = new providers.JsonRpcProvider(nativeChainUrl);
+const nativeChainWallet = new Wallet(PRIVATE_KEY, nativeChainRPC);
 
-const filePath = (fileName) => path.join(process.cwd(), fileName);
+const filePath = (fileName) => join(process.cwd(), fileName);
 
 const loadJSONFile = async (fileName) => {
-  const fileJSON = await fs.readFile(filePath(fileName), 'utf8');
+  const fileJSON = await readFile(filePath(fileName), 'utf8');
   const file = JSON.parse(fileJSON);
   return file;
 };
 
 const saveJSONToFile = async (json, fileName) => {
   const text = JSON.stringify(json, null, 2);
-  await fs.writeFile(filePath(fileName), text);
+  await writeFile(filePath(fileName), text);
 };
 
-const checkExists = async (file) => fs.pathExists(file);
+const checkExists = async (file) => pathExists(file);
 
-const removeWallet = () => fs.remove('./wallet.json').catch(() => {});
+const removeWallet = () => remove('./wallet.json').catch(() => {});
 
 const setRichWallet = () =>
   saveJSONToFile(
@@ -130,9 +130,7 @@ const setPoorWallet1 = () =>
   );
 
 const setWallet = async (privateKey) => {
-  const wallet = privateKey
-    ? new ethers.Wallet(privateKey)
-    : ethers.Wallet.createRandom();
+  const wallet = privateKey ? new Wallet(privateKey) : Wallet.createRandom();
   const jsonWallet = {
     privateKey: wallet.privateKey,
     publicKey: wallet.publicKey,
@@ -315,7 +313,7 @@ const editDatasetorder = async ({ tag }) =>
   });
 
 const initializeTask = async (wallet, hub, dealid, idx) => {
-  const hubContract = new ethers.Contract(
+  const hubContract = new Contract(
     hub,
     [
       {
@@ -349,7 +347,7 @@ const initializeTask = async (wallet, hub, dealid, idx) => {
 };
 
 const getRandomWallet = () => {
-  const { privateKey, publicKey, address } = ethers.Wallet.createRandom();
+  const { privateKey, publicKey, address } = Wallet.createRandom();
   return { privateKey, publicKey, address };
 };
 const getRandomAddress = () => getRandomWallet().address;
@@ -3973,7 +3971,7 @@ describe('[Common]', () => {
       await execAsync(`${iexecPath} init --skip-wallet --force`);
       await setTokenChain();
     });
-    if (semver.gt('v10.12.0', process.version)) {
+    if (gt('v10.12.0', process.version)) {
       test('iexec result generate-encryption-keypair (node version < v10.12.0)', async () => {
         const raw = await execAsync(
           `${iexecPath} result generate-encryption-keypair --force --raw`,

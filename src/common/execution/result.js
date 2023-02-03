@@ -1,7 +1,7 @@
 import Debug from 'debug';
-import { show } from './task';
-import { downloadZipApi } from '../utils/api-utils';
-import { bytes32Schema, throwIfMissing } from '../utils/validator';
+import { show } from './task.js';
+import { downloadZipApi } from '../utils/api-utils.js';
+import { bytes32Schema, throwIfMissing } from '../utils/validator.js';
 
 const debug = Debug('iexec:execution:result');
 

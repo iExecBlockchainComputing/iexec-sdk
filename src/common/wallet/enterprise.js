@@ -1,15 +1,15 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import { NULL_BYTES } from '../utils/constant';
-import { checkSigner } from '../utils/utils';
+import { NULL_BYTES } from '../utils/constant.js';
+import { checkSigner } from '../utils/utils.js';
 import {
   addressSchema,
   nRlcAmountSchema,
   throwIfMissing,
-} from '../utils/validator';
-import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
-import { getAddress } from './address';
-import { getRlcBalance } from './balance';
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { getAddress } from './address.js';
+import { getRlcBalance } from './balance.js';
 
 const debug = Debug('iexec:wallet:enterprise');
 

@@ -1,16 +1,16 @@
 import Debug from 'debug';
 import { Contract, utils } from 'ethers';
-import { abi } from './abi/PublicResolver-min.json';
+import { abi } from '../generated/@ensdomains/resolvers/PublicResolver.js';
 import {
   throwIfMissing,
   ensDomainSchema,
   textRecordKeySchema,
   textRecordValueSchema,
-} from '../utils/validator';
-import { getAddress } from '../wallet/address';
-import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers';
-import { NULL_ADDRESS } from '../utils/constant';
-import { getOwner } from './resolution';
+} from '../utils/validator.js';
+import { getAddress } from '../wallet/address.js';
+import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers.js';
+import { NULL_ADDRESS } from '../utils/constant.js';
+import { getOwner } from './resolution.js';
 
 const debug = Debug('iexec:ens:text-record');
 

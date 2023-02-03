@@ -3,11 +3,11 @@ import { Buffer } from 'buffer';
 import BnJs from 'bn.js';
 import JSZip from 'jszip';
 import NodeRSA from 'node-rsa';
-import { ModeOfOperation } from 'aes-js';
+import aesJs from 'aes-js';
 import { utils, BigNumber } from 'ethers';
 import { multiaddr } from 'multiaddr';
-import { ValidationError, ConfigurationError } from './errors';
-import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant';
+import { ValidationError, ConfigurationError } from './errors.js';
+import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
 
 export const BN = BnJs;
 
@@ -350,7 +350,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
 
   // decrypt AES ECB (with one time AES key)
   try {
-    const aesEcb = new ModeOfOperation.ecb(aesKeyBuffer);
+    const aesEcb = new aesJs.ModeOfOperation.ecb(aesKeyBuffer);
     const base64EncodedEncryptedZip = Buffer.from(
       encryptedZipArrayBuffer,
     ).toString();

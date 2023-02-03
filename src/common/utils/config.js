@@ -1,4 +1,4 @@
-import { TEE_FRAMEWORKS } from './constant';
+import { TEE_FRAMEWORKS } from './constant.js';
 
 const hostMap = {
   1: 'mainnet',
