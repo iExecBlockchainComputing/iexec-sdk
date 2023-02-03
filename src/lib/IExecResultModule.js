@@ -1,9 +1,9 @@
-const IExecModule = require('./IExecModule');
-const { checkWeb2SecretExists } = require('../common/sms/check');
-const { pushWeb2Secret } = require('../common/sms/push');
-const { getResultEncryptionKeyName } = require('../common/utils/secrets-utils');
+import IExecModule from './IExecModule';
+import { checkWeb2SecretExists } from '../common/sms/check';
+import { pushWeb2Secret } from '../common/sms/push';
+import { getResultEncryptionKeyName } from '../common/utils/secrets-utils';
 
-class IExecResultModule extends IExecModule {
+export default class IExecResultModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -30,5 +30,3 @@ class IExecResultModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecResultModule;

@@ -1,8 +1,8 @@
-const Debug = require('debug');
-const fetch = require('cross-fetch');
-const qs = require('query-string');
-const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedData } = require('./errorWrappers');
+import Debug from 'debug';
+import fetch from 'cross-fetch';
+import { stringify } from 'query-string';
+import { hashEIP712 } from './sig-utils';
+import { wrapSignTypedData } from './errorWrappers';
 
 const debug = Debug('iexec:api-utils');
 
@@ -18,7 +18,7 @@ const makeBody = (method, body) => {
 
 const makeQueryString = (method, queryParams) => {
   if (Object.keys(queryParams).length !== 0) {
-    return '?'.concat(qs.stringify(queryParams));
+    return '?'.concat(stringify(queryParams));
   }
   return '';
 };
@@ -32,7 +32,7 @@ const makeHeaders = (method, headers, body) => {
   return { headers: { ...generatedHeaders, ...headers } };
 };
 
-const httpRequest =
+export const httpRequest =
   (method) =>
   async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
     debug(
@@ -103,7 +103,7 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
-const wrapPaginableRequest = (request) => async (args) =>
+export const wrapPaginableRequest = (request) => async (args) =>
   request(args).then(({ nextPage, ...rest }) => ({
     ...rest,
     ...(nextPage && {
@@ -115,7 +115,7 @@ const wrapPaginableRequest = (request) => async (args) =>
     }),
   }));
 
-const jsonApi = {
+export const jsonApi = {
   get: (args) =>
     httpRequest('GET')({
       ...args,
@@ -133,20 +133,15 @@ const jsonApi = {
     }).then(responseToJson),
 };
 
-const downloadZipApi = {
+export const downloadZipApi = {
   get: (args) =>
     httpRequest('GET')({
       ...args,
       ...{ headers: { Accept: 'application/zip', ...args.headers } },
     }).then(checkResponseOk),
-  post: (args) =>
-    httpRequest('POST')({
-      ...args,
-      ...{ headers: { Accept: 'application/zip', ...args.headers } },
-    }).then(checkResponseOk),
 };
 
-const getAuthorization =
+export const getAuthorization =
   (api, endpoint = '/challenge') =>
   async (chainId, address, signer) => {
     try {
@@ -185,11 +180,3 @@ const getAuthorization =
       throw Error(`Failed to get authorization: ${error}`);
     }
   };
-
-module.exports = {
-  wrapPaginableRequest,
-  httpRequest,
-  jsonApi,
-  downloadZipApi,
-  getAuthorization,
-};

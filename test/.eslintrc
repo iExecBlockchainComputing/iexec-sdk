@@ -2,9 +2,10 @@
   "env": {
     "jest": true
   },
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb-base", "plugin:import/recommended", "prettier"],
   "rules": {
     "no-await-in-loop": "off",
-    "no-console": 0
+    "no-console": 0,
+    "import/prefer-default-export": "off"
   }
 }

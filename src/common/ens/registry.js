@@ -1,11 +1,11 @@
-const Debug = require('debug');
-const { throwIfMissing } = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
-const { ConfigurationError } = require('../utils/errors');
+import Debug from 'debug';
+import { throwIfMissing } from '../utils/validator';
+import { wrapCall } from '../utils/errorWrappers';
+import { ConfigurationError } from '../utils/errors';
 
 const debug = Debug('iexec:ens:registry');
 
-const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
+export const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
   try {
     const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
     if (!ensAddress) {
@@ -18,7 +18,7 @@ const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
   }
 };
 
-const checkEns = async (contracts = throwIfMissing()) => {
+export const checkEns = async (contracts = throwIfMissing()) => {
   try {
     await getEnsRegistryAddress(contracts);
   } catch (e) {
@@ -26,5 +26,3 @@ const checkEns = async (contracts = throwIfMissing()) => {
     throw e;
   }
 };
-
-module.exports = { getEnsRegistryAddress, checkEns };

@@ -1,18 +1,17 @@
-const Debug = require('debug');
-const iexecProxyNetworks =
-  require('@iexec/poco/build/contracts-min/ERC1538Proxy.json').networks;
-const rlcDesc = require('rlc-faucet-contract/build/contracts/RLC.json');
-const erlcDesc = require('@iexec/erlc/build/contracts-min/ERLCTokenSwap.json');
-const { Contract } = require('ethers');
-const pocoVersion = require('@iexec/poco/package.json').version;
-const iexecTokenDesc = require('@iexec/poco/build/contracts-min/IexecInterfaceToken.json');
-const iexecNativeDesc = require('@iexec/poco/build/contracts-min/IexecInterfaceNative.json');
-const appRegistryDesc = require('@iexec/poco/build/contracts-min/AppRegistry.json');
-const workerpoolRegistryDesc = require('@iexec/poco/build/contracts-min/WorkerpoolRegistry.json');
-const datasetRegistryDesc = require('@iexec/poco/build/contracts-min/DatasetRegistry.json');
-const appDesc = require('@iexec/poco/build/contracts-min/App.json');
-const workerpoolDesc = require('@iexec/poco/build/contracts-min/Workerpool.json');
-const datasetDesc = require('@iexec/poco/build/contracts-min/Dataset.json');
+import Debug from 'debug';
+import { networks as iexecProxyNetworks } from '@iexec/poco/build/contracts-min/ERC1538Proxy.json';
+import rlcDesc from 'rlc-faucet-contract/build/contracts/RLC.json';
+import erlcDesc from '@iexec/erlc/build/contracts-min/ERLCTokenSwap.json';
+import { Contract } from 'ethers';
+import { version as pocoVersion } from '@iexec/poco/package.json';
+import iexecTokenDesc from '@iexec/poco/build/contracts-min/IexecInterfaceToken.json';
+import iexecNativeDesc from '@iexec/poco/build/contracts-min/IexecInterfaceNative.json';
+import appRegistryDesc from '@iexec/poco/build/contracts-min/AppRegistry.json';
+import workerpoolRegistryDesc from '@iexec/poco/build/contracts-min/WorkerpoolRegistry.json';
+import datasetRegistryDesc from '@iexec/poco/build/contracts-min/DatasetRegistry.json';
+import appDesc from '@iexec/poco/build/contracts-min/App.json';
+import workerpoolDesc from '@iexec/poco/build/contracts-min/Workerpool.json';
+import datasetDesc from '@iexec/poco/build/contracts-min/Dataset.json';
 
 const debug = Debug('iexec:IExecContractsClient');
 
@@ -268,4 +267,4 @@ class IExecContractsClient {
   }
 }
 
-module.exports = IExecContractsClient;
+export default IExecContractsClient;

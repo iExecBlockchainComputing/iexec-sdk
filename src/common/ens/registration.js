@@ -1,24 +1,24 @@
-const Debug = require('debug');
-const { Contract, utils } = require('ethers');
-const RegistryEntry = require('@iexec/poco/build/contracts-min/RegistryEntry.json');
-const ENSRegistry = require('./abi/ENSRegistry-min.json');
-const FIFSRegistrar = require('./abi/FIFSRegistrar-min.json');
-const PublicResolver = require('./abi/PublicResolver-min.json');
-const ReverseRegistrar = require('./abi/ReverseRegistrar-min.json');
-const {
+import Debug from 'debug';
+import { Contract, utils } from 'ethers';
+import { abi } from '@iexec/poco/build/contracts-min/RegistryEntry.json';
+import { abi as ENSRegistryAbi } from './abi/ENSRegistry-min.json';
+import { abi as FIFSRegistrarAbi } from './abi/FIFSRegistrar-min.json';
+import { abi as PublicResolverAbi } from './abi/PublicResolver-min.json';
+import { abi as ReverseRegistrarAbi } from './abi/ReverseRegistrar-min.json';
+import {
   throwIfMissing,
   addressSchema,
   ensDomainSchema,
   ensLabelSchema,
-} = require('../utils/validator');
-const { getAddress } = require('../wallet/address');
-const { checkDeployedObj } = require('../protocol/registries');
-const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
-const { Observable, SafeObserver } = require('../utils/reactive');
-const { checkSigner } = require('../utils/utils');
-const { NULL_ADDRESS, APP, DATASET, WORKERPOOL } = require('../utils/constant');
-const { getEnsRegistryAddress } = require('./registry');
-const { getOwner, lookupAddress } = require('./resolution');
+} from '../utils/validator';
+import { getAddress } from '../wallet/address';
+import { checkDeployedObj } from '../protocol/registries';
+import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers';
+import { Observable, SafeObserver } from '../utils/reactive';
+import { checkSigner } from '../utils/utils';
+import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant';
+import { getEnsRegistryAddress } from './registry';
+import { getOwner, lookupAddress } from './resolution';
 
 const debug = Debug('iexec:ens:registration');
 
@@ -29,7 +29,7 @@ const FIFS_DOMAINS = {
   default: 'users.iexec.eth',
 };
 
-const getDefaultDomain = async (
+export const getDefaultDomain = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -58,7 +58,7 @@ const getDefaultDomain = async (
   }
 };
 
-const registerFifsEns = async (
+export const registerFifsEns = async (
   contracts = throwIfMissing(),
   label = throwIfMissing(),
   domain = FIFS_DOMAINS.default,
@@ -84,7 +84,7 @@ const registerFifsEns = async (
       }
       const fifsRegistrarContract = new Contract(
         domainOwner,
-        FIFSRegistrar.abi,
+        FIFSRegistrarAbi,
         contracts.signer,
       );
       const registerTx = await wrapSend(
@@ -120,7 +120,7 @@ const obsConfigureResolutionMessages = {
   SET_NAME_SUCCESS: 'SET_NAME_SUCCESS',
 };
 
-const obsConfigureResolution = (
+export const obsConfigureResolution = (
   contracts = throwIfMissing(),
   publicResolverAddress = throwIfMissing(),
   name = throwIfMissing(),
@@ -170,7 +170,7 @@ const obsConfigureResolution = (
         if (addressIsContract) {
           const registryEntryContract = new Contract(
             vAddress,
-            RegistryEntry.abi,
+            abi,
             contracts.signer,
           );
           const entryOwner = await wrapCall(registryEntryContract.owner());
@@ -216,7 +216,7 @@ const obsConfigureResolution = (
         if (!isResolverSet) {
           const registryContract = new Contract(
             ensAddress,
-            ENSRegistry.abi,
+            ENSRegistryAbi,
             contracts.signer,
           );
           safeObserver.next({
@@ -248,7 +248,7 @@ const obsConfigureResolution = (
         // set addr
         const resolverContract = new Contract(
           publicResolverAddress,
-          PublicResolver.abi,
+          PublicResolverAbi,
           contracts.signer,
         );
         const addr = await wrapCall(
@@ -291,7 +291,7 @@ const obsConfigureResolution = (
             // set name for iExec NFTs
             const registryEntryContract = new Contract(
               vAddress,
-              RegistryEntry.abi,
+              abi,
               contracts.signer,
             );
             safeObserver.next({
@@ -321,7 +321,7 @@ const obsConfigureResolution = (
             );
             const reverseRegistrarContract = new Contract(
               reverseRegistrarAddress,
-              ReverseRegistrar.abi,
+              ReverseRegistrarAbi,
               contracts.signer,
             );
             safeObserver.next({
@@ -360,7 +360,7 @@ const obsConfigureResolution = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
-const configureResolution = async (
+export const configureResolution = async (
   contracts = throwIfMissing(),
   publicResolverAddress = throwIfMissing(),
   name = throwIfMissing(),
@@ -412,11 +412,4 @@ const configureResolution = async (
     debug('configureResolution()', e);
     throw e;
   }
-};
-
-module.exports = {
-  configureResolution,
-  obsConfigureResolution,
-  registerFifsEns,
-  getDefaultDomain,
 };

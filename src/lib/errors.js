@@ -1,3 +1,1 @@
-const errors = require('../common/utils/errors');
-
-module.exports = errors;
+export * from '../common/utils/errors';

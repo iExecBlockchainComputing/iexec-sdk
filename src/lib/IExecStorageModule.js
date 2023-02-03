@@ -1,10 +1,10 @@
-const IExecModule = require('./IExecModule');
-const { checkWeb2SecretExists } = require('../common/sms/check');
-const { pushWeb2Secret } = require('../common/sms/push');
-const { login: resultProxyLogin } = require('../common/storage/result-proxy');
-const { getStorageTokenKeyName } = require('../common/utils/secrets-utils');
+import IExecModule from './IExecModule';
+import { checkWeb2SecretExists } from '../common/sms/check';
+import { pushWeb2Secret } from '../common/sms/push';
+import { login as resultProxyLogin } from '../common/storage/result-proxy';
+import { getStorageTokenKeyName } from '../common/utils/secrets-utils';
 
-class IExecStorageModule extends IExecModule {
+export default class IExecStorageModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -37,5 +37,3 @@ class IExecStorageModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecStorageModule;

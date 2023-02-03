@@ -1,7 +1,7 @@
-const { getDefaultProvider, providers } = require('ethers');
-const { getChainDefaults, getId } = require('./config');
+import { getDefaultProvider, providers } from 'ethers';
+import { getChainDefaults, getId } from './config';
 
-const getReadOnlyProvider = (host, options = {}) => {
+export const getReadOnlyProvider = (host, options = {}) => {
   const providerOptions = options.providers || {};
   const networkOptions = options.network;
   let resolvedHost = host;
@@ -56,8 +56,4 @@ const getReadOnlyProvider = (host, options = {}) => {
     quorum: quorum || 1,
     ...providersOptionsRest,
   });
-};
-
-module.exports = {
-  getReadOnlyProvider,
 };

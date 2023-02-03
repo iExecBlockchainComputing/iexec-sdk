@@ -1,8 +1,8 @@
-const IExecModule = require('./IExecModule');
-const { checkRequesterSecretExists } = require('../common/sms/check');
-const { pushRequesterSecret } = require('../common/sms/push');
+import IExecModule from './IExecModule';
+import { checkRequesterSecretExists } from '../common/sms/check';
+import { pushRequesterSecret } from '../common/sms/push';
 
-class IExecSecretModule extends IExecModule {
+export default class IExecSecretModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -30,5 +30,3 @@ class IExecSecretModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecSecretModule;

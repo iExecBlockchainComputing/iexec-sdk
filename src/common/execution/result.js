@@ -1,7 +1,7 @@
-const Debug = require('debug');
-const taskModule = require('./task');
-const { downloadZipApi } = require('../utils/api-utils');
-const { bytes32Schema, throwIfMissing } = require('../utils/validator');
+import Debug from 'debug';
+import { show } from './task';
+import { downloadZipApi } from '../utils/api-utils';
+import { bytes32Schema, throwIfMissing } from '../utils/validator';
 
 const debug = Debug('iexec:execution:result');
 
@@ -20,14 +20,14 @@ const downloadFromIpfs = async (
   }
 };
 
-const fetchTaskResults = async (
+export const fetchTaskResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   { ipfsGatewayURL } = {},
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const task = await taskModule.show(contracts, vTaskId);
+    const task = await show(contracts, vTaskId);
     if (task.status !== 3) throw Error('Task is not completed');
     const { storage, location } = task.results;
     if (storage === 'none') {
@@ -47,8 +47,4 @@ const fetchTaskResults = async (
     debug('fetchResults()', error);
     throw error;
   }
-};
-
-module.exports = {
-  fetchTaskResults,
 };

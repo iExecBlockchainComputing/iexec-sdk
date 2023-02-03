@@ -1,21 +1,21 @@
-const IExecModule = require('./IExecModule');
-const IExecAccountModule = require('./IExecAccountModule');
-const IExecAppModule = require('./IExecAppModule');
-const IExecDatasetModule = require('./IExecDatasetModule');
-const IExecDealModule = require('./IExecDealModule');
-const IExecENSModule = require('./IExecENSModule');
-const IExecHubModule = require('./IExecHubModule');
-const IExecNetworkModule = require('./IExecNetworkModule');
-const IExecOrderModule = require('./IExecOrderModule');
-const IExecOrderbookModule = require('./IExecOrderbookModule');
-const IExecResultModule = require('./IExecResultModule');
-const IExecSecretsModule = require('./IExecSecretsModule');
-const IExecStorageModule = require('./IExecStorageModule');
-const IExecTaskModule = require('./IExecTaskModule');
-const IExecWalletModule = require('./IExecWalletModule');
-const IExecWorkerpoolModule = require('./IExecWorkerpoolModule');
+import IExecModule from './IExecModule';
+import IExecAccountModule from './IExecAccountModule';
+import IExecAppModule from './IExecAppModule';
+import IExecDatasetModule from './IExecDatasetModule';
+import IExecDealModule from './IExecDealModule';
+import IExecENSModule from './IExecENSModule';
+import IExecHubModule from './IExecHubModule';
+import IExecNetworkModule from './IExecNetworkModule';
+import IExecOrderModule from './IExecOrderModule';
+import IExecOrderbookModule from './IExecOrderbookModule';
+import IExecResultModule from './IExecResultModule';
+import IExecSecretsModule from './IExecSecretsModule';
+import IExecStorageModule from './IExecStorageModule';
+import IExecTaskModule from './IExecTaskModule';
+import IExecWalletModule from './IExecWalletModule';
+import IExecWorkerpoolModule from './IExecWorkerpoolModule';
 
-class IExec extends IExecModule {
+export default class IExec extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -36,5 +36,3 @@ class IExec extends IExecModule {
     this.network = IExecNetworkModule.fromConfig(this.config);
   }
 }
-
-module.exports = IExec;

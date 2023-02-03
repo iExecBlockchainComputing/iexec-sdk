@@ -1,22 +1,22 @@
-const Debug = require('debug');
-const {
+import Debug from 'debug';
+import {
   throwIfMissing,
   addressSchema,
   workerpoolApiUrlSchema,
   bytes32Schema,
-} = require('../utils/validator');
-const { lookupAddress } = require('../ens/resolution');
-const { readTextRecord } = require('../ens/text-record');
-const { show: dealShow } = require('./deal');
-const { show: taskShow } = require('./task');
-const { WORKERPOOL_URL_TEXT_RECORD_KEY } = require('../utils/constant');
-const { jsonApi, getAuthorization } = require('../utils/api-utils');
-const { checkSigner } = require('../utils/utils');
-const { getAddress } = require('../wallet/address');
+} from '../utils/validator';
+import { lookupAddress } from '../ens/resolution';
+import { readTextRecord } from '../ens/text-record';
+import { show as dealShow } from './deal';
+import { show as taskShow } from './task';
+import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant';
+import { jsonApi, getAuthorization } from '../utils/api-utils';
+import { checkSigner } from '../utils/utils';
+import { getAddress } from '../wallet/address';
 
 const debug = Debug('iexec:execution:debug');
 
-const getWorkerpoolApiUrl = async (
+export const getWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
   workerpoolAddress,
 ) => {
@@ -73,7 +73,7 @@ const getTaskOffchainApiUrl = async (
   }
 };
 
-const fetchTaskOffchainInfo = async (
+export const fetchTaskOffchainInfo = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
 ) => {
@@ -91,7 +91,7 @@ const fetchTaskOffchainInfo = async (
   }
 };
 
-const fetchAllReplicatesLogs = async (
+export const fetchAllReplicatesLogs = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
 ) => {
@@ -126,10 +126,4 @@ const fetchAllReplicatesLogs = async (
     debug('fetchAllReplicatesLogs()', error);
     throw error;
   }
-};
-
-module.exports = {
-  getWorkerpoolApiUrl,
-  fetchTaskOffchainInfo,
-  fetchAllReplicatesLogs,
 };

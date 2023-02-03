@@ -1,15 +1,15 @@
-const Debug = require('debug');
-const { httpRequest } = require('../utils/api-utils');
-const {
+import Debug from 'debug';
+import { httpRequest } from '../utils/api-utils';
+import {
   addressSchema,
   throwIfMissing,
   positiveIntSchema,
-} = require('../utils/validator');
+} from '../utils/validator';
 
 const debug = Debug('iexec:sms:check');
 
 // used for dataset key
-const checkWeb3SecretExists = async (
+export const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   resourceAddress = throwIfMissing(),
@@ -44,7 +44,7 @@ const checkWeb3SecretExists = async (
 };
 
 // used for beneficiary key
-const checkWeb2SecretExists = async (
+export const checkWeb2SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   ownerAddress = throwIfMissing(),
@@ -80,7 +80,7 @@ const checkWeb2SecretExists = async (
   }
 };
 
-const checkRequesterSecretExists = async (
+export const checkRequesterSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
@@ -112,7 +112,7 @@ const checkRequesterSecretExists = async (
   }
 };
 
-const checkAppSecretExists = async (
+export const checkAppSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
@@ -143,11 +143,4 @@ const checkAppSecretExists = async (
     debug('checkRequesterSecretExists()', error);
     throw error;
   }
-};
-
-module.exports = {
-  checkWeb3SecretExists,
-  checkWeb2SecretExists,
-  checkRequesterSecretExists,
-  checkAppSecretExists,
 };

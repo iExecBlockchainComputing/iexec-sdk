@@ -1,6 +1,6 @@
-const { exec } = require('child_process');
+import { exec } from 'child_process';
 
-const execAsync = (cmd) =>
+export const execAsync = (cmd) =>
   new Promise((res, rej) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
@@ -9,7 +9,3 @@ const execAsync = (cmd) =>
       res(stdout + stderr);
     });
   });
-
-module.exports = {
-  execAsync,
-};

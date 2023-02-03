@@ -1,46 +1,24 @@
-const IExec = require('./IExec');
-const IExecConfig = require('./IExecConfig');
-const IExecModule = require('./IExecModule');
-const IExecAccountModule = require('./IExecAccountModule');
-const IExecAppModule = require('./IExecAppModule');
-const IExecDatasetModule = require('./IExecDatasetModule');
-const IExecDealModule = require('./IExecDealModule');
-const IExecENSModule = require('./IExecENSModule');
-const IExecHubModule = require('./IExecHubModule');
-const IExecNetworkModule = require('./IExecNetworkModule');
-const IExecOrderModule = require('./IExecOrderModule');
-const IExecOrderbookModule = require('./IExecOrderbookModule');
-const IExecResultModule = require('./IExecResultModule');
-const IExecSecretsModule = require('./IExecSecretsModule');
-const IExecStorageModule = require('./IExecStorageModule');
-const IExecTaskModule = require('./IExecTaskModule');
-const IExecWalletModule = require('./IExecWalletModule');
-const IExecWorkerpoolModule = require('./IExecWorkerpoolModule');
+import * as utilsModule from './utils';
+import * as errorsModule from './errors';
 
-const errors = require('./errors');
-const utils = require('./utils');
+export { default as IExec } from './IExec';
+export { default as IExecConfig } from './IExecConfig';
+export { default as IExecModule } from './IExecModule';
+export { default as IExecAccountModule } from './IExecAccountModule';
+export { default as IExecAppModule } from './IExecAppModule';
+export { default as IExecDatasetModule } from './IExecDatasetModule';
+export { default as IExecDealModule } from './IExecDealModule';
+export { default as IExecENSModule } from './IExecENSModule';
+export { default as IExecHubModule } from './IExecHubModule';
+export { default as IExecNetworkModule } from './IExecNetworkModule';
+export { default as IExecOrderModule } from './IExecOrderModule';
+export { default as IExecOrderbookModule } from './IExecOrderbookModule';
+export { default as IExecResultModule } from './IExecResultModule';
+export { default as IExecSecretsModule } from './IExecSecretsModule';
+export { default as IExecStorageModule } from './IExecStorageModule';
+export { default as IExecTaskModule } from './IExecTaskModule';
+export { default as IExecWalletModule } from './IExecWalletModule';
+export { default as IExecWorkerpoolModule } from './IExecWorkerpoolModule';
 
-const sdk = {
-  IExec,
-  IExecConfig,
-  IExecModule,
-  IExecAccountModule,
-  IExecAppModule,
-  IExecDatasetModule,
-  IExecDealModule,
-  IExecENSModule,
-  IExecHubModule,
-  IExecNetworkModule,
-  IExecOrderModule,
-  IExecOrderbookModule,
-  IExecResultModule,
-  IExecSecretsModule,
-  IExecStorageModule,
-  IExecTaskModule,
-  IExecWalletModule,
-  IExecWorkerpoolModule,
-  errors,
-  utils,
-};
-
-module.exports = sdk;
+export const utils = utilsModule;
+export const errors = errorsModule;

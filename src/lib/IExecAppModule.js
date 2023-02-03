@@ -1,5 +1,5 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule';
+import {
   deployApp,
   showApp,
   showUserApp,
@@ -7,11 +7,11 @@ const {
   predictAppAddress,
   checkDeployedApp,
   resolveTeeFrameworkFromApp,
-} = require('../common/protocol/registries');
-const { checkAppSecretExists } = require('../common/sms/check');
-const { pushAppSecret } = require('../common/sms/push');
+} from '../common/protocol/registries';
+import { checkAppSecretExists } from '../common/sms/check';
+import { pushAppSecret } from '../common/sms/push';
 
-class IExecAppModule extends IExecModule {
+export default class IExecAppModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -68,5 +68,3 @@ class IExecAppModule extends IExecModule {
       checkDeployedApp(await this.config.resolveContractsClient(), address);
   }
 }
-
-module.exports = IExecAppModule;

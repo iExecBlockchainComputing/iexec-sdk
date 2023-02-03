@@ -2,6 +2,7 @@
   "name": "iexec",
   "version": "8.0.0-alpha.3",
   "description": "iExec SDK",
+  "type": "module",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "engine": {

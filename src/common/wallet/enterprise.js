@@ -1,19 +1,19 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { NULL_BYTES } = require('../utils/constant');
-const { checkSigner } = require('../utils/utils');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { NULL_BYTES } from '../utils/constant';
+import { checkSigner } from '../utils/utils';
+import {
   addressSchema,
   nRlcAmountSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { getAddress } = require('./address');
-const { getRlcBalance } = require('./balance');
+} from '../utils/validator';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers';
+import { getAddress } from './address';
+import { getRlcBalance } from './balance';
 
 const debug = Debug('iexec:wallet:enterprise');
 
-const isInWhitelist = async (
+export const isInWhitelist = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
   { strict = true } = {},
@@ -37,7 +37,7 @@ const isInWhitelist = async (
   }
 };
 
-const wrapEnterpriseRLC = async (
+export const wrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   enterpriseContracts,
   nRlcAmount = throwIfMissing(),
@@ -76,7 +76,7 @@ const wrapEnterpriseRLC = async (
   }
 };
 
-const unwrapEnterpriseRLC = async (
+export const unwrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
 ) => {
@@ -100,5 +100,3 @@ const unwrapEnterpriseRLC = async (
     throw error;
   }
 };
-
-module.exports = { isInWhitelist, wrapEnterpriseRLC, unwrapEnterpriseRLC };

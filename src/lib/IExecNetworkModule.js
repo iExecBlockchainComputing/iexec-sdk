@@ -1,6 +1,6 @@
-const IExecModule = require('./IExecModule');
+import IExecModule from './IExecModule';
 
-class IExecNetworkModule extends IExecModule {
+export default class IExecNetworkModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -10,5 +10,3 @@ class IExecNetworkModule extends IExecModule {
     };
   }
 }
-
-module.exports = IExecNetworkModule;

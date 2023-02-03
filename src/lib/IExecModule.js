@@ -1,6 +1,6 @@
-const IExecConfig = require('./IExecConfig');
+import IExecConfig from './IExecConfig';
 
-class IExecModule {
+export default class IExecModule {
   constructor(...args) {
     if (!args[0]) {
       throw Error(`${this.constructor.name} requires at least one argument`);
@@ -18,5 +18,3 @@ class IExecModule {
     return new this.prototype.constructor(config);
   }
 }
-
-module.exports = IExecModule;

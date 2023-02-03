@@ -1,15 +1,18 @@
-const { Buffer } = require('buffer');
-const { randomBytes, sha256 } = require('ethers').utils;
-const aesjs = require('aes-js');
-const {
+import { Buffer } from 'buffer';
+import { utils } from 'ethers';
+import { ModeOfOperation } from 'aes-js';
+import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
   throwIfMissing,
-} = require('./validator');
+} from './validator';
 
-const generateAes256Key = () => Buffer.from(randomBytes(32)).toString('base64');
+const { randomBytes, sha256 } = utils;
 
-const encryptAes256Cbc = async (
+export const generateAes256Key = () =>
+  Buffer.from(randomBytes(32)).toString('base64');
+
+export const encryptAes256Cbc = async (
   fileBytes = throwIfMissing(),
   base64Key = throwIfMissing(),
 ) => {
@@ -21,7 +24,7 @@ const encryptAes256Cbc = async (
 
   const ivBuffer = Buffer.from(randomBytes(16));
 
-  const aesCbc = new aesjs.ModeOfOperation.cbc(keyBuffer, ivBuffer);
+  const aesCbc = new ModeOfOperation.cbc(keyBuffer, ivBuffer);
 
   const pkcs7PaddingLength = 16 - (fileBuffer.length % 16);
   const pkcs7PaddingBuffer = Buffer.alloc(
@@ -38,13 +41,7 @@ const encryptAes256Cbc = async (
   return ivEncryptedFileBuffer;
 };
 
-const sha256Sum = async (fileBytes = throwIfMissing()) => {
+export const sha256Sum = async (fileBytes = throwIfMissing()) => {
   const fileBuffer = await fileBufferSchema().validate(fileBytes);
   return sha256(fileBuffer);
-};
-
-module.exports = {
-  generateAes256Key,
-  encryptAes256Cbc,
-  sha256Sum,
 };

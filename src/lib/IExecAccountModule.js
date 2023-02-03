@@ -1,8 +1,8 @@
-const IExecModule = require('./IExecModule');
-const { checkBalance } = require('../common/account/balance');
-const { deposit, withdraw } = require('../common/account/fund');
+import IExecModule from './IExecModule';
+import { checkBalance } from '../common/account/balance';
+import { deposit, withdraw } from '../common/account/fund';
 
-class IExecAccountModule extends IExecModule {
+export default class IExecAccountModule extends IExecModule {
   constructor(...args) {
     super(...args);
     this.checkBalance = async (address) =>
@@ -15,5 +15,3 @@ class IExecAccountModule extends IExecModule {
       withdraw(await this.config.resolveContractsClient(), nRlcAmount);
   }
 }
-
-module.exports = IExecAccountModule;

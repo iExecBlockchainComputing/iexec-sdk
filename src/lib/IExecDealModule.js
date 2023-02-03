@@ -1,20 +1,20 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule';
+import {
   show,
   computeTaskId,
   fetchDealsByOrderHash,
   fetchRequesterDeals,
   claim,
-} = require('../common/execution/deal');
-const { obsDeal } = require('../common/execution/deal');
-const {
+  obsDeal,
+} from '../common/execution/deal';
+import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} = require('../common/utils/constant');
+} from '../common/utils/constant';
 
-class IExecDealModule extends IExecModule {
+export default class IExecDealModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -69,5 +69,3 @@ class IExecDealModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecDealModule;

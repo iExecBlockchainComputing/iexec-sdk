@@ -1,12 +1,12 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule';
+import {
   createCategory,
   showCategory,
   countCategory,
-} = require('../common/protocol/category');
-const { getTimeoutRatio } = require('../common/protocol/configuration');
+} from '../common/protocol/category';
+import { getTimeoutRatio } from '../common/protocol/configuration';
 
-class IExecHubModule extends IExecModule {
+export default class IExecHubModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -20,5 +20,3 @@ class IExecHubModule extends IExecModule {
       getTimeoutRatio(await this.config.resolveContractsClient());
   }
 }
-
-module.exports = IExecHubModule;

@@ -1,26 +1,26 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { Contract } = require('ethers');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { Contract } from 'ethers';
+import {
   ethersBnToBn,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   formatRLC,
   checkSigner,
-} = require('../utils/utils');
-const {
+} from '../utils/utils';
+import {
   addressSchema,
   nRlcAmountSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
-const { BridgeError } = require('../utils/errors');
-const { Observable, SafeObserver } = require('../utils/reactive');
-const foreignBridgeErcToNativeDesc = require('./abi/ForeignBridgeErcToNative.json');
-const homeBridgeErcToNativeDesc = require('./abi/HomeBridgeErcToNative.json');
-const { getAddress } = require('./address');
-const { getRlcBalance } = require('./balance');
-const { sendRLC } = require('./send');
+} from '../utils/validator';
+import { wrapCall } from '../utils/errorWrappers';
+import { BridgeError } from '../utils/errors';
+import { Observable, SafeObserver } from '../utils/reactive';
+import { abi as ForeignBridgeErcToNativeAbi } from './abi/ForeignBridgeErcToNative.json';
+import { abi as HomeBridgeErcToNativeAbi } from './abi/HomeBridgeErcToNative.json';
+import { getAddress } from './address';
+import { getRlcBalance } from './balance';
+import { sendRLC } from './send';
 
 const debug = Debug('iexec:wallet:bridge');
 
@@ -62,7 +62,7 @@ const findBlockNumberBeforeTimestamp = async (
   return triedBlock.number;
 };
 
-const obsBridgeToSidechain = (
+export const obsBridgeToSidechain = (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
@@ -101,7 +101,7 @@ const obsBridgeToSidechain = (
         if (abort) return;
         const ercBridgeContract = new Contract(
           vBridgeAddress,
-          foreignBridgeErcToNativeDesc.abi,
+          ForeignBridgeErcToNativeAbi,
           contracts.provider,
         );
         const [minPerTx, maxPerTx, dailyLimit] = await Promise.all([
@@ -223,7 +223,7 @@ const obsBridgeToSidechain = (
             new Promise((resolve, reject) => {
               const sidechainBridge = new Contract(
                 vSidechainBridgeAddress,
-                homeBridgeErcToNativeDesc.abi,
+                HomeBridgeErcToNativeAbi,
                 bridgedContracts.provider,
               );
               const cleanListeners = () =>
@@ -279,7 +279,7 @@ const obsBridgeToSidechain = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
-const bridgeToSidechain = async (
+export const bridgeToSidechain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
@@ -315,7 +315,7 @@ const bridgeToSidechain = async (
   }
 };
 
-const obsBridgeToMainchain = (
+export const obsBridgeToMainchain = (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
@@ -348,7 +348,7 @@ const obsBridgeToMainchain = (
         }
         const sidechainBridgeContract = new Contract(
           vBridgeAddress,
-          homeBridgeErcToNativeDesc.abi,
+          HomeBridgeErcToNativeAbi,
           contracts.provider,
         );
         const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
@@ -446,7 +446,7 @@ const obsBridgeToMainchain = (
             new Promise((resolve, reject) => {
               const mainchainBridge = new Contract(
                 vMainchainBridgeAddress,
-                foreignBridgeErcToNativeDesc.abi,
+                ForeignBridgeErcToNativeAbi,
                 bridgedContracts.provider,
               );
               const cleanListeners = () =>
@@ -502,7 +502,7 @@ const obsBridgeToMainchain = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
-const bridgeToMainchain = async (
+export const bridgeToMainchain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
@@ -536,11 +536,4 @@ const bridgeToMainchain = async (
     if (sendTxHash) throw new BridgeError(error, sendTxHash);
     throw error;
   }
-};
-
-module.exports = {
-  obsBridgeToMainchain,
-  obsBridgeToSidechain,
-  bridgeToMainchain,
-  bridgeToSidechain,
 };

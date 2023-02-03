@@ -1,11 +1,11 @@
-const Debug = require('debug');
-const { ethersBnToBn } = require('../utils/utils');
-const { addressSchema, throwIfMissing } = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
+import Debug from 'debug';
+import { ethersBnToBn } from '../utils/utils';
+import { addressSchema, throwIfMissing } from '../utils/validator';
+import { wrapCall } from '../utils/errorWrappers';
 
 const debug = Debug('iexec:account:balance');
 
-const checkBalance = async (
+export const checkBalance = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -26,8 +26,4 @@ const checkBalance = async (
     debug('checkBalance()', error);
     throw error;
   }
-};
-
-module.exports = {
-  checkBalance,
 };

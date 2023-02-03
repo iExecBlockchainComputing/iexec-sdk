@@ -1,34 +1,31 @@
-const {
+import {
   checkWeb2SecretExists,
   checkWeb3SecretExists,
   checkRequesterSecretExists,
-} = require('../sms/check');
-const { checkActiveBitInTag, TAG_MAP } = require('../utils/utils');
-const {
+} from '../sms/check';
+import { checkActiveBitInTag, TAG_MAP } from '../utils/utils';
+import {
   NULL_ADDRESS,
   NULL_BYTES32,
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
   TEE_FRAMEWORKS,
-} = require('../utils/constant');
-const {
+} from '../utils/constant';
+import {
   getStorageTokenKeyName,
   reservedSecretKeyName,
-} = require('../utils/secrets-utils');
-const {
+} from '../utils/secrets-utils';
+import {
   objParamsSchema,
   requestorderSchema,
   throwIfMissing,
   datasetorderSchema,
   apporderSchema,
   tagSchema,
-} = require('../utils/validator');
-const {
-  resolveTeeFrameworkFromApp,
-  showApp,
-} = require('../protocol/registries');
+} from '../utils/validator';
+import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries';
 
-const resolveTeeFrameworkFromTag = async (tag) => {
+export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema().validate(tag);
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
@@ -39,7 +36,7 @@ const resolveTeeFrameworkFromTag = async (tag) => {
   return undefined;
 };
 
-const createObjParams = async ({
+export const createObjParams = async ({
   params = {},
   tag = NULL_BYTES32,
   callback = NULL_ADDRESS,
@@ -67,7 +64,7 @@ const createObjParams = async ({
   return objParams;
 };
 
-const checkRequestRequirements = async (
+export const checkRequestRequirements = async (
   {
     contracts = throwIfMissing(),
     smsURL = throwIfMissing(),
@@ -157,7 +154,7 @@ const checkRequestRequirements = async (
   }
 };
 
-const checkDatasetRequirements = async (
+export const checkDatasetRequirements = async (
   {
     contracts = throwIfMissing(),
     smsURL = throwIfMissing(),
@@ -186,7 +183,7 @@ const checkDatasetRequirements = async (
   }
 };
 
-const checkAppRequirements = async (
+export const checkAppRequirements = async (
   { contracts = throwIfMissing() } = throwIfMissing(),
   apporder = throwIfMissing(),
   { tagOverride } = {},
@@ -202,12 +199,4 @@ const checkAppRequirements = async (
   if (appTeeFramework !== tagTeeFramework) {
     throw Error('Tag mismatch the TEE framework specified by app');
   }
-};
-
-module.exports = {
-  resolveTeeFrameworkFromTag,
-  createObjParams,
-  checkRequestRequirements,
-  checkDatasetRequirements,
-  checkAppRequirements,
 };

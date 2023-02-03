@@ -1,18 +1,18 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { getAddress } = require('../wallet/address');
-const { isInWhitelist } = require('../wallet/enterprise');
-const { checkBalance } = require('../account/balance');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { getAddress } from '../wallet/address';
+import { isInWhitelist } from '../wallet/enterprise';
+import { checkBalance } from '../account/balance';
+import {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-} = require('../protocol/registries');
-const { createObjParams } = require('../execution/order-helper');
-const {
+} from '../protocol/registries';
+import { createObjParams } from '../execution/order-helper';
+import {
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
@@ -23,9 +23,9 @@ const {
   tagBitToHuman,
   checkSigner,
   TAG_MAP,
-} = require('../utils/utils');
-const { hashEIP712 } = require('../utils/sig-utils');
-const {
+} from '../utils/utils';
+import { hashEIP712 } from '../utils/sig-utils';
+import {
   NULL_BYTES,
   NULL_BYTES32,
   NULL_ADDRESS,
@@ -34,8 +34,8 @@ const {
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
   NULL_DATASETORDER,
-} = require('../utils/constant');
-const {
+} from '../utils/constant';
+import {
   addressSchema,
   apporderSchema,
   datasetorderSchema,
@@ -53,13 +53,13 @@ const {
   uint256Schema,
   nRlcAmountSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const {
+} from '../utils/validator';
+import {
   wrapCall,
   wrapSend,
   wrapWait,
   wrapSignTypedData,
-} = require('../utils/errorWrappers');
+} from '../utils/errorWrappers';
 
 const debug = Debug('iexec:market:order');
 
@@ -236,7 +236,7 @@ const computeOrderHash = async (
   }
 };
 
-const hashApporder = async (
+export const hashApporder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -247,7 +247,7 @@ const hashApporder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashDatasetorder = async (
+export const hashDatasetorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -258,7 +258,7 @@ const hashDatasetorder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashWorkerpoolorder = async (
+export const hashWorkerpoolorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -269,7 +269,7 @@ const hashWorkerpoolorder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashRequestorder = async (
+export const hashRequestorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -281,7 +281,7 @@ const hashRequestorder = async (
     }).validate(order),
   );
 
-const getRemainingVolume = async (
+export const getRemainingVolume = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),
@@ -329,7 +329,7 @@ const signOrder = async (
   };
   const { signer } = contracts;
   const sign = await wrapSignTypedData(
-    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // use experiential ether Signer._signTypedData (to remove when signTypedData is included)
     // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
     /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
     signer._signTypedData && typeof signer._signTypedData === 'function'
@@ -340,7 +340,7 @@ const signOrder = async (
   return signedOrder;
 };
 
-const signApporder = async (
+export const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
 ) =>
@@ -352,7 +352,7 @@ const signApporder = async (
     ),
   );
 
-const signDatasetorder = async (
+export const signDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
 ) =>
@@ -364,7 +364,7 @@ const signDatasetorder = async (
     }).validate(datasetorder),
   );
 
-const signWorkerpoolorder = async (
+export const signWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
 ) =>
@@ -376,7 +376,7 @@ const signWorkerpoolorder = async (
     }).validate(workerpoolorder),
   );
 
-const signRequestorder = async (
+export const signRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) =>
@@ -419,7 +419,7 @@ const cancelOrder = async (
   }
 };
 
-const cancelApporder = async (
+export const cancelApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
 ) =>
@@ -429,7 +429,7 @@ const cancelApporder = async (
     await signedApporderSchema().validate(apporder),
   );
 
-const cancelDatasetorder = async (
+export const cancelDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
 ) =>
@@ -439,7 +439,7 @@ const cancelDatasetorder = async (
     await signedDatasetorderSchema().validate(datasetorder),
   );
 
-const cancelWorkerpoolorder = async (
+export const cancelWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
 ) =>
@@ -449,7 +449,7 @@ const cancelWorkerpoolorder = async (
     await signedWorkerpoolorderSchema().validate(workerpoolorder),
   );
 
-const cancelRequestorder = async (
+export const cancelRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) =>
@@ -805,7 +805,7 @@ const getMatchableVolume = async (
   }
 };
 
-const matchOrders = async (
+export const matchOrders = async (
   contracts = throwIfMissing(),
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
@@ -901,7 +901,7 @@ const matchOrders = async (
   }
 };
 
-const createApporder = async (
+export const createApporder = async (
   contracts = throwIfMissing(),
   {
     app = throwIfMissing(),
@@ -928,7 +928,7 @@ const createApporder = async (
   }).validate(requesterrestrict),
 });
 
-const createDatasetorder = async (
+export const createDatasetorder = async (
   contracts = throwIfMissing(),
   {
     dataset = throwIfMissing(),
@@ -957,7 +957,7 @@ const createDatasetorder = async (
   }).validate(requesterrestrict),
 });
 
-const createWorkerpoolorder = async (
+export const createWorkerpoolorder = async (
   contracts = throwIfMissing(),
   {
     workerpool = throwIfMissing(),
@@ -990,7 +990,7 @@ const createWorkerpoolorder = async (
   }).validate(requesterrestrict),
 });
 
-const createRequestorder = async (
+export const createRequestorder = async (
   { contracts = throwIfMissing(), resultProxyURL = throwIfMissing() } = {},
   {
     app = throwIfMissing(),
@@ -1045,26 +1045,4 @@ const createRequestorder = async (
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };
-};
-
-module.exports = {
-  computeOrderHash,
-  getRemainingVolume,
-  hashApporder,
-  hashDatasetorder,
-  hashWorkerpoolorder,
-  hashRequestorder,
-  createApporder,
-  createDatasetorder,
-  createWorkerpoolorder,
-  createRequestorder,
-  signApporder,
-  signDatasetorder,
-  signWorkerpoolorder,
-  signRequestorder,
-  cancelApporder,
-  cancelDatasetorder,
-  cancelWorkerpoolorder,
-  cancelRequestorder,
-  matchOrders,
 };

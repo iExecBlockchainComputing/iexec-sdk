@@ -1,8 +1,8 @@
-const IExecModule = require('./IExecModule');
-const { show, obsTask, claim } = require('../common/execution/task');
-const { fetchTaskResults } = require('../common/execution/result');
+import IExecModule from './IExecModule';
+import { show, obsTask, claim } from '../common/execution/task';
+import { fetchTaskResults } from '../common/execution/result';
 
-class IExecTaskModule extends IExecModule {
+export default class IExecTaskModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -20,5 +20,3 @@ class IExecTaskModule extends IExecModule {
       });
   }
 }
-
-module.exports = IExecTaskModule;

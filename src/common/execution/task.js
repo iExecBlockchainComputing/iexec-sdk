@@ -1,18 +1,18 @@
-const Debug = require('debug');
-const { Buffer } = require('buffer');
-const { checkEvent, checkSigner, FETCH_INTERVAL } = require('../utils/utils');
-const { NULL_BYTES } = require('../utils/constant');
-const { bytes32Schema, throwIfMissing } = require('../utils/validator');
-const { ObjectNotFoundError } = require('../utils/errors');
-const { wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { Observable, SafeObserver } = require('../utils/reactive');
-const { viewDeal, viewTask } = require('./common');
-const { showCategory } = require('../protocol/category');
-const { getTimeoutRatio } = require('../protocol/configuration');
+import Debug from 'debug';
+import { Buffer } from 'buffer';
+import { checkEvent, checkSigner, FETCH_INTERVAL } from '../utils/utils';
+import { NULL_BYTES } from '../utils/constant';
+import { bytes32Schema, throwIfMissing } from '../utils/validator';
+import { ObjectNotFoundError } from '../utils/errors';
+import { wrapSend, wrapWait } from '../utils/errorWrappers';
+import { Observable, SafeObserver } from '../utils/reactive';
+import { viewDeal, viewTask } from './common';
+import { showCategory } from '../protocol/category';
+import { getTimeoutRatio } from '../protocol/configuration';
 
 const debug = Debug('iexec:execution:task');
 
-const TASK_STATUS_MAP = {
+export const TASK_STATUS_MAP = {
   0: 'UNSET',
   1: 'ACTIVE',
   2: 'REVEALING',
@@ -35,7 +35,7 @@ const decodeTaskResult = (results) => {
   return { storage: 'none' };
 };
 
-const show = async (
+export const show = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
 ) => {
@@ -69,7 +69,7 @@ const obsTaskMessages = {
   TASK_FAILED: 'TASK_FAILED',
 };
 
-const obsTask = (
+export const obsTask = (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   { dealid } = {},
@@ -170,7 +170,7 @@ const obsTask = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
-const claim = async (
+export const claim = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
 ) => {
@@ -210,11 +210,4 @@ const claim = async (
     debug('claim()', error);
     throw error;
   }
-};
-
-module.exports = {
-  TASK_STATUS_MAP,
-  show,
-  obsTask,
-  claim,
 };

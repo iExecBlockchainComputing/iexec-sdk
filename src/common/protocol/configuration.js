@@ -1,11 +1,11 @@
-const Debug = require('debug');
-const { ethersBnToBn } = require('../utils/utils');
-const { throwIfMissing } = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
+import Debug from 'debug';
+import { ethersBnToBn } from '../utils/utils';
+import { throwIfMissing } from '../utils/validator';
+import { wrapCall } from '../utils/errorWrappers';
 
 const debug = Debug('iexec:protocol:configuration');
 
-const getTimeoutRatio = async (contracts = throwIfMissing()) => {
+export const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
     const timeoutRatio = ethersBnToBn(
       await wrapCall(contracts.getIExecContract().final_deadline_ratio()),
@@ -16,5 +16,3 @@ const getTimeoutRatio = async (contracts = throwIfMissing()) => {
     throw error;
   }
 };
-
-module.exports = { getTimeoutRatio };

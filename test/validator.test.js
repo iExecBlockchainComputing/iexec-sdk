@@ -1,36 +1,20 @@
-const BN = require('bn.js');
-const { getDefaultProvider } = require('ethers');
-const fs = require('fs-extra');
-const path = require('path');
-const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
-const {
-  // throwIfMissing,
-  // stringSchema,
+import BN from 'bn.js';
+import { getDefaultProvider } from 'ethers';
+import { readFile } from 'fs-extra';
+import { join } from 'path';
+import { ValidationError } from '../src/common/utils/errors';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
+import {
   uint256Schema,
   weiAmountSchema,
   nRlcAmountSchema,
   addressSchema,
-  // bytes32Schema,
-  // apporderSchema,
-  // signedApporderSchema,
-  // datasetorderSchema,
-  // signedDatasetorderSchema,
-  // workerpoolorderSchema,
-  // signedWorkerpoolorderSchema,
-  // requestorderSchema,
-  // signedRequestorderSchema,
   paramsSchema,
   paramsInputFilesArraySchema,
   tagSchema,
-  // chainIdSchema,
-  // hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
   mrenclaveSchema,
-  // appSchema,
-  // datasetSchema,
-  // categorySchema,
-  // workerpoolSchema,
   objParamsSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
@@ -40,9 +24,8 @@ const {
   textRecordValueSchema,
   workerpoolApiUrlSchema,
   smsUrlOrMapSchema,
-  ValidationError,
   teeFrameworkSchema,
-} = require('../src/common/utils/validator');
+} from '../src/common/utils/validator';
 
 const { INFURA_PROJECT_ID } = process.env;
 // public chains
@@ -1048,8 +1031,8 @@ describe('[base64Encoded256bitsKeySchema]', () => {
 
 describe('[fileBufferSchema]', () => {
   test('file', async () => {
-    const fileBuffer = await fs.readFile(
-      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    const fileBuffer = await readFile(
+      join(process.cwd(), 'test/inputs/files/text.zip'),
     );
     await expect(
       fileBufferSchema().validate(fileBuffer),

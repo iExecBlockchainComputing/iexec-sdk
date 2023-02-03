@@ -1,8 +1,9 @@
-const { Wallet, Signer, BigNumber } = require('ethers');
-const { Web3Provider } = require('ethers').providers;
-const { getReadOnlyProvider } = require('./providers');
+import { Wallet, Signer, BigNumber, providers as _providers } from 'ethers';
+import { getReadOnlyProvider } from './providers';
 
-class EnhancedWallet extends Wallet {
+const { Web3Provider } = _providers;
+
+export class EnhancedWallet extends Wallet {
   constructor(privateKey, provider, options = {}) {
     super(privateKey, provider);
     this._options = options;
@@ -49,7 +50,7 @@ class EnhancedWallet extends Wallet {
   }
 }
 
-class EnhancedWeb3Signer extends Signer {
+export class EnhancedWeb3Signer extends Signer {
   constructor(...args) {
     super();
     const web3Provider = new Web3Provider(...args);
@@ -78,7 +79,7 @@ class EnhancedWeb3Signer extends Signer {
   }
 }
 
-const getSignerFromPrivateKey = (
+export const getSignerFromPrivateKey = (
   host,
   privateKey,
   { gasPrice, getTransactionCount, providers } = {},
@@ -87,9 +88,3 @@ const getSignerFromPrivateKey = (
     gasPrice,
     getTransactionCount,
   });
-
-module.exports = {
-  EnhancedWallet,
-  EnhancedWeb3Signer,
-  getSignerFromPrivateKey,
-};
