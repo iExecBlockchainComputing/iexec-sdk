@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import fetch from 'cross-fetch';
-import { stringify } from 'query-string';
+import querystring from 'query-string';
 import { hashEIP712 } from './sig-utils.js';
 import { wrapSignTypedData } from './errorWrappers.js';
 
@@ -16,9 +16,9 @@ const makeBody = (method, body) => {
   return {};
 };
 
-const makeQueryString = (method, queryParams) => {
+const makeQueryString = (queryParams) => {
   if (Object.keys(queryParams).length !== 0) {
-    return '?'.concat(stringify(queryParams));
+    return '?'.concat(querystring.stringify(queryParams));
   }
   return '';
 };
@@ -51,7 +51,7 @@ export const httpRequest =
       headers,
     );
     const baseURL = new URL(endpoint, api).href;
-    const queryString = makeQueryString(method, query);
+    const queryString = makeQueryString(query);
     const url = baseURL.concat(queryString);
     const response = await fetch(url, {
       method,

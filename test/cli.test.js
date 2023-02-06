@@ -1,11 +1,16 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
 import { gt } from 'semver';
 import { providers, Wallet, Contract } from 'ethers';
-import { readFile, writeFile, pathExists, remove } from 'fs-extra';
+import fsExtra from 'fs-extra';
 import { join } from 'path';
 import BN from 'bn.js';
 import { execAsync } from './test-utils';
 import { bytes32Regex } from '../src/common/utils/utils';
 import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
+
+const { readFile, writeFile, pathExists, remove } = fsExtra;
 
 console.log('Node version:', process.version);
 

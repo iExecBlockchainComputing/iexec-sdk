@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { getDefaultProvider } from 'ethers';
-import { readFile } from 'fs-extra';
+import fsExtra from 'fs-extra';
 import { join } from 'path';
 import { ValidationError } from '../src/common/utils/errors';
 import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
@@ -26,6 +26,8 @@ import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
 } from '../src/common/utils/validator';
+
+const { readFile } = fsExtra;
 
 const { INFURA_PROJECT_ID } = process.env;
 // public chains
