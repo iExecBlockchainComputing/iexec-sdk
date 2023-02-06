@@ -3,8 +3,13 @@
   "version": "8.0.0-alpha.3",
   "description": "iExec SDK",
   "type": "module",
-  "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "exports": {
+    "default": "./src/lib/index.js",
+    "types": "./src/lib/index.d.ts"
+  },
+  "bin": {
+    "iexec": "./src/cli/cmd/iexec.js"
+  },
   "engine": {
     "node": ">=14.17.0",
     "npm": ">=8"
@@ -12,17 +17,14 @@
   "scripts": {
     "postinstall": "npm run generate-json-es-modules",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
-    "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
+    "build": "npm run generate-json-es-modules && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
     "generate-json-es-modules": "rm -rf src/common/generated && node generateEsModulesFromJson.cjs",
-    "generate-dist": "./node_modules/.bin/babel src --out-dir dist --copy-files",
+    "generate-dist": "./node_modules/.bin/babel src --out-dir cjs --copy-files",
     "generate-packages": "node generatePackages.cjs",
     "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
     "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
     "generate-cli-doc": "node generateCliDoc.cjs"
-  },
-  "bin": {
-    "iexec": "./dist/cli/cmd/iexec.js"
   },
   "files": [
     "dist/",

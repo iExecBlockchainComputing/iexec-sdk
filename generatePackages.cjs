@@ -4,7 +4,9 @@ const packageJson = require('./package.json');
 
 console.log(`\ngeneratePackages start`);
 
-const mainDir = path.join(...packageJson.main.split('/').slice(0, -1));
+const mainDir = path.join(
+  ...packageJson.exports.default.split('/').slice(0, -1),
+);
 const packageFiles = packageJson.files;
 
 const generatePackage = async (fileName) => {
@@ -19,8 +21,10 @@ const generatePackage = async (fileName) => {
     path.join(dirName, 'package.json'),
     JSON.stringify(
       {
-        main: path.join('..', mainDir, fileName),
-        types: path.join('..', mainDir, typeFileName),
+        exports: {
+          default: path.join('..', mainDir, fileName),
+          types: path.join('..', mainDir, typeFileName),
+        },
       },
       null,
       2,
