@@ -5,7 +5,9 @@ import JSZip from 'jszip';
 import NodeRSA from 'node-rsa';
 import aesJs from 'aes-js';
 import { utils, BigNumber } from 'ethers';
-import { multiaddr } from 'multiaddr';
+// import-js/eslint-plugin-import/issues/2703
+// eslint-disable-next-line import/no-unresolved
+import { multiaddr } from '@multiformats/multiaddr';
 import { ValidationError, ConfigurationError } from './errors.js';
 import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
 
