@@ -79,6 +79,13 @@ const resultsDownloadButton = document.getElementById(
 );
 const resultsDownloadError = document.getElementById('results-download-error');
 
+const resultsDecryptKey = document.getElementById('results-decrypt-key-file');
+const resultsDecryptEncrypted = document.getElementById(
+  'results-decrypt-encrypted-file',
+);
+const resultsDecryptButton = document.getElementById('results-decrypt-button');
+const resultsDecryptError = document.getElementById('results-decrypt-error');
+
 const refreshUser = (iexec) => async () => {
   const userAddress = await iexec.wallet.getAddress();
   const [wallet, account] = await Promise.all([
@@ -238,12 +245,13 @@ const buyComputation = (iexec) => async () => {
     const appAddress = buyAppAddressInput.value;
     const category = buyCategoryInput.value;
     const params = buyParamsInput.value;
-    const { appOrders } = await iexec.orderbook.fetchAppOrderbook(appAddress);
+    const { orders: appOrders } = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+    );
     const appOrder = appOrders && appOrders[0] && appOrders[0].order;
     if (!appOrder) throw Error(`no apporder found for app ${appAddress}`);
-    const { workerpoolOrders } = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      { category },
-    );
+    const { orders: workerpoolOrders } =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({ category });
     const workerpoolOrder =
       workerpoolOrders && workerpoolOrders[0] && workerpoolOrders[0].order;
     if (!workerpoolOrder)
@@ -325,7 +333,7 @@ const showTask = (iexec) => async () => {
   }
 };
 
-const dowloadResults = (iexec) => async () => {
+const downloadResults = (iexec) => async () => {
   try {
     resultsDownloadButton.disabled = true;
     resultsDownloadError.innerText = '';
@@ -353,6 +361,49 @@ const dowloadResults = (iexec) => async () => {
     resultsDownloadError.innerText = error;
   } finally {
     resultsDownloadButton.disabled = false;
+  }
+};
+
+const decryptResults = () => async () => {
+  try {
+    resultsDecryptError.innerText = '';
+    const readFile = (file) =>
+      new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = (e) => resolve(e.target.result);
+        fileReader.onerror = () =>
+          reject(Error(`Failed to read file: ${fileReader.error}`));
+        fileReader.onabort = () =>
+          reject(Error(`Failed to read file: aborted`));
+      });
+
+    const keyBuffer = await readFile(resultsDecryptKey.files[0]);
+    const encryptedBuffer = await readFile(resultsDecryptEncrypted.files[0]);
+
+    const decryptedBuffer = await utils.decryptResult(
+      encryptedBuffer,
+      keyBuffer,
+    );
+
+    const file = new Blob([decryptedBuffer]);
+    const fileName = `decrypted.zip`;
+    if (window.navigator.msSaveOrOpenBlob)
+      window.navigator.msSaveOrOpenBlob(file, fileName);
+    else {
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(file);
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 0);
+    }
+  } catch (error) {
+    resultsDecryptError.innerText = error;
   }
 };
 
@@ -397,7 +448,8 @@ const init = async () => {
     previousDealsButton.addEventListener('click', showPreviousDeals(iexec));
     resultsShowDealButton.addEventListener('click', showDeal(iexec));
     resultsShowTaskButton.addEventListener('click', showTask(iexec));
-    resultsDownloadButton.addEventListener('click', dowloadResults(iexec));
+    resultsDownloadButton.addEventListener('click', downloadResults(iexec));
+    resultsDecryptButton.addEventListener('click', decryptResults(iexec));
     accountDepositButton.disabled = false;
     accountWithdrawButton.disabled = false;
     walletBTMButton.disabled = false;
@@ -411,6 +463,7 @@ const init = async () => {
     resultsShowDealButton.disabled = false;
     resultsShowTaskButton.disabled = false;
     resultsDownloadButton.disabled = false;
+    resultsDecryptButton.disabled = false;
     console.log('initialized');
   } catch (e) {
     console.error(e.message);

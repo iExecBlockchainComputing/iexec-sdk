@@ -194,7 +194,7 @@
         <div class="scrollable" id="previous-deals-output"></div>
       </div>
       <hr />
-      <h2>Find results</h2>
+
       <div class="container">
         <div>
           <label for="results-dealid-input">Dealid</label>
@@ -236,9 +236,21 @@
             DOWNLOAD TASK RESULT
           </button>
         </div>
+        <label id="results-download-error" class="error"></label>
       </div>
-      <label id="results-download-error" class="error"></label>
+      <h2>Decrypt results</h2>
+      <div class="container">
+        <div>
+          <label for="results-decrypt-key-file">beneficiary key</label>
+          <input id="results-decrypt-key-file" type="file" />
+          <label for="results-decrypt-encrypted-file">encrypted result</label>
+          <input id="results-decrypt-encrypted-file" type="file" />
+          <button id="results-decrypt-button" disabled>DECRYPT</button>
+        </div>
+        <label id="results-decrypt-error" class="error"></label>
+      </div>
     </div>
+
     <script type="module" src="src/index.js"></script>
   </body>
 </html>
