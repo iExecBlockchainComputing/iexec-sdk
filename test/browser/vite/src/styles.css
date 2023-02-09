@@ -1,0 +1,30 @@
+body {
+  font-family: sans-serif;
+}
+label {
+  display: inline-block;
+  min-width: 150px;
+}
+input {
+  display: inline-block;
+  width: 200px;
+  margin: 2px;
+}
+button {
+  margin: 2px;
+}
+.error {
+  display: inline;
+  color: red;
+}
+.scrollable {
+  background-color: #f5f5f5;
+  max-height: 250px;
+  overflow-y: auto;
+  white-space: pre;
+}
+.container {
+  margin: 10px 5px;
+  padding-left: 10px;
+  border-left: 3px solid #fae900;
+}
