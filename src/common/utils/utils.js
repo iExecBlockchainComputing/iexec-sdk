@@ -332,6 +332,16 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       encryptionScheme: 'pkcs1',
     });
     const decryptedAesKeyBuffer = key.decrypt(encryptedAesKeyBuffer);
+
+    // alt not used because crypto polyfill fail with buffer polyfill
+    // const decryptedAesKeyBuffer = crypto.privateDecrypt(
+    //   {
+    //     key: crypto.createPrivateKey(keyBuffer),
+    //     padding: crypto.constants.RSA_PKCS1_PADDING,
+    //   },
+    //   encryptedAesKeyBuffer,
+    // );
+
     const base64EncodedResultsKey = decryptedAesKeyBuffer.toString();
     aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
   } catch (error) {
