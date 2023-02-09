@@ -1,13 +1,13 @@
 const path = require('path');
-const fsPromises = require('fs').promises;
+const fsPromises = require('fs/promises');
 const packageJson = require('./package.json');
 
 console.log(`\ngeneratePackages start`);
 
-const mainDir = path.join(
-  ...packageJson.exports.default.split('/').slice(0, -1),
-);
-const packageFiles = packageJson.files;
+const distDir = 'dist';
+
+const mainDir = 'src/lib';
+const packageExports = packageJson.exports;
 
 const generatePackage = async (fileName) => {
   const [baseName] = fileName.split('.');
@@ -16,26 +16,13 @@ const generatePackage = async (fileName) => {
   await fsPromises
     .rmdir(dirName, { recursive: true, force: true })
     .catch(() => {});
-  await fsPromises.mkdir(dirName, { recursive: true });
-  await fsPromises.writeFile(
-    path.join(dirName, 'package.json'),
-    JSON.stringify(
-      {
-        exports: {
-          default: path.join('..', mainDir, fileName),
-          types: path.join('..', mainDir, typeFileName),
-        },
-      },
-      null,
-      2,
-    ).concat('\n'),
-  );
-  console.log(`generated ${dirName}`);
-  const dirPath = `${dirName}/`;
-  if (!packageFiles.includes(dirPath)) {
-    packageFiles.push(dirPath);
-    console.log(`adding ${dirPath} to package files`);
-  }
+  packageExports[`./${baseName}`] = {
+    types: `./${path.join(distDir, 'esm', typeFileName)}`,
+    import: `./${path.join(distDir, 'esm', fileName)}`,
+    require: `./${path.join(distDir, 'cjs', fileName)}`,
+    browser: `./${path.join(distDir, 'esm', fileName)}`,
+    default: `./${path.join(distDir, 'esm', fileName)}`,
+  };
 };
 
 fsPromises
@@ -56,7 +43,7 @@ fsPromises
   )
   .then(() => {
     console.log('updating package.json');
-    packageJson.files = packageFiles;
+    packageJson.exports = packageExports;
     return fsPromises.writeFile(
       'package.json',
       JSON.stringify(packageJson, null, 2).concat('\n'),

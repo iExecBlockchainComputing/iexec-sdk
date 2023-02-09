@@ -1,6 +1,6 @@
 const { exec } = require('child_process');
 const { EOL } = require('os');
-const fsPromises = require('fs').promises;
+const fsPromises = require('fs/promises');
 
 const CMD = 'iexec';
 const PLACEHOLDER = '%CLI_API_GENERATED_DOC%';
