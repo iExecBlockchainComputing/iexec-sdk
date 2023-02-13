@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "8.0.0-alpha.3",
+  "version": "8.0.0-alpha.3-esm.0",
   "description": "iExec SDK",
   "bin": {
     "iexec": "./dist/esm/cli/cmd/iexec.js"
@@ -13,7 +13,7 @@
       "import": "./dist/esm/lib/index.js",
       "require": "./dist/cjs/lib/index.js",
       "browser": "./dist/esm/lib/index.js",
-      "default": "./dist/cjs/lib/index.js"
+      "default": "./dist/esm/lib/index.js"
     },
     "./IExec": {
       "types": "./dist/esm/IExec.d.ts",
@@ -175,6 +175,7 @@
   "files": [
     "src/",
     "dist/",
+    "generateEsModulesFromJson.cjs",
     "iexec_sdk_logo.jpg"
   ],
   "repository": {
