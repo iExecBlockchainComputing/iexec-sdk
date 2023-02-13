@@ -17,11 +17,11 @@ const generatePackage = async (fileName) => {
     .rmdir(dirName, { recursive: true, force: true })
     .catch(() => {});
   packageExports[`./${baseName}`] = {
-    types: `./${path.join(distDir, 'esm', typeFileName)}`,
-    import: `./${path.join(distDir, 'esm', fileName)}`,
-    require: `./${path.join(distDir, 'cjs', fileName)}`,
-    browser: `./${path.join(distDir, 'esm', fileName)}`,
-    default: `./${path.join(distDir, 'esm', fileName)}`,
+    types: `./${path.join(distDir, 'esm', 'lib', typeFileName)}`,
+    import: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
+    require: `./${path.join(distDir, 'cjs', 'lib', fileName)}`,
+    browser: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
+    default: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
   };
 };
 
