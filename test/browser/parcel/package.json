@@ -1,6 +1,6 @@
 {
   "name": "browser",
-  "version": "8.0.0-alpha.3-esm.0",
+  "version": "8.0.0-alpha.3-esm.1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
