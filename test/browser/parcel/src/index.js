@@ -1,3 +1,7 @@
+// parcel does not supports exports map
+// import IExec from 'iexec/IExec';
+// import * as utils from 'iexec/utils';
+
 import { IExec, utils } from 'iexec';
 import './styles.css';
 

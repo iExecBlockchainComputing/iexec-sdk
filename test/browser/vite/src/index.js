@@ -1,4 +1,5 @@
-import { IExec, utils } from 'iexec';
+import IExec from 'iexec/IExec';
+import * as utils from 'iexec/utils';
 import './styles.css';
 
 const networkOutput = document.getElementById('network');
