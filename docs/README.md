@@ -53,7 +53,9 @@ Here are the recommended polyfills for the required NodeJS modules:
 - crypto: fallback to `crypto-browserify`
 - stream: fallback to `stream-browserify`
 - constants: fallback to `constants-browserify`
-- Buffer: fallback to `buffer`
+- assert: fallback to `assert`
+- Buffer: `buffer` plugin
+- process: `process/browser` plugin
 
 ### Create-react-app
 
@@ -66,7 +68,7 @@ Here is the steps to follow:
 - Install the following dev-dependencies:
 
 ```bash
-npm install --save-dev react-app-rewired crypto-browserify stream-browserify constants-browserify process
+npm install --save-dev react-app-rewired crypto-browserify stream-browserify constants-browserify assert process
 ```
 
 - Create the following `config-overrides.js` at the root of your project:
@@ -80,7 +82,7 @@ module.exports = function override(config) {
     crypto: require.resolve('crypto-browserify'),
     stream: require.resolve('stream-browserify'),
     constants: require.resolve('constants-browserify'),
-    assert: false,
+    assert: require.resolve('assert/'),
   });
   config.resolve.fallback = fallback;
   config.plugins = (config.plugins || []).concat([
