@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import Debug from 'debug';
 import { string, number, object, mixed, boolean, array, lazy } from 'yup';
 import { utils } from 'ethers';

@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import BN from 'bn.js';
 import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
