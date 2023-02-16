@@ -1,6 +1,6 @@
 {
-  "name": "browser",
-  "version": "8.0.0-alpha.3-esm.2",
+  "name": "parcel",
+  "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
   "scripts": {

@@ -1,5 +1,4 @@
-import IExec from 'iexec/IExec';
-import * as utils from 'iexec/utils';
+import { IExec, utils } from 'iexec';
 
 const networkOutput = document.getElementById('network');
 const addressOutput = document.getElementById('address');
@@ -78,6 +77,68 @@ const resultsDownloadButton = document.getElementById(
   'results-download-button',
 );
 const resultsDownloadError = document.getElementById('results-download-error');
+
+const datasetsShowInput = document.getElementById('datasets-address-input');
+const datasetsShowButton = document.getElementById('datasets-show-button');
+const datasetsShowError = document.getElementById('datasets-show-error');
+const datasetShowOutput = document.getElementById('datasets-details-output');
+const datasetsCountButton = document.getElementById('datasets-count-button');
+const datasetsCountError = document.getElementById('datasets-count-error');
+const datasetsCountOutput = document.getElementById('datasets-count-output');
+const datasetsIndexInput = document.getElementById('datasets-index-input');
+const datasetsShowIndexButton = document.getElementById(
+  'datasets-showindex-button',
+);
+const datasetsShowIndexError = document.getElementById(
+  'datasets-showindex-error',
+);
+const datasetsShowIndexOutput = document.getElementById(
+  'datasets-showindex-output',
+);
+
+const datasetsGenerateKeyButton = document.getElementById(
+  'datasets-generatekey-button',
+);
+const datasetsGenerateKeyError = document.getElementById(
+  'datasets-generatekey-error',
+);
+const datasetsGenerateKeyOutput = document.getElementById(
+  'datasets-generatekey-output',
+);
+const datasetsEncryptKeyInput = document.getElementById(
+  'datasets-encryptkey-input',
+);
+const datasetsEncryptFileInput = document.getElementById(
+  'datasets-encryptfile-input',
+);
+const datasetsEncryptButton = document.getElementById(
+  'datasets-encrypt-button',
+);
+const datasetsEncryptError = document.getElementById('datasets-encrypt-error');
+const datasetsEncryptOutput = document.getElementById(
+  'datasets-encrypt-output',
+);
+
+const datasetsDeployNameInput = document.getElementById(
+  'datasets-deployname-input',
+);
+const datasetsDeployMultiaddrInput = document.getElementById(
+  'datasets-deploymultiaddr-input',
+);
+const datasetsDeployChecksumInput = document.getElementById(
+  'datasets-deploychecksum-input',
+);
+const datasetsDeployButton = document.getElementById('datasets-deploy-button');
+const datasetsDeployError = document.getElementById('datasets-deploy-error');
+const datasetsDeployOutput = document.getElementById('datasets-deploy-output');
+
+const pushSecretKeyInput = document.getElementById('pushsecret-key-input');
+const pushSecretAddressInput = document.getElementById(
+  'pushsecret-address-input',
+);
+const pushSecretButton = document.getElementById('push-secret-button');
+const pushSecretError = document.getElementById('push-secret-error');
+const pushSecretOutput = document.getElementById('push-secret-output');
 
 const resultsDecryptKey = document.getElementById('results-decrypt-key-file');
 const resultsDecryptEncrypted = document.getElementById(
@@ -364,6 +425,177 @@ const downloadResults = (iexec) => async () => {
   }
 };
 
+const showDataset = (iexec) => async () => {
+  try {
+    datasetsShowButton.disabled = true;
+    datasetsShowError.innerText = '';
+    datasetShowOutput.innerText = '';
+    const datasetAddress = datasetsShowInput.value;
+    const res = await iexec.dataset.showDataset(datasetAddress);
+    datasetShowOutput.innerText = JSON.stringify(res, null, 2);
+  } catch (error) {
+    datasetsShowError.innerText = error;
+  } finally {
+    datasetsShowButton.disabled = false;
+  }
+};
+
+const showDatasetByIndex = (iexec) => async () => {
+  try {
+    datasetsShowIndexButton.disabled = true;
+    datasetsShowIndexError.innerText = '';
+    datasetsShowIndexOutput.innerText = '';
+    const datasetIndex = datasetsIndexInput.value;
+    const res = await iexec.dataset.showUserDataset(
+      datasetIndex,
+      await iexec.wallet.getAddress(),
+    );
+    datasetsShowIndexOutput.innerText = JSON.stringify(res, null, 2);
+  } catch (error) {
+    datasetsShowIndexError.innerText = error;
+  } finally {
+    datasetsShowIndexButton.disabled = false;
+  }
+};
+
+const countDatasets = (iexec) => async () => {
+  try {
+    datasetsCountButton.disabled = true;
+    datasetsCountError.innerText = '';
+    datasetsCountOutput.innerText = '';
+    const count = await iexec.dataset.countUserDatasets(
+      await iexec.wallet.getAddress(),
+    );
+    datasetsCountOutput.innerText = `total deployed datasets ${count}`;
+  } catch (error) {
+    datasetsCountError.innerText = error;
+  } finally {
+    datasetsCountButton.disabled = false;
+  }
+};
+
+const generateDatasetKey = (iexec) => () => {
+  try {
+    datasetsGenerateKeyError.innerText = '';
+    datasetsGenerateKeyOutput.innerText = '';
+    const key = iexec.dataset.generateEncryptionKey();
+    datasetsGenerateKeyOutput.innerText = `Generated key: ${key}`;
+    datasetsEncryptKeyInput.value = key;
+  } catch (error) {
+    datasetsGenerateKeyError.innerText = error;
+  } finally {
+    datasetsGenerateKeyButton.disabled = false;
+  }
+};
+
+const encryptDataset = (iexec) => async () => {
+  try {
+    datasetsEncryptButton.disabled = true;
+    datasetsEncryptError.innerText = '';
+    datasetsEncryptOutput.innerText = '';
+    const file = datasetsEncryptFileInput.files[0];
+    if (!file) {
+      throw Error('No file selected');
+    }
+    if (file.size > 500) {
+      throw Error(
+        'File too large, this is a demo, please use small files (>=500 bytes)',
+      );
+    }
+
+    datasetsEncryptOutput.innerText = `Reading ${file.name}`;
+    const fileBytes = await new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsArrayBuffer(file);
+      fileReader.onload = (e) => resolve(e.target.result);
+      fileReader.onerror = () =>
+        reject(Error(`Failed to read file: ${fileReader.error}`));
+      fileReader.onabort = () => reject(Error(`Failed to read file: aborted`));
+    });
+
+    const key = datasetsEncryptKeyInput.value;
+
+    datasetsEncryptOutput.innerText = `Encrypting ${file.name}`;
+    const encrypted = await iexec.dataset.encrypt(fileBytes, key);
+    const checksum = await iexec.dataset.computeEncryptedFileChecksum(
+      encrypted,
+    );
+
+    datasetsEncryptOutput.innerText = 'Uploading encrypted file to IPFS';
+    const ipfs = window.KuboRpcClient.create('/dns4/ipfs-upload.iex.ec/https/');
+    const uploadResult = await ipfs.add(encrypted);
+    const { cid } = uploadResult;
+    const multiaddr = `ipfs/${cid.toString()}`;
+    const publicUrl = `https://ipfs.iex.ec/${multiaddr}`;
+
+    datasetsEncryptOutput.innerText = 'Checking file on IPFS';
+    await fetch(publicUrl).then((res) => {
+      if (!res.ok) {
+        throw Error(`Failed to load uploaded file at ${publicUrl}`);
+      }
+    });
+
+    const a = document.createElement('a');
+    a.href = publicUrl;
+    a.text = publicUrl;
+    a.target = '_blank';
+    datasetsEncryptOutput.innerText = `File encrypted and uploaded to IPFS (checksum ${checksum})\n`;
+    datasetsEncryptOutput.appendChild(a);
+
+    datasetsDeployNameInput.value = file.name;
+    datasetsDeployMultiaddrInput.value = multiaddr;
+    datasetsDeployChecksumInput.value = checksum;
+    pushSecretKeyInput.value = key;
+  } catch (error) {
+    datasetsEncryptError.innerText = error;
+    datasetsEncryptOutput.innerText = '';
+  } finally {
+    datasetsEncryptButton.disabled = false;
+  }
+};
+
+const deployDataset = (iexec) => async () => {
+  try {
+    datasetsDeployButton.disabled = true;
+    datasetsDeployError.innerText = '';
+    datasetsDeployOutput.innerText = '';
+    const owner = await iexec.wallet.getAddress();
+    const name = datasetsDeployNameInput.value;
+    const multiaddr = datasetsDeployMultiaddrInput.value;
+    const checksum = datasetsDeployChecksumInput.value;
+    const { address } = await iexec.dataset.deployDataset({
+      owner,
+      name,
+      multiaddr,
+      checksum,
+    });
+    datasetsDeployOutput.innerText = `Dataset deployed at address ${address}`;
+    pushSecretAddressInput.value = address;
+    datasetsShowInput.value = address;
+    refreshUser(iexec)();
+  } catch (error) {
+    datasetsDeployError.innerText = error;
+  } finally {
+    datasetsDeployButton.disabled = false;
+  }
+};
+
+const pushSecret = (iexec) => async () => {
+  try {
+    pushSecretButton.disabled = true;
+    pushSecretError.innerText = '';
+    pushSecretOutput.innerText = '';
+    const datasetAddress = pushSecretAddressInput.value;
+    const key = pushSecretKeyInput.value;
+    await iexec.dataset.pushDatasetSecret(datasetAddress, key);
+    pushSecretOutput.innerText = `Encryption key pushed for dataset ${datasetAddress}`;
+  } catch (error) {
+    pushSecretError.innerText = error;
+  } finally {
+    pushSecretButton.disabled = false;
+  }
+};
+
 const decryptResults = () => async () => {
   try {
     resultsDecryptError.innerText = '';
@@ -450,6 +682,28 @@ const init = async () => {
     resultsShowTaskButton.addEventListener('click', showTask(iexec));
     resultsDownloadButton.addEventListener('click', downloadResults(iexec));
     resultsDecryptButton.addEventListener('click', decryptResults(iexec));
+    datasetsShowButton.addEventListener('click', showDataset(iexec));
+    datasetsCountButton.addEventListener('click', countDatasets(iexec));
+    datasetsShowIndexButton.addEventListener(
+      'click',
+      showDatasetByIndex(iexec),
+    );
+    datasetsGenerateKeyButton.addEventListener(
+      'click',
+      generateDatasetKey(iexec),
+    );
+    datasetsEncryptButton.addEventListener('click', encryptDataset(iexec));
+    datasetsDeployButton.addEventListener('click', deployDataset(iexec));
+    pushSecretButton.addEventListener('click', pushSecret(iexec));
+    accountDepositButton.disabled = false;
+    accountWithdrawButton.disabled = false;
+    datasetsShowButton.disabled = false;
+    datasetsCountButton.disabled = false;
+    datasetsShowIndexButton.disabled = false;
+    datasetsGenerateKeyButton.disabled = false;
+    datasetsEncryptButton.disabled = false;
+    pushSecretButton.disabled = false;
+    datasetsDeployButton.disabled = false;
     accountDepositButton.disabled = false;
     accountWithdrawButton.disabled = false;
     walletBTMButton.disabled = false;

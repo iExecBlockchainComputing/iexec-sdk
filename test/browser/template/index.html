@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="src/styles.css" />
+    <script src="https://unpkg.com/kubo-rpc-client/dist/index.min.js"></script>
   </head>
   <body>
     <div id="app">
@@ -239,6 +240,129 @@
         </div>
         <label id="results-download-error" class="error"></label>
       </div>
+      <hr />
+      <h2>Datasets</h2>
+      <div class="container">
+        <button id="datasets-count-button" disabled>COUNT USER DATASETS</button>
+        <label id="datasets-count-error" class="error"></label>
+        <div id="datasets-count-output"></div>
+      </div>
+      <div class="container">
+        <div>
+          <label for="datasets-index-input">Dataset index</label>
+          <input
+            id="datasets-index-input"
+            type="number"
+            value="1"
+            min="1"
+            placeholder="Dataset index"
+          />
+          <button id="datasets-showindex-button" disabled>
+            SHOW USER DATASET
+          </button>
+        </div>
+        <label id="datasets-showindex-error" class="error"></label>
+        <div class="scrollable" id="datasets-showindex-output"></div>
+      </div>
+      <div class="container">
+        <div>
+          <label for="datasets-address-input">Dataset address</label>
+          <input
+            id="datasets-address-input"
+            type="text"
+            value="0xE67F5fDfE39ff3b45E1137De8453A7788Be89f6d"
+            placeholder="Dataset address"
+          />
+          <button id="datasets-show-button" disabled>SHOW DATASET</button>
+        </div>
+        <label id="datasets-show-error" class="error"></label>
+        <div class="scrollable" id="datasets-details-output"></div>
+      </div>
+      <hr />
+      <h2>Prepare encrypted dataset</h2>
+      <div class="container">
+        <button id="datasets-generatekey-button" disabled>
+          GENERATE DATASET KEY
+        </button>
+        <label id="datasets-generatekey-error" class="error"></label>
+        <div id="datasets-generatekey-output"></div>
+      </div>
+      <div class="container">
+        <div>
+          <label for="datasets-encryptkey-input">Encryption key</label>
+          <input
+            id="datasets-encryptkey-input"
+            type="text"
+            value=""
+            placeholder="base64 encoded aes 256 key"
+          />
+        </div>
+        <div>
+          <label for="datasets-encryptfile-input">Dataset file</label>
+          <input id="datasets-encryptfile-input" type="file" />
+        </div>
+        <button id="datasets-encrypt-button" disabled>
+          ENCRYPT AND UPLOAD DATASET
+        </button>
+        <label id="datasets-encrypt-error" class="error"></label>
+        <div id="datasets-encrypt-output"></div>
+      </div>
+      <hr />
+      <h2>Deploy dataset</h2>
+      <div class="container">
+        <div>
+          <div>
+            <label for="datasets-deployname-input">Dataset name</label>
+            <input
+              id="datasets-deployname-input"
+              type="text"
+              placeholder="Dataset name"
+            />
+          </div>
+          <div>
+            <label for="datasets-deploymultiaddr-input">Dataset url/ipfs</label>
+            <input
+              id="datasets-deploymultiaddr-input"
+              type="text"
+              placeholder="Dataset multiaddr"
+            />
+          </div>
+          <div>
+            <label for="datasets-deploychecksum-input">Dataset checksum</label>
+            <input
+              id="datasets-deploychecksum-input"
+              type="text"
+              placeholder="encrypted file sha256sum"
+            />
+          </div>
+          <button id="datasets-deploy-button" disabled>DEPLOY DATASET</button>
+        </div>
+        <label id="datasets-deploy-error" class="error"></label>
+        <div id="datasets-deploy-output"></div>
+      </div>
+      <hr />
+      <h2>Push encryption key to the SMS</h2>
+      <div class="container">
+        <div>
+          <label for="pushsecret-key-input">Encryption key</label>
+          <input
+            id="pushsecret-key-input"
+            type="text"
+            placeholder="Dataset key"
+          />
+          <div></div>
+          <label for="pushsecret-address-input">Dataset address</label>
+          <input
+            id="pushsecret-address-input"
+            type="text"
+            placeholder="Dataset address"
+          />
+        </div>
+        <button id="push-secret-button" disabled>PUSH SECRET</button>
+      </div>
+      <label id="push-secret-error" class="error"></label>
+      <div id="push-secret-output"></div>
+      <hr />
       <h2>Decrypt results</h2>
       <div class="container">
         <div>
@@ -251,7 +375,6 @@
         <label id="results-decrypt-error" class="error"></label>
       </div>
     </div>
-
     <script type="module" src="src/index.js"></script>
   </body>
 </html>

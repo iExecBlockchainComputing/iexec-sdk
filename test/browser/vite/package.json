@@ -9,12 +9,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "iexec": "file:../../.."
+    "@rollup/plugin-inject": "^5.0.3",
+    "iexec": "file:../../..",
+    "kubo-rpc-client": "^3.0.1"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "constants-browserify": "^1.0.0",
+    "crypto-browserify": "^3.12.0",
+    "process": "^0.11.10",
     "rollup-plugin-node-polyfills": "^0.2.1",
+    "rollup-plugin-polyfill-node": "^0.12.0",
+    "serve": "^14.2.0",
+    "stream-browserify": "^3.0.0",
     "vite": "^4.1.0"
   }
 }
