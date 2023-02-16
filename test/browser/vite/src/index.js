@@ -1,4 +1,5 @@
-import { IExec, utils } from 'iexec';
+import IExec from 'iexec/IExec';
+import * as utils from 'iexec/utils';
 
 const networkOutput = document.getElementById('network');
 const addressOutput = document.getElementById('address');
