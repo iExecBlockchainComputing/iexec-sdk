@@ -333,7 +333,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     });
     const decryptedAesKeyBuffer = key.decrypt(encryptedAesKeyBuffer);
 
-    // alt not used because crypto polyfill fail with buffer polyfill
+    // alt not used because crypto-browserify does not support createPrivateKey
     // const decryptedAesKeyBuffer = crypto.privateDecrypt(
     //   {
     //     key: crypto.createPrivateKey(keyBuffer),
