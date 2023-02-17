@@ -9,10 +9,10 @@ module.exports = {
   },
   resolve: {
     fallback: {
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-      constants: require.resolve('constants-browserify'),
       assert: require.resolve('assert/'),
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify'), // required for crypto-browserify
+      constants: require.resolve('constants-browserify'),
     },
   },
   plugins: [
