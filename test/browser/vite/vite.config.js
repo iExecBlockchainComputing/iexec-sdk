@@ -1,14 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
-// npm i -D @esbuild-plugins/node-globals-polyfill
+// esbuild plugins (dev)
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
-// npm i -D @esbuild-plugins/node-modules-polyfill
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
-import rollupInject from '@rollup/plugin-inject';
+// rollup plugins (build)
+import inject from '@rollup/plugin-inject';
 
 export default {
   resolve: {
     alias: {
       buffer: 'buffer/',
+      assert: 'node_modules/assert/build/assert.js',
     },
   },
   optimizeDeps: {
@@ -17,20 +17,19 @@ export default {
       define: {
         global: 'globalThis',
       },
-      // Enable esbuild polyfill plugins
       plugins: [
         NodeGlobalsPolyfillPlugin({
-          process: true,
           buffer: true,
+          process: true,
         }),
-        NodeModulesPolyfillPlugin(),
       ],
     },
   },
   build: {
+    // sourcemap: true,
     rollupOptions: {
       plugins: [
-        rollupInject({
+        inject({
           Buffer: ['buffer', 'Buffer'],
           process: ['process', 'browser'],
         }),
@@ -38,5 +37,3 @@ export default {
     },
   },
 };
-
-// missing assert in build (required in ans1)
