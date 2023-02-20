@@ -231,6 +231,9 @@ export const obsDeal = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
+const numericStringPropAscSort = (propName) => (a, b) =>
+  parseInt(a[propName], 10) > parseInt(b[propName], 10) ? 1 : -1;
+
 export const claim = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
@@ -265,12 +268,9 @@ export const claim = async (
     );
     if (initialized.length === 0 && notInitialized.length === 0)
       throw Error('Nothing to claim');
-    initialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
-    notInitialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
+
+    initialized.sort(numericStringPropAscSort('idx'));
+    notInitialized.sort(numericStringPropAscSort('idx'));
     const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
