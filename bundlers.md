@@ -3,6 +3,8 @@
 # Bundlers integration
 
 - [parcel](#parcel)
+- [rollup](#rollup)
+- [vite](#vite)
 - [webpack](#webpack)
 - [create-react-app / react-scripts](#create-react-app)
 
@@ -22,11 +24,111 @@ To solve this you must provide resolution `alias` in your `package.json`
 }
 ```
 
+## rollup
+
+`rollup` does not provides much auto-configuration, fortunately there are plugins to do what we need to achieve.
+
+- commonjs interoperability => `@rollup/plugin-commonjs`
+- modules resolution => `@rollup/plugin-node-resolve`
+- NodeJS builtins => `rollup-plugin-node-polyfills`
+- NodeJS globals => `@rollup/plugin-inject`
+
+Here are the steps to follow:
+
+- Install the following dev-dependencies:
+
+```bash
+npm i --save-dev @rollup/plugin-commonjs @rollup/plugin-inject @rollup/plugin-node-resolve rollup-plugin-node-polyfills
+```
+
+- Configure `rollup.config.mjs`:
+
+```js
+import inject from '@rollup/plugin-inject';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import nodePolyfills from 'rollup-plugin-node-polyfills';
+import commonjs from '@rollup/plugin-commonjs';
+
+export default {
+  input: 'src/index.js',
+  output: {
+    file: 'dist/bundle.js',
+    format: 'esm',
+  },
+  plugins: [
+    nodeResolve({
+      preferBuiltins: false,
+      browser: true,
+    }),
+    commonjs(), // after @rollup/plugin-node-resolve
+    nodePolyfills(),
+    inject({
+      Buffer: ['buffer', 'Buffer'],
+      process: ['process', 'browser'],
+    }),
+  ],
+};
+```
+
+## vite
+
+`vite` provides some auto-configuration but we still need to add some configuration to add support for NodeJS globals and to replace some auto provided polyfills.
+Since `vite` uses `eslint` for development build and `rollup` for building the production bundle the configuration is doubled.
+
+Here are the steps to follow:
+
+- Install the following dev-dependencies:
+
+```bash
+npm i --save-dev @esbuild-plugins/node-globals-polyfill @rollup/plugin-inject assert buffer
+```
+
+- Configure `vite.config.mjs`:
+
+```js
+// esbuild plugins (dev)
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+// rollup plugins (build)
+import inject from '@rollup/plugin-inject';
+
+export default {
+  resolve: {
+    alias: {
+      buffer: 'buffer/',
+      assert: 'node_modules/assert/build/assert.js',
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          buffer: true,
+          process: true,
+        }),
+      ],
+    },
+  },
+  build: {
+    rollupOptions: {
+      plugins: [
+        inject({
+          Buffer: ['buffer', 'Buffer'],
+          process: ['process', 'browser'],
+        }),
+      ],
+    },
+  },
+};
+```
+
 ## webpack
 
 `webpack` >= 5 no longer provides polyfills for NodeJS, you must include them in your configuration.
 
-Here is the steps to follow:
+here are the steps to follow:
 
 - Install the following dev-dependencies:
 
@@ -34,7 +136,7 @@ Here is the steps to follow:
 npm i --save-dev assert buffer constants-browserify crypto-browserify process stream-browserify
 ```
 
-- Configure `webpack.config.js`
+- Configure `webpack.config.cjs`:
 
 ```js
 const webpack = require('webpack');
@@ -69,7 +171,7 @@ module.exports = {
 
 Since `react-scripts` enforce the `webpack` configuration and ejecting is not an option, you will need to use `react-app-rewired` to override the configuration.
 
-Here is the steps to follow:
+here are the steps to follow:
 
 - Install the following dev-dependencies:
 
