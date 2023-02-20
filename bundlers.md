@@ -72,7 +72,7 @@ export default {
 
 ## vite
 
-`vite` provides some auto-configuration but we still need to add some configuration to add support for NodeJS globals and to replace some auto provided polyfills.
+`vite` provides some auto-configuration but we still need to add support for NodeJS globals and to replace some auto provided polyfills.
 Since `vite` uses `eslint` for development build and `rollup` for building the production bundle the configuration is doubled.
 
 Here are the steps to follow:
