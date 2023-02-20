@@ -500,8 +500,7 @@ fill
         if (!opts.force) {
           await prompt.signGeneratedOrder(REQUEST_ORDER, pretty(unsignedOrder));
         }
-        const signed = await signRequestorder(chain.contracts, unsignedOrder);
-        return signed;
+        return await signRequestorder(chain.contracts, unsignedOrder);
       };
 
       const requestOrder = requestOrderInput || (await computeRequestOrder());

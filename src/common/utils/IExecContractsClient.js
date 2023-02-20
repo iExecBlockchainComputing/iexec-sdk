@@ -118,12 +118,11 @@ const createClient = ({
       if (!address) {
         throw Error(`no contract address provided`);
       }
-      const contract = new Contract(
+      return new Contract(
         address,
         contractDesc.abi,
         ethSigner || ethProvider,
       );
-      return contract;
     } catch (error) {
       debug('getContract()', error);
       throw error;
@@ -153,11 +152,10 @@ const createClient = ({
   const fetchRegistryContract = async (objName) => {
     try {
       const registryAddress = await fetchRegistryAddress(objName);
-      const registryContract = getContract(
+      return getContract(
         contractsDescMap[objName].registryName,
         registryAddress,
       );
-      return registryContract;
     } catch (error) {
       debug('fetchRegistryContract()', error);
       throw error;
@@ -182,8 +180,7 @@ const createClient = ({
   const fetchTokenContract = async () => {
     try {
       const tokenAddress = await fetchTokenAddress();
-      const registryContract = getContract('token', tokenAddress);
-      return registryContract;
+      return getContract('token', tokenAddress);
     } catch (error) {
       debug('fetchTokenContract()', error);
       throw error;

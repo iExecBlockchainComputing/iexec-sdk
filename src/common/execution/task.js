@@ -24,10 +24,9 @@ export const TASK_STATUS_MAP = {
 const decodeTaskResult = (results) => {
   try {
     if (results !== NULL_BYTES) {
-      const json = JSON.parse(
+      return JSON.parse(
         Buffer.from(results.substr(2), 'hex').toString('utf8'),
       );
-      return json;
     }
   } catch (e) {
     // nothing to do

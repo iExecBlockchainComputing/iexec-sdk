@@ -163,13 +163,12 @@ export const saveTextToFile = async (
   { force = false, strict = true, fileDir } = {},
 ) => {
   try {
-    const filePath = await saveToFile(fileName, text, {
+    return await saveToFile(fileName, text, {
       format: 'utf8',
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveTextToFile()', error);
     throw error;
@@ -183,12 +182,11 @@ const saveJSONToFile = async (
 ) => {
   try {
     const json = JSON.stringify(obj, null, 2);
-    const filePath = await saveTextToFile(fileName, json, {
+    return await saveTextToFile(fileName, json, {
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveJSONToFile()', error);
     throw error;
@@ -222,8 +220,7 @@ const loadJSONFile = async (fileName, { fileDir } = {}) => {
   }
   debug('loading filePath', filePath);
   const fileJSON = await readFile(filePath, 'utf8');
-  const file = JSON.parse(fileJSON);
-  return file;
+  return JSON.parse(fileJSON);
 };
 
 const loadJSONAndRetry = async (fileName, options = {}) => {

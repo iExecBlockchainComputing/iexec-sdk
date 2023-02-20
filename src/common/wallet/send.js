@@ -94,8 +94,7 @@ export const sendETH = async (
     if (balance.lt(new BN(vAmount))) {
       throw Error('Amount to send exceed wallet balance');
     }
-    const txHash = await sendNativeToken(contracts, vAmount, vAddress);
-    return txHash;
+    return await sendNativeToken(contracts, vAmount, vAddress);
   } catch (error) {
     debug('sendETH()', error);
     throw error;
@@ -126,12 +125,10 @@ export const sendRLC = async (
     if (contracts.isNative) {
       debug('send native token');
       const weiValue = bnNRlcToBnWei(new BN(vAmount)).toString();
-      const txHash = await sendNativeToken(contracts, weiValue, vAddress);
-      return txHash;
+      return await sendNativeToken(contracts, weiValue, vAddress);
     }
     debug('send ERC20 token');
-    const txHash = await sendERC20(contracts, vAmount, vAddress);
-    return txHash;
+    return await sendERC20(contracts, vAmount, vAddress);
   } catch (error) {
     debug('sendRLC()', error);
     throw error;

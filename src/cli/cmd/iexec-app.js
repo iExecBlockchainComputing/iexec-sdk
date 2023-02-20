@@ -752,14 +752,13 @@ run
         if (isAppOwner) {
           spinner.info('Creating apporder');
           await connectKeystore(chain, keystore);
-          const order = await createApporder(chain.contracts, {
+          return await createApporder(chain.contracts, {
             app,
             appprice: 0,
             volume: 1,
             requesterrestrict: requester,
             tag,
           }).then((o) => signApporder(chain.contracts, o));
-          return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
         const minTags = [];
@@ -806,14 +805,13 @@ run
         if (isDatasetOwner) {
           spinner.info('Creating datasetorder');
           await connectKeystore(chain, keystore);
-          const order = await createDatasetorder(chain.contracts, {
+          return await createDatasetorder(chain.contracts, {
             dataset,
             datasetprice: 0,
             volume: 1,
             requesterrestrict: requester,
             tag,
           }).then((o) => signDatasetorder(chain.contracts, o));
-          return order;
         }
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { orders } = await fetchDatasetOrderbook(
@@ -860,7 +858,7 @@ run
           if (isWorkerpoolOwner) {
             spinner.info('Creating workerpoolorder');
             await connectKeystore(chain, keystore);
-            const order = await createWorkerpoolorder(chain.contracts, {
+            return await createWorkerpoolorder(chain.contracts, {
               workerpool,
               workerpoolprice: 0,
               volume: 1,
@@ -869,7 +867,6 @@ run
               trust,
               category: category || 0,
             }).then((o) => signWorkerpoolorder(chain.contracts, o));
-            return order;
           }
         }
         spinner.info('Fetching workerpoolorder from iExec Marketplace');

@@ -26,13 +26,12 @@ export const setWorkerpoolApiUrl = async (
     if (!name) {
       throw Error(`No ENS name reverse resolution configured for ${vAddress}`);
     }
-    const txHash = await setTextRecord(
+    return await setTextRecord(
       contracts,
       name,
       WORKERPOOL_URL_TEXT_RECORD_KEY,
       vUrl,
     );
-    return txHash;
   } catch (e) {
     debug('setWorkerpoolApiUrl()', e);
     throw e;

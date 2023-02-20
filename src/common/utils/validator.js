@@ -150,7 +150,7 @@ export const addressSchema = ({ ethProvider } = {}) =>
               typeof ethProvider.resolveName === 'function'
             ) {
               debug('resolving ENS', value);
-              const addressPromise = wrapCall(ethProvider.resolveName(value))
+              return wrapCall(ethProvider.resolveName(value))
                 .then((resolved) => {
                   debug('resolved ENS', resolved);
                   return resolved;
@@ -159,7 +159,6 @@ export const addressSchema = ({ ethProvider } = {}) =>
                   debug('ENS resolution error', error);
                   return null;
                 });
-              return addressPromise;
             }
             debug("no ethProvider ENS can't be resolved");
           }
@@ -370,8 +369,7 @@ export const tagSchema = () =>
     .transform((value) => {
       if (Array.isArray(value)) {
         try {
-          const bytes32Tag = encodeTag(value);
-          return bytes32Tag;
+          return encodeTag(value);
         } catch (e) {
           return e;
         }
@@ -380,8 +378,7 @@ export const tagSchema = () =>
         const lowerCase = value.toLowerCase();
         if (lowerCase.substring(0, 2) === '0x') return lowerCase;
         try {
-          const bytes32Tag = encodeTag(value.split(','));
-          return bytes32Tag;
+          return encodeTag(value.split(','));
         } catch (e) {
           return e;
         }
@@ -679,8 +676,7 @@ export const fileBufferSchema = () =>
       if (typeof value === 'string') {
         throw Error('unsupported string');
       }
-      const buffer = Buffer.from(value);
-      return buffer;
+      return Buffer.from(value);
     } catch (e) {
       throw new ValidationError(
         'Invalid file buffer, must be ArrayBuffer or Buffer',

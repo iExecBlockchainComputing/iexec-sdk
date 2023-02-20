@@ -94,8 +94,7 @@ export const computeTaskId = async (
       await uint256Schema().validate(taskIdx),
     ];
     const encoded = defaultAbiCoder.encode(encodedTypes, values);
-    const taskid = keccak256(encoded);
-    return taskid;
+    return keccak256(encoded);
   } catch (error) {
     debug('computeTaskId()', error);
     throw error;
@@ -111,10 +110,9 @@ const computeTaskIdsArray = async (
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
   const vBotSize = await positiveStrictIntSchema().validate(botSize);
   const tasksIdx = [...Array(vBotSize).keys()].map((n) => n + vFirstTaskIdx);
-  const taskids = await Promise.all(
+  return await Promise.all(
     tasksIdx.map((idx) => computeTaskId(vDealid, idx)),
   );
-  return taskids;
 };
 
 export const show = async (
@@ -137,14 +135,13 @@ export const show = async (
       deal.botFirst.toString(),
       deal.botSize.toString(),
     );
-    const enhancedDeal = {
+    return {
       dealid: vDealid,
       ...deal,
       finalTime,
       deadlineReached,
       tasks,
     };
-    return enhancedDeal;
   } catch (error) {
     debug('show()', error);
     throw error;

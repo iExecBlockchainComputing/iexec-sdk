@@ -53,7 +53,7 @@ export const httpRequest =
     const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(query);
     const url = baseURL.concat(queryString);
-    const response = await fetch(url, {
+    return await fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
@@ -61,7 +61,6 @@ export const httpRequest =
       debug(`httpRequest() fetch:`, error);
       throw Error(`Connection to ${baseURL} failed with a network error`);
     });
-    return response;
   };
 
 const checkResponseOk = (response) => {
@@ -79,8 +78,7 @@ const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     if (response.ok) {
-      const json = await response.json();
-      return json;
+      return await response.json();
     }
     const errorMessage = await response
       .json()
@@ -169,12 +167,11 @@ export const getAuthorization =
       );
       const hash = hashEIP712(typedData);
       const separator = '_';
-      const authorization = hash
+      return hash
         .concat(separator)
         .concat(sign)
         .concat(separator)
         .concat(address);
-      return authorization;
     } catch (error) {
       debug('getAuthorization()', error);
       throw Error(`Failed to get authorization: ${error}`);

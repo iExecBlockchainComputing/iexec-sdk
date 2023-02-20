@@ -156,14 +156,12 @@ const objDesc = {
 
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
-  const struct = objDesc[objName].structMembers.reduce(reducer, []);
-  return struct;
+  return objDesc[objName].structMembers.reduce(reducer, []);
 };
 
 const signedOrderToStruct = (orderName, orderObj) => {
   const unsigned = objToStructArray(orderName, orderObj);
-  const signed = unsigned.concat([orderObj.sign]);
-  return signed;
+  return unsigned.concat([orderObj.sign]);
 };
 
 const getEIP712Domain = async (contracts) => {
@@ -295,8 +293,7 @@ export const getRemainingVolume = async (
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
-    const remain = initial.sub(consumed);
-    return remain;
+    return initial.sub(consumed);
   } catch (error) {
     debug('getRemainingVolume()', error);
     throw error;
@@ -336,8 +333,7 @@ const signOrder = async (
       ? signer._signTypedData(domain, types, saltedOrder)
       : signer.signTypedData(domain, types, saltedOrder),
   );
-  const signedOrder = { ...saltedOrder, sign };
-  return signedOrder;
+  return { ...saltedOrder, sign };
 };
 
 export const signApporder = async (
