@@ -158,24 +158,20 @@ export const sweep = async (
     let balances = await checkBalances(contracts, userAddress);
     const res = {};
     const errors = [];
-    if (!contracts.isNative) {
-      if (balances.nRLC.gt(new BN(0))) {
-        try {
-          const sendERC20TxHash = await sendERC20(
-            contracts,
-            bnToEthersBn(balances.nRLC),
-            vAddressTo,
-          );
-          Object.assign(res, { sendERC20TxHash });
-        } catch (error) {
-          debug('error', error);
-          errors.push(`Failed to transfer ERC20': ${error.message}`);
-          throw Error(
-            `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
-          );
-        }
-        balances = await checkBalances(contracts, userAddress);
+    if (!contracts.isNative && balances.nRLC.gt(new BN(0))) {
+      try {
+        const sendERC20TxHash = await sendERC20(
+          contracts,
+          bnToEthersBn(balances.nRLC),
+          vAddressTo,
+        );
+        Object.assign(res, { sendERC20TxHash });
+      } catch (error) {
+        debug('error', error);
+        errors.push(`Failed to transfer ERC20': ${error.message}`);
+        throw Error(`Failed to sweep ERC20, sweep aborted. errors: ${errors}`);
       }
+      balances = await checkBalances(contracts, userAddress);
     }
     const gasPrice =
       contracts.txOptions && contracts.txOptions.gasPrice

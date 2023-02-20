@@ -871,8 +871,7 @@ export const getSmsUrlFromChain = (
   { teeFramework, strict = true } = {},
 ) => {
   const selectedTeeFramework =
-    teeFramework ||
-    getDefaultTeeFrameworkFromChain(chain, 'defaultTeeFramework');
+    teeFramework || getDefaultTeeFrameworkFromChain(chain);
   let smsUrl;
   const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
   if (typeof smsUrlOrMap === 'string') {
@@ -958,10 +957,12 @@ export const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initialResultsCount, totalCount) =>
-      `Results (${initialResultsCount + 1} to ${
+    createResultsMessage = (callResults, initialResultsCount, totalCount) => {
+      const totalDisplay = totalCount ? ` of ${totalCount}` : '';
+      return `Results (${initialResultsCount + 1} to ${
         initialResultsCount + callResults.length
-      }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
+      }${totalDisplay}):\n${pretty(callResults)}`;
+    },
     spinner,
     raw = false,
   },

@@ -217,10 +217,10 @@ export const computeOrderHash = async (
       default:
     }
     const domainObj = await getEIP712Domain(contracts);
-    const types = {};
-    types.EIP712Domain = objDesc.EIP712Domain.structMembers;
-    types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
-
+    const types = {
+      EIP712Domain: objDesc.EIP712Domain.structMembers,
+      [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
+    };
     const typedData = {
       types,
       domain: domainObj,
@@ -491,12 +491,13 @@ const getMatchableVolume = async (
       }
     };
     const checkDatasetDeployedAsync = async () => {
-      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
-        if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
-          throw new Error(
-            `No dataset deployed at address ${vDatasetOrder.dataset}`,
-          );
-        }
+      if (
+        vDatasetOrder.dataset !== NULL_ADDRESS &&
+        !(await checkDeployedDataset(contracts, vDatasetOrder.dataset))
+      ) {
+        throw new Error(
+          `No dataset deployed at address ${vDatasetOrder.dataset}`,
+        );
       }
     };
     const checkWorkerpoolDeployedAsync = async () => {
@@ -683,10 +684,8 @@ const getMatchableVolume = async (
       sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
       1,
     );
-    if (teeAppRequired) {
-      if (!checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
-        throw Error('Missing tag [tee] in apporder');
-      }
+    if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
+      throw Error('Missing tag [tee] in apporder');
     }
 
     // price check

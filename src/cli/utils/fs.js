@@ -69,17 +69,15 @@ const chainsConfSchema = () =>
       alchemy: string().notRequired(),
       etherscan: string().notRequired(),
       infura: lazy((value) => {
-        switch (typeof value) {
-          case 'object':
-            return object({
-              projectId: string().required(),
-              projectSecret: string(),
-            })
-              .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
-              .strict();
-          default:
-            return string();
+        if (typeof value === 'object') {
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
         }
+        return string();
       }),
       quorum: number().integer().min(1).max(3).notRequired(),
     })
@@ -358,8 +356,7 @@ export const loadDeployedObj = async (objName) => {
 export const isEmptyDir = async (dirPath) => {
   try {
     const files = await readdir(dirPath);
-    if (!files.length) return true;
-    return false;
+    return !files.length;
   } catch (error) {
     debug('isEmptyDir()', error);
     throw error;

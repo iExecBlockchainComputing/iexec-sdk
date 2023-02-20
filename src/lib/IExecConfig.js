@@ -310,16 +310,16 @@ export default class IExecConfig {
 
     this.resolveChainId = async () => (await networkPromise).chainId;
 
-    this.resolveContractsClient = async () => await contractsPromise;
+    this.resolveContractsClient = async () => contractsPromise;
 
-    this.resolveBridgedContractsClient = async () => await bridgedContractsPromise;
+    this.resolveBridgedContractsClient = async () => bridgedContractsPromise;
 
     this.resolveStandardContractsClient = async () => {
       const contracts = await contractsPromise;
       if (contracts.flavour === 'standard') {
         return contracts;
       }
-      return await enterpriseSwapContractsPromise;
+      return enterpriseSwapContractsPromise;
     };
 
     this.resolveEnterpriseContractsClient = async () => {
@@ -327,7 +327,7 @@ export default class IExecConfig {
       if (contracts.flavour === 'enterprise') {
         return contracts;
       }
-      return await enterpriseSwapContractsPromise;
+      return enterpriseSwapContractsPromise;
     };
 
     this.resolveSmsURL = async ({

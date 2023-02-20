@@ -53,7 +53,7 @@ export const httpRequest =
     const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(query);
     const url = baseURL.concat(queryString);
-    return await fetch(url, {
+    return fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
@@ -78,7 +78,7 @@ const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     if (response.ok) {
-      return await response.json();
+      return response.json();
     }
     const errorMessage = await response
       .json()

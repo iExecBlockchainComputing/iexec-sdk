@@ -110,9 +110,7 @@ const computeTaskIdsArray = async (
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
   const vBotSize = await positiveStrictIntSchema().validate(botSize);
   const tasksIdx = [...Array(vBotSize).keys()].map((n) => n + vFirstTaskIdx);
-  return await Promise.all(
-    tasksIdx.map((idx) => computeTaskId(vDealid, idx)),
-  );
+  return Promise.all(tasksIdx.map((idx) => computeTaskId(vDealid, idx)));
 };
 
 export const show = async (

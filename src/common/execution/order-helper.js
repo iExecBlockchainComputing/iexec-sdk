@@ -57,7 +57,7 @@ export const createObjParams = async ({
   }
   const isTee = checkActiveBitInTag(tag, TAG_MAP.tee);
   const isCallback = callback !== NULL_ADDRESS;
-  return await objParamsSchema().validate(inputParams, {
+  return objParamsSchema().validate(inputParams, {
     strict: noCast,
     context: { isTee, isCallback, resultProxyURL },
   });

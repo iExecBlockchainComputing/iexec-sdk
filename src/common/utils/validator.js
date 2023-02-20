@@ -177,10 +177,7 @@ export const addressSchema = ({ ethProvider } = {}) =>
           return true;
         }
         if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            return false;
-          }
-          return true;
+          return !value.match(/^.*\.eth$/);
         }
         try {
           const address = await value;
@@ -260,30 +257,22 @@ export const paramsRequesterSecretsSchema = () =>
     .test(
       'keys-are-int',
       '${path} mapping keys must be strictly positive integers',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
           Object.keys(value).find((key) => !posStrictIntRegex.test(key))
-        ) {
-          return false;
-        }
-        return true;
-      },
+        ),
     )
     .test(
       'values-are-string',
       '${path} mapping names must be strings',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
           Object.values(value).find(
             (val) => typeof val !== 'string' || val.length === 0,
           )
-        ) {
-          return false;
-        }
-        return true;
-      },
+        ),
     );
 
 export const objParamsSchema = () =>
@@ -315,12 +304,7 @@ export const objParamsSchema = () =>
       otherwise: mixed().test(
         'is-not-defined',
         '${path} is not supported for non TEE tasks',
-        (value) => {
-          if (value === undefined) {
-            return true;
-          }
-          return false;
-        },
+        (value) => value === undefined,
       ),
     }),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
@@ -389,10 +373,7 @@ export const tagSchema = () =>
       'no-transform-error',
       ({ originalValue, value }) =>
         `${originalValue} is not a valid tag. ${value.message}`,
-      (value) => {
-        if (value instanceof Error) return false;
-        return true;
-      },
+      (value) => !(value instanceof Error),
     )
     .test(
       'is-bytes32',

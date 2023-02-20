@@ -752,7 +752,7 @@ run
         if (isAppOwner) {
           spinner.info('Creating apporder');
           await connectKeystore(chain, keystore);
-          return await createApporder(chain.contracts, {
+          return createApporder(chain.contracts, {
             app,
             appprice: 0,
             volume: 1,
@@ -805,7 +805,7 @@ run
         if (isDatasetOwner) {
           spinner.info('Creating datasetorder');
           await connectKeystore(chain, keystore);
-          return await createDatasetorder(chain.contracts, {
+          return createDatasetorder(chain.contracts, {
             dataset,
             datasetprice: 0,
             volume: 1,
@@ -858,7 +858,7 @@ run
           if (isWorkerpoolOwner) {
             spinner.info('Creating workerpoolorder');
             await connectKeystore(chain, keystore);
-            return await createWorkerpoolorder(chain.contracts, {
+            return createWorkerpoolorder(chain.contracts, {
               workerpool,
               workerpoolprice: 0,
               volume: 1,
