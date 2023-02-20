@@ -19,7 +19,6 @@ const generatePackage = async (fileName) => {
   packageExports[`./${baseName}`] = {
     types: `./${path.join(distDir, 'esm', 'lib', typeFileName)}`,
     import: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
-    require: `./${path.join(distDir, 'cjs', 'lib', fileName)}`,
     browser: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
     default: `./${path.join(distDir, 'esm', 'lib', fileName)}`,
   };

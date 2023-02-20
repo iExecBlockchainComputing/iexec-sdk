@@ -11,147 +11,126 @@
     ".": {
       "types": "./dist/esm/lib/index.d.ts",
       "import": "./dist/esm/lib/index.js",
-      "require": "./dist/cjs/lib/index.js",
       "browser": "./dist/esm/lib/index.js",
       "default": "./dist/esm/lib/index.js"
     },
     "./IExec": {
       "types": "./dist/esm/lib/IExec.d.ts",
       "import": "./dist/esm/lib/IExec.js",
-      "require": "./dist/cjs/lib/IExec.js",
       "browser": "./dist/esm/lib/IExec.js",
       "default": "./dist/esm/lib/IExec.js"
     },
     "./IExecAccountModule": {
       "types": "./dist/esm/lib/IExecAccountModule.d.ts",
       "import": "./dist/esm/lib/IExecAccountModule.js",
-      "require": "./dist/cjs/lib/IExecAccountModule.js",
       "browser": "./dist/esm/lib/IExecAccountModule.js",
       "default": "./dist/esm/lib/IExecAccountModule.js"
     },
     "./IExecAppModule": {
       "types": "./dist/esm/lib/IExecAppModule.d.ts",
       "import": "./dist/esm/lib/IExecAppModule.js",
-      "require": "./dist/cjs/lib/IExecAppModule.js",
       "browser": "./dist/esm/lib/IExecAppModule.js",
       "default": "./dist/esm/lib/IExecAppModule.js"
     },
     "./IExecConfig": {
       "types": "./dist/esm/lib/IExecConfig.d.ts",
       "import": "./dist/esm/lib/IExecConfig.js",
-      "require": "./dist/cjs/lib/IExecConfig.js",
       "browser": "./dist/esm/lib/IExecConfig.js",
       "default": "./dist/esm/lib/IExecConfig.js"
     },
     "./IExecDatasetModule": {
       "types": "./dist/esm/lib/IExecDatasetModule.d.ts",
       "import": "./dist/esm/lib/IExecDatasetModule.js",
-      "require": "./dist/cjs/lib/IExecDatasetModule.js",
       "browser": "./dist/esm/lib/IExecDatasetModule.js",
       "default": "./dist/esm/lib/IExecDatasetModule.js"
     },
     "./IExecDealModule": {
       "types": "./dist/esm/lib/IExecDealModule.d.ts",
       "import": "./dist/esm/lib/IExecDealModule.js",
-      "require": "./dist/cjs/lib/IExecDealModule.js",
       "browser": "./dist/esm/lib/IExecDealModule.js",
       "default": "./dist/esm/lib/IExecDealModule.js"
     },
     "./IExecENSModule": {
       "types": "./dist/esm/lib/IExecENSModule.d.ts",
       "import": "./dist/esm/lib/IExecENSModule.js",
-      "require": "./dist/cjs/lib/IExecENSModule.js",
       "browser": "./dist/esm/lib/IExecENSModule.js",
       "default": "./dist/esm/lib/IExecENSModule.js"
     },
     "./IExecHubModule": {
       "types": "./dist/esm/lib/IExecHubModule.d.ts",
       "import": "./dist/esm/lib/IExecHubModule.js",
-      "require": "./dist/cjs/lib/IExecHubModule.js",
       "browser": "./dist/esm/lib/IExecHubModule.js",
       "default": "./dist/esm/lib/IExecHubModule.js"
     },
     "./IExecModule": {
       "types": "./dist/esm/lib/IExecModule.d.ts",
       "import": "./dist/esm/lib/IExecModule.js",
-      "require": "./dist/cjs/lib/IExecModule.js",
       "browser": "./dist/esm/lib/IExecModule.js",
       "default": "./dist/esm/lib/IExecModule.js"
     },
     "./IExecNetworkModule": {
       "types": "./dist/esm/lib/IExecNetworkModule.d.ts",
       "import": "./dist/esm/lib/IExecNetworkModule.js",
-      "require": "./dist/cjs/lib/IExecNetworkModule.js",
       "browser": "./dist/esm/lib/IExecNetworkModule.js",
       "default": "./dist/esm/lib/IExecNetworkModule.js"
     },
     "./IExecOrderModule": {
       "types": "./dist/esm/lib/IExecOrderModule.d.ts",
       "import": "./dist/esm/lib/IExecOrderModule.js",
-      "require": "./dist/cjs/lib/IExecOrderModule.js",
       "browser": "./dist/esm/lib/IExecOrderModule.js",
       "default": "./dist/esm/lib/IExecOrderModule.js"
     },
     "./IExecOrderbookModule": {
       "types": "./dist/esm/lib/IExecOrderbookModule.d.ts",
       "import": "./dist/esm/lib/IExecOrderbookModule.js",
-      "require": "./dist/cjs/lib/IExecOrderbookModule.js",
       "browser": "./dist/esm/lib/IExecOrderbookModule.js",
       "default": "./dist/esm/lib/IExecOrderbookModule.js"
     },
     "./IExecResultModule": {
       "types": "./dist/esm/lib/IExecResultModule.d.ts",
       "import": "./dist/esm/lib/IExecResultModule.js",
-      "require": "./dist/cjs/lib/IExecResultModule.js",
       "browser": "./dist/esm/lib/IExecResultModule.js",
       "default": "./dist/esm/lib/IExecResultModule.js"
     },
     "./IExecSecretsModule": {
       "types": "./dist/esm/lib/IExecSecretsModule.d.ts",
       "import": "./dist/esm/lib/IExecSecretsModule.js",
-      "require": "./dist/cjs/lib/IExecSecretsModule.js",
       "browser": "./dist/esm/lib/IExecSecretsModule.js",
       "default": "./dist/esm/lib/IExecSecretsModule.js"
     },
     "./IExecStorageModule": {
       "types": "./dist/esm/lib/IExecStorageModule.d.ts",
       "import": "./dist/esm/lib/IExecStorageModule.js",
-      "require": "./dist/cjs/lib/IExecStorageModule.js",
       "browser": "./dist/esm/lib/IExecStorageModule.js",
       "default": "./dist/esm/lib/IExecStorageModule.js"
     },
     "./IExecTaskModule": {
       "types": "./dist/esm/lib/IExecTaskModule.d.ts",
       "import": "./dist/esm/lib/IExecTaskModule.js",
-      "require": "./dist/cjs/lib/IExecTaskModule.js",
       "browser": "./dist/esm/lib/IExecTaskModule.js",
       "default": "./dist/esm/lib/IExecTaskModule.js"
     },
     "./IExecWalletModule": {
       "types": "./dist/esm/lib/IExecWalletModule.d.ts",
       "import": "./dist/esm/lib/IExecWalletModule.js",
-      "require": "./dist/cjs/lib/IExecWalletModule.js",
       "browser": "./dist/esm/lib/IExecWalletModule.js",
       "default": "./dist/esm/lib/IExecWalletModule.js"
     },
     "./IExecWorkerpoolModule": {
       "types": "./dist/esm/lib/IExecWorkerpoolModule.d.ts",
       "import": "./dist/esm/lib/IExecWorkerpoolModule.js",
-      "require": "./dist/cjs/lib/IExecWorkerpoolModule.js",
       "browser": "./dist/esm/lib/IExecWorkerpoolModule.js",
       "default": "./dist/esm/lib/IExecWorkerpoolModule.js"
     },
     "./errors": {
       "types": "./dist/esm/lib/errors.d.ts",
       "import": "./dist/esm/lib/errors.js",
-      "require": "./dist/cjs/lib/errors.js",
       "browser": "./dist/esm/lib/errors.js",
       "default": "./dist/esm/lib/errors.js"
     },
     "./utils": {
       "types": "./dist/esm/lib/utils.d.ts",
       "import": "./dist/esm/lib/utils.js",
-      "require": "./dist/cjs/lib/utils.js",
       "browser": "./dist/esm/lib/utils.js",
       "default": "./dist/esm/lib/utils.js"
     }
@@ -166,7 +145,7 @@
     "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
     "generate-json-es-modules": "rm -rf src/common/generated && node generateEsModulesFromJson.cjs",
-    "generate-dist": "rm -rf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/ && mkdir dist/cjs && ./node_modules/.bin/babel src --out-dir dist/cjs --copy-files",
+    "generate-dist": "rm -rf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
     "generate-packages": "node generatePackages.cjs",
     "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
     "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
@@ -234,9 +213,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/cli": "^7.20.7",
-    "@babel/core": "^7.20.12",
-    "@babel/preset-env": "^7.20.2",
     "eslint": "^8.33.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.6.0",
@@ -249,21 +225,5 @@
     "typedoc-plugin-rename-defaults": "^0.6.4",
     "typescript": "^4.9.5",
     "web3-eth": "^1.8.1"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "targets": {
-            "node": "14.0.0",
-            "browsers": [
-              "defaults",
-              "not IE 11"
-            ]
-          }
-        }
-      ]
-    ]
   }
 }

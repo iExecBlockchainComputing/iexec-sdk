@@ -12,7 +12,6 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Exports ES modules
 - SMS URL resolution depends on TEE framework (default `scone`)
 - SMS URL override in `IExecConfig` or `chain.json` accepts `Record<TeeFramework,Url> | string`
 - `iexec app push-secret` and `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
@@ -26,11 +25,14 @@ All notable changes to this project will be documented in this file.
 - `iexec dataset check-secret` and `dataset.checkDatasetSecretExists(datasetAddress)` use the default TEE framework if not specified
 - `iexec dataset push-secret` and `dataset.pushDatasetSecret(datasetAddress, encryptionKey)` use the default TEE framework if not specified
 - TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
+- [BREAKING] drop support for node 12
+- [BREAKING] exports ES modules only, since all NodeJS LTS now supports ES modules natively, commonjs modules are no longer exported.
+  - if you use commonjs module `require` consider moving to ES module to use static import (ie: `import iexecSdk from 'iexec'`)
+  - if moving your project to ES module is not an option, you must use dynamic import to load iExec SDK (ie: `import('iexec').then((iexecSdk) => { ... })`)
 - [BREAKING] 'tee' tag must be combined with a tee framework tag ('scone' or 'gramine')
 - [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
 - [BREAKING] `--skip-request-check` option is replaced by `--skip-preflight-check`
 - [BREAKING] bellecour is now the default chain initialized in `chain.json` when running `iexec init`
-- [BREAKING] drop support for node 12
 
 ### Removed
 
