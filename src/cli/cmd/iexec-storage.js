@@ -38,7 +38,7 @@ initStorage
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -113,7 +113,7 @@ checkStorage
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),

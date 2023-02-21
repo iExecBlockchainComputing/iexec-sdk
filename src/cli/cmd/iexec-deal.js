@@ -102,7 +102,7 @@ claimDeal
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });

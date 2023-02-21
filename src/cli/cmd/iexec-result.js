@@ -59,7 +59,7 @@ generateKeys
           `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
@@ -153,7 +153,7 @@ decryptResults
         opts.decryptedResultsPath ||
         join(process.cwd(), DEFAULT_DECRYPTED_RESULTS_NAME);
 
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
@@ -216,7 +216,7 @@ pushSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, {
@@ -273,7 +273,7 @@ checkSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );

@@ -137,7 +137,7 @@ register
       const { force } = opts;
       const forAddress = opts.for; // workaround cannot destructure for
       let { domain } = opts;
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });

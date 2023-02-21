@@ -34,7 +34,7 @@ pushSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const [chain, address] = await Promise.all([
         loadChain(opts.chain, {
@@ -83,7 +83,7 @@ checkSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
