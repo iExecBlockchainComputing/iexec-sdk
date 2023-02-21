@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const Debug = require('debug');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import {
   tagSchema,
   catidSchema,
   addressSchema,
@@ -19,9 +19,9 @@ const {
   datasetorderSchema,
   apporderSchema,
   requestorderSchema,
-} = require('../../common/utils/validator');
-const { sconeTeeApp, gramineTeeApp } = require('../utils/templates');
-const {
+} from '../../common/utils/validator.js';
+import { sconeTeeApp, gramineTeeApp } from '../utils/templates.js';
+import {
   deployApp,
   showApp,
   showUserApp,
@@ -33,9 +33,9 @@ const {
   checkDeployedDataset,
   checkDeployedWorkerpool,
   resolveTeeFrameworkFromApp,
-} = require('../../common/protocol/registries');
-const { showCategory } = require('../../common/protocol/category');
-const {
+} from '../../common/protocol/registries.js';
+import { showCategory } from '../../common/protocol/category.js';
+import {
   getRemainingVolume,
   createApporder,
   createDatasetorder,
@@ -46,21 +46,21 @@ const {
   signWorkerpoolorder,
   signRequestorder,
   matchOrders,
-} = require('../../common/market/order');
-const {
+} from '../../common/market/order.js';
+import {
   publishApporder,
   publishRequestorder,
   unpublishLastApporder,
   unpublishAllApporders,
-} = require('../../common/market/marketplace');
-const {
+} from '../../common/market/marketplace.js';
+import {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchWorkerpoolOrderbook,
-} = require('../../common/market/orderbook');
-const { checkBalance } = require('../../common/account/balance');
-const { obsDeal } = require('../../common/execution/deal');
-const {
+} from '../../common/market/orderbook.js';
+import { checkBalance } from '../../common/account/balance.js';
+import { obsDeal } from '../../common/execution/deal.js';
+import {
   encodeTag,
   sumTags,
   checkActiveBitInTag,
@@ -68,8 +68,8 @@ const {
   stringifyNestedBn,
   formatRLC,
   TAG_MAP,
-} = require('../../common/utils/utils');
-const {
+} from '../../common/utils/utils.js';
+import {
   NULL_ADDRESS,
   NULL_BYTES32,
   NULL_DATASETORDER,
@@ -78,15 +78,15 @@ const {
   APP,
   WORKERPOOL,
   TEE_FRAMEWORKS,
-} = require('../../common/utils/constant');
-const { IEXEC_REQUEST_PARAMS } = require('../../common/utils/constant');
-const {
+  IEXEC_REQUEST_PARAMS,
+} from '../../common/utils/constant.js';
+import {
   checkRequestRequirements,
   checkDatasetRequirements,
   resolveTeeFrameworkFromTag,
   checkAppRequirements,
-} = require('../../common/execution/order-helper');
-const {
+} from '../../common/execution/order-helper.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -107,22 +107,22 @@ const {
   getDefaultTeeFrameworkFromChain,
   getSmsUrlFromChain,
   optionCreator,
-} = require('../utils/cli-helper');
-const {
+} from '../utils/cli-helper.js';
+import {
   loadIExecConf,
   initObj,
   saveDeployedObj,
   loadDeployedObj,
-} = require('../utils/fs');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { lookupAddress } = require('../../common/ens/resolution');
-const {
+} from '../utils/fs.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { lookupAddress } from '../../common/ens/resolution.js';
+import {
   ConfigurationError,
   ValidationError,
-} = require('../../common/utils/errors');
-const { pushAppSecret } = require('../../common/sms/push');
-const { checkAppSecretExists } = require('../../common/sms/check');
+} from '../../common/utils/errors.js';
+import { pushAppSecret } from '../../common/sms/push.js';
+import { checkAppSecretExists } from '../../common/sms/check.js';
 
 const debug = Debug('iexec:iexec-app');
 

@@ -1,6 +1,6 @@
-const Debug = require('debug');
-const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
-const {
+import Debug from 'debug';
+import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
+import {
   addressSchema,
   chainIdSchema,
   uint256Schema,
@@ -8,11 +8,11 @@ const {
   positiveStrictIntSchema,
   tagSchema,
   throwIfMissing,
-} = require('../utils/validator');
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:market:orderbook');
 
-const fetchAppOrderbook = async (
+export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   app = throwIfMissing(),
@@ -64,7 +64,7 @@ const fetchAppOrderbook = async (
   }
 };
 
-const fetchDatasetOrderbook = async (
+export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   dataset = throwIfMissing(),
@@ -116,7 +116,7 @@ const fetchDatasetOrderbook = async (
   }
 };
 
-const fetchWorkerpoolOrderbook = async (
+export const fetchWorkerpoolOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   {
@@ -189,7 +189,7 @@ const fetchWorkerpoolOrderbook = async (
   }
 };
 
-const fetchRequestOrderbook = async (
+export const fetchRequestOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   {
@@ -260,11 +260,4 @@ const fetchRequestOrderbook = async (
     debug('fetchRequestOrderbook()', error);
     throw error;
   }
-};
-
-module.exports = {
-  fetchAppOrderbook,
-  fetchDatasetOrderbook,
-  fetchWorkerpoolOrderbook,
-  fetchRequestOrderbook,
 };

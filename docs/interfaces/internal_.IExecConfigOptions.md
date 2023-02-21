@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / IExecConfigOptions
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / IExecConfigOptions
 
 # Interface: IExecConfigOptions
 
-[{internal}](../modules/internal_.md).IExecConfigOptions
+[<internal>](../modules/internal_.md).IExecConfigOptions
 
 ## Table of contents
 

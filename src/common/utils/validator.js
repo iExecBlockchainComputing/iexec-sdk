@@ -1,7 +1,8 @@
-const Debug = require('debug');
-const { string, number, object, mixed, boolean, array, lazy } = require('yup');
-const { getAddress, namehash } = require('ethers').utils;
-const {
+import { Buffer } from 'buffer';
+import Debug from 'debug';
+import { string, number, object, mixed, boolean, array, lazy } from 'yup';
+import { utils } from 'ethers';
+import {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
   encodeTag,
@@ -10,14 +11,16 @@ const {
   parseEth,
   checkActiveBitInTag,
   TAG_MAP,
-} = require('./utils');
-const { ValidationError } = require('./errors');
-const { wrapCall } = require('./errorWrappers');
-const {
+} from './utils.js';
+import { ValidationError } from './errors.js';
+import { wrapCall } from './errorWrappers.js';
+import {
   TEE_FRAMEWORKS,
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
-} = require('./constant');
+} from './constant.js';
+
+const { getAddress, namehash } = utils;
 
 const debug = Debug('validators');
 
@@ -26,12 +29,15 @@ const posIntRegex = /^\d+$/;
 const posStrictIntRegex = /^[1-9]\d*$/;
 
 const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
-const teeFrameworkSchema = () =>
+
+export const stringSchema = string;
+
+export const teeFrameworkSchema = () =>
   string()
     .transform((name) => name.toLowerCase())
     .oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
 
-const stringNumberSchema = ({ message } = {}) =>
+export const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
       const trimmed = value.replace(/^0+/, '');
@@ -39,19 +45,19 @@ const stringNumberSchema = ({ message } = {}) =>
     })
     .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
-const integerSchema = () => number().integer();
+export const integerSchema = () => number().integer();
 
-const positiveIntSchema = () =>
+export const positiveIntSchema = () =>
   integerSchema()
     .min(0)
     .max(Number.MAX_SAFE_INTEGER - 1);
 
-const positiveStrictIntSchema = () =>
+export const positiveStrictIntSchema = () =>
   integerSchema()
     .min(1)
     .max(Number.MAX_SAFE_INTEGER - 1);
 
-const hexnumberSchema = () =>
+export const hexnumberSchema = () =>
   string()
     .lowercase()
     .matches(
@@ -59,7 +65,7 @@ const hexnumberSchema = () =>
       '${originalValue} is not a valid hex number',
     );
 
-const uint256Schema = () =>
+export const uint256Schema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
 const amountErrorMessage = ({ originalValue }) =>
@@ -67,7 +73,7 @@ const amountErrorMessage = ({ originalValue }) =>
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
   } is not a valid amount`;
 
-const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
+export const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
@@ -98,7 +104,7 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     })
     .matches(/^[0-9]*$/, amountErrorMessage);
 
-const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
+export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
@@ -129,10 +135,10 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
     })
     .matches(/^[0-9]*$/, amountErrorMessage);
 
-const chainIdSchema = () =>
+export const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
-const addressSchema = ({ ethProvider } = {}) =>
+export const addressSchema = ({ ethProvider } = {}) =>
   mixed()
     .transform((value) => {
       try {
@@ -202,12 +208,12 @@ const addressSchema = ({ ethProvider } = {}) =>
       },
     );
 
-const bytes32Schema = () =>
+export const bytes32Schema = () =>
   string()
     .lowercase()
     .matches(bytes32Regex, '${originalValue} is not a bytes32 hexstring');
 
-const orderSignSchema = () =>
+export const orderSignSchema = () =>
   string().matches(
     /^(0x)([0-9a-f]{2})*/,
     '${originalValue} is not a valid signature',
@@ -221,11 +227,11 @@ const signed = () => ({
   sign: orderSignSchema().required(),
 });
 
-const catidSchema = () => uint256Schema();
+export const catidSchema = () => uint256Schema();
 
-const paramsArgsSchema = () => string();
+export const paramsArgsSchema = () => string();
 
-const paramsInputFilesArraySchema = () =>
+export const paramsInputFilesArraySchema = () =>
   array()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
@@ -242,15 +248,15 @@ const paramsInputFilesArraySchema = () =>
         .required('${path} "${value}" is not a valid URL'),
     );
 
-const paramsEncryptResultSchema = () => boolean();
+export const paramsEncryptResultSchema = () => boolean();
 
-const paramsStorageProviderSchema = () =>
+export const paramsStorageProviderSchema = () =>
   string().oneOf(
     Object.values(STORAGE_PROVIDERS),
     '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
   );
 
-const paramsRequesterSecretsSchema = () =>
+export const paramsRequesterSecretsSchema = () =>
   object()
     .test(
       'keys-are-int',
@@ -281,7 +287,7 @@ const paramsRequesterSecretsSchema = () =>
       },
     );
 
-const objParamsSchema = () =>
+export const objParamsSchema = () =>
   object({
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
@@ -335,7 +341,7 @@ const objParamsSchema = () =>
     [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   }).noUnknown(true, 'Unknown key "${unknown}" in params');
 
-const paramsSchema = () =>
+export const paramsSchema = () =>
   string()
     .transform((value, originalValue) => {
       if (typeof originalValue === 'object') {
@@ -359,7 +365,7 @@ const paramsSchema = () =>
       },
     );
 
-const tagSchema = () =>
+export const tagSchema = () =>
   mixed()
     .transform((value) => {
       if (Array.isArray(value)) {
@@ -449,7 +455,7 @@ const tagSchema = () =>
       },
     );
 
-const apporderSchema = (opt) =>
+export const apporderSchema = (opt) =>
   object(
     {
       app: addressSchema(opt).required(),
@@ -463,19 +469,19 @@ const apporderSchema = (opt) =>
     '${originalValue} is not a valid apporder',
   );
 
-const saltedApporderSchema = (opt) =>
+export const saltedApporderSchema = (opt) =>
   apporderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted apporder',
   );
 
-const signedApporderSchema = (opt) =>
+export const signedApporderSchema = (opt) =>
   saltedApporderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed apporder',
   );
 
-const datasetorderSchema = (opt) =>
+export const datasetorderSchema = (opt) =>
   object(
     {
       dataset: addressSchema(opt).required(),
@@ -489,19 +495,19 @@ const datasetorderSchema = (opt) =>
     '${originalValue} is not a valid datasetorder',
   );
 
-const saltedDatasetorderSchema = (opt) =>
+export const saltedDatasetorderSchema = (opt) =>
   datasetorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted datasetorder',
   );
 
-const signedDatasetorderSchema = (opt) =>
+export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
   );
 
-const workerpoolorderSchema = (opt) =>
+export const workerpoolorderSchema = (opt) =>
   object(
     {
       workerpool: addressSchema(opt).required(),
@@ -517,19 +523,19 @@ const workerpoolorderSchema = (opt) =>
     '${originalValue} is not a valid workerpoolorder',
   );
 
-const saltedWorkerpoolorderSchema = (opt) =>
+export const saltedWorkerpoolorderSchema = (opt) =>
   workerpoolorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted workerpoolorder',
   );
 
-const signedWorkerpoolorderSchema = (opt) =>
+export const signedWorkerpoolorderSchema = (opt) =>
   saltedWorkerpoolorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed workerpoolorder',
   );
 
-const requestorderSchema = (opt) =>
+export const requestorderSchema = (opt) =>
   object(
     {
       app: addressSchema(opt).required(),
@@ -550,19 +556,19 @@ const requestorderSchema = (opt) =>
     '${originalValue} is not a valid requestorder',
   );
 
-const saltedRequestorderSchema = (opt) =>
+export const saltedRequestorderSchema = (opt) =>
   requestorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted requestorder',
   );
 
-const signedRequestorderSchema = (opt) =>
+export const signedRequestorderSchema = (opt) =>
   saltedRequestorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed requestorder',
   );
 
-const multiaddressSchema = () =>
+export const multiaddressSchema = () =>
   mixed().transform((value) => {
     if (value instanceof Uint8Array) return value;
     if (typeof value === 'string') {
@@ -571,7 +577,7 @@ const multiaddressSchema = () =>
     throw new ValidationError('${originalValue} is not a valid multiaddr');
   });
 
-const objMrenclaveSchema = () =>
+export const objMrenclaveSchema = () =>
   object({
     framework: teeFrameworkSchema().required(),
     version: string().required(),
@@ -580,7 +586,7 @@ const objMrenclaveSchema = () =>
     fingerprint: string().required(),
   }).noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
 
-const mrenclaveSchema = () =>
+export const mrenclaveSchema = () =>
   mixed()
     .transform((value) => {
       if (value instanceof Uint8Array) {
@@ -633,10 +639,10 @@ const mrenclaveSchema = () =>
     )
     .default(() => utf8ToBuffer(''));
 
-const appTypeSchema = () =>
+export const appTypeSchema = () =>
   string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
-const appSchema = (opt) =>
+export const appSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     name: string().required(),
@@ -646,7 +652,7 @@ const appSchema = (opt) =>
     mrenclave: mrenclaveSchema().required(),
   });
 
-const datasetSchema = (opt) =>
+export const datasetSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     name: string().required(),
@@ -654,20 +660,20 @@ const datasetSchema = (opt) =>
     checksum: bytes32Schema().required(),
   });
 
-const workerpoolSchema = (opt) =>
+export const workerpoolSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     description: string().required(),
   });
 
-const categorySchema = () =>
+export const categorySchema = () =>
   object({
     name: string().required(),
     description: string().required(),
     workClockTimeRef: uint256Schema().required(),
   });
 
-const fileBufferSchema = () =>
+export const fileBufferSchema = () =>
   mixed().transform((value) => {
     try {
       if (typeof value === 'string') {
@@ -682,7 +688,7 @@ const fileBufferSchema = () =>
     }
   });
 
-const base64Encoded256bitsKeySchema = () =>
+export const base64Encoded256bitsKeySchema = () =>
   string().test(
     'is-base64-256bits-key',
     '${originalValue} is not a valid encryption key (must be base64 encoded 256 bits key)',
@@ -700,7 +706,7 @@ const base64Encoded256bitsKeySchema = () =>
     },
   );
 
-const ensDomainSchema = () =>
+export const ensDomainSchema = () =>
   string()
     .test(
       'no-empty-label',
@@ -748,7 +754,7 @@ const ensDomainSchema = () =>
       },
     );
 
-const ensLabelSchema = () =>
+export const ensLabelSchema = () =>
   string()
     .test(
       'no-dot',
@@ -793,16 +799,16 @@ const ensLabelSchema = () =>
       },
     );
 
-const textRecordKeySchema = () => string().required().strict(true);
+export const textRecordKeySchema = () => string().required().strict(true);
 
-const textRecordValueSchema = () => string().default('').strict(true);
+export const textRecordValueSchema = () => string().default('').strict(true);
 
-const workerpoolApiUrlSchema = () => string().url().default('');
+export const workerpoolApiUrlSchema = () => string().url().default('');
 
-const basicUrlSchema = () =>
+export const basicUrlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
 
-const smsUrlOrMapSchema = () =>
+export const smsUrlOrMapSchema = () =>
   lazy((stringOrMap) => {
     switch (typeof stringOrMap) {
       case 'string':
@@ -822,58 +828,6 @@ const smsUrlOrMapSchema = () =>
     }
   });
 
-const throwIfMissing = () => {
+export const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
-};
-
-module.exports = {
-  throwIfMissing,
-  stringSchema: string,
-  uint256Schema,
-  nRlcAmountSchema,
-  weiAmountSchema,
-  addressSchema,
-  bytes32Schema,
-  apporderSchema,
-  saltedApporderSchema,
-  signedApporderSchema,
-  datasetorderSchema,
-  signedDatasetorderSchema,
-  saltedDatasetorderSchema,
-  workerpoolorderSchema,
-  saltedWorkerpoolorderSchema,
-  signedWorkerpoolorderSchema,
-  requestorderSchema,
-  saltedRequestorderSchema,
-  signedRequestorderSchema,
-  catidSchema,
-  paramsSchema,
-  objParamsSchema,
-  paramsArgsSchema,
-  paramsInputFilesArraySchema,
-  paramsRequesterSecretsSchema,
-  paramsEncryptResultSchema,
-  paramsStorageProviderSchema,
-  tagSchema,
-  chainIdSchema,
-  hexnumberSchema,
-  positiveIntSchema,
-  positiveStrictIntSchema,
-  mrenclaveSchema,
-  objMrenclaveSchema,
-  appTypeSchema,
-  appSchema,
-  datasetSchema,
-  categorySchema,
-  workerpoolSchema,
-  base64Encoded256bitsKeySchema,
-  fileBufferSchema,
-  ensDomainSchema,
-  ensLabelSchema,
-  textRecordKeySchema,
-  textRecordValueSchema,
-  workerpoolApiUrlSchema,
-  smsUrlOrMapSchema,
-  teeFrameworkSchema,
-  ValidationError,
 };

@@ -1,5 +1,5 @@
 {
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb-base", "plugin:import/recommended", "prettier"],
   "rules": {
     "default-param-last": "off",
     "new-cap": 0,
@@ -28,6 +28,8 @@
     ],
     "no-template-curly-in-string": "off",
     "max-classes-per-file": "off",
-    "max-len": "off"
+    "max-len": "off",
+    "import/prefer-default-export": "off",
+    "import/extensions": ["error", "always"]
   }
 }

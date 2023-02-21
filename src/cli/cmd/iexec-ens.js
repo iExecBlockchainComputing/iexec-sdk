@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
 // const Debug = require('debug');
-const cli = require('commander');
-const {
+import { program as cli } from 'commander';
+import {
   getOwner,
   resolveName,
   lookupAddress,
+} from '../../common/ens/resolution.js';
+import {
   registerFifsEns,
   configureResolution,
   getDefaultDomain,
-} = require('../../common/ens');
-const {
+} from '../../common/ens/registration.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -22,11 +24,9 @@ const {
   Spinner,
   getPropertyFormChain,
   prompt,
-} = require('../utils/cli-helper');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
-
-// const debug = Debug('iexec:iexec-ens');
+} from '../utils/cli-helper.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
 
 cli.name('iexec ens').usage('<command> [options]');
 
@@ -120,7 +120,7 @@ register
   .option(
     '--domain <domain>',
     `use the specified ENS domain (default \`users.iexec.eth\`)
- - if the ENS name (label.domain) is not owned by the user, the domain must be controled by a FIFS registrar
+ - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar
  - if the ENS name (label.domain) is already owned by the user, the registration will be skipped`,
   )
   .option(
@@ -184,7 +184,7 @@ register
         targetAddress,
       );
       spinner.succeed(
-        `ENS ${name} successfuly registered and configured for ${targetAddress}`,
+        `ENS ${name} successfully registered and configured for ${targetAddress}`,
         {
           raw: {
             name,

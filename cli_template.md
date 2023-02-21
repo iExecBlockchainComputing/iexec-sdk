@@ -21,7 +21,7 @@ All three major OS are supported (linux, OSX, windows).
 
 ## Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.0.0-brightgreen.svg)](https://nodejs.org/en/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.17.0-brightgreen.svg)](https://nodejs.org/en/).
 
 ```bash
 npm -g install iexec # install the cli

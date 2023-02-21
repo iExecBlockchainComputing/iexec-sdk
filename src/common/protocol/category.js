@@ -1,20 +1,20 @@
-const Debug = require('debug');
-const {
+import Debug from 'debug';
+import {
   ethersBnToBn,
   bnifyNestedEthersBn,
   getEventFromLogs,
   checkSigner,
-} = require('../utils/utils');
-const {
+} from '../utils/utils.js';
+import {
   uint256Schema,
   categorySchema,
   throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:protocol:category');
 
-const createCategory = async (
+export const createCategory = async (
   contracts = throwIfMissing(),
   obj = throwIfMissing(),
 ) => {
@@ -49,7 +49,7 @@ const createCategory = async (
   }
 };
 
-const showCategory = async (
+export const showCategory = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
 ) => {
@@ -59,8 +59,8 @@ const showCategory = async (
     const categoryRPC = await wrapCall(iexecContract.viewCategory(vIndex));
     const categoryPropNames = ['name', 'description', 'workClockTimeRef'];
     const category = categoryRPC.reduce(
-      (accu, curr, i) =>
-        Object.assign(accu, {
+      (acc, curr, i) =>
+        Object.assign(acc, {
           [categoryPropNames[i]]: curr,
         }),
       {},
@@ -72,7 +72,7 @@ const showCategory = async (
   }
 };
 
-const countCategory = async (contracts = throwIfMissing()) => {
+export const countCategory = async (contracts = throwIfMissing()) => {
   try {
     const countBN = ethersBnToBn(
       await wrapCall(contracts.getIExecContract().countCategory()),
@@ -82,10 +82,4 @@ const countCategory = async (contracts = throwIfMissing()) => {
     debug('countCategory()', error);
     throw error;
   }
-};
-
-module.exports = {
-  createCategory,
-  showCategory,
-  countCategory,
 };

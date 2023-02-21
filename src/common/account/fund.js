@@ -1,22 +1,22 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { checkBalance } = require('./balance');
-const { getAddress } = require('../wallet/address');
-const { isInWhitelist } = require('../wallet/enterprise');
-const { checkBalances } = require('../wallet/balance');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { checkBalance } from './balance.js';
+import { getAddress } from '../wallet/address.js';
+import { isInWhitelist } from '../wallet/enterprise.js';
+import { checkBalances } from '../wallet/balance.js';
+import {
   checkEvent,
   bnNRlcToBnWei,
   bnToEthersBn,
   checkSigner,
-} = require('../utils/utils');
-const { NULL_BYTES } = require('../utils/constant');
-const { nRlcAmountSchema, throwIfMissing } = require('../utils/validator');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
+} from '../utils/utils.js';
+import { NULL_BYTES } from '../utils/constant.js';
+import { nRlcAmountSchema, throwIfMissing } from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:account:fund');
 
-const deposit = async (
+export const deposit = async (
   contracts = throwIfMissing(),
   amount = throwIfMissing(),
 ) => {
@@ -77,7 +77,7 @@ const deposit = async (
   }
 };
 
-const withdraw = async (
+export const withdraw = async (
   contracts = throwIfMissing(),
   amount = throwIfMissing(),
 ) => {
@@ -109,9 +109,4 @@ const withdraw = async (
     debug('withdraw()', error);
     throw error;
   }
-};
-
-module.exports = {
-  deposit,
-  withdraw,
 };

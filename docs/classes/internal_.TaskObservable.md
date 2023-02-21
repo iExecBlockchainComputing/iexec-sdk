@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / TaskObservable
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / TaskObservable
 
 # Class: TaskObservable
 
-[{internal}](../modules/internal_.md).TaskObservable
+[<internal>](../modules/internal_.md).TaskObservable
 
 ## Hierarchy
 

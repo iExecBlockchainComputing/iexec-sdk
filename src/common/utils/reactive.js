@@ -1,4 +1,4 @@
-class SafeObserver {
+export class SafeObserver {
   constructor(destination) {
     this.destination = destination;
   }
@@ -52,7 +52,7 @@ class SafeObserver {
   }
 }
 
-class Observable {
+export class Observable {
   constructor(_subscribe) {
     this._subscribe = _subscribe;
   }
@@ -62,8 +62,3 @@ class Observable {
     return this._subscribe(safeObserver);
   }
 }
-
-module.exports = {
-  Observable,
-  SafeObserver,
-};

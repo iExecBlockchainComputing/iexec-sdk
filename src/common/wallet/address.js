@@ -1,12 +1,10 @@
-const { ConfigurationError } = require('../utils/errors');
-const { checksummedAddress } = require('../utils/utils');
-const { throwIfMissing } = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
+import { ConfigurationError } from '../utils/errors.js';
+import { checksummedAddress } from '../utils/utils.js';
+import { throwIfMissing } from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
 
-const getAddress = async (contracts = throwIfMissing()) => {
+export const getAddress = async (contracts = throwIfMissing()) => {
   if (!contracts.signer) throw new ConfigurationError('Missing Signer');
   const address = await wrapCall(contracts.signer.getAddress());
   return checksummedAddress(address);
 };
-
-module.exports = { getAddress };

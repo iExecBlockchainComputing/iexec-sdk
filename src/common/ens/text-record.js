@@ -1,20 +1,24 @@
-const Debug = require('debug');
-const { Contract, utils } = require('ethers');
-const PublicResolver = require('./abi/PublicResolver-min.json');
-const {
+import Debug from 'debug';
+import { Contract, utils } from 'ethers';
+import { abi } from '../generated/@ensdomains/resolvers/PublicResolver.js';
+import {
   throwIfMissing,
   ensDomainSchema,
   textRecordKeySchema,
   textRecordValueSchema,
-} = require('../utils/validator');
-const { getAddress } = require('../wallet/address');
-const { wrapSend, wrapWait, wrapCall } = require('../utils/errorWrappers');
-const { NULL_ADDRESS } = require('../utils/constant');
-const { getOwner } = require('./resolution');
+} from '../utils/validator.js';
+import { getAddress } from '../wallet/address.js';
+import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers.js';
+import { NULL_ADDRESS } from '../utils/constant.js';
+import { getOwner } from './resolution.js';
 
 const debug = Debug('iexec:ens:text-record');
 
-const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
+export const readTextRecord = async (
+  contracts = throwIfMissing(),
+  name,
+  key,
+) => {
   try {
     const vName = await ensDomainSchema().validate(name);
     const vKey = await textRecordKeySchema().validate(key);
@@ -31,7 +35,7 @@ const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
     }
     const resolverContract = new Contract(
       currentResolver.address,
-      PublicResolver.abi,
+      abi,
       contracts.provider,
     );
     const txt = await wrapCall(resolverContract.text(node, vKey));
@@ -42,7 +46,7 @@ const readTextRecord = async (contracts = throwIfMissing(), name, key) => {
   }
 };
 
-const setTextRecord = async (
+export const setTextRecord = async (
   contracts = throwIfMissing(),
   name,
   key,
@@ -72,7 +76,7 @@ const setTextRecord = async (
     }
     const resolverContract = new Contract(
       currentResolver.address,
-      PublicResolver.abi,
+      abi,
       contracts.signer,
     );
     const tx = await wrapSend(resolverContract.setText(node, vKey, vValue));
@@ -82,9 +86,4 @@ const setTextRecord = async (
     debug('setTextRecord()', e);
     throw e;
   }
-};
-
-module.exports = {
-  readTextRecord,
-  setTextRecord,
 };

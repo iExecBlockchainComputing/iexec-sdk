@@ -1,34 +1,34 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const Debug = require('debug');
-const fs = require('fs-extra');
-const path = require('path');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import fsExtra from 'fs-extra';
+import { join } from 'path';
+import {
   checkDeployedDataset,
   deployDataset,
   countUserDatasets,
   showDataset,
   showUserDataset,
-} = require('../../common/protocol/registries');
-const {
+} from '../../common/protocol/registries.js';
+import {
   createDatasetorder,
   signDatasetorder,
-} = require('../../common/market/order');
-const {
+} from '../../common/market/order.js';
+import {
   publishDatasetorder,
   unpublishLastDatasetorder,
   unpublishAllDatasetorders,
-} = require('../../common/market/marketplace');
-const { checkWeb3SecretExists } = require('../../common/sms/check');
-const { pushWeb3Secret } = require('../../common/sms/push');
-const { NULL_ADDRESS, DATASET } = require('../../common/utils/constant');
-const {
+} from '../../common/market/marketplace.js';
+import { checkWeb3SecretExists } from '../../common/sms/check.js';
+import { pushWeb3Secret } from '../../common/sms/push.js';
+import { NULL_ADDRESS, DATASET } from '../../common/utils/constant.js';
+import {
   generateAes256Key,
   encryptAes256Cbc,
   sha256Sum,
-} = require('../../common/utils/encryption-utils');
-const {
+} from '../../common/utils/encryption-utils.js';
+import {
   loadIExecConf,
   initObj,
   saveDeployedObj,
@@ -36,10 +36,10 @@ const {
   isEmptyDir,
   saveToFile,
   saveTextToFile,
-} = require('../utils/fs');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const {
+} from '../utils/fs.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -59,13 +59,15 @@ const {
   getPropertyFormChain,
   getSmsUrlFromChain,
   optionCreator,
-} = require('../utils/cli-helper');
-const { lookupAddress } = require('../../common/ens/resolution');
-const { ConfigurationError } = require('../../common/utils/errors');
-const {
+} from '../utils/cli-helper.js';
+import { lookupAddress } from '../../common/ens/resolution.js';
+import { ConfigurationError } from '../../common/utils/errors.js';
+import {
   checkDatasetRequirements,
   resolveTeeFrameworkFromTag,
-} = require('../../common/execution/order-helper');
+} from '../../common/execution/order-helper.js';
+
+const { ensureDir, pathExists, readFile, lstat, readdir } = fsExtra;
 
 const debug = Debug('iexec:iexec-dataset');
 
@@ -105,9 +107,9 @@ init
           encryptedDatasetFolderPath,
         } = createEncFolderPaths(opts);
         await Promise.all([
-          fs.ensureDir(datasetSecretsFolderPath),
-          fs.ensureDir(originalDatasetFolderPath),
-          fs.ensureDir(encryptedDatasetFolderPath),
+          ensureDir(datasetSecretsFolderPath),
+          ensureDir(originalDatasetFolderPath),
+          ensureDir(encryptedDatasetFolderPath),
         ]);
         spinner.info('Created dataset folder tree for encryption');
       }
@@ -290,9 +292,9 @@ encryptDataset
       } = createEncFolderPaths(opts);
 
       const [eDSF, eODF, eEDF] = await Promise.all([
-        fs.pathExists(datasetSecretsFolderPath),
-        fs.pathExists(originalDatasetFolderPath),
-        fs.pathExists(encryptedDatasetFolderPath),
+        pathExists(datasetSecretsFolderPath),
+        pathExists(originalDatasetFolderPath),
+        pathExists(encryptedDatasetFolderPath),
       ]);
 
       if (!eDSF || !eODF || !eEDF) {
@@ -312,11 +314,11 @@ encryptDataset
         spinner.info(`Encrypting ${datasetFileName}`);
         const key = generateAes256Key();
 
-        const originalFilePath = path.join(
+        const originalFilePath = join(
           originalDatasetFolderPath,
           datasetFileName,
         );
-        const fileBuffer = await fs.readFile(originalFilePath);
+        const fileBuffer = await readFile(originalFilePath);
         const encryptedFileBuffer = await encryptAes256Cbc(fileBuffer, key);
         const encryptedFileChecksum = await sha256Sum(encryptedFileBuffer);
 
@@ -363,8 +365,8 @@ encryptDataset
         encryptedFiles = [],
       ) => {
         if (index >= filesNames.length) return encryptedFiles;
-        const stats = await fs.lstat(
-          path.join(originalDatasetFolderPath, filesNames[index]),
+        const stats = await lstat(
+          join(originalDatasetFolderPath, filesNames[index]),
         );
         if (!stats.isFile()) {
           spinner.info(
@@ -377,7 +379,7 @@ encryptDataset
         return recursiveEncryptDatasets(filesNames, index + 1, encryptedFiles);
       };
 
-      const datasetFiles = await fs.readdir(originalDatasetFolderPath);
+      const datasetFiles = await readdir(originalDatasetFolderPath);
       debug('datasetFiles', datasetFiles);
       const encrypted = await recursiveEncryptDatasets(datasetFiles);
 
@@ -434,16 +436,13 @@ pushSecret
         secretFilePath = opts.secretPath;
       } else {
         const { datasetSecretsFolderPath } = createEncFolderPaths();
-        secretFilePath = path.join(
-          datasetSecretsFolderPath,
-          defaultKeyFileName,
-        );
+        secretFilePath = join(datasetSecretsFolderPath, defaultKeyFileName);
         spinner.info(
           `No --secret-path <path> option, using default ${secretFilePath}`,
         );
       }
 
-      const secretToPush = (await fs.readFile(secretFilePath, 'utf8')).trim();
+      const secretToPush = (await readFile(secretFilePath, 'utf8')).trim();
       debug('secretToPush', secretToPush);
 
       await connectKeystore(chain, keystore);

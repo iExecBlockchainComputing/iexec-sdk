@@ -1,19 +1,19 @@
-const IExecModule = require('./IExecModule');
-const { fetchPublishedOrderByHash } = require('../common/market/marketplace');
-const {
+import IExecModule from './IExecModule.js';
+import { fetchPublishedOrderByHash } from '../common/market/marketplace.js';
+import {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchRequestOrderbook,
   fetchWorkerpoolOrderbook,
-} = require('../common/market/orderbook');
-const {
+} from '../common/market/orderbook.js';
+import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} = require('../common/utils/constant');
+} from '../common/utils/constant.js';
 
-class IExecOrderbookModule extends IExecModule {
+export default class IExecOrderbookModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -73,5 +73,3 @@ class IExecOrderbookModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecOrderbookModule;

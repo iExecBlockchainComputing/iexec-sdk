@@ -1,6 +1,6 @@
-const { STORAGE_PROVIDERS } = require('./constant');
+import { STORAGE_PROVIDERS } from './constant.js';
 
-const reservedSecretKeyName = {
+export const reservedSecretKeyName = {
   // result encryption
   IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY: 'iexec-result-encryption-public-key',
   // result storage
@@ -8,7 +8,7 @@ const reservedSecretKeyName = {
   IEXEC_RESULT_IEXEC_IPFS_TOKEN: 'iexec-result-iexec-ipfs-token',
 };
 
-const getStorageTokenKeyName = (provider) => {
+export const getStorageTokenKeyName = (provider) => {
   switch (provider) {
     case undefined:
     case 'default':
@@ -21,11 +21,5 @@ const getStorageTokenKeyName = (provider) => {
   }
 };
 
-const getResultEncryptionKeyName = () =>
+export const getResultEncryptionKeyName = () =>
   reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY;
-
-module.exports = {
-  reservedSecretKeyName,
-  getStorageTokenKeyName,
-  getResultEncryptionKeyName,
-};

@@ -1,5 +1,5 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule.js';
+import {
   createApporder,
   createDatasetorder,
   createRequestorder,
@@ -17,8 +17,8 @@ const {
   cancelRequestorder,
   cancelWorkerpoolorder,
   matchOrders,
-} = require('../common/market/order');
-const {
+} from '../common/market/order.js';
+import {
   publishApporder,
   publishDatasetorder,
   publishRequestorder,
@@ -35,22 +35,22 @@ const {
   unpublishLastWorkerpoolorder,
   unpublishRequestorder,
   unpublishWorkerpoolorder,
-} = require('../common/market/marketplace');
-const {
+} from '../common/market/marketplace.js';
+import {
   checkRequestRequirements,
   resolveTeeFrameworkFromTag,
   checkAppRequirements,
   checkDatasetRequirements,
-} = require('../common/execution/order-helper');
-const { NULL_DATASETORDER } = require('../common/utils/constant');
-const {
+} from '../common/execution/order-helper.js';
+import { NULL_DATASETORDER } from '../common/utils/constant.js';
+import {
   requestorderSchema,
   apporderSchema,
   datasetorderSchema,
-} = require('../common/utils/validator');
-const { sumTags } = require('../common/utils/utils');
+} from '../common/utils/validator.js';
+import { sumTags } from '../common/utils/utils.js';
 
-class IExecOrderModule extends IExecModule {
+export default class IExecOrderModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -371,5 +371,3 @@ class IExecOrderModule extends IExecModule {
     };
   }
 }
-
-module.exports = IExecOrderModule;

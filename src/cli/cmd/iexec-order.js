@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const Debug = require('debug');
-const cli = require('commander');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import {
   createApporder,
   createDatasetorder,
   createRequestorder,
@@ -16,8 +16,8 @@ const {
   cancelWorkerpoolorder,
   computeOrderHash,
   matchOrders,
-} = require('../../common/market/order');
-const {
+} from '../../common/market/order.js';
+import {
   publishApporder,
   publishDatasetorder,
   publishRequestorder,
@@ -27,21 +27,25 @@ const {
   unpublishRequestorder,
   unpublishWorkerpoolorder,
   fetchPublishedOrderByHash,
-} = require('../../common/market/marketplace');
-const { fetchDealsByOrderHash } = require('../../common/execution/deal');
-const {
+} from '../../common/market/marketplace.js';
+import { fetchDealsByOrderHash } from '../../common/execution/deal.js';
+import {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/protocol/registries');
-const {
+} from '../../common/protocol/registries.js';
+import {
   NULL_ADDRESS,
   APP,
   DATASET,
   WORKERPOOL,
   REQUEST,
-} = require('../../common/utils/constant');
-const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} from '../../common/utils/constant.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -58,34 +62,28 @@ const {
   prompt,
   getPropertyFormChain,
   getSmsUrlFromChain,
-} = require('../utils/cli-helper');
-const {
+} from '../utils/cli-helper.js';
+import {
   checkRequestRequirements,
   resolveTeeFrameworkFromTag,
   checkDatasetRequirements,
   checkAppRequirements,
-} = require('../../common/execution/order-helper');
-const {
+} from '../../common/execution/order-helper.js';
+import {
   loadIExecConf,
   initOrderObj,
   loadDeployedObj,
   saveSignedOrder,
   loadSignedOrders,
-} = require('../utils/fs');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
-const {
-  APP_ORDER,
-  DATASET_ORDER,
-  WORKERPOOL_ORDER,
-  REQUEST_ORDER,
-} = require('../../common/utils/constant');
-const { sumTags } = require('../../lib/utils');
-const {
+} from '../utils/fs.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
+import { sumTags } from '../../lib/utils.js';
+import {
   requestorderSchema,
   apporderSchema,
   datasetorderSchema,
-} = require('../../common/utils/validator');
+} from '../../common/utils/validator.js';
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';

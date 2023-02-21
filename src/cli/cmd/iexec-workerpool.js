@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const Debug = require('debug');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import {
   checkDeployedWorkerpool,
   deployWorkerpool,
   countUserWorkerpools,
   showWorkerpool,
   showUserWorkerpool,
-} = require('../../common/protocol/registries');
-const {
+} from '../../common/protocol/registries.js';
+import {
   createWorkerpoolorder,
   signWorkerpoolorder,
-} = require('../../common/market/order');
-const {
+} from '../../common/market/order.js';
+import {
   publishWorkerpoolorder,
   unpublishLastWorkerpoolorder,
   unpublishAllWorkerpoolorders,
-} = require('../../common/market/marketplace');
-const { stringifyNestedBn } = require('../../common/utils/utils');
-const { NULL_ADDRESS, WORKERPOOL } = require('../../common/utils/constant');
-const {
+} from '../../common/market/marketplace.js';
+import { stringifyNestedBn } from '../../common/utils/utils.js';
+import { NULL_ADDRESS, WORKERPOOL } from '../../common/utils/constant.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -37,19 +37,19 @@ const {
   prompt,
   getPropertyFormChain,
   isEthAddress,
-} = require('../utils/cli-helper');
-const {
+} from '../utils/cli-helper.js';
+import {
   loadIExecConf,
   initObj,
   saveDeployedObj,
   loadDeployedObj,
-} = require('../utils/fs');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { setWorkerpoolApiUrl } = require('../../common/execution/workerpool');
-const { getWorkerpoolApiUrl } = require('../../common/execution/debug');
-const { lookupAddress } = require('../../common/ens/resolution');
-const { ConfigurationError } = require('../../common/utils/errors');
+} from '../utils/fs.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { setWorkerpoolApiUrl } from '../../common/execution/workerpool.js';
+import { getWorkerpoolApiUrl } from '../../common/execution/debug.js';
+import { lookupAddress } from '../../common/ens/resolution.js';
+import { ConfigurationError } from '../../common/utils/errors.js';
 
 const debug = Debug('iexec:iexec-workerpool');
 

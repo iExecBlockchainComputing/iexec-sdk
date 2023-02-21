@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / Dataset
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Dataset
 
 # Interface: Dataset
 
-[{internal}](../modules/internal_.md).Dataset
+[<internal>](../modules/internal_.md).Dataset
 
 IExec dataset
 

@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-// const Debug = require('debug');
-const cli = require('commander');
-const { checkRequesterSecretExists } = require('../../common/sms/check');
-const { pushRequesterSecret } = require('../../common/sms/push');
-const {
+import { program as cli } from 'commander';
+import { checkRequesterSecretExists } from '../../common/sms/check.js';
+import { pushRequesterSecret } from '../../common/sms/push.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -17,11 +16,9 @@ const {
   Spinner,
   getSmsUrlFromChain,
   optionCreator,
-} = require('../utils/cli-helper');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
-
-// const debug = Debug('iexec:iexec-requester');
+} from '../utils/cli-helper.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
 
 cli.name('iexec requester').usage('<command> [options]');
 

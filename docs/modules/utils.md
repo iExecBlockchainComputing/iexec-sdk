@@ -86,8 +86,8 @@ const binary = new Blob([decryptedFileBuffer]);
 
 | Name | Type |
 | :------ | :------ |
-| `encrypted` | `string` \| `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
-| `beneficiaryKey` | `string` \| `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
+| `encrypted` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
+| `beneficiaryKey` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
 
 #### Returns
 
@@ -180,12 +180,12 @@ const iexec = new IExec({ ethProvider });
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `host` | `string` | - |
-| `privateKey` | `string` | - |
+| `host` | `string` | node RPC url |
+| `privateKey` | `string` | wallet private key |
 | `options?` | `Object` | - |
 | `options.gasPrice?` | `string` | gas price override |
+| `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
 | `options.providers` | [`ProviderOptions`](../interfaces/internal_.ProviderOptions.md) | providers options |
-| `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | - |
 
 #### Returns
 

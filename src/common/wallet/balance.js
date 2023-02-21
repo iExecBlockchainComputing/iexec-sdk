@@ -1,15 +1,11 @@
-const Debug = require('debug');
-const { ethersBnToBn, truncateBnWeiToBnNRlc } = require('../utils/utils');
-const {
-  addressSchema,
-
-  throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
+import Debug from 'debug';
+import { ethersBnToBn, truncateBnWeiToBnNRlc } from '../utils/utils.js';
+import { addressSchema, throwIfMissing } from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:wallet:balance');
 
-const getRlcBalance = async (
+export const getRlcBalance = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -26,7 +22,7 @@ const getRlcBalance = async (
   return ethersBnToBn(nRlcBalance);
 };
 
-const getEthBalance = async (
+export const getEthBalance = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -37,7 +33,7 @@ const getEthBalance = async (
   return ethersBnToBn(weiBalance);
 };
 
-const checkBalances = async (
+export const checkBalances = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -60,5 +56,3 @@ const checkBalances = async (
     throw error;
   }
 };
-
-module.exports = { getEthBalance, getRlcBalance, checkBalances };

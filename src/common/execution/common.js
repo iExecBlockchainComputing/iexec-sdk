@@ -1,13 +1,13 @@
-const Debug = require('debug');
-const { NULL_ADDRESS, NULL_BYTES32 } = require('../utils/constant');
-const { ObjectNotFoundError } = require('../utils/errors');
-const { wrapCall } = require('../utils/errorWrappers');
-const { bnifyNestedEthersBn, cleanRPC } = require('../utils/utils');
-const { throwIfMissing, bytes32Schema } = require('../utils/validator');
+import Debug from 'debug';
+import { NULL_ADDRESS, NULL_BYTES32 } from '../utils/constant.js';
+import { ObjectNotFoundError } from '../utils/errors.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { bnifyNestedEthersBn, cleanRPC } from '../utils/utils.js';
+import { throwIfMissing, bytes32Schema } from '../utils/validator.js';
 
 const debug = Debug('iexec:execution:common');
 
-const viewDeal = async (
+export const viewDeal = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
 ) => {
@@ -30,7 +30,7 @@ const viewDeal = async (
   }
 };
 
-const viewTask = async (
+export const viewTask = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   { strict = true } = {},
@@ -50,9 +50,4 @@ const viewTask = async (
     debug('viewTask()', error);
     throw error;
   }
-};
-
-module.exports = {
-  viewDeal,
-  viewTask,
 };

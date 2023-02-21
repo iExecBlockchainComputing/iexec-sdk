@@ -21,7 +21,7 @@ All three major OS are supported (linux, OSX, windows).
 
 ## Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.0.0-brightgreen.svg)](https://nodejs.org/en/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.17.0-brightgreen.svg)](https://nodejs.org/en/).
 
 ```bash
 npm -g install iexec # install the cli
@@ -2266,7 +2266,7 @@ Options:
 | --force | force perform action without prompting user |
 | --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
+| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
 | --for \<address\> | register for an owned iExec app, dataset or workerpool |
 
 ### iexec category

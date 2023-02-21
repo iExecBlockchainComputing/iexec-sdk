@@ -1,23 +1,23 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { BigNumber } = require('ethers');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { BigNumber } from 'ethers';
+import {
   ethersBnToBn,
   bnToEthersBn,
   bnNRlcToBnWei,
   checkSigner,
-} = require('../utils/utils');
-const {
+} from '../utils/utils.js';
+import {
   addressSchema,
   uint256Schema,
   nRlcAmountSchema,
   weiAmountSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { getAddress } = require('./address');
-const { getEthBalance, getRlcBalance, checkBalances } = require('./balance');
-const { isInWhitelist } = require('./enterprise');
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { getAddress } from './address.js';
+import { getEthBalance, getRlcBalance, checkBalances } from './balance.js';
+import { isInWhitelist } from './enterprise.js';
 
 const debug = Debug('iexec:wallet:send');
 
@@ -77,7 +77,7 @@ const sendERC20 = async (
   }
 };
 
-const sendETH = async (
+export const sendETH = async (
   contracts = throwIfMissing(),
   amount = throwIfMissing(),
   to = throwIfMissing(),
@@ -102,7 +102,7 @@ const sendETH = async (
   }
 };
 
-const sendRLC = async (
+export const sendRLC = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
   to = throwIfMissing(),
@@ -138,7 +138,10 @@ const sendRLC = async (
   }
 };
 
-const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
+export const sweep = async (
+  contracts = throwIfMissing(),
+  to = throwIfMissing(),
+) => {
   try {
     checkSigner(contracts);
     const vAddressTo = await addressSchema({
@@ -169,7 +172,7 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
           Object.assign(res, { sendERC20TxHash });
         } catch (error) {
           debug('error', error);
-          errors.push(`Failed to transfert ERC20': ${error.message}`);
+          errors.push(`Failed to transfer ERC20': ${error.message}`);
           throw Error(
             `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
           );
@@ -195,12 +198,12 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
         Object.assign(res, { sendNativeTxHash });
       } catch (error) {
         debug(error);
-        errors.push(`Failed to transfert native token': ${error.message}`);
+        errors.push(`Failed to transfer native token': ${error.message}`);
       }
     } else {
       const err = 'Tx fees are greater than wallet balance';
       debug(err);
-      errors.push(`Failed to transfert native token': ${err}`);
+      errors.push(`Failed to transfer native token': ${err}`);
     }
     if (errors.length > 0) Object.assign(res, { errors });
     return res;
@@ -208,10 +211,4 @@ const sweep = async (contracts = throwIfMissing(), to = throwIfMissing()) => {
     debug('sweep()', error);
     throw error;
   }
-};
-
-module.exports = {
-  sendETH,
-  sendRLC,
-  sweep,
 };

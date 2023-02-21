@@ -1,49 +1,34 @@
-const Debug = require('debug');
-const { Buffer } = require('buffer');
-const BN = require('bn.js');
-const JSZip = require('jszip');
-const NodeRSA = require('node-rsa');
-const aesjs = require('aes-js');
-const { getAddress, randomBytes, formatUnits, parseUnits, hexlify } =
-  require('ethers').utils;
-const { BigNumber } = require('ethers');
-const { multiaddr } = require('multiaddr');
-const { ValidationError, ConfigurationError } = require('./errors');
-const { NULL_BYTES32, TEE_FRAMEWORKS } = require('./constant');
+import Debug from 'debug';
+import { Buffer } from 'buffer';
+import BnJs from 'bn.js';
+import JSZip from 'jszip';
+import NodeRSA from 'node-rsa';
+import aesJs from 'aes-js';
+import { utils, BigNumber } from 'ethers';
+// import-js/eslint-plugin-import/issues/2703
+// eslint-disable-next-line import/no-unresolved
+import { multiaddr } from '@multiformats/multiaddr';
+import { ValidationError, ConfigurationError } from './errors.js';
+import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
+
+export const BN = BnJs;
+
+const { getAddress, randomBytes, formatUnits, parseUnits, hexlify } = utils;
 
 const debug = Debug('iexec:utils');
 
-const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
-const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
+export const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
+export const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
-const isEthersBn = (obj) =>
+export const isEthersBn = (obj) =>
   !!(obj._ethersType && obj._ethersType === 'BigNumber');
 
-const bnToEthersBn = (bn) => BigNumber.from(bn.toString());
-const ethersBnToBn = (ethersBn) => new BN(ethersBn.toString());
+export const bnToEthersBn = (bn) => BigNumber.from(bn.toString());
+export const ethersBnToBn = (ethersBn) => new BN(ethersBn.toString());
 
-const stringify = (val) => {
-  try {
-    let stringVal;
-    switch (typeof nRLC) {
-      case 'number':
-        stringVal = Number(val).toString();
-        break;
-      case 'string':
-        stringVal = val;
-        break;
-      default:
-        stringVal = val.toString();
-        break;
-    }
-    return stringVal;
-  } catch (error) {
-    debug('stringify()', error);
-    throw Error('Invalid val');
-  }
-};
+const stringify = (val) => val.toString();
 
-const formatRLC = (nRLC) => {
+export const formatRLC = (nRLC) => {
   try {
     return formatUnits(stringify(nRLC), 9);
   } catch (error) {
@@ -52,9 +37,9 @@ const formatRLC = (nRLC) => {
   }
 };
 
-const isRlcUnit = (str) => ['nRLC', 'RLC'].includes(str);
+export const isRlcUnit = (str) => ['nRLC', 'RLC'].includes(str);
 
-const parseRLC = (value, defaultUnit = 'RLC') => {
+export const parseRLC = (value, defaultUnit = 'RLC') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (!isRlcUnit(unit)) {
@@ -69,7 +54,7 @@ const parseRLC = (value, defaultUnit = 'RLC') => {
   }
 };
 
-const formatEth = (wei) => {
+export const formatEth = (wei) => {
   try {
     return formatUnits(BigNumber.from(stringify(wei)));
   } catch (error) {
@@ -78,12 +63,12 @@ const formatEth = (wei) => {
   }
 };
 
-const isEthUnit = (str) =>
+export const isEthUnit = (str) =>
   ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
     str,
   );
 
-const parseEth = (value, defaultUnit = 'ether') => {
+export const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (!isEthUnit(unit)) {
@@ -97,19 +82,19 @@ const parseEth = (value, defaultUnit = 'ether') => {
   }
 };
 
-const truncateBnWeiToBnNRlc = (bnWei) => {
+export const truncateBnWeiToBnNRlc = (bnWei) => {
   const weiString = bnWei.toString();
   const nRlcString = weiString.length > 9 ? weiString.slice(0, -9) : '0';
   return new BN(nRlcString);
 };
 
-const bnNRlcToBnWei = (bnNRlc) => {
+export const bnNRlcToBnWei = (bnNRlc) => {
   const nRlcString = bnNRlc.toString();
   const weiString = nRlcString !== '0' ? nRlcString.concat('000000000') : '0';
   return new BN(weiString);
 };
 
-const bnifyNestedEthersBn = (obj) => {
+export const bnifyNestedEthersBn = (obj) => {
   const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
@@ -123,7 +108,7 @@ const bnifyNestedEthersBn = (obj) => {
   return objOut;
 };
 
-const stringifyNestedBn = (obj) => {
+export const stringifyNestedBn = (obj) => {
   const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
@@ -135,12 +120,13 @@ const stringifyNestedBn = (obj) => {
   return objOut;
 };
 
-const checksummedAddress = (address) => getAddress(address);
+export const checksummedAddress = (address) => getAddress(address);
 
-const utf8ToBuffer = (str) => Buffer.from(str, 'utf8');
-const hexToBuffer = (hexString) => Buffer.from(hexString.substr(2), 'hex');
+export const utf8ToBuffer = (str) => Buffer.from(str, 'utf8');
+export const hexToBuffer = (hexString) =>
+  Buffer.from(hexString.substr(2), 'hex');
 
-const multiaddrHexToHuman = (hexString) => {
+export const multiaddrHexToHuman = (hexString) => {
   let res;
   const buffer = hexToBuffer(hexString);
   try {
@@ -151,7 +137,7 @@ const multiaddrHexToHuman = (hexString) => {
   return res;
 };
 
-const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
+export const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
   let multiaddrBuffer;
   try {
     multiaddrBuffer = Buffer.from(multiaddr(str).bytes);
@@ -162,7 +148,7 @@ const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
   return multiaddrBuffer;
 };
 
-const cleanRPC = (rpcObj) => {
+export const cleanRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
   const cleanObj = keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
@@ -184,7 +170,7 @@ const cleanRPC = (rpcObj) => {
   return cleanObj;
 };
 
-const checkEvent = (eventName, events) => {
+export const checkEvent = (eventName, events) => {
   let confirm = false;
   events.forEach((event) => {
     if (event.event === eventName) confirm = true;
@@ -192,7 +178,7 @@ const checkEvent = (eventName, events) => {
   return confirm;
 };
 
-const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
+export const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
   const eventFound = events.find((event) => event.event === eventName);
   if (!eventFound) {
     if (strict) throw new Error(`Unknown event ${eventName}`);
@@ -201,15 +187,9 @@ const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
   return eventFound;
 };
 
-const secToDate = (secs) => {
-  const t = new Date(1970, 0, 1);
-  t.setSeconds(secs);
-  return t;
-};
+export const getSalt = () => hexlify(randomBytes(32));
 
-const getSalt = () => hexlify(randomBytes(32));
-
-const TAG_MAP = {
+export const TAG_MAP = {
   tee: 0,
   [TEE_FRAMEWORKS.SCONE]: 1,
   [TEE_FRAMEWORKS.GRAMINE]: 2,
@@ -220,7 +200,7 @@ Object.assign(
   Object.fromEntries(Object.entries(TAG_MAP).map(([k, v]) => [v, k])),
 );
 
-const encodeTag = (tags) => {
+export const encodeTag = (tags) => {
   const binaryTags = new Array(256).fill(false);
   tags.forEach((tag) => {
     if (tag === '') return;
@@ -237,7 +217,7 @@ const encodeTag = (tags) => {
   return encodedTag;
 };
 
-const decodeTag = (tag) => {
+export const decodeTag = (tag) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
   const binString = new BN(tag.substring(2), 'hex').toString(2);
@@ -254,7 +234,7 @@ const decodeTag = (tag) => {
   return tags;
 };
 
-const sumTags = (tagArray) => {
+export const sumTags = (tagArray) => {
   const binStringArray = tagArray.map((hexTag) => {
     if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex))
       throw new ValidationError('tag must be bytes32 hex string');
@@ -275,7 +255,7 @@ const sumTags = (tagArray) => {
   return encodedTag;
 };
 
-const findMissingBitsInTag = (tag, requiredTag) => {
+export const findMissingBitsInTag = (tag, requiredTag) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
   if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag))
@@ -297,7 +277,7 @@ const findMissingBitsInTag = (tag, requiredTag) => {
   return missingBits;
 };
 
-const checkActiveBitInTag = (tag, bit) => {
+export const checkActiveBitInTag = (tag, bit) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
   if (typeof bit !== 'number' || bit < 0 || bit > 255)
@@ -306,13 +286,13 @@ const checkActiveBitInTag = (tag, bit) => {
   return binString.charAt(binString.length - bit - 1) === '1';
 };
 
-const tagBitToHuman = (bit) => {
+export const tagBitToHuman = (bit) => {
   if (typeof bit !== 'number' || bit < 0 || bit > 255)
     throw new ValidationError('Invalid bit tag');
   return TAG_MAP[bit] || bit;
 };
 
-const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
+export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   const encKeyFile = 'aes-key.rsa';
   const encResultsFile = 'iexec_out.zip.aes';
 
@@ -352,6 +332,16 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       encryptionScheme: 'pkcs1',
     });
     const decryptedAesKeyBuffer = key.decrypt(encryptedAesKeyBuffer);
+
+    // alt not used because crypto-browserify does not support createPrivateKey
+    // const decryptedAesKeyBuffer = crypto.privateDecrypt(
+    //   {
+    //     key: crypto.createPrivateKey(keyBuffer),
+    //     padding: crypto.constants.RSA_PKCS1_PADDING,
+    //   },
+    //   encryptedAesKeyBuffer,
+    // );
+
     const base64EncodedResultsKey = decryptedAesKeyBuffer.toString();
     aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
   } catch (error) {
@@ -372,7 +362,7 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
 
   // decrypt AES ECB (with one time AES key)
   try {
-    const aesEcb = new aesjs.ModeOfOperation.ecb(aesKeyBuffer);
+    const aesEcb = new aesJs.ModeOfOperation.ecb(aesKeyBuffer);
     const base64EncodedEncryptedZip = Buffer.from(
       encryptedZipArrayBuffer,
     ).toString();
@@ -396,15 +386,14 @@ const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   }
 };
 
-const sleep = (ms) =>
+export const sleep = (ms) =>
   new Promise((res) => {
     setTimeout(() => {
       res();
     }, ms);
   });
-const FETCH_INTERVAL = 5000;
 
-const checkSigner = (contracts) => {
+export const checkSigner = (contracts) => {
   if (!(contracts && contracts.signer)) {
     throw new ConfigurationError(
       'The current provider is not a signer, impossible to sign messages or transactions',
@@ -412,41 +401,4 @@ const checkSigner = (contracts) => {
   }
 };
 
-module.exports = {
-  BN,
-  isRlcUnit,
-  isEthUnit,
-  formatRLC,
-  formatEth,
-  parseRLC,
-  parseEth,
-  decryptResult,
-  checksummedAddress,
-  cleanRPC,
-  checkEvent,
-  getEventFromLogs,
-  bnToEthersBn,
-  ethersBnToBn,
-  bnifyNestedEthersBn,
-  stringifyNestedBn,
-  multiaddrHexToHuman,
-  humanToMultiaddrBuffer,
-  utf8ToBuffer,
-  hexToBuffer,
-  secToDate,
-  getSalt,
-  truncateBnWeiToBnNRlc,
-  bnNRlcToBnWei,
-  TAG_MAP,
-  encodeTag,
-  decodeTag,
-  sumTags,
-  findMissingBitsInTag,
-  checkActiveBitInTag,
-  tagBitToHuman,
-  bytes32Regex,
-  addressRegex,
-  sleep,
-  checkSigner,
-  FETCH_INTERVAL,
-};
+export const FETCH_INTERVAL = 5000;

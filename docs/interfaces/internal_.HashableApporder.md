@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / HashableApporder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / HashableApporder
 
 # Interface: HashableApporder
 
-[{internal}](../modules/internal_.md).HashableApporder
+[<internal>](../modules/internal_.md).HashableApporder
 
 sell order for an app
 

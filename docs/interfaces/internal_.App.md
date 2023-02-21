@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / App
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / App
 
 # Interface: App
 
-[{internal}](../modules/internal_.md).App
+[<internal>](../modules/internal_.md).App
 
 IExec app
 

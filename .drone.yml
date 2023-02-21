@@ -45,23 +45,6 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
-    when:
-      ref: refs/tags/v*
-
-  test_node12:
-    image: node:12
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
-    commands:
-      - apt update
-      - apt install xxd
-      - npm i -g npm@8
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
 
   publish_npm:
     image: plugins/npm

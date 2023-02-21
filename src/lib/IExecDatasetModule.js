@@ -1,21 +1,21 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule.js';
+import {
   deployDataset,
   showDataset,
   showUserDataset,
   countUserDatasets,
   predictDatasetAddress,
   checkDeployedDataset,
-} = require('../common/protocol/registries');
-const { checkWeb3SecretExists } = require('../common/sms/check');
-const { pushWeb3Secret } = require('../common/sms/push');
-const {
+} from '../common/protocol/registries.js';
+import { checkWeb3SecretExists } from '../common/sms/check.js';
+import { pushWeb3Secret } from '../common/sms/push.js';
+import {
   generateAes256Key,
   encryptAes256Cbc,
   sha256Sum,
-} = require('../common/utils/encryption-utils');
+} from '../common/utils/encryption-utils.js';
 
-class IExecDatasetModule extends IExecModule {
+export default class IExecDatasetModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -65,5 +65,3 @@ class IExecDatasetModule extends IExecModule {
       checkDeployedDataset(await this.config.resolveContractsClient(), address);
   }
 }
-
-module.exports = IExecDatasetModule;

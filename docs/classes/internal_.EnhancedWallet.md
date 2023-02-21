@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / EnhancedWallet
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / EnhancedWallet
 
 # Class: EnhancedWallet
 
-[{internal}](../modules/internal_.md).EnhancedWallet
+[<internal>](../modules/internal_.md).EnhancedWallet
 
 ## Hierarchy
 

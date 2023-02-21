@@ -1,4 +1,4 @@
-const { TEE_FRAMEWORKS } = require('./constant');
+import { TEE_FRAMEWORKS } from './constant.js';
 
 const hostMap = {
   1: 'mainnet',
@@ -92,9 +92,9 @@ const idMap = {
   bellecour: 134,
 };
 
-const getId = (idOrName) => idMap[idOrName] || idOrName;
+export const getId = (idOrName) => idMap[idOrName] || idOrName;
 
-const getChainDefaults = ({ id, flavour }) => ({
+export const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
@@ -114,11 +114,4 @@ const getChainDefaults = ({ id, flavour }) => ({
   network: networkMap[id],
 });
 
-const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
-
-module.exports = {
-  getId,
-  getChainDefaults,
-  isEnterpriseEnabled,
-  TEE_FRAMEWORKS,
-};
+export const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];

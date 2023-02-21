@@ -5,6 +5,11 @@
   "extends": ["airbnb-base", "prettier"],
   "rules": {
     "no-await-in-loop": "off",
-    "no-console": 0
+    "no-console": 0,
+    "import/prefer-default-export": "off"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
   }
 }

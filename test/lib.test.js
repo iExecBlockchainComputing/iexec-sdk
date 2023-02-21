@@ -1,19 +1,19 @@
-const ethers = require('ethers');
-const BN = require('bn.js');
-const fs = require('fs-extra');
-const path = require('path');
-const JSZip = require('jszip');
-const { execAsync } = require('./test-utils');
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
+import { providers, Wallet, Contract, BigNumber } from 'ethers';
+import BN from 'bn.js';
+import fsExtra from 'fs-extra';
+import { join } from 'path';
+import JSZip from 'jszip';
+import { execAsync } from './test-utils';
 
-const { utils, IExec, errors } = require('../src/lib');
-const {
-  sleep,
-  bytes32Regex,
-  addressRegex,
-} = require('../src/common/utils/utils');
-const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
+import { utils, IExec, errors } from '../src/lib';
+import { sleep, bytes32Regex, addressRegex } from '../src/common/utils/utils';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
 
 const { NULL_ADDRESS } = utils;
+const { readFile, ensureDir, writeFile } = fsExtra;
 
 console.log('Node version:', process.version);
 
@@ -131,16 +131,16 @@ console.log('nativeHubAddress', nativeHubAddress);
 console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
-const tokenChainRPC = new ethers.providers.JsonRpcProvider(tokenChainUrl);
-const tokenChainRPC1s = new ethers.providers.JsonRpcProvider(tokenChain1sUrl);
-const tokenChainWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
-const whitelistAdminWallet = new ethers.Wallet(PRIVATE_KEY, tokenChainRPC);
+const tokenChainRPC = new providers.JsonRpcProvider(tokenChainUrl);
+const tokenChainRPC1s = new providers.JsonRpcProvider(tokenChain1sUrl);
+const tokenChainWallet = new Wallet(PRIVATE_KEY, tokenChainRPC);
+const whitelistAdminWallet = new Wallet(PRIVATE_KEY, tokenChainRPC);
 
 // const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
 // const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
 
 const initializeTask = async (wallet, hub, dealid, idx) => {
-  const hubContract = new ethers.Contract(
+  const hubContract = new Contract(
     hub,
     [
       {
@@ -174,7 +174,7 @@ const initializeTask = async (wallet, hub, dealid, idx) => {
 };
 
 const grantKYC = async (wallet, hub, address) => {
-  const iExecContract = new ethers.Contract(
+  const iExecContract = new Contract(
     hub,
     [
       {
@@ -194,7 +194,7 @@ const grantKYC = async (wallet, hub, address) => {
     wallet,
   );
   const eRlcAddress = await iExecContract.token();
-  const eRlcContract = new ethers.Contract(
+  const eRlcContract = new Contract(
     eRlcAddress,
     [
       {
@@ -218,7 +218,7 @@ const grantKYC = async (wallet, hub, address) => {
 };
 
 const revokeKYC = async (wallet, hub, address) => {
-  const iExecContract = new ethers.Contract(
+  const iExecContract = new Contract(
     hub,
     [
       {
@@ -238,7 +238,7 @@ const revokeKYC = async (wallet, hub, address) => {
     wallet,
   );
   const eRlcAddress = await iExecContract.token();
-  const eRlcContract = new ethers.Contract(
+  const eRlcContract = new Contract(
     eRlcAddress,
     [
       {
@@ -428,7 +428,7 @@ const createCategory = async (iexec, { workClockTimeRef = 0 } = {}) => {
 };
 
 const getRandomWallet = () => {
-  const { privateKey, publicKey, address } = ethers.Wallet.createRandom();
+  const { privateKey, publicKey, address } = Wallet.createRandom();
   return { privateKey, publicKey, address };
 };
 const getRandomAddress = () => getRandomWallet().address;
@@ -946,7 +946,7 @@ describe('[getSignerFromPrivateKey]', () => {
     const receiver = POOR_ADDRESS2;
 
     const nonceProvider = await (async (address) => {
-      const initNonce = ethers.BigNumber.from(
+      const initNonce = BigNumber.from(
         await tokenChainRPC1s.send('eth_getTransactionCount', [
           address,
           'latest',
@@ -954,7 +954,7 @@ describe('[getSignerFromPrivateKey]', () => {
       );
       let i = 0;
       const getNonce = () =>
-        Promise.resolve(initNonce.add(ethers.BigNumber.from(i)).toHexString());
+        Promise.resolve(initNonce.add(BigNumber.from(i)).toHexString());
       const increaseNonce = () => {
         i += 1;
       };
@@ -1594,7 +1594,7 @@ describe('[wallet]', () => {
     );
     await expect(iexec.wallet.sweep(POOR_ADDRESS3)).rejects.toThrow(
       Error(
-        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfert ERC20': insufficient funds for intrinsic transaction cost`,
+        `Failed to sweep ERC20, sweep aborted. errors: Failed to transfer ERC20': insufficient funds for intrinsic transaction cost`,
       ),
     );
     const finalBalance = await iexec.wallet.checkBalances(POOR_ADDRESS2);
@@ -1646,7 +1646,7 @@ describe('[wallet]', () => {
     expect(res.sendERC20TxHash).toMatch(bytes32Regex);
     expect(res.errors.length).toBe(1);
     expect(res.errors[0]).toBe(
-      "Failed to transfert native token': Tx fees are greater than wallet balance",
+      "Failed to transfer native token': Tx fees are greater than wallet balance",
     );
     expect(initialBalance.wei.gt(new BN(0))).toBe(true);
     expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
@@ -3159,21 +3159,19 @@ describe('[dataset]', () => {
     );
     const key = iexec.dataset.generateEncryptionKey();
     const encryptedBytes = await iexec.dataset.encrypt(
-      await fs.readFile(path.join(process.cwd(), 'test/inputs/files/text.zip')),
+      await readFile(join(process.cwd(), 'test/inputs/files/text.zip')),
       key,
     );
     expect(encryptedBytes).toBeInstanceOf(Buffer);
     expect(encryptedBytes.length).toBe(224);
 
     // decrypt with openssl
-    const outDirPath = path.join(process.cwd(), 'test/out');
-    await fs
-      .ensureDir(outDirPath)
-      .then(() =>
-        fs.writeFile(path.join(outDirPath, 'dataset.enc'), encryptedBytes),
-      );
-    const encryptedFilePath = path.join(outDirPath, 'dataset.enc');
-    const decryptedFilePath = path.join(outDirPath, 'decrypted.zip');
+    const outDirPath = join(process.cwd(), 'test/out');
+    await ensureDir(outDirPath).then(() =>
+      writeFile(join(outDirPath, 'dataset.enc'), encryptedBytes),
+    );
+    const encryptedFilePath = join(outDirPath, 'dataset.enc');
+    const decryptedFilePath = join(outDirPath, 'decrypted.zip');
     await expect(
       execAsync(
         `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${iexec.dataset.generateEncryptionKey()}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
@@ -3197,8 +3195,8 @@ describe('[dataset]', () => {
       },
     );
     const key = iexec.dataset.generateEncryptionKey();
-    const fileBytes = await fs.readFile(
-      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    const fileBytes = await readFile(
+      join(process.cwd(), 'test/inputs/files/text.zip'),
     );
 
     const originalFileChecksum =
@@ -8624,14 +8622,11 @@ describe('[result]', () => {
   });
 
   test('result.decryptResult()', async () => {
-    const encZip = await fs.readFile(
-      path.join(
-        process.cwd(),
-        'test/inputs/encryptedResults/encryptedResults.zip',
-      ),
+    const encZip = await readFile(
+      join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip'),
     );
-    const beneficiaryKey = await fs.readFile(
-      path.join(
+    const beneficiaryKey = await readFile(
+      join(
         process.cwd(),
         'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
       ),
@@ -8649,15 +8644,12 @@ describe('[result]', () => {
   });
 
   test('result.decryptResult() string key', async () => {
-    const encZip = await fs.readFile(
-      path.join(
-        process.cwd(),
-        'test/inputs/encryptedResults/encryptedResults.zip',
-      ),
+    const encZip = await readFile(
+      join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip'),
     );
     const beneficiaryKey = (
-      await fs.readFile(
-        path.join(
+      await readFile(
+        join(
           process.cwd(),
           'test/inputs/beneficiaryKeys/0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
         ),
@@ -8676,14 +8668,11 @@ describe('[result]', () => {
   });
 
   test('result.decryptResult() wrong key', async () => {
-    const encZip = await fs.readFile(
-      path.join(
-        process.cwd(),
-        'test/inputs/encryptedResults/encryptedResults.zip',
-      ),
+    const encZip = await readFile(
+      join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip'),
     );
-    const beneficiaryKey = await fs.readFile(
-      path.join(
+    const beneficiaryKey = await readFile(
+      join(
         process.cwd(),
         'test/inputs/beneficiaryKeys/unexpected_0x7bd4783FDCAD405A28052a0d1f11236A741da593_key',
       ),

@@ -1,25 +1,22 @@
-const Debug = require('debug');
-const { providers } = require('ethers');
-const IExecContractsClient = require('../common/utils/IExecContractsClient');
-const { ConfigurationError } = require('../common/utils/errors');
-const {
-  EnhancedWallet,
-  EnhancedWeb3Signer,
-} = require('../common/utils/signers');
-const {
+import Debug from 'debug';
+import { providers } from 'ethers';
+import IExecContractsClient from '../common/utils/IExecContractsClient.js';
+import { ConfigurationError } from '../common/utils/errors.js';
+import { EnhancedWallet, EnhancedWeb3Signer } from '../common/utils/signers.js';
+import {
   getChainDefaults,
   isEnterpriseEnabled,
-  TEE_FRAMEWORKS,
-} = require('../common/utils/config');
-const { getReadOnlyProvider } = require('../common/utils/providers');
-const {
+} from '../common/utils/config.js';
+import { TEE_FRAMEWORKS } from '../common/utils/constant.js';
+import { getReadOnlyProvider } from '../common/utils/providers.js';
+import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
-} = require('../common/utils/validator');
+} from '../common/utils/validator.js';
 
 const debug = Debug('iexec:IExecConfig');
 
-class IExecConfig {
+export default class IExecConfig {
   constructor(
     { ethProvider, flavour = 'standard' } = {},
     {
@@ -430,5 +427,3 @@ class IExecConfig {
     };
   }
 }
-
-module.exports = IExecConfig;

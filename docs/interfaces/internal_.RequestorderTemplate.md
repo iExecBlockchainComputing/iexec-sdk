@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / RequestorderTemplate
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / RequestorderTemplate
 
 # Interface: RequestorderTemplate
 
-[{internal}](../modules/internal_.md).RequestorderTemplate
+[<internal>](../modules/internal_.md).RequestorderTemplate
 
 buy order for computing tasks
 

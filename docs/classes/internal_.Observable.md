@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / Observable
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Observable
 
 # Class: Observable
 
-[{internal}](../modules/internal_.md).Observable
+[<internal>](../modules/internal_.md).Observable
 
 ## Hierarchy
 
@@ -44,12 +44,12 @@ return the `unsubscribe: () => void` method.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `callbacks` | `Object` |
-| `callbacks.complete` | () => `any` |
-| `callbacks.error` | (`error`: `Error`) => `any` |
-| `callbacks.next` | (`data`: `any`) => `any` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `callbacks` | `Object` | callbacks to call on specific events |
+| `callbacks.complete` | () => `any` | callback to fire when the data emission is done no other callback is fired after firing `complete()` |
+| `callbacks.error` | (`error`: `Error`) => `any` | callback to fire when a error occurs on the data source no other callback is fired after firing `error(error: Error)` |
+| `callbacks.next` | (`data`: `any`) => `any` | callback to fire on incoming data |
 
 #### Returns
 

@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / SignedApporder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / SignedApporder
 
 # Interface: SignedApporder
 
-[{internal}](../modules/internal_.md).SignedApporder
+[<internal>](../modules/internal_.md).SignedApporder
 
 signed sell order for an app
 

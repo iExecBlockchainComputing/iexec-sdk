@@ -1,9 +1,9 @@
-const ethers = require('ethers');
-const Eth = require('web3-eth');
+import { providers } from 'ethers';
+import Eth from 'web3-eth';
 
-const { utils, IExecConfig, errors } = require('../src/lib');
-const IExecContractsClient = require('../src/common/utils/IExecContractsClient');
-const { TEE_FRAMEWORKS } = require('../src/common/utils/constant');
+import { utils, IExecConfig, errors } from '../src/lib';
+import IExecContractsClient from '../src/common/utils/IExecContractsClient';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
 
 console.log('Node version:', process.version);
 
@@ -118,7 +118,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -131,7 +131,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -154,7 +154,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -167,7 +167,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -180,7 +180,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -193,7 +193,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -231,7 +231,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.InfuraProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -251,7 +251,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.InfuraProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -271,7 +271,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.AlchemyProvider);
+        expect(provider).toBeInstanceOf(providers.AlchemyProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -291,7 +291,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.EtherscanProvider);
+        expect(provider).toBeInstanceOf(providers.EtherscanProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -313,7 +313,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -332,7 +332,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -347,7 +347,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -366,7 +366,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -390,7 +390,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -415,7 +415,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -439,7 +439,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -455,7 +455,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -475,7 +475,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.InfuraProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -488,7 +488,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -512,7 +512,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);

@@ -1,17 +1,17 @@
-const Debug = require('debug');
-const { Contract, utils } = require('ethers');
-const ENSRegistry = require('./abi/ENSRegistry-min.json');
-const {
+import Debug from 'debug';
+import { Contract, utils } from 'ethers';
+import { abi } from '../generated/@ensdomains/registry/ENSRegistry.js';
+import {
   throwIfMissing,
   addressSchema,
   ensDomainSchema,
-} = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
-const { getEnsRegistryAddress, checkEns } = require('./registry');
+} from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
+import { getEnsRegistryAddress, checkEns } from './registry.js';
 
 const debug = Debug('iexec:ens:resolution');
 
-const getOwner = async (
+export const getOwner = async (
   contracts = throwIfMissing(),
   name = throwIfMissing(),
 ) => {
@@ -21,7 +21,7 @@ const getOwner = async (
     const ensAddress = await getEnsRegistryAddress(contracts);
     const ensRegistryContract = new Contract(
       ensAddress,
-      ENSRegistry.abi,
+      abi,
       contracts.provider,
     );
     const owner = await wrapCall(ensRegistryContract.owner(nameHash));
@@ -32,7 +32,7 @@ const getOwner = async (
   }
 };
 
-const resolveName = async (
+export const resolveName = async (
   contracts = throwIfMissing(),
   name = throwIfMissing(),
 ) => {
@@ -47,7 +47,7 @@ const resolveName = async (
   }
 };
 
-const lookupAddress = async (
+export const lookupAddress = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -62,10 +62,4 @@ const lookupAddress = async (
     debug('lookupAddress()', e);
     throw e;
   }
-};
-
-module.exports = {
-  getOwner,
-  resolveName,
-  lookupAddress,
 };

@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / AppDeploymentArgs
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / AppDeploymentArgs
 
 # Interface: AppDeploymentArgs
 
-[{internal}](../modules/internal_.md).AppDeploymentArgs
+[<internal>](../modules/internal_.md).AppDeploymentArgs
 
 ## Table of contents
 
