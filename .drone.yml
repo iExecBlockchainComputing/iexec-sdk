@@ -46,6 +46,13 @@ pipeline:
       - npm -g install .
       - npm test
 
+  code_analysis:
+    image: aosapps/drone-sonar-plugin
+    secrets: [sonar_host, sonar_token]
+    settings:
+      usingProperties: true
+      branchAnalysis: true
+
   publish_npm:
     image: plugins/npm
     secrets: [npm_token]
