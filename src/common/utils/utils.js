@@ -150,7 +150,7 @@ export const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
 
 export const cleanRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
-  const cleanObj = keys.reduce((acc, curr) => {
+  return keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
       let value;
       if (
@@ -167,7 +167,6 @@ export const cleanRPC = (rpcObj) => {
     }
     return acc;
   }, {});
-  return cleanObj;
 };
 
 export const checkEvent = (eventName, events) => {
@@ -213,8 +212,7 @@ export const encodeTag = (tags) => {
     '',
   );
   const hex = new BN(binString, 2).toString('hex');
-  const encodedTag = NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
-  return encodedTag;
+  return NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
 };
 
 export const decodeTag = (tag) => {
@@ -251,8 +249,7 @@ export const sumTags = (tagArray) => {
     summedTagsBinString = currentBit + summedTagsBinString;
   }
   const hex = new BN(summedTagsBinString, 2).toString('hex');
-  const encodedTag = NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
-  return encodedTag;
+  return NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
 };
 
 export const findMissingBitsInTag = (tag, requiredTag) => {
@@ -375,11 +372,10 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     );
     // remove pkcs7 padding
     const padding = decryptedOutZipBuffer[decryptedOutZipBuffer.length - 1];
-    const unpaddedDecryptedOutZipBuffer = decryptedOutZipBuffer.slice(
+    return decryptedOutZipBuffer.slice(
       0,
       decryptedOutZipBuffer.length - padding,
     );
-    return unpaddedDecryptedOutZipBuffer;
   } catch (error) {
     debug(error);
     throw Error('Failed to decrypt results with decrypted results key');

@@ -27,8 +27,7 @@ export const login = async (
       throw Error(`Result Proxy at ${resultProxyURL} didn't answered`);
     });
     if (res.ok) {
-      const token = await res.text();
-      return token;
+      return await res.text();
     }
     throw Error(`Result Proxy login failed: ${res.status} ${res.statusText}`);
   } catch (error) {

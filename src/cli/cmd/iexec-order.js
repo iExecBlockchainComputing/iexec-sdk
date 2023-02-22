@@ -114,7 +114,7 @@ init
         opts.request
       );
 
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
 
       const chain = await loadChain(opts.chain, { spinner });
       const success = {};
@@ -195,7 +195,7 @@ sign
         opts.workerpool ||
         opts.request
       );
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -421,7 +421,7 @@ fill
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
@@ -500,8 +500,7 @@ fill
         if (!opts.force) {
           await prompt.signGeneratedOrder(REQUEST_ORDER, pretty(unsignedOrder));
         }
-        const signed = await signRequestorder(chain.contracts, unsignedOrder);
-        return signed;
+        return signRequestorder(chain.contracts, unsignedOrder);
       };
 
       const requestOrder = requestOrderInput || (await computeRequestOrder());
@@ -614,7 +613,7 @@ publish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
@@ -776,7 +775,7 @@ unpublish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
@@ -900,7 +899,7 @@ cancel
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([

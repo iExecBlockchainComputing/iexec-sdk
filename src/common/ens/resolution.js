@@ -24,8 +24,7 @@ export const getOwner = async (
       abi,
       contracts.provider,
     );
-    const owner = await wrapCall(ensRegistryContract.owner(nameHash));
-    return owner;
+    return await wrapCall(ensRegistryContract.owner(nameHash));
   } catch (e) {
     debug('getOwner()', e);
     throw e;
@@ -39,8 +38,7 @@ export const resolveName = async (
   try {
     const vName = await ensDomainSchema().validate(name);
     await checkEns(contracts);
-    const address = await wrapCall(contracts.provider.resolveName(vName));
-    return address;
+    return await wrapCall(contracts.provider.resolveName(vName));
   } catch (e) {
     debug('resolveName()', e);
     throw e;
@@ -56,8 +54,7 @@ export const lookupAddress = async (
       ethProvider: contracts.provider,
     }).validate(address);
     await checkEns(contracts);
-    const ens = await wrapCall(contracts.provider.lookupAddress(vAddress));
-    return ens;
+    return await wrapCall(contracts.provider.lookupAddress(vAddress));
   } catch (e) {
     debug('lookupAddress()', e);
     throw e;

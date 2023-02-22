@@ -69,17 +69,15 @@ const chainsConfSchema = () =>
       alchemy: string().notRequired(),
       etherscan: string().notRequired(),
       infura: lazy((value) => {
-        switch (typeof value) {
-          case 'object':
-            return object({
-              projectId: string().required(),
-              projectSecret: string(),
-            })
-              .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
-              .strict();
-          default:
-            return string();
+        if (typeof value === 'object') {
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
         }
+        return string();
       }),
       quorum: number().integer().min(1).max(3).notRequired(),
     })
@@ -163,13 +161,12 @@ export const saveTextToFile = async (
   { force = false, strict = true, fileDir } = {},
 ) => {
   try {
-    const filePath = await saveToFile(fileName, text, {
+    return await saveToFile(fileName, text, {
       format: 'utf8',
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveTextToFile()', error);
     throw error;
@@ -183,12 +180,11 @@ const saveJSONToFile = async (
 ) => {
   try {
     const json = JSON.stringify(obj, null, 2);
-    const filePath = await saveTextToFile(fileName, json, {
+    return await saveTextToFile(fileName, json, {
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveJSONToFile()', error);
     throw error;
@@ -222,8 +218,7 @@ const loadJSONFile = async (fileName, { fileDir } = {}) => {
   }
   debug('loading filePath', filePath);
   const fileJSON = await readFile(filePath, 'utf8');
-  const file = JSON.parse(fileJSON);
-  return file;
+  return JSON.parse(fileJSON);
 };
 
 const loadJSONAndRetry = async (fileName, options = {}) => {
@@ -361,8 +356,7 @@ export const loadDeployedObj = async (objName) => {
 export const isEmptyDir = async (dirPath) => {
   try {
     const files = await readdir(dirPath);
-    if (!files.length) return true;
-    return false;
+    return !files.length;
   } catch (error) {
     debug('isEmptyDir()', error);
     throw error;

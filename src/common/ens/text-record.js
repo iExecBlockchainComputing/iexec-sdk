@@ -38,8 +38,7 @@ export const readTextRecord = async (
       abi,
       contracts.provider,
     );
-    const txt = await wrapCall(resolverContract.text(node, vKey));
-    return txt;
+    return await wrapCall(resolverContract.text(node, vKey));
   } catch (e) {
     debug('readText()', e);
     throw e;

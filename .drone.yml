@@ -46,6 +46,13 @@ pipeline:
       - npm -g install .
       - npm test
 
+  code_analysis:
+    image: sonarsource/sonar-scanner-cli
+    pull: true
+    secrets: [sonar_token, sonar_host]
+    commands:
+      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH -Dsonar.pullrequest.key=$DRONE_PULL_REQUEST -Dsonar.pullrequest.base=$DRONE_TARGET_BRANCH -Dsonar.pullrequest.branch=$DRONE_SOURCE_BRANCH
+
   publish_npm:
     image: plugins/npm
     secrets: [npm_token]

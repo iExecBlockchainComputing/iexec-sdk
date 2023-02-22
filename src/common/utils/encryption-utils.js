@@ -36,9 +36,7 @@ export const encryptAes256Cbc = async (
 
   const encryptedFileBuffer = Buffer.from(aesCbc.encrypt(paddedFileBuffer));
 
-  const ivEncryptedFileBuffer = Buffer.concat([ivBuffer, encryptedFileBuffer]);
-
-  return ivEncryptedFileBuffer;
+  return Buffer.concat([ivBuffer, encryptedFileBuffer]);
 };
 
 export const sha256Sum = async (fileBytes = throwIfMissing()) => {

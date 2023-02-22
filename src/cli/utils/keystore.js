@@ -65,8 +65,7 @@ const encrypt = async (privateKey, password) => {
   try {
     const wallet = new Wallet(privateKey);
     const encryptedJSON = await wallet.encrypt(password);
-    const encrypted = await JSON.parse(encryptedJSON);
-    return encrypted;
+    return await JSON.parse(encryptedJSON);
   } catch (error) {
     debug('encryptAndSave()', error);
     throw error;

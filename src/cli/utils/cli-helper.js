@@ -871,8 +871,7 @@ export const getSmsUrlFromChain = (
   { teeFramework, strict = true } = {},
 ) => {
   const selectedTeeFramework =
-    teeFramework ||
-    getDefaultTeeFrameworkFromChain(chain, 'defaultTeeFramework');
+    teeFramework || getDefaultTeeFrameworkFromChain(chain);
   let smsUrl;
   const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
   if (typeof smsUrlOrMap === 'string') {
@@ -944,7 +943,7 @@ export const isBytes32 = (str, { strict = false } = {}) => {
   if (
     typeof str !== 'string' ||
     str.length !== 66 ||
-    str.substr(0, 2) !== '0x'
+    str.substring(0, 2) !== '0x'
   ) {
     if (strict) throw new Error(`${str} is not a valid Bytes32 HexString`);
     return false;
@@ -958,10 +957,12 @@ export const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initialResultsCount, totalCount) =>
-      `Results (${initialResultsCount + 1} to ${
+    createResultsMessage = (callResults, initialResultsCount, totalCount) => {
+      const totalDisplay = totalCount ? ` of ${totalCount}` : '';
+      return `Results (${initialResultsCount + 1} to ${
         initialResultsCount + callResults.length
-      }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
+      }${totalDisplay}):\n${pretty(callResults)}`;
+    },
     spinner,
     raw = false,
   },
@@ -976,21 +977,12 @@ export const displayPaginableRequest = async (
     spinner.info(createResultsMessage(callResults, results.length, totalCount));
     results.push(...callResults);
     if (res.more && typeof res.more === 'function') {
-      if (!raw) {
-        const more = await prompt.more();
-        if (more) {
-          return displayPaginableRequest(
-            {
-              request: res.more(),
-              processResponse,
-              createResultsMessage,
-              spinner,
-            },
-            { results, count },
-          );
-        }
-      } else if (results.length <= 80) {
+      const more =
         // auto paginate get up to 100 results
+        (raw && results.length <= 80) ||
+        // promt
+        (!raw && (await prompt.more()));
+      if (more) {
         return displayPaginableRequest(
           {
             request: res.more(),

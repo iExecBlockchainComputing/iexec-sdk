@@ -37,13 +37,12 @@ export const getWorkerpoolApiUrl = async (
       name,
       WORKERPOOL_URL_TEXT_RECORD_KEY,
     );
-    const vUrl = await workerpoolApiUrlSchema()
+    return await workerpoolApiUrlSchema()
       .required()
       .validate(url)
       .catch(() => {
         /** return undefined */
       });
-    return vUrl;
   } catch (e) {
     debug('getWorkerpoolApiUrl()', e);
     throw e;
@@ -80,11 +79,10 @@ export const fetchTaskOffchainInfo = async (
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
     const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
-    const json = await jsonApi.get({
+    return await jsonApi.get({
       api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
     });
-    return json;
   } catch (error) {
     debug('fetchTaskOffchainInfo()', error);
     throw error;

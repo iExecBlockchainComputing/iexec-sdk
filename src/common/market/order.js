@@ -156,14 +156,12 @@ const objDesc = {
 
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
-  const struct = objDesc[objName].structMembers.reduce(reducer, []);
-  return struct;
+  return objDesc[objName].structMembers.reduce(reducer, []);
 };
 
 const signedOrderToStruct = (orderName, orderObj) => {
   const unsigned = objToStructArray(orderName, orderObj);
-  const signed = unsigned.concat([orderObj.sign]);
-  return signed;
+  return unsigned.concat([orderObj.sign]);
 };
 
 const getEIP712Domain = async (contracts) => {
@@ -219,10 +217,10 @@ export const computeOrderHash = async (
       default:
     }
     const domainObj = await getEIP712Domain(contracts);
-    const types = {};
-    types.EIP712Domain = objDesc.EIP712Domain.structMembers;
-    types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
-
+    const types = {
+      EIP712Domain: objDesc.EIP712Domain.structMembers,
+      [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
+    };
     const typedData = {
       types,
       domain: domainObj,
@@ -295,8 +293,7 @@ export const getRemainingVolume = async (
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
-    const remain = initial.sub(consumed);
-    return remain;
+    return initial.sub(consumed);
   } catch (error) {
     debug('getRemainingVolume()', error);
     throw error;
@@ -336,8 +333,7 @@ const signOrder = async (
       ? signer._signTypedData(domain, types, saltedOrder)
       : signer.signTypedData(domain, types, saltedOrder),
   );
-  const signedOrder = { ...saltedOrder, sign };
-  return signedOrder;
+  return { ...saltedOrder, sign };
 };
 
 export const signApporder = async (
@@ -495,12 +491,13 @@ const getMatchableVolume = async (
       }
     };
     const checkDatasetDeployedAsync = async () => {
-      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
-        if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
-          throw new Error(
-            `No dataset deployed at address ${vDatasetOrder.dataset}`,
-          );
-        }
+      if (
+        vDatasetOrder.dataset !== NULL_ADDRESS &&
+        !(await checkDeployedDataset(contracts, vDatasetOrder.dataset))
+      ) {
+        throw new Error(
+          `No dataset deployed at address ${vDatasetOrder.dataset}`,
+        );
       }
     };
     const checkWorkerpoolDeployedAsync = async () => {
@@ -687,10 +684,8 @@ const getMatchableVolume = async (
       sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
       1,
     );
-    if (teeAppRequired) {
-      if (!checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
-        throw Error('Missing tag [tee] in apporder');
-      }
+    if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
+      throw Error('Missing tag [tee] in apporder');
     }
 
     // price check

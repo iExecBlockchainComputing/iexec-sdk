@@ -94,8 +94,7 @@ export const computeTaskId = async (
       await uint256Schema().validate(taskIdx),
     ];
     const encoded = defaultAbiCoder.encode(encodedTypes, values);
-    const taskid = keccak256(encoded);
-    return taskid;
+    return keccak256(encoded);
   } catch (error) {
     debug('computeTaskId()', error);
     throw error;
@@ -111,10 +110,7 @@ const computeTaskIdsArray = async (
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
   const vBotSize = await positiveStrictIntSchema().validate(botSize);
   const tasksIdx = [...Array(vBotSize).keys()].map((n) => n + vFirstTaskIdx);
-  const taskids = await Promise.all(
-    tasksIdx.map((idx) => computeTaskId(vDealid, idx)),
-  );
-  return taskids;
+  return Promise.all(tasksIdx.map((idx) => computeTaskId(vDealid, idx)));
 };
 
 export const show = async (
@@ -137,14 +133,13 @@ export const show = async (
       deal.botFirst.toString(),
       deal.botSize.toString(),
     );
-    const enhancedDeal = {
+    return {
       dealid: vDealid,
       ...deal,
       finalTime,
       deadlineReached,
       tasks,
     };
-    return enhancedDeal;
   } catch (error) {
     debug('show()', error);
     throw error;
@@ -236,6 +231,9 @@ export const obsDeal = (
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
+const numericStringPropAscSort = (propName) => (a, b) =>
+  parseInt(a[propName], 10) > parseInt(b[propName], 10) ? 1 : -1;
+
 export const claim = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
@@ -270,12 +268,9 @@ export const claim = async (
     );
     if (initialized.length === 0 && notInitialized.length === 0)
       throw Error('Nothing to claim');
-    initialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
-    notInitialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
+
+    initialized.sort(numericStringPropAscSort('idx'));
+    notInitialized.sort(numericStringPropAscSort('idx'));
     const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());

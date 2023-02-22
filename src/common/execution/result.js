@@ -10,11 +10,10 @@ const downloadFromIpfs = async (
   { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
 ) => {
   try {
-    const res = await downloadZipApi.get({
+    return await downloadZipApi.get({
       api: ipfsGatewayURL,
       endpoint: ipfsAddress,
     });
-    return res;
   } catch (error) {
     throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
   }
@@ -41,8 +40,7 @@ export const fetchTaskResults = async (
         'Missing location key in task results, download not supported',
       );
     }
-    const res = await downloadFromIpfs(location, { ipfsGatewayURL });
-    return res;
+    return await downloadFromIpfs(location, { ipfsGatewayURL });
   } catch (error) {
     debug('fetchResults()', error);
     throw error;

@@ -150,7 +150,7 @@ export const addressSchema = ({ ethProvider } = {}) =>
               typeof ethProvider.resolveName === 'function'
             ) {
               debug('resolving ENS', value);
-              const addressPromise = wrapCall(ethProvider.resolveName(value))
+              return wrapCall(ethProvider.resolveName(value))
                 .then((resolved) => {
                   debug('resolved ENS', resolved);
                   return resolved;
@@ -159,7 +159,6 @@ export const addressSchema = ({ ethProvider } = {}) =>
                   debug('ENS resolution error', error);
                   return null;
                 });
-              return addressPromise;
             }
             debug("no ethProvider ENS can't be resolved");
           }
@@ -178,10 +177,7 @@ export const addressSchema = ({ ethProvider } = {}) =>
           return true;
         }
         if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            return false;
-          }
-          return true;
+          return !value.match(/^.*\.eth$/);
         }
         try {
           const address = await value;
@@ -261,30 +257,22 @@ export const paramsRequesterSecretsSchema = () =>
     .test(
       'keys-are-int',
       '${path} mapping keys must be strictly positive integers',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
           Object.keys(value).find((key) => !posStrictIntRegex.test(key))
-        ) {
-          return false;
-        }
-        return true;
-      },
+        ),
     )
     .test(
       'values-are-string',
       '${path} mapping names must be strings',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
           Object.values(value).find(
             (val) => typeof val !== 'string' || val.length === 0,
           )
-        ) {
-          return false;
-        }
-        return true;
-      },
+        ),
     );
 
 export const objParamsSchema = () =>
@@ -316,12 +304,7 @@ export const objParamsSchema = () =>
       otherwise: mixed().test(
         'is-not-defined',
         '${path} is not supported for non TEE tasks',
-        (value) => {
-          if (value === undefined) {
-            return true;
-          }
-          return false;
-        },
+        (value) => value === undefined,
       ),
     }),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
@@ -370,8 +353,7 @@ export const tagSchema = () =>
     .transform((value) => {
       if (Array.isArray(value)) {
         try {
-          const bytes32Tag = encodeTag(value);
-          return bytes32Tag;
+          return encodeTag(value);
         } catch (e) {
           return e;
         }
@@ -380,8 +362,7 @@ export const tagSchema = () =>
         const lowerCase = value.toLowerCase();
         if (lowerCase.substring(0, 2) === '0x') return lowerCase;
         try {
-          const bytes32Tag = encodeTag(value.split(','));
-          return bytes32Tag;
+          return encodeTag(value.split(','));
         } catch (e) {
           return e;
         }
@@ -392,10 +373,7 @@ export const tagSchema = () =>
       'no-transform-error',
       ({ originalValue, value }) =>
         `${originalValue} is not a valid tag. ${value.message}`,
-      (value) => {
-        if (value instanceof Error) return false;
-        return true;
-      },
+      (value) => !(value instanceof Error),
     )
     .test(
       'is-bytes32',
@@ -679,8 +657,7 @@ export const fileBufferSchema = () =>
       if (typeof value === 'string') {
         throw Error('unsupported string');
       }
-      const buffer = Buffer.from(value);
-      return buffer;
+      return Buffer.from(value);
     } catch (e) {
       throw new ValidationError(
         'Invalid file buffer, must be ArrayBuffer or Buffer',

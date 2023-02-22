@@ -17,11 +17,10 @@ export const checkBalance = async (
     const { stake, locked } = await wrapCall(
       iexecContract.viewAccount(vAddress),
     );
-    const balance = {
+    return {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
     };
-    return balance;
   } catch (error) {
     debug('checkBalance()', error);
     throw error;

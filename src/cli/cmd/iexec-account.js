@@ -41,7 +41,7 @@ deposit
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
@@ -68,7 +68,7 @@ withdraw
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
@@ -93,7 +93,7 @@ show
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
 
       let userAddress;

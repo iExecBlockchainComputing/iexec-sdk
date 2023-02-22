@@ -40,8 +40,7 @@ export const checkDeployedObj =
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
-      const isDeployed = await wrapCall(registryContract.isRegistered(address));
-      return isDeployed;
+      return await wrapCall(registryContract.isRegistered(address));
     } catch (error) {
       debug('checkDeployedObj()', error);
       throw error;
@@ -92,10 +91,9 @@ const predictObjAddress =
       );
       const args = createArgs[objName].map((e) => obj[e]);
       const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
-      const predictedAddress = await wrapCall(
+      return await wrapCall(
         registryContract[predictFunctionName](...args),
       );
-      return predictedAddress;
     } catch (error) {
       debug('predictObjAddress()', error);
       throw error;
@@ -182,8 +180,7 @@ const getObjOwner =
   async (contracts = throwIfMissing(), address = throwIfMissing()) => {
     try {
       const contract = contracts.getContract(objName, address);
-      const owner = checksummedAddress(await wrapCall(contract.owner()));
-      return owner;
+      return checksummedAddress(await wrapCall(contract.owner()));
     } catch (error) {
       debug('getObjOwner()', error);
       throw error;

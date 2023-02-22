@@ -144,7 +144,7 @@ init
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [address] = await keystore.accounts();
 
@@ -187,7 +187,7 @@ deploy
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
@@ -225,7 +225,7 @@ show
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -295,7 +295,7 @@ count
   .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore({ ...walletOptions, isSigner: false });
     try {
       const [chain, [address]] = await Promise.all([
@@ -375,7 +375,7 @@ pushSecret
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const chain = await loadChain(opts.chain, { spinner });
       const { contracts } = chain;
@@ -439,7 +439,7 @@ publish
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -509,7 +509,7 @@ unpublish
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -587,7 +587,7 @@ run
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
@@ -752,14 +752,13 @@ run
         if (isAppOwner) {
           spinner.info('Creating apporder');
           await connectKeystore(chain, keystore);
-          const order = await createApporder(chain.contracts, {
+          return createApporder(chain.contracts, {
             app,
             appprice: 0,
             volume: 1,
             requesterrestrict: requester,
             tag,
           }).then((o) => signApporder(chain.contracts, o));
-          return order;
         }
         spinner.info('Fetching apporder from iExec Marketplace');
         const minTags = [];
@@ -806,14 +805,13 @@ run
         if (isDatasetOwner) {
           spinner.info('Creating datasetorder');
           await connectKeystore(chain, keystore);
-          const order = await createDatasetorder(chain.contracts, {
+          return createDatasetorder(chain.contracts, {
             dataset,
             datasetprice: 0,
             volume: 1,
             requesterrestrict: requester,
             tag,
           }).then((o) => signDatasetorder(chain.contracts, o));
-          return order;
         }
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { orders } = await fetchDatasetOrderbook(
@@ -860,7 +858,7 @@ run
           if (isWorkerpoolOwner) {
             spinner.info('Creating workerpoolorder');
             await connectKeystore(chain, keystore);
-            const order = await createWorkerpoolorder(chain.contracts, {
+            return createWorkerpoolorder(chain.contracts, {
               workerpool,
               workerpoolprice: 0,
               volume: 1,
@@ -869,7 +867,6 @@ run
               trust,
               category: category || 0,
             }).then((o) => signWorkerpoolorder(chain.contracts, o));
-            return order;
           }
         }
         spinner.info('Fetching workerpoolorder from iExec Marketplace');
@@ -1188,7 +1185,7 @@ requestRun
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { spinner });
       debug('app', app);

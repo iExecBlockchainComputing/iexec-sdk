@@ -67,7 +67,7 @@ init.description(desc.initObj(objName)).action(async (opts) => {
   await checkUpdate(opts);
   const spinner = Spinner(opts);
   try {
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore({ ...walletOptions, isSigner: false });
     const [address] = await keystore.accounts();
     const { saved, fileName } = await initObj(objName, {
@@ -96,7 +96,7 @@ deploy
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
@@ -135,7 +135,7 @@ setApiUrl
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
@@ -176,7 +176,7 @@ show
   .action(async (cliAddressOrIndex, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore({ ...walletOptions, isSigner: false });
     try {
       const [chain, [address]] = await Promise.all([
@@ -258,7 +258,7 @@ count
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [chain, [address]] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -301,7 +301,7 @@ publish
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });
@@ -376,7 +376,7 @@ unpublish
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
-    const walletOptions = await computeWalletLoadOptions(opts);
+    const walletOptions = computeWalletLoadOptions(opts);
     const keystore = Keystore(walletOptions);
     try {
       const chain = await loadChain(opts.chain, { spinner });

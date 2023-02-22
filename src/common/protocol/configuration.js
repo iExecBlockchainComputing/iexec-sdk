@@ -7,10 +7,9 @@ const debug = Debug('iexec:protocol:configuration');
 
 export const getTimeoutRatio = async (contracts = throwIfMissing()) => {
   try {
-    const timeoutRatio = ethersBnToBn(
+    return ethersBnToBn(
       await wrapCall(contracts.getIExecContract().final_deadline_ratio()),
     );
-    return timeoutRatio;
   } catch (error) {
     debug('getTimeoutRatio()', error);
     throw error;

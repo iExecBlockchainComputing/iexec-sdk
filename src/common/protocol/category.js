@@ -74,10 +74,9 @@ export const showCategory = async (
 
 export const countCategory = async (contracts = throwIfMissing()) => {
   try {
-    const countBN = ethersBnToBn(
+    return ethersBnToBn(
       await wrapCall(contracts.getIExecContract().countCategory()),
     );
-    return countBN;
   } catch (error) {
     debug('countCategory()', error);
     throw error;
