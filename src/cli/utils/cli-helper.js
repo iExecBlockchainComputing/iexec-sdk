@@ -49,7 +49,7 @@ export const finalizeCli = (cli) => {
         })),
       }),
     );
-    process.exit();
+    process.exit(0);
   }
 
   cli.showHelpAfterError();
