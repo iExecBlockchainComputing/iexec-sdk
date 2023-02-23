@@ -312,7 +312,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
    */
   const zip = await new JSZip().loadAsync(encryptedZipBuffer).catch((error) => {
     debug(error);
-    throw Error(`Failed to load encrypted results zip file: ${error}`);
+    throw Error(`Failed to load encrypted results zip file`);
   });
 
   // check required files
