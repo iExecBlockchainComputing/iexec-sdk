@@ -290,28 +290,73 @@ export const tagBitToHuman = (bit) => {
 };
 
 export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
-  const encKeyFile = 'aes-key.rsa';
-  const encResultsFile = 'iexec_out.zip.aes';
+  const ENC_KEY_FILE_NAME = 'aes-key.rsa';
+  const ENC_RESULTS_FILE_NAME = 'iexec_out.zip.aes';
+  const ENC_KEY_MAX_SIZE = 1000;
+  const ENC_RESULTS_MAX_SIZE = 1000000000; // 1GB
 
   const encryptedZipBuffer = Buffer.from(encResultsZipBuffer);
   const keyBuffer = Buffer.from(beneficiaryKey);
 
-  let zip;
-  try {
-    zip = await new JSZip().loadAsync(encryptedZipBuffer);
-  } catch (error) {
+  /**
+   * Sonar hotspot
+   *
+   * - path traversal
+   * https://stuk.github.io/jszip/documentation/api_jszip/load_async.html
+   * > Since v3.8.0 this method will santize relative path components (i.e. ..) in loaded filenames to avoid “zip slip” attacks. For example: ../../../example.txt → example.txt, src/images/../example.txt → src/example.txt. The original filename is available on each zip entry as unsafeOriginalName.
+   *
+   * - zip bomb
+   * Only 2 files are uncompressed.
+   * Best effort size check is performed before buffer allocation, resulting buffer size is checked to ensure big file will not be written on disc.
+   * When best effort size check fails to detect large file, buffer allocation could flood the memory.
+   */
+  const zip = await new JSZip().loadAsync(encryptedZipBuffer).catch((error) => {
     debug(error);
-    throw Error('Failed to load encrypted results zip file');
+    throw Error(`Failed to load encrypted results zip file: ${error}`);
+  });
+
+  // check required files
+  const encKeyFileZip = zip.file(ENC_KEY_FILE_NAME);
+  if (!encKeyFileZip) {
+    throw Error(`Missing ${ENC_KEY_FILE_NAME} file in zip input file`);
+  }
+  const encResultsFileZip = zip.file(ENC_RESULTS_FILE_NAME);
+  if (!encResultsFileZip) {
+    throw Error(`Missing ${ENC_RESULTS_FILE_NAME} file in zip input file`);
   }
 
-  let encryptedResultsKeyArrayBuffer;
-  try {
-    encryptedResultsKeyArrayBuffer = await zip
-      .file(encKeyFile)
-      .async('arraybuffer');
-  } catch (error) {
-    throw Error(`Missing ${encKeyFile} file in zip input file`);
+  // pre allocation best effort check (_data may not exist, uncompressedSize may have an overflow)
+  if (
+    encKeyFileZip._data &&
+    encKeyFileZip._data.uncompressedSize &&
+    (encKeyFileZip._data.uncompressedSize < 0 ||
+      encKeyFileZip._data.uncompressedSize > ENC_KEY_MAX_SIZE)
+  ) {
+    throw Error(`${ENC_KEY_FILE_NAME} is too large`);
   }
+  if (
+    encResultsFileZip._data &&
+    encResultsFileZip._data.uncompressedSize &&
+    (encResultsFileZip._data.uncompressedSize < 0 ||
+      encResultsFileZip._data.uncompressedSize > ENC_RESULTS_MAX_SIZE)
+  ) {
+    throw Error(`${ENC_RESULTS_FILE_NAME} is too large`);
+  }
+
+  debug(`loading ${ENC_KEY_FILE_NAME}`);
+  const encryptedResultsKeyArrayBuffer = await encKeyFileZip
+    .async('arraybuffer')
+    .then((arrayBuffer) => {
+      if (arrayBuffer.byteLength > ENC_KEY_MAX_SIZE) {
+        throw Error(`Unexpected file size (${arrayBuffer.byteLength} bytes)`);
+      }
+      return arrayBuffer;
+    })
+    .catch((error) => {
+      throw Error(
+        `Failed to load ${ENC_KEY_FILE_NAME} file from zip input file: ${error}`,
+      );
+    });
 
   const base64encodedEncryptedAesKey = Buffer.from(
     encryptedResultsKeyArrayBuffer,
@@ -346,22 +391,27 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     throw Error('Failed to decrypt results key with beneficiary key');
   }
 
-  debug('Decrypting results');
-  let encryptedZipArrayBuffer;
-
-  try {
-    encryptedZipArrayBuffer = await zip
-      .file(encResultsFile)
-      .async('arraybuffer');
-  } catch (error) {
-    throw Error(`Missing ${encResultsFile} file in zip input file`);
-  }
+  debug(`loading ${ENC_RESULTS_FILE_NAME}`);
+  const encResultsArrayBuffer = await encResultsFileZip
+    .async('arraybuffer')
+    .then((arrayBuffer) => {
+      if (arrayBuffer.byteLength > ENC_RESULTS_MAX_SIZE) {
+        throw Error(`Unexpected file size (${arrayBuffer.byteLength} bytes)`);
+      }
+      return arrayBuffer;
+    })
+    .catch((error) => {
+      throw Error(
+        `Failed to load ${ENC_RESULTS_FILE_NAME} file from zip input file: ${error}`,
+      );
+    });
 
   // decrypt AES ECB (with one time AES key)
+  debug('Decrypting results');
   try {
     const aesEcb = new aesJs.ModeOfOperation.ecb(aesKeyBuffer);
     const base64EncodedEncryptedZip = Buffer.from(
-      encryptedZipArrayBuffer,
+      encResultsArrayBuffer,
     ).toString();
     const encryptedOutZipBuffer = Buffer.from(
       base64EncodedEncryptedZip,
