@@ -51,7 +51,7 @@ pipeline:
     pull: true
     secrets: [sonar_token, sonar_host]
     commands:
-      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH -Dsonar.pullrequest.key=$DRONE_PULL_REQUEST -Dsonar.pullrequest.base=$DRONE_TARGET_BRANCH -Dsonar.pullrequest.branch=$DRONE_SOURCE_BRANCH
+      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
 
   publish_npm:
     image: plugins/npm
