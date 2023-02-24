@@ -15,6 +15,7 @@
       {
         "allow": [
           "_args",
+          "_data",
           "_ethersType",
           "_eventName",
           "_execs",

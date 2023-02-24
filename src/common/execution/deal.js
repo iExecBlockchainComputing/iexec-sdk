@@ -215,7 +215,7 @@ export const obsDeal = (
             },
             error: (e) => {
               safeObserver.error(e);
-              taskWatchers.map((unsub) => unsub());
+              taskWatchers.forEach((unsub) => unsub());
             },
           }),
         );
@@ -225,7 +225,7 @@ export const obsDeal = (
     };
 
     safeObserver.unsub = () => {
-      taskWatchers.map((unsub) => unsub());
+      taskWatchers.forEach((unsub) => unsub());
     };
     startWatch();
     return safeObserver.unsubscribe.bind(safeObserver);
