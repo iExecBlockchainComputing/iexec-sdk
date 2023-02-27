@@ -504,7 +504,7 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('[0] "" is not a valid URL'),
+      new ValidationError('["0"] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
@@ -617,11 +617,7 @@ describe('[objParamsSchema]', () => {
         },
         { context: { isTee: true } },
       ),
-    ).rejects.toThrow(
-      new ValidationError(
-        'iexec_secrets must be a `object` type, but the final value was: `null`.\n If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
-      ),
-    );
+    ).rejects.toThrow(new ValidationError('iexec_secrets cannot be null'));
   });
 
   test('iexec_secrets mapping keys must be strictly positive integers', async () => {
@@ -1314,7 +1310,7 @@ describe('[textRecordValueSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
   test('throw with string coercible value', async () => {
@@ -1347,7 +1343,7 @@ describe('[workerpoolApiUrlSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
 });
@@ -1391,7 +1387,7 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
-      'this must be a `object` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
   test('throw with invalid url', async () => {
