@@ -1052,6 +1052,17 @@ describe('[fileBufferSchema]', () => {
 describe('[mrenclaveSchema]', () => {
   test('valid obj', async () => {
     const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
+      Buffer.from(JSON.stringify(obj), 'utf8'),
+    );
+  });
+  test('valid SCONE obj', async () => {
+    const obj = {
       framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
@@ -1106,6 +1117,30 @@ describe('[mrenclaveSchema]', () => {
   test('allow empty bytes', async () => {
     await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
       Buffer.from([]),
+    );
+  });
+  test('throw when "entrypoint" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "entrypoint" in mrenclave'),
+    );
+  });
+  test('throw when "heapSize" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "heapSize" in mrenclave'),
     );
   });
   test('throw with null', async () => {

@@ -326,7 +326,9 @@ export const objParamsSchema = () =>
           : providerSchema.notRequired(),
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
-  }).noUnknown(true, 'Unknown key "${unknown}" in params');
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in params');
 
 export const paramsSchema = () =>
   string()
@@ -561,12 +563,30 @@ export const multiaddressSchema = () =>
 
 export const objMrenclaveSchema = () =>
   object({
+    // common keys
     framework: teeFrameworkSchema().required(),
     version: string().required(),
-    entrypoint: string().required(),
-    heapSize: positiveIntSchema().required(),
     fingerprint: string().required(),
-  }).noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
+    // framework specific keys
+    entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? string().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+    heapSize: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? positiveIntSchema().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
 
 export const mrenclaveSchema = () =>
   mixed()

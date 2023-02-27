@@ -14,7 +14,7 @@ export const main = {
 
 export const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'python-hello-world',
+  name: 'hello-world',
   type: 'DOCKER',
   multiaddr: 'docker.io/iexechub/python-hello-world:1.0.0',
   checksum:
@@ -23,9 +23,10 @@ export const app = {
 
 export const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'tee-python-hello-world',
+  name: 'hello-world-scone',
   type: 'DOCKER',
-  multiaddr: 'nexus.iex.ec/tee-python-hello-world:6.2.0',
+  // todo update with new sconified app
+  multiaddr: 'docker.io/iexechub/tee-python-hello-world:6.2.0',
   checksum:
     '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
   mrenclave: {
@@ -38,21 +39,18 @@ export const sconeTeeApp = {
   },
 };
 
-// todo update once gramine format is known
 export const gramineTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'tee-python-hello-world',
+  name: 'hello-world-gramine',
   type: 'DOCKER',
-  multiaddr: 'nexus.iex.ec/tee-python-hello-world:6.2.0',
+  multiaddr: 'docker.io/iexechub/tee-python-hello-world:8.0.3-gramine',
   checksum:
-    '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
+    '0x8e13b1592bff2e1651225b1533282ed2e1939ce173c9f0c2c39ed02a4963401f',
   mrenclave: {
     framework: 'GRAMINE',
-    version: 'v5',
-    entrypoint: 'python /app/app.py',
-    heapSize: 1073741824,
+    version: 'v0',
     fingerprint:
-      'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      'c879351b3640a21331c4d931d3e32bfbb8373b502966f9c639538666b2cf3641',
   },
 };
 
