@@ -148,7 +148,6 @@ export const chains = {
   chains: {
     mainnet: {},
     bellecour: {},
-    enterprise: {},
   },
 };
 

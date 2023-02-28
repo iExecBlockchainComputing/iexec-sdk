@@ -8,7 +8,7 @@ ValidationError is thrown when a method is called with missing or unexpected par
 
 ## Hierarchy
 
-- `default`
+- `ValidationError`
 
   ↳ **`ValidationError`**
 
@@ -28,7 +28,7 @@ ValidationError is thrown when a method is called with missing or unexpected par
 
 | Name | Type |
 | :------ | :------ |
-| `errorOrErrors` | `string` \| `default` \| `default`[] |
+| `errorOrErrors` | `string` \| `ValidationError` \| readonly `ValidationError`[] |
 | `value?` | `any` |
 | `field?` | `string` |
 | `type?` | `string` |
