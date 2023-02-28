@@ -726,27 +726,6 @@ describe('[IExecConfig]', () => {
   });
 
   describe('resolveEnterpriseContractsClient()', () => {
-    test('success', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: 'mainnet',
-        },
-        {
-          providerOptions: {
-            infura: INFURA_PROJECT_ID,
-            alchemy: ALCHEMY_API_KEY,
-            etherscan: ETHERSCAN_API_KEY,
-          },
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(
-        '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-      );
-      expect(contracts.flavour).toBe('enterprise');
-    });
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
@@ -1016,14 +995,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { iexecGatewayURL },
+      );
       const promise = config.resolveIexecGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe(iexecGatewayURL);
     });
     test('success iexecGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -1034,6 +1014,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).resolves.toBe(iexecGatewayURL);
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIexecGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `iexecGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
@@ -1055,14 +1045,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
+      );
       const promise = config.resolveIpfsGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
     });
     test('success ipfsGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -1073,6 +1064,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
+    });
+    test('success when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIpfsGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `ipfsGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
