@@ -246,11 +246,14 @@ export const paramsInputFilesArraySchema = () =>
 
 export const paramsEncryptResultSchema = () => boolean();
 
-export const paramsStorageProviderSchema = () =>
-  string().oneOf(
+const addAllStorageProviders = (schema) =>
+  schema.oneOf(
     Object.values(STORAGE_PROVIDERS),
     '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
   );
+
+export const paramsStorageProviderSchema = () =>
+  addAllStorageProviders(string());
 
 export const paramsRequesterSecretsSchema = () =>
   object()
@@ -260,6 +263,7 @@ export const paramsRequesterSecretsSchema = () =>
       (value) =>
         !(
           value !== undefined &&
+          value !== null &&
           Object.keys(value).find((key) => !posStrictIntRegex.test(key))
         ),
     )
@@ -269,11 +273,13 @@ export const paramsRequesterSecretsSchema = () =>
       (value) =>
         !(
           value !== undefined &&
+          value !== null &&
           Object.values(value).find(
             (val) => typeof val !== 'string' || val.length === 0,
           )
         ),
-    );
+    )
+    .nonNullable();
 
 export const objParamsSchema = () =>
   object({
@@ -282,47 +288,47 @@ export const objParamsSchema = () =>
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
-      {
-        is: true,
-        then: string().notRequired(),
-        otherwise: string()
-          .default(STORAGE_PROVIDERS.IPFS)
-          .when('$isTee', {
-            is: true,
-            then: paramsStorageProviderSchema(),
-            otherwise: string().oneOf(
-              [STORAGE_PROVIDERS.IPFS],
-              '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
-            ),
-          })
-          .required(),
-      },
+      ([isCallback], storageSchema) =>
+        isCallback === true
+          ? storageSchema.notRequired()
+          : storageSchema
+              .default(STORAGE_PROVIDERS.IPFS)
+              .when('$isTee', ([isTee], archiveStorageSchema) =>
+                isTee === true
+                  ? addAllStorageProviders(archiveStorageSchema)
+                  : archiveStorageSchema.oneOf(
+                      [STORAGE_PROVIDERS.IPFS],
+                      '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
+                    ),
+              )
+              .required(),
     ),
-    [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', {
-      is: true,
-      then: paramsRequesterSecretsSchema(),
-      otherwise: mixed().test(
-        'is-not-defined',
-        '${path} is not supported for non TEE tasks',
-        (value) => value === undefined,
-      ),
-    }),
+    [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', ([isTee]) =>
+      isTee === true
+        ? paramsRequesterSecretsSchema()
+        : mixed().test(
+            'is-not-defined',
+            '${path} is not supported for non TEE tasks',
+            (value) => value === undefined,
+          ),
+    ),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
       `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
-      {
-        is: STORAGE_PROVIDERS.IPFS,
-        then: string()
-          .when('$resultProxyURL', (resultProxyURL, schema) =>
-            schema.default(resultProxyURL),
-          )
-          .required(
-            `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
-          ),
-        otherwise: string().notRequired(),
-      },
+      ([provider], providerSchema) =>
+        provider === STORAGE_PROVIDERS.IPFS
+          ? providerSchema
+              .when('$resultProxyURL', ([resultProxyURL], schema) =>
+                schema.default(resultProxyURL),
+              )
+              .required(
+                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
+              )
+          : providerSchema.notRequired(),
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
-  }).noUnknown(true, 'Unknown key "${unknown}" in params');
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in params');
 
 export const paramsSchema = () =>
   string()
@@ -557,12 +563,30 @@ export const multiaddressSchema = () =>
 
 export const objMrenclaveSchema = () =>
   object({
+    // common keys
     framework: teeFrameworkSchema().required(),
     version: string().required(),
-    entrypoint: string().required(),
-    heapSize: positiveIntSchema().required(),
     fingerprint: string().required(),
-  }).noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
+    // framework specific keys
+    entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? string().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+    heapSize: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? positiveIntSchema().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
 
 export const mrenclaveSchema = () =>
   mixed()
@@ -787,22 +811,18 @@ export const basicUrlSchema = () =>
 
 export const smsUrlOrMapSchema = () =>
   lazy((stringOrMap) => {
-    switch (typeof stringOrMap) {
-      case 'string':
-        return basicUrlSchema().required();
-      case 'object':
-        return object(
-          teeFrameworksList.reduce(
-            (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
-            {},
-          ),
-        )
-          .noUnknown(true)
-          .nullable(false)
-          .strict(true);
-      default:
-        return basicUrlSchema();
+    if (typeof stringOrMap === 'object' && stringOrMap !== null) {
+      return object(
+        teeFrameworksList.reduce(
+          (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
+          {},
+        ),
+      )
+        .noUnknown(true)
+        .nonNullable()
+        .strict(true);
     }
+    return basicUrlSchema();
   });
 
 export const throwIfMissing = () => {

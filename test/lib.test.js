@@ -267,8 +267,8 @@ const getId = () => {
   return sequenceId;
 };
 
-const deployRandomApp = async (iexec, { owner, teeFramework } = {}) => {
-  const appDeployRes = await iexec.app.deployApp({
+const deployRandomApp = async (iexec, { owner, teeFramework } = {}) =>
+  iexec.app.deployApp({
     owner: owner || (await iexec.wallet.getAddress()),
     name: `app${getId()}`,
     type: 'DOCKER',
@@ -278,32 +278,28 @@ const deployRandomApp = async (iexec, { owner, teeFramework } = {}) => {
     mrenclave: teeFramework && {
       framework: teeFramework,
       version: 'v1',
-      entrypoint: 'entrypoint.sh',
-      heapSize: 4096,
       fingerprint: 'fingerprint',
+      ...(teeFramework.toLowerCase() === TEE_FRAMEWORKS.SCONE && {
+        entrypoint: 'entrypoint.sh',
+        heapSize: 4096,
+      }),
     },
   });
-  return appDeployRes;
-};
 
-const deployRandomDataset = async (iexec, { owner } = {}) => {
-  const datasetDeployRes = await iexec.dataset.deployDataset({
+const deployRandomDataset = async (iexec, { owner } = {}) =>
+  iexec.dataset.deployDataset({
     owner: owner || (await iexec.wallet.getAddress()),
     name: `dataset${getId()}`,
     multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
     checksum:
       '0x0000000000000000000000000000000000000000000000000000000000000000',
   });
-  return datasetDeployRes;
-};
 
-const deployRandomWorkerpool = async (iexec, { owner } = {}) => {
-  const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
+const deployRandomWorkerpool = async (iexec, { owner } = {}) =>
+  iexec.workerpool.deployWorkerpool({
     owner: owner || (await iexec.wallet.getAddress()),
     description: `workerpool${getId()}`,
   });
-  return workerpoolDeployRes;
-};
 
 const deployAndGetApporder = async (
   iexec,
@@ -319,7 +315,7 @@ const deployAndGetApporder = async (
 ) => {
   const appDeployRes = await deployRandomApp(iexec, { teeFramework });
   const app = appDeployRes.address;
-  const apporder = await iexec.order
+  return iexec.order
     .createApporder({
       app,
       appprice,
@@ -332,7 +328,6 @@ const deployAndGetApporder = async (
     .then((order) =>
       iexec.order.signApporder(order, { preflightCheck: false }),
     );
-  return apporder;
 };
 
 const deployAndGetDatasetorder = async (
@@ -348,7 +343,7 @@ const deployAndGetDatasetorder = async (
 ) => {
   const datasetDeployRes = await deployRandomDataset(iexec);
   const dataset = datasetDeployRes.address;
-  const datasetorder = await iexec.order
+  return iexec.order
     .createDatasetorder({
       dataset,
       datasetprice,
@@ -361,7 +356,6 @@ const deployAndGetDatasetorder = async (
     .then((order) =>
       iexec.order.signDatasetorder(order, { preflightCheck: false }),
     );
-  return datasetorder;
 };
 
 const deployAndGetWorkerpoolorder = async (
@@ -379,7 +373,7 @@ const deployAndGetWorkerpoolorder = async (
 ) => {
   const workerpoolDeployRes = await deployRandomWorkerpool(iexec);
   const workerpool = workerpoolDeployRes.address;
-  const workerpoolorder = await iexec.order
+  return iexec.order
     .createWorkerpoolorder({
       workerpool,
       workerpoolprice,
@@ -392,7 +386,6 @@ const deployAndGetWorkerpoolorder = async (
       requesterrestrict,
     })
     .then(iexec.order.signWorkerpoolorder);
-  return workerpoolorder;
 };
 
 const getMatchableRequestorder = async (
@@ -400,7 +393,7 @@ const getMatchableRequestorder = async (
   { apporder, datasetorder, workerpoolorder } = {},
 ) => {
   const address = await iexec.wallet.getAddress();
-  const requestorder = await iexec.order
+  return iexec.order
     .createRequestorder({
       requester: address,
       app: apporder.app,
@@ -414,7 +407,6 @@ const getMatchableRequestorder = async (
       volume: workerpoolorder.volume,
     })
     .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }));
-  return requestorder;
 };
 
 const createCategory = async (iexec, { workClockTimeRef = 0 } = {}) => {
@@ -423,8 +415,7 @@ const createCategory = async (iexec, { workClockTimeRef = 0 } = {}) => {
     description: 'desc',
     workClockTimeRef,
   });
-  const catid = res.catid.toString();
-  return catid;
+  return res.catid.toString();
 };
 
 const getRandomWallet = () => {
@@ -3052,7 +3043,7 @@ describe('[app]', () => {
       },
     );
     const { address } = await deployRandomApp(iexec, {
-      teeFramework: 'gramine',
+      teeFramework: TEE_FRAMEWORKS.GRAMINE,
     });
     const randomWallet = getRandomWallet();
     const randomIexec = new IExec(
@@ -3110,7 +3101,7 @@ describe('[app]', () => {
       },
     );
     const { address } = await deployRandomApp(iexec, {
-      teeFramework: 'gramine',
+      teeFramework: TEE_FRAMEWORKS.GRAMINE,
     });
     await expect(iexec.app.checkAppSecretExists(address)).resolves.toBe(false);
     await iexec.app.pushAppSecret(address, 'foo');

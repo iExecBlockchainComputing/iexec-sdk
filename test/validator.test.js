@@ -504,7 +504,7 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('[0] "" is not a valid URL'),
+      new ValidationError('["0"] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
@@ -617,11 +617,7 @@ describe('[objParamsSchema]', () => {
         },
         { context: { isTee: true } },
       ),
-    ).rejects.toThrow(
-      new ValidationError(
-        'iexec_secrets must be a `object` type, but the final value was: `null`.\n If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
-      ),
-    );
+    ).rejects.toThrow(new ValidationError('iexec_secrets cannot be null'));
   });
 
   test('iexec_secrets mapping keys must be strictly positive integers', async () => {
@@ -1056,6 +1052,17 @@ describe('[fileBufferSchema]', () => {
 describe('[mrenclaveSchema]', () => {
   test('valid obj', async () => {
     const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
+      Buffer.from(JSON.stringify(obj), 'utf8'),
+    );
+  });
+  test('valid SCONE obj', async () => {
+    const obj = {
       framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
@@ -1110,6 +1117,30 @@ describe('[mrenclaveSchema]', () => {
   test('allow empty bytes', async () => {
     await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
       Buffer.from([]),
+    );
+  });
+  test('throw when "entrypoint" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "entrypoint" in mrenclave'),
+    );
+  });
+  test('throw when "heapSize" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "heapSize" in mrenclave'),
     );
   });
   test('throw with null', async () => {
@@ -1314,7 +1345,7 @@ describe('[textRecordValueSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
   test('throw with string coercible value', async () => {
@@ -1347,7 +1378,7 @@ describe('[workerpoolApiUrlSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
 });
@@ -1391,7 +1422,7 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
-      'this must be a `object` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
   test('throw with invalid url', async () => {
