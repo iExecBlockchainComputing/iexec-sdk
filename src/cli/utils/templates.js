@@ -16,25 +16,25 @@ const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'python-hello-world',
   type: 'DOCKER',
-  multiaddr: 'docker.io/iexechub/python-hello-world:1.0.0',
+  multiaddr: 'iexechub/python-hello-world:7.0.5',
   checksum:
-    '0xa28d8ae83ae586b4c8addd60413a8302798891411a8f87b5f0987050d0d73816',
+    '0xaea3f77f09567fa0da20b86d9b7dac3ef958b7d4751a37cfa7cd7851f57ac191',
 };
 
 const teeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'tee-python-hello-world',
   type: 'DOCKER',
-  multiaddr: 'nexus.iex.ec/tee-python-hello-world:6.2.0',
+  multiaddr: 'iexechub/python-hello-world:7.0.5-sconify-5.3.15-v8-production',
   checksum:
-    '0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78',
+    '0x14013dea6c0c8e1bd95b549a5bdc97383f45beeecf874d9c61cd34f21159364e',
   mrenclave: {
     provider: 'SCONE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
     fingerprint:
-      'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
+      '9be0cccb597e038e9445f4c418c8f8335257a94d7331ba01ee52c43285e38aeb',
   },
 };
 
