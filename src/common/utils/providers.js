@@ -11,7 +11,7 @@ export const getReadOnlyProvider = (host, options = {}) => {
   if (defaults && defaults.host) {
     resolvedHost = defaults.host;
   } else if (
-    // hot in host map, must be a RPC endpoint
+    // host in host map, must be a RPC endpoint
     typeof resolvedHost !== 'string' ||
     !resolvedHost.startsWith('http')
   ) {
@@ -22,38 +22,21 @@ export const getReadOnlyProvider = (host, options = {}) => {
   if (!resolvedNetwork && defaults && defaults.network) {
     resolvedNetwork = defaults.network;
   }
-
   // RPC endpoint
   if (resolvedHost.startsWith('http')) {
     return new providers.JsonRpcProvider(resolvedHost, resolvedNetwork);
   }
   // API provider
   const { quorum, ...providersOptionsRest } = providerOptions;
-  // if only one provider API key try the specific provider
-  if (Object.keys(providersOptionsRest).length === 1) {
-    const [providerName, apiKey] = Object.entries(providersOptionsRest)[0];
-    switch (providerName) {
-      case 'infura':
-        return new providers.InfuraProvider(
-          resolvedNetwork || resolvedHost,
-          apiKey,
-        );
-      case 'alchemy':
-        return new providers.AlchemyProvider(
-          resolvedNetwork || resolvedHost,
-          apiKey,
-        );
-      case 'etherscan':
-        return new providers.EtherscanProvider(
-          resolvedNetwork || resolvedHost,
-          apiKey,
-        );
-      default:
-        break;
-    }
-  }
+  // disable non configured providers when at least 1 is configured
+  const apiProvidersList = ['etherscan', 'infura', 'alchemy', 'pocket', 'ankr'];
+  const nonConfiguredProviders = apiProvidersList.filter(
+    (apiProvider) => !Object.keys(providersOptionsRest).includes(apiProvider),
+  );
   return getDefaultProvider(resolvedNetwork || resolvedHost, {
     quorum: quorum || 1,
+    ...(nonConfiguredProviders.length < apiProvidersList.length &&
+      Object.fromEntries(nonConfiguredProviders.map((name) => [name, '-']))),
     ...providersOptionsRest,
   });
 };
