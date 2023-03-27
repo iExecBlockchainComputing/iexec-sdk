@@ -231,7 +231,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -251,7 +258,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -271,7 +285,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.AlchemyProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.AlchemyProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -291,7 +312,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.EtherscanProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.EtherscanProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -314,6 +342,8 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(4);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -475,7 +505,14 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
