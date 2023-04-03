@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.5] 2023-04-03
+
+### Changed
+
+- changed IPFS default gateway to v7 stack specific gateway
+- fix API providers configuration
+
 ## [7.2.4] 2023-01-12
 
 ### Changed
