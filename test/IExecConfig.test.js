@@ -276,7 +276,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -296,7 +296,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -316,7 +316,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.AlchemyProvider);
+        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -336,7 +336,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.EtherscanProvider);
+        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -520,7 +520,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);

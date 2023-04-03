@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "7.2.4",
+  "version": "7.2.5",
   "description": "iExec SDK",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -9,7 +9,9 @@
     "build": "npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "generate-dist": "./node_modules/.bin/babel src --out-dir dist --copy-files",
     "generate-packages": "node generatePackages.js",
-    "generate-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources"
+    "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
+    "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
+    "generate-cli-doc": "node generateCliDoc.js"
   },
   "bin": {
     "iexec": "./dist/cli/cmd/iexec.js"

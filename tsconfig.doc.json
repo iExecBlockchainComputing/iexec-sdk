@@ -10,7 +10,7 @@
       "typedoc-plugin-rename-defaults",
       "typedoc-plugin-markdown"
     ],
-    "readme": "typedoc_readme.md",
+    "readme": "typedoc_template.md",
     "internalNamespace": "{internal}",
     "excludeExternals": true
   }

@@ -16,6 +16,38 @@ const { storageProviders } = require('../../common/utils/params-utils');
 const debug = Debug('help');
 
 const finalizeCli = (cli) => {
+  if (process.env.GENERATE_DOC) {
+    const processOptions = (options) =>
+      options.map((o) => ({
+        flags: o.flags,
+        description: o.description,
+      }));
+    const getUsage = (cmd) => {
+      const OPTIONS = '[options]';
+      const usage = cmd.usage();
+      if (!usage.includes(OPTIONS)) {
+        return usage;
+      }
+      return `${usage.replace(OPTIONS, '').trim()} ${OPTIONS}`.trim();
+    };
+    console.log(
+      JSON.stringify({
+        name: cli.name(),
+        description: cli.description() || undefined,
+        usage: getUsage(cli),
+        options: processOptions(cli.options),
+        subCommands: cli.commands.map((x) => ({
+          name: x.name(),
+          alias: x.alias(),
+          description: x.description() || undefined,
+          usage: getUsage(x),
+          options: processOptions(x.options),
+        })),
+      }),
+    );
+    process.exit();
+  }
+
   cli.showHelpAfterError();
   cli.addHelpText(
     'afterAll',
@@ -110,7 +142,7 @@ const desc = {
     "for each file in the original dataset directory, generate a key, create an encrypted copy of the file in the encrypted dataset directory and compute the encrypted file's checksum",
   generateKeys: () =>
     'generate a beneficiary key pair to encrypt and decrypt the results',
-  decryptResults: () => 'decrypt encrypted results with beneficary key',
+  decryptResults: () => 'decrypt encrypted results with beneficiary key',
   bridgeToSidechain: () =>
     'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () =>
@@ -132,7 +164,7 @@ const option = {
   raw: () => ['--raw', desc.raw()],
   chain: () => ['--chain <name>', desc.chainName()],
   user: () => ['--user <address>', desc.userAddress()],
-  initTee: () => ['--tee', 'use the Trused Execution Environment template'],
+  initTee: () => ['--tee', 'use the Trusted Execution Environment template'],
   initAppOrder: () => ['--app', 'init an app sell order'],
   initDatasetOrder: () => ['--dataset', 'init a dataset sell order'],
   initWorkerpoolOrder: () => ['--workerpool', 'init a workerpool sell order'],
@@ -140,14 +172,14 @@ const option = {
   signAppOrder: () => ['--app', 'sign an selling apporder'],
   signDatasetOrder: () => ['--dataset', 'sign a selling datasetorder'],
   signWorkerpoolOrder: () => ['--workerpool', 'sign a selling workerpoolorder'],
-  signRequestOrder: () => ['--request', 'sign a buying userorder'],
+  signRequestOrder: () => ['--request', 'sign a buying requestorder'],
   cancelAppOrder: () => ['--app', 'cancel a signed apporder'],
   cancelDatasetOrder: () => ['--dataset', 'cancel a signed datasetorder'],
   cancelWorkerpoolOrder: () => [
     '--workerpool',
     'cancel a signed workerpoolorder',
   ],
-  cancelRequestOrder: () => ['--request', 'cancel a signed userorder'],
+  cancelRequestOrder: () => ['--request', 'cancel a signed requestorder'],
   publishAppOrder: () => [
     '--app',
     'publish a signed apporder on iExec marketplace',
@@ -199,7 +231,7 @@ const option = {
   ],
   fillWorkerpoolOrder: () => [
     '--workerpool <orderHash>',
-    'specify the wokerpool order from the marketplace to fill',
+    'specify the workerpool order from the marketplace to fill',
   ],
   fillRequestOrder: () => [
     '--request <orderHash>',
@@ -219,7 +251,7 @@ const option = {
   force: () => ['--force', 'force perform action without prompting user'],
   showPrivateKey: () => [
     '--show-private-key',
-    'allow displaying walletprivate key',
+    'allow displaying wallet private key',
   ],
   watch: () => ['--watch', 'watch execution status changes'],
   download: () => [
@@ -256,12 +288,12 @@ const option = {
   ],
   maxTag: () => [
     '--max-tag <tag>',
-    'specify maximun tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
+    'specify maximum tags (exclude not listed tags)\n* usage: --max-tag tag1,tag2',
   ],
   tag: () => ['--tag <tag>', 'specify exact tags\n* usage: --tag tag1,tag2'],
   minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
   minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
-  maxTrust: () => ['--max-trust <integer>', 'specify maximun trust'],
+  maxTrust: () => ['--max-trust <integer>', 'specify maximum trust'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
@@ -492,10 +524,10 @@ const promptConfirmedPassword = async (
 ) => {
   const pw1 = await promptPassword(message, { strict: false });
   const pw2 = await promptPassword(confirmation, {
-    error: 'Password missmatch',
+    error: 'Password mismatch',
   });
   if (pw1 === pw2) return pw1;
-  throw Error('Password missmatch');
+  throw Error('Password mismatch');
 };
 
 const prompt = {
@@ -676,7 +708,7 @@ const computeWalletCreateOptions = async (opts) => {
       throw Error('Missing wallet password');
     }
     if (pw && opts.unencrypted) {
-      spinner.warn('Option --unencrypted will be ingnored');
+      spinner.warn('Option --unencrypted will be ignored');
     }
     if (opts.unencrypted) {
       spinner.warn(
@@ -844,11 +876,11 @@ const pretty = (obj, options) => lb(prettyjson.render(obj, options));
 
 const prettyRPC = (rpcObj) => {
   const keys = Object.keys(rpcObj);
-  const prettyObj = keys.reduce((accu, curr) => {
+  const prettyObj = keys.reduce((acc, curr) => {
     if (Number.isNaN(parseInt(curr, 10))) {
-      return Object.assign(accu, { [curr]: rpcObj[curr].toString() });
+      return Object.assign(acc, { [curr]: rpcObj[curr].toString() });
     }
-    return accu;
+    return acc;
   }, {});
   return pretty(prettyObj);
 };
@@ -884,9 +916,9 @@ const displayPaginableRequest = async (
     processResponse = (res) => res,
     fetchMessage = 'Fetching data',
     emptyResultsMessage,
-    createResultsMessage = (callResults, initilResultsCount, totalCount) =>
-      `Results (${initilResultsCount + 1} to ${
-        initilResultsCount + callResults.length
+    createResultsMessage = (callResults, initialResultsCount, totalCount) =>
+      `Results (${initialResultsCount + 1} to ${
+        initialResultsCount + callResults.length
       }${totalCount ? ` of ${totalCount}` : ''}):\n${pretty(callResults)}`,
     spinner,
     raw = false,

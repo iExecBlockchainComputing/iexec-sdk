@@ -98,7 +98,7 @@ download the specified task result.
 example:
 ```js
 const response = await fetchResults('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
-cosnt binary = await response.blob();
+const binary = await response.blob();
 ```
 
 #### Parameters

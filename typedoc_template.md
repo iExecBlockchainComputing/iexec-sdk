@@ -5,7 +5,7 @@
 [![Build Status](https://drone.iex.ec/api/badges/iExecBlockchainComputing/iexec-sdk/status.svg)](https://drone.iex.ec/iExecBlockchainComputing/iexec-sdk)
 [![npm version](https://badge.fury.io/js/iexec.svg)](https://www.npmjs.com/package/iexec) [![npm version](https://img.shields.io/npm/dm/iexec.svg)](https://www.npmjs.com/package/iexec) [![license](https://img.shields.io/github/license/iExecBlockchainComputing/iexec-sdk.svg)](LICENSE)
 
-Use the iExec decentralised marketplace for off-chain computing in your dapp.
+Use the iExec decentralized marketplace for off-chain computing in your dapp.
 
 ## Content
 
@@ -46,7 +46,7 @@ const iexec = new IExec({ ethProvider: window.ethereum });
 
 `webpack` >= 5 no longer provides polyfills for NodeJS, you must include them in your configuration.
 
-Here are the recommanded polyfills for the required NodeJS modudes:
+Here are the recommended polyfills for the required NodeJS modules:
 
 - crypto: fallback to `crypto-browserify`
 - stream: fallback to `stream-browserify`
@@ -126,9 +126,9 @@ const iexec = new IExec({
 
 ## IExecModules
 
-IExec SDK is splitted into [IExecModule](./classes/IExecModule.md)s, each providing a set of methods relatives to a specific field.
+IExec SDK is split into [IExecModule](./classes/IExecModule.md)s, each providing a set of methods relatives to a specific field.
 
-Additionaly the [IExec](./classes/IExec.md) module exposes all the following listed modules under the corresponding namespace.
+Additionally the [IExec](./classes/IExec.md) module exposes all the following listed modules under the corresponding namespace.
 
 - [IExecAccountModule](./classes/IExecAccountModule.md) exposes **account** methods
 - [IExecAppModule](./classes/IExecAppModule.md) exposes **app** methods
@@ -150,7 +150,7 @@ Additionaly the [IExec](./classes/IExec.md) module exposes all the following lis
 
 As your app won't probably use all the features, you may want to import only the modules you need.
 
-Each module is available as an independant package under `iexec/MODULE_NAME` and is exported in the umbrella package.
+Each module is available as an independent package under `iexec/MODULE_NAME` and is exported in the umbrella package.
 
 _example:_
 
@@ -168,7 +168,7 @@ import { IExecWalletModule } from 'iexec';
 
 ### Usage
 
-[IExecModule](./classes/IExecModule.md)s are instancied with an [IExecConfig](./classes/IExecConfig.md) providing the configuration to access to a specific instance of the iExec platform.
+[IExecModule](./classes/IExecModule.md)s are instantiated with an [IExecConfig](./classes/IExecConfig.md) providing the configuration to access to a specific instance of the iExec platform.
 
 Once created, an [IExecConfig](./classes/IExecConfig.md) can be shared with any [IExecModule](./classes/IExecModule.md).
 
@@ -190,7 +190,7 @@ const wallet = IExecWalletModule.fromConfig(config);
 const account = IExecAccountModule.fromConfig(config);
 ```
 
-- reuse instancied module configuration
+- reuse instantiated module configuration
 
 ```js
 import IExecWalletModule from 'iexec/IExecWalletModule';
@@ -201,7 +201,7 @@ import iexecModule from './my-module';
 const wallet = IExecWalletModule.fromConfig(iexecModule.config);
 ```
 
-- quick instanciation (shorter but not recommanded)
+- quick instantiation (shorter but not recommended)
 
 ```js
 import IExecWalletModule from 'iexec/IExecWalletModule';
