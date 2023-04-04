@@ -1,18 +1,19 @@
-const Debug = require('debug');
-const os = require('os');
-const path = require('path');
-const fs = require('fs-extra');
-const { Wallet } = require('ethers');
-const { computePublicKey } = require('ethers').utils;
-const { checksummedAddress } = require('../../common/utils/utils');
-const { NULL_ADDRESS } = require('../../common/utils/constant');
-const {
+import Debug from 'debug';
+import os from 'os';
+import path from 'path';
+import fsExtra from 'fs-extra';
+import { Wallet, utils } from 'ethers';
+import { checksummedAddress } from '../../common/utils/utils.js';
+import { NULL_ADDRESS } from '../../common/utils/constant.js';
+import {
   saveWalletConf,
   loadWalletConf,
   saveEncryptedWalletConf,
   loadEncryptedWalletConf,
-} = require('./fs');
-const { prompt, option, computeWalletLoadOptions } = require('./cli-helper');
+} from './fs.js';
+import { prompt, option, computeWalletLoadOptions } from './cli-helper.js';
+
+const { computePublicKey } = utils;
 
 const debug = Debug('iexec:keystore');
 
@@ -64,8 +65,7 @@ const encrypt = async (privateKey, password) => {
   try {
     const wallet = new Wallet(privateKey);
     const encryptedJSON = await wallet.encrypt(password);
-    const encrypted = await JSON.parse(encryptedJSON);
-    return encrypted;
+    return await JSON.parse(encryptedJSON);
   } catch (error) {
     debug('encryptAndSave()', error);
     throw error;
@@ -119,15 +119,15 @@ const saveWallet = async (userWallet, options) => {
   return { wallet: userWallet, fileName, address: userWallet.address };
 };
 
-const importPrivateKeyAndSave = async (privateKey, options) => {
+export const importPrivateKeyAndSave = async (privateKey, options) => {
   const { wallet } = walletFromPrivKey(privateKey);
   return saveWallet(wallet, options);
 };
 
-const createAndSave = async (options) =>
+export const createAndSave = async (options) =>
   importPrivateKeyAndSave(Wallet.createRandom().privateKey, options);
 
-const Keystore = ({
+export const Keystore = ({
   walletOptions = computeWalletLoadOptions().walletOptions,
   isSigner = true,
 } = {}) => {
@@ -157,7 +157,7 @@ const Keystore = ({
   const getMostRecentWalletFileName = async () => {
     let files;
     try {
-      files = await fs.readdir(fileDir);
+      files = await fsExtra.readdir(fileDir);
       debug('files', files);
     } catch (error) {
       debug('getMostRecentWalletFileName()', error);
@@ -176,7 +176,7 @@ const Keystore = ({
     if (walletOptions && walletOptions.walletAddress) {
       let files;
       try {
-        files = await fs.readdir(fileDir);
+        files = await fsExtra.readdir(fileDir);
       } catch (error) {
         debug('getWalletFileName()', error);
         throw Error(
@@ -202,7 +202,7 @@ const Keystore = ({
         `No wallet file matching address ${walletOptions.walletAddress} found in ${fileDir}`,
       );
     }
-    const existsUnencrypted = await fs.existsSync(
+    const existsUnencrypted = await fsExtra.existsSync(
       path.join(process.cwd(), 'wallet.json'),
     );
     if (existsUnencrypted) return null;
@@ -310,10 +310,4 @@ const Keystore = ({
     load,
     accounts,
   };
-};
-
-module.exports = {
-  Keystore,
-  importPrivateKeyAndSave,
-  createAndSave,
 };

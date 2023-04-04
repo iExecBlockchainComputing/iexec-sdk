@@ -1,18 +1,18 @@
-const Debug = require('debug');
-const BN = require('bn.js');
-const { getAddress } = require('../wallet/address');
-const { isInWhitelist } = require('../wallet/enterprise');
-const { checkBalance } = require('../account/balance');
-const {
+import Debug from 'debug';
+import BN from 'bn.js';
+import { getAddress } from '../wallet/address.js';
+import { isInWhitelist } from '../wallet/enterprise.js';
+import { checkBalance } from '../account/balance.js';
+import {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
   getAppOwner,
   getDatasetOwner,
   getWorkerpoolOwner,
-} = require('../protocol/registries');
-const { createObjParams } = require('../execution/request-helper');
-const {
+} from '../protocol/registries.js';
+import { createObjParams } from '../execution/order-helper.js';
+import {
   checkEvent,
   getEventFromLogs,
   ethersBnToBn,
@@ -22,9 +22,10 @@ const {
   checkActiveBitInTag,
   tagBitToHuman,
   checkSigner,
-} = require('../utils/utils');
-const { hashEIP712 } = require('../utils/sig-utils');
-const {
+  TAG_MAP,
+} from '../utils/utils.js';
+import { hashEIP712 } from '../utils/sig-utils.js';
+import {
   NULL_BYTES,
   NULL_BYTES32,
   NULL_ADDRESS,
@@ -33,8 +34,8 @@ const {
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
   NULL_DATASETORDER,
-} = require('../utils/constant');
-const {
+} from '../utils/constant.js';
+import {
   addressSchema,
   apporderSchema,
   datasetorderSchema,
@@ -52,13 +53,13 @@ const {
   uint256Schema,
   nRlcAmountSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const {
+} from '../utils/validator.js';
+import {
   wrapCall,
   wrapSend,
   wrapWait,
   wrapSignTypedData,
-} = require('../utils/errorWrappers');
+} from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -155,14 +156,12 @@ const objDesc = {
 
 const objToStructArray = (objName, obj) => {
   const reducer = (total, current) => total.concat([obj[current.name]]);
-  const struct = objDesc[objName].structMembers.reduce(reducer, []);
-  return struct;
+  return objDesc[objName].structMembers.reduce(reducer, []);
 };
 
 const signedOrderToStruct = (orderName, orderObj) => {
   const unsigned = objToStructArray(orderName, orderObj);
-  const signed = unsigned.concat([orderObj.sign]);
-  return signed;
+  return unsigned.concat([orderObj.sign]);
 };
 
 const getEIP712Domain = async (contracts) => {
@@ -187,7 +186,7 @@ const getContractOwner = async (
   return objDesc[orderName].ownerMethod(contracts, contractAddress);
 };
 
-const computeOrderHash = async (
+export const computeOrderHash = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),
@@ -218,10 +217,10 @@ const computeOrderHash = async (
       default:
     }
     const domainObj = await getEIP712Domain(contracts);
-    const types = {};
-    types.EIP712Domain = objDesc.EIP712Domain.structMembers;
-    types[objDesc[orderName].primaryType] = objDesc[orderName].structMembers;
-
+    const types = {
+      EIP712Domain: objDesc.EIP712Domain.structMembers,
+      [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
+    };
     const typedData = {
       types,
       domain: domainObj,
@@ -235,7 +234,7 @@ const computeOrderHash = async (
   }
 };
 
-const hashApporder = async (
+export const hashApporder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -246,7 +245,7 @@ const hashApporder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashDatasetorder = async (
+export const hashDatasetorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -257,7 +256,7 @@ const hashDatasetorder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashWorkerpoolorder = async (
+export const hashWorkerpoolorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -268,7 +267,7 @@ const hashWorkerpoolorder = async (
       ethProvider: contracts.provider,
     }).validate(order),
   );
-const hashRequestorder = async (
+export const hashRequestorder = async (
   contracts = throwIfMissing(),
   order = throwIfMissing(),
 ) =>
@@ -280,7 +279,7 @@ const hashRequestorder = async (
     }).validate(order),
   );
 
-const getRemainingVolume = async (
+export const getRemainingVolume = async (
   contracts = throwIfMissing(),
   orderName = throwIfMissing(),
   order = throwIfMissing(),
@@ -294,8 +293,7 @@ const getRemainingVolume = async (
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
     const consumed = ethersBnToBn(cons);
-    const remain = initial.sub(consumed);
-    return remain;
+    return initial.sub(consumed);
   } catch (error) {
     debug('getRemainingVolume()', error);
     throw error;
@@ -328,18 +326,17 @@ const signOrder = async (
   };
   const { signer } = contracts;
   const sign = await wrapSignTypedData(
-    // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
+    // use experiential ether Signer._signTypedData (to remove when signTypedData is included)
     // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
     /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
     signer._signTypedData && typeof signer._signTypedData === 'function'
       ? signer._signTypedData(domain, types, saltedOrder)
       : signer.signTypedData(domain, types, saltedOrder),
   );
-  const signedOrder = { ...saltedOrder, sign };
-  return signedOrder;
+  return { ...saltedOrder, sign };
 };
 
-const signApporder = async (
+export const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
 ) =>
@@ -351,7 +348,7 @@ const signApporder = async (
     ),
   );
 
-const signDatasetorder = async (
+export const signDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
 ) =>
@@ -363,7 +360,7 @@ const signDatasetorder = async (
     }).validate(datasetorder),
   );
 
-const signWorkerpoolorder = async (
+export const signWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
 ) =>
@@ -375,7 +372,7 @@ const signWorkerpoolorder = async (
     }).validate(workerpoolorder),
   );
 
-const signRequestorder = async (
+export const signRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) =>
@@ -418,7 +415,7 @@ const cancelOrder = async (
   }
 };
 
-const cancelApporder = async (
+export const cancelApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
 ) =>
@@ -428,7 +425,7 @@ const cancelApporder = async (
     await signedApporderSchema().validate(apporder),
   );
 
-const cancelDatasetorder = async (
+export const cancelDatasetorder = async (
   contracts = throwIfMissing(),
   datasetorder = throwIfMissing(),
 ) =>
@@ -438,7 +435,7 @@ const cancelDatasetorder = async (
     await signedDatasetorderSchema().validate(datasetorder),
   );
 
-const cancelWorkerpoolorder = async (
+export const cancelWorkerpoolorder = async (
   contracts = throwIfMissing(),
   workerpoolorder = throwIfMissing(),
 ) =>
@@ -448,7 +445,7 @@ const cancelWorkerpoolorder = async (
     await signedWorkerpoolorderSchema().validate(workerpoolorder),
   );
 
-const cancelRequestorder = async (
+export const cancelRequestorder = async (
   contracts = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) =>
@@ -494,12 +491,13 @@ const getMatchableVolume = async (
       }
     };
     const checkDatasetDeployedAsync = async () => {
-      if (vDatasetOrder.dataset !== NULL_ADDRESS) {
-        if (!(await checkDeployedDataset(contracts, vDatasetOrder.dataset))) {
-          throw new Error(
-            `No dataset deployed at address ${vDatasetOrder.dataset}`,
-          );
-        }
+      if (
+        vDatasetOrder.dataset !== NULL_ADDRESS &&
+        !(await checkDeployedDataset(contracts, vDatasetOrder.dataset))
+      ) {
+        throw new Error(
+          `No dataset deployed at address ${vDatasetOrder.dataset}`,
+        );
       }
     };
     const checkWorkerpoolDeployedAsync = async () => {
@@ -686,10 +684,8 @@ const getMatchableVolume = async (
       sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
       1,
     );
-    if (teeAppRequired) {
-      if (!checkActiveBitInTag(vAppOrder.tag, 1)) {
-        throw Error('Missing tag [tee] in apporder');
-      }
+    if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
+      throw Error('Missing tag [tee] in apporder');
     }
 
     // price check
@@ -729,7 +725,7 @@ const getMatchableVolume = async (
       : stake.div(requiredStakePerTask);
     if (workerpoolStakedVolume.isZero()) {
       throw Error(
-        `workerpool required stake (${requiredStakePerTask}) is greather than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
+        `workerpool required stake (${requiredStakePerTask}) is greater than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
     }
 
@@ -804,7 +800,7 @@ const getMatchableVolume = async (
   }
 };
 
-const matchOrders = async (
+export const matchOrders = async (
   contracts = throwIfMissing(),
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
@@ -820,6 +816,15 @@ const matchOrders = async (
         signedWorkerpoolorderSchema().validate(workerpoolOrder),
         signedRequestorderSchema().validate(requestOrder),
       ]);
+
+    // check resulting tag
+    await tagSchema()
+      .validate(sumTags([vAppOrder.tag, vDatasetOrder.tag, vRequestOrder.tag]))
+      .catch((e) => {
+        throw new Error(
+          `Matching order would produce an invalid deal tag. ${e.message}`,
+        );
+      });
 
     // check matchability
     const matchableVolume = await getMatchableVolume(
@@ -841,12 +846,12 @@ const matchOrders = async (
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (stake.lt(costPerTask)) {
         throw new Error(
-          `Cost per task (${costPerTask}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+          `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
         );
       }
       if (stake.lt(totalCost)) {
         throw new Error(
-          `Total cost for ${matchableVolume} tasks (${totalCost}) is greather than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
+          `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
         );
       }
     };
@@ -891,7 +896,7 @@ const matchOrders = async (
   }
 };
 
-const createApporder = async (
+export const createApporder = async (
   contracts = throwIfMissing(),
   {
     app = throwIfMissing(),
@@ -918,7 +923,7 @@ const createApporder = async (
   }).validate(requesterrestrict),
 });
 
-const createDatasetorder = async (
+export const createDatasetorder = async (
   contracts = throwIfMissing(),
   {
     dataset = throwIfMissing(),
@@ -947,7 +952,7 @@ const createDatasetorder = async (
   }).validate(requesterrestrict),
 });
 
-const createWorkerpoolorder = async (
+export const createWorkerpoolorder = async (
   contracts = throwIfMissing(),
   {
     workerpool = throwIfMissing(),
@@ -980,7 +985,7 @@ const createWorkerpoolorder = async (
   }).validate(requesterrestrict),
 });
 
-const createRequestorder = async (
+export const createRequestorder = async (
   { contracts = throwIfMissing(), resultProxyURL = throwIfMissing() } = {},
   {
     app = throwIfMissing(),
@@ -1035,26 +1040,4 @@ const createRequestorder = async (
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };
-};
-
-module.exports = {
-  computeOrderHash,
-  getRemainingVolume,
-  hashApporder,
-  hashDatasetorder,
-  hashWorkerpoolorder,
-  hashRequestorder,
-  createApporder,
-  createDatasetorder,
-  createWorkerpoolorder,
-  createRequestorder,
-  signApporder,
-  signDatasetorder,
-  signWorkerpoolorder,
-  signRequestorder,
-  cancelApporder,
-  cancelDatasetorder,
-  cancelWorkerpoolorder,
-  cancelRequestorder,
-  matchOrders,
 };

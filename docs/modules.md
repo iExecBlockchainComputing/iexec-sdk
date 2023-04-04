@@ -4,11 +4,14 @@
 
 ## Table of contents
 
+### Modules
+
+- [&lt;internal\&gt;](modules/internal_.md)
+
 ### Namespaces
 
 - [errors](modules/errors.md)
 - [utils](modules/utils.md)
-- [{internal}](modules/internal_.md)
 
 ### Classes
 

@@ -43,7 +43,7 @@ declare class TaskObservable extends Observable {
      */
     error: (error: Error) => any;
   }): /**
-   * `unsubscribe: () => void` method, calling this method cancels the subscribtion
+   * `unsubscribe: () => void` method, calling this method cancels the subscription
    *
    * no callback is fired after calling this method
    */

@@ -44,7 +44,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -67,7 +67,7 @@ current IExecConfig
 
 ### checkAppSecretExists
 
-▸ **checkAppSecretExists**(`appAddress`): `Promise`<`boolean`\>
+▸ **checkAppSecretExists**(`appAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a secret exists for the app in the Secret Management Service
 
@@ -76,12 +76,16 @@ example:
 const isSecretSet = await checkAppSecretExists(appAddress);
 console.log('app secret set:', isSecretSet);
 ```
+_NB_:
+- each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appAddress` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -201,7 +205,7 @@ ___
 
 ### pushAppSecret
 
-▸ **pushAppSecret**(`appAddress`, `secretValue`): `Promise`<`boolean`\>
+▸ **pushAppSecret**(`appAddress`, `secretValue`, `options?`): `Promise`<`boolean`\>
 
 **SIGNER REQUIRED, ONLY APP OWNER**
 
@@ -210,6 +214,7 @@ push an application secret to the Secret Management Service
 _NB_:
 - pushed secret will be available for the app in `tee` tasks.
 - once pushed a secret can not be updated
+- each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
 
 example:
 ```js
@@ -223,6 +228,8 @@ console.log('pushed App secret:', isPushed);
 | :------ | :------ |
 | `appAddress` | `string` |
 | `secretValue` | `String` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 

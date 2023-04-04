@@ -1,14 +1,23 @@
-const Debug = require('debug');
-const fs = require('fs-extra');
-const path = require('path');
-const { object, string, number, boolean, lazy } = require('yup');
-const { APP, DATASET } = require('../../common/utils/constant');
-const {
+import Debug from 'debug';
+import fsExtra from 'fs-extra';
+import { join } from 'path';
+import { object, string, number, boolean, lazy } from 'yup';
+import { APP, DATASET } from '../../common/utils/constant.js';
+import {
   addressSchema,
   chainIdSchema,
-} = require('../../common/utils/validator');
-const { prompt, info } = require('./cli-helper');
-const templates = require('./templates');
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
+} from '../../common/utils/validator.js';
+import { prompt, info } from './cli-helper.js';
+import templates, {
+  main,
+  chains,
+  overwriteObject,
+  createOrder,
+} from './templates.js';
+
+const { ensureDir, writeFile, open, write, close, readFile, readdir } = fsExtra;
 
 const debug = Debug('iexec:fs');
 
@@ -19,13 +28,14 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // todo address
     ensPublicResolver: string(), // todo address
-    sms: string(),
+    sms: smsUrlOrMapSchema(),
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
     native: boolean(),
     useGas: boolean().default(true),
     flavour: string().oneOf(['standard', 'enterprise']),
+    defaultTeeFramework: teeFrameworkSchema(),
     bridge: object({
       bridgedChainName: string().required(),
       contract: addressSchema().required(),
@@ -45,9 +55,9 @@ const chainsConfSchema = () =>
   object({
     default: string(),
     chains: object()
-      .test(async (chains) => {
+      .test(async (chainsOjb) => {
         await Promise.all(
-          Object.entries({ ...chains }).map(async ([name, chain]) => {
+          Object.entries({ ...chainsOjb }).map(async ([name, chain]) => {
             await string().validate(name, { strict: true });
             await chainConfSchema().validate(chain, { strict: true });
           }),
@@ -59,17 +69,15 @@ const chainsConfSchema = () =>
       alchemy: string().notRequired(),
       etherscan: string().notRequired(),
       infura: lazy((value) => {
-        switch (typeof value) {
-          case 'object':
-            return object({
-              projectId: string().required(),
-              projectSecret: string(),
-            })
-              .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
-              .strict();
-          default:
-            return string();
+        if (typeof value === 'object') {
+          return object({
+            projectId: string().required(),
+            projectSecret: string(),
+          })
+            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
+            .strict();
         }
+        return string();
       }),
       quorum: number().integer().min(1).max(3).notRequired(),
     })
@@ -99,14 +107,14 @@ const deployedConfSchema = () =>
     .noUnknown(true, 'Unknown key "${unknown}"')
     .strict();
 
-const IEXEC_FILE_NAME = 'iexec.json';
+export const IEXEC_FILE_NAME = 'iexec.json';
 const CHAIN_FILE_NAME = 'chain.json';
 const WALLET_FILE_NAME = 'wallet.json';
 const ENCRYPTED_WALLET_FILE_NAME = 'encrypted-wallet.json';
-const DEPLOYED_FILE_NAME = 'deployed.json';
+export const DEPLOYED_FILE_NAME = 'deployed.json';
 const ORDERS_FILE_NAME = 'orders.json';
 
-const saveToFile = async (
+export const saveToFile = async (
   fileName,
   text,
   { force = false, strict = true, fileDir, format } = {},
@@ -114,18 +122,18 @@ const saveToFile = async (
   try {
     let filePath;
     if (fileDir) {
-      await fs.ensureDir(fileDir);
-      filePath = path.join(fileDir, fileName);
+      await ensureDir(fileDir);
+      filePath = join(fileDir, fileName);
     } else {
       filePath = fileName;
     }
     if (force) {
-      await fs.writeFile(filePath, text);
+      await writeFile(filePath, text);
       return filePath;
     }
-    const fd = await fs.open(filePath, 'wx');
-    await fs.write(fd, text, 0, format);
-    await fs.close(fd);
+    const fd = await open(filePath, 'wx');
+    await write(fd, text, 0, format);
+    await close(fd);
     return filePath;
   } catch (error) {
     if (error.code === 'EEXIST') {
@@ -133,11 +141,11 @@ const saveToFile = async (
       if (answer) {
         let filePath;
         if (fileDir) {
-          filePath = path.join(fileDir, fileName);
+          filePath = join(fileDir, fileName);
         } else {
           filePath = fileName;
         }
-        await fs.writeFile(filePath, text);
+        await writeFile(filePath, text);
         return filePath;
       }
       return '';
@@ -147,19 +155,18 @@ const saveToFile = async (
   }
 };
 
-const saveTextToFile = async (
+export const saveTextToFile = async (
   fileName,
   text,
   { force = false, strict = true, fileDir } = {},
 ) => {
   try {
-    const filePath = await saveToFile(fileName, text, {
+    return await saveToFile(fileName, text, {
       format: 'utf8',
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveTextToFile()', error);
     throw error;
@@ -173,47 +180,45 @@ const saveJSONToFile = async (
 ) => {
   try {
     const json = JSON.stringify(obj, null, 2);
-    const filePath = await saveTextToFile(fileName, json, {
+    return await saveTextToFile(fileName, json, {
       force,
       strict,
       fileDir,
     });
-    return filePath;
   } catch (error) {
     debug('saveJSONToFile()', error);
     throw error;
   }
 };
 
-const saveWallet = (obj, deflautFileName, options) => {
-  const fileName = options.walletName || deflautFileName;
+const saveWallet = (obj, defaultFileName, options) => {
+  const fileName = options.walletName || defaultFileName;
   return saveJSONToFile(fileName, obj, options);
 };
-const saveWalletConf = (obj, options) =>
+export const saveWalletConf = (obj, options) =>
   saveWallet(obj, WALLET_FILE_NAME, options);
-const saveEncryptedWalletConf = (obj, options) =>
+export const saveEncryptedWalletConf = (obj, options) =>
   saveWallet(obj, ENCRYPTED_WALLET_FILE_NAME, options);
 
-const saveIExecConf = (obj, options) =>
+export const saveIExecConf = (obj, options) =>
   saveJSONToFile(IEXEC_FILE_NAME, obj, options);
-const saveDeployedConf = (obj, options) =>
+export const saveDeployedConf = (obj, options) =>
   saveJSONToFile(DEPLOYED_FILE_NAME, obj, options);
-const saveChainConf = (obj, options) =>
+export const saveChainConf = (obj, options) =>
   saveJSONToFile(CHAIN_FILE_NAME, obj, options);
-const saveSignedOrders = (obj, options) =>
+export const saveSignedOrders = (obj, options) =>
   saveJSONToFile(ORDERS_FILE_NAME, obj, options);
 
 const loadJSONFile = async (fileName, { fileDir } = {}) => {
   let filePath;
   if (fileDir) {
-    filePath = path.join(fileDir, fileName);
+    filePath = join(fileDir, fileName);
   } else {
-    filePath = path.join(process.cwd(), fileName);
+    filePath = join(process.cwd(), fileName);
   }
   debug('loading filePath', filePath);
-  const fileJSON = await fs.readFile(filePath, 'utf8');
-  const file = JSON.parse(fileJSON);
-  return file;
+  const fileJSON = await readFile(filePath, 'utf8');
+  return JSON.parse(fileJSON);
 };
 
 const loadJSONAndRetry = async (fileName, options = {}) => {
@@ -238,36 +243,37 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
     throw new Error(`${error} in ${fileName}`);
   }
 };
-const loadIExecConf = (options) => loadJSONAndRetry(IEXEC_FILE_NAME, options);
-const loadChainConf = (options) =>
+export const loadIExecConf = (options) =>
+  loadJSONAndRetry(IEXEC_FILE_NAME, options);
+export const loadChainConf = (options) =>
   loadJSONAndRetry(CHAIN_FILE_NAME, {
     validationSchema: chainsConfSchema,
     ...options,
   });
-const loadWalletConf = (options) =>
+export const loadWalletConf = (options) =>
   loadJSONFile(options.fileName || WALLET_FILE_NAME, options);
-const loadEncryptedWalletConf = (options) =>
+export const loadEncryptedWalletConf = (options) =>
   loadJSONFile(options.fileName || ENCRYPTED_WALLET_FILE_NAME, options);
-const loadDeployedConf = (options) =>
+export const loadDeployedConf = (options) =>
   loadJSONAndRetry(DEPLOYED_FILE_NAME, {
     validationSchema: deployedConfSchema,
     ...options,
   });
-const loadSignedOrders = (options) =>
+export const loadSignedOrders = (options) =>
   loadJSONAndRetry(ORDERS_FILE_NAME, {
     ...options,
     loadErrorMessage: info.missingSignedOrders,
   });
 
-const initIExecConf = async (options) => {
-  const iexecConf = Object.assign(templates.main);
+export const initIExecConf = async (options) => {
+  const iexecConf = Object.assign(main);
   const fileName = await saveIExecConf(iexecConf, options);
   return { saved: iexecConf, fileName };
 };
 
-const initChainConf = async (options) => {
-  const fileName = await saveChainConf(templates.chains, options);
-  return { saved: templates.chains, fileName };
+export const initChainConf = async (options) => {
+  const fileName = await saveChainConf(chains, options);
+  return { saved: chains, fileName };
 };
 
 const initArray = async (arrayName, { array } = {}) => {
@@ -282,13 +288,12 @@ const initArray = async (arrayName, { array } = {}) => {
   }
 };
 
-const initObj = async (objName, { obj, overwrite = {} } = {}) => {
+export const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   try {
     if (objName === APP) await initObj('buyConf');
     if (objName === DATASET) await initArray('dapps');
     const iexecConf = await loadIExecConf();
-    iexecConf[objName] =
-      obj || templates.overwriteObject(templates[objName], overwrite);
+    iexecConf[objName] = obj || overwriteObject(templates[objName], overwrite);
     const fileName = await saveIExecConf(iexecConf, { force: true });
     return { saved: iexecConf[objName], fileName };
   } catch (error) {
@@ -297,10 +302,10 @@ const initObj = async (objName, { obj, overwrite = {} } = {}) => {
   }
 };
 
-const initOrderObj = async (orderName, overwrite) => {
+export const initOrderObj = async (orderName, overwrite) => {
   try {
     const iexecConf = await loadIExecConf();
-    const order = templates.createOrder(orderName, overwrite);
+    const order = createOrder(orderName, overwrite);
     if (typeof iexecConf.order !== 'object') iexecConf.order = {};
     iexecConf.order[orderName] = order;
     const fileName = await saveIExecConf(iexecConf, { force: true });
@@ -311,7 +316,7 @@ const initOrderObj = async (orderName, overwrite) => {
   }
 };
 
-const saveDeployedObj = async (objName, chainId, address) => {
+export const saveDeployedObj = async (objName, chainId, address) => {
   try {
     const deployedConf = await loadDeployedConf({ retry: () => ({}) });
     debug('deployedConf', deployedConf);
@@ -326,7 +331,7 @@ const saveDeployedObj = async (objName, chainId, address) => {
   }
 };
 
-const saveSignedOrder = async (orderName, chainId, signedOrder) => {
+export const saveSignedOrder = async (orderName, chainId, signedOrder) => {
   try {
     const signedOrders = await loadSignedOrders({ retry: () => ({}) });
 
@@ -341,52 +346,19 @@ const saveSignedOrder = async (orderName, chainId, signedOrder) => {
   }
 };
 
-const loadDeployedObj = async (objName) => {
+export const loadDeployedObj = async (objName) => {
   const deployedConf = await loadDeployedConf({ retry: () => ({}) });
 
   if (typeof deployedConf[objName] !== 'object') return {};
   return deployedConf[objName];
 };
 
-const isEmptyDir = async (dirPath) => {
+export const isEmptyDir = async (dirPath) => {
   try {
-    const files = await fs.readdir(dirPath);
-    if (!files.length) return true;
-    return false;
+    const files = await readdir(dirPath);
+    return !files.length;
   } catch (error) {
     debug('isEmptyDir()', error);
     throw error;
   }
-};
-
-module.exports = {
-  saveToFile,
-  saveTextToFile,
-  saveJSONToFile,
-  saveWalletConf,
-  saveEncryptedWalletConf,
-  saveDeployedConf,
-  saveChainConf,
-  saveSignedOrder,
-  loadJSONFile,
-  loadJSONAndRetry,
-  loadIExecConf,
-  loadChainConf,
-  loadWalletConf,
-  loadEncryptedWalletConf,
-  loadDeployedConf,
-  loadSignedOrders,
-  saveDeployedObj,
-  initObj,
-  initIExecConf,
-  loadDeployedObj,
-  initChainConf,
-  initOrderObj,
-  isEmptyDir,
-  IEXEC_FILE_NAME,
-  CHAIN_FILE_NAME,
-  WALLET_FILE_NAME,
-  ENCRYPTED_WALLET_FILE_NAME,
-  DEPLOYED_FILE_NAME,
-  ORDERS_FILE_NAME,
 };

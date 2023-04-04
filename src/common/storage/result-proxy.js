@@ -1,12 +1,12 @@
-const Debug = require('debug');
-const { getAddress } = require('../wallet/address');
-const { getAuthorization, httpRequest } = require('../utils/api-utils');
-const { throwIfMissing } = require('../utils/validator');
-const { checkSigner } = require('../utils/utils');
+import Debug from 'debug';
+import { getAddress } from '../wallet/address.js';
+import { getAuthorization, httpRequest } from '../utils/api-utils.js';
+import { throwIfMissing } from '../utils/validator.js';
+import { checkSigner } from '../utils/utils.js';
 
 const debug = Debug('iexec:storage:result-proxy');
 
-const login = async (
+export const login = async (
   contracts = throwIfMissing(),
   resultProxyURL = throwIfMissing(),
 ) => {
@@ -27,16 +27,11 @@ const login = async (
       throw Error(`Result Proxy at ${resultProxyURL} didn't answered`);
     });
     if (res.ok) {
-      const token = await res.text();
-      return token;
+      return await res.text();
     }
     throw Error(`Result Proxy login failed: ${res.status} ${res.statusText}`);
   } catch (error) {
     debug('login()', error);
     throw error;
   }
-};
-
-module.exports = {
-  login,
 };

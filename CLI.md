@@ -21,7 +21,7 @@ All three major OS are supported (linux, OSX, windows).
 
 ## Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.0.0-brightgreen.svg)](https://nodejs.org/en/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.17.0-brightgreen.svg)](https://nodejs.org/en/).
 
 ```bash
 npm -g install iexec # install the cli
@@ -69,7 +69,7 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+> _NB:_ iExec SDK CLI access the public blockchain (mainnet) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
 > Default API keys for backend services are provided for convenience.
 > As these keys are shared across all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
@@ -107,10 +107,6 @@ iexec storage init # initialize your remote storage
 >       "mainnet": {
 >         "id": "1",
 >         "host": "http://localhost:8545"
->       },
->       "goerli": {
->         "id": "5",
->         "host": "http://localhost:58545"
 >       }
 >    }
 > }
@@ -359,8 +355,6 @@ Commands:
 - [create](#iexec-wallet-create)
 - [import](#iexec-wallet-import)
 - [show](#iexec-wallet-show)
-- [get-ether](#iexec-wallet-get-ether)
-- [get-RLC](#iexec-wallet-get-rlc)
 - [send-ether](#iexec-wallet-send-ether)
 - [send-RLC](#iexec-wallet-send-rlc)
 - [sweep](#iexec-wallet-sweep)
@@ -434,52 +428,6 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --show-private-key | allow displaying wallet private key |
-
-#### iexec wallet get-ether
-
-_Alias: getETH_
-
-apply for test ether from pre-registered faucets
-
-Usage:
-
-```sh
-iexec wallet get-ether [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-
-#### iexec wallet get-RLC
-
-apply for test RLC from iExec faucet
-
-Usage:
-
-```sh
-iexec wallet get-RLC [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
 
 #### iexec wallet send-ether
 
@@ -817,6 +765,7 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --tee | use the Trusted Execution Environment template |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app deploy
 
@@ -905,6 +854,7 @@ Options:
 | --raw | use raw output |
 | --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app push-secret
 
@@ -928,6 +878,7 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --secret-value \<secretValue\> | secret value (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app publish
 
@@ -957,6 +908,7 @@ Options:
 | --dataset-restrict \<address\> | restrict usage to specific dataset |
 | --workerpool-restrict \<address\> | restrict usage to specific workerpool |
 | --requester-restrict \<address\> | restrict usage to specific requester |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec app unpublish
 
@@ -1019,8 +971,8 @@ Options:
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
 | --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
-| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"dostuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
-| --skip-request-check | skip request validity checks, this may result in task execution fail |
+| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec app request-execution
 
@@ -1060,8 +1012,8 @@ Options:
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
 | --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
-| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"dostuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
-| --skip-request-check | skip request validity checks, this may result in task execution fail |
+| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 ### iexec dataset
 
@@ -1224,6 +1176,7 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --secret-path \<secretPath\> | push the secret from a file |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec dataset check-secret
 
@@ -1242,6 +1195,7 @@ Options:
 | --raw | use raw output |
 | --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec dataset publish
 
@@ -1271,6 +1225,7 @@ Options:
 | --app-restrict \<address\> | restrict usage to specific app |
 | --workerpool-restrict \<address\> | restrict usage to specific workerpool |
 | --requester-restrict \<address\> | restrict usage to specific requester |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec dataset unpublish
 
@@ -1523,6 +1478,7 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --secret-value \<secretValue\> | secret value (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec requester check-secret
 
@@ -1545,6 +1501,7 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec order
 
@@ -1618,7 +1575,7 @@ Options:
 | --dataset | sign a selling datasetorder |
 | --workerpool | sign a selling workerpoolorder |
 | --request | sign a buying requestorder |
-| --skip-request-check | skip request validity checks, this may result in task execution fail |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order fill
 
@@ -1648,8 +1605,8 @@ Options:
 | --dataset \<orderHash\> | specify the dataset order from the marketplace to fill |
 | --workerpool \<orderHash\> | specify the workerpool order from the marketplace to fill |
 | --request \<orderHash\> | specify the requestorder from the marketplace to fill |
-| --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"dostuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
-| --skip-request-check | skip request validity checks, this may result in task execution fail |
+| --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order publish
 
@@ -1677,7 +1634,7 @@ Options:
 | --dataset | publish a signed datasetorder on iExec marketplace |
 | --workerpool | publish a signed workerpoolorder on iExec marketplace |
 | --request | publish a signed requestorder on iExec marketplace |
-| --skip-request-check | skip request validity checks, this may result in task execution fail |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order unpublish
 
@@ -2070,6 +2027,7 @@ Options:
 | --chain \<name\> | chain name from "chain.json" |
 | --force-update | update if already exists |
 | --token \<token\> | storage provider authorization token (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec storage check
 
@@ -2093,6 +2051,7 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --user \<address\> | custom user address |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec result
 
@@ -2185,6 +2144,7 @@ Options:
 | --chain \<name\> | chain name from "chain.json" |
 | --force-update | update if already exists |
 | --secret-path \<secretPath\> | push the secret from a file |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec result check-encryption-key
 
@@ -2209,6 +2169,7 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec ens
 
@@ -2305,7 +2266,7 @@ Options:
 | --force | force perform action without prompting user |
 | --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
+| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
 | --for \<address\> | register for an owned iExec app, dataset or workerpool |
 
 ### iexec category
@@ -2552,7 +2513,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "beneficiary": "0x0000000000000000000000000000000000000000",
       "callback": "0x0000000000000000000000000000000000000000",
-      "params": "{ cmdline: '--help' }"
+      "params": "{ \"iexec_args\": \"--help\" }"
     }
   }
 }
@@ -2566,7 +2527,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 - `chains` set the available chains
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value), this key accepts a string or a mapping TEE framework - SMS url.
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
@@ -2581,12 +2542,14 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ```json
 {
-  "default": "viviani",
+  "default": "bellecour",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "standard",
@@ -2602,7 +2565,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-sidechain": {
       "host": "http://localhost:18545",
       "id": "123456",
-      "sms": "http://localhost:15000",
+      "sms": {
+        "scone": "http://localhost:15000"
+      },
       "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
@@ -2617,7 +2582,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-enterprise": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "enterprise",
@@ -2626,11 +2593,8 @@ The `chain.json` file, located in every iExec project, describes the parameters 
         "enterpriseSwapChainName": "dev"
       }
     },
-    "goerli": {},
-    "viviani": {},
     "mainnet": {},
-    "bellecour": {},
-    "enterprise": {}
+    "bellecour": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",

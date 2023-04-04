@@ -45,7 +45,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -82,7 +82,7 @@ const { name, registerTxHash } = claimName(
   'me',
   'users.iexec.eth',
 );
-console.log('regitered:', name);
+console.log('registered:', name);
 ```
 
 #### Parameters
@@ -241,7 +241,7 @@ const configureResolutionObservable = await obsConfigureResolution(
 configureResolutionObservable.subscribe({
   error: console.error,
   next: ({ message, ...rest }) =>
-    console.log(`${message} ${JSON.strigify(rest)}`),
+    console.log(`${message} ${JSON.stringify(rest)}`),
   completed: () => console.log('resolution configured'),
 });
 ```
@@ -254,7 +254,7 @@ const configureResolutionObservable = await obsConfigureResolution(
 configureResolutionObservable.subscribe({
   error: console.error,
   next: ({ message, ...rest }) =>
-    console.log(`${message} ${JSON.strigify(rest)}`),
+    console.log(`${message} ${JSON.stringify(rest)}`),
   completed: () => console.log('resolution configured'),
 });
 ```

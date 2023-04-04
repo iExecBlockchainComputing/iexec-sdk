@@ -1,44 +1,34 @@
-const Debug = require('debug');
-const { ethers } = require('ethers');
-const {
+import Debug from 'debug';
+import { ethers } from 'ethers';
+import {
   getChainDefaults,
   isEnterpriseEnabled,
-} = require('../../common/utils/config');
-const IExecContractsClient = require('../../common/utils/IExecContractsClient');
-const { EnhancedWallet } = require('../../common/utils/signers');
-const { loadChainConf } = require('./fs');
-const { Spinner } = require('./cli-helper');
-const { getReadOnlyProvider } = require('../../common/utils/providers');
+} from '../../common/utils/config.js';
+import IExecContractsClient from '../../common/utils/IExecContractsClient.js';
+import { EnhancedWallet } from '../../common/utils/signers.js';
+import { loadChainConf } from './fs.js';
+import { Spinner } from './cli-helper.js';
+import { getReadOnlyProvider } from '../../common/utils/providers.js';
 
 const debug = Debug('iexec:chains');
 
 const CHAIN_ALIASES_MAP = {
   1: 'mainnet',
-  5: 'goerli',
-  133: 'viviani',
   134: 'bellecour',
 };
 
 const CHAIN_NAME_MAP = {
   1: { id: '1', flavour: 'standard' },
   mainnet: { id: '1', flavour: 'standard' },
-  5: { id: '5', flavour: 'standard' },
-  goerli: { id: '5', flavour: 'standard' },
-  133: { id: '133', flavour: 'standard' },
-  viviani: { id: '133', flavour: 'standard' },
   134: { id: '134', flavour: 'standard' },
   bellecour: { id: '134', flavour: 'standard' },
   enterprise: { id: '1', flavour: 'enterprise' },
-  'enterprise-testnet': { id: '5', flavour: 'enterprise' },
 };
 
 const ENTERPRISE_SWAP_MAP = {
   1: 'enterprise',
   mainnet: 'enterprise',
-  5: 'enterprise-testnet',
-  goerli: 'enterprise-testnet',
   enterprise: 'mainnet',
-  'enterprise-testnet': 'goerli',
 };
 
 const createChainFromConf = (
@@ -108,7 +98,7 @@ const createChainFromConf = (
   }
 };
 
-const loadChain = async (
+export const loadChain = async (
   chainName,
   { txOptions, spinner = Spinner() } = {},
 ) => {
@@ -137,9 +127,6 @@ const loadChain = async (
       } else {
         throw Error(`Missing "${chainsConf.default}" chain in "chain.json"`);
       }
-    } else if (chainsConf.chains && chainsConf.chains.goerli) {
-      name = 'goerli';
-      loadedConf = chainsConf.chain.goerli;
     }
     if (!name)
       throw Error('Missing chain parameter. Check your "chain.json" file');
@@ -247,15 +234,14 @@ const loadChain = async (
   }
 };
 
-const connectKeystore = async (chain, keystore, { txOptions = {} } = {}) => {
+export const connectKeystore = async (
+  chain,
+  keystore,
+  { txOptions = {} } = {},
+) => {
   const { privateKey } = await keystore.load();
   const keystoreOptions = { gasPrice: txOptions.gasPrice };
   chain.contracts.setSigner(
     new EnhancedWallet(privateKey, undefined, keystoreOptions),
   );
-};
-
-module.exports = {
-  loadChain,
-  connectKeystore,
 };

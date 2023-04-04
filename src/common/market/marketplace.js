@@ -1,14 +1,14 @@
-const Debug = require('debug');
-const { getAddress } = require('../wallet/address');
-const { checkSigner } = require('../utils/utils');
-const {
+import Debug from 'debug';
+import { getAddress } from '../wallet/address.js';
+import { checkSigner } from '../utils/utils.js';
+import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} = require('../utils/constant');
-const { jsonApi, getAuthorization } = require('../utils/api-utils');
-const {
+} from '../utils/constant.js';
+import { jsonApi, getAuthorization } from '../utils/api-utils.js';
+import {
   addressSchema,
   signedApporderSchema,
   signedDatasetorderSchema,
@@ -17,7 +17,7 @@ const {
   chainIdSchema,
   bytes32Schema,
   throwIfMissing,
-} = require('../utils/validator');
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:market:marketplace');
 
@@ -63,14 +63,14 @@ const publishOrder = async (
     if (response.ok && response.published && response.published.orderHash) {
       return response.published.orderHash;
     }
-    throw Error('An error occured while publishing order');
+    throw Error('An error occurred while publishing order');
   } catch (error) {
     debug('publishOrder()', error);
     throw error;
   }
 };
 
-const publishApporder = async (
+export const publishApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedApporder = throwIfMissing(),
@@ -83,7 +83,7 @@ const publishApporder = async (
     await signedApporderSchema().validate(signedApporder),
   );
 
-const publishDatasetorder = async (
+export const publishDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedDatasetorder = throwIfMissing(),
@@ -96,7 +96,7 @@ const publishDatasetorder = async (
     await signedDatasetorderSchema().validate(signedDatasetorder),
   );
 
-const publishWorkerpoolorder = async (
+export const publishWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedWorkerpoolorder = throwIfMissing(),
@@ -109,7 +109,7 @@ const publishWorkerpoolorder = async (
     await signedWorkerpoolorderSchema().validate(signedWorkerpoolorder),
   );
 
-const publishRequestorder = async (
+export const publishRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   signedRequestorder = throwIfMissing(),
@@ -164,14 +164,14 @@ const unpublishOrder = async (
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
-    throw new Error('An error occured while unpublishing order');
+    throw new Error('An error occurred while unpublishing order');
   } catch (error) {
     debug('unpublishOrder()', error);
     throw error;
   }
 };
 
-const unpublishApporder = async (
+export const unpublishApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   apporderHash = throwIfMissing(),
@@ -186,7 +186,7 @@ const unpublishApporder = async (
   return unpublished[0];
 };
 
-const unpublishDatasetorder = async (
+export const unpublishDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetorderHash = throwIfMissing(),
@@ -201,7 +201,7 @@ const unpublishDatasetorder = async (
   return unpublished[0];
 };
 
-const unpublishWorkerpoolorder = async (
+export const unpublishWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolorderHash = throwIfMissing(),
@@ -216,7 +216,7 @@ const unpublishWorkerpoolorder = async (
   return unpublished[0];
 };
 
-const unpublishRequestorder = async (
+export const unpublishRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requestorderHash = throwIfMissing(),
@@ -231,7 +231,7 @@ const unpublishRequestorder = async (
   return unpublished[0];
 };
 
-const unpublishAllApporders = async (
+export const unpublishAllApporders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
@@ -249,7 +249,7 @@ const unpublishAllApporders = async (
     },
   );
 
-const unpublishAllDatasetorders = async (
+export const unpublishAllDatasetorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
@@ -267,7 +267,7 @@ const unpublishAllDatasetorders = async (
     },
   );
 
-const unpublishAllWorkerpoolorders = async (
+export const unpublishAllWorkerpoolorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
@@ -285,7 +285,7 @@ const unpublishAllWorkerpoolorders = async (
     },
   );
 
-const unpublishAllRequestorders = async (
+export const unpublishAllRequestorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
 ) =>
@@ -300,7 +300,7 @@ const unpublishAllRequestorders = async (
     },
   );
 
-const unpublishLastApporder = async (
+export const unpublishLastApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   appAddress = throwIfMissing(),
@@ -320,7 +320,7 @@ const unpublishLastApporder = async (
   return unpublished[0];
 };
 
-const unpublishLastDatasetorder = async (
+export const unpublishLastDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   datasetAddress = throwIfMissing(),
@@ -340,7 +340,7 @@ const unpublishLastDatasetorder = async (
   return unpublished[0];
 };
 
-const unpublishLastWorkerpoolorder = async (
+export const unpublishLastWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
@@ -360,7 +360,7 @@ const unpublishLastWorkerpoolorder = async (
   return unpublished[0];
 };
 
-const unpublishLastRequestorder = async (
+export const unpublishLastRequestorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
 ) => {
@@ -377,7 +377,7 @@ const unpublishLastRequestorder = async (
   return unpublished[0];
 };
 
-const fetchPublishedOrderByHash = async (
+export const fetchPublishedOrderByHash = async (
   iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
@@ -387,7 +387,7 @@ const fetchPublishedOrderByHash = async (
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const endpoint = apiEndpoints[orderName];
-    if (!endpoint) throw Error(`Unsuported orderName ${orderName}`);
+    if (!endpoint) throw Error(`Unsupported orderName ${orderName}`);
     const query = {
       chainId: vChainId,
     };
@@ -401,24 +401,4 @@ const fetchPublishedOrderByHash = async (
     debug('fetchPublishedOrderByHash()', error);
     throw error;
   }
-};
-
-module.exports = {
-  publishApporder,
-  publishDatasetorder,
-  publishWorkerpoolorder,
-  publishRequestorder,
-  unpublishApporder,
-  unpublishDatasetorder,
-  unpublishWorkerpoolorder,
-  unpublishRequestorder,
-  unpublishLastApporder,
-  unpublishLastDatasetorder,
-  unpublishLastWorkerpoolorder,
-  unpublishLastRequestorder,
-  unpublishAllApporders,
-  unpublishAllDatasetorders,
-  unpublishAllWorkerpoolorders,
-  unpublishAllRequestorders,
-  fetchPublishedOrderByHash,
 };

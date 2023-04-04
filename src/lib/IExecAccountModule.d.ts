@@ -33,7 +33,7 @@ export default class IExecAccountModule extends IExecModule {
    */
   withdraw(amount: NRLCAmount): Promise<{ amount: BN; txHash: TxHash }>;
   /**
-   * check the account balance of specified address (stake is availlable nRLC, locked is escowed nRLC)
+   * check the account balance of specified address (stake is available nRLC, locked is escrowed nRLC)
    *
    * example:
    * ```js

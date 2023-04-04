@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const Debug = require('debug');
-const cli = require('commander');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import {
   createApporder,
   createDatasetorder,
   createRequestorder,
@@ -16,8 +16,8 @@ const {
   cancelWorkerpoolorder,
   computeOrderHash,
   matchOrders,
-} = require('../../common/market/order');
-const {
+} from '../../common/market/order.js';
+import {
   publishApporder,
   publishDatasetorder,
   publishRequestorder,
@@ -27,21 +27,25 @@ const {
   unpublishRequestorder,
   unpublishWorkerpoolorder,
   fetchPublishedOrderByHash,
-} = require('../../common/market/marketplace');
-const { fetchDealsByOrderHash } = require('../../common/execution/deal');
-const {
+} from '../../common/market/marketplace.js';
+import { fetchDealsByOrderHash } from '../../common/execution/deal.js';
+import {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-} = require('../../common/protocol/registries');
-const {
+} from '../../common/protocol/registries.js';
+import {
   NULL_ADDRESS,
   APP,
   DATASET,
   WORKERPOOL,
   REQUEST,
-} = require('../../common/utils/constant');
-const {
+  APP_ORDER,
+  DATASET_ORDER,
+  WORKERPOOL_ORDER,
+  REQUEST_ORDER,
+} from '../../common/utils/constant.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -57,25 +61,29 @@ const {
   isBytes32,
   prompt,
   getPropertyFormChain,
-} = require('../utils/cli-helper');
-const {
+  getSmsUrlFromChain,
+} from '../utils/cli-helper.js';
+import {
   checkRequestRequirements,
-} = require('../../common/execution/request-helper');
-const {
+  resolveTeeFrameworkFromTag,
+  checkDatasetRequirements,
+  checkAppRequirements,
+} from '../../common/execution/order-helper.js';
+import {
   loadIExecConf,
   initOrderObj,
   loadDeployedObj,
   saveSignedOrder,
   loadSignedOrders,
-} = require('../utils/fs');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
-const {
-  APP_ORDER,
-  DATASET_ORDER,
-  WORKERPOOL_ORDER,
-  REQUEST_ORDER,
-} = require('../../common/utils/constant');
+} from '../utils/fs.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
+import { sumTags } from '../../lib/utils.js';
+import {
+  requestorderSchema,
+  apporderSchema,
+  datasetorderSchema,
+} from '../../common/utils/validator.js';
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -106,7 +114,7 @@ init
         opts.request
       );
 
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
 
       const chain = await loadChain(opts.chain, { spinner });
       const success = {};
@@ -175,7 +183,7 @@ sign
   .option(...option.signDatasetOrder())
   .option(...option.signWorkerpoolOrder())
   .option(...option.signRequestOrder())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.sign())
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -187,7 +195,7 @@ sign
         opts.workerpool ||
         opts.request
       );
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, iexecConf] = await Promise.all([
         loadChain(opts.chain, { spinner }),
@@ -207,6 +215,22 @@ sign
           const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
+          if (!opts.skipPreflightCheck) {
+            await checkAppRequirements(
+              {
+                contracts: chain.contracts,
+              },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `App requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
+              );
+            });
+          }
           const signedOrder = await signApporder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
             APP_ORDER,
@@ -235,6 +259,25 @@ sign
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw Error(`No dataset deployed at address ${orderObj.dataset}`);
+          if (!opts.skipPreflightCheck) {
+            await checkDatasetRequirements(
+              {
+                contracts: chain.contracts,
+                smsURL: getSmsUrlFromChain(chain, {
+                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
+                }),
+              },
+              orderObj,
+            ).catch((e) => {
+              throw Error(
+                `Dataset requirements check failed: ${
+                  e.message
+                } (If you consider this is not an issue, use ${
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
+              );
+            });
+          }
           const signedOrder = await signDatasetorder(chain.contracts, orderObj);
           const { saved, fileName } = await saveSignedOrder(
             DATASET_ORDER,
@@ -306,11 +349,13 @@ sign
           );
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
-          if (!opts.skipRequestCheck) {
+          if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
                 contracts: chain.contracts,
-                smsURL: getPropertyFormChain(chain, 'sms'),
+                smsURL: getSmsUrlFromChain(chain, {
+                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
+                }),
               },
               orderObj,
             ).catch((e) => {
@@ -318,8 +363,8 @@ sign
                 `Request requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
-                  option.skipRequestCheck()[0]
-                } to skip request requirement check)`,
+                  option.skipPreflightCheck()[0]
+                } to skip preflight requirement check)`,
               );
             });
           }
@@ -370,13 +415,13 @@ fill
   .option(...option.fillWorkerpoolOrder())
   .option(...option.fillRequestOrder())
   .option(...option.fillRequestParams())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([
@@ -455,8 +500,7 @@ fill
         if (!opts.force) {
           await prompt.signGeneratedOrder(REQUEST_ORDER, pretty(unsignedOrder));
         }
-        const signed = await signRequestorder(chain.contracts, unsignedOrder);
-        return signed;
+        return signRequestorder(chain.contracts, unsignedOrder);
       };
 
       const requestOrder = requestOrderInput || (await computeRequestOrder());
@@ -464,11 +508,59 @@ fill
         throw new Error('Missing requestorder');
       }
 
-      if (!opts.skipRequestCheck) {
+      if (!opts.skipPreflightCheck) {
+        const resolvedTag = sumTags([
+          (
+            await requestorderSchema()
+              .label('requestorder')
+              .validate(requestOrder)
+          ).tag,
+          (await apporderSchema().label('apporder').validate(appOrder)).tag,
+          (
+            await datasetorderSchema()
+              .label('datasetorder')
+              .validate(datasetOrder)
+          ).tag,
+        ]);
+        await checkAppRequirements(
+          {
+            contracts: chain.contracts,
+          },
+          appOrder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `App requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
+        await checkDatasetRequirements(
+          {
+            contracts: chain.contracts,
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
+          },
+          datasetOrder,
+          { tagOverride: resolvedTag },
+        ).catch((e) => {
+          throw Error(
+            `Dataset requirements check failed: ${
+              e.message
+            } (If you consider this is not an issue, use ${
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
+          );
+        });
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getPropertyFormChain(chain, 'sms'),
+            smsURL: getSmsUrlFromChain(chain, {
+              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+            }),
           },
           requestOrder,
         ).catch((e) => {
@@ -476,8 +568,8 @@ fill
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
-              option.skipRequestCheck()[0]
-            } to skip request requirement check)`,
+              option.skipPreflightCheck()[0]
+            } to skip preflight requirement check)`,
           );
         });
       }
@@ -510,7 +602,7 @@ publish
   .option(...option.publishDatasetOrder())
   .option(...option.publishWorkerpoolOrder())
   .option(...option.publishRequestOrder())
-  .option(...option.skipRequestCheck())
+  .option(...option.skipPreflightCheck())
   .description(desc.publish(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -521,7 +613,7 @@ publish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
@@ -548,6 +640,22 @@ publish
           let orderHash;
           switch (orderName) {
             case APP_ORDER:
+              if (!opts.skipPreflightCheck) {
+                await checkAppRequirements(
+                  {
+                    contracts: chain.contracts,
+                  },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `App requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
+                  );
+                });
+              }
               orderHash = await publishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
@@ -555,6 +663,27 @@ publish
               );
               break;
             case DATASET_ORDER:
+              if (!opts.skipPreflightCheck) {
+                await checkDatasetRequirements(
+                  {
+                    contracts: chain.contracts,
+                    smsURL: getSmsUrlFromChain(chain, {
+                      teeFramework: await resolveTeeFrameworkFromTag(
+                        orderToPublish.tag,
+                      ),
+                    }),
+                  },
+                  orderToPublish,
+                ).catch((e) => {
+                  throw Error(
+                    `Dataset requirements check failed: ${
+                      e.message
+                    } (If you consider this is not an issue, use ${
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
+                  );
+                });
+              }
               orderHash = await publishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
@@ -569,11 +698,15 @@ publish
               );
               break;
             case REQUEST_ORDER:
-              if (!opts.skipRequestCheck) {
+              if (!opts.skipPreflightCheck) {
                 await checkRequestRequirements(
                   {
                     contracts: chain.contracts,
-                    smsURL: getPropertyFormChain(chain, 'sms'),
+                    smsURL: getSmsUrlFromChain(chain, {
+                      teeFramework: await resolveTeeFrameworkFromTag(
+                        orderToPublish.tag,
+                      ),
+                    }),
                   },
                   orderToPublish,
                 ).catch((e) => {
@@ -581,8 +714,8 @@ publish
                     `Request requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
-                      option.skipRequestCheck()[0]
-                    } to skip request requirement check)`,
+                      option.skipPreflightCheck()[0]
+                    } to skip preflight requirement check)`,
                   );
                 });
               }
@@ -642,7 +775,7 @@ unpublish
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
 
       const [chain, signedOrders] = await Promise.all([
@@ -766,7 +899,7 @@ cancel
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [chain, signedOrders] = await Promise.all([

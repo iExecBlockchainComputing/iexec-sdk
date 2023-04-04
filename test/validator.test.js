@@ -1,35 +1,21 @@
-const BN = require('bn.js');
-const { getDefaultProvider } = require('ethers');
-const fs = require('fs-extra');
-const path = require('path');
-const {
-  // throwIfMissing,
-  // stringSchema,
+import { Buffer } from 'buffer';
+import BN from 'bn.js';
+import { getDefaultProvider } from 'ethers';
+import fsExtra from 'fs-extra';
+import { join } from 'path';
+import { ValidationError } from '../src/common/utils/errors';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
+import {
   uint256Schema,
   weiAmountSchema,
   nRlcAmountSchema,
   addressSchema,
-  // bytes32Schema,
-  // apporderSchema,
-  // signedApporderSchema,
-  // datasetorderSchema,
-  // signedDatasetorderSchema,
-  // workerpoolorderSchema,
-  // signedWorkerpoolorderSchema,
-  // requestorderSchema,
-  // signedRequestorderSchema,
   paramsSchema,
   paramsInputFilesArraySchema,
   tagSchema,
-  // chainIdSchema,
-  // hexnumberSchema,
   positiveIntSchema,
   positiveStrictIntSchema,
   mrenclaveSchema,
-  // appSchema,
-  // datasetSchema,
-  // categorySchema,
-  // workerpoolSchema,
   objParamsSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
@@ -38,8 +24,11 @@ const {
   textRecordKeySchema,
   textRecordValueSchema,
   workerpoolApiUrlSchema,
-  ValidationError,
-} = require('../src/common/utils/validator');
+  smsUrlOrMapSchema,
+  teeFrameworkSchema,
+} from '../src/common/utils/validator';
+
+const { readFile } = fsExtra;
 
 const { INFURA_PROJECT_ID } = process.env;
 // public chains
@@ -515,7 +504,7 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('[0] "" is not a valid URL'),
+      new ValidationError('["0"] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
@@ -628,11 +617,7 @@ describe('[objParamsSchema]', () => {
         },
         { context: { isTee: true } },
       ),
-    ).rejects.toThrow(
-      new ValidationError(
-        'iexec_secrets must be a `object` type, but the final value was: `null`.\n If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
-      ),
-    );
+    ).rejects.toThrow(new ValidationError('iexec_secrets cannot be null'));
   });
 
   test('iexec_secrets mapping keys must be strictly positive integers', async () => {
@@ -854,10 +839,10 @@ describe('[tagSchema]', () => {
   test('bytes 32 tags', async () => {
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000103',
       ),
     ).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown bytes 32 tag is allowed', async () => {
@@ -870,8 +855,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('array of tags', async () => {
-    await expect(tagSchema().validate(['tee', 'gpu'])).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate(['tee', 'scone', 'gpu'])).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('empty tag', async () => {
@@ -885,8 +870,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('comma separated tags', async () => {
-    await expect(tagSchema().validate('gpu,tee')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000101',
+    await expect(tagSchema().validate('gpu,tee,scone')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown tag in array', async () => {
@@ -897,6 +882,56 @@ describe('[tagSchema]', () => {
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
       new ValidationError('foo is not a valid tag. Unknown tag foo'),
+    );
+  });
+  test('invalid tee tag', async () => {
+    await expect(tagSchema().validate('tee')).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
+    );
+    await expect(tagSchema().validate('scone')).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('gramine')).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000004',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
+    );
+    await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000007',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
     );
   });
 });
@@ -995,8 +1030,8 @@ describe('[base64Encoded256bitsKeySchema]', () => {
 
 describe('[fileBufferSchema]', () => {
   test('file', async () => {
-    const fileBuffer = await fs.readFile(
-      path.join(process.cwd(), 'test/inputs/files/text.zip'),
+    const fileBuffer = await readFile(
+      join(process.cwd(), 'test/inputs/files/text.zip'),
     );
     await expect(
       fileBufferSchema().validate(fileBuffer),
@@ -1017,7 +1052,18 @@ describe('[fileBufferSchema]', () => {
 describe('[mrenclaveSchema]', () => {
   test('valid obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'GRAMINE',
+      version: 'v5',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
+      Buffer.from(JSON.stringify(obj), 'utf8'),
+    );
+  });
+  test('valid SCONE obj', async () => {
+    const obj = {
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1030,7 +1076,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('valid string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1044,7 +1090,7 @@ describe('[mrenclaveSchema]', () => {
   test('valid bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1073,6 +1119,30 @@ describe('[mrenclaveSchema]', () => {
       Buffer.from([]),
     );
   });
+  test('throw when "entrypoint" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "entrypoint" in mrenclave'),
+    );
+  });
+  test('throw when "heapSize" is set for non SCONE framework', async () => {
+    const obj = {
+      framework: 'GRAMINE',
+      version: 'v5',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('Unknown key "heapSize" in mrenclave'),
+    );
+  });
   test('throw with null', async () => {
     await expect(mrenclaveSchema().validate(null)).rejects.toThrow(
       new ValidationError('this is not a valid mrenclave'),
@@ -1090,7 +1160,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in obj', async () => {
     const obj = {
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1104,7 +1174,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw when unexpected key is found in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       version: 'v5',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
@@ -1119,7 +1189,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when unexpected key is found in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         entrypoint: '/app/helloworld',
         heapSize: 1073741824,
@@ -1142,12 +1212,12 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('provider is a required field'),
+      new ValidationError('framework is a required field'),
     );
   });
   test('throw when a key is missing in JSON string', async () => {
     const str = JSON.stringify({
-      provider: 'SCONE',
+      framework: 'SCONE',
       entrypoint: '/app/helloworld',
       heapSize: 1073741824,
       fingerprint:
@@ -1160,7 +1230,7 @@ describe('[mrenclaveSchema]', () => {
   test('throw when a key is missing in decoded bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
-        provider: 'SCONE',
+        framework: 'SCONE',
         version: 'v5',
         heapSize: 1073741824,
         fingerprint:
@@ -1172,21 +1242,39 @@ describe('[mrenclaveSchema]', () => {
       new ValidationError('entrypoint is a required field'),
     );
   });
+  test('throw when framework is not a valid TEE framework', async () => {
+    const obj = {
+      framework: 'FOO',
+      version: 'v5',
+      entrypoint: '/app/helloworld',
+      heapSize: 1073741824,
+      fingerprint:
+        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
+    };
+    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
+      new ValidationError('framework is not a valid TEE framework'),
+    );
+  });
 });
 
 describe('[ensLabelSchema]', () => {
-  test('unicode', async () => {
-    const res = await ensLabelSchema().validate('a@α');
-    expect(res).toBe('a@α');
+  test('valid', async () => {
+    await expect(ensLabelSchema().validate('a')).resolves.toBe('a');
+    await expect(ensLabelSchema().validate('🦄')).resolves.toBe('🦄');
+    await expect(ensLabelSchema().validate('a-b')).resolves.toBe('a-b');
+    await expect(ensLabelSchema().validate('α')).resolves.toBe('α');
   });
   test('throw with uppercase', async () => {
-    await expect(ensLabelSchema().validate('A@α')).rejects.toThrow(
-      'A@α is not a valid ENS label (label cannot contain uppercase characters)',
+    await expect(ensLabelSchema().validate('A')).rejects.toThrow(
+      'A is not a valid ENS label (label cannot contain uppercase characters)',
     );
   });
-  test('throw with unicode unsupported', async () => {
-    await expect(ensLabelSchema().validate('🦄&🦄')).rejects.toThrow(
-      '🦄&🦄 is not a valid ENS label (label cannot contain unsupported characters)',
+  test('throw with unsupported characters', async () => {
+    await expect(ensLabelSchema().validate('&')).rejects.toThrow(
+      '& is not a valid ENS label (label cannot contain unsupported characters)',
+    );
+    await expect(ensLabelSchema().validate('@')).rejects.toThrow(
+      '@ is not a valid ENS label (label cannot contain unsupported characters)',
     );
   });
   test('throw with dot', async () => {
@@ -1197,20 +1285,25 @@ describe('[ensLabelSchema]', () => {
 });
 
 describe('[ensDomainSchema]', () => {
-  test('unicode', async () => {
-    const res = await ensDomainSchema().validate('foo.a@α.bar.eth');
-    expect(res).toBe('foo.a@α.bar.eth');
+  test('valid', async () => {
+    await expect(ensDomainSchema().validate('foo.a-b.bar.eth')).resolves.toBe(
+      'foo.a-b.bar.eth',
+    );
+    await expect(
+      ensDomainSchema().validate('foo.🦄🦄🦄.bar.eth'),
+    ).resolves.toBe('foo.🦄🦄🦄.bar.eth');
   });
   test('throw with uppercase', async () => {
-    await expect(ensDomainSchema().validate('foo.A@α.bar.eth')).rejects.toThrow(
-      'foo.A@α.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
+    await expect(ensDomainSchema().validate('foo.Abc.bar.eth')).rejects.toThrow(
+      'foo.Abc.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
     );
   });
-  test('throw with unicode unsupported', async () => {
-    await expect(
-      ensDomainSchema().validate('foo.🦄&🦄.bar.eth'),
-    ).rejects.toThrow(
-      'foo.🦄&🦄.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
+  test('throw with unsupported characters', async () => {
+    await expect(ensDomainSchema().validate('foo.a&b.bar.eth')).rejects.toThrow(
+      'foo.a&b.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
+    );
+    await expect(ensDomainSchema().validate('foo.a@a.bar.eth')).rejects.toThrow(
+      'foo.a@a.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
     );
   });
   test('throw with empty labels', async () => {
@@ -1252,7 +1345,7 @@ describe('[textRecordValueSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+      'this cannot be null',
     );
   });
   test('throw with string coercible value', async () => {
@@ -1284,8 +1377,93 @@ describe('[workerpoolApiUrlSchema]', () => {
     expect(res).toBe('');
   });
   test('throw with null', async () => {
-    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `null`.',
+    await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
+      'this cannot be null',
+    );
+  });
+});
+
+describe('[smsUrlOrMapSchema]', () => {
+  test('allow IP with port', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://192.168.0.1:8080');
+    expect(res).toBe('http://192.168.0.1:8080');
+  });
+  test('allow url', async () => {
+    const res = await smsUrlOrMapSchema().validate('https://my-sms.com');
+    expect(res).toBe('https://my-sms.com');
+  });
+  test('allow docker url', async () => {
+    const res = await smsUrlOrMapSchema().validate('http://my-sms');
+    expect(res).toBe('http://my-sms');
+  });
+  test('allow undefined', async () => {
+    const res = await smsUrlOrMapSchema().validate();
+    expect(res).toBe(undefined);
+  });
+  test('allow Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      scone: 'http://scone-sms',
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('allow partial Record<TeeFramework,Url>', async () => {
+    const smsMap = {
+      gramine: 'http://gramine-sms',
+    };
+    const res = await smsUrlOrMapSchema().validate(smsMap);
+    expect(res).toEqual(smsMap);
+  });
+  test('throw with empty string', async () => {
+    await expect(smsUrlOrMapSchema().validate('')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with null', async () => {
+    await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
+      'this cannot be null',
+    );
+  });
+  test('throw with invalid url', async () => {
+    await expect(smsUrlOrMapSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid url',
+    );
+  });
+  test('throw with unknown TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ foo: 'https://my-sms.com' }),
+    ).rejects.toThrow('this field has unspecified keys: foo');
+  });
+  test('throw with invalid url on a TEE framework key', async () => {
+    await expect(
+      smsUrlOrMapSchema().validate({ scone: 'foo' }),
+    ).rejects.toThrow('scone is not a valid url');
+  });
+});
+
+describe('[teeFrameworkSchema]', () => {
+  test('allow known TEE frameworks', async () => {
+    await Promise.all(
+      Object.values(TEE_FRAMEWORKS).map(async (name) => {
+        await expect(teeFrameworkSchema().validate(name)).resolves.toBe(name);
+        await expect(
+          teeFrameworkSchema().validate(name.toUpperCase()),
+        ).resolves.toBe(name);
+      }),
+    );
+  });
+  test('allow undefined', async () => {
+    await expect(teeFrameworkSchema().validate()).resolves.toBe(undefined);
+  });
+  test('throw with unknown TEE framework', async () => {
+    await expect(teeFrameworkSchema().validate('foo')).rejects.toThrow(
+      'this is not a valid TEE framework',
+    );
+  });
+  test('throw with empty string', async () => {
+    await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
+      'this is not a valid TEE framework',
     );
   });
 });

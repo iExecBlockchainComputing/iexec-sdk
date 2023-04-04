@@ -45,7 +45,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -234,7 +234,7 @@ ___
 
 ▸ **fetchRequesterDeals**(`requesterAddress`, `filters?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
-fetch the latest deals of the requester optionaly filtered by specified filters.
+fetch the latest deals of the requester optionally filtered by specified filters.
 
 _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
 

@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / AppDeploymentArgs
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / AppDeploymentArgs
 
 # Interface: AppDeploymentArgs
 
-[{internal}](../modules/internal_.md).AppDeploymentArgs
+[<internal>](../modules/internal_.md).AppDeploymentArgs
 
 ## Table of contents
 
@@ -37,9 +37,9 @@ optional for TEE apps only, specify the TEE protocol to use
 | :------ | :------ | :------ |
 | `entrypoint` | `string` | app entrypoint path |
 | `fingerprint` | `string` | app tee fingerprint |
+| `framework` | [`TeeFramework`](../modules/internal_.md#teeframework) | TEE framework name |
 | `heapSize` | `number` | dedicated memory in bytes |
-| `provider` | `string` | only "SCONE" is supported |
-| `version` | `string` | provider's protocol version |
+| `version` | `string` | framework's protocol version |
 
 ___
 

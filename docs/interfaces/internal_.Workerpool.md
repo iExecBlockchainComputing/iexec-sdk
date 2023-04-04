@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / Workerpool
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Workerpool
 
 # Interface: Workerpool
 
-[{internal}](../modules/internal_.md).Workerpool
+[<internal>](../modules/internal_.md).Workerpool
 
 IExec workerpool
 

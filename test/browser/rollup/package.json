@@ -1,0 +1,23 @@
+{
+  "name": "rollup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "start": "npm run build && serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "iexec": "file:../../.."
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-inject": "^5.0.3",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "rollup": "^3.15.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "serve": "^14.2.0"
+  }
+}

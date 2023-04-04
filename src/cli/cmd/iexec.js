@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const packageJSON = require('../../../package.json');
-const { getChainDefaults } = require('../../common/utils/config');
-const { wrapCall } = require('../../common/utils/errorWrappers');
-const {
+import { program as cli } from 'commander';
+import { getChainDefaults } from '../../common/utils/config.js';
+import { wrapCall } from '../../common/utils/errorWrappers.js';
+import {
   addGlobalOptions,
   addWalletCreateOptions,
   computeWalletCreateOptions,
@@ -16,13 +15,14 @@ const {
   pretty,
   desc,
   option,
-} = require('../utils/cli-helper');
-const { initIExecConf, initChainConf } = require('../utils/fs');
-const { createAndSave } = require('../utils/keystore');
-const { loadChain } = require('../utils/chains');
-const { APP, DATASET, WORKERPOOL } = require('../../common/utils/constant');
+} from '../utils/cli-helper.js';
+import { initIExecConf, initChainConf } from '../utils/fs.js';
+import { createAndSave } from '../utils/keystore.js';
+import { loadChain } from '../utils/chains.js';
+import { APP, DATASET, WORKERPOOL } from '../../common/utils/constant.js';
+import { description, version } from '../../common/generated/sdk/package.js';
 
-cli.description(packageJSON.description).version(packageJSON.version);
+cli.description(description).version(version);
 cli.name('iexec').usage('[command] [options]');
 
 const init = cli.command('init');

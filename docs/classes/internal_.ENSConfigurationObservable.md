@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ENSConfigurationObservable
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ENSConfigurationObservable
 
 # Class: ENSConfigurationObservable
 
-[{internal}](../modules/internal_.md).ENSConfigurationObservable
+[<internal>](../modules/internal_.md).ENSConfigurationObservable
 
 ## Hierarchy
 

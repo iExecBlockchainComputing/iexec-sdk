@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ConsumableWorkerpoolorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ConsumableWorkerpoolorder
 
 # Interface: ConsumableWorkerpoolorder
 
-[{internal}](../modules/internal_.md).ConsumableWorkerpoolorder
+[<internal>](../modules/internal_.md).ConsumableWorkerpoolorder
 
 signed sell order for computing power
 

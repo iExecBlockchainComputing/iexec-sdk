@@ -1,4 +1,4 @@
-const { ValidationError } = require('yup');
+export { ValidationError } from 'yup';
 
 const getPropsToCopy = (error) => {
   const {
@@ -13,14 +13,14 @@ const getPropsToCopy = (error) => {
   return propsToCopy;
 };
 
-class ConfigurationError extends Error {
+export class ConfigurationError extends Error {
   constructor(...args) {
     super(...args);
     this.name = this.constructor.name;
   }
 }
 
-class Web3ProviderError extends Error {
+export class Web3ProviderError extends Error {
   constructor(message, originalError) {
     super(message);
     this.name = this.constructor.name;
@@ -31,28 +31,28 @@ class Web3ProviderError extends Error {
   }
 }
 
-class Web3ProviderCallError extends Web3ProviderError {
+export class Web3ProviderCallError extends Web3ProviderError {
   constructor(...args) {
     super(...args);
     this.name = this.constructor.name;
   }
 }
 
-class Web3ProviderSendError extends Web3ProviderError {
+export class Web3ProviderSendError extends Web3ProviderError {
   constructor(...args) {
     super(...args);
     this.name = this.constructor.name;
   }
 }
 
-class Web3ProviderSignMessageError extends Web3ProviderError {
+export class Web3ProviderSignMessageError extends Web3ProviderError {
   constructor(...args) {
     super(...args);
     this.name = this.constructor.name;
   }
 }
 
-class ObjectNotFoundError extends Error {
+export class ObjectNotFoundError extends Error {
   constructor(objName, objId, chainId) {
     super(`No ${objName} found for id ${objId} on chain ${chainId}`);
     this.name = this.constructor.name;
@@ -62,7 +62,7 @@ class ObjectNotFoundError extends Error {
   }
 }
 
-class BridgeError extends Error {
+export class BridgeError extends Error {
   constructor(originalError, sendTxHash) {
     super(
       `Failed to get bridged chain confirmation for transaction ${sendTxHash}`,
@@ -75,14 +75,3 @@ class BridgeError extends Error {
     }
   }
 }
-
-module.exports = {
-  ConfigurationError,
-  ObjectNotFoundError,
-  ValidationError,
-  Web3ProviderError,
-  Web3ProviderCallError,
-  Web3ProviderSendError,
-  Web3ProviderSignMessageError,
-  BridgeError,
-};

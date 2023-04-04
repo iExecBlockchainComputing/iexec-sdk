@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / IExecContractsClient
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / IExecContractsClient
 
 # Class: IExecContractsClient
 
-[{internal}](../modules/internal_.md).IExecContractsClient
+[<internal>](../modules/internal_.md).IExecContractsClient
 
 ## Table of contents
 

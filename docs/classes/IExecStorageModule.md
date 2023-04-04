@@ -39,7 +39,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -81,6 +81,7 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 | `beneficiaryAddress` | `string` |
 | `options?` | `Object` |
 | `options.provider?` | `string` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -142,6 +143,7 @@ console.log('dropbox storage initialized:', isPushed);
 | `options?` | `Object` |
 | `options.forceUpdate?` | `boolean` |
 | `options.provider?` | `string` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 

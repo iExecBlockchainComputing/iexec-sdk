@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ConsumableDatasetorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ConsumableDatasetorder
 
 # Interface: ConsumableDatasetorder
 
-[{internal}](../modules/internal_.md).ConsumableDatasetorder
+[<internal>](../modules/internal_.md).ConsumableDatasetorder
 
 signed sell order for a dataset
 

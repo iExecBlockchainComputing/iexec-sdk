@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const {
+import { program as cli } from 'commander';
+import {
   fetchAppOrderbook,
   fetchDatasetOrderbook,
   fetchRequestOrderbook,
   fetchWorkerpoolOrderbook,
-} = require('../../common/market/orderbook');
-const { NULL_ADDRESS, NULL_BYTES32 } = require('../../common/utils/constant');
-const {
+} from '../../common/market/orderbook.js';
+import { NULL_ADDRESS, NULL_BYTES32 } from '../../common/utils/constant.js';
+import {
   finalizeCli,
   addGlobalOptions,
   checkUpdate,
@@ -20,8 +20,8 @@ const {
   pretty,
   info,
   getPropertyFormChain,
-} = require('../utils/cli-helper');
-const { loadChain } = require('../utils/chains');
+} from '../utils/cli-helper.js';
+import { loadChain } from '../utils/chains.js';
 
 const objName = 'orderbook';
 
@@ -86,11 +86,11 @@ orderbookApp
           : [];
       const createResultsMessage = (
         callResults,
-        initilResultsCount,
+        initialResultsCount,
         totalCount,
       ) =>
-        `Apporders details (${initilResultsCount + 1} to ${
-          initilResultsCount + callResults.length
+        `Apporders details (${initialResultsCount + 1} to ${
+          initialResultsCount + callResults.length
         }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
           callResults.map((e) => ({
             orderHash: e.orderHash,
@@ -192,11 +192,11 @@ orderbookDataset
           : [];
       const createResultsMessage = (
         callResults,
-        initilResultsCount,
+        initialResultsCount,
         totalCount,
       ) =>
-        `Datasetorders details (${initilResultsCount + 1} to ${
-          initilResultsCount + callResults.length
+        `Datasetorders details (${initialResultsCount + 1} to ${
+          initialResultsCount + callResults.length
         }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
           callResults.map((e) => ({
             orderHash: e.orderHash,
@@ -306,11 +306,11 @@ orderbookWorkerpool
           : [];
       const createResultsMessage = (
         callResults,
-        initilResultsCount,
+        initialResultsCount,
         totalCount,
       ) =>
-        `Workerpoolorders details (${initilResultsCount + 1} to ${
-          initilResultsCount + callResults.length
+        `Workerpoolorders details (${initialResultsCount + 1} to ${
+          initialResultsCount + callResults.length
         }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
           callResults.map((e) => ({
             orderHash: e.orderHash,
@@ -429,11 +429,11 @@ orderbookRequester
           : [];
       const createResultsMessage = (
         callResults,
-        initilResultsCount,
+        initialResultsCount,
         totalCount,
       ) =>
-        `Requestorders details (${initilResultsCount + 1} to ${
-          initilResultsCount + callResults.length
+        `Requestorders details (${initialResultsCount + 1} to ${
+          initialResultsCount + callResults.length
         }${totalCount ? ` of ${totalCount}` : ''}):${pretty(
           callResults.map((e) => ({
             orderHash: e.orderHash,

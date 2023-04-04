@@ -1,28 +1,27 @@
-const Debug = require('debug');
-const { Buffer } = require('buffer');
-const { keccak256, arrayify } = require('ethers').utils;
-const { getAddress } = require('../wallet/address');
-const { httpRequest } = require('../utils/api-utils');
-const {
+import Debug from 'debug';
+import { Buffer } from 'buffer';
+import { utils } from 'ethers';
+import { getAddress } from '../wallet/address.js';
+import { httpRequest } from '../utils/api-utils.js';
+import {
   addressSchema,
   stringSchema,
   throwIfMissing,
   positiveIntSchema,
-} = require('../utils/validator');
-const { wrapPersonalSign } = require('../utils/errorWrappers');
-const { checkSigner } = require('../utils/utils');
-const {
-  checkWeb2SecretExists,
-  checkRequesterSecretExists,
-} = require('./check');
+} from '../utils/validator.js';
+import { wrapPersonalSign } from '../utils/errorWrappers.js';
+import { checkSigner } from '../utils/utils.js';
+import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
+
+const { keccak256, arrayify } = utils;
 
 const debug = Debug('iexec:sms');
 
 const DOMAIN = 'IEXEC_SMS_DOMAIN';
 
-const concatenateAndHash = (...hexaStringArray) => {
+const concatenateAndHash = (...hexStringArray) => {
   const buffer = Buffer.concat(
-    hexaStringArray.map((hexString) => Buffer.from(arrayify(hexString))),
+    hexStringArray.map((hexString) => Buffer.from(arrayify(hexString))),
   );
   return keccak256(buffer);
 };
@@ -65,7 +64,7 @@ const handleNonUpdatablePushSecret = ({
   );
 };
 
-const pushWeb3Secret = async (
+export const pushWeb3Secret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   resourceAddress = throwIfMissing(),
@@ -111,7 +110,7 @@ const pushWeb3Secret = async (
   }
 };
 
-const pushWeb2Secret = async (
+export const pushWeb2Secret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   secretName = throwIfMissing(),
@@ -172,7 +171,7 @@ const pushWeb2Secret = async (
   }
 };
 
-const pushRequesterSecret = async (
+export const pushRequesterSecret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   secretName = throwIfMissing(),
@@ -228,7 +227,7 @@ const pushRequesterSecret = async (
   }
 };
 
-const pushAppSecret = async (
+export const pushAppSecret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
@@ -272,11 +271,4 @@ const pushAppSecret = async (
     debug('pushAppSecret()', error);
     throw error;
   }
-};
-
-module.exports = {
-  pushWeb2Secret,
-  pushWeb3Secret,
-  pushRequesterSecret,
-  pushAppSecret,
 };

@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Added
+
+- `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
+- `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
+- tee framework tags 'scone' & 'gramine'
+
+### Changed
+
+- SMS URL resolution depends on TEE framework (default `scone`)
+- SMS URL override in `IExecConfig` or `chain.json` accepts `Record<TeeFramework,Url> | string`
+- `iexec app push-secret` and `app.pushAppSecretExists(appAddress)` use a TEE framework inferred from app if not specified
+- `iexec app check-secret` and `app.checkAppSecret(appAddress, secret)` use a TEE framework inferred from app if not specified
+- `iexec storage init` and `storage.pushStorageToken(appAddress)` use the default TEE framework if not specified
+- `iexec storage check` and `app.checkStorageTokenExists(appAddress, secret)` use the default TEE framework if not specified
+- `iexec requester check-secret <name>` and `secrets.checkRequesterSecretExists(name)` use the default TEE framework if not specified
+- `iexec requester push-secret <name>` and `secrets.pushRequesterSecret(name, value)` use the default TEE framework if not specified
+- `iexec result check-encryption-key` and `result.checkResultEncryptionKeyExists(address)` use the default TEE framework if not specified
+- `iexec result push-encryption-key` and `result.pushResultEncryptionKey(value)` use the default TEE framework if not specified
+- `iexec dataset check-secret` and `dataset.checkDatasetSecretExists(datasetAddress)` use the default TEE framework if not specified
+- `iexec dataset push-secret` and `dataset.pushDatasetSecret(datasetAddress, encryptionKey)` use the default TEE framework if not specified
+- TEE app `mrenclave.provider` has been renamed `mrenclave.framework`
+- [BREAKING] drop support for node 12
+- [BREAKING] exports ES modules only, since all NodeJS LTS now supports ES modules natively, commonjs modules are no longer exported.
+  - if you use commonjs module `require` consider moving to ES module to use static import (ie: `import iexecSdk from 'iexec'`)
+  - if moving your project to ES module is not an option, you must use dynamic import to load iExec SDK (ie: `import('iexec').then((iexecSdk) => { ... })`)
+- [BREAKING] 'tee' tag must be combined with a tee framework tag ('scone' or 'gramine')
+- [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
+- [BREAKING] `--skip-request-check` option is replaced by `--skip-preflight-check`
+- [BREAKING] bellecour is now the default chain initialized in `chain.json` when running `iexec init`
+- [BREAKING] iExec stack is no longer deployed on mainnet, stack configuration for mainnet is no longer provided
+- [BREAKING] iExec enterprise stack is no longer deployed, stack configuration for enterprise is no longer provided
+
+### Removed
+
+- [BREAKING] viviani is no longer available in the default configuration
+- [BREAKING] goerli is no longer available in the default configuration
+- [BREAKING] removed now useless faucet commands `iexec wallet get-RLC` and `iexec wallet get-ether`
+
 ## [7.2.5] 2023-04-03
 
 ### Changed
@@ -51,7 +91,7 @@ All notable changes to this project will be documented in this file.
 
 - `show` commands display ENS when configured
 - `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
-- [DEPRECATED] Node 12 support will be droped
+- [DEPRECATED] Node 12 support will be dropped
 
 ## [7.1.1] 2022-06-06
 
@@ -71,7 +111,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- split lib into `IExecConfig` and independant `IExecModule`s to allow modular imports
+- split lib into `IExecConfig` and independent `IExecModule`s to allow modular imports
 - reintegrated `iexec-contracts-js-client`
 - fix a bug transforming an Array into a plain object
 - documentation refactoring
@@ -100,9 +140,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ENS resolution on iExec sidechains and custom networks
-- ENS methods in CLI & lib:
+- ENS methods in CLI and lib:
   - `iexec ens resolve <name>` and `iexec.ens.resolveName(name)`
-  - `iexec ens lookup <address>` and `iexec.ens.lookupAddress(addres)`
+  - `iexec ens lookup <address>` and `iexec.ens.lookupAddress(address)`
   - `iexec ens get-owner <name>` and `iexec.ens.getOwner(name)`
   - `iexec ens register <label>`
   - `iexec.ens.claimName(label, domain)`
@@ -124,13 +164,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- [BREAKING] `iexec init` set default chain `viviani` (iExec sidecahin testnet) in `chain.json`, previously was `goerli` (using `--chain` option still overrides the `chain.json` configuration).
+- [BREAKING] `iexec init` set default chain `viviani` (iExec sidechain testnet) in `chain.json`, previously was `goerli` (using `--chain` option still overrides the `chain.json` configuration).
 - [BREAKING] SCONE file system encryption is dropped in favor of AES-256-CBC for dataset encryption. Existing datasets will stop working, these datasets original files MUST be re-encrypted using `iexec dataset encrypt` and republished.
 - [BREAKING] changed generated dataset keys and encrypted datasets files naming pattern.
 - [BREAKING] a dataset is now a single file. in order to pass a tree structure, the dataset owner must package all the files in a single archive file, applications that previously used multiple files from a single dataset must handle unwrapping files from an archive file.
 - [BREAKING] app `mrenclave` format changed from string to object previously deployed TEE apps must be rebuilt and redeployed with v6 workflow
-- [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observabe`
-- [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observabe`
+- [BREAKING] `iexec.task.obsTask()` now returns `Promise<Observable>` previously it returned `Observable`
+- [BREAKING] `iexec.deal.obsDeal()` now returns `Promise<Observable>` previously it returned `Observable`
 - [DEPRECATED] `iexec wallet getETH` is now an alias to `iexec wallet get-ether` and will be removed in a next version
 - [DEPRECATED] `iexec wallet getRLC` is now an alias to `iexec wallet get-RLC` and will be removed in a next version
 - [DEPRECATED] `iexec wallet sendETH` is now an alias to `iexec wallet send-ether` and will be removed in a next version
@@ -140,7 +180,7 @@ All notable changes to this project will be documented in this file.
 - fix `fetchWorkerpoolOrderbook()` to include `requester` restricted workerpoolorders (fix `app run` using requester restricted workerpoolorder)
 - fix `iexec app run` `--gas-price` option
 - removed `mrenclave` from app default template
-- `iexec appr run --watch` and `iexec deal show --watch` added tasks status details
+- `iexec run --watch` and `iexec deal show --watch` added tasks status details
 
 ### Removed
 
@@ -185,7 +225,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- `id` is no longer requred in `chain.json`
+- `id` is no longer required in `chain.json`
 - passing `chainId` to `--chain [chainName]` will support only the following values: `1` for `mainnet`, `5` for `goerli`, `134` for `bellecour`, `133` for `viviani`
 - CLI `native` chain key no longer set default gasPrice to 0, use key `"useGas": false` to force default gasPrice to 0
 - lib `isNative` option no longer set default gasPrice to 0, use option `useGas: false` to force default gasPrice to 0
@@ -210,8 +250,8 @@ All notable changes to this project will be documented in this file.
 - fixed multiaddr format machine to human
 - fixed requester stake too low error message for matching orders
 - update `Web3ProviderError` messages
-- `iexec orderbook workerpool [address]` `--category <catid>` is now optionnal
-- `iexec orderbook requester [address]` `--category <catid>` is now optionnal
+- `iexec orderbook workerpool [address]` `--category <catid>` is now optional
+- `iexec orderbook requester [address]` `--category <catid>` is now optional
 - [DEPRECATED] `iexec.orderbook.fetchWorkerpoolOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchWorkerpoolOrderbook(options)`
 - [DEPRECATED] `iexec.orderbook.fetchRequestOrderbook(category, options)` is deprecated, use `category` as an option of `iexec.orderbook.fetchRequestOrderbook(options)`
 - [DEPRECATED] `iexec.orderbook.fetchAppOrderbook()` returned value `appOrders` is deprecated, use `orders`
@@ -259,9 +299,9 @@ All notable changes to this project will be documented in this file.
   - `iexec.dataset.pushDatasetSecret(datasetAddress, secret)` push the dataset key to the SMS
   - `iexec.dataset.checkDatasetSecretExists(datasetAddress)` check if the dataset key exists in the SMS
 - result encryption key management in js lib
-  - `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficary result encryption key to the SMS
-  - `iexec.result.updateResultEncryptionKey(rsaPubKey)` update the beneficary result encryption key in the SMS
-  - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficary result encryption key exists in the SMS
+  - `iexec.result.pushResultEncryptionKey(rsaPubKey)` push the beneficiary result encryption key to the SMS
+  - `iexec.result.updateResultEncryptionKey(rsaPubKey)` update the beneficiary result encryption key in the SMS
+  - `iexec.result.checkResultEncryptionKeyExists(address)` check if the beneficiary result encryption key exists in the SMS
   - `utils.decryptResult(encryptedResultFile, beneficiaryKey)` decrypt encrypted result with RSA beneficiary key
 - requestorder check to prevent runtime errors
   - `iexec order sign`, `iexec order publish`, `iexec order fill` and `iexec app run` perform advanced check on request (use option `--skip-request-check` to disable)
@@ -269,15 +309,15 @@ All notable changes to this project will be documented in this file.
 - `--decrypt` option added `iexec task show <taskid> --download --decrypt` allow to decrypt downloaded result
 - `--watch` option added to `iexec deal show <dealid>` allow to watch execution status changes
 - default values for `order.createApporder()`, `order.createDatasetorder()`, `order.createWorkerpoolorder()` and `order.createRequestorder()`.
-- support for units in `parseEth()` & `parseRLC()` methods
+- support for units in `parseEth()` and `parseRLC()` methods
 
 ### Changed
 
-- [BREAKING] `iexec app show <index>` & `app.showUserApp(index)` first index is `0` previously was `1`
-- [BREAKING] `iexec dataset show <index>` & `dataset.showUserDataset(index)` first index is `0` previously was `1`
-- [BREAKING] `iexec workerpool show <index>` & `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec app show <index>` and `app.showUserApp(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec dataset show <index>` and `dataset.showUserDataset(index)` first index is `0` previously was `1`
+- [BREAKING] `iexec workerpool show <index>` and `dataset.showUserWorkerpool(index)` first index is `0` previously was `1`
 - [BREAKING] `iexec dataset check-secret` returned json key is now `isSecretSet` previously was `isKnownAddress`
-- [BREAKING] `iexec task show` & `task.show(taskid)` returned `task.results` is an object previously was url or hexString
+- [BREAKING] `iexec task show` and `task.show(taskid)` returned `task.results` is an object previously was url or hexString
 - [BREAKING] `iexec app run` option `--dataset <address|"deployed">` using last deployed dataset is no more implicit
 - [BREAKING] `iexec app run` option `--workerpool <address|"deployed">` using last deployed workerpool is no more implicit
 - [BREAKING] `bridge.bridgedChainId` is now used to override bridged chain chainId in `iexec.json` previously `bridge.bridgedNetworkId` was used
@@ -288,7 +328,7 @@ All notable changes to this project will be documented in this file.
 - access to the blockchain through ethers default provider
 - standardized CLI messages format
 - fixed mutation in order sign methods
-- fixed `iexec wallet sweep` & `wallet.sweep()`
+- fixed `iexec wallet sweep` and `wallet.sweep()`
 - fixed method name `iexec.order.publishWorkerpoolorder()`
 - fixed method name `iexec.order.unpublishWorkerpoolorder()`
 
@@ -353,7 +393,7 @@ All notable changes to this project will be documented in this file.
 - `iexec wallet bridge-to-sidechain <nRlcAmount>` sending RLC from a mainchain to the bridged sidechain.
 - `iexec wallet bridge-to-mainchain <nRlcAmount>` sending RLC from a sidechain to the bridged mainchain.
 - optional bridge configuration in `chain.json`
-- brindging RLC between mainchain an sidechain may throw `BridgeError`
+- bridging RLC between mainchain an sidechain may throw `BridgeError`
 - `deal.claim(dealid)` and `iexec deal claim` to claim all failed of a deal
 - `utils.getSignerFromPrivateKey()` creates a signer provider for server side applications
 
@@ -362,12 +402,12 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec order init --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec order sign --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec order cancel --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order fill --raw` volume in output is now formated as decimal string, previously was hexadecimal string.
+- [BREAKING] `iexec order fill --raw` volume in output is now formatted as decimal string, previously was hexadecimal string.
 - [BREAKING] `iexec order publish --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
-- [BREAKING] `iexec order unpublis --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
+- [BREAKING] `iexec order unpublish --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec order show --raw` output is now a single json `{ok, apporder, datasetorder, workerpoolorder, requestorder, fail: [...errors]}`.
 - [BREAKING] `iexec registry validate <object> --raw` output is now a single json `{ok, validated: [...fileNames], fail: [...errors]}`.
-- [BREAKING] Ethereum public key representation changed, first byte `04` is no longuer skipped.
+- [BREAKING] Ethereum public key representation changed, first byte `04` is no longer skipped.
 - [BREAKING] `app.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `dataset.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
 - [BREAKING] `workerpool.deploy()` promise now resolves as `{address, txHash}`, previously was `address`.
@@ -378,7 +418,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-- [BREAKING] currated utils
+- [BREAKING] curated utils
 - [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 
 ## [3.1.1] - 2019-10-17
@@ -408,9 +448,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- [BREAKING] droped support for nodejs v8 added support for nodejs v14
+- [BREAKING] dropped support for nodejs v8 added support for nodejs v14
 - [BREAKING] `iexec tee` subcommands removed and replaced
-  - `iexec tee init` is replaced by `ìexec dataset init --encrypted`
+  - `iexec tee init` is replaced by `iexec dataset init --encrypted`
   - `iexec tee encrypt-dataset` is replaced by `iexec dataset encrypt`
   - `iexec tee generate-beneficiary-keys` is replaced by `iexec result generate-key`
   - `iexec tee decrypt-result` is replaced by `iexec result decrypt`
@@ -432,11 +472,11 @@ All notable changes to this project will be documented in this file.
 - [DEPRECATED] `hub.createObj()` is replaced by dedicated methods of `IExec`: `app.deployApp()`, `dataset.deployDataset()`, `workerpool.deployWorkerpool()`
 - [DEPRECATED] `hub.countObj()` is replaced by dedicated methods of `IExec`: `app.countUserApps()`, `dataset.countUserDatasets()`, `workerpool.countUserWorkerpools()`
 - [DEPRECATED] `hub.showObj()` is replaced by dedicated methods of `IExec`: `hub.countUserApps()`, `hub.countUserDatasets()`, `hub.countUserWorkerpools()`
-- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` use `IExec` methods `app.showUserApp(index, userAddress)` or `app.showApp(appAddress)`
-- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` please use `IExec` method `dataset.showUserDataset(index, userAddress)` or `dataset.showDataset(contracts, datasetAddress)`
-- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `ìndex` and `userAdress` please use `IExec` method `workerpool.showUserWorkerpool(index, userAddress)` or `workerpool.showWorkerpool(workerpoolAddress)`
-- [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAdress` is no longer required, please use `IExec` method `task.claim(taskid)`
-- [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAdress` is no longer required, please use `IExec` method `task.fetchResults(taskid, options)`
+- [DEPRECATED] `hub.showApp(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` use `IExec` methods `app.showUserApp(index, userAddress)` or `app.showApp(appAddress)`
+- [DEPRECATED] `hub.showDataset(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` please use `IExec` method `dataset.showUserDataset(index, userAddress)` or `dataset.showDataset(contracts, datasetAddress)`
+- [DEPRECATED] `hub.showWorkerpool(contracts, objAddressOrIndex, userAddress)` will stop support params `index` and `userAddress` please use `IExec` method `workerpool.showUserWorkerpool(index, userAddress)` or `workerpool.showWorkerpool(workerpoolAddress)`
+- [DEPRECATED] `task.claim(contracts, taskid, userAddress)` `userAddress` is no longer required, please use `IExec` method `task.claim(taskid)`
+- [DEPRECATED] `task.fetchResults(contracts, taskid, userAddress, options)` `userAddress` is no longer required, please use `IExec` method `task.fetchResults(taskid, options)`
 - Update `multiaddr@6.1.0` to `multiaddr@7.1.0`: `/ipfs` protocol 421 is now displayed `/p2p`
 - fix everyone can claim a task
 - fix `iexec task show` oracle results hexadecimal display (#88)
@@ -444,7 +484,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-- [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the ouptup.
+- [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the output.
 - [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
 
 ## [3.0.36] - 2019-09-24
@@ -482,13 +522,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- request orders are no longer initialized with formated params
+- request orders are no longer initialized with formatted params
 
 ## [3.0.33] - 2019-06-25
 
 ### Added
 
-- `iexec tee encrypt-dataset --algorithm <'aes-256-cbc'|'scone'>` allow to choose encryption methode, default is aes-256-cbc.
+- `iexec tee encrypt-dataset --algorithm <'aes-256-cbc'|'scone'>` allow to choose encryption method, default is aes-256-cbc.
   `--algorithm scone` allow an encrypted dataset to be processed into a SGX enclave by a Scone compatible dapp.
 
 ### Changed
@@ -524,7 +564,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- beneficary keys generated by `ìexec tee generate-beneficiary-keys` now use AES 256 (previously AES 128).
+- beneficiary keys generated by `iexec tee generate-beneficiary-keys` now use AES 256 (previously AES 128).
 
 ## [3.0.29] - 2019-05-15
 

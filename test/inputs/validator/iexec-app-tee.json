@@ -22,7 +22,7 @@
     "multiaddr": "registry.hub.docker.com/iexechub/vanityeth:1.1.1",
     "checksum": "0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14",
     "mrenclave": {
-      "provider": "SCONE",
+      "framework": "SCONE",
       "version": "v5",
       "entrypoint": "python /app/app.py",
       "heapSize": 1073741824,

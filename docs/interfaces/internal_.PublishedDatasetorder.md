@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / PublishedDatasetorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / PublishedDatasetorder
 
 # Interface: PublishedDatasetorder
 
-[{internal}](../modules/internal_.md).PublishedDatasetorder
+[<internal>](../modules/internal_.md).PublishedDatasetorder
 
 published sell order for a dataset
 

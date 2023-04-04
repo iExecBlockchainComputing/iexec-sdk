@@ -1,10 +1,10 @@
-const Debug = require('debug');
-const { defaultAbiCoder, keccak256 } = require('ethers').utils;
-const { showCategory } = require('../protocol/category');
-const { getTimeoutRatio } = require('../protocol/configuration');
-const { ethersBnToBn, BN, checkSigner } = require('../utils/utils');
-const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
-const {
+import Debug from 'debug';
+import { utils } from 'ethers';
+import { showCategory } from '../protocol/category.js';
+import { getTimeoutRatio } from '../protocol/configuration.js';
+import { ethersBnToBn, BN, checkSigner } from '../utils/utils.js';
+import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
+import {
   chainIdSchema,
   addressSchema,
   bytes32Schema,
@@ -12,21 +12,23 @@ const {
   positiveIntSchema,
   positiveStrictIntSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const {
+} from '../utils/validator.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import {
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
   REQUEST_ORDER,
-} = require('../utils/constant');
-const { viewDeal, viewTask } = require('./common');
-const { obsTask } = require('./task');
-const { Observable, SafeObserver } = require('../utils/reactive');
+} from '../utils/constant.js';
+import { viewDeal, viewTask } from './common.js';
+import { obsTask } from './task.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+
+const { defaultAbiCoder, keccak256 } = utils;
 
 const debug = Debug('iexec:execution:deal');
 
-const fetchRequesterDeals = async (
+export const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
@@ -81,7 +83,7 @@ const fetchRequesterDeals = async (
   }
 };
 
-const computeTaskId = async (
+export const computeTaskId = async (
   dealid = throwIfMissing(),
   taskIdx = throwIfMissing(),
 ) => {
@@ -92,8 +94,7 @@ const computeTaskId = async (
       await uint256Schema().validate(taskIdx),
     ];
     const encoded = defaultAbiCoder.encode(encodedTypes, values);
-    const taskid = keccak256(encoded);
-    return taskid;
+    return keccak256(encoded);
   } catch (error) {
     debug('computeTaskId()', error);
     throw error;
@@ -109,13 +110,10 @@ const computeTaskIdsArray = async (
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
   const vBotSize = await positiveStrictIntSchema().validate(botSize);
   const tasksIdx = [...Array(vBotSize).keys()].map((n) => n + vFirstTaskIdx);
-  const taskids = await Promise.all(
-    tasksIdx.map((idx) => computeTaskId(vDealid, idx)),
-  );
-  return taskids;
+  return Promise.all(tasksIdx.map((idx) => computeTaskId(vDealid, idx)));
 };
 
-const show = async (
+export const show = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
 ) => {
@@ -135,14 +133,13 @@ const show = async (
       deal.botFirst.toString(),
       deal.botSize.toString(),
     );
-    const enhancedDeal = {
+    return {
       dealid: vDealid,
       ...deal,
       finalTime,
       deadlineReached,
       tasks,
     };
-    return enhancedDeal;
   } catch (error) {
     debug('show()', error);
     throw error;
@@ -155,7 +152,10 @@ const obsDealMessages = {
   DEAL_TIMEDOUT: 'DEAL_TIMEDOUT',
 };
 
-const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) =>
+export const obsDeal = (
+  contracts = throwIfMissing(),
+  dealid = throwIfMissing(),
+) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
     let taskWatchers = [];
@@ -215,7 +215,7 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) =>
             },
             error: (e) => {
               safeObserver.error(e);
-              taskWatchers.map((unsub) => unsub());
+              taskWatchers.forEach((unsub) => unsub());
             },
           }),
         );
@@ -225,13 +225,16 @@ const obsDeal = (contracts = throwIfMissing(), dealid = throwIfMissing()) =>
     };
 
     safeObserver.unsub = () => {
-      taskWatchers.map((unsub) => unsub());
+      taskWatchers.forEach((unsub) => unsub());
     };
     startWatch();
     return safeObserver.unsubscribe.bind(safeObserver);
   });
 
-const claim = async (
+const numericStringPropAscSort = (propName) => (a, b) =>
+  parseInt(a[propName], 10) > parseInt(b[propName], 10) ? 1 : -1;
+
+export const claim = async (
   contracts = throwIfMissing(),
   dealid = throwIfMissing(),
 ) => {
@@ -265,12 +268,9 @@ const claim = async (
     );
     if (initialized.length === 0 && notInitialized.length === 0)
       throw Error('Nothing to claim');
-    initialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
-    notInitialized.sort((a, b) =>
-      parseInt(a.idx, 10) > parseInt(b.idx, 10) ? 1 : -1,
-    );
+
+    initialized.sort(numericStringPropAscSort('idx'));
+    notInitialized.sort(numericStringPropAscSort('idx'));
     const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
     const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
@@ -353,7 +353,7 @@ const apiDealField = {
   [REQUEST_ORDER]: 'requestorderHash',
 };
 
-const fetchDealsByOrderHash = async (
+export const fetchDealsByOrderHash = async (
   iexecGatewayURL = throwIfMissing(),
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
@@ -375,18 +375,9 @@ const fetchDealsByOrderHash = async (
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
     }
-    throw Error('An error occured while getting deals');
+    throw Error('An error occurred while getting deals');
   } catch (error) {
     debug('fetchDealsByOrderHash()', error);
     throw error;
   }
-};
-
-module.exports = {
-  show,
-  obsDeal,
-  computeTaskId,
-  fetchRequesterDeals,
-  fetchDealsByOrderHash,
-  claim,
 };

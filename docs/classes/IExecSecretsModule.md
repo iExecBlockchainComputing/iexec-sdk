@@ -38,7 +38,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -61,7 +61,7 @@ current IExecConfig
 
 ### checkRequesterSecretExists
 
-▸ **checkRequesterSecretExists**(`requesterAddress`, `secretName`): `Promise`<`boolean`\>
+▸ **checkRequesterSecretExists**(`requesterAddress`, `secretName`, `options?`): `Promise`<`boolean`\>
 
 check if a named secret exists for the requester in the Secret Management Service
 
@@ -77,6 +77,8 @@ console.log('secret "my-password" set:', isSecretSet);
 | :------ | :------ |
 | `requesterAddress` | `string` |
 | `secretName` | `String` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -86,7 +88,7 @@ ___
 
 ### pushRequesterSecret
 
-▸ **pushRequesterSecret**(`secretName`, `secretValue`): `Promise`<{ `isPushed`: `boolean`  }\>
+▸ **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`<{ `isPushed`: `boolean`  }\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -108,6 +110,8 @@ console.log('pushed secret "my-password":', isPushed);
 | :------ | :------ |
 | `secretName` | `String` |
 | `secretValue` | `String` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 

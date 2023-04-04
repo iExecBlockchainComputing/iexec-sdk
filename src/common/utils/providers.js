@@ -1,7 +1,7 @@
-const { getDefaultProvider, providers } = require('ethers');
-const { getChainDefaults, getId } = require('./config');
+import { getDefaultProvider, providers } from 'ethers';
+import { getChainDefaults, getId } from './config.js';
 
-const getReadOnlyProvider = (host, options = {}) => {
+export const getReadOnlyProvider = (host, options = {}) => {
   const providerOptions = options.providers || {};
   const networkOptions = options.network;
   let resolvedHost = host;
@@ -39,8 +39,4 @@ const getReadOnlyProvider = (host, options = {}) => {
       Object.fromEntries(nonConfiguredProviders.map((name) => [name, '-']))),
     ...providersOptionsRest,
   });
-};
-
-module.exports = {
-  getReadOnlyProvider,
 };

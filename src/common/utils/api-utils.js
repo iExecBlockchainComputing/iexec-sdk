@@ -1,8 +1,8 @@
-const Debug = require('debug');
-const fetch = require('cross-fetch');
-const qs = require('query-string');
-const { hashEIP712 } = require('./sig-utils');
-const { wrapSignTypedData } = require('./errorWrappers');
+import Debug from 'debug';
+import fetch from 'cross-fetch';
+import querystring from 'query-string';
+import { hashEIP712 } from './sig-utils.js';
+import { wrapSignTypedData } from './errorWrappers.js';
 
 const debug = Debug('iexec:api-utils');
 
@@ -16,9 +16,9 @@ const makeBody = (method, body) => {
   return {};
 };
 
-const makeQueryString = (method, queryParams) => {
+const makeQueryString = (queryParams) => {
   if (Object.keys(queryParams).length !== 0) {
-    return '?'.concat(qs.stringify(queryParams));
+    return '?'.concat(querystring.stringify(queryParams));
   }
   return '';
 };
@@ -32,7 +32,7 @@ const makeHeaders = (method, headers, body) => {
   return { headers: { ...generatedHeaders, ...headers } };
 };
 
-const httpRequest =
+export const httpRequest =
   (method) =>
   async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
     debug(
@@ -51,9 +51,9 @@ const httpRequest =
       headers,
     );
     const baseURL = new URL(endpoint, api).href;
-    const queryString = makeQueryString(method, query);
+    const queryString = makeQueryString(query);
     const url = baseURL.concat(queryString);
-    const response = await fetch(url, {
+    return fetch(url, {
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
@@ -61,7 +61,6 @@ const httpRequest =
       debug(`httpRequest() fetch:`, error);
       throw Error(`Connection to ${baseURL} failed with a network error`);
     });
-    return response;
   };
 
 const checkResponseOk = (response) => {
@@ -79,8 +78,7 @@ const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     if (response.ok) {
-      const json = await response.json();
-      return json;
+      return response.json();
     }
     const errorMessage = await response
       .json()
@@ -103,7 +101,7 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
-const wrapPaginableRequest = (request) => async (args) =>
+export const wrapPaginableRequest = (request) => async (args) =>
   request(args).then(({ nextPage, ...rest }) => ({
     ...rest,
     ...(nextPage && {
@@ -115,7 +113,7 @@ const wrapPaginableRequest = (request) => async (args) =>
     }),
   }));
 
-const jsonApi = {
+export const jsonApi = {
   get: (args) =>
     httpRequest('GET')({
       ...args,
@@ -133,20 +131,15 @@ const jsonApi = {
     }).then(responseToJson),
 };
 
-const downloadZipApi = {
+export const downloadZipApi = {
   get: (args) =>
     httpRequest('GET')({
       ...args,
       ...{ headers: { Accept: 'application/zip', ...args.headers } },
     }).then(checkResponseOk),
-  post: (args) =>
-    httpRequest('POST')({
-      ...args,
-      ...{ headers: { Accept: 'application/zip', ...args.headers } },
-    }).then(checkResponseOk),
 };
 
-const getAuthorization =
+export const getAuthorization =
   (api, endpoint = '/challenge') =>
   async (chainId, address, signer) => {
     try {
@@ -174,22 +167,13 @@ const getAuthorization =
       );
       const hash = hashEIP712(typedData);
       const separator = '_';
-      const authorization = hash
+      return hash
         .concat(separator)
         .concat(sign)
         .concat(separator)
         .concat(address);
-      return authorization;
     } catch (error) {
       debug('getAuthorization()', error);
       throw Error(`Failed to get authorization: ${error}`);
     }
   };
-
-module.exports = {
-  wrapPaginableRequest,
-  httpRequest,
-  jsonApi,
-  downloadZipApi,
-  getAuthorization,
-};

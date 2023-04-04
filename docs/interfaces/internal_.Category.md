@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / Category
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Category
 
 # Interface: Category
 
-[{internal}](../modules/internal_.md).Category
+[<internal>](../modules/internal_.md).Category
 
 IExec category
 

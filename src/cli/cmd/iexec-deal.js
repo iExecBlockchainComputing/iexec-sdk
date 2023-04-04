@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const { show, obsDeal, claim } = require('../../common/execution/deal');
-const { stringifyNestedBn } = require('../../common/utils/utils');
-const {
+import { program as cli } from 'commander';
+import { show, obsDeal, claim } from '../../common/execution/deal.js';
+import { stringifyNestedBn } from '../../common/utils/utils.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -17,9 +17,9 @@ const {
   info,
   pretty,
   renderTasksStatus,
-} = require('../utils/cli-helper');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
+} from '../utils/cli-helper.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
 
 const objName = 'deal';
 
@@ -102,7 +102,7 @@ claimDeal
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });

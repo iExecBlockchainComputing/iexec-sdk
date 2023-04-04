@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).BridgeError
 
-BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfert confirmation.
+BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfer confirmation.
 
 ## Hierarchy
 

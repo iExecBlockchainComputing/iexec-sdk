@@ -21,7 +21,7 @@ All three major OS are supported (linux, OSX, windows).
 
 ## Using Nodejs
 
-Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.0.0-brightgreen.svg)](https://nodejs.org/en/).
+Requirements: [![npm version](https://img.shields.io/badge/nodejs-%3E=14.17.0-brightgreen.svg)](https://nodejs.org/en/).
 
 ```bash
 npm -g install iexec # install the cli
@@ -69,7 +69,7 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchains (mainnet & goerli) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+> _NB:_ iExec SDK CLI access the public blockchain (mainnet) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
 > Default API keys for backend services are provided for convenience.
 > As these keys are shared across all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
@@ -107,10 +107,6 @@ iexec storage init # initialize your remote storage
 >       "mainnet": {
 >         "id": "1",
 >         "host": "http://localhost:8545"
->       },
->       "goerli": {
->         "id": "5",
->         "host": "http://localhost:58545"
 >       }
 >    }
 > }
@@ -387,7 +383,7 @@ The `iexec.json` file, located in every iExec project, describes the parameters 
       "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "beneficiary": "0x0000000000000000000000000000000000000000",
       "callback": "0x0000000000000000000000000000000000000000",
-      "params": "{ cmdline: '--help' }"
+      "params": "{ \"iexec_args\": \"--help\" }"
     }
   }
 }
@@ -401,7 +397,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 - `chains` set the available chains
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
-  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
+  - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value), this key accepts a string or a mapping TEE framework - SMS url.
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
@@ -416,12 +412,14 @@ The `chain.json` file, located in every iExec project, describes the parameters 
 
 ```json
 {
-  "default": "viviani",
+  "default": "bellecour",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "standard",
@@ -437,7 +435,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-sidechain": {
       "host": "http://localhost:18545",
       "id": "123456",
-      "sms": "http://localhost:15000",
+      "sms": {
+        "scone": "http://localhost:15000"
+      },
       "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
@@ -452,7 +452,9 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev-enterprise": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": "http://localhost:5000",
+      "sms": {
+        "scone": "http://localhost:5000"
+      },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "flavour": "enterprise",
@@ -461,11 +463,8 @@ The `chain.json` file, located in every iExec project, describes the parameters 
         "enterpriseSwapChainName": "dev"
       }
     },
-    "goerli": {},
-    "viviani": {},
     "mainnet": {},
-    "bellecour": {},
-    "enterprise": {}
+    "bellecour": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",

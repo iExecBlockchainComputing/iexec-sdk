@@ -1,18 +1,18 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule.js';
+import {
   getOwner,
   resolveName,
   lookupAddress,
-} = require('../common/ens/resolution');
-const {
+} from '../common/ens/resolution.js';
+import {
   registerFifsEns,
   obsConfigureResolution,
   configureResolution,
   getDefaultDomain,
-} = require('../common/ens/registration');
-const { setTextRecord, readTextRecord } = require('../common/ens/text-record');
+} from '../common/ens/registration.js';
+import { setTextRecord, readTextRecord } from '../common/ens/text-record.js';
 
-class IExecENSModule extends IExecModule {
+export default class IExecENSModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -55,5 +55,3 @@ class IExecENSModule extends IExecModule {
       readTextRecord(await this.config.resolveContractsClient(), name, key);
   }
 }
-
-module.exports = IExecENSModule;
