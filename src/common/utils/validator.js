@@ -20,6 +20,7 @@ import {
   STORAGE_PROVIDERS,
   ANY,
 } from './constant.js';
+import { isAddress } from 'ethers/lib/utils.js';
 
 const { getAddress, namehash } = utils;
 
@@ -139,238 +140,95 @@ export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
 export const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
+const transformAddressOrEns = (ethProvider) => (value) => {
+  try {
+    if (typeof value === 'string') {
+      if (value.match(/^.*\.eth$/)) {
+        if (
+          ethProvider &&
+          ethProvider.resolveName &&
+          typeof ethProvider.resolveName === 'function'
+        ) {
+          debug('resolving ENS', value);
+          return wrapCall(ethProvider.resolveName(value))
+            .then((resolved) => {
+              debug('resolved ENS', resolved);
+              return resolved;
+            })
+            .catch((error) => {
+              debug('ENS resolution error', error);
+              return null;
+            });
+        }
+        debug("no ethProvider ENS can't be resolved");
+      }
+      return getAddress(value.toLowerCase());
+    }
+  } catch (e) {
+    debug('Error', e);
+  }
+  return value;
+};
+
+const testResolveEnsPromise = async (value) => {
+  if (value === undefined) {
+    return true;
+  }
+  if (typeof value === 'string') {
+    return !value.match(/^.*\.eth$/);
+  }
+  try {
+    const address = await value;
+    if (!address) return false;
+    getAddress(address);
+    return true;
+  } catch (e) {
+    debug('resolve-ens', e);
+    return false;
+  }
+};
+
+const testAddressOrAddressPromise = async (value) => {
+  const resolvedValue = typeof value === 'string' ? value : await value;
+  return isAddress(resolvedValue);
+};
+
 export const addressSchema = ({ ethProvider } = {}) =>
   mixed()
-    .transform((value) => {
-      try {
-        if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            if (
-              ethProvider &&
-              ethProvider.resolveName &&
-              typeof ethProvider.resolveName === 'function'
-            ) {
-              debug('resolving ENS', value);
-              return wrapCall(ethProvider.resolveName(value))
-                .then((resolved) => {
-                  debug('resolved ENS', resolved);
-                  return resolved;
-                })
-                .catch((error) => {
-                  debug('ENS resolution error', error);
-                  return null;
-                });
-            }
-            debug("no ethProvider ENS can't be resolved");
-          }
-          return getAddress(value.toLowerCase());
-        }
-      } catch (e) {
-        debug('Error', e);
-      }
-      return value;
-    })
-    .test(
-      'resolve-ens',
-      'Unable to resolve ENS ${originalValue}',
-      async (value) => {
-        if (value === undefined) {
-          return true;
-        }
-        if (typeof value === 'string') {
-          return !value.match(/^.*\.eth$/);
-        }
-        try {
-          const address = await value;
-          if (!address) return false;
-          getAddress(address);
-          return true;
-        } catch (e) {
-          debug('resolve-ens', e);
-          return false;
-        }
-      },
+    .transform((value) => transformAddressOrEns(ethProvider)(value))
+    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) =>
+      testResolveEnsPromise(value),
     )
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
-      async (value) => {
-        const resolvedValue = typeof value === 'string' ? value : await value;
-        try {
-          getAddress(resolvedValue);
-          return true;
-        } catch (e) {
-          return false;
-        }
-      },
+      (value) => testAddressOrAddressPromise(value),
     );
 
 export const addressOrAnySchema = ({ ethProvider } = {}) =>
   mixed()
     .transform((value) => {
-      try {
-        if (value === ANY) {
-          return value;
-        }
-        if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            if (
-              ethProvider &&
-              ethProvider.resolveName &&
-              typeof ethProvider.resolveName === 'function'
-            ) {
-              debug('resolving ENS', value);
-              return wrapCall(ethProvider.resolveName(value))
-                .then((resolved) => {
-                  debug('resolved ENS', resolved);
-                  return resolved;
-                })
-                .catch((error) => {
-                  debug('ENS resolution error', error);
-                  return null;
-                });
-            }
-            debug("no ethProvider ENS can't be resolved");
-          }
-          return getAddress(value.toLowerCase());
-        }
-      } catch (e) {
-        debug('Error', e);
+      if (value === ANY) {
+        return value;
       }
-      return value;
+      return transformAddressOrEns(ethProvider)(value);
     })
-    .test(
-      'resolve-ens',
-      'Unable to resolve ENS ${originalValue}',
-      async (value) => {
-        if (value === ANY) {
-          return true;
-        }
-        if (value === undefined) {
-          return true;
-        }
-        if (typeof value === 'string') {
-          return !value.match(/^.*\.eth$/);
-        }
-        try {
-          const address = await value;
-          if (!address) return false;
-          getAddress(address);
-          return true;
-        } catch (e) {
-          debug('resolve-ens', e);
-          return false;
-        }
-      },
-    )
+    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) => {
+      if (value === ANY) {
+        return true;
+      }
+      return testResolveEnsPromise(value);
+    })
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
-      async (value) => {
+      (value) => {
         if (value === ANY) {
           return true;
         }
-        const resolvedValue = typeof value === 'string' ? value : await value;
-        try {
-          getAddress(resolvedValue);
-          return true;
-        } catch (e) {
-          return false;
-        }
+        return testAddressOrAddressPromise(value);
       },
     );
-
-//   const transformAddressOrEns =
-//   ({ ethProvider } = {}) =>
-//   (value) => {
-//     try {
-//       if (typeof value === 'string') {
-//         if (value.match(/^.*\.eth$/)) {
-//           if (
-//             ethProvider &&
-//             ethProvider.resolveName &&
-//             typeof ethProvider.resolveName === 'function'
-//           ) {
-//             debug('resolving ENS', value);
-//             return wrapCall(ethProvider.resolveName(value))
-//               .then((resolved) => {
-//                 debug('resolved ENS', resolved);
-//                 return resolved;
-//               })
-//               .catch((error) => {
-//                 debug('ENS resolution error', error);
-//                 return null;
-//               });
-//           }
-//           debug("no ethProvider ENS can't be resolved");
-//         }
-//         return getAddress(value.toLowerCase());
-//       }
-//     } catch (e) {
-//       debug('Error', e);
-//     }
-//     return value;
-//   };
-
-// export const addressSchema = ({ ethProvider } = {}) =>
-//   mixed()
-//     .transform((value) => transformAddressOrEns({ ethProvider })(value))
-//     .test({
-//       name: 'is-address-or-ens',
-//       test: async (value, ctx) => {
-//         if (
-//           typeof ctx.originalValue === 'string' &&
-//           ctx.originalValue.match(/^.*\.eth$/)
-//         ) {
-//           debug(`ens ${ctx.originalValue}`);
-//           const resolvedValue = await value;
-//           isAddress(resolvedValue) ||
-//             ctx.createError({
-//               message: 'Unable to resolve ENS ${originalValue}',
-//             });
-//         }
-//         if (typeof value === 'string') {
-//           return (
-//             isAddress(value) ||
-//             ctx.createError({
-//               message: '${originalValue} is not a valid ethereum address',
-//             })
-//           );
-//         }
-//       },
-//     });
-
-// const isAny = (value) => value === ANY;
-
-// export const addressOrAnySchema = ({ ethProvider } = {}) =>
-//   mixed()
-//     .transform((value) => {
-//       if (isAny(value)) return value;
-//       return transformAddressOrEns({ ethProvider })(value);
-//     })
-//     .test({
-//       name: 'is-address-or-ens-or-any',
-//       test: async (value, ctx) => {
-//         if (isAny(value)) {
-//           return true;
-//         }
-//         if (typeof value === 'string') {
-//           return (
-//             isAddress(value) ||
-//             ctx.createError({
-//               message: '${originalValue} is not a valid ethereum address',
-//             })
-//           );
-//         }
-//         const resolvedValue = await value;
-//         return (
-//           isAddress(resolvedValue) ||
-//           ctx.createError({
-//             message: 'Unable to resolve ENS ${originalValue}',
-//           })
-//         );
-//       },
-//     });
 
 export const bytes32Schema = () =>
   string()
