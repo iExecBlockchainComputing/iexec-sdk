@@ -45,3 +45,5 @@ export const IEXEC_REQUEST_PARAMS = {
   IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
   IEXEC_DEVELOPER_LOGGER: 'iexec_developer_logger',
 };
+
+export const ANY = 'any';
