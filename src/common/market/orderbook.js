@@ -2,6 +2,7 @@ import Debug from 'debug';
 import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
 import {
   addressSchema,
+  addressOrAnySchema,
   chainIdSchema,
   uint256Schema,
   positiveIntSchema,
@@ -25,17 +26,17 @@ export const fetchAppOrderbook = async (
         ethProvider: contracts.provider,
       }).validate(app),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -77,17 +78,17 @@ export const fetchDatasetOrderbook = async (
         ethProvider: contracts.provider,
       }).validate(dataset),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -142,17 +143,17 @@ export const fetchWorkerpoolOrderbook = async (
         }).validate(workerpool),
       }),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -230,7 +231,7 @@ export const fetchRequestOrderbook = async (
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
