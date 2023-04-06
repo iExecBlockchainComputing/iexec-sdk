@@ -26,6 +26,7 @@ import {
   workerpoolApiUrlSchema,
   smsUrlOrMapSchema,
   teeFrameworkSchema,
+  addressOrAnySchema,
 } from '../src/common/utils/validator';
 
 const { readFile } = fsExtra;
@@ -990,6 +991,74 @@ describe('[addressSchema]', () => {
   });
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
+      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
+    );
+  });
+});
+
+describe('[addressOrAnySchema]', () => {
+  test('any', async () => {
+    await expect(addressOrAnySchema().validate('any')).resolves.toBe('any');
+  });
+  test('address', async () => {
+    await expect(
+      addressOrAnySchema().validate(
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address 0x stripped', async () => {
+    await expect(
+      addressOrAnySchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('address (with ethProvider)', async () => {
+    await expect(
+      addressOrAnySchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  });
+  test('invalid address', async () => {
+    await expect(
+      addressOrAnySchema().validate(
+        '0x07F4C5BB672230e8672085532f7e901544a7375',
+      ),
+    ).rejects.toThrow(
+      new ValidationError(
+        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
+      ),
+    );
+  });
+  test('address undefined (throw)', async () => {
+    await expect(
+      addressOrAnySchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate(undefined),
+    ).rejects.toThrow(
+      new ValidationError('undefined is not a valid ethereum address'),
+    );
+  });
+  test('ens (resolve ENS with ethProvider)', async () => {
+    await expect(
+      addressOrAnySchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate('rlc.iexec.eth'),
+    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
+  }, 10000);
+  test('invalid ens (throw when ens is missing)', async () => {
+    await expect(
+      addressOrAnySchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate('pierre.iexec.eth'),
+    ).rejects.toThrow(
+      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
+    );
+  });
+  test('ens (throw when ethProvider is missing)', async () => {
+    await expect(
+      addressOrAnySchema().validate('rlc.iexec.eth'),
+    ).rejects.toThrow(
       new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
