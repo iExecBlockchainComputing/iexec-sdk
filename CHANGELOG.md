@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
 - `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
 - tee framework tags 'scone' & 'gramine'
+- app orderbook accept `"any"` for `dataset`, `workerpool`, `requester` to fetch orderbook without filtering
+- dataset orderbook accept `"any"` for `app`, `workerpool`, `requester` to fetch orderbook without filtering
+- workerpool orderbook accept `"any"` for `app`, `dataset`, `requester` to fetch orderbook without filtering
+- requester orderbook accept `"any"` for `workerpool` to fetch orderbook without filtering
 
 ### Changed
 
