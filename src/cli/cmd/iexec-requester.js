@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-// const Debug = require('debug');
-const cli = require('commander');
-const { checkRequesterSecretExists } = require('../../common/sms/check');
-const { pushRequesterSecret } = require('../../common/sms/push');
-const {
+import { program as cli } from 'commander';
+import { checkRequesterSecretExists } from '../../common/sms/check.js';
+import { pushRequesterSecret } from '../../common/sms/push.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -15,12 +14,11 @@ const {
   option,
   prompt,
   Spinner,
-  getPropertyFormChain,
-} = require('../utils/cli-helper');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
-
-// const debug = Debug('iexec:iexec-requester');
+  getSmsUrlFromChain,
+  optionCreator,
+} from '../utils/cli-helper.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
 
 cli.name('iexec requester').usage('<command> [options]');
 
@@ -30,12 +28,13 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
+  .addOption(optionCreator.teeFramework())
   .description(desc.pushRequesterSecret())
   .action(async (secretName, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(Object.assign(walletOptions));
       const [chain, address] = await Promise.all([
         loadChain(opts.chain, {
@@ -45,8 +44,9 @@ pushSecret
       ]);
       await connectKeystore(chain, keystore);
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
-
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       spinner.info(`Secret "${secretName}" for address ${address}`);
       const secretValue =
         opts.secretValue ||
@@ -77,12 +77,13 @@ addGlobalOptions(checkSecret);
 addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
+  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (secretName, requesterAddress, opts) => {
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, { isSigner: false }),
       );
@@ -99,7 +100,9 @@ checkSecret
         );
       }
       const { contracts } = chain;
-      const sms = getPropertyFormChain(chain, 'sms');
+      const sms = getSmsUrlFromChain(chain, {
+        teeFramework: opts.teeFramework,
+      });
       const secretExists = await checkRequesterSecretExists(
         contracts,
         sms,

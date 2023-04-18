@@ -1,7 +1,7 @@
 import IExecContractsClient from '../common/utils/IExecContractsClient';
 import { EnhancedWallet } from '../common/utils/signers';
 import { ExternalProvider } from '@ethersproject/providers';
-import { ProviderOptions } from './types';
+import { ProviderOptions, TeeFramework } from './types';
 
 export interface IExecConfigArgs {
   /**
@@ -58,11 +58,11 @@ export interface IExecConfigOptions {
      */
     rpcURL?: string;
     /**
-     * IExec contract address on bridgde network
+     * IExec contract address on bridged network
      */
     hubAddress?: string;
     /**
-     * bridge contract address on bridgde network
+     * bridge contract address on bridged network
      */
     bridgeAddress?: string;
   };
@@ -71,7 +71,7 @@ export interface IExecConfigOptions {
    */
   enterpriseSwapConf?: {
     /**
-     * IExec enerprise contract address
+     * IExec enterprise contract address
      */
     hubAddress?: string;
   };
@@ -82,7 +82,11 @@ export interface IExecConfigOptions {
   /**
    * override the SMS URL to target a custom instance
    */
-  smsURL?: string;
+  smsURL?: Record<TeeFramework, string> | string;
+  /**
+   * override the TEE framework to use when as default
+   */
+  defaultTeeFramework?: TeeFramework;
   /**
    * override the IPFS gateway URL to target a custom instance
    */
@@ -109,10 +113,10 @@ export interface IExecConfigOptions {
  * // create the configuration
  * const config = new IExecConfig({ ethProvider: window.ethereum });
  *
- * // instanciate iExec SDK
+ * // instantiate iExec SDK
  * const iexec = IExec.fromConfig(config);
  *
- * // or instanciate IExecModules sharing the same configuration
+ * // or instantiate IExecModules sharing the same configuration
  * const account = IExecAccountModule.fromConfig(config);
  * const wallet = IExecWalletModule.fromConfig(config);
  * ```
@@ -160,7 +164,7 @@ export default class IExecConfig {
   /**
    * resolve the current SMS URL
    */
-  resolveSmsURL(): Promise<string>;
+  resolveSmsURL(options?: { teeFramework?: TeeFramework }): Promise<string>;
   /**
    * resolve the current result proxy URL
    */

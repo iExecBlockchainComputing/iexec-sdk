@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ConsumableRequestorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ConsumableRequestorder
 
 # Interface: ConsumableRequestorder
 
-[{internal}](../modules/internal_.md).ConsumableRequestorder
+[<internal>](../modules/internal_.md).ConsumableRequestorder
 
 signed buy order for computing tasks
 

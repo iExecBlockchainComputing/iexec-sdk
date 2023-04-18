@@ -40,7 +40,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -116,14 +116,14 @@ ___
 
 ▸ **getTimeoutRatio**(): `Promise`<`BN`\>
 
-get the current `TimoutRatio`
+get the current `TimeoutRatio`
 
-`TimoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimoutRatio * workClockTimeRef)
+`TimeoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimeoutRatio * workClockTimeRef)
 
 example:
 ```js
-const timoutRatio = await getTimeoutRatio();
-console.log('timoutRatio:', timoutRatio);
+const timeoutRatio = await getTimeoutRatio();
+console.log('timeoutRatio:', timeoutRatio);
 ```
 
 #### Returns

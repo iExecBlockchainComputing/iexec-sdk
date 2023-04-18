@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / ApporderTemplate
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / ApporderTemplate
 
 # Interface: ApporderTemplate
 
-[{internal}](../modules/internal_.md).ApporderTemplate
+[<internal>](../modules/internal_.md).ApporderTemplate
 
 sell order for an app
 

@@ -1,16 +1,16 @@
-const IExecModule = require('./IExecModule');
-const {
+import IExecModule from './IExecModule.js';
+import {
   deployWorkerpool,
   showWorkerpool,
   showUserWorkerpool,
   countUserWorkerpools,
   predictWorkerpoolAddress,
   checkDeployedWorkerpool,
-} = require('../common/protocol/registries');
-const { setWorkerpoolApiUrl } = require('../common/execution/workerpool');
-const { getWorkerpoolApiUrl } = require('../common/execution/debug');
+} from '../common/protocol/registries.js';
+import { setWorkerpoolApiUrl } from '../common/execution/workerpool.js';
+import { getWorkerpoolApiUrl } from '../common/execution/debug.js';
 
-class IExecWorkerpoolModule extends IExecModule {
+export default class IExecWorkerpoolModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -49,5 +49,3 @@ class IExecWorkerpoolModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecWorkerpoolModule;

@@ -1,8 +1,8 @@
-const {
+import {
   Web3ProviderCallError,
   Web3ProviderSendError,
   Web3ProviderSignMessageError,
-} = require('./errors');
+} from './errors.js';
 
 const PROCESSING_RESPONSE_ERROR = 'processing response error';
 
@@ -24,7 +24,7 @@ const getMessage = (err) => {
   return err.message;
 };
 
-const wrapCall = async (promise) => {
+export const wrapCall = async (promise) => {
   try {
     return await promise;
   } catch (err) {
@@ -32,9 +32,9 @@ const wrapCall = async (promise) => {
   }
 };
 
-const wrapWait = wrapCall;
+export const wrapWait = wrapCall;
 
-const wrapSend = async (promise) => {
+export const wrapSend = async (promise) => {
   try {
     return await promise;
   } catch (err) {
@@ -42,7 +42,7 @@ const wrapSend = async (promise) => {
   }
 };
 
-const wrapSign = async (promise) => {
+export const wrapSign = async (promise) => {
   try {
     return await promise;
   } catch (err) {
@@ -50,14 +50,6 @@ const wrapSign = async (promise) => {
   }
 };
 
-const wrapSignTypedData = wrapSign;
+export const wrapSignTypedData = wrapSign;
 
-const wrapPersonalSign = wrapSign;
-
-module.exports = {
-  wrapCall,
-  wrapSend,
-  wrapWait,
-  wrapPersonalSign,
-  wrapSignTypedData,
-};
+export const wrapPersonalSign = wrapSign;

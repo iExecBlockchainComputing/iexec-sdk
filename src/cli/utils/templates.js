@@ -1,8 +1,8 @@
-const { paramsKeyName } = require('../../common/utils/params-utils');
+import { IEXEC_REQUEST_PARAMS } from '../../common/utils/constant.js';
 
-const main = {
+export const main = {
   description:
-    'My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
+    'My iExec resource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users',
   license: 'MIT',
   author: '?',
   social: {
@@ -12,24 +12,24 @@ const main = {
   logo: 'logo.png',
 };
 
-const app = {
+export const app = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'python-hello-world',
+  name: 'hello-world',
   type: 'DOCKER',
   multiaddr: 'iexechub/python-hello-world:7.0.5',
   checksum:
     '0xaea3f77f09567fa0da20b86d9b7dac3ef958b7d4751a37cfa7cd7851f57ac191',
 };
 
-const teeApp = {
+export const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
-  name: 'tee-python-hello-world',
+  name: 'hello-world-scone',
   type: 'DOCKER',
   multiaddr: 'iexechub/python-hello-world:7.0.5-sconify-5.3.15-v8-production',
   checksum:
     '0x14013dea6c0c8e1bd95b549a5bdc97383f45beeecf874d9c61cd34f21159364e',
   mrenclave: {
-    provider: 'SCONE',
+    framework: 'SCONE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
@@ -38,16 +38,31 @@ const teeApp = {
   },
 };
 
-const buyConf = {
+export const gramineTeeApp = {
+  owner: '0x0000000000000000000000000000000000000000',
+  name: 'hello-world-gramine',
+  type: 'DOCKER',
+  multiaddr: 'iexechub/tee-python-hello-world:8.0.3-gramine',
+  checksum:
+    '0x8e13b1592bff2e1651225b1533282ed2e1939ce173c9f0c2c39ed02a4963401f',
+  mrenclave: {
+    framework: 'GRAMINE',
+    version: 'v0',
+    fingerprint:
+      'c879351b3640a21331c4d931d3e32bfbb8373b502966f9c639538666b2cf3641',
+  },
+};
+
+export const buyConf = {
   params: {
-    [paramsKeyName.IEXEC_ARGS]: '',
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
   },
   tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
   trust: '0',
   callback: '0x0000000000000000000000000000000000000000',
 };
 
-const dataset = {
+export const dataset = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'my-dataset',
   multiaddr: '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
@@ -55,22 +70,22 @@ const dataset = {
     '0x0000000000000000000000000000000000000000000000000000000000000000',
 };
 
-const compatibleDapp = {
-  name: 'Recomanded-dapp-for-MyDataset',
+export const compatibleDapp = {
+  name: 'Recommended-dapp-for-MyDataset',
   addresses: {
     5: '0x0000000000000000000000000000000000000000',
   },
   buyConf,
 };
 
-const dapps = [compatibleDapp];
+export const dapps = [compatibleDapp];
 
-const workerpool = {
+export const workerpool = {
   owner: '0x0000000000000000000000000000000000000000',
   description: 'my-workerpool',
 };
 
-const order = {
+export const order = {
   apporder: {
     app: '0x0000000000000000000000000000000000000000',
     appprice: '0',
@@ -114,71 +129,39 @@ const order = {
     beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
     callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {
-      [paramsKeyName.IEXEC_ARGS]: '',
-      [paramsKeyName.IEXEC_INPUT_FILES]: [],
-      [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
+      [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
+      [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: [],
+      [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: false, // todo remove from default
     },
   },
 };
 
-const category = {
+export const category = {
   name: 'XXL',
   description: 'new hub category',
   workClockTimeRef: '100',
 };
 
-const chains = {
-  default: 'viviani',
+export const chains = {
+  default: 'bellecour',
   chains: {
-    // dev: {
-    //   host: 'http://localhost:8545',
-    //   id: '65535',
-    //   sms: 'http://localhost:5000',
-    //   resultProxy: 'http://localhost:8089',
-    //   ipfsGateway: 'http://localhost:8080',
-    //   flavour: 'standard',
-    //   hub: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    //   enterprise: {
-    //     enterpriseSwapChainName: 'dev-enterprise',
-    //   },
-    // },
-    // 'dev-enterprise': {
-    //   host: 'http://localhost:8545',
-    //   id: '65535',
-    //   sms: 'http://localhost:5000',
-    //   resultProxy: 'http://localhost:8089',
-    //   ipfsGateway: 'http://localhost:8080',
-    //   flavour: 'enterprise',
-    //   hub: '0xb80C02d24791fA92fA8983f15390274698A75D23',
-    //   enterprise: {
-    //     enterpriseSwapChainName: 'dev',
-    //   },
-    // },
-    goerli: {},
-    viviani: {},
     mainnet: {},
     bellecour: {},
-    enterprise: {},
-    'enterprise-testnet': {},
   },
 };
 
-const createOrder = (orderName, overwrite = {}) => ({
+export const createOrder = (orderName, overwrite = {}) => ({
   ...order[orderName],
   ...overwrite,
 });
-const overwriteObject = (obj, overwrite = {}) => ({ ...obj, ...overwrite });
+export const overwriteObject = (obj, overwrite = {}) => ({
+  ...obj,
+  ...overwrite,
+});
 
-module.exports = {
-  main,
+export default {
   app,
-  teeApp,
   dataset,
   workerpool,
   category,
-  buyConf,
-  dapps,
-  chains,
-  overwriteObject,
-  createOrder,
 };

@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / PaginableDeals
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / PaginableDeals
 
 # Interface: PaginableDeals
 
-[{internal}](../modules/internal_.md).PaginableDeals
+[<internal>](../modules/internal_.md).PaginableDeals
 
 ## Table of contents
 
@@ -10,9 +10,6 @@
 
 - [count](internal_.PaginableDeals.md#count)
 - [deals](internal_.PaginableDeals.md#deals)
-
-### Methods
-
 - [more](internal_.PaginableDeals.md#more)
 
 ## Properties
@@ -31,14 +28,18 @@ ___
 
 deal page (this may be a partial result)
 
-## Methods
+___
 
 ### more
 
-▸ `Optional` **more**(): `Promise`<[`PaginableDeals`](internal_.PaginableDeals.md)\>
+• `Optional` **more**: () => `Promise`<[`PaginableDeals`](internal_.PaginableDeals.md)\>
+
+#### Type declaration
+
+▸ (): `Promise`<[`PaginableDeals`](internal_.PaginableDeals.md)\>
 
 when a partial result is returned, `more()` can be called to get the next page.
 
-#### Returns
+##### Returns
 
 `Promise`<[`PaginableDeals`](internal_.PaginableDeals.md)\>

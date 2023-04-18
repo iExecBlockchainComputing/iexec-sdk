@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 
-const Debug = require('debug');
-const cli = require('commander');
-const path = require('path');
-const fs = require('fs-extra');
-const { show, claim, obsTask } = require('../../common/execution/task');
-const { fetchTaskResults } = require('../../common/execution/result');
-const {
+import { program as cli } from 'commander';
+import Debug from 'debug';
+import { join } from 'path';
+import fsExtra from 'fs-extra';
+import { show, claim, obsTask } from '../../common/execution/task.js';
+import { fetchTaskResults } from '../../common/execution/result.js';
+import {
   fetchTaskOffchainInfo,
   fetchAllReplicatesLogs,
-} = require('../../common/execution/debug');
-const {
-  stringifyNestedBn,
-  decryptResult,
-} = require('../../common/utils/utils');
-const {
+} from '../../common/execution/debug.js';
+import { stringifyNestedBn, decryptResult } from '../../common/utils/utils.js';
+import {
   finalizeCli,
   addGlobalOptions,
   addWalletLoadOptions,
@@ -29,9 +26,11 @@ const {
   pretty,
   createEncFolderPaths,
   privateKeyName,
-} = require('../utils/cli-helper');
-const { Keystore } = require('../utils/keystore');
-const { loadChain, connectKeystore } = require('../utils/chains');
+} from '../utils/cli-helper.js';
+import { Keystore } from '../utils/keystore.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+
+const { pathExists, readFile, writeFile, createWriteStream } = fsExtra;
 
 const debug = Debug('iexec:iexec-task');
 const objName = 'task';
@@ -53,7 +52,7 @@ showTask
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
         Object.assign(walletOptions, !opts.download && { isSigner: false }),
       );
@@ -94,7 +93,7 @@ showTask
           const resultFileName =
             opts.download !== true ? opts.download : taskid;
 
-          resultPath = path.join(
+          resultPath = join(
             process.cwd(),
             resultFileName.length > 4 &&
               resultFileName.substr(resultFileName.length - 4) === '.zip'
@@ -109,7 +108,7 @@ showTask
           if (opts.decrypt) {
             spinner.start(info.decrypting());
             const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
-            const exists = await fs.pathExists(beneficiarySecretsFolderPath);
+            const exists = await pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
                 'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
@@ -117,21 +116,21 @@ showTask
             }
             let beneficiaryKeyPath;
             if (opts.beneficiaryKeyFile) {
-              beneficiaryKeyPath = path.join(
+              beneficiaryKeyPath = join(
                 beneficiarySecretsFolderPath,
                 opts.beneficiaryKeyFile,
               );
             } else {
               const [address] = await keystore.accounts();
               spinner.info(`Using beneficiary key for wallet ${address}`);
-              beneficiaryKeyPath = path.join(
+              beneficiaryKeyPath = join(
                 beneficiarySecretsFolderPath,
                 privateKeyName(address),
               );
             }
             let beneficiaryKey;
             try {
-              beneficiaryKey = await fs.readFile(beneficiaryKeyPath, 'utf8');
+              beneficiaryKey = await readFile(beneficiaryKeyPath, 'utf8');
             } catch (error) {
               debug(error);
               throw Error(
@@ -142,9 +141,9 @@ showTask
               await res.arrayBuffer(),
               beneficiaryKey,
             );
-            await fs.writeFile(resultPath, result);
+            await writeFile(resultPath, result);
           } else {
-            const stream = fs.createWriteStream(resultPath);
+            const stream = createWriteStream(resultPath);
             await res.body.pipe(stream);
           }
         } else {
@@ -194,8 +193,8 @@ debugTask
       const chain = await loadChain(opts.chain, { spinner });
 
       if (opts.logs) {
-        // Requester wallet authentiation is required to access logs
-        const walletOptions = await computeWalletLoadOptions(opts);
+        // Requester wallet authentication is required to access logs
+        const walletOptions = computeWalletLoadOptions(opts);
         const keystore = Keystore(walletOptions);
         await connectKeystore(chain, keystore);
       }
@@ -247,7 +246,7 @@ claimTask
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });

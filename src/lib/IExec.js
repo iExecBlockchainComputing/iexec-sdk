@@ -1,21 +1,21 @@
-const IExecModule = require('./IExecModule');
-const IExecAccountModule = require('./IExecAccountModule');
-const IExecAppModule = require('./IExecAppModule');
-const IExecDatasetModule = require('./IExecDatasetModule');
-const IExecDealModule = require('./IExecDealModule');
-const IExecENSModule = require('./IExecENSModule');
-const IExecHubModule = require('./IExecHubModule');
-const IExecNetworkModule = require('./IExecNetworkModule');
-const IExecOrderModule = require('./IExecOrderModule');
-const IExecOrderbookModule = require('./IExecOrderbookModule');
-const IExecResultModule = require('./IExecResultModule');
-const IExecSecretsModule = require('./IExecSecretsModule');
-const IExecStorageModule = require('./IExecStorageModule');
-const IExecTaskModule = require('./IExecTaskModule');
-const IExecWalletModule = require('./IExecWalletModule');
-const IExecWorkerpoolModule = require('./IExecWorkerpoolModule');
+import IExecModule from './IExecModule.js';
+import IExecAccountModule from './IExecAccountModule.js';
+import IExecAppModule from './IExecAppModule.js';
+import IExecDatasetModule from './IExecDatasetModule.js';
+import IExecDealModule from './IExecDealModule.js';
+import IExecENSModule from './IExecENSModule.js';
+import IExecHubModule from './IExecHubModule.js';
+import IExecNetworkModule from './IExecNetworkModule.js';
+import IExecOrderModule from './IExecOrderModule.js';
+import IExecOrderbookModule from './IExecOrderbookModule.js';
+import IExecResultModule from './IExecResultModule.js';
+import IExecSecretsModule from './IExecSecretsModule.js';
+import IExecStorageModule from './IExecStorageModule.js';
+import IExecTaskModule from './IExecTaskModule.js';
+import IExecWalletModule from './IExecWalletModule.js';
+import IExecWorkerpoolModule from './IExecWorkerpoolModule.js';
 
-class IExec extends IExecModule {
+export default class IExec extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -36,5 +36,3 @@ class IExec extends IExecModule {
     this.network = IExecNetworkModule.fromConfig(this.config);
   }
 }
-
-module.exports = IExec;

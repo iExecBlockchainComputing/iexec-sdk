@@ -1,18 +1,17 @@
-const Debug = require('debug');
-const iexecProxyNetworks =
-  require('@iexec/poco/build/contracts-min/ERC1538Proxy.json').networks;
-const rlcDesc = require('rlc-faucet-contract/build/contracts/RLC.json');
-const erlcDesc = require('@iexec/erlc/build/contracts-min/ERLCTokenSwap.json');
-const { Contract } = require('ethers');
-const pocoVersion = require('@iexec/poco/package.json').version;
-const iexecTokenDesc = require('@iexec/poco/build/contracts-min/IexecInterfaceToken.json');
-const iexecNativeDesc = require('@iexec/poco/build/contracts-min/IexecInterfaceNative.json');
-const appRegistryDesc = require('@iexec/poco/build/contracts-min/AppRegistry.json');
-const workerpoolRegistryDesc = require('@iexec/poco/build/contracts-min/WorkerpoolRegistry.json');
-const datasetRegistryDesc = require('@iexec/poco/build/contracts-min/DatasetRegistry.json');
-const appDesc = require('@iexec/poco/build/contracts-min/App.json');
-const workerpoolDesc = require('@iexec/poco/build/contracts-min/Workerpool.json');
-const datasetDesc = require('@iexec/poco/build/contracts-min/Dataset.json');
+import Debug from 'debug';
+import { Contract } from 'ethers';
+import { version as pocoVersion } from '../generated/@iexec/poco/package.js';
+import { networks as iexecProxyNetworks } from '../generated/@iexec/poco/ERC1538Proxy.js';
+import iexecTokenDesc from '../generated/@iexec/poco/IexecInterfaceToken.js';
+import iexecNativeDesc from '../generated/@iexec/poco/IexecInterfaceNative.js';
+import appRegistryDesc from '../generated/@iexec/poco/AppRegistry.js';
+import workerpoolRegistryDesc from '../generated/@iexec/poco/WorkerpoolRegistry.js';
+import datasetRegistryDesc from '../generated/@iexec/poco/DatasetRegistry.js';
+import appDesc from '../generated/@iexec/poco/App.js';
+import workerpoolDesc from '../generated/@iexec/poco/Workerpool.js';
+import datasetDesc from '../generated/@iexec/poco/Dataset.js';
+import rlcDesc from '../generated/@iexec/rlc/RLC.js';
+import erlcDesc from '../generated/@iexec/erlc/ERLCTokenSwap.js';
 
 const debug = Debug('iexec:IExecContractsClient');
 
@@ -22,12 +21,11 @@ const enterpriseHubMap = {
 };
 
 const nativeNetworks = {
-  standard: ['133', '134'],
+  standard: ['134'],
   enterprise: [],
 };
 
 const gasPriceByNetwork = {
-  133: '0x0',
   134: '0x0',
 };
 
@@ -120,12 +118,11 @@ const createClient = ({
       if (!address) {
         throw Error(`no contract address provided`);
       }
-      const contract = new Contract(
+      return new Contract(
         address,
         contractDesc.abi,
         ethSigner || ethProvider,
       );
-      return contract;
     } catch (error) {
       debug('getContract()', error);
       throw error;
@@ -155,11 +152,10 @@ const createClient = ({
   const fetchRegistryContract = async (objName) => {
     try {
       const registryAddress = await fetchRegistryAddress(objName);
-      const registryContract = getContract(
+      return getContract(
         contractsDescMap[objName].registryName,
         registryAddress,
       );
-      return registryContract;
     } catch (error) {
       debug('fetchRegistryContract()', error);
       throw error;
@@ -184,8 +180,7 @@ const createClient = ({
   const fetchTokenContract = async () => {
     try {
       const tokenAddress = await fetchTokenAddress();
-      const registryContract = getContract('token', tokenAddress);
-      return registryContract;
+      return getContract('token', tokenAddress);
     } catch (error) {
       debug('fetchTokenContract()', error);
       throw error;
@@ -269,4 +264,4 @@ class IExecContractsClient {
   }
 }
 
-module.exports = IExecContractsClient;
+export default IExecContractsClient;

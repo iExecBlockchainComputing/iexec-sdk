@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / WorkerpoolorderTemplate
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / WorkerpoolorderTemplate
 
 # Interface: WorkerpoolorderTemplate
 
-[{internal}](../modules/internal_.md).WorkerpoolorderTemplate
+[<internal>](../modules/internal_.md).WorkerpoolorderTemplate
 
 sell order for computing power
 

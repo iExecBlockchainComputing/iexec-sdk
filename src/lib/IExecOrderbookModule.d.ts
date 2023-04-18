@@ -146,17 +146,17 @@ export default class IExecOrderbookModule extends IExecModule {
     appAddress: Addressish,
     options?: {
       /**
-       * include orders restricted to specified dataset
+       * include orders restricted to specified dataset (use `'any'` to include any dataset)
        */
-      dataset?: Addressish;
+      dataset?: Addressish | 'any';
       /**
-       * include orders restricted to specified workerpool
+       * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
        */
-      workerpool?: Addressish;
+      workerpool?: Addressish | 'any';
       /**
-       * include orders restricted to specified requester
+       * include orders restricted to specified requester (use `'any'` to include any requester)
        */
-      requester?: Addressish;
+      requester?: Addressish | 'any';
       /**
        * filter by minimum volume remaining
        */
@@ -166,7 +166,7 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       minTag?: Tag | HumanSingleTag[];
       /**
-       * filter by maximun tag accepted
+       * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
     },
@@ -187,17 +187,17 @@ export default class IExecOrderbookModule extends IExecModule {
     datasetAddress: Addressish,
     options?: {
       /**
-       * include orders restricted to specified app
+       * include orders restricted to specified app (use `'any'` to include any app)
        */
-      app?: Addressish;
+      app?: Addressish | 'any';
       /**
-       * include orders restricted to specified workerpool
+       * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
        */
-      workerpool?: Addressish;
+      workerpool?: Addressish | 'any';
       /**
-       * include orders restricted to specified requester
+       * include orders restricted to specified requester (use `'any'` to include any requester)
        */
-      requester?: Addressish;
+      requester?: Addressish | 'any';
       /**
        * filter by minimum volume remaining
        */
@@ -207,7 +207,7 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       minTag?: Tag | HumanSingleTag[];
       /**
-       * filter by maximun tag accepted
+       * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
     },
@@ -234,17 +234,17 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     category?: BNish;
     /**
-     * include orders restricted to specified app
+     * include orders restricted to specified app (use `'any'` to include any app)
      */
-    app?: Addressish;
+    app?: Addressish | 'any';
     /**
-     * include orders restricted to specified dataset
+     * include orders restricted to specified dataset (use `'any'` to include any dataset)
      */
-    dataset?: Addressish;
+    dataset?: Addressish | 'any';
     /**
-     * include orders restricted to specified requester
+     * include orders restricted to specified requester (use `'any'` to include any requester)
      */
-    requester?: Addressish;
+    requester?: Addressish | 'any';
     /**
      * filter by minimum volume remaining
      */
@@ -254,7 +254,7 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     minTag?: Tag | HumanSingleTag[];
     /**
-     * filter by maximun tag offered
+     * filter by maximum tag offered
      */
     maxTag?: Tag | HumanSingleTag[];
     /**
@@ -284,17 +284,17 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     category?: BNish;
     /**
-     * include orders restricted to specified app
+     * filter by specified app
      */
     app?: Addressish;
     /**
-     * include orders restricted to specified dataset
+     * filter by specified dataset
      */
     dataset?: Addressish;
     /**
-     * include orders restricted to specified workerpool
+     * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
      */
-    workerpool?: Addressish;
+    workerpool?: Addressish | 'any';
     /**
      * filter by minimum volume remaining
      */
@@ -304,7 +304,7 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     minTag?: Tag | HumanSingleTag[];
     /**
-     * filter by maximun tag accepted
+     * filter by maximum tag accepted
      */
     maxTag?: Tag | HumanSingleTag[];
     /**

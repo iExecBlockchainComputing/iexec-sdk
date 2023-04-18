@@ -1,4 +1,6 @@
-const reservedSecretKeyName = {
+import { STORAGE_PROVIDERS } from './constant.js';
+
+export const reservedSecretKeyName = {
   // result encryption
   IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY: 'iexec-result-encryption-public-key',
   // result storage
@@ -6,24 +8,18 @@ const reservedSecretKeyName = {
   IEXEC_RESULT_IEXEC_IPFS_TOKEN: 'iexec-result-iexec-ipfs-token',
 };
 
-const getStorageTokenKeyName = (provider) => {
+export const getStorageTokenKeyName = (provider) => {
   switch (provider) {
     case undefined:
     case 'default':
-    case 'ipfs':
+    case STORAGE_PROVIDERS.IPFS:
       return reservedSecretKeyName.IEXEC_RESULT_IEXEC_IPFS_TOKEN;
-    case 'dropbox':
+    case STORAGE_PROVIDERS.DROPBOX:
       return reservedSecretKeyName.IEXEC_RESULT_DROPBOX_TOKEN;
     default:
       throw Error(`"${provider}" not supported`);
   }
 };
 
-const getResultEncryptionKeyName = () =>
+export const getResultEncryptionKeyName = () =>
   reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY;
-
-module.exports = {
-  reservedSecretKeyName,
-  getStorageTokenKeyName,
-  getResultEncryptionKeyName,
-};

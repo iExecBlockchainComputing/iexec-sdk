@@ -1,11 +1,11 @@
-const Debug = require('debug');
-const { ethersBnToBn } = require('../utils/utils');
-const { addressSchema, throwIfMissing } = require('../utils/validator');
-const { wrapCall } = require('../utils/errorWrappers');
+import Debug from 'debug';
+import { ethersBnToBn } from '../utils/utils.js';
+import { addressSchema, throwIfMissing } from '../utils/validator.js';
+import { wrapCall } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:account:balance');
 
-const checkBalance = async (
+export const checkBalance = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) => {
@@ -17,17 +17,12 @@ const checkBalance = async (
     const { stake, locked } = await wrapCall(
       iexecContract.viewAccount(vAddress),
     );
-    const balance = {
+    return {
       stake: ethersBnToBn(stake),
       locked: ethersBnToBn(locked),
     };
-    return balance;
   } catch (error) {
     debug('checkBalance()', error);
     throw error;
   }
-};
-
-module.exports = {
-  checkBalance,
 };

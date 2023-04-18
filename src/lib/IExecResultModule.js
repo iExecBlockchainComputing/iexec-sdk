@@ -1,31 +1,32 @@
-const IExecModule = require('./IExecModule');
-const { checkWeb2SecretExists } = require('../common/sms/check');
-const { pushWeb2Secret } = require('../common/sms/push');
-const { getResultEncryptionKeyName } = require('../common/utils/secrets-utils');
+import IExecModule from './IExecModule.js';
+import { checkWeb2SecretExists } from '../common/sms/check.js';
+import { pushWeb2Secret } from '../common/sms/push.js';
+import { getResultEncryptionKeyName } from '../common/utils/secrets-utils.js';
 
-class IExecResultModule extends IExecModule {
+export default class IExecResultModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
-    this.checkResultEncryptionKeyExists = async (address) =>
+    this.checkResultEncryptionKeyExists = async (
+      address,
+      { teeFramework } = {},
+    ) =>
       checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         address,
         getResultEncryptionKeyName(),
       );
     this.pushResultEncryptionKey = async (
       publicKey,
-      { forceUpdate = false } = {},
+      { forceUpdate = false, teeFramework } = {},
     ) =>
       pushWeb2Secret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         getResultEncryptionKeyName(),
         publicKey,
         { forceUpdate },
       );
   }
 }
-
-module.exports = IExecResultModule;

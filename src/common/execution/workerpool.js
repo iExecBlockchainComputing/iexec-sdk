@@ -1,16 +1,16 @@
-const Debug = require('debug');
-const {
+import Debug from 'debug';
+import {
   throwIfMissing,
   addressSchema,
   workerpoolApiUrlSchema,
-} = require('../utils/validator');
-const { lookupAddress } = require('../ens/resolution');
-const { setTextRecord } = require('../ens/text-record');
-const { WORKERPOOL_URL_TEXT_RECORD_KEY } = require('../utils/constant');
+} from '../utils/validator.js';
+import { lookupAddress } from '../ens/resolution.js';
+import { setTextRecord } from '../ens/text-record.js';
+import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
 
 const debug = Debug('iexec:execution:workerpool');
 
-const setWorkerpoolApiUrl = async (
+export const setWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
   workerpoolAddress,
   url,
@@ -26,19 +26,14 @@ const setWorkerpoolApiUrl = async (
     if (!name) {
       throw Error(`No ENS name reverse resolution configured for ${vAddress}`);
     }
-    const txHash = await setTextRecord(
+    return await setTextRecord(
       contracts,
       name,
       WORKERPOOL_URL_TEXT_RECORD_KEY,
       vUrl,
     );
-    return txHash;
   } catch (e) {
     debug('setWorkerpoolApiUrl()', e);
     throw e;
   }
-};
-
-module.exports = {
-  setWorkerpoolApiUrl,
 };

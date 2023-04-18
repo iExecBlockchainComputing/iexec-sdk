@@ -1,18 +1,19 @@
-const Debug = require('debug');
-const { jsonApi, wrapPaginableRequest } = require('../utils/api-utils');
-const {
+import Debug from 'debug';
+import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
+import {
   addressSchema,
+  addressOrAnySchema,
   chainIdSchema,
   uint256Schema,
   positiveIntSchema,
   positiveStrictIntSchema,
   tagSchema,
   throwIfMissing,
-} = require('../utils/validator');
+} from '../utils/validator.js';
 
 const debug = Debug('iexec:market:orderbook');
 
-const fetchAppOrderbook = async (
+export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   app = throwIfMissing(),
@@ -25,17 +26,17 @@ const fetchAppOrderbook = async (
         ethProvider: contracts.provider,
       }).validate(app),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -64,7 +65,7 @@ const fetchAppOrderbook = async (
   }
 };
 
-const fetchDatasetOrderbook = async (
+export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   dataset = throwIfMissing(),
@@ -77,17 +78,17 @@ const fetchDatasetOrderbook = async (
         ethProvider: contracts.provider,
       }).validate(dataset),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -116,7 +117,7 @@ const fetchDatasetOrderbook = async (
   }
 };
 
-const fetchWorkerpoolOrderbook = async (
+export const fetchWorkerpoolOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   {
@@ -142,17 +143,17 @@ const fetchWorkerpoolOrderbook = async (
         }).validate(workerpool),
       }),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -189,7 +190,7 @@ const fetchWorkerpoolOrderbook = async (
   }
 };
 
-const fetchRequestOrderbook = async (
+export const fetchRequestOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   {
@@ -230,7 +231,7 @@ const fetchRequestOrderbook = async (
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
@@ -260,11 +261,4 @@ const fetchRequestOrderbook = async (
     debug('fetchRequestOrderbook()', error);
     throw error;
   }
-};
-
-module.exports = {
-  fetchAppOrderbook,
-  fetchDatasetOrderbook,
-  fetchWorkerpoolOrderbook,
-  fetchRequestOrderbook,
 };

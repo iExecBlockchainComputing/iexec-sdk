@@ -48,7 +48,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -201,7 +201,7 @@ ___
 
 ### obsBridgeToMainchain
 
-▸ **obsBridgeToMainchain**(`nRLCAmount`): `Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
+▸ **obsBridgeToMainchain**(`nRLCAmount`): `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
 **SIGNER REQUIRED**
 
@@ -225,13 +225,13 @@ const cancel = bridgeObservable.subscribe({
 
 #### Returns
 
-`Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
+`Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
 ___
 
 ### obsBridgeToSidechain
 
-▸ **obsBridgeToSidechain**(`nRLCAmount`): `Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
+▸ **obsBridgeToSidechain**(`nRLCAmount`): `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
 **SIGNER REQUIRED**
 
@@ -255,7 +255,7 @@ const cancel = bridgeObservable.subscribe({
 
 #### Returns
 
-`Promise`<[`BrigdeObservable`](internal_.BrigdeObservable.md)\>
+`Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
 ___
 

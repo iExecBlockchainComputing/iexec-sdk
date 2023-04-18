@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / PublishedRequestorder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / PublishedRequestorder
 
 # Interface: PublishedRequestorder
 
-[{internal}](../modules/internal_.md).PublishedRequestorder
+[<internal>](../modules/internal_.md).PublishedRequestorder
 
 published buy order for computing tasks
 

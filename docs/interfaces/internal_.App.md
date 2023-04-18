@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / App
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / App
 
 # Interface: App
 
-[{internal}](../modules/internal_.md).App
+[<internal>](../modules/internal_.md).App
 
 IExec app
 
@@ -30,7 +30,7 @@ ___
 
 ### appMrenclave
 
-• **appMrenclave**: `string`
+• **appMrenclave**: `string` \| { `entrypoint`: `string` ; `fingerprint`: `string` ; `framework`: ``"SCONE"`` \| ``"GRAMINE"`` ; `heapSize`: `number` ; `version`: `string`  }
 
 for TEE apps only, specify the TEE protocol to use
 

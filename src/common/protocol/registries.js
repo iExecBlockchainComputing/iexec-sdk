@@ -1,13 +1,14 @@
-const Debug = require('debug');
-const {
+import Debug from 'debug';
+import {
   addressSchema,
   appSchema,
   datasetSchema,
   workerpoolSchema,
   uint256Schema,
+  objMrenclaveSchema,
   throwIfMissing,
-} = require('../utils/validator');
-const {
+} from '../utils/validator.js';
+import {
   getEventFromLogs,
   checkSigner,
   bnifyNestedEthersBn,
@@ -16,10 +17,10 @@ const {
   multiaddrHexToHuman,
   hexToBuffer,
   BN,
-} = require('../utils/utils');
-const { NULL_ADDRESS, APP, DATASET, WORKERPOOL } = require('../utils/constant');
-const { wrapCall, wrapSend, wrapWait } = require('../utils/errorWrappers');
-const { ObjectNotFoundError } = require('../utils/errors');
+} from '../utils/utils.js';
+import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { ObjectNotFoundError } from '../utils/errors.js';
 
 const debug = Debug('iexec:protocol:registries');
 
@@ -32,22 +33,21 @@ const tokenIdToAddress = (tokenId) => {
   return checksummedAddress(lowerCaseAddress);
 };
 
-const checkDeployedObj =
+export const checkDeployedObj =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), address = throwIfMissing()) => {
     try {
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
-      const isDeployed = await wrapCall(registryContract.isRegistered(address));
-      return isDeployed;
+      return await wrapCall(registryContract.isRegistered(address));
     } catch (error) {
       debug('checkDeployedObj()', error);
       throw error;
     }
   };
 
-const checkDeployedApp = async (
+export const checkDeployedApp = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -56,7 +56,7 @@ const checkDeployedApp = async (
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
   );
 
-const checkDeployedDataset = async (
+export const checkDeployedDataset = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -65,7 +65,7 @@ const checkDeployedDataset = async (
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
   );
 
-const checkDeployedWorkerpool = async (
+export const checkDeployedWorkerpool = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -90,11 +90,10 @@ const predictObjAddress =
         contracts.fetchRegistryContract(objName),
       );
       const args = createArgs[objName].map((e) => obj[e]);
-      const predictFonctionName = 'predict'.concat(toUpperFirst(objName));
-      const predictedAddress = await wrapCall(
-        registryContract[predictFonctionName](...args),
+      const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
+      return await wrapCall(
+        registryContract[predictFunctionName](...args),
       );
-      return predictedAddress;
     } catch (error) {
       debug('predictObjAddress()', error);
       throw error;
@@ -122,9 +121,9 @@ const deployObj =
         );
       }
       const args = createArgs[objName].map((e) => obj[e]);
-      const createFonctionName = 'create'.concat(toUpperFirst(objName));
+      const createFunctionName = 'create'.concat(toUpperFirst(objName));
       const tx = await wrapSend(
-        registryContract[createFonctionName](...args, contracts.txOptions),
+        registryContract[createFunctionName](...args, contracts.txOptions),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.events, {
@@ -140,17 +139,17 @@ const deployObj =
     }
   };
 
-const predictAppAddress = async (contracts, app) =>
+export const predictAppAddress = async (contracts, app) =>
   predictObjAddress(APP)(
     contracts,
     await appSchema({ ethProvider: contracts.provider }).validate(app),
   );
-const predictDatasetAddress = async (contracts, dataset) =>
+export const predictDatasetAddress = async (contracts, dataset) =>
   predictObjAddress(DATASET)(
     contracts,
     await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
   );
-const predictWorkerpoolAddress = async (contracts, workerpool) =>
+export const predictWorkerpoolAddress = async (contracts, workerpool) =>
   predictObjAddress(WORKERPOOL)(
     contracts,
     await workerpoolSchema({ ethProvider: contracts.provider }).validate(
@@ -158,17 +157,17 @@ const predictWorkerpoolAddress = async (contracts, workerpool) =>
     ),
   );
 
-const deployApp = async (contracts, app) =>
+export const deployApp = async (contracts, app) =>
   deployObj(APP)(
     contracts,
     await appSchema({ ethProvider: contracts.provider }).validate(app),
   );
-const deployDataset = async (contracts, dataset) =>
+export const deployDataset = async (contracts, dataset) =>
   deployObj(DATASET)(
     contracts,
     await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
   );
-const deployWorkerpool = async (contracts, workerpool) =>
+export const deployWorkerpool = async (contracts, workerpool) =>
   deployObj(WORKERPOOL)(
     contracts,
     await workerpoolSchema({ ethProvider: contracts.provider }).validate(
@@ -181,15 +180,14 @@ const getObjOwner =
   async (contracts = throwIfMissing(), address = throwIfMissing()) => {
     try {
       const contract = contracts.getContract(objName, address);
-      const owner = checksummedAddress(await wrapCall(contract.owner()));
-      return owner;
+      return checksummedAddress(await wrapCall(contract.owner()));
     } catch (error) {
       debug('getObjOwner()', error);
       throw error;
     }
   };
 
-const getAppOwner = async (
+export const getAppOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -198,7 +196,7 @@ const getAppOwner = async (
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
   );
 
-const getDatasetOwner = async (
+export const getDatasetOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -207,7 +205,7 @@ const getDatasetOwner = async (
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
   );
 
-const getWorkerpoolOwner = async (
+export const getWorkerpoolOwner = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
 ) =>
@@ -263,7 +261,7 @@ const countUserObj =
     }
   };
 
-const countUserApps = async (
+export const countUserApps = async (
   contracts = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) =>
@@ -273,7 +271,7 @@ const countUserApps = async (
       userAddress,
     ),
   );
-const countUserDatasets = async (
+export const countUserDatasets = async (
   contracts = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) =>
@@ -283,7 +281,7 @@ const countUserDatasets = async (
       userAddress,
     ),
   );
-const countUserWorkerpools = async (
+export const countUserWorkerpools = async (
   contracts = throwIfMissing(),
   userAddress = throwIfMissing(),
 ) =>
@@ -342,7 +340,7 @@ const cleanApp = (obj) =>
     },
   );
 
-const showApp = async (
+export const showApp = async (
   contracts = throwIfMissing(),
   appAddress = throwIfMissing(),
 ) => {
@@ -355,7 +353,7 @@ const showApp = async (
   return { objAddress, app: cleanApp(obj) };
 };
 
-const showUserApp = async (
+export const showUserApp = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
@@ -370,7 +368,7 @@ const showUserApp = async (
   return { objAddress, app: cleanApp(obj) };
 };
 
-const showDataset = async (
+export const showDataset = async (
   contracts = throwIfMissing(),
   datasetAddress = throwIfMissing(),
 ) => {
@@ -389,7 +387,7 @@ const showDataset = async (
   return { objAddress, dataset: clean };
 };
 
-const showUserDataset = async (
+export const showUserDataset = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
@@ -410,7 +408,7 @@ const showUserDataset = async (
   return { objAddress, dataset: clean };
 };
 
-const showWorkerpool = async (
+export const showWorkerpool = async (
   contracts = throwIfMissing(),
   workerpoolAddress = throwIfMissing(),
 ) => {
@@ -424,7 +422,7 @@ const showWorkerpool = async (
   return { objAddress, workerpool: clean };
 };
 
-const showUserWorkerpool = async (
+export const showUserWorkerpool = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
   userAddress = throwIfMissing(),
@@ -440,32 +438,20 @@ const showUserWorkerpool = async (
   return { objAddress, workerpool: clean };
 };
 
-module.exports = {
-  predictAppAddress,
-  predictDatasetAddress,
-  predictWorkerpoolAddress,
-  checkDeployedObj,
-  checkDeployedApp,
-  checkDeployedDataset,
-  checkDeployedWorkerpool,
-  deployObj,
-  deployApp,
-  deployDataset,
-  deployWorkerpool,
-  getObjOwner,
-  getAppOwner,
-  getDatasetOwner,
-  getWorkerpoolOwner,
-  showObjByAddress,
-  showApp,
-  showDataset,
-  showWorkerpool,
-  showUserObjByIndex,
-  showUserApp,
-  showUserDataset,
-  showUserWorkerpool,
-  countUserObj,
-  countUserApps,
-  countUserDatasets,
-  countUserWorkerpools,
+export const resolveTeeFrameworkFromApp = async (
+  app,
+  { strict = true } = {},
+) => {
+  if (app.appMREnclave) {
+    try {
+      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
+      return mrenclave.framework;
+    } catch (err) {
+      debug('resolveTeeFrameworkFromApp()', err);
+      if (strict) {
+        throw Error('Failed to resolve TEE framework from app');
+      }
+    }
+  }
+  return undefined;
 };

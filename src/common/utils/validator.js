@@ -1,17 +1,28 @@
-const Debug = require('debug');
-const { string, number, object, mixed, boolean, array } = require('yup');
-const { getAddress, namehash } = require('ethers').utils;
-const {
+import { Buffer } from 'buffer';
+import Debug from 'debug';
+import { string, number, object, mixed, boolean, array, lazy } from 'yup';
+import { utils } from 'ethers';
+import {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
   encodeTag,
   bytes32Regex,
   parseRLC,
   parseEth,
-} = require('./utils');
-const { paramsKeyName, storageProviders } = require('./params-utils');
-const { ValidationError } = require('./errors');
-const { wrapCall } = require('./errorWrappers');
+  checkActiveBitInTag,
+  TAG_MAP,
+} from './utils.js';
+import { ValidationError } from './errors.js';
+import { wrapCall } from './errorWrappers.js';
+import {
+  TEE_FRAMEWORKS,
+  IEXEC_REQUEST_PARAMS,
+  STORAGE_PROVIDERS,
+  ANY,
+} from './constant.js';
+import { isAddress } from 'ethers/lib/utils.js';
+
+const { getAddress, namehash } = utils;
 
 const debug = Debug('validators');
 
@@ -19,27 +30,36 @@ const posIntRegex = /^\d+$/;
 
 const posStrictIntRegex = /^[1-9]\d*$/;
 
-const stringNumberSchema = ({ message } = {}) =>
+const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
+
+export const stringSchema = string;
+
+export const teeFrameworkSchema = () =>
+  string()
+    .transform((name) => name.toLowerCase())
+    .oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
+
+export const stringNumberSchema = ({ message } = {}) =>
   string()
     .transform((value) => {
-      const trimed = value.replace(/^0+/, '');
-      return trimed.length > 0 ? trimed : '0';
+      const trimmed = value.replace(/^0+/, '');
+      return trimmed.length > 0 ? trimmed : '0';
     })
     .matches(posIntRegex, message || '${originalValue} is not a valid number');
 
-const integerSchema = () => number().integer();
+export const integerSchema = () => number().integer();
 
-const positiveIntSchema = () =>
+export const positiveIntSchema = () =>
   integerSchema()
     .min(0)
     .max(Number.MAX_SAFE_INTEGER - 1);
 
-const positiveStrictIntSchema = () =>
+export const positiveStrictIntSchema = () =>
   integerSchema()
     .min(1)
     .max(Number.MAX_SAFE_INTEGER - 1);
 
-const hexnumberSchema = () =>
+export const hexnumberSchema = () =>
   string()
     .lowercase()
     .matches(
@@ -47,20 +67,20 @@ const hexnumberSchema = () =>
       '${originalValue} is not a valid hex number',
     );
 
-const uint256Schema = () =>
+export const uint256Schema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
-const amontErrorMessage = ({ originalValue }) =>
+const amountErrorMessage = ({ originalValue }) =>
   `${
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
   } is not a valid amount`;
 
-const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
+export const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -71,25 +91,27 @@ const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseRLC(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
-const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
+export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
   string()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
         if (originalValue.length > 2) {
-          throw new ValidationError(amontErrorMessage({ originalValue }));
+          throw new ValidationError(amountErrorMessage({ originalValue }));
         }
         if (originalValue.length === 2 && originalValue[1]) {
           return `${originalValue[0]} ${originalValue[1]}`;
@@ -100,98 +122,120 @@ const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
     })
     .transform((value) => {
       const [amount, unit] = value.split(' ');
-      const trimed = amount.replace(/^0+/, '');
-      const trimedAmount = trimed.length > 0 ? trimed : '0';
-      return unit !== undefined ? [trimedAmount, unit].join(' ') : trimedAmount;
+      const trimmed = amount.replace(/^0+/, '');
+      const trimmedAmount = trimmed.length > 0 ? trimmed : '0';
+      return unit !== undefined
+        ? [trimmedAmount, unit].join(' ')
+        : trimmedAmount;
     })
     .transform((value, originalValue) => {
       try {
         return parseEth(value, defaultUnit).toString();
       } catch (e) {
-        throw new ValidationError(amontErrorMessage({ originalValue }));
+        throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amontErrorMessage);
+    .matches(/^[0-9]*$/, amountErrorMessage);
 
-const chainIdSchema = () =>
+export const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
-const addressSchema = ({ ethProvider } = {}) =>
-  mixed()
-    .transform((value) => {
-      try {
-        if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            if (
-              ethProvider &&
-              ethProvider.resolveName &&
-              typeof ethProvider.resolveName === 'function'
-            ) {
-              debug('resolving ENS', value);
-              const addressPromise = wrapCall(ethProvider.resolveName(value))
-                .then((resolved) => {
-                  debug('resolved ENS', resolved);
-                  return resolved;
-                })
-                .catch((error) => {
-                  debug('ENS resolution error', error);
-                  return null;
-                });
-              return addressPromise;
-            }
-            debug("no ethProvider ENS can't be resolved");
-          }
-          return getAddress(value.toLowerCase());
+const transformAddressOrEns = (ethProvider) => (value) => {
+  try {
+    if (typeof value === 'string') {
+      if (value.match(/^.*\.eth$/)) {
+        if (
+          ethProvider &&
+          ethProvider.resolveName &&
+          typeof ethProvider.resolveName === 'function'
+        ) {
+          debug('resolving ENS', value);
+          return wrapCall(ethProvider.resolveName(value))
+            .then((resolved) => {
+              debug('resolved ENS', resolved);
+              return resolved;
+            })
+            .catch((error) => {
+              debug('ENS resolution error', error);
+              return null;
+            });
         }
-      } catch (e) {
-        debug('Error', e);
+        debug("no ethProvider ENS can't be resolved");
       }
-      return value;
-    })
-    .test(
-      'resolve-ens',
-      'Unable to resolve ENS ${originalValue}',
-      async (value) => {
-        if (value === undefined) {
-          return true;
-        }
-        if (typeof value === 'string') {
-          if (value.match(/^.*\.eth$/)) {
-            return false;
-          }
-          return true;
-        }
-        try {
-          const address = await value;
-          if (!address) return false;
-          getAddress(address);
-          return true;
-        } catch (e) {
-          debug('resolve-ens', e);
-          return false;
-        }
-      },
+      return getAddress(value.toLowerCase());
+    }
+  } catch (e) {
+    debug('Error', e);
+  }
+  return value;
+};
+
+const testResolveEnsPromise = async (value) => {
+  if (value === undefined) {
+    return true;
+  }
+  if (typeof value === 'string') {
+    return !value.match(/^.*\.eth$/);
+  }
+  try {
+    const address = await value;
+    if (!address) return false;
+    getAddress(address);
+    return true;
+  } catch (e) {
+    debug('resolve-ens', e);
+    return false;
+  }
+};
+
+const testAddressOrAddressPromise = async (value) => {
+  const resolvedValue = typeof value === 'string' ? value : await value;
+  return isAddress(resolvedValue);
+};
+
+export const addressSchema = ({ ethProvider } = {}) =>
+  mixed()
+    .transform((value) => transformAddressOrEns(ethProvider)(value))
+    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) =>
+      testResolveEnsPromise(value),
     )
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
-      async (value) => {
-        const resolvedValue = typeof value === 'string' ? value : await value;
-        try {
-          getAddress(resolvedValue);
+      (value) => testAddressOrAddressPromise(value),
+    );
+
+export const addressOrAnySchema = ({ ethProvider } = {}) =>
+  mixed()
+    .transform((value) => {
+      if (value === ANY) {
+        return value;
+      }
+      return transformAddressOrEns(ethProvider)(value);
+    })
+    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) => {
+      if (value === ANY) {
+        return true;
+      }
+      return testResolveEnsPromise(value);
+    })
+    .test(
+      'is-address',
+      '${originalValue} is not a valid ethereum address',
+      (value) => {
+        if (value === ANY) {
           return true;
-        } catch (e) {
-          return false;
         }
+        return testAddressOrAddressPromise(value);
       },
     );
 
-const bytes32Schema = () =>
+export const bytes32Schema = () =>
   string()
     .lowercase()
     .matches(bytes32Regex, '${originalValue} is not a bytes32 hexstring');
 
-const orderSignSchema = () =>
+export const orderSignSchema = () =>
   string().matches(
     /^(0x)([0-9a-f]{2})*/,
     '${originalValue} is not a valid signature',
@@ -205,11 +249,11 @@ const signed = () => ({
   sign: orderSignSchema().required(),
 });
 
-const catidSchema = () => uint256Schema();
+export const catidSchema = () => uint256Schema();
 
-const paramsArgsSchema = () => string();
+export const paramsArgsSchema = () => string();
 
-const paramsInputFilesArraySchema = () =>
+export const paramsInputFilesArraySchema = () =>
   array()
     .transform((value, originalValue) => {
       if (Array.isArray(originalValue)) {
@@ -226,98 +270,93 @@ const paramsInputFilesArraySchema = () =>
         .required('${path} "${value}" is not a valid URL'),
     );
 
-const paramsEncryptResultSchema = () => boolean();
+export const paramsEncryptResultSchema = () => boolean();
 
-const paramsStorageProviderSchema = () =>
-  string().oneOf(
-    storageProviders(),
+const addAllStorageProviders = (schema) =>
+  schema.oneOf(
+    Object.values(STORAGE_PROVIDERS),
     '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
   );
 
-const paramsRequesterSecretsSchema = () =>
+export const paramsStorageProviderSchema = () =>
+  addAllStorageProviders(string());
+
+export const paramsRequesterSecretsSchema = () =>
   object()
     .test(
       'keys-are-int',
       '${path} mapping keys must be strictly positive integers',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
+          value !== null &&
           Object.keys(value).find((key) => !posStrictIntRegex.test(key))
-        ) {
-          return false;
-        }
-        return true;
-      },
+        ),
     )
     .test(
       'values-are-string',
       '${path} mapping names must be strings',
-      (value) => {
-        if (
+      (value) =>
+        !(
           value !== undefined &&
+          value !== null &&
           Object.values(value).find(
             (val) => typeof val !== 'string' || val.length === 0,
           )
-        ) {
-          return false;
-        }
-        return true;
-      },
-    );
+        ),
+    )
+    .nonNullable();
 
-const objParamsSchema = () =>
+export const objParamsSchema = () =>
   object({
-    [paramsKeyName.IEXEC_ARGS]: paramsArgsSchema(),
-    [paramsKeyName.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
-    [paramsKeyName.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
+    [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
-      {
-        is: true,
-        then: string().notRequired(),
-        otherwise: string()
-          .default('ipfs')
-          .when('$isTee', {
-            is: true,
-            then: paramsStorageProviderSchema(),
-            otherwise: string().oneOf(
-              ['ipfs'],
-              '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
-            ),
-          })
-          .required(),
-      },
+      ([isCallback], storageSchema) =>
+        isCallback === true
+          ? storageSchema.notRequired()
+          : storageSchema
+              .default(STORAGE_PROVIDERS.IPFS)
+              .when('$isTee', ([isTee], archiveStorageSchema) =>
+                isTee === true
+                  ? addAllStorageProviders(archiveStorageSchema)
+                  : archiveStorageSchema.oneOf(
+                      [STORAGE_PROVIDERS.IPFS],
+                      '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
+                    ),
+              )
+              .required(),
     ),
-    [paramsKeyName.IEXEC_SECRETS]: mixed().when('$isTee', {
-      is: true,
-      then: paramsRequesterSecretsSchema(),
-      otherwise: mixed().test(
-        'is-not-defined',
-        '${path} is not supported for non TEE tasks',
-        (value) => {
-          if (value === undefined) {
-            return true;
-          }
-          return false;
-        },
-      ),
-    }),
-    [paramsKeyName.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-      `${paramsKeyName.IEXEC_RESULT_STORAGE_PROVIDER}`,
-      {
-        is: 'ipfs',
-        then: string()
-          .when('$resultProxyURL', (resultProxyURL, schema) =>
-            schema.default(resultProxyURL),
-          )
-          .required('${path} is required field with "ipfs" storage'),
-        otherwise: string().notRequired(),
-      },
+    [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', ([isTee]) =>
+      isTee === true
+        ? paramsRequesterSecretsSchema()
+        : mixed().test(
+            'is-not-defined',
+            '${path} is not supported for non TEE tasks',
+            (value) => value === undefined,
+          ),
     ),
-    [paramsKeyName.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
-  }).noUnknown(true, 'Unknown key "${unknown}" in params');
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
+      `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
+      ([provider], providerSchema) =>
+        provider === STORAGE_PROVIDERS.IPFS
+          ? providerSchema
+              .when('$resultProxyURL', ([resultProxyURL], schema) =>
+                schema.default(resultProxyURL),
+              )
+              .required(
+                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
+              )
+          : providerSchema.notRequired(),
+    ),
+    [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in params');
 
-const paramsSchema = () =>
+export const paramsSchema = () =>
   string()
     .transform((value, originalValue) => {
       if (typeof originalValue === 'object') {
@@ -341,42 +380,40 @@ const paramsSchema = () =>
       },
     );
 
-const tagSchema = () =>
+export const tagSchema = () =>
   mixed()
     .transform((value) => {
       if (Array.isArray(value)) {
         try {
-          const bytes32Tag = encodeTag(value);
-          return bytes32Tag;
+          return encodeTag(value);
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
       if (typeof value === 'string') {
         const lowerCase = value.toLowerCase();
-        if (lowerCase.substr(0, 2) === '0x') return lowerCase;
+        if (lowerCase.substring(0, 2) === '0x') return lowerCase;
         try {
-          const bytes32Tag = encodeTag(value.split(','));
-          return bytes32Tag;
+          return encodeTag(value.split(','));
         } catch (e) {
-          return e.message;
+          return e;
         }
       }
-      return 'Invalid tag';
+      return Error('Invalid tag');
     })
     .test(
       'no-transform-error',
       ({ originalValue, value }) =>
-        `${originalValue} is not a valid tag. ${value}`,
-      (value) => {
-        if (value.substr(0, 2) !== '0x') return false;
-        return true;
-      },
+        `${originalValue} is not a valid tag. ${value.message}`,
+      (value) => !(value instanceof Error),
     )
     .test(
       'is-bytes32',
       '${originalValue} is not a valid bytes32 hexstring',
       async (value) => {
+        if (value instanceof Error) {
+          return true;
+        }
         try {
           await bytes32Schema().validate(value);
           return true;
@@ -384,9 +421,51 @@ const tagSchema = () =>
           return false;
         }
       },
+    )
+    .test(
+      'is-valid-tee-tag',
+      '${originalValue} has a invalid tee combination',
+      (value, { createError }) => {
+        if (value instanceof Error) {
+          return true;
+        }
+        const isTee = checkActiveBitInTag(value, TAG_MAP.tee);
+        const teeFrameworks = Object.values(TEE_FRAMEWORKS).filter(
+          (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework]),
+        );
+        try {
+          if (isTee) {
+            if (teeFrameworks.length < 1) {
+              throw Error(
+                `'tee' tag must be used with a tee framework (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+            if (teeFrameworks.length > 1) {
+              throw Error(
+                `tee framework tags are exclusive (${Object.values(
+                  TEE_FRAMEWORKS,
+                )
+                  .map((name) => `'${name}'`)
+                  .join('|')})`,
+              );
+            }
+          } else if (teeFrameworks.length > 0) {
+            throw Error(
+              `'${teeFrameworks[0]}' tag must be used with 'tee' tag`,
+            );
+          }
+        } catch (e) {
+          return createError({ message: e.message });
+        }
+        return true;
+      },
     );
 
-const apporderSchema = (opt) =>
+export const apporderSchema = (opt) =>
   object(
     {
       app: addressSchema(opt).required(),
@@ -400,19 +479,19 @@ const apporderSchema = (opt) =>
     '${originalValue} is not a valid apporder',
   );
 
-const saltedApporderSchema = (opt) =>
+export const saltedApporderSchema = (opt) =>
   apporderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted apporder',
   );
 
-const signedApporderSchema = (opt) =>
+export const signedApporderSchema = (opt) =>
   saltedApporderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed apporder',
   );
 
-const datasetorderSchema = (opt) =>
+export const datasetorderSchema = (opt) =>
   object(
     {
       dataset: addressSchema(opt).required(),
@@ -426,19 +505,19 @@ const datasetorderSchema = (opt) =>
     '${originalValue} is not a valid datasetorder',
   );
 
-const saltedDatasetorderSchema = (opt) =>
+export const saltedDatasetorderSchema = (opt) =>
   datasetorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted datasetorder',
   );
 
-const signedDatasetorderSchema = (opt) =>
+export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
   );
 
-const workerpoolorderSchema = (opt) =>
+export const workerpoolorderSchema = (opt) =>
   object(
     {
       workerpool: addressSchema(opt).required(),
@@ -454,19 +533,19 @@ const workerpoolorderSchema = (opt) =>
     '${originalValue} is not a valid workerpoolorder',
   );
 
-const saltedWorkerpoolorderSchema = (opt) =>
+export const saltedWorkerpoolorderSchema = (opt) =>
   workerpoolorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted workerpoolorder',
   );
 
-const signedWorkerpoolorderSchema = (opt) =>
+export const signedWorkerpoolorderSchema = (opt) =>
   saltedWorkerpoolorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed workerpoolorder',
   );
 
-const requestorderSchema = (opt) =>
+export const requestorderSchema = (opt) =>
   object(
     {
       app: addressSchema(opt).required(),
@@ -487,19 +566,19 @@ const requestorderSchema = (opt) =>
     '${originalValue} is not a valid requestorder',
   );
 
-const saltedRequestorderSchema = (opt) =>
+export const saltedRequestorderSchema = (opt) =>
   requestorderSchema(opt).shape(
     salted(),
     '${originalValue} is not a valid salted requestorder',
   );
 
-const signedRequestorderSchema = (opt) =>
+export const signedRequestorderSchema = (opt) =>
   saltedRequestorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed requestorder',
   );
 
-const multiaddressSchema = () =>
+export const multiaddressSchema = () =>
   mixed().transform((value) => {
     if (value instanceof Uint8Array) return value;
     if (typeof value === 'string') {
@@ -508,16 +587,34 @@ const multiaddressSchema = () =>
     throw new ValidationError('${originalValue} is not a valid multiaddr');
   });
 
-const objMrenclaveSchema = () =>
+export const objMrenclaveSchema = () =>
   object({
-    provider: string().required(),
+    // common keys
+    framework: teeFrameworkSchema().required(),
     version: string().required(),
-    entrypoint: string().required(),
-    heapSize: positiveIntSchema().required(),
     fingerprint: string().required(),
-  }).noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
+    // framework specific keys
+    entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? string().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+    heapSize: mixed().when('framework', ([framework], entrypointSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
+        ? positiveIntSchema().required()
+        : entrypointSchema.is(
+            [undefined],
+            'Unknown key "${path}" in mrenclave',
+          ),
+    ),
+  })
+    .json()
+    .noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
 
-const mrenclaveSchema = () =>
+export const mrenclaveSchema = () =>
   mixed()
     .transform((value) => {
       if (value instanceof Uint8Array) {
@@ -570,10 +667,10 @@ const mrenclaveSchema = () =>
     )
     .default(() => utf8ToBuffer(''));
 
-const appTypeSchema = () =>
+export const appTypeSchema = () =>
   string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
-const appSchema = (opt) =>
+export const appSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     name: string().required(),
@@ -583,7 +680,7 @@ const appSchema = (opt) =>
     mrenclave: mrenclaveSchema().required(),
   });
 
-const datasetSchema = (opt) =>
+export const datasetSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     name: string().required(),
@@ -591,27 +688,26 @@ const datasetSchema = (opt) =>
     checksum: bytes32Schema().required(),
   });
 
-const workerpoolSchema = (opt) =>
+export const workerpoolSchema = (opt) =>
   object({
     owner: addressSchema(opt).required(),
     description: string().required(),
   });
 
-const categorySchema = () =>
+export const categorySchema = () =>
   object({
     name: string().required(),
     description: string().required(),
     workClockTimeRef: uint256Schema().required(),
   });
 
-const fileBufferSchema = () =>
+export const fileBufferSchema = () =>
   mixed().transform((value) => {
     try {
       if (typeof value === 'string') {
         throw Error('unsupported string');
       }
-      const buffer = Buffer.from(value);
-      return buffer;
+      return Buffer.from(value);
     } catch (e) {
       throw new ValidationError(
         'Invalid file buffer, must be ArrayBuffer or Buffer',
@@ -619,7 +715,7 @@ const fileBufferSchema = () =>
     }
   });
 
-const base64Encoded256bitsKeySchema = () =>
+export const base64Encoded256bitsKeySchema = () =>
   string().test(
     'is-base64-256bits-key',
     '${originalValue} is not a valid encryption key (must be base64 encoded 256 bits key)',
@@ -637,7 +733,7 @@ const base64Encoded256bitsKeySchema = () =>
     },
   );
 
-const ensDomainSchema = () =>
+export const ensDomainSchema = () =>
   string()
     .test(
       'no-empty-label',
@@ -685,7 +781,7 @@ const ensDomainSchema = () =>
       },
     );
 
-const ensLabelSchema = () =>
+export const ensLabelSchema = () =>
   string()
     .test(
       'no-dot',
@@ -730,61 +826,31 @@ const ensLabelSchema = () =>
       },
     );
 
-const textRecordKeySchema = () => string().required().strict(true);
+export const textRecordKeySchema = () => string().required().strict(true);
 
-const textRecordValueSchema = () => string().default('').strict(true);
+export const textRecordValueSchema = () => string().default('').strict(true);
 
-const workerpoolApiUrlSchema = () => string().url().default('');
+export const workerpoolApiUrlSchema = () => string().url().default('');
 
-const throwIfMissing = () => {
+export const basicUrlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
+
+export const smsUrlOrMapSchema = () =>
+  lazy((stringOrMap) => {
+    if (typeof stringOrMap === 'object' && stringOrMap !== null) {
+      return object(
+        teeFrameworksList.reduce(
+          (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
+          {},
+        ),
+      )
+        .noUnknown(true)
+        .nonNullable()
+        .strict(true);
+    }
+    return basicUrlSchema();
+  });
+
+export const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
-};
-
-module.exports = {
-  throwIfMissing,
-  stringSchema: string,
-  uint256Schema,
-  nRlcAmountSchema,
-  weiAmountSchema,
-  addressSchema,
-  bytes32Schema,
-  apporderSchema,
-  saltedApporderSchema,
-  signedApporderSchema,
-  datasetorderSchema,
-  signedDatasetorderSchema,
-  saltedDatasetorderSchema,
-  workerpoolorderSchema,
-  saltedWorkerpoolorderSchema,
-  signedWorkerpoolorderSchema,
-  requestorderSchema,
-  saltedRequestorderSchema,
-  signedRequestorderSchema,
-  catidSchema,
-  paramsSchema,
-  objParamsSchema,
-  paramsArgsSchema,
-  paramsInputFilesArraySchema,
-  paramsRequesterSecretsSchema,
-  paramsEncryptResultSchema,
-  paramsStorageProviderSchema,
-  tagSchema,
-  chainIdSchema,
-  hexnumberSchema,
-  positiveIntSchema,
-  positiveStrictIntSchema,
-  mrenclaveSchema,
-  appTypeSchema,
-  appSchema,
-  datasetSchema,
-  categorySchema,
-  workerpoolSchema,
-  base64Encoded256bitsKeySchema,
-  fileBufferSchema,
-  ensDomainSchema,
-  ensLabelSchema,
-  textRecordKeySchema,
-  textRecordValueSchema,
-  workerpoolApiUrlSchema,
-  ValidationError,
 };

@@ -1,19 +1,19 @@
 pipeline:
-  # test_node18:
-  #   image: node:18
-  #   pull: true
-  #   secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
-  #   commands:
-  #     - apt update
-  #     - apt install xxd
-  #     - node -v
-  #     - npm -v
-  #     - npm ci
-  #     - npm run build
-  #     - npm -g install .
-  #     - npm test
-  #   when:
-  #     ref: refs/tags/v*
+  test_node18:
+    image: node:18
+    pull: true
+    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
+    when:
+      ref: refs/tags/v*
 
   test_node16:
     image: node:16
@@ -45,23 +45,13 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
-    when:
-      ref: refs/tags/v*
 
-  test_node12:
-    image: node:12
+  code_analysis:
+    image: sonarsource/sonar-scanner-cli
     pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    secrets: [sonar_token, sonar_host]
     commands:
-      - apt update
-      - apt install xxd
-      - npm i -g npm@8
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
+      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
 
   publish_npm:
     image: plugins/npm
@@ -113,7 +103,30 @@ services:
     image: iexechub/poco-chaintest:5.3.2-token-openethereum
     pull: true
 
-  token-sms:
+  token-sms-scone:
+    image: iexechub/iexec-sms:7.1.0
+    pull: true
+    environment:
+      - TZ=Europe/Paris
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
+      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
+      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
+      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
+      - IEXEC_SCONE_CAS_HOST=foo
+      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
+    expose:
+      - 13300
+    depends_on:
+      - token-chain-openethereum
+
+  token-sms-gramine:
     image: iexechub/iexec-sms:7.1.0
     pull: true
     environment:
@@ -173,7 +186,7 @@ services:
     command: redis-server --appendonly yes
 
   token-watcher:
-    image: iexechub/iexec-market-watcher:5
+    image: iexechub/iexec-market-watcher:6.1
     commands:
       - sleep 10
       - cd /app
@@ -190,7 +203,7 @@ services:
       - REDIS_HOST=gateway-redis
 
   token-gateway:
-    image: iexechub/iexec-market-api:5
+    image: iexechub/iexec-market-api:6.1
     commands:
       - sleep 10
       - cd /app

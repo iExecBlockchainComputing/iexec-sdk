@@ -1,10 +1,10 @@
-const IExecModule = require('./IExecModule');
-const { checkWeb2SecretExists } = require('../common/sms/check');
-const { pushWeb2Secret } = require('../common/sms/push');
-const { login: resultProxyLogin } = require('../common/storage/result-proxy');
-const { getStorageTokenKeyName } = require('../common/utils/secrets-utils');
+import IExecModule from './IExecModule.js';
+import { checkWeb2SecretExists } from '../common/sms/check.js';
+import { pushWeb2Secret } from '../common/sms/push.js';
+import { login as resultProxyLogin } from '../common/storage/result-proxy.js';
+import { getStorageTokenKeyName } from '../common/utils/secrets-utils.js';
 
-class IExecStorageModule extends IExecModule {
+export default class IExecStorageModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -13,25 +13,27 @@ class IExecStorageModule extends IExecModule {
         await this.config.resolveContractsClient(),
         await this.config.resolveResultProxyURL(),
       );
-    this.checkStorageTokenExists = async (address, { provider } = {}) =>
+    this.checkStorageTokenExists = async (
+      address,
+      { provider, teeFramework } = {},
+    ) =>
       checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         address,
         getStorageTokenKeyName(provider),
       );
+
     this.pushStorageToken = async (
       token,
-      { provider, forceUpdate = false } = {},
+      { provider, teeFramework, forceUpdate = false } = {},
     ) =>
       pushWeb2Secret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
+        await this.config.resolveSmsURL({ teeFramework }),
         getStorageTokenKeyName(provider),
         token,
         { forceUpdate },
       );
   }
 }
-
-module.exports = IExecStorageModule;

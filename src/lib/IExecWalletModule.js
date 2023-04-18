@@ -1,19 +1,19 @@
-const IExecModule = require('./IExecModule');
-const { getAddress } = require('../common/wallet/address');
-const { checkBalances } = require('../common/wallet/balance');
-const { sendETH, sendRLC, sweep } = require('../common/wallet/send');
-const {
+import IExecModule from './IExecModule.js';
+import { getAddress } from '../common/wallet/address.js';
+import { checkBalances } from '../common/wallet/balance.js';
+import { sendETH, sendRLC, sweep } from '../common/wallet/send.js';
+import {
   bridgeToMainchain,
   bridgeToSidechain,
   obsBridgeToMainchain,
   obsBridgeToSidechain,
-} = require('../common/wallet/bridge');
-const {
+} from '../common/wallet/bridge.js';
+import {
   wrapEnterpriseRLC,
   unwrapEnterpriseRLC,
-} = require('../common/wallet/enterprise');
+} from '../common/wallet/enterprise.js';
 
-class IExecWalletModule extends IExecModule {
+export default class IExecWalletModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
@@ -82,5 +82,3 @@ class IExecWalletModule extends IExecModule {
       );
   }
 }
-
-module.exports = IExecWalletModule;

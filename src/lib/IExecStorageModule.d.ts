@@ -1,6 +1,6 @@
 import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
-import { Addressish } from './types';
+import { Addressish, TeeFramework } from './types';
 
 /**
  * module exposing storage methods
@@ -21,6 +21,7 @@ export default class IExecStorageModule extends IExecModule {
     beneficiaryAddress: Addressish,
     options?: {
       provider?: string;
+      teeFramework?: TeeFramework;
     },
   ): Promise<boolean>;
   /**
@@ -62,6 +63,7 @@ export default class IExecStorageModule extends IExecModule {
     token: string,
     options?: {
       provider?: string;
+      teeFramework?: TeeFramework;
       forceUpdate?: boolean;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;

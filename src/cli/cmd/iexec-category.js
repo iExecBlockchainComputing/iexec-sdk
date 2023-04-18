@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const cli = require('commander');
-const {
+import { program as cli } from 'commander';
+import {
   createCategory,
   showCategory,
   countCategory,
-} = require('../../common/protocol/category');
-const {
+} from '../../common/protocol/category.js';
+import {
   addGlobalOptions,
   addWalletLoadOptions,
   computeWalletLoadOptions,
@@ -19,10 +19,10 @@ const {
   Spinner,
   pretty,
   info,
-} = require('../utils/cli-helper');
-const { loadIExecConf, initObj } = require('../utils/fs');
-const { loadChain, connectKeystore } = require('../utils/chains');
-const { Keystore } = require('../utils/keystore');
+} from '../utils/cli-helper.js';
+import { loadIExecConf, initObj } from '../utils/fs.js';
+import { loadChain, connectKeystore } from '../utils/chains.js';
+import { Keystore } from '../utils/keystore.js';
 
 const objName = 'category';
 
@@ -58,7 +58,7 @@ create
     await checkUpdate(opts);
     const spinner = Spinner(opts);
     try {
-      const walletOptions = await computeWalletLoadOptions(opts);
+      const walletOptions = computeWalletLoadOptions(opts);
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const [iexecConf, chain] = await Promise.all([

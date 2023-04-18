@@ -38,7 +38,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -61,7 +61,7 @@ current IExecConfig
 
 ### checkResultEncryptionKeyExists
 
-▸ **checkResultEncryptionKeyExists**(`beneficiaryAddress`): `Promise`<`boolean`\>
+▸ **checkResultEncryptionKeyExists**(`beneficiaryAddress`, `options`): `Promise`<`boolean`\>
 
 check if a beneficiary result encryption key exists in the Secret Management Service
 
@@ -76,6 +76,8 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 | Name | Type |
 | :------ | :------ |
 | `beneficiaryAddress` | `string` |
+| `options` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -121,6 +123,7 @@ console.log('encryption key pushed:', isPushed);
 | `rsaPublicKey` | `string` |
 | `options?` | `Object` |
 | `options.forceUpdate?` | `boolean` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 

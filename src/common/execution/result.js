@@ -1,7 +1,7 @@
-const Debug = require('debug');
-const taskModule = require('./task');
-const { downloadZipApi } = require('../utils/api-utils');
-const { bytes32Schema, throwIfMissing } = require('../utils/validator');
+import Debug from 'debug';
+import { show } from './task.js';
+import { downloadZipApi } from '../utils/api-utils.js';
+import { bytes32Schema, throwIfMissing } from '../utils/validator.js';
 
 const debug = Debug('iexec:execution:result');
 
@@ -10,24 +10,23 @@ const downloadFromIpfs = async (
   { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
 ) => {
   try {
-    const res = await downloadZipApi.get({
+    return await downloadZipApi.get({
       api: ipfsGatewayURL,
       endpoint: ipfsAddress,
     });
-    return res;
   } catch (error) {
     throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
   }
 };
 
-const fetchTaskResults = async (
+export const fetchTaskResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
   { ipfsGatewayURL } = {},
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
-    const task = await taskModule.show(contracts, vTaskId);
+    const task = await show(contracts, vTaskId);
     if (task.status !== 3) throw Error('Task is not completed');
     const { storage, location } = task.results;
     if (storage === 'none') {
@@ -41,14 +40,9 @@ const fetchTaskResults = async (
         'Missing location key in task results, download not supported',
       );
     }
-    const res = await downloadFromIpfs(location, { ipfsGatewayURL });
-    return res;
+    return await downloadFromIpfs(location, { ipfsGatewayURL });
   } catch (error) {
     debug('fetchResults()', error);
     throw error;
   }
-};
-
-module.exports = {
-  fetchTaskResults,
 };

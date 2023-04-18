@@ -47,7 +47,7 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) \| [`IExecConfig`](IExecConfig.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
 
 #### Inherited from
@@ -70,7 +70,7 @@ current IExecConfig
 
 ### checkDatasetSecretExists
 
-▸ **checkDatasetSecretExists**(`datasetAddress`): `Promise`<`boolean`\>
+▸ **checkDatasetSecretExists**(`datasetAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a the dataset secret exists in the Secret Management Service
 
@@ -85,6 +85,8 @@ console.log('secret exists:', isSecretSet);
 | Name | Type |
 | :------ | :------ |
 | `datasetAddress` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 
@@ -143,7 +145,7 @@ const checksum = await computeEncryptedFileChecksum(
 
 | Name | Type |
 | :------ | :------ |
-| `encryptedFile` | `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
+| `encryptedFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
 
 #### Returns
 
@@ -235,7 +237,7 @@ const binary = new Blob([encryptedDataset]);
 
 | Name | Type |
 | :------ | :------ |
-| `datasetFile` | `ArrayBuffer` \| `Uint8Array` \| `Buffer` |
+| `datasetFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
 | `encyptionKey` | `string` |
 
 #### Returns
@@ -295,7 +297,7 @@ ___
 
 ### pushDatasetSecret
 
-▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`): `Promise`<`boolean`\>
+▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`, `options?`): `Promise`<`boolean`\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
@@ -315,6 +317,8 @@ console.log('secret pushed:', pushed);
 | :------ | :------ |
 | `datasetAddress` | `string` |
 | `encryptionKey` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
 
 #### Returns
 

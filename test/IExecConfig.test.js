@@ -1,8 +1,9 @@
-const ethers = require('ethers');
-const Eth = require('web3-eth');
+import { providers } from 'ethers';
+import Eth from 'web3-eth';
 
-const { utils, IExecConfig, errors } = require('../src/lib');
-const IExecContractsClient = require('../src/common/utils/IExecContractsClient');
+import { utils, IExecConfig, errors } from '../src/lib';
+import IExecContractsClient from '../src/common/utils/IExecContractsClient';
+import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
 
 console.log('Node version:', process.version);
 
@@ -22,7 +23,9 @@ const nativeChainUrl = DRONE
   ? 'http://native-chain:8545'
   : 'http://localhost:18545';
 // secret management service
-const smsURL = DRONE ? 'http://token-sms:13300' : 'http://localhost:13300';
+const sconeSms = DRONE
+  ? 'http://token-sms-scone:13300'
+  : 'http://localhost:13301';
 // result proxy
 const resultProxyURL = DRONE
   ? 'http://token-result-proxy:13200'
@@ -78,6 +81,36 @@ describe('[IExecConfig]', () => {
       });
     });
 
+    describe('throw Invalid option smsURL', () => {
+      test('IExecConfig({ ethProvider }, { smsURL: { foo: "https://foo.com" } })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { smsURL: { foo: 'https://foo.com' } },
+          );
+        expect(createConfig).toThrow(
+          Error('Invalid smsURL: this field has unspecified keys: foo'),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
+    describe('throw Invalid option defaultTeeFramework', () => {
+      test('IExecConfig({ ethProvider }, { defaultTeeFramework: "foo" })', () => {
+        const createConfig = () =>
+          new IExecConfig(
+            { ethProvider: 'bellecour' },
+            { defaultTeeFramework: 'foo' },
+          );
+        expect(createConfig).toThrow(
+          Error(
+            'Invalid defaultTeeFramework: this is not a valid TEE framework',
+          ),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+    });
+
     describe('read-only ethProvider from network name', () => {
       test('IExecConfig({ ethProvider: "mainnet" })', async () => {
         const config = new IExecConfig({ ethProvider: 'mainnet' });
@@ -85,24 +118,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
         expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "goerli" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'goerli' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
         expect(network.ensAddress).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "bellecour" })', async () => {
@@ -111,24 +131,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "viviani" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'viviani' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: "kovan" })', () => {
@@ -147,24 +154,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
         expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "5" })', async () => {
-        const config = new IExecConfig({ ethProvider: '5' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
         expect(network.ensAddress).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "134" })', async () => {
@@ -173,24 +167,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: "133" })', async () => {
-        const config = new IExecConfig({ ethProvider: '133' });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('IExecConfig({ ethProvider: 1 })', async () => {
@@ -199,24 +180,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
         expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: 5 })', async () => {
-        const config = new IExecConfig({ ethProvider: 5 });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
-        expect(chainId).toBe('5');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(5);
-        expect(network.name).toBe('goerli');
         expect(network.ensAddress).toBeDefined();
       });
       test('IExecConfig({ ethProvider: 134 })', async () => {
@@ -225,24 +193,11 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
-      });
-      test('IExecConfig({ ethProvider: 133 })', async () => {
-        const config = new IExecConfig({ ethProvider: 133 });
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
-        expect(chainId).toBe('133');
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(133);
-        expect(network.name).toBe('viviani');
         expect(network.ensAddress).toBeDefined();
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: 42 })', () => {
@@ -276,7 +231,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -296,7 +258,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -316,7 +285,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.AlchemyProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -336,7 +312,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.EtherscanProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -358,7 +341,9 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(4);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -377,7 +362,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -392,7 +377,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -411,7 +396,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -435,7 +420,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -460,7 +445,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -484,7 +469,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -500,7 +485,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -520,7 +505,14 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -533,7 +525,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134);
@@ -557,7 +549,7 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(ethers.providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(65535);
@@ -609,7 +601,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(false);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -663,7 +655,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.chainId).toBe(`${networkId}`);
       expect(contracts.isNative).toBe(true);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -711,7 +703,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('success with enterpriseSwapConf on custom entreprise chain', async () => {
+    test('success with enterpriseSwapConf on custom enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -730,7 +722,7 @@ describe('[IExecConfig]', () => {
       expect(contracts.hubAddress).toBe(hubAddress);
       expect(contracts.flavour).toBe('standard');
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: tokenChainUrl,
       });
@@ -742,7 +734,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown enterprise chain', async () => {
+    test('throw on unknown enterprise chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -771,27 +763,6 @@ describe('[IExecConfig]', () => {
   });
 
   describe('resolveEnterpriseContractsClient()', () => {
-    test('success', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: 'mainnet',
-        },
-        {
-          providerOptions: {
-            infura: INFURA_PROJECT_ID,
-            alchemy: ALCHEMY_API_KEY,
-            etherscan: ETHERSCAN_API_KEY,
-          },
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(
-        '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-      );
-      expect(contracts.flavour).toBe('enterprise');
-    });
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
@@ -838,7 +809,7 @@ describe('[IExecConfig]', () => {
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
     });
-    test('throw on unkwown chain', async () => {
+    test('throw on unknown chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
@@ -875,25 +846,97 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success smsURL override', async () => {
+    test('success default resolves to scone', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const sconeSmsUrl = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const gramineSmsUrl = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSms).toBe(sconeSmsUrl);
+      expect(defaultSms).not.toBe(gramineSmsUrl);
+    });
+    test('success override defaultTeeFramework', async () => {
+      const defaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL();
+      const defaultSmsTeeFrameworkOverride = await new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
+      ).resolveSmsURL();
+      const gramineSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
+      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
+      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
+    });
+    test('success smsURL object override per teeFramework', async () => {
+      const smsMap = {
+        scone: 'http://foo.io',
+        gramine: 'http://bar.io',
+      };
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { smsURL },
+        { smsURL: smsMap },
       );
-      const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(smsMap.scone);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
     });
-    test('success with smsURL on custom chain', async () => {
+    test('success smsURL object override only one teeFramework', async () => {
+      const sconeDefaultSms = await new IExecConfig({
+        ethProvider: 'bellecour',
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      const smsMap = {
+        gramine: 'http://bar.io',
+      };
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: smsMap },
+      );
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(sconeDefaultSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(smsMap.gramine);
+    });
+    test('success smsURL string override all teeFramework', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { smsURL: sconeSms },
+      );
+      await expect(config.resolveSmsURL()).resolves.toBe(sconeSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
+      ).resolves.toBe(sconeSms);
+      await expect(
+        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
+      ).resolves.toBe(sconeSms);
+    });
+    test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
           ethProvider: tokenChainUrl,
         },
-        { smsURL },
+        { smsURL: sconeSms },
       );
       const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(smsURL);
+      await expect(promise).resolves.toBe(sconeSms);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
@@ -914,6 +957,16 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
+    });
+    test('throw with invalid TEE framework', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveSmsURL({ teeFramework: 'foo' });
+      await expect(promise).rejects.toThrow(
+        Error(`teeFramework is not a valid TEE framework`),
+      );
+      await expect(promise).rejects.toThrow(errors.ValidationError);
     });
   });
 
@@ -979,14 +1032,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { iexecGatewayURL },
+      );
       const promise = config.resolveIexecGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe(iexecGatewayURL);
     });
     test('success iexecGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -997,6 +1051,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).resolves.toBe(iexecGatewayURL);
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIexecGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `iexecGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
@@ -1018,14 +1082,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
+      );
       const promise = config.resolveIpfsGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
     });
     test('success ipfsGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -1036,6 +1101,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
+    });
+    test('success when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIpfsGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `ipfsGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({

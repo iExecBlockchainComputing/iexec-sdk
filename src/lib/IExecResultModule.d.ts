@@ -1,6 +1,6 @@
 import IExecConfig from './IExecConfig';
 import IExecModule from './IExecModule';
-import { Addressish } from './types';
+import { Addressish, TeeFramework } from './types';
 
 /**
  * module exposing result methods
@@ -17,6 +17,7 @@ export default class IExecResultModule extends IExecModule {
    */
   checkResultEncryptionKeyExists(
     beneficiaryAddress: Addressish,
+    options: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
@@ -50,6 +51,7 @@ export default class IExecResultModule extends IExecModule {
     rsaPublicKey: string,
     options?: {
       forceUpdate?: boolean;
+      teeFramework?: TeeFramework;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;
   /**

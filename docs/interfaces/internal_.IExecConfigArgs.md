@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / IExecConfigArgs
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / IExecConfigArgs
 
 # Interface: IExecConfigArgs
 
-[{internal}](../modules/internal_.md).IExecConfigArgs
+[<internal>](../modules/internal_.md).IExecConfigArgs
 
 ## Table of contents
 
@@ -15,7 +15,7 @@
 
 ### ethProvider
 
-• **ethProvider**: `string` \| `number` \| `ExternalProvider` \| [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
+• **ethProvider**: `string` \| `number` \| [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md) \| `ExternalProvider`
 
 A web3 Eth provider or network name or chain id
 

@@ -1,8 +1,8 @@
-[iexec](../README.md) / [Exports](../modules.md) / [{internal}](../modules/internal_.md) / PublishedApporder
+[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / PublishedApporder
 
 # Interface: PublishedApporder
 
-[{internal}](../modules/internal_.md).PublishedApporder
+[<internal>](../modules/internal_.md).PublishedApporder
 
 published sell order for an app
 
