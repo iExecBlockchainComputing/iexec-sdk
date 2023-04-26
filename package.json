@@ -6,6 +6,7 @@
     "iexec": "./dist/esm/cli/cmd/iexec.js"
   },
   "main": "./dist/esm/lib/index.js",
+  "types": "./dist/esm/lib/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
