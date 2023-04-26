@@ -1,7 +1,7 @@
 import IExecConfig, {
   IExecConfigArgs,
   IExecConfigOptions,
-} from './IExecConfig';
+} from './IExecConfig.js';
 
 /**
  * module base

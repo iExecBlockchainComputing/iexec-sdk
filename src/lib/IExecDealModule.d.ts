@@ -1,6 +1,6 @@
-import IExecConfig from './IExecConfig';
-import { Observable } from '../common/utils/reactive';
-import IExecModule from './IExecModule';
+import IExecConfig from './IExecConfig.js';
+import { Observable } from '../common/utils/reactive.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -13,7 +13,7 @@ import {
   Taskid,
   TaskIndex,
   TxHash,
-} from './types';
+} from './types.js';
 
 declare class DealObservable extends Observable {
   /**

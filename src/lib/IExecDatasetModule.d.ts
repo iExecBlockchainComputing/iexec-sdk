@@ -1,5 +1,5 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -9,7 +9,7 @@ import {
   Multiaddress,
   TxHash,
   TeeFramework,
-} from './types';
+} from './types.js';
 
 export interface DatasetDeploymentArgs {
   /**

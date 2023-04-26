@@ -1,5 +1,5 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 
 /**
  * module exposing network methods

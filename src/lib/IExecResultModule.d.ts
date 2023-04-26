@@ -1,6 +1,6 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
-import { Addressish, TeeFramework } from './types';
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
+import { Addressish, TeeFramework } from './types.js';
 
 /**
  * module exposing result methods

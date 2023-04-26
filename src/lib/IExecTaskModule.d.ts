@@ -1,7 +1,15 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
-import { Observable } from '../common/utils/reactive';
-import { Address, BN, Bytes, Bytes32, Dealid, Taskid, TxHash } from './types';
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
+import { Observable } from '../common/utils/reactive.js';
+import {
+  Address,
+  BN,
+  Bytes,
+  Bytes32,
+  Dealid,
+  Taskid,
+  TxHash,
+} from './types.js';
 
 declare class TaskObservable extends Observable {
   /**

@@ -1,20 +1,20 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
-import IExecAccountModule from './IExecAccountModule';
-import IExecAppModule from './IExecAppModule';
-import IExecDatasetModule from './IExecDatasetModule';
-import IExecDealModule from './IExecDealModule';
-import IExecENSModule from './IExecENSModule';
-import IExecHubModule from './IExecHubModule';
-import IExecNetworkModule from './IExecNetworkModule';
-import IExecOrderModule from './IExecOrderModule';
-import IExecOrderbookModule from './IExecOrderbookModule';
-import IExecResultModule from './IExecResultModule';
-import IExecSecretsModule from './IExecSecretsModule';
-import IExecStorageModule from './IExecStorageModule';
-import IExecTaskModule from './IExecTaskModule';
-import IExecWalletModule from './IExecWalletModule';
-import IExecWorkerpoolModule from './IExecWorkerpoolModule';
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
+import IExecAccountModule from './IExecAccountModule.js';
+import IExecAppModule from './IExecAppModule.js';
+import IExecDatasetModule from './IExecDatasetModule.js';
+import IExecDealModule from './IExecDealModule.js';
+import IExecENSModule from './IExecENSModule.js';
+import IExecHubModule from './IExecHubModule.js';
+import IExecNetworkModule from './IExecNetworkModule.js';
+import IExecOrderModule from './IExecOrderModule.js';
+import IExecOrderbookModule from './IExecOrderbookModule.js';
+import IExecResultModule from './IExecResultModule.js';
+import IExecSecretsModule from './IExecSecretsModule.js';
+import IExecStorageModule from './IExecStorageModule.js';
+import IExecTaskModule from './IExecTaskModule.js';
+import IExecWalletModule from './IExecWalletModule.js';
+import IExecWorkerpoolModule from './IExecWorkerpoolModule.js';
 
 /**
  * module exposing all the iExec SDK modules
