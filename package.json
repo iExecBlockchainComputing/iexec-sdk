@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "8.0.1-alpha.0",
+  "version": "8.0.1-alpha.1",
   "description": "iExec SDK",
   "bin": {
     "iexec": "./dist/esm/cli/cmd/iexec.js"
