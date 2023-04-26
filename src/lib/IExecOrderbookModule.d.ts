@@ -25,7 +25,7 @@ export interface PublishedApporder {
     app: Address;
     appprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     datasetrestrict: Address;
     workerpoolrestrict: Address;
     requesterrestrict: Address;
@@ -48,7 +48,7 @@ export interface PublishedDatasetorder {
     dataset: Address;
     datasetprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     apprestrict: Address;
     workerpoolrestrict: Address;
     requesterrestrict: Address;
@@ -71,7 +71,7 @@ export interface PublishedWorkerpoolorder {
     workerpool: Address;
     workerpoolprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     category: number;
     trust: number;
     apprestrict: Address;
@@ -100,7 +100,7 @@ export interface PublishedRequestorder {
     workerpool: Address;
     workerpoolmaxprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     category: number;
     trust: number;
     beneficiary: Address;
