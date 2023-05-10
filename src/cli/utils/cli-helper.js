@@ -19,7 +19,7 @@ import packageJSON, { version } from '../../common/generated/sdk/package.js';
 
 const debug = Debug('help');
 
-export const finalizeCli = (cli) => {
+export const finalizeCli = async (cli) => {
   if (process.env.GENERATE_DOC) {
     const processOptions = (options) =>
       options.map((o) => ({
@@ -49,6 +49,15 @@ export const finalizeCli = (cli) => {
         })),
       }),
     );
+
+    // When dynamically generating the CLI doc using the 'GENERATE_DOC' env var,
+    // calling process.exit(0) immediately after a console.log(...) 
+    // may randomly truncate the output string, mainly because console.log()
+    // internal buffer is not fully flushed. This issue usually occurs with
+    // commands offering large number of subcommands. To quickly fix the problem
+    // simply add a small sleep before exiting.
+    await new Promise(resolve => { setTimeout(resolve, 500); });
+
     process.exit(0);
   }
 
