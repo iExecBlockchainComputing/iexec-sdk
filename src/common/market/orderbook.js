@@ -13,6 +13,8 @@ import {
 
 const debug = Debug('iexec:market:orderbook');
 
+const ERROR_GETTING_ORDERBOOK = 'An error occurred while getting orderbook';
+
 export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
@@ -58,7 +60,7 @@ export const fetchAppOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchAppOrderbook()', error);
     throw error;
@@ -110,7 +112,7 @@ export const fetchDatasetOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchDatasetOrderbook()', error);
     throw error;
@@ -183,7 +185,7 @@ export const fetchWorkerpoolOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchWorkerpoolOrderbook()', error);
     throw error;
@@ -256,7 +258,7 @@ export const fetchRequestOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchRequestOrderbook()', error);
     throw error;
