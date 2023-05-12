@@ -20,9 +20,8 @@ import {
   STORAGE_PROVIDERS,
   ANY,
 } from './constant.js';
-import { isAddress } from 'ethers/lib/utils.js';
 
-const { getAddress, namehash } = utils;
+const { getAddress, namehash, isAddress } = utils;
 
 const debug = Debug('validators');
 
