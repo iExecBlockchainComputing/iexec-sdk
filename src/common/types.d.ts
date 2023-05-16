@@ -1,9 +1,15 @@
-import BN from 'bn.js';
+import BNjs from 'bn.js';
+
+export * from './utils/IExecContractsClient.js';
+export * from './utils/reactive.js';
+export * from './utils/signers.js';
+
+export type BN = BNjs;
 
 /**
  * big number like
  */
-type BNish = BN | string | number;
+export type BNish = BN | string | number;
 /**
  * ethereum address
  *
@@ -12,7 +18,7 @@ type BNish = BN | string | number;
  * const address = '0xF048eF3d7E3B33A465E0599E641BB29421f7Df92';
  * ```
  */
-type Address = string;
+export type Address = string;
 /**
  * ENS
  *
@@ -21,11 +27,11 @@ type Address = string;
  * const ensName = 'iexec.eth';
  * ```
  */
-type ENS = string;
+export type ENS = string;
 /**
  * ethereum address or ENS
  */
-type Addressish = Address | ENS;
+export type Addressish = Address | ENS;
 /**
  * bytes hex string
  *
@@ -34,7 +40,7 @@ type Addressish = Address | ENS;
  * const NULL_BYTES = '0x';
  * ```
  */
-type Bytes = string;
+export type Bytes = string;
 /**
  * bytes 32 hex string
  *
@@ -43,27 +49,27 @@ type Bytes = string;
  * const bytes32 = '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef883c6';
  * ```
  */
-type Bytes32 = string;
+export type Bytes32 = string;
 /**
  * id of a deal
  */
-type Dealid = Bytes32;
+export type Dealid = Bytes32;
 /**
  * id of a task
  */
-type Taskid = Bytes32;
+export type Taskid = Bytes32;
 /**
  * index of a task in a bag of tasks
  */
-type TaskIndex = number;
+export type TaskIndex = number;
 /**
  * transaction hash
  */
-type TxHash = Bytes32;
+export type TxHash = Bytes32;
 /**
  * order hash
  */
-type OrderHash = Bytes32;
+export type OrderHash = Bytes32;
 /**
  * wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,000,000,000 wei).
  *
@@ -83,7 +89,7 @@ type OrderHash = Bytes32;
  * const tenWei = new BN(10);
  * ```
  */
-type WeiAmount = number | string | BN;
+export type WeiAmount = number | string | BN;
 /**
  * nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
  *
@@ -103,7 +109,7 @@ type WeiAmount = number | string | BN;
  * const tenNRLC = new BN(10);
  * ```
  */
-type NRLCAmount = number | string | BN;
+export type NRLCAmount = number | string | BN;
 /**
  * human redable task tag
  *
@@ -112,7 +118,7 @@ type NRLCAmount = number | string | BN;
  * const teeTag = 'tee';
  * ```
  */
-type HumanSingleTag = string;
+export type HumanSingleTag = string;
 /**
  * task tag used to specify the runtime
  *
@@ -123,7 +129,7 @@ type HumanSingleTag = string;
  * const gramineTeeTag = ['tee', 'gramine'];
  * ```
  */
-type Tag = Bytes32 | HumanSingleTag[];
+export type Tag = Bytes32 | HumanSingleTag[];
 /**
  * multiaddress
  *
@@ -133,17 +139,17 @@ type Tag = Bytes32 | HumanSingleTag[];
  * const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
  * ```
  */
-type Multiaddress = string | Buffer;
+export type Multiaddress = string | Buffer;
 
 /**
  * Trusted Execution Environment name
  */
-type TeeFramework = 'scone' | 'gramine';
+export type TeeFramework = 'scone' | 'gramine';
 
 /**
  * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
  */
-interface ProviderOptions {
+export interface ProviderOptions {
   /**
    * [Alchemy](https://alchemyapi.io/) API key
    */
@@ -172,25 +178,3 @@ interface ProviderOptions {
    */
   quorum?: number;
 }
-
-export {
-  BN,
-  BNish,
-  Address,
-  Addressish,
-  ENS,
-  Bytes,
-  Bytes32,
-  Dealid,
-  Taskid,
-  TaskIndex,
-  TxHash,
-  OrderHash,
-  WeiAmount,
-  NRLCAmount,
-  HumanSingleTag,
-  Tag,
-  Multiaddress,
-  TeeFramework,
-  ProviderOptions,
-};

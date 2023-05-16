@@ -1,7 +1,9 @@
+export * from '../common/types.js';
+
 import { ExternalProvider } from '@ethersproject/providers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
-import { ProviderOptions, TeeFramework } from './types.js';
+import { ProviderOptions, TeeFramework } from '../common/types.js';
 
 export interface IExecConfigArgs {
   /**

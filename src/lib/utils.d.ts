@@ -8,7 +8,7 @@ import {
   HumanSingleTag,
   Bytes32,
   ProviderOptions,
-} from './types.js';
+} from '../common/types.js';
 
 /**
  * create a signer connected to the specified blockchain host from a private key

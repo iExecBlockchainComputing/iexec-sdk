@@ -1,3 +1,5 @@
+export * from '../common/types.js';
+
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
@@ -9,7 +11,7 @@ import {
   Multiaddress,
   TeeFramework,
   TxHash,
-} from './types.js';
+} from '../common/types.js';
 
 export interface AppDeploymentArgs {
   /**

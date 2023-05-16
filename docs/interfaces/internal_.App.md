@@ -38,7 +38,7 @@ ___
 
 ### appMultiaddr
 
-• **appMultiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
+• **appMultiaddr**: [`Multiaddress`](../modules.md#multiaddress)
 
 app image address
 

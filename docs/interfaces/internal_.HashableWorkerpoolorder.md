@@ -31,7 +31,7 @@ ___
 
 ### category
 
-• **category**: [`BNish`](../modules/internal_.md#bnish)
+• **category**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -55,19 +55,19 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
 
 ___
 
 ### trust
 
-• **trust**: [`BNish`](../modules/internal_.md#bnish)
+• **trust**: [`BNish`](../modules.md#bnish)
 
 ___
 
 ### volume
 
-• **volume**: [`BNish`](../modules/internal_.md#bnish)
+• **volume**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -79,4 +79,4 @@ ___
 
 ### workerpoolprice
 
-• **workerpoolprice**: [`BNish`](../modules/internal_.md#bnish)
+• **workerpoolprice**: [`BNish`](../modules.md#bnish)

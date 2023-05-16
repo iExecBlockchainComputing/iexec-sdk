@@ -1,3 +1,5 @@
+export * from '../common/types.js';
+
 export { default as IExec } from './IExec.js';
 export { default as IExecConfig } from './IExecConfig.js';
 export { default as IExecModule } from './IExecModule.js';
