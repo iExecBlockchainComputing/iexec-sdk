@@ -1,8 +1,6 @@
-[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / EnhancedWallet
+[iexec](../README.md) / [Exports](../modules.md) / EnhancedWallet
 
 # Class: EnhancedWallet
-
-[<internal>](../modules/internal_.md).EnhancedWallet
 
 ## Hierarchy
 
@@ -14,11 +12,11 @@
 
 ### Constructors
 
-- [constructor](internal_.EnhancedWallet.md#constructor)
+- [constructor](EnhancedWallet.md#constructor)
 
 ### Methods
 
-- [signTypedData](internal_.EnhancedWallet.md#signtypeddata)
+- [signTypedData](EnhancedWallet.md#signtypeddata)
 
 ## Constructors
 

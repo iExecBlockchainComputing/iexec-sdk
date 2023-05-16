@@ -1,6 +1,8 @@
+export * from '../common/types.js';
+
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Address, Addressish, BN, BNish, TxHash } from './types.js';
+import { Address, Addressish, BN, BNish, TxHash } from '../common/types.js';
 
 export interface WorkerpoolDeploymentArgs {
   /**

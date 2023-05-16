@@ -1,3 +1,5 @@
+export * from '../common/types.js';
+
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
@@ -7,7 +9,7 @@ import {
   TxHash,
   WeiAmount,
   BN,
-} from './types.js';
+} from '../common/types.js';
 import { Observable } from '../common/utils/reactive.js';
 
 declare class BridgeObservable extends Observable {

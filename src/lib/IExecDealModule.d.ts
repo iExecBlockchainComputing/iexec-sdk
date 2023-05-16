@@ -1,3 +1,5 @@
+export * from '../common/types.js';
+
 import IExecConfig from './IExecConfig.js';
 import { Observable } from '../common/utils/reactive.js';
 import IExecModule from './IExecModule.js';
@@ -13,7 +15,7 @@ import {
   Taskid,
   TaskIndex,
   TxHash,
-} from './types.js';
+} from '../common/types.js';
 
 declare class DealObservable extends Observable {
   /**

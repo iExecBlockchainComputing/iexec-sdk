@@ -241,7 +241,7 @@ console.log('workerpool:', workerpool);
 
 | Name | Type |
 | :------ | :------ |
-| `index` | [`BNish`](../modules/internal_.md#bnish) |
+| `index` | [`BNish`](../modules.md#bnish) |
 | `address` | `string` |
 
 #### Returns

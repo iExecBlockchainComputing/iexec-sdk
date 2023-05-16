@@ -114,7 +114,7 @@ console.log('taskid:', taskid)
 | Name | Type |
 | :------ | :------ |
 | `dealid` | `string` |
-| `taskIdx` | [`BNish`](../modules/internal_.md#bnish) |
+| `taskIdx` | [`BNish`](../modules.md#bnish) |
 
 #### Returns
 

@@ -35,7 +35,7 @@ ___
 
 ### datasetprice
 
-• **datasetprice**: [`BNish`](../modules/internal_.md#bnish)
+• **datasetprice**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -53,13 +53,13 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
 
 ___
 
 ### volume
 
-• **volume**: [`BNish`](../modules/internal_.md#bnish)
+• **volume**: [`BNish`](../modules.md#bnish)
 
 ___
 

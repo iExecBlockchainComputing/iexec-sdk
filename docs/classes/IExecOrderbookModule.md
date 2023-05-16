@@ -87,9 +87,9 @@ console.log('total orders:', count);
 | `appAddress` | `string` | - |
 | `options?` | `Object` | - |
 | `options.dataset?` | `string` | include orders restricted to specified dataset (use `'any'` to include any dataset) |
-| `options.maxTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by maximum tag accepted |
-| `options.minTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by minimum tag required |
-| `options.minVolume?` | [`BNish`](../modules/internal_.md#bnish) | filter by minimum volume remaining |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -146,9 +146,9 @@ console.log('total orders:', count);
 | `datasetAddress` | `string` | - |
 | `options?` | `Object` | - |
 | `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
-| `options.maxTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by maximum tag accepted |
-| `options.minTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by minimum tag required |
-| `options.minVolume?` | [`BNish`](../modules/internal_.md#bnish) | filter by minimum volume remaining |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -204,12 +204,12 @@ console.log('total orders:', count);
 | :------ | :------ | :------ |
 | `options?` | `Object` | - |
 | `options.app?` | `string` | filter by specified app |
-| `options.category?` | [`BNish`](../modules/internal_.md#bnish) | filter by category |
+| `options.category?` | [`BNish`](../modules.md#bnish) | filter by category |
 | `options.dataset?` | `string` | filter by specified dataset |
-| `options.maxTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by maximum tag accepted |
-| `options.maxTrust?` | [`BNish`](../modules/internal_.md#bnish) | filter by maximum trust required |
-| `options.minTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by minimum tag required |
-| `options.minVolume?` | [`BNish`](../modules/internal_.md#bnish) | filter by minimum volume remaining |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.maxTrust?` | [`BNish`](../modules.md#bnish) | filter by maximum trust required |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
 | `options.requester?` | `string` | filter by requester |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -265,12 +265,12 @@ console.log('total orders:', count);
 | :------ | :------ | :------ |
 | `options?` | `Object` | - |
 | `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
-| `options.category?` | [`BNish`](../modules/internal_.md#bnish) | filter by category |
+| `options.category?` | [`BNish`](../modules.md#bnish) | filter by category |
 | `options.dataset?` | `string` | include orders restricted to specified dataset (use `'any'` to include any dataset) |
-| `options.maxTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by maximum tag offered |
-| `options.minTag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | filter by minimum tag required |
-| `options.minTrust?` | [`BNish`](../modules/internal_.md#bnish) | filter by minimum trust required |
-| `options.minVolume?` | [`BNish`](../modules/internal_.md#bnish) | filter by minimum volume remaining |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag offered |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minTrust?` | [`BNish`](../modules.md#bnish) | filter by minimum trust required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | filter by workerpool |
 

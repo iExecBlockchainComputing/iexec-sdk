@@ -35,7 +35,7 @@ ___
 
 ### appmaxprice
 
-• **appmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **appmaxprice**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 ### category
 
-• **category**: [`BNish`](../modules/internal_.md#bnish)
+• **category**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 ### datasetmaxprice
 
-• **datasetmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **datasetmaxprice**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -83,19 +83,19 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
 
 ___
 
 ### trust
 
-• **trust**: [`BNish`](../modules/internal_.md#bnish)
+• **trust**: [`BNish`](../modules.md#bnish)
 
 ___
 
 ### volume
 
-• **volume**: [`BNish`](../modules/internal_.md#bnish)
+• **volume**: [`BNish`](../modules.md#bnish)
 
 ___
 
@@ -107,4 +107,4 @@ ___
 
 ### workerpoolmaxprice
 
-• **workerpoolmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **workerpoolmaxprice**: [`BNish`](../modules.md#bnish)

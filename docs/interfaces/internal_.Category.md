@@ -34,6 +34,6 @@ ___
 
 ### workClockTimeRef
 
-• **workClockTimeRef**: [`BNish`](../modules/internal_.md#bnish)
+• **workClockTimeRef**: [`BNish`](../modules.md#bnish)
 
 time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)

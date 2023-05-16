@@ -1,7 +1,9 @@
+export * from '../common/types.js';
+
 import IExecConfig from './IExecConfig.js';
 import { Observable } from '../common/utils/reactive.js';
 import IExecModule from './IExecModule.js';
-import { Address, ENS, TxHash } from './types.js';
+import { Address, ENS, TxHash } from '../common/types.js';
 
 declare class ENSConfigurationObservable extends Observable {
   /**

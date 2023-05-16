@@ -104,7 +104,7 @@ console.log('deployed with catid', catid);
 | `category` | `Object` |
 | `category.description` | `string` |
 | `category.name` | `string` |
-| `category.workClockTimeRef` | [`BNish`](../modules/internal_.md#bnish) |
+| `category.workClockTimeRef` | [`BNish`](../modules.md#bnish) |
 
 #### Returns
 
@@ -148,7 +148,7 @@ console.log('category:', category);
 
 | Name | Type |
 | :------ | :------ |
-| `catid` | [`BNish`](../modules/internal_.md#bnish) |
+| `catid` | [`BNish`](../modules.md#bnish) |
 
 #### Returns
 
