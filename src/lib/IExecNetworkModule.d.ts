@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 
 /**
  * module exposing network methods

@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -9,7 +11,7 @@ import {
   OrderHash,
   HumanSingleTag,
   Tag,
-} from './types';
+} from '../common/types.js';
 
 /**
  * published sell order for an app
@@ -25,7 +27,7 @@ export interface PublishedApporder {
     app: Address;
     appprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     datasetrestrict: Address;
     workerpoolrestrict: Address;
     requesterrestrict: Address;
@@ -48,7 +50,7 @@ export interface PublishedDatasetorder {
     dataset: Address;
     datasetprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     apprestrict: Address;
     workerpoolrestrict: Address;
     requesterrestrict: Address;
@@ -71,7 +73,7 @@ export interface PublishedWorkerpoolorder {
     workerpool: Address;
     workerpoolprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     category: number;
     trust: number;
     apprestrict: Address;
@@ -100,7 +102,7 @@ export interface PublishedRequestorder {
     workerpool: Address;
     workerpoolmaxprice: number;
     volume: number;
-    tag: Tag;
+    tag: Bytes32;
     category: number;
     trust: number;
     beneficiary: Address;

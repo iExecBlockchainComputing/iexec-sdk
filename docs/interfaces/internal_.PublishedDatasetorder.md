@@ -40,7 +40,7 @@ ___
 | `requesterrestrict` | `string` |
 | `salt` | `string` |
 | `sign` | `string` |
-| `tag` | [`Tag`](../modules/internal_.md#tag) |
+| `tag` | `string` |
 | `volume` | `number` |
 | `workerpoolrestrict` | `string` |
 

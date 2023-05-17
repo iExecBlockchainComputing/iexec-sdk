@@ -1,6 +1,8 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
-import { Addressish, BN, NRLCAmount, TxHash } from './types';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
+import { Addressish, BN, NRLCAmount, TxHash } from '../common/types.js';
 
 /**
  * module exposing account methods

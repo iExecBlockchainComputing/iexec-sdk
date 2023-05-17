@@ -1,7 +1,9 @@
+export * from '../common/types.js';
+
 import IExecConfig, {
   IExecConfigArgs,
   IExecConfigOptions,
-} from './IExecConfig';
+} from './IExecConfig.js';
 
 /**
  * module base

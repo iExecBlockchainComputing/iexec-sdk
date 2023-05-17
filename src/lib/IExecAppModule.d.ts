@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -9,7 +11,7 @@ import {
   Multiaddress,
   TeeFramework,
   TxHash,
-} from './types';
+} from '../common/types.js';
 
 export interface AppDeploymentArgs {
   /**

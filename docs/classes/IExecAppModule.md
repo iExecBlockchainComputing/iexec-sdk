@@ -85,7 +85,7 @@ _NB_:
 | :------ | :------ |
 | `appAddress` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
@@ -229,7 +229,7 @@ console.log('pushed App secret:', isPushed);
 | `appAddress` | `string` |
 | `secretValue` | `String` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
@@ -277,7 +277,7 @@ console.log('app:', app);
 
 | Name | Type |
 | :------ | :------ |
-| `index` | [`BNish`](../modules/internal_.md#bnish) |
+| `index` | [`BNish`](../modules.md#bnish) |
 | `address` | `string` |
 
 #### Returns

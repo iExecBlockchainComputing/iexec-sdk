@@ -211,11 +211,11 @@ const apporderTemplate = await createApporder({app: appAddress});
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.app` | `string` | - |
-| `overrides.appprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.appprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool default no restrict |
 
 #### Returns
@@ -242,10 +242,10 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 | `overrides` | `Object` | - |
 | `overrides.apprestrict?` | `string` | restrict usage to a specific app default no restrict |
 | `overrides.dataset` | `string` | - |
-| `overrides.datasetprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.datasetprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool default no restrict |
 
 #### Returns
@@ -275,18 +275,18 @@ const requestorderTemplate = await createRequestorder({
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.app` | `string` | app to run |
-| `overrides.appmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | app max price per task default `0` |
+| `overrides.appmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | app max price per task default `0` |
 | `overrides.beneficiary?` | `string` | beneficiary default connected wallet address |
-| `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
+| `overrides.category` | [`BNish`](../modules.md#bnish) | computation category |
 | `overrides.dataset?` | `string` | dataset to use default none |
-| `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task default `0` |
+| `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | dataset max price per task default `0` |
 | `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\>  } | execution parameters |
 | `overrides.requester?` | `string` | requester default connected wallet address |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust default `0` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.trust?` | [`BNish`](../modules.md#bnish) | required trust default `0` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpool?` | `string` | run one specified workerpool default run on any workerpool |
-| `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | workerpool max price per task default `0` |
+| `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | workerpool max price per task default `0` |
 
 #### Returns
 
@@ -311,14 +311,14 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.apprestrict?` | `string` | restrict usage to a specific app default no restrict |
-| `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
+| `overrides.category` | [`BNish`](../modules.md#bnish) | computation category |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | proposed tags default `[]` |
-| `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | proposed trust default `0` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | proposed tags default `[]` |
+| `overrides.trust?` | [`BNish`](../modules.md#bnish) | proposed trust default `0` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpool` | `string` | - |
-| `overrides.workerpoolprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.workerpoolprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 
 #### Returns
 

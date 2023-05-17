@@ -1,6 +1,8 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
-import { BN, BNish, TxHash } from './types';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
+import { BN, BNish, TxHash } from '../common/types.js';
 
 /**
  * IExec category

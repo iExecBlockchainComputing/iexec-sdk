@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -13,7 +15,7 @@ import {
   Dealid,
   BN,
   TxHash,
-} from './types';
+} from '../common/types.js';
 
 /**
  * sell order for an app

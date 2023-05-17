@@ -53,7 +53,7 @@ ___
 
 ### confirms
 
-• `Optional` **confirms**: `boolean`
+• `Optional` **confirms**: `number`
 
 number of block to wait for transactions confirmation (default 1)
 
@@ -61,7 +61,7 @@ ___
 
 ### defaultTeeFramework
 
-• `Optional` **defaultTeeFramework**: [`TeeFramework`](../modules/internal_.md#teeframework)
+• `Optional` **defaultTeeFramework**: [`TeeFramework`](../modules.md#teeframework)
 
 override the TEE framework to use when as default
 
@@ -131,7 +131,7 @@ ___
 
 ### providerOptions
 
-• `Optional` **providerOptions**: [`ProviderOptions`](internal_.ProviderOptions.md)
+• `Optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md)
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 
@@ -147,7 +147,7 @@ ___
 
 ### smsURL
 
-• `Optional` **smsURL**: `string` \| `Record`<[`TeeFramework`](../modules/internal_.md#teeframework), `string`\>
+• `Optional` **smsURL**: `string` \| `Record`<[`TeeFramework`](../modules.md#teeframework), `string`\>
 
 override the SMS URL to target a custom instance
 
