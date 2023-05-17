@@ -100,7 +100,7 @@ export interface IExecConfigOptions {
   /**
    * number of block to wait for transactions confirmation (default 1)
    */
-  confirms?: boolean;
+  confirms?: number;
   /**
    * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
    */

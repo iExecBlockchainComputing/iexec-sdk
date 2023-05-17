@@ -53,7 +53,7 @@ ___
 
 ### confirms
 
-• `Optional` **confirms**: `boolean`
+• `Optional` **confirms**: `number`
 
 number of block to wait for transactions confirmation (default 1)
 
