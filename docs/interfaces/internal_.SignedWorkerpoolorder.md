@@ -62,7 +62,7 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
 
 ___
 

@@ -129,7 +129,7 @@ console.log('tx:', txHash);
 
 | Name | Type |
 | :------ | :------ |
-| `amount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -156,7 +156,7 @@ console.log('tx:', txHash);
 
 | Name | Type |
 | :------ | :------ |
-| `amount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 

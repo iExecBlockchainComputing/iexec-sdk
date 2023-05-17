@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Typescript fixes
+- app orderbook accept `"any"` for the app address to fetch orderbook without filtering on app
+- dataset orderbook accept `"any"` for the dataset address to fetch orderbook without filtering on dataset
 
 ## [8.0.0] 2023-04-07
 

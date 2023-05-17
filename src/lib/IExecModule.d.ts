@@ -1,3 +1,5 @@
+export * from '../common/types.js';
+
 import IExecConfig, {
   IExecConfigArgs,
   IExecConfigOptions,

@@ -86,7 +86,7 @@ console.log('secret exists:', isSecretSet);
 | :------ | :------ |
 | `datasetAddress` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
@@ -318,7 +318,7 @@ console.log('secret pushed:', pushed);
 | `datasetAddress` | `string` |
 | `encryptionKey` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules/internal_.md#teeframework) |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
@@ -366,7 +366,7 @@ console.log('dataset:', dataset);
 
 | Name | Type |
 | :------ | :------ |
-| `index` | [`BNish`](../modules/internal_.md#bnish) |
+| `index` | [`BNish`](../modules.md#bnish) |
 | `address` | `string` |
 
 #### Returns

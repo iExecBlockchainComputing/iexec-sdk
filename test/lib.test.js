@@ -7028,7 +7028,7 @@ describe('[order]', () => {
   });
 });
 
-describe('[orderbook]', () => {
+describe.only('[orderbook]', () => {
   test('orderbook.fetchApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
@@ -7179,6 +7179,7 @@ describe('[orderbook]', () => {
     expect(res.count).toBe(0);
     expect(res.orders).toStrictEqual([]);
     const apporder = await deployAndGetApporder(iexec);
+
     for (let i = 0; i < 22; i += 1) {
       await iexec.order
         .signApporder(apporder)
@@ -7199,6 +7200,10 @@ describe('[orderbook]', () => {
         .signApporder({ ...apporder, requesterrestrict: getRandomAddress() })
         .then((o) => iexec.order.publishApporder(o));
     }
+    await deployAndGetApporder(iexec).then((o) =>
+      iexec.order.publishApporder(o),
+    );
+
     const res1 = await iexec.orderbook.fetchAppOrderbook(apporder.app);
     expect(res1.count).toBe(22);
     expect(res1.orders.length).toBe(20);
@@ -7225,6 +7230,12 @@ describe('[orderbook]', () => {
       workerpool: 'any',
     });
     expect(res6.count).toBe(31);
+    const res7 = await iexec.orderbook.fetchAppOrderbook('any', {
+      dataset: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res7.count >= 32).toBe(true);
   });
 
   test('orderbook.fetchDatasetOrderbook()', async () => {
@@ -7284,6 +7295,10 @@ describe('[orderbook]', () => {
           iexec.order.publishDatasetorder(o, { preflightCheck: false }),
         );
     }
+    await deployAndGetDatasetorder(iexec).then((o) =>
+      iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+    );
+
     const res1 = await iexec.orderbook.fetchDatasetOrderbook(
       datasetorder.dataset,
     );
@@ -7314,6 +7329,12 @@ describe('[orderbook]', () => {
       { app: 'any', workerpool: 'any', requester: 'any' },
     );
     expect(res6.count).toBe(32);
+    const res7 = await iexec.orderbook.fetchDatasetOrderbook('any', {
+      app: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res7.count >= 33).toBe(true);
   });
 
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
@@ -7399,6 +7420,18 @@ describe('[orderbook]', () => {
       requester: 'any',
     });
     expect(res6.count).toBe(33);
+    const res7 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      app: 'any',
+      dataset: 'any',
+      requester: 'any',
+    });
+    const res8 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: 'any',
+      app: 'any',
+      dataset: 'any',
+      requester: 'any',
+    });
+    expect(res7.count).toBe(res8.count);
   });
 
   test('orderbook.fetchRequestOrderbook()', async () => {
@@ -7417,7 +7450,7 @@ describe('[orderbook]', () => {
         smsURL: 'https://sms.iex.ec',
       },
     );
-    const initialOrdebookRes = await iexec.orderbook.fetchRequestOrderbook({
+    const initialOrderbookRes = await iexec.orderbook.fetchRequestOrderbook({
       category: 2,
     });
     const initialAnyWorkerpoolRes = await iexec.orderbook.fetchRequestOrderbook(
@@ -7461,11 +7494,11 @@ describe('[orderbook]', () => {
       requester: await iexec.wallet.getAddress(),
       category: 2,
     });
-    expect(res1.count).toBe(initialOrdebookRes.count + 25);
+    expect(res1.count).toBe(initialOrderbookRes.count + 25);
     expect(res1.orders.length).toBe(20);
     expect(res1.more).toBeDefined();
     const res2 = await res1.more();
-    expect(res2.count).toBe(initialOrdebookRes.count + 25);
+    expect(res2.count).toBe(initialOrderbookRes.count + 25);
     expect(res2.orders.length >= 5).toBe(true);
     if (res2.orders.length < 20) {
       expect(res2.more).toBeUndefined();
@@ -7476,6 +7509,14 @@ describe('[orderbook]', () => {
       workerpool: 'any',
     });
     expect(res3.count).toBe(initialAnyWorkerpoolRes.count + 27);
+    const res4 = await iexec.orderbook.fetchRequestOrderbook({
+      workerpool: 'any',
+    });
+    const res5 = await iexec.orderbook.fetchRequestOrderbook({
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res4.count).toBe(res5.count);
   });
 });
 
