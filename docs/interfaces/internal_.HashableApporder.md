@@ -6,6 +6,12 @@
 
 sell order for an app
 
+## Hierarchy
+
+- [`SignableApporder`](internal_.SignableApporder.md)
+
+  ↳ **`HashableApporder`**
+
 ## Table of contents
 
 ### Properties
@@ -25,11 +31,19 @@ sell order for an app
 
 • **app**: `string`
 
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[app](internal_.SignableApporder.md#app)
+
 ___
 
 ### appprice
 
 • **appprice**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[appprice](internal_.SignableApporder.md#appprice)
 
 ___
 
@@ -37,11 +51,19 @@ ___
 
 • **datasetrestrict**: `string`
 
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[datasetrestrict](internal_.SignableApporder.md#datasetrestrict)
+
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
+
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[requesterrestrict](internal_.SignableApporder.md#requesterrestrict)
 
 ___
 
@@ -55,14 +77,26 @@ ___
 
 • **tag**: [`Tag`](../modules.md#tag)
 
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[tag](internal_.SignableApporder.md#tag)
+
 ___
 
 ### volume
 
 • **volume**: [`BNish`](../modules.md#bnish)
 
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[volume](internal_.SignableApporder.md#volume)
+
 ___
 
 ### workerpoolrestrict
 
 • **workerpoolrestrict**: `string`
+
+#### Inherited from
+
+[SignableApporder](internal_.SignableApporder.md).[workerpoolrestrict](internal_.SignableApporder.md#workerpoolrestrict)
