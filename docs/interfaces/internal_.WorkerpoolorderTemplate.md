@@ -48,7 +48,7 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules.md#tag)
+• **tag**: `string`
 
 ___
 
