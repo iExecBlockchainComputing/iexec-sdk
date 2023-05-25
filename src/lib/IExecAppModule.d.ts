@@ -87,15 +87,7 @@ export interface App {
   /**
    * for TEE apps only, specify the TEE protocol to use
    */
-  appMrenclave:
-    | string
-    | {
-        framework: 'SCONE' | 'GRAMINE';
-        version: string;
-        entrypoint: string;
-        heapSize: number;
-        fingerprint: string;
-      };
+  appMrenclave: string;
   /**
    * app registry address
    */

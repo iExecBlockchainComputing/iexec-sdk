@@ -30,7 +30,7 @@ ___
 
 ### appMrenclave
 
-• **appMrenclave**: `string` \| { `entrypoint`: `string` ; `fingerprint`: `string` ; `framework`: ``"SCONE"`` \| ``"GRAMINE"`` ; `heapSize`: `number` ; `version`: `string`  }
+• **appMrenclave**: `string`
 
 for TEE apps only, specify the TEE protocol to use
 
