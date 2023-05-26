@@ -95,7 +95,7 @@ export interface App {
   /**
    * app image address
    */
-  appMultiaddr: Multiaddress;
+  appMultiaddr: string;
   /**
    * app image digest
    */

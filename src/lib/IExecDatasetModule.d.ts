@@ -47,7 +47,7 @@ export interface Dataset {
   /**
    * dataset file download address
    */
-  datasetMultiaddr: Multiaddress;
+  datasetMultiaddr: string;
   /**
    * sha256sum of the file
    */
