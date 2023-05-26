@@ -13,6 +13,43 @@ import {
   TxHash,
 } from '../common/types.js';
 
+interface MREnclaveBase {
+  /**
+   * TEE framework name
+   */
+  framework: TeeFramework;
+  /**
+   * framework's protocol version
+   */
+  version: string;
+  /**
+   * app tee fingerprint
+   */
+  fingerprint: string;
+}
+
+export interface SconeMREnclave extends MREnclaveBase {
+  /**
+   * TEE framework name
+   */
+  framework: 'scone';
+  /**
+   * app entrypoint path
+   */
+  entrypoint: string;
+  /**
+   * dedicated memory in bytes
+   */
+  heapSize: number;
+}
+
+export interface GramineMREnclave extends MREnclaveBase {
+  /**
+   * TEE framework name
+   */
+  framework: 'gramine';
+}
+
 export interface AppDeploymentArgs {
   /**
    * the app owner
@@ -37,28 +74,7 @@ export interface AppDeploymentArgs {
   /**
    * optional for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: {
-    /**
-     * TEE framework name
-     */
-    framework: TeeFramework;
-    /**
-     * framework's protocol version
-     */
-    version: string;
-    /**
-     * app entrypoint path
-     */
-    entrypoint: string;
-    /**
-     * dedicated memory in bytes
-     */
-    heapSize: number;
-    /**
-     * app tee fingerprint
-     */
-    fingerprint: string;
-  };
+  mrenclave?: SconeMREnclave | GramineMREnclave;
 }
 /**
  * IExec app
@@ -79,7 +95,7 @@ export interface App {
   /**
    * app image address
    */
-  appMultiaddr: Multiaddress;
+  appMultiaddr: string;
   /**
    * app image digest
    */
@@ -87,15 +103,7 @@ export interface App {
   /**
    * for TEE apps only, specify the TEE protocol to use
    */
-  appMrenclave:
-    | string
-    | {
-        framework: 'SCONE' | 'GRAMINE';
-        version: string;
-        entrypoint: string;
-        heapSize: number;
-        fingerprint: string;
-      };
+  appMrenclave: string;
   /**
    * app registry address
    */
