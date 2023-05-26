@@ -11,7 +11,7 @@ IExec app
 ### Properties
 
 - [appChecksum](internal_.App.md#appchecksum)
-- [appMrenclave](internal_.App.md#appmrenclave)
+- [appMREnclave](internal_.App.md#appmrenclave)
 - [appMultiaddr](internal_.App.md#appmultiaddr)
 - [appName](internal_.App.md#appname)
 - [appType](internal_.App.md#apptype)
@@ -28,9 +28,9 @@ app image digest
 
 ___
 
-### appMrenclave
+### appMREnclave
 
-• **appMrenclave**: `string`
+• **appMREnclave**: `string`
 
 for TEE apps only, specify the TEE protocol to use
 

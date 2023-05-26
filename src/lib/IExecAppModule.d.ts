@@ -103,7 +103,7 @@ export interface App {
   /**
    * for TEE apps only, specify the TEE protocol to use
    */
-  appMrenclave: string;
+  appMREnclave: string;
   /**
    * app registry address
    */
