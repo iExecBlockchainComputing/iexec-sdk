@@ -27,19 +27,9 @@ ___
 
 ### mrenclave
 
-• `Optional` **mrenclave**: `Object`
+• `Optional` **mrenclave**: [`SconeMREnclave`](internal_.SconeMREnclave.md) \| [`GramineMREnclave`](internal_.GramineMREnclave.md)
 
 optional for TEE apps only, specify the TEE protocol to use
-
-#### Type declaration
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `entrypoint` | `string` | app entrypoint path |
-| `fingerprint` | `string` | app tee fingerprint |
-| `framework` | [`TeeFramework`](../modules.md#teeframework) | TEE framework name |
-| `heapSize` | `number` | dedicated memory in bytes |
-| `version` | `string` | framework's protocol version |
 
 ___
 
