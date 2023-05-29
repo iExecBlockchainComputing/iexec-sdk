@@ -305,7 +305,7 @@ resolve the ENS name to an ethereum address if a resolver is configured for the 
 
 example:
 ```js
-const owner = await resolveName('me.users.iexec.eth');
+const address = await resolveName('me.users.iexec.eth');
 console.log('me.users.iexec.eth:', address);
 ```
 
