@@ -32,7 +32,6 @@
 - [HashableWorkerpoolorder](../interfaces/internal_.HashableWorkerpoolorder.md)
 - [IExecConfigArgs](../interfaces/internal_.IExecConfigArgs.md)
 - [IExecConfigOptions](../interfaces/internal_.IExecConfigOptions.md)
-- [MREnclaveBase](../interfaces/internal_.MREnclaveBase.md)
 - [PaginableDeals](../interfaces/internal_.PaginableDeals.md)
 - [PaginableOrders](../interfaces/internal_.PaginableOrders.md)
 - [PublishedApporder](../interfaces/internal_.PublishedApporder.md)
