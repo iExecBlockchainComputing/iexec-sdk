@@ -16,124 +16,124 @@
       "default": "./dist/esm/lib/index.js"
     },
     "./IExec": {
-      "types": "./dist/esm/lib/IExec.d.ts",
-      "import": "./dist/esm/lib/IExec.js",
-      "browser": "./dist/esm/lib/IExec.js",
-      "default": "./dist/esm/lib/IExec.js"
+      "types": "./dist\\esm\\lib\\IExec.d.ts",
+      "import": "./dist\\esm\\lib\\IExec.js",
+      "browser": "./dist\\esm\\lib\\IExec.js",
+      "default": "./dist\\esm\\lib\\IExec.js"
     },
     "./IExecAccountModule": {
-      "types": "./dist/esm/lib/IExecAccountModule.d.ts",
-      "import": "./dist/esm/lib/IExecAccountModule.js",
-      "browser": "./dist/esm/lib/IExecAccountModule.js",
-      "default": "./dist/esm/lib/IExecAccountModule.js"
+      "types": "./dist\\esm\\lib\\IExecAccountModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecAccountModule.js",
+      "browser": "./dist\\esm\\lib\\IExecAccountModule.js",
+      "default": "./dist\\esm\\lib\\IExecAccountModule.js"
     },
     "./IExecAppModule": {
-      "types": "./dist/esm/lib/IExecAppModule.d.ts",
-      "import": "./dist/esm/lib/IExecAppModule.js",
-      "browser": "./dist/esm/lib/IExecAppModule.js",
-      "default": "./dist/esm/lib/IExecAppModule.js"
+      "types": "./dist\\esm\\lib\\IExecAppModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecAppModule.js",
+      "browser": "./dist\\esm\\lib\\IExecAppModule.js",
+      "default": "./dist\\esm\\lib\\IExecAppModule.js"
     },
     "./IExecConfig": {
-      "types": "./dist/esm/lib/IExecConfig.d.ts",
-      "import": "./dist/esm/lib/IExecConfig.js",
-      "browser": "./dist/esm/lib/IExecConfig.js",
-      "default": "./dist/esm/lib/IExecConfig.js"
+      "types": "./dist\\esm\\lib\\IExecConfig.d.ts",
+      "import": "./dist\\esm\\lib\\IExecConfig.js",
+      "browser": "./dist\\esm\\lib\\IExecConfig.js",
+      "default": "./dist\\esm\\lib\\IExecConfig.js"
     },
     "./IExecDatasetModule": {
-      "types": "./dist/esm/lib/IExecDatasetModule.d.ts",
-      "import": "./dist/esm/lib/IExecDatasetModule.js",
-      "browser": "./dist/esm/lib/IExecDatasetModule.js",
-      "default": "./dist/esm/lib/IExecDatasetModule.js"
+      "types": "./dist\\esm\\lib\\IExecDatasetModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecDatasetModule.js",
+      "browser": "./dist\\esm\\lib\\IExecDatasetModule.js",
+      "default": "./dist\\esm\\lib\\IExecDatasetModule.js"
     },
     "./IExecDealModule": {
-      "types": "./dist/esm/lib/IExecDealModule.d.ts",
-      "import": "./dist/esm/lib/IExecDealModule.js",
-      "browser": "./dist/esm/lib/IExecDealModule.js",
-      "default": "./dist/esm/lib/IExecDealModule.js"
+      "types": "./dist\\esm\\lib\\IExecDealModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecDealModule.js",
+      "browser": "./dist\\esm\\lib\\IExecDealModule.js",
+      "default": "./dist\\esm\\lib\\IExecDealModule.js"
     },
     "./IExecENSModule": {
-      "types": "./dist/esm/lib/IExecENSModule.d.ts",
-      "import": "./dist/esm/lib/IExecENSModule.js",
-      "browser": "./dist/esm/lib/IExecENSModule.js",
-      "default": "./dist/esm/lib/IExecENSModule.js"
+      "types": "./dist\\esm\\lib\\IExecENSModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecENSModule.js",
+      "browser": "./dist\\esm\\lib\\IExecENSModule.js",
+      "default": "./dist\\esm\\lib\\IExecENSModule.js"
     },
     "./IExecHubModule": {
-      "types": "./dist/esm/lib/IExecHubModule.d.ts",
-      "import": "./dist/esm/lib/IExecHubModule.js",
-      "browser": "./dist/esm/lib/IExecHubModule.js",
-      "default": "./dist/esm/lib/IExecHubModule.js"
+      "types": "./dist\\esm\\lib\\IExecHubModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecHubModule.js",
+      "browser": "./dist\\esm\\lib\\IExecHubModule.js",
+      "default": "./dist\\esm\\lib\\IExecHubModule.js"
     },
     "./IExecModule": {
-      "types": "./dist/esm/lib/IExecModule.d.ts",
-      "import": "./dist/esm/lib/IExecModule.js",
-      "browser": "./dist/esm/lib/IExecModule.js",
-      "default": "./dist/esm/lib/IExecModule.js"
+      "types": "./dist\\esm\\lib\\IExecModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecModule.js",
+      "browser": "./dist\\esm\\lib\\IExecModule.js",
+      "default": "./dist\\esm\\lib\\IExecModule.js"
     },
     "./IExecNetworkModule": {
-      "types": "./dist/esm/lib/IExecNetworkModule.d.ts",
-      "import": "./dist/esm/lib/IExecNetworkModule.js",
-      "browser": "./dist/esm/lib/IExecNetworkModule.js",
-      "default": "./dist/esm/lib/IExecNetworkModule.js"
+      "types": "./dist\\esm\\lib\\IExecNetworkModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecNetworkModule.js",
+      "browser": "./dist\\esm\\lib\\IExecNetworkModule.js",
+      "default": "./dist\\esm\\lib\\IExecNetworkModule.js"
     },
     "./IExecOrderModule": {
-      "types": "./dist/esm/lib/IExecOrderModule.d.ts",
-      "import": "./dist/esm/lib/IExecOrderModule.js",
-      "browser": "./dist/esm/lib/IExecOrderModule.js",
-      "default": "./dist/esm/lib/IExecOrderModule.js"
+      "types": "./dist\\esm\\lib\\IExecOrderModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecOrderModule.js",
+      "browser": "./dist\\esm\\lib\\IExecOrderModule.js",
+      "default": "./dist\\esm\\lib\\IExecOrderModule.js"
     },
     "./IExecOrderbookModule": {
-      "types": "./dist/esm/lib/IExecOrderbookModule.d.ts",
-      "import": "./dist/esm/lib/IExecOrderbookModule.js",
-      "browser": "./dist/esm/lib/IExecOrderbookModule.js",
-      "default": "./dist/esm/lib/IExecOrderbookModule.js"
+      "types": "./dist\\esm\\lib\\IExecOrderbookModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecOrderbookModule.js",
+      "browser": "./dist\\esm\\lib\\IExecOrderbookModule.js",
+      "default": "./dist\\esm\\lib\\IExecOrderbookModule.js"
     },
     "./IExecResultModule": {
-      "types": "./dist/esm/lib/IExecResultModule.d.ts",
-      "import": "./dist/esm/lib/IExecResultModule.js",
-      "browser": "./dist/esm/lib/IExecResultModule.js",
-      "default": "./dist/esm/lib/IExecResultModule.js"
+      "types": "./dist\\esm\\lib\\IExecResultModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecResultModule.js",
+      "browser": "./dist\\esm\\lib\\IExecResultModule.js",
+      "default": "./dist\\esm\\lib\\IExecResultModule.js"
     },
     "./IExecSecretsModule": {
-      "types": "./dist/esm/lib/IExecSecretsModule.d.ts",
-      "import": "./dist/esm/lib/IExecSecretsModule.js",
-      "browser": "./dist/esm/lib/IExecSecretsModule.js",
-      "default": "./dist/esm/lib/IExecSecretsModule.js"
+      "types": "./dist\\esm\\lib\\IExecSecretsModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecSecretsModule.js",
+      "browser": "./dist\\esm\\lib\\IExecSecretsModule.js",
+      "default": "./dist\\esm\\lib\\IExecSecretsModule.js"
     },
     "./IExecStorageModule": {
-      "types": "./dist/esm/lib/IExecStorageModule.d.ts",
-      "import": "./dist/esm/lib/IExecStorageModule.js",
-      "browser": "./dist/esm/lib/IExecStorageModule.js",
-      "default": "./dist/esm/lib/IExecStorageModule.js"
+      "types": "./dist\\esm\\lib\\IExecStorageModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecStorageModule.js",
+      "browser": "./dist\\esm\\lib\\IExecStorageModule.js",
+      "default": "./dist\\esm\\lib\\IExecStorageModule.js"
     },
     "./IExecTaskModule": {
-      "types": "./dist/esm/lib/IExecTaskModule.d.ts",
-      "import": "./dist/esm/lib/IExecTaskModule.js",
-      "browser": "./dist/esm/lib/IExecTaskModule.js",
-      "default": "./dist/esm/lib/IExecTaskModule.js"
+      "types": "./dist\\esm\\lib\\IExecTaskModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecTaskModule.js",
+      "browser": "./dist\\esm\\lib\\IExecTaskModule.js",
+      "default": "./dist\\esm\\lib\\IExecTaskModule.js"
     },
     "./IExecWalletModule": {
-      "types": "./dist/esm/lib/IExecWalletModule.d.ts",
-      "import": "./dist/esm/lib/IExecWalletModule.js",
-      "browser": "./dist/esm/lib/IExecWalletModule.js",
-      "default": "./dist/esm/lib/IExecWalletModule.js"
+      "types": "./dist\\esm\\lib\\IExecWalletModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecWalletModule.js",
+      "browser": "./dist\\esm\\lib\\IExecWalletModule.js",
+      "default": "./dist\\esm\\lib\\IExecWalletModule.js"
     },
     "./IExecWorkerpoolModule": {
-      "types": "./dist/esm/lib/IExecWorkerpoolModule.d.ts",
-      "import": "./dist/esm/lib/IExecWorkerpoolModule.js",
-      "browser": "./dist/esm/lib/IExecWorkerpoolModule.js",
-      "default": "./dist/esm/lib/IExecWorkerpoolModule.js"
+      "types": "./dist\\esm\\lib\\IExecWorkerpoolModule.d.ts",
+      "import": "./dist\\esm\\lib\\IExecWorkerpoolModule.js",
+      "browser": "./dist\\esm\\lib\\IExecWorkerpoolModule.js",
+      "default": "./dist\\esm\\lib\\IExecWorkerpoolModule.js"
     },
     "./errors": {
-      "types": "./dist/esm/lib/errors.d.ts",
-      "import": "./dist/esm/lib/errors.js",
-      "browser": "./dist/esm/lib/errors.js",
-      "default": "./dist/esm/lib/errors.js"
+      "types": "./dist\\esm\\lib\\errors.d.ts",
+      "import": "./dist\\esm\\lib\\errors.js",
+      "browser": "./dist\\esm\\lib\\errors.js",
+      "default": "./dist\\esm\\lib\\errors.js"
     },
     "./utils": {
-      "types": "./dist/esm/lib/utils.d.ts",
-      "import": "./dist/esm/lib/utils.js",
-      "browser": "./dist/esm/lib/utils.js",
-      "default": "./dist/esm/lib/utils.js"
+      "types": "./dist\\esm\\lib\\utils.d.ts",
+      "import": "./dist\\esm\\lib\\utils.js",
+      "browser": "./dist\\esm\\lib\\utils.js",
+      "default": "./dist\\esm\\lib\\utils.js"
     }
   },
   "engine": {
@@ -145,11 +145,13 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
     "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
-    "generate-json-es-modules": "rm -rf src/common/generated && node generateEsModulesFromJson.cjs",
-    "generate-dist": "rm -rf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
+    "clean": "rimraf dist",
+    "clean2": "rimraf src/common/generated",
+    "generate-json-es-modules": "npm run clean2  && node generateEsModulesFromJson.cjs",
+    "generate-dist": "npm run clean && mkdirp dist && mkdirp dist/esm && cp -r src/. dist/esm/ || xcopy /s /e src\\* dist\\esm\\",
     "generate-packages": "node generatePackages.cjs",
     "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
-    "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
+    "generate-lib-doc": "typedoc --tsconfig tsconfig.doc.json --disableSources",
     "generate-cli-doc": "node generateCliDoc.cjs"
   },
   "files": [
@@ -220,7 +222,9 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-sonarjs": "^0.18.0",
     "jest": "^29.4.1",
+    "mkdirp": "^3.0.1",
     "prettier": "^2.8.3",
+    "rimraf": "^5.0.1",
     "typedoc": "^0.23.24",
     "typedoc-plugin-markdown": "^3.14.0",
     "typedoc-plugin-missing-exports": "^1.0.0",
