@@ -44,3 +44,9 @@ dist/**
 IExec*/**
 utils/**
 errors/**
+src/common/generated/@ensdomains/registry/**
+src/common/generated/@ensdomains/resolvers/**
+src/common/generated/@iexec/erlc/**
+src/common/generated/@iexec/rlc/**
+src/common/generated/@iexec/poco/**
+src/common/generated/sdk/**
