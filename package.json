@@ -141,7 +141,6 @@
     "npm": ">=8"
   },
   "scripts": {
-    "postinstall": "npm run generate-json-es-modules",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
     "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
@@ -155,7 +154,6 @@
   "files": [
     "src/",
     "dist/",
-    "generateEsModulesFromJson.cjs",
     "iexec_sdk_logo.jpg",
     "IExec",
     "IExecAccountModule",
