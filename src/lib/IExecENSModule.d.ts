@@ -91,7 +91,7 @@ export default class IExecENSModule extends IExecModule {
    *
    * example:
    * ```js
-   * const owner = await resolveName('me.users.iexec.eth');
+   * const address = await resolveName('me.users.iexec.eth');
    * console.log('me.users.iexec.eth:', address);
    * ```
    */

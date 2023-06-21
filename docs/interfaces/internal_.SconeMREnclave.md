@@ -4,12 +4,6 @@
 
 [<internal>](../modules/internal_.md).SconeMREnclave
 
-## Hierarchy
-
-- [`MREnclaveBase`](internal_.MREnclaveBase.md)
-
-  ↳ **`SconeMREnclave`**
-
 ## Table of contents
 
 ### Properties
@@ -36,21 +30,13 @@ ___
 
 app tee fingerprint
 
-#### Inherited from
-
-[MREnclaveBase](internal_.MREnclaveBase.md).[fingerprint](internal_.MREnclaveBase.md#fingerprint)
-
 ___
 
 ### framework
 
-• **framework**: ``"scone"``
+• **framework**: ``"SCONE"``
 
 TEE framework name
-
-#### Overrides
-
-[MREnclaveBase](internal_.MREnclaveBase.md).[framework](internal_.MREnclaveBase.md#framework)
 
 ___
 
@@ -67,7 +53,3 @@ ___
 • **version**: `string`
 
 framework's protocol version
-
-#### Inherited from
-
-[MREnclaveBase](internal_.MREnclaveBase.md).[version](internal_.MREnclaveBase.md#version)

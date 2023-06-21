@@ -13,11 +13,19 @@ import {
   TxHash,
 } from '../common/types.js';
 
-interface MREnclaveBase {
+export interface SconeMREnclave {
   /**
    * TEE framework name
    */
-  framework: TeeFramework;
+  framework: 'SCONE';
+  /**
+   * app entrypoint path
+   */
+  entrypoint: string;
+  /**
+   * dedicated memory in bytes
+   */
+  heapSize: number;
   /**
    * framework's protocol version
    */
@@ -28,26 +36,19 @@ interface MREnclaveBase {
   fingerprint: string;
 }
 
-export interface SconeMREnclave extends MREnclaveBase {
+export interface GramineMREnclave {
   /**
    * TEE framework name
    */
-  framework: 'scone';
+  framework: 'GRAMINE';
   /**
-   * app entrypoint path
+   * framework's protocol version
    */
-  entrypoint: string;
+  version: string;
   /**
-   * dedicated memory in bytes
+   * app tee fingerprint
    */
-  heapSize: number;
-}
-
-export interface GramineMREnclave extends MREnclaveBase {
-  /**
-   * TEE framework name
-   */
-  framework: 'gramine';
+  fingerprint: string;
 }
 
 export interface AppDeploymentArgs {
