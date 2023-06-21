@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.4] 2023-06-01
+
+### Changed
+
+- Typescript fixes
+
 ## [8.1.3] 2023-05-26
 
 ### Changed
