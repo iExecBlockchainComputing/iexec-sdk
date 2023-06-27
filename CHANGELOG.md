@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.5] 2023-06-22
+
+- fix windows install
+
 ## [8.1.4] 2023-06-01
 
 ### Changed
