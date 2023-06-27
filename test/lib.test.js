@@ -7028,7 +7028,7 @@ describe('[order]', () => {
   });
 });
 
-describe.only('[orderbook]', () => {
+describe('[orderbook]', () => {
   test('orderbook.fetchApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
