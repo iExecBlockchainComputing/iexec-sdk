@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { utils } from 'ethers';
-import aesJs from 'aes-js';
+import { cipher, createBuffer } from './forge.js';
 import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
@@ -21,22 +21,12 @@ export const encryptAes256Cbc = async (
     'base64',
   );
   const fileBuffer = await fileBufferSchema().validate(fileBytes);
-
-  const ivBuffer = Buffer.from(randomBytes(16));
-
-  const aesCbc = new aesJs.ModeOfOperation.cbc(keyBuffer, ivBuffer);
-
-  const pkcs7PaddingLength = 16 - (fileBuffer.length % 16);
-  const pkcs7PaddingBuffer = Buffer.alloc(
-    pkcs7PaddingLength,
-    pkcs7PaddingLength,
-  );
-
-  const paddedFileBuffer = Buffer.concat([fileBuffer, pkcs7PaddingBuffer]);
-
-  const encryptedFileBuffer = Buffer.from(aesCbc.encrypt(paddedFileBuffer));
-
-  return Buffer.concat([ivBuffer, encryptedFileBuffer]);
+  const iv = randomBytes(16);
+  const aesCbcCipher = cipher.createCipher('AES-CBC', createBuffer(keyBuffer));
+  aesCbcCipher.start({ iv: createBuffer(iv) });
+  aesCbcCipher.update(createBuffer(fileBuffer));
+  aesCbcCipher.finish();
+  return Buffer.concat([iv, Buffer.from(aesCbcCipher.output.toHex(), 'hex')]);
 };
 
 export const sha256Sum = async (fileBytes = throwIfMissing()) => {
