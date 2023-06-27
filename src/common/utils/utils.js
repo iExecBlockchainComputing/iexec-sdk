@@ -2,12 +2,11 @@ import Debug from 'debug';
 import { Buffer } from 'buffer';
 import BnJs from 'bn.js';
 import JSZip from 'jszip';
-import NodeRSA from 'node-rsa';
-import aesJs from 'aes-js';
 import { utils, BigNumber } from 'ethers';
 // import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
 import { multiaddr } from '@multiformats/multiaddr';
+import { pki, cipher, createBuffer } from './forge.js';
 import { ValidationError, ConfigurationError } from './errors.js';
 import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
 
@@ -296,7 +295,6 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   const ENC_RESULTS_MAX_SIZE = 1000000000; // 1GB
 
   const encryptedZipBuffer = Buffer.from(encResultsZipBuffer);
-  const keyBuffer = Buffer.from(beneficiaryKey);
 
   /**
    * Sonar hotspot
@@ -370,21 +368,8 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   debug('Decrypting results key');
   let aesKeyBuffer;
   try {
-    const key = new NodeRSA(keyBuffer, {
-      encryptionScheme: 'pkcs1',
-    });
-    const decryptedAesKeyBuffer = key.decrypt(encryptedAesKeyBuffer);
-
-    // alt not used because crypto-browserify does not support createPrivateKey
-    // const decryptedAesKeyBuffer = crypto.privateDecrypt(
-    //   {
-    //     key: crypto.createPrivateKey(keyBuffer),
-    //     padding: crypto.constants.RSA_PKCS1_PADDING,
-    //   },
-    //   encryptedAesKeyBuffer,
-    // );
-
-    const base64EncodedResultsKey = decryptedAesKeyBuffer.toString();
+    const key = pki.privateKeyFromPem(Buffer.from(beneficiaryKey).toString());
+    const base64EncodedResultsKey = key.decrypt(encryptedAesKeyBuffer);
     aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
   } catch (error) {
     debug(error);
@@ -409,7 +394,10 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   // decrypt AES ECB (with one time AES key)
   debug('Decrypting results');
   try {
-    const aesEcb = new aesJs.ModeOfOperation.ecb(aesKeyBuffer);
+    const aesEcbCipher = cipher.createDecipher(
+      'AES-ECB',
+      createBuffer(aesKeyBuffer),
+    );
     const base64EncodedEncryptedZip = Buffer.from(
       encResultsArrayBuffer,
     ).toString();
@@ -417,15 +405,10 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       base64EncodedEncryptedZip,
       'base64',
     );
-    const decryptedOutZipBuffer = Buffer.from(
-      aesEcb.decrypt(encryptedOutZipBuffer),
-    );
-    // remove pkcs7 padding
-    const padding = decryptedOutZipBuffer[decryptedOutZipBuffer.length - 1];
-    return decryptedOutZipBuffer.slice(
-      0,
-      decryptedOutZipBuffer.length - padding,
-    );
+    aesEcbCipher.start();
+    aesEcbCipher.update(createBuffer(encryptedOutZipBuffer));
+    aesEcbCipher.finish();
+    return Buffer.from(aesEcbCipher.output.toHex(), 'hex');
   } catch (error) {
     debug(error);
     throw Error('Failed to decrypt results with decrypted results key');
