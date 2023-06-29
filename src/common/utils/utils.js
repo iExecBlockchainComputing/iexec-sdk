@@ -394,21 +394,36 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   // decrypt AES ECB (with one time AES key)
   debug('Decrypting results');
   try {
-    const aesEcbCipher = cipher.createDecipher(
-      'AES-ECB',
-      createBuffer(aesKeyBuffer),
-    );
     const base64EncodedEncryptedZip = Buffer.from(
       encResultsArrayBuffer,
     ).toString();
-    const encryptedOutZipBuffer = Buffer.from(
+    let encryptedOutZipBuffer = Buffer.from(
       base64EncodedEncryptedZip,
       'base64',
     );
-    aesEcbCipher.start();
-    aesEcbCipher.update(createBuffer(encryptedOutZipBuffer));
-    aesEcbCipher.finish();
-    return Buffer.from(aesEcbCipher.output.toHex(), 'hex');
+    const aesEcbDecipher = cipher.createDecipher(
+      'AES-ECB',
+      createBuffer(aesKeyBuffer),
+    );
+    aesEcbDecipher.start();
+
+    const CHUNK_SIZE = 10 * 1000 * 1000;
+    let decryptionBuffer = Buffer.from([]);
+    while (encryptedOutZipBuffer.byteLength > 0) {
+      // flush cipher buffer
+      const tmpBuffer = Buffer.from(aesEcbDecipher.output.getBytes(), 'binary');
+      decryptionBuffer = Buffer.concat([decryptionBuffer, tmpBuffer]);
+      // process chunk
+      const chunk = encryptedOutZipBuffer.slice(0, CHUNK_SIZE);
+      encryptedOutZipBuffer = encryptedOutZipBuffer.slice(CHUNK_SIZE);
+      aesEcbDecipher.update(createBuffer(chunk));
+    }
+    aesEcbDecipher.finish();
+    const finalizationBuffer = Buffer.from(
+      aesEcbDecipher.output.getBytes(),
+      'binary',
+    );
+    return Buffer.concat([decryptionBuffer, finalizationBuffer]);
   } catch (error) {
     debug(error);
     throw Error('Failed to decrypt results with decrypted results key');
