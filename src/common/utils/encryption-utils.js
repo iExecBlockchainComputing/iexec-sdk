@@ -20,13 +20,29 @@ export const encryptAes256Cbc = async (
     await base64Encoded256bitsKeySchema().validate(base64Key),
     'base64',
   );
-  const fileBuffer = await fileBufferSchema().validate(fileBytes);
+  let fileBuffer = await fileBufferSchema().validate(fileBytes);
+
   const iv = randomBytes(16);
   const aesCbcCipher = cipher.createCipher('AES-CBC', createBuffer(keyBuffer));
   aesCbcCipher.start({ iv: createBuffer(iv) });
-  aesCbcCipher.update(createBuffer(fileBuffer));
+
+  const CHUNK_SIZE = 10 * 1000 * 1000;
+  let encryptionBuffer = Buffer.from([]);
+  while (fileBuffer.byteLength > 0) {
+    // flush cipher buffer
+    const tmpBuffer = Buffer.from(aesCbcCipher.output.getBytes(), 'binary');
+    encryptionBuffer = Buffer.concat([encryptionBuffer, tmpBuffer]);
+    // process chunk
+    const chunk = fileBuffer.slice(0, CHUNK_SIZE);
+    fileBuffer = fileBuffer.slice(CHUNK_SIZE);
+    aesCbcCipher.update(createBuffer(chunk));
+  }
   aesCbcCipher.finish();
-  return Buffer.concat([iv, Buffer.from(aesCbcCipher.output.toHex(), 'hex')]);
+  const finalizationBuffer = Buffer.from(
+    aesCbcCipher.output.getBytes(),
+    'binary',
+  );
+  return Buffer.concat([iv, encryptionBuffer, finalizationBuffer]);
 };
 
 export const sha256Sum = async (fileBytes = throwIfMissing()) => {
