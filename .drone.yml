@@ -1,8 +1,18 @@
-pipeline:
-  test_node18:
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: test node18
     image: node:18
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
     commands:
       - apt update
       - apt install xxd
@@ -15,10 +25,16 @@ pipeline:
     when:
       ref: refs/tags/v*
 
-  test_node16:
+  - name: test node16
     image: node:16
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
     commands:
       - apt update
       - apt install xxd
@@ -31,10 +47,16 @@ pipeline:
     when:
       ref: refs/tags/v*
 
-  test_node14:
+  - name: test node14
     image: node:14
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
     commands:
       - apt update
       - apt install xxd
@@ -46,173 +68,191 @@ pipeline:
       - npm -g install .
       - npm test
 
-  code_analysis:
+  - name: code analysis
     image: sonarsource/sonar-scanner-cli
-    pull: true
-    secrets: [sonar_token, sonar_host]
+    pull: always
+    environment:
+      SONAR_TOKEN:
+        from_secret: sonar_token
+      SONAR_HOST:
+        from_secret: sonar_host
     commands:
       - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
 
-  publish_npm:
+  - name: publish npm
     image: plugins/npm
-    secrets: [npm_token]
-    username: iexecteam
-    email: dev@iex.ec
-    tag: latest
+    pull: always
+    settings:
+      username: iexecteam
+      token:
+        from_secret: npm_token
+      tag: latest
     when:
       ref:
         include: refs/tags/v[1-9]*.*[0-9].*[0-9]
         exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
-  publish_alpha_npm:
+  - name: publish npm alpha
     image: plugins/npm
-    secrets: [npm_token]
-    username: iexecteam
-    email: dev@iex.ec
-    tag: alpha
+    pull: always
+    settings:
+      username: iexecteam
+      token:
+        from_secret: npm_token
+      tag: alpha
     when:
       ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
 
-  publish_dockerhub:
+  - name: publish dockerhub
     image: plugins/docker
-    repo: iexechub/iexec-sdk
-    secrets: [docker_username, docker_password]
-    tags:
-      - latest
-      - ${DRONE_TAG##v}
+    pull: always
+    settings:
+      repo: iexechub/iexec-sdk
+      dockerfile: Dockerfile
+      tags:
+        - latest
+        - ${DRONE_TAG##v}
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
     when:
       ref:
         include: refs/tags/v[1-9]*.*[0-9].*[0-9]
         exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
 services:
-  token-chain:
+  - name: token-chain
     image: iexechub/poco-chaintest:5.3.2-token
-    pull: true
+    pull: always
 
-  native-chain:
+  - name: native-chain
     image: iexechub/poco-chaintest:5.3.2-native
-    pull: true
+    pull: always
 
-  token-chain-1s:
+  - name: token-chain-1s
     image: iexechub/poco-chaintest:5.3.2-token
     commands:
       - node /app/dist/node/cli.js --chain.networkId 65535 --chain.chainId 65535 --chain.hardfork london --database.dbPath /ganachedb --miner.blockTime 1
-    pull: true
+    pull: always
 
-  token-chain-openethereum:
+  - name: token-chain-openethereum
     image: iexechub/poco-chaintest:5.3.2-token-openethereum
-    pull: true
+    pull: always
 
-  token-sms-scone:
+  - name: token-sms-scone
     image: iexechub/iexec-sms:7.1.0
-    pull: true
+    pull: always
     commands:
       - sleep 10
       - java -jar /app/iexec-sms.jar
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
 
-  token-sms-gramine:
+  - name: token-sms-gramine
     image: iexechub/iexec-sms:7.1.0
-    pull: true
+    pull: always
     commands:
       - sleep 10
       - java -jar /app/iexec-sms.jar
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
 
-  token-result-proxy:
+  - name: token-result-proxy
     image: iexechub/iexec-result-proxy:7.1.0
-    pull: true
+    pull: always
     commands:
       - sleep 10
       - java -Djava.security.egd=file:/dev/./urandom -jar /iexec-result-proxy.jar
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=27017
-      - IEXEC_IPFS_HOST=ipfs
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      MONGO_HOST: token-result-proxy-mongo
+      MONGO_PORT: 27017
+      IEXEC_IPFS_HOST: ipfs
 
-  token-result-proxy-mongo:
-    pull: true
+  - name: token-result-proxy-mongo
+    pull: always
     image: library/mongo:4.2
-    commands: 
+    commands:
       - mongod --bind_ip_all
 
-  ipfs:
+  - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
-    pull: true
+    pull: always
 
-  gateway-mongo:
+  - name: gateway-mongo
     image: mongo:latest
+    pull: always
 
-  gateway-redis:
+  - name: gateway-redis
     image: redis:alpine
+    pull: always
     commands:
       - redis-server --appendonly yes
 
-  token-watcher:
+  - name: token-watcher
     image: iexechub/iexec-market-watcher:6.2
+    pull: always
     commands:
       - sleep 10
       - cd /app
       - npm start
     environment:
-      - DEBUG=iexec-watcher*
-      - DEBUG_COLORS=true
-      - CHAIN=DEV
-      - CHAIN_ID=65535
-      - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - ETH_WS_HOST=ws://token-chain-openethereum:8546
-      - ETH_RPC_HOST=http://token-chain-openethereum:8545
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
+      DEBUG: iexec-watcher*
+      DEBUG_COLORS: true
+      CHAIN: DEV
+      CHAIN_ID: 65535
+      IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      ETH_WS_HOST: ws://token-chain-openethereum:8546
+      ETH_RPC_HOST: http://token-chain-openethereum:8545
+      MONGO_HOST: gateway-mongo
+      REDIS_HOST: gateway-redis
 
-  token-gateway:
+  - name: token-gateway
     image: iexechub/iexec-market-api:6.2
+    pull: always
     commands:
       - sleep 10
       - cd /app
       - npm start
     environment:
-      - DEBUG=iexec-market-api*
-      - DEBUG_COLORS=true
-      - CHAINS=DEV
-      - DEV_NATIVE=false
-      - DEV_ETH_RPC_HOST=http://token-chain-openethereum:8545
-      - DEV_CHAIN_ID=65535
-      - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
-      - RATE_LIMIT_MAX=10000
-      - RATE_LIMIT_PERIOD=60000
-      - MAX_OPEN_ORDERS_PER_WALLET=1000
+      DEBUG: iexec-market-api*
+      DEBUG_COLORS: true
+      CHAINS: DEV
+      DEV_NATIVE: false
+      DEV_ETH_RPC_HOST: http://token-chain-openethereum:8545
+      DEV_CHAIN_ID: 65535
+      DEV_IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      MONGO_HOST: gateway-mongo
+      REDIS_HOST: gateway-redis
+      RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_PERIOD: 60000
+      MAX_OPEN_ORDERS_PER_WALLET: 1000
