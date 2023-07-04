@@ -79,47 +79,47 @@ steps:
     commands:
       - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
 
-  - name: publish npm
-    image: plugins/npm
-    pull: always
-    settings:
-      username: iexecteam
-      token:
-        from_secret: npm_token
-      tag: latest
-    when:
-      ref:
-        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+  # - name: publish npm
+  #   image: plugins/npm
+  #   pull: always
+  #   settings:
+  #     username: iexecteam
+  #     token:
+  #       from_secret: npm_token
+  #     tag: latest
+  #   when:
+  #     ref:
+  #       include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+  #       exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
-  - name: publish npm alpha
-    image: plugins/npm
-    pull: always
-    settings:
-      username: iexecteam
-      token:
-        from_secret: npm_token
-      tag: alpha
-    when:
-      ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
+  # - name: publish npm alpha
+  #   image: plugins/npm
+  #   pull: always
+  #   settings:
+  #     username: iexecteam
+  #     token:
+  #       from_secret: npm_token
+  #     tag: alpha
+  #   when:
+  #     ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
 
-  - name: publish dockerhub
-    image: plugins/docker
-    pull: always
-    settings:
-      repo: iexechub/iexec-sdk
-      dockerfile: Dockerfile
-      tags:
-        - latest
-        - ${DRONE_TAG##v}
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-    when:
-      ref:
-        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+  # - name: publish dockerhub
+  #   image: plugins/docker
+  #   pull: always
+  #   settings:
+  #     repo: iexechub/iexec-sdk
+  #     dockerfile: Dockerfile
+  #     tags:
+  #       - latest
+  #       - ${DRONE_TAG##v}
+  #     username:
+  #       from_secret: docker_username
+  #     password:
+  #       from_secret: docker_password
+  #   when:
+  #     ref:
+  #       include: refs/tags/v[1-9]*.*[0-9].*[0-9]
+  #       exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
 
 services:
   - name: token-chain
