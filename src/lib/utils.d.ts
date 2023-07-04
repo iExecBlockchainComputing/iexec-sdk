@@ -1,6 +1,6 @@
 import { BlockTag } from '@ethersproject/abstract-provider';
 import BNJS from 'bn.js';
-import { EnhancedWallet } from '../common/utils/signers';
+import { EnhancedWallet } from '../common/utils/signers.js';
 import {
   BN as BNtype,
   WeiAmount,
@@ -8,7 +8,7 @@ import {
   HumanSingleTag,
   Bytes32,
   ProviderOptions,
-} from './types';
+} from '../common/types.js';
 
 /**
  * create a signer connected to the specified blockchain host from a private key

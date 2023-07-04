@@ -133,7 +133,7 @@ console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 
 | Name | Type |
 | :------ | :------ |
-| `wei` | [`WeiAmount`](internal_.md#weiamount) |
+| `wei` | [`WeiAmount`](../modules.md#weiamount) |
 
 #### Returns
 
@@ -156,7 +156,7 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 
 | Name | Type |
 | :------ | :------ |
-| `nRLC` | [`NRLCAmount`](internal_.md#nrlcamount) |
+| `nRLC` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -166,7 +166,7 @@ ___
 
 ### getSignerFromPrivateKey
 
-▸ **getSignerFromPrivateKey**(`host`, `privateKey`, `options?`): [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
+▸ **getSignerFromPrivateKey**(`host`, `privateKey`, `options?`): [`EnhancedWallet`](../classes/EnhancedWallet.md)
 
 create a signer connected to the specified blockchain host from a private key
 
@@ -185,11 +185,11 @@ const iexec = new IExec({ ethProvider });
 | `options?` | `Object` | - |
 | `options.gasPrice?` | `string` | gas price override |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
-| `options.providers` | [`ProviderOptions`](../interfaces/internal_.ProviderOptions.md) | providers options |
+| `options.providers` | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options |
 
 #### Returns
 
-[`EnhancedWallet`](../classes/internal_.EnhancedWallet.md)
+[`EnhancedWallet`](../classes/EnhancedWallet.md)
 
 ___
 

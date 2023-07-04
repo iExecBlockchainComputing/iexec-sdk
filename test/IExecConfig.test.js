@@ -231,7 +231,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -251,7 +258,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -271,7 +285,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.AlchemyProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.AlchemyProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -291,7 +312,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.EtherscanProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.EtherscanProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -314,6 +342,8 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(4);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -475,7 +505,14 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.InfuraProvider);
+        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider.providerConfigs.length).toBe(2);
+        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
+          providers.InfuraProvider,
+        );
+        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
+          providers.CloudflareProvider,
+        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1);
@@ -726,27 +763,6 @@ describe('[IExecConfig]', () => {
   });
 
   describe('resolveEnterpriseContractsClient()', () => {
-    test('success', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: 'mainnet',
-        },
-        {
-          providerOptions: {
-            infura: INFURA_PROJECT_ID,
-            alchemy: ALCHEMY_API_KEY,
-            etherscan: ETHERSCAN_API_KEY,
-          },
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(
-        '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-      );
-      expect(contracts.flavour).toBe('enterprise');
-    });
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
@@ -1016,14 +1032,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { iexecGatewayURL },
+      );
       const promise = config.resolveIexecGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe(iexecGatewayURL);
     });
     test('success iexecGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -1034,6 +1051,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).resolves.toBe(iexecGatewayURL);
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIexecGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `iexecGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
@@ -1055,14 +1082,15 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
-      });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: tokenChainUrl,
+        },
+        { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
+      );
       const promise = config.resolveIpfsGatewayURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
+      await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
     });
     test('success ipfsGatewayURL override', async () => {
       const config = new IExecConfig(
@@ -1073,6 +1101,16 @@ describe('[IExecConfig]', () => {
       );
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
+    });
+    test('success when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: tokenChainUrl,
+      });
+      const promise = config.resolveIpfsGatewayURL();
+      await expect(promise).rejects.toThrow(
+        `ipfsGatewayURL option not set and no default value for your chain ${networkId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({

@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -13,7 +15,7 @@ import {
   Dealid,
   BN,
   TxHash,
-} from './types';
+} from '../common/types.js';
 
 /**
  * sell order for an app
@@ -22,6 +24,19 @@ export interface ApporderTemplate {
   app: Address;
   appprice: string;
   volume: string;
+  tag: Bytes32;
+  datasetrestrict: Address;
+  workerpoolrestrict: Address;
+  requesterrestrict: Address;
+}
+
+/**
+ * sell order for an app
+ */
+export interface SignableApporder {
+  app: Address;
+  appprice: BNish;
+  volume: BNish;
   tag: Tag;
   datasetrestrict: Address;
   workerpoolrestrict: Address;
@@ -31,14 +46,7 @@ export interface ApporderTemplate {
 /**
  * sell order for an app
  */
-export interface HashableApporder {
-  app: Address;
-  appprice: BNish;
-  volume: BNish;
-  tag: Tag;
-  datasetrestrict: Address;
-  workerpoolrestrict: Address;
-  requesterrestrict: Address;
+export interface HashableApporder extends SignableApporder {
   salt: Bytes32;
 }
 
@@ -49,7 +57,7 @@ export interface SignedApporder {
   app: Address;
   appprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   datasetrestrict: Address;
   workerpoolrestrict: Address;
   requesterrestrict: Address;
@@ -88,7 +96,7 @@ export interface DatasetorderTemplate {
 /**
  * sell order for a dataset
  */
-export interface HashableDatasetorder {
+export interface SignableDatasetorder {
   dataset: Address;
   datasetprice: BNish;
   volume: BNish;
@@ -96,6 +104,12 @@ export interface HashableDatasetorder {
   apprestrict: Address;
   workerpoolrestrict: Address;
   requesterrestrict: Address;
+}
+
+/**
+ * sell order for a dataset
+ */
+export interface HashableDatasetorder extends SignableDatasetorder {
   salt: Bytes32;
 }
 
@@ -106,7 +120,7 @@ export interface SignedDatasetorder {
   dataset: Address;
   datasetprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   apprestrict: Address;
   workerpoolrestrict: Address;
   requesterrestrict: Address;
@@ -136,7 +150,7 @@ export interface WorkerpoolorderTemplate {
   workerpool: Address;
   workerpoolprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   category: string;
   trust: string;
   apprestrict: Address;
@@ -147,7 +161,7 @@ export interface WorkerpoolorderTemplate {
 /**
  * sell order for computing power
  */
-export interface HashableWorkerpoolorder {
+export interface SignableWorkerpoolorder {
   workerpool: Address;
   workerpoolprice: BNish;
   volume: BNish;
@@ -157,6 +171,12 @@ export interface HashableWorkerpoolorder {
   apprestrict: Address;
   datasetrestrict: Address;
   requesterrestrict: Address;
+}
+
+/**
+ * sell order for computing power
+ */
+export interface HashableWorkerpoolorder extends SignableWorkerpoolorder {
   salt: Bytes32;
 }
 
@@ -167,7 +187,7 @@ export interface SignedWorkerpoolorder {
   workerpool: Address;
   workerpoolprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   category: string;
   trust: string;
   apprestrict: Address;
@@ -194,6 +214,60 @@ export interface ConsumableWorkerpoolorder {
   sign: Bytes;
 }
 
+export interface RequestorderParams {
+  /**
+   * arguments to pass to the app
+   */
+  iexec_args?: string;
+  /**
+   * input files for the app (direct download url)
+   */
+  iexec_input_files?: string[];
+  /**
+   * requester secrets to pass to the app
+   *
+   * ```js
+   * const secret = {
+   *   1: 'login', // maps requester named secret "login" to app secret 1
+   *   2: 'password' // maps requester named secret "password" to app secret 2
+   * };
+   * ```
+   *
+   * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
+   */
+  iexec_secrets?: Record<number, string>;
+  /**
+   * encrypt results
+   *
+   * default `false`
+   *
+   * _NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
+   */
+  iexec_result_encryption?: boolean;
+  /**
+   * selected storage provider
+   *
+   * supported: `'ipfs'`|`'dropbox'`
+   *
+   * default `'ipfs'`
+   */
+  iexec_result_storage_provider?: string;
+  /**
+   * result proxy url
+   *
+   * default determined by IExecConfig
+   */
+  iexec_result_storage_proxy?: string;
+  /**
+   * [deprecated]
+   *
+   * enable debug logs
+   *
+   * default false
+   */
+  iexec_developer_logger?: boolean;
+}
+
 /**
  * buy order for computing tasks
  */
@@ -205,26 +279,18 @@ export interface RequestorderTemplate {
   workerpool: Address;
   workerpoolmaxprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   category: string;
   trust: string;
   beneficiary: Address;
   callback: Address;
-  params: {
-    iexec_args?: string;
-    iexec_input_files?: string[];
-    iexec_secrets?: Record<number, string>;
-    iexec_result_encryption?: boolean;
-    iexec_result_storage_provider?: string;
-    iexec_result_storage_proxy?: string;
-    iexec_developer_logger?: boolean;
-  };
+  params: RequestorderParams;
 }
 
 /**
  * buy order for computing tasks
  */
-export interface HashableRequestorder {
+export interface SignableRequestorder {
   app: Address;
   appmaxprice: BNish;
   dataset: Address;
@@ -237,7 +303,13 @@ export interface HashableRequestorder {
   trust: BNish;
   beneficiary: Address;
   callback: Address;
-  params: string;
+  params: RequestorderParams | string;
+}
+
+/**
+ * buy order for computing tasks
+ */
+export interface HashableRequestorder extends SignableRequestorder {
   salt: Bytes32;
 }
 
@@ -252,7 +324,7 @@ export interface SignedRequestorder {
   workerpool: Address;
   workerpoolmaxprice: string;
   volume: string;
-  tag: Tag;
+  tag: Bytes32;
   category: string;
   trust: string;
   beneficiary: Address;
@@ -474,61 +546,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * execution parameters
      */
-    params?:
-      | {
-          /**
-           * arguments to pass to the app
-           */
-          iexec_args?: string;
-          /**
-           * input files for the app (direct download url)
-           */
-          iexec_input_files?: string[];
-          /**
-           * requester secrets to pass to the app
-           *
-           * ```js
-           * const secret = {
-           *   1: 'login', // maps requester named secret "login" to app secret 1
-           *   2: 'password' // maps requester named secret "password" to app secret 2
-           * };
-           * ```
-           *
-           * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
-           */
-          iexec_secrets?: Record<number, string>;
-          /**
-           * encrypt results
-           *
-           * default `false`
-           *
-           * _NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
-           */
-          iexec_result_encryption?: boolean;
-          /**
-           * selected storage provider
-           *
-           * supported: `'ipfs'`|`'dropbox'`
-           *
-           * default `'ipfs'`
-           */
-          iexec_result_storage_provider?: string;
-          /**
-           * result proxy url
-           *
-           * default determined by IExecConfig
-           */
-          iexec_result_storage_proxy?: string;
-          /**
-           * [deprecated]
-           *
-           * enable debug logs
-           *
-           * default false
-           */
-          iexec_developer_logger?: boolean;
-        }
-      | string;
+    params?: RequestorderParams | string;
     /**
      * app max price per task
      *
@@ -592,7 +610,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signApporder(
-    apporderTemplate: ApporderTemplate,
+    apporder: SignableApporder,
     options?: { preflightCheck?: boolean },
   ): Promise<SignedApporder>;
   /**
@@ -609,7 +627,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signDatasetorder(
-    datasetorderTemplate: DatasetorderTemplate,
+    datasetorder: SignableDatasetorder,
     options?: { preflightCheck?: boolean },
   ): Promise<SignedDatasetorder>;
   /**
@@ -623,7 +641,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signWorkerpoolorder(
-    workerpoolorderTemplate: WorkerpoolorderTemplate,
+    workerpoolorder: SignedWorkerpoolorder,
   ): Promise<SignedWorkerpoolorder>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -643,7 +661,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signRequestorder(
-    requestorderTemplate: RequestorderTemplate,
+    requestorder: SignableRequestorder,
     options?: { preflightCheck?: boolean },
   ): Promise<SignedRequestorder>;
   /**
@@ -701,7 +719,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   cancelApporder(
     apporder: ConsumableApporder,
-  ): Promise<{ txHash: TxHash; order: ConsumableApporder }>;
+  ): Promise<{ txHash: TxHash; order: SignedApporder }>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
@@ -715,7 +733,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   cancelDatasetorder(
     datasetorder: ConsumableDatasetorder,
-  ): Promise<{ txHash: TxHash; order: ConsumableDatasetorder }>;
+  ): Promise<{ txHash: TxHash; order: SignedDatasetorder }>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
    *
@@ -729,7 +747,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   cancelWorkerpoolorder(
     workerpoolorder: ConsumableWorkerpoolorder,
-  ): Promise<{ txHash: TxHash; order: ConsumableWorkerpoolorder }>;
+  ): Promise<{ txHash: TxHash; order: SignedWorkerpoolorder }>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
    *
@@ -743,7 +761,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   cancelRequestorder(
     requestorder: ConsumableRequestorder,
-  ): Promise<{ txHash: TxHash; order: ConsumableRequestorder }>;
+  ): Promise<{ txHash: TxHash; order: SignedRequestorder }>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
    *

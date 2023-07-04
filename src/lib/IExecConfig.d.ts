@@ -1,7 +1,9 @@
-import IExecContractsClient from '../common/utils/IExecContractsClient';
-import { EnhancedWallet } from '../common/utils/signers';
+export * from '../common/types.js';
+
 import { ExternalProvider } from '@ethersproject/providers';
-import { ProviderOptions, TeeFramework } from './types';
+import IExecContractsClient from '../common/utils/IExecContractsClient.js';
+import { EnhancedWallet } from '../common/utils/signers.js';
+import { ProviderOptions, TeeFramework } from '../common/types.js';
 
 export interface IExecConfigArgs {
   /**
@@ -98,7 +100,7 @@ export interface IExecConfigOptions {
   /**
    * number of block to wait for transactions confirmation (default 1)
    */
-  confirms?: boolean;
+  confirms?: number;
   /**
    * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
    */

@@ -60,7 +60,7 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: `string`
 
 ___
 

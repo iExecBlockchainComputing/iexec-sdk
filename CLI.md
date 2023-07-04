@@ -2594,8 +2594,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       }
     },
     "mainnet": {},
-    "bellecour": {},
-    "enterprise": {}
+    "bellecour": {}
   },
   "providers": {
     "alchemy": "ALCHEMY_API_KEY",

@@ -6,6 +6,12 @@
 
 buy order for computing tasks
 
+## Hierarchy
+
+- [`SignableRequestorder`](internal_.SignableRequestorder.md)
+
+  ↳ **`HashableRequestorder`**
+
 ## Table of contents
 
 ### Properties
@@ -31,11 +37,19 @@ buy order for computing tasks
 
 • **app**: `string`
 
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[app](internal_.SignableRequestorder.md#app)
+
 ___
 
 ### appmaxprice
 
-• **appmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **appmaxprice**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[appmaxprice](internal_.SignableRequestorder.md#appmaxprice)
 
 ___
 
@@ -43,17 +57,29 @@ ___
 
 • **beneficiary**: `string`
 
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[beneficiary](internal_.SignableRequestorder.md#beneficiary)
+
 ___
 
 ### callback
 
 • **callback**: `string`
 
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[callback](internal_.SignableRequestorder.md#callback)
+
 ___
 
 ### category
 
-• **category**: [`BNish`](../modules/internal_.md#bnish)
+• **category**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[category](internal_.SignableRequestorder.md#category)
 
 ___
 
@@ -61,17 +87,29 @@ ___
 
 • **dataset**: `string`
 
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[dataset](internal_.SignableRequestorder.md#dataset)
+
 ___
 
 ### datasetmaxprice
 
-• **datasetmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **datasetmaxprice**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[datasetmaxprice](internal_.SignableRequestorder.md#datasetmaxprice)
 
 ___
 
 ### params
 
-• **params**: `string`
+• **params**: `string` \| [`RequestorderParams`](internal_.RequestorderParams.md)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[params](internal_.SignableRequestorder.md#params)
 
 ___
 
@@ -83,19 +121,31 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[tag](internal_.SignableRequestorder.md#tag)
 
 ___
 
 ### trust
 
-• **trust**: [`BNish`](../modules/internal_.md#bnish)
+• **trust**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[trust](internal_.SignableRequestorder.md#trust)
 
 ___
 
 ### volume
 
-• **volume**: [`BNish`](../modules/internal_.md#bnish)
+• **volume**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[volume](internal_.SignableRequestorder.md#volume)
 
 ___
 
@@ -103,8 +153,16 @@ ___
 
 • **workerpool**: `string`
 
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[workerpool](internal_.SignableRequestorder.md#workerpool)
+
 ___
 
 ### workerpoolmaxprice
 
-• **workerpoolmaxprice**: [`BNish`](../modules/internal_.md#bnish)
+• **workerpoolmaxprice**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[workerpoolmaxprice](internal_.SignableRequestorder.md#workerpoolmaxprice)

@@ -15,7 +15,7 @@
 
 ### ethProvider
 
-• **ethProvider**: `string` \| `number` \| [`EnhancedWallet`](../classes/internal_.EnhancedWallet.md) \| `ExternalProvider`
+• **ethProvider**: `string` \| `number` \| [`EnhancedWallet`](../classes/EnhancedWallet.md) \| `ExternalProvider`
 
 A web3 Eth provider or network name or chain id
 

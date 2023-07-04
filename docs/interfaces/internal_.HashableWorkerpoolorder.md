@@ -6,6 +6,12 @@
 
 sell order for computing power
 
+## Hierarchy
+
+- [`SignableWorkerpoolorder`](internal_.SignableWorkerpoolorder.md)
+
+  ↳ **`HashableWorkerpoolorder`**
+
 ## Table of contents
 
 ### Properties
@@ -27,11 +33,19 @@ sell order for computing power
 
 • **apprestrict**: `string`
 
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[apprestrict](internal_.SignableWorkerpoolorder.md#apprestrict)
+
 ___
 
 ### category
 
-• **category**: [`BNish`](../modules/internal_.md#bnish)
+• **category**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[category](internal_.SignableWorkerpoolorder.md#category)
 
 ___
 
@@ -39,11 +53,19 @@ ___
 
 • **datasetrestrict**: `string`
 
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[datasetrestrict](internal_.SignableWorkerpoolorder.md#datasetrestrict)
+
 ___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[requesterrestrict](internal_.SignableWorkerpoolorder.md#requesterrestrict)
 
 ___
 
@@ -55,19 +77,31 @@ ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: [`Tag`](../modules.md#tag)
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[tag](internal_.SignableWorkerpoolorder.md#tag)
 
 ___
 
 ### trust
 
-• **trust**: [`BNish`](../modules/internal_.md#bnish)
+• **trust**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[trust](internal_.SignableWorkerpoolorder.md#trust)
 
 ___
 
 ### volume
 
-• **volume**: [`BNish`](../modules/internal_.md#bnish)
+• **volume**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[volume](internal_.SignableWorkerpoolorder.md#volume)
 
 ___
 
@@ -75,8 +109,16 @@ ___
 
 • **workerpool**: `string`
 
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[workerpool](internal_.SignableWorkerpoolorder.md#workerpool)
+
 ___
 
 ### workerpoolprice
 
-• **workerpoolprice**: [`BNish`](../modules/internal_.md#bnish)
+• **workerpoolprice**: [`BNish`](../modules.md#bnish)
+
+#### Inherited from
+
+[SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[workerpoolprice](internal_.SignableWorkerpoolorder.md#workerpoolprice)

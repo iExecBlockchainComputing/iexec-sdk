@@ -31,31 +31,19 @@ const hubMap = {
 
 const smsMap = {
   standard: {
-    1: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.mainnet.iex.ec',
-      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
-    },
     134: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms.bellecour.iex.ec',
-      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
+      [TEE_FRAMEWORKS.SCONE]: 'https://sms.scone-prod.v8-bellecour.iex.ec',
+      [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
     },
   },
-  enterprise: {
-    1: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://v7.sms-enterprise.mainnet.iex.ec',
-      [TEE_FRAMEWORKS.GRAMINE]: 'https://gramine-sms.iex.ec',
-    },
-  },
+  enterprise: {},
 };
 
 const resultProxyMap = {
   standard: {
-    1: 'https://v7.result.mainnet.iex.ec',
-    134: 'https://v7.result.bellecour.iex.ec',
+    134: 'https://result.v8-bellecour.iex.ec',
   },
-  enterprise: {
-    1: 'https://v7.result-enterprise.mainnet.iex.ec',
-  },
+  enterprise: {},
 };
 
 const bridgeMap = {
@@ -72,19 +60,20 @@ const bridgeMap = {
   enterprise: {},
 };
 
-const enterpriseEnabledMap = {
-  1: true,
-};
+const enterpriseEnabledMap = {};
 
-const ipfsGatewayMap = {};
+const ipfsGatewayMap = {
+  standard: {
+    134: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+  },
+  enterprise: {},
+};
 
 const iexecGatewayMap = {
   standard: {
-    default: 'https://v7.api.market.iex.ec',
+    134: 'https://api.market.v8-bellecour.iex.ec',
   },
-  enterprise: {
-    default: 'https://v7.api-enterprise.market.iex.ec',
-  },
+  enterprise: {},
 };
 
 const idMap = {
@@ -101,14 +90,8 @@ export const getChainDefaults = ({ id, flavour }) => ({
   ensRegistry: ensMap[id] && ensMap[id].registry,
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
-  ipfsGateway:
-    (ipfsGatewayMap[flavour] &&
-      (ipfsGatewayMap[flavour][id] || ipfsGatewayMap[flavour].default)) ||
-    'https://ipfs.iex.ec',
-  iexecGateway:
-    (iexecGatewayMap[flavour] &&
-      (iexecGatewayMap[flavour][id] || iexecGatewayMap[flavour].default)) ||
-    'https://v7.api.market.iex.ec',
+  ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
+  iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
   network: networkMap[id],

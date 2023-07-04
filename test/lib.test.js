@@ -7171,7 +7171,6 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
       },
     );
@@ -7180,11 +7179,31 @@ describe('[orderbook]', () => {
     expect(res.count).toBe(0);
     expect(res.orders).toStrictEqual([]);
     const apporder = await deployAndGetApporder(iexec);
+
     for (let i = 0; i < 22; i += 1) {
       await iexec.order
         .signApporder(apporder)
         .then((o) => iexec.order.publishApporder(o));
     }
+    for (let i = 0; i < 2; i += 1) {
+      await iexec.order
+        .signApporder({ ...apporder, datasetrestrict: getRandomAddress() })
+        .then((o) => iexec.order.publishApporder(o));
+    }
+    for (let i = 0; i < 3; i += 1) {
+      await iexec.order
+        .signApporder({ ...apporder, workerpoolrestrict: getRandomAddress() })
+        .then((o) => iexec.order.publishApporder(o));
+    }
+    for (let i = 0; i < 4; i += 1) {
+      await iexec.order
+        .signApporder({ ...apporder, requesterrestrict: getRandomAddress() })
+        .then((o) => iexec.order.publishApporder(o));
+    }
+    await deployAndGetApporder(iexec).then((o) =>
+      iexec.order.publishApporder(o),
+    );
+
     const res1 = await iexec.orderbook.fetchAppOrderbook(apporder.app);
     expect(res1.count).toBe(22);
     expect(res1.orders.length).toBe(20);
@@ -7193,6 +7212,30 @@ describe('[orderbook]', () => {
     expect(res2.count).toBe(22);
     expect(res2.orders.length).toBe(2);
     expect(res2.more).toBeUndefined();
+    const res3 = await iexec.orderbook.fetchAppOrderbook(apporder.app, {
+      dataset: 'any',
+    });
+    expect(res3.count).toBe(24);
+    const res4 = await iexec.orderbook.fetchAppOrderbook(apporder.app, {
+      workerpool: 'any',
+    });
+    expect(res4.count).toBe(25);
+    const res5 = await iexec.orderbook.fetchAppOrderbook(apporder.app, {
+      requester: 'any',
+    });
+    expect(res5.count).toBe(26);
+    const res6 = await iexec.orderbook.fetchAppOrderbook(apporder.app, {
+      dataset: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res6.count).toBe(31);
+    const res7 = await iexec.orderbook.fetchAppOrderbook('any', {
+      dataset: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res7.count >= 32).toBe(true);
   });
 
   test('orderbook.fetchDatasetOrderbook()', async () => {
@@ -7222,6 +7265,40 @@ describe('[orderbook]', () => {
           iexec.order.publishDatasetorder(o, { preflightCheck: false }),
         );
     }
+    for (let i = 0; i < 2; i += 1) {
+      await iexec.order
+        .signDatasetorder(
+          { ...datasetorder, apprestrict: getRandomAddress() },
+          { preflightCheck: false },
+        )
+        .then((o) =>
+          iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+        );
+    }
+    for (let i = 0; i < 3; i += 1) {
+      await iexec.order
+        .signDatasetorder(
+          { ...datasetorder, workerpoolrestrict: getRandomAddress() },
+          { preflightCheck: false },
+        )
+        .then((o) =>
+          iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+        );
+    }
+    for (let i = 0; i < 4; i += 1) {
+      await iexec.order
+        .signDatasetorder(
+          { ...datasetorder, requesterrestrict: getRandomAddress() },
+          { preflightCheck: false },
+        )
+        .then((o) =>
+          iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+        );
+    }
+    await deployAndGetDatasetorder(iexec).then((o) =>
+      iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+    );
+
     const res1 = await iexec.orderbook.fetchDatasetOrderbook(
       datasetorder.dataset,
     );
@@ -7232,6 +7309,32 @@ describe('[orderbook]', () => {
     expect(res2.count).toBe(23);
     expect(res2.orders.length).toBe(3);
     expect(res2.more).toBeUndefined();
+    const res3 = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetorder.dataset,
+      { app: 'any' },
+    );
+    expect(res3.count).toBe(25);
+    const res4 = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetorder.dataset,
+      { workerpool: 'any' },
+    );
+    expect(res4.count).toBe(26);
+    const res5 = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetorder.dataset,
+      { requester: 'any' },
+    );
+    expect(res5.count).toBe(27);
+    const res6 = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetorder.dataset,
+      { app: 'any', workerpool: 'any', requester: 'any' },
+    );
+    expect(res6.count).toBe(32);
+    const res7 = await iexec.orderbook.fetchDatasetOrderbook('any', {
+      app: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res7.count >= 33).toBe(true);
   });
 
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
@@ -7261,6 +7364,30 @@ describe('[orderbook]', () => {
         .signWorkerpoolorder(workerpoolorder)
         .then((o) => iexec.order.publishWorkerpoolorder(o));
     }
+    for (let i = 0; i < 2; i += 1) {
+      await iexec.order
+        .signWorkerpoolorder({
+          ...workerpoolorder,
+          apprestrict: getRandomAddress(),
+        })
+        .then((o) => iexec.order.publishWorkerpoolorder(o));
+    }
+    for (let i = 0; i < 3; i += 1) {
+      await iexec.order
+        .signWorkerpoolorder({
+          ...workerpoolorder,
+          datasetrestrict: getRandomAddress(),
+        })
+        .then((o) => iexec.order.publishWorkerpoolorder(o));
+    }
+    for (let i = 0; i < 4; i += 1) {
+      await iexec.order
+        .signWorkerpoolorder({
+          ...workerpoolorder,
+          requesterrestrict: getRandomAddress(),
+        })
+        .then((o) => iexec.order.publishWorkerpoolorder(o));
+    }
     const res1 = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: workerpoolorder.workerpool,
     });
@@ -7271,6 +7398,40 @@ describe('[orderbook]', () => {
     expect(res2.count).toBe(24);
     expect(res2.orders.length).toBe(4);
     expect(res2.more).toBeUndefined();
+    const res3 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolorder.workerpool,
+      app: 'any',
+    });
+    expect(res3.count).toBe(26);
+    const res4 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolorder.workerpool,
+      dataset: 'any',
+    });
+    expect(res4.count).toBe(27);
+    const res5 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolorder.workerpool,
+      requester: 'any',
+    });
+    expect(res5.count).toBe(28);
+    const res6 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolorder.workerpool,
+      app: 'any',
+      dataset: 'any',
+      requester: 'any',
+    });
+    expect(res6.count).toBe(33);
+    const res7 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      app: 'any',
+      dataset: 'any',
+      requester: 'any',
+    });
+    const res8 = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: 'any',
+      app: 'any',
+      dataset: 'any',
+      requester: 'any',
+    });
+    expect(res7.count).toBe(res8.count);
   });
 
   test('orderbook.fetchRequestOrderbook()', async () => {
@@ -7284,13 +7445,17 @@ describe('[orderbook]', () => {
       },
       {
         hubAddress,
-
         iexecGatewayURL,
         resultProxyURL: 'https://result-proxy.iex.ec',
         smsURL: 'https://sms.iex.ec',
       },
     );
-    const res = await iexec.orderbook.fetchRequestOrderbook({ category: 2 });
+    const initialOrderbookRes = await iexec.orderbook.fetchRequestOrderbook({
+      category: 2,
+    });
+    const initialAnyWorkerpoolRes = await iexec.orderbook.fetchRequestOrderbook(
+      { category: 2, workerpool: 'any' },
+    );
     const apporder = await deployAndGetApporder(iexec);
     const workerpoolorder = await deployAndGetWorkerpoolorder(iexec, {
       category: 2,
@@ -7313,19 +7478,45 @@ describe('[orderbook]', () => {
           }),
         );
     }
+    for (let i = 0; i < 2; i += 1) {
+      await iexec.order
+        .signRequestorder(
+          { ...requestorder, workerpool: getRandomAddress() },
+          { preflightCheck: false },
+        )
+        .then((o) =>
+          iexec.order.publishRequestorder(o, {
+            preflightCheck: false,
+          }),
+        );
+    }
     const res1 = await iexec.orderbook.fetchRequestOrderbook({
       requester: await iexec.wallet.getAddress(),
       category: 2,
     });
-    expect(res1.count).toBe(res.count + 25);
+    expect(res1.count).toBe(initialOrderbookRes.count + 25);
     expect(res1.orders.length).toBe(20);
     expect(res1.more).toBeDefined();
     const res2 = await res1.more();
-    expect(res2.count).toBe(res.count + 25);
+    expect(res2.count).toBe(initialOrderbookRes.count + 25);
     expect(res2.orders.length >= 5).toBe(true);
     if (res2.orders.length < 20) {
       expect(res2.more).toBeUndefined();
     }
+    const res3 = await iexec.orderbook.fetchRequestOrderbook({
+      requester: await iexec.wallet.getAddress(),
+      category: 2,
+      workerpool: 'any',
+    });
+    expect(res3.count).toBe(initialAnyWorkerpoolRes.count + 27);
+    const res4 = await iexec.orderbook.fetchRequestOrderbook({
+      workerpool: 'any',
+    });
+    const res5 = await iexec.orderbook.fetchRequestOrderbook({
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(res4.count).toBe(res5.count);
   });
 });
 

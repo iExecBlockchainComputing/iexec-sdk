@@ -1,7 +1,9 @@
-import IExecConfig from './IExecConfig';
-import { Observable } from '../common/utils/reactive';
-import IExecModule from './IExecModule';
-import { Address, ENS, TxHash } from './types';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import { Observable } from '../common/utils/reactive.js';
+import IExecModule from './IExecModule.js';
+import { Address, ENS, TxHash } from '../common/types.js';
 
 declare class ENSConfigurationObservable extends Observable {
   /**
@@ -89,7 +91,7 @@ export default class IExecENSModule extends IExecModule {
    *
    * example:
    * ```js
-   * const owner = await resolveName('me.users.iexec.eth');
+   * const address = await resolveName('me.users.iexec.eth');
    * console.log('me.users.iexec.eth:', address);
    * ```
    */

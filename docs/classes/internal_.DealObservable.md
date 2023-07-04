@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-- [`Observable`](internal_.Observable.md)
+- [`Observable`](Observable.md)
 
   ↳ **`DealObservable`**
 
@@ -28,7 +28,7 @@
 
 #### Inherited from
 
-[Observable](internal_.Observable.md).[constructor](internal_.Observable.md#constructor)
+[Observable](Observable.md).[constructor](Observable.md#constructor)
 
 ## Methods
 
@@ -79,4 +79,4 @@ data:
 
 #### Overrides
 
-[Observable](internal_.Observable.md).[subscribe](internal_.Observable.md#subscribe)
+[Observable](Observable.md).[subscribe](Observable.md#subscribe)

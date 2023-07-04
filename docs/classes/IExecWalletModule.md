@@ -91,7 +91,7 @@ console.log(`sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainc
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -121,7 +121,7 @@ console.log(`sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidec
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -221,7 +221,7 @@ const cancel = bridgeObservable.subscribe({
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -251,7 +251,7 @@ const cancel = bridgeObservable.subscribe({
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -277,7 +277,7 @@ console.log('transaction hash:', txHash);
 
 | Name | Type |
 | :------ | :------ |
-| `WeiAmount` | [`WeiAmount`](../modules/internal_.md#weiamount) |
+| `WeiAmount` | [`WeiAmount`](../modules.md#weiamount) |
 | `to` | `string` |
 
 #### Returns
@@ -304,7 +304,7 @@ console.log('transaction hash:', txHash);
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 | `to` | `string` |
 
 #### Returns
@@ -358,7 +358,7 @@ console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
@@ -384,7 +384,7 @@ console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
 
 | Name | Type |
 | :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) |
+| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 

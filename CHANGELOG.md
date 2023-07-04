@@ -2,13 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [8.1.5] 2023-06-22
+
+- fix windows install
+
+## [8.1.4] 2023-06-01
+
+### Changed
+
+- Typescript fixes
+
+## [8.1.3] 2023-05-26
+
+### Changed
+
+- Typescript fixes
+
+## [8.1.2] 2023-05-26
+
+### Changed
+
+- Typescript fixes
+
+## [8.1.1] 2023-05-22
+
+### Changed
+
+- Typescript fixes
+
+## [8.1.0] 2023-05-17
+
+### Changed
+
+- Typescript fixes
+- app orderbook accept `"any"` for the app address to fetch orderbook without filtering on app
+- dataset orderbook accept `"any"` for the dataset address to fetch orderbook without filtering on dataset
+
+## [8.0.0] 2023-04-07
 
 ### Added
 
 - `defaultTeeFramework` option for `IExecConfig` and `chain.json` for choosing the default TEE framework to use
 - `iexec app init` option `--tee-framework <'scone'|'gramine'>` to specify the TEE framework to use for the app
 - tee framework tags 'scone' & 'gramine'
+- app orderbook accept `"any"` for `dataset`, `workerpool`, `requester` to fetch orderbook without filtering
+- dataset orderbook accept `"any"` for `app`, `workerpool`, `requester` to fetch orderbook without filtering
+- workerpool orderbook accept `"any"` for `app`, `dataset`, `requester` to fetch orderbook without filtering
+- requester orderbook accept `"any"` for `workerpool` to fetch orderbook without filtering
 
 ### Changed
 
@@ -33,12 +73,21 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `checkRequest` option is replaced by `preflightCheck`, use `preflightCheck: false` to disable checks
 - [BREAKING] `--skip-request-check` option is replaced by `--skip-preflight-check`
 - [BREAKING] bellecour is now the default chain initialized in `chain.json` when running `iexec init`
+- [BREAKING] iExec stack is no longer deployed on mainnet, stack configuration for mainnet is no longer provided
+- [BREAKING] iExec enterprise stack is no longer deployed, stack configuration for enterprise is no longer provided
 
 ### Removed
 
 - [BREAKING] viviani is no longer available in the default configuration
 - [BREAKING] goerli is no longer available in the default configuration
 - [BREAKING] removed now useless faucet commands `iexec wallet get-RLC` and `iexec wallet get-ether`
+
+## [7.2.5] 2023-04-03
+
+### Changed
+
+- changed IPFS default gateway to v7 stack specific gateway
+- fix API providers configuration
 
 ## [7.2.4] 2023-01-12
 

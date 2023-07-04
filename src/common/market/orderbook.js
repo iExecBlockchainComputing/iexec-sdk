@@ -2,6 +2,7 @@ import Debug from 'debug';
 import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
 import {
   addressSchema,
+  addressOrAnySchema,
   chainIdSchema,
   uint256Schema,
   positiveIntSchema,
@@ -12,6 +13,8 @@ import {
 
 const debug = Debug('iexec:market:orderbook');
 
+const ERROR_GETTING_ORDERBOOK = 'An error occurred while getting orderbook';
+
 export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
@@ -21,21 +24,21 @@ export const fetchAppOrderbook = async (
   try {
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
-      app: await addressSchema({
+      app: await addressOrAnySchema({
         ethProvider: contracts.provider,
       }).validate(app),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -57,7 +60,7 @@ export const fetchAppOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchAppOrderbook()', error);
     throw error;
@@ -73,21 +76,21 @@ export const fetchDatasetOrderbook = async (
   try {
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
-      dataset: await addressSchema({
+      dataset: await addressOrAnySchema({
         ethProvider: contracts.provider,
       }).validate(dataset),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -109,7 +112,7 @@ export const fetchDatasetOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchDatasetOrderbook()', error);
     throw error;
@@ -137,22 +140,22 @@ export const fetchWorkerpoolOrderbook = async (
       chainId: await chainIdSchema().validate(contracts.chainId),
       category: await uint256Schema().validate(category),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
@@ -182,7 +185,7 @@ export const fetchWorkerpoolOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchWorkerpoolOrderbook()', error);
     throw error;
@@ -210,27 +213,27 @@ export const fetchRequestOrderbook = async (
       chainId: await chainIdSchema().validate(contracts.chainId),
       category: await uint256Schema().validate(category),
       ...(requester && {
-        requester: await addressSchema({
+        requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
       ...(beneficiary && {
-        beneficiary: await addressSchema({
+        beneficiary: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(beneficiary),
       }),
       ...(app && {
-        app: await addressSchema({
+        app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
       }),
       ...(dataset && {
-        dataset: await addressSchema({
+        dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressSchema({
+        workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
@@ -255,7 +258,7 @@ export const fetchRequestOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error('An error occured while getting orderbook');
+    throw Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchRequestOrderbook()', error);
     throw error;

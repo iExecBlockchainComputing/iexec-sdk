@@ -1,5 +1,7 @@
-import IExecConfig from './IExecConfig';
-import IExecModule from './IExecModule';
+export * from '../common/types.js';
+
+import IExecConfig from './IExecConfig.js';
+import IExecModule from './IExecModule.js';
 import {
   Address,
   Addressish,
@@ -9,7 +11,45 @@ import {
   Multiaddress,
   TeeFramework,
   TxHash,
-} from './types';
+} from '../common/types.js';
+
+export interface SconeMREnclave {
+  /**
+   * TEE framework name
+   */
+  framework: 'SCONE';
+  /**
+   * app entrypoint path
+   */
+  entrypoint: string;
+  /**
+   * dedicated memory in bytes
+   */
+  heapSize: number;
+  /**
+   * framework's protocol version
+   */
+  version: string;
+  /**
+   * app tee fingerprint
+   */
+  fingerprint: string;
+}
+
+export interface GramineMREnclave {
+  /**
+   * TEE framework name
+   */
+  framework: 'GRAMINE';
+  /**
+   * framework's protocol version
+   */
+  version: string;
+  /**
+   * app tee fingerprint
+   */
+  fingerprint: string;
+}
 
 export interface AppDeploymentArgs {
   /**
@@ -35,28 +75,7 @@ export interface AppDeploymentArgs {
   /**
    * optional for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: {
-    /**
-     * TEE framework name
-     */
-    framework: TeeFramework;
-    /**
-     * framework's protocol version
-     */
-    version: string;
-    /**
-     * app entrypoint path
-     */
-    entrypoint: string;
-    /**
-     * dedicated memory in bytes
-     */
-    heapSize: number;
-    /**
-     * app tee fingerprint
-     */
-    fingerprint: string;
-  };
+  mrenclave?: SconeMREnclave | GramineMREnclave;
 }
 /**
  * IExec app
@@ -77,7 +96,7 @@ export interface App {
   /**
    * app image address
    */
-  appMultiaddr: Multiaddress;
+  appMultiaddr: string;
   /**
    * app image digest
    */
@@ -85,15 +104,7 @@ export interface App {
   /**
    * for TEE apps only, specify the TEE protocol to use
    */
-  appMrenclave:
-    | string
-    | {
-        framework: 'SCONE' | 'GRAMINE';
-        version: string;
-        entrypoint: string;
-        heapSize: number;
-        fingerprint: string;
-      };
+  appMREnclave: string;
   /**
    * app registry address
    */

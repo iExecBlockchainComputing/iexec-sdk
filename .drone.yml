@@ -181,7 +181,7 @@ services:
       - redis-server --appendonly yes
 
   token-watcher:
-    image: iexechub/iexec-market-watcher:5
+    image: iexechub/iexec-market-watcher:6.2
     commands:
       - sleep 10
       - cd /app
@@ -198,7 +198,7 @@ services:
       - REDIS_HOST=gateway-redis
 
   token-gateway:
-    image: iexechub/iexec-market-api:5
+    image: iexechub/iexec-market-api:6.2
     commands:
       - sleep 10
       - cd /app

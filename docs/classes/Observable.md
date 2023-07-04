@@ -1,8 +1,6 @@
-[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Observable
+[iexec](../README.md) / [Exports](../modules.md) / Observable
 
 # Class: Observable
-
-[<internal>](../modules/internal_.md).Observable
 
 ## Hierarchy
 
@@ -20,11 +18,11 @@
 
 ### Constructors
 
-- [constructor](internal_.Observable.md#constructor)
+- [constructor](Observable.md#constructor)
 
 ### Methods
 
-- [subscribe](internal_.Observable.md#subscribe)
+- [subscribe](Observable.md#subscribe)
 
 ## Constructors
 

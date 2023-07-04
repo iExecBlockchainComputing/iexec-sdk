@@ -70,25 +70,13 @@ ___
 
 ### params
 
-• **params**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `iexec_args?` | `string` |
-| `iexec_developer_logger?` | `boolean` |
-| `iexec_input_files?` | `string`[] |
-| `iexec_result_encryption?` | `boolean` |
-| `iexec_result_storage_provider?` | `string` |
-| `iexec_result_storage_proxy?` | `string` |
-| `iexec_secrets?` | `Record`<`number`, `string`\> |
+• **params**: [`RequestorderParams`](internal_.RequestorderParams.md)
 
 ___
 
 ### tag
 
-• **tag**: [`Tag`](../modules/internal_.md#tag)
+• **tag**: `string`
 
 ___
 

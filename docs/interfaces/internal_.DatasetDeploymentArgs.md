@@ -25,7 +25,7 @@ ___
 
 ### multiaddr
 
-• **multiaddr**: [`Multiaddress`](../modules/internal_.md#multiaddress)
+• **multiaddr**: [`Multiaddress`](../modules.md#multiaddress)
 
 dataset file download address
 

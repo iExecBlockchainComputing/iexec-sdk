@@ -92,7 +92,7 @@ current IExecConfig
 
 ### cancelApporder
 
-▸ **cancelApporder**(`apporder`): `Promise`<{ `order`: [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) ; `txHash`: `string`  }\>
+▸ **cancelApporder**(`apporder`): `Promise`<{ `order`: [`SignedApporder`](../interfaces/internal_.SignedApporder.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY APP OWNER**
 
@@ -112,13 +112,13 @@ console.log('cancel tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `order`: [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) ; `txHash`: `string`  }\>
+`Promise`<{ `order`: [`SignedApporder`](../interfaces/internal_.SignedApporder.md) ; `txHash`: `string`  }\>
 
 ___
 
 ### cancelDatasetorder
 
-▸ **cancelDatasetorder**(`datasetorder`): `Promise`<{ `order`: [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) ; `txHash`: `string`  }\>
+▸ **cancelDatasetorder**(`datasetorder`): `Promise`<{ `order`: [`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
@@ -138,13 +138,13 @@ console.log('cancel tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `order`: [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) ; `txHash`: `string`  }\>
+`Promise`<{ `order`: [`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md) ; `txHash`: `string`  }\>
 
 ___
 
 ### cancelRequestorder
 
-▸ **cancelRequestorder**(`requestorder`): `Promise`<{ `order`: [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) ; `txHash`: `string`  }\>
+▸ **cancelRequestorder**(`requestorder`): `Promise`<{ `order`: [`SignedRequestorder`](../interfaces/internal_.SignedRequestorder.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -164,13 +164,13 @@ console.log('cancel tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `order`: [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) ; `txHash`: `string`  }\>
+`Promise`<{ `order`: [`SignedRequestorder`](../interfaces/internal_.SignedRequestorder.md) ; `txHash`: `string`  }\>
 
 ___
 
 ### cancelWorkerpoolorder
 
-▸ **cancelWorkerpoolorder**(`workerpoolorder`): `Promise`<{ `order`: [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) ; `txHash`: `string`  }\>
+▸ **cancelWorkerpoolorder**(`workerpoolorder`): `Promise`<{ `order`: [`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
@@ -190,7 +190,7 @@ console.log('cancel tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `order`: [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) ; `txHash`: `string`  }\>
+`Promise`<{ `order`: [`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md) ; `txHash`: `string`  }\>
 
 ___
 
@@ -211,11 +211,11 @@ const apporderTemplate = await createApporder({app: appAddress});
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.app` | `string` | - |
-| `overrides.appprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.appprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool default no restrict |
 
 #### Returns
@@ -242,10 +242,10 @@ const datasetorderTemplate = await createDatasetorder({dataset: datasetAddress})
 | `overrides` | `Object` | - |
 | `overrides.apprestrict?` | `string` | restrict usage to a specific app default no restrict |
 | `overrides.dataset` | `string` | - |
-| `overrides.datasetprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.datasetprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpoolrestrict?` | `string` | restrict usage to a specific workerpool default no restrict |
 
 #### Returns
@@ -275,18 +275,18 @@ const requestorderTemplate = await createRequestorder({
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.app` | `string` | app to run |
-| `overrides.appmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | app max price per task default `0` |
+| `overrides.appmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | app max price per task default `0` |
 | `overrides.beneficiary?` | `string` | beneficiary default connected wallet address |
-| `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
+| `overrides.category` | [`BNish`](../modules.md#bnish) | computation category |
 | `overrides.dataset?` | `string` | dataset to use default none |
-| `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | dataset max price per task default `0` |
-| `overrides.params?` | `string` \| { `iexec_args?`: `string` ; `iexec_developer_logger?`: `boolean` ; `iexec_input_files?`: `string`[] ; `iexec_result_encryption?`: `boolean` ; `iexec_result_storage_provider?`: `string` ; `iexec_result_storage_proxy?`: `string` ; `iexec_secrets?`: `Record`<`number`, `string`\>  } | execution parameters |
+| `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | dataset max price per task default `0` |
+| `overrides.params?` | `string` \| [`RequestorderParams`](../interfaces/internal_.RequestorderParams.md) | execution parameters |
 | `overrides.requester?` | `string` | requester default connected wallet address |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
-| `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | required trust default `0` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | restrict usage to runtime with specified tags default `[]` |
+| `overrides.trust?` | [`BNish`](../modules.md#bnish) | required trust default `0` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpool?` | `string` | run one specified workerpool default run on any workerpool |
-| `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | workerpool max price per task default `0` |
+| `overrides.workerpoolmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | workerpool max price per task default `0` |
 
 #### Returns
 
@@ -311,14 +311,14 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 | :------ | :------ | :------ |
 | `overrides` | `Object` | - |
 | `overrides.apprestrict?` | `string` | restrict usage to a specific app default no restrict |
-| `overrides.category` | [`BNish`](../modules/internal_.md#bnish) | computation category |
+| `overrides.category` | [`BNish`](../modules.md#bnish) | computation category |
 | `overrides.datasetrestrict?` | `string` | restrict usage to a specific dataset default no restrict |
 | `overrides.requesterrestrict?` | `string` | restrict usage to a specific requester default no restrict |
-| `overrides.tag?` | [`Tag`](../modules/internal_.md#tag) \| `string`[] | proposed tags default `[]` |
-| `overrides.trust?` | [`BNish`](../modules/internal_.md#bnish) | proposed trust default `0` |
-| `overrides.volume?` | [`BNish`](../modules/internal_.md#bnish) | volume of tasks executable with the order default `1` |
+| `overrides.tag?` | [`Tag`](../modules.md#tag) \| `string`[] | proposed tags default `[]` |
+| `overrides.trust?` | [`BNish`](../modules.md#bnish) | proposed trust default `0` |
+| `overrides.volume?` | [`BNish`](../modules.md#bnish) | volume of tasks executable with the order default `1` |
 | `overrides.workerpool` | `string` | - |
-| `overrides.workerpoolprice?` | [`NRLCAmount`](../modules/internal_.md#nrlcamount) | price per task default `0` |
+| `overrides.workerpoolprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | price per task default `0` |
 
 #### Returns
 
@@ -577,7 +577,7 @@ ___
 
 ### signApporder
 
-▸ **signApporder**(`apporderTemplate`, `options?`): `Promise`<[`SignedApporder`](../interfaces/internal_.SignedApporder.md)\>
+▸ **signApporder**(`apporder`, `options?`): `Promise`<[`SignedApporder`](../interfaces/internal_.SignedApporder.md)\>
 
 **ONLY APP OWNER**
 
@@ -595,7 +595,7 @@ const apporder = await signApporder(apporderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `apporderTemplate` | [`ApporderTemplate`](../interfaces/internal_.ApporderTemplate.md) |
+| `apporder` | [`SignableApporder`](../interfaces/internal_.SignableApporder.md) |
 | `options?` | `Object` |
 | `options.preflightCheck?` | `boolean` |
 
@@ -607,7 +607,7 @@ ___
 
 ### signDatasetorder
 
-▸ **signDatasetorder**(`datasetorderTemplate`, `options?`): `Promise`<[`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md)\>
+▸ **signDatasetorder**(`datasetorder`, `options?`): `Promise`<[`SignedDatasetorder`](../interfaces/internal_.SignedDatasetorder.md)\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
@@ -625,7 +625,7 @@ const datasetorder = await signDatasetorder(datasetorderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `datasetorderTemplate` | [`DatasetorderTemplate`](../interfaces/internal_.DatasetorderTemplate.md) |
+| `datasetorder` | [`SignableDatasetorder`](../interfaces/internal_.SignableDatasetorder.md) |
 | `options?` | `Object` |
 | `options.preflightCheck?` | `boolean` |
 
@@ -637,7 +637,7 @@ ___
 
 ### signRequestorder
 
-▸ **signRequestorder**(`requestorderTemplate`, `options?`): `Promise`<[`SignedRequestorder`](../interfaces/internal_.SignedRequestorder.md)\>
+▸ **signRequestorder**(`requestorder`, `options?`): `Promise`<[`SignedRequestorder`](../interfaces/internal_.SignedRequestorder.md)\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -659,7 +659,7 @@ const requestorder = await signRequestorder(requestorderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `requestorderTemplate` | [`RequestorderTemplate`](../interfaces/internal_.RequestorderTemplate.md) |
+| `requestorder` | [`SignableRequestorder`](../interfaces/internal_.SignableRequestorder.md) |
 | `options?` | `Object` |
 | `options.preflightCheck?` | `boolean` |
 
@@ -671,7 +671,7 @@ ___
 
 ### signWorkerpoolorder
 
-▸ **signWorkerpoolorder**(`workerpoolorderTemplate`): `Promise`<[`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md)\>
+▸ **signWorkerpoolorder**(`workerpoolorder`): `Promise`<[`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md)\>
 
 **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
@@ -686,7 +686,7 @@ const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `workerpoolorderTemplate` | [`WorkerpoolorderTemplate`](../interfaces/internal_.WorkerpoolorderTemplate.md) |
+| `workerpoolorder` | [`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md) |
 
 #### Returns
 
