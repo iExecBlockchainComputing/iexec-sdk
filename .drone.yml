@@ -262,19 +262,31 @@ services:
 ---
 kind: pipeline
 type: docker
-name: publish-dry-run
+name: publish dry-run
 
 steps:
-  - name: build
+  - name: install
     image: node:18
     pull: always
     commands:
       - node -v
       - npm -v
       - npm ci
+
+  - name: build
+    image: node:18
+    commands:
       - npm run build
 
   - name: npm publish dry-run
     image: node:18
     commands:
       - npm publish --dry-run
+
+  - name: docker publish dry-run
+    image: plugins/docker
+    pull: always
+    settings:
+      repo: iexechub/iexec-sdk
+      dockerfile: Dockerfile
+      dry_run: true
