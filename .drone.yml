@@ -81,48 +81,6 @@ steps:
     commands:
       - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
 
-  # - name: publish npm
-  #   image: plugins/npm
-  #   pull: always
-  #   settings:
-  #     username: iexecteam
-  #     token:
-  #       from_secret: npm_token
-  #     tag: latest
-  #   when:
-  #     ref:
-  #       include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-  #       exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
-
-  # - name: publish npm alpha
-  #   image: plugins/npm
-  #   pull: always
-  #   settings:
-  #     username: iexecteam
-  #     token:
-  #       from_secret: npm_token
-  #     tag: alpha
-  #   when:
-  #     ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
-
-  # - name: publish dockerhub
-  #   image: plugins/docker
-  #   pull: always
-  #   settings:
-  #     repo: iexechub/iexec-sdk
-  #     dockerfile: Dockerfile
-  #     tags:
-  #       - latest
-  #       - ${DRONE_TAG##v}
-  #     username:
-  #       from_secret: docker_username
-  #     password:
-  #       from_secret: docker_password
-  #   when:
-  #     ref:
-  #       include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-  #       exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
-
 services:
   - name: token-chain
     image: iexechub/poco-chaintest:5.3.2-token
@@ -290,3 +248,117 @@ steps:
       repo: iexechub/iexec-sdk
       dockerfile: Dockerfile
       dry_run: true
+
+---
+kind: pipeline
+type: docker
+name: publish nightly
+
+trigger:
+  event:
+    - promote
+  target:
+    - nightly
+  branch:
+    - next
+    - new
+
+steps:
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: set version nightly
+    image: node:18
+    commands:
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+
+  - name: npm publish
+    image: plugins/npm
+    pull: always
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: generate docker tag
+    image: node:18
+    # generates the .tags file for the docker plugin
+    commands:
+      - npm pkg get version | sed 's/"//g' > .tags
+
+  - name: docker publish
+    image: plugins/docker
+    pull: always
+    settings:
+      registry: docker-regis.iex.ec
+      repo: iexec-sdk
+      dockerfile: Dockerfile
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+
+---
+kind: pipeline
+type: docker
+name: publish latest
+
+trigger:
+  event:
+    - promote
+  target:
+    - latest
+  branch:
+    - master
+
+steps:
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: npm publish
+    image: plugins/npm
+    pull: always
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: latest
+
+  - name: generate docker tag
+    image: node:18
+    # generates the .tags file for the docker plugin
+    commands:
+      - echo -n "latest,$(npm pkg get version | sed 's/"//g')" > .tags
+
+  - name: docker publish
+    image: plugins/docker
+    pull: always
+    settings:
+      repo: iexechub/iexec-sdk
+      dockerfile: Dockerfile
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
