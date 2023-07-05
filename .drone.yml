@@ -191,8 +191,6 @@ services:
       - cd /app
       - npm start
     environment:
-      DEBUG: iexec-watcher*
-      DEBUG_COLORS: true
       CHAIN: DEV
       CHAIN_ID: 65535
       IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
@@ -209,8 +207,6 @@ services:
       - cd /app
       - npm start
     environment:
-      DEBUG: iexec-market-api*
-      DEBUG_COLORS: true
       CHAINS: DEV
       DEV_NATIVE: false
       DEV_ETH_RPC_HOST: http://token-chain-openethereum:8545
