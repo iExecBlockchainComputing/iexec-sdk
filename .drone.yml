@@ -2,6 +2,11 @@ kind: pipeline
 type: docker
 name: default
 
+trigger:
+  event:
+    exclude:
+      - promote
+
 steps:
   - name: test node 18
     image: node:18
@@ -221,6 +226,11 @@ services:
 kind: pipeline
 type: docker
 name: publish dry-run
+
+trigger:
+  event:
+    exclude:
+      - promote
 
 steps:
   - name: install
