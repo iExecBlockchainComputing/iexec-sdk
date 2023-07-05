@@ -258,3 +258,23 @@ services:
       RATE_LIMIT_MAX: 10000
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
+
+---
+kind: pipeline
+type: docker
+name: publish-dry-run
+
+steps:
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+
+  - name: npm publish dry-run
+    image: node:18
+    commands:
+      - npm publish --dry-run
