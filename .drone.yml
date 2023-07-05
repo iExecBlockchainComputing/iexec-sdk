@@ -23,7 +23,8 @@ steps:
       - npm -g install .
       - npm test
     when:
-      ref: refs/tags/v*
+      event:
+        - tag
 
   - name: test node16
     image: node:16
@@ -45,7 +46,8 @@ steps:
       - npm -g install .
       - npm test
     when:
-      ref: refs/tags/v*
+      event:
+        - tag
 
   - name: test node14
     image: node:14
