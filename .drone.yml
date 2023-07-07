@@ -410,18 +410,15 @@ steps:
         from_secret: npm_token
       tag: latest
 
-  - name: generate docker tag
-    image: node:18
-    # generates the .tags file for the docker plugin
-    commands:
-      - echo -n "latest,$(npm pkg get version | sed 's/"//g')" > .tags
-
   - name: docker publish
     image: plugins/docker
     pull: always
     settings:
       repo: iexechub/iexec-sdk
       dockerfile: Dockerfile
+      tags:
+        - latest
+        - ${DRONE_TAG##v}
       username:
         from_secret: docker_username
       password:
