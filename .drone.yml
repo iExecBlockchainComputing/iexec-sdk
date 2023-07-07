@@ -372,13 +372,19 @@ kind: pipeline
 type: docker
 name: publish latest
 
+# promote latest on tag semver tags
 trigger:
   event:
     - promote
   target:
     - latest
-  branch:
-    - master
+  ref:
+    include:
+      - refs/tags/v[0-9]*.*[0-9].*[0-9]
+    exclude:
+      - refs/tags/v*.*.*.*
+      - refs/tags/v*-*
+      - refs/tags/v*[a-zA-Z]*
 
 steps:
   - name: install
