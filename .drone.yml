@@ -8,8 +8,8 @@ trigger:
       - promote
 
 steps:
-  - name: test node 18
-    image: node:18
+  - name: test
+    image: node:14
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -21,15 +21,36 @@ steps:
     commands:
       - apt update
       - apt install xxd
+      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
       - npm run build
       - npm -g install .
       - npm test
-    when:
-      event:
-        - tag
+    depends_on:
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
+
+  - name: code analysis
+    image: sonarsource/sonar-scanner-cli
+    pull: always
+    environment:
+      SONAR_TOKEN:
+        from_secret: sonar_token
+      SONAR_HOST:
+        from_secret: sonar_host
+    commands:
+      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
+    depends_on:
+      - test
 
   - name: test node 16
     image: node:16
@@ -53,9 +74,21 @@ steps:
     when:
       event:
         - tag
+    depends_on:
+      - test
+      - code analysis
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
 
-  - name: test node 14
-    image: node:14
+  - name: test node 18
+    image: node:18
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -67,24 +100,27 @@ steps:
     commands:
       - apt update
       - apt install xxd
-      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
       - npm run build
       - npm -g install .
       - npm test
-
-  - name: code analysis
-    image: sonarsource/sonar-scanner-cli
-    pull: always
-    environment:
-      SONAR_TOKEN:
-        from_secret: sonar_token
-      SONAR_HOST:
-        from_secret: sonar_host
-    commands:
-      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
+    when:
+      event:
+        - tag
+    depends_on:
+      - test node 16
+      - code analysis
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
 
 services:
   - name: token-chain
@@ -126,6 +162,8 @@ services:
       IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
       IEXEC_SCONE_CAS_HOST: foo
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
+    depends_on:
+      - token-chain-openethereum
 
   - name: token-sms-gramine
     image: iexechub/iexec-sms:7.1.0
@@ -148,6 +186,18 @@ services:
       IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
       IEXEC_SCONE_CAS_HOST: foo
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
+    depends_on:
+      - token-chain-openethereum
+
+  - name: ipfs
+    image: ipfs/go-ipfs:v0.9.1
+    pull: always
+
+  - name: token-result-proxy-mongo
+    pull: always
+    image: library/mongo:4.2
+    commands:
+      - mongod --bind_ip_all
 
   - name: token-result-proxy
     image: iexechub/iexec-result-proxy:7.1.0
@@ -162,16 +212,10 @@ services:
       MONGO_HOST: token-result-proxy-mongo
       MONGO_PORT: 27017
       IEXEC_IPFS_HOST: ipfs
-
-  - name: token-result-proxy-mongo
-    pull: always
-    image: library/mongo:4.2
-    commands:
-      - mongod --bind_ip_all
-
-  - name: ipfs
-    image: ipfs/go-ipfs:v0.9.1
-    pull: always
+    depends_on:
+      - ipfs
+      - token-chain-openethereum
+      - token-result-proxy-mongo
 
   - name: gateway-mongo
     image: mongo:latest
@@ -198,6 +242,10 @@ services:
       ETH_RPC_HOST: http://token-chain-openethereum:8545
       MONGO_HOST: gateway-mongo
       REDIS_HOST: gateway-redis
+    depends_on:
+      - token-chain-openethereum
+      - gateway-mongo
+      - gateway-redis
 
   - name: token-gateway
     image: iexechub/iexec-market-api:6.2
@@ -217,6 +265,10 @@ services:
       RATE_LIMIT_MAX: 10000
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
+    depends_on:
+      - token-chain-openethereum
+      - gateway-mongo
+      - gateway-redis
 
 ---
 kind: pipeline
