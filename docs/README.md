@@ -42,19 +42,6 @@ import { IExec } from 'iexec';
 const iexec = new IExec({ ethProvider: window.ethereum });
 ```
 
-**NB:** `iexec` SDK requires some NodeJS builtin modules to work, in the browser your bundler might on might not provides polyfills for these modules. If your bundler does not automatically includes NodeJS polyfills you must add them by yourself.
-
-The following NodeJS builtins à required to run in a browser:
-
-- globals:
-  - Buffer
-  - process
-- modules:
-  - assert
-  - crypto
-  - constants
-  - buffer
-
 [Read more about popular bundlers integration](../bundlers.md)
 
 ## Back-end integration
