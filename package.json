@@ -154,7 +154,6 @@
   "files": [
     "src/",
     "dist/",
-    "iexec_sdk_logo.jpg",
     "IExec",
     "IExecAccountModule",
     "IExecAppModule",
