@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { utils } from 'ethers';
-import { cipher, createBuffer } from './forge.js';
+import { cipher, createBuffer } from '../libs/forge.js';
 import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,

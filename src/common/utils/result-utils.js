@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import JSZip from 'jszip';
-import { pki, cipher, createBuffer } from './forge.js';
+import { pki, cipher, createBuffer } from '../libs/forge.js';
 
 const debug = Debug('iexec:result-utils');
 
