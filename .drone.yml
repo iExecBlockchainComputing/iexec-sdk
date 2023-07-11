@@ -1,40 +1,24 @@
-pipeline:
-  test_node18:
-    image: node:18
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      ref: refs/tags/v*
+kind: pipeline
+type: docker
+name: default
 
-  test_node16:
-    image: node:16
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      ref: refs/tags/v*
+trigger:
+  event:
+    exclude:
+      - promote
+      - pull_request
 
-  test_node14:
+steps:
+  - name: test
     image: node:14
-    pull: true
-    secrets: [infura_project_id, alchemy_api_key, etherscan_api_key]
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
     commands:
       - apt update
       - apt install xxd
@@ -45,179 +29,398 @@ pipeline:
       - npm run build
       - npm -g install .
       - npm test
+    depends_on:
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
 
-  code_analysis:
+  - name: code analysis
     image: sonarsource/sonar-scanner-cli
-    pull: true
-    secrets: [sonar_token, sonar_host]
+    pull: always
+    environment:
+      SONAR_TOKEN:
+        from_secret: sonar_token
+      SONAR_HOST:
+        from_secret: sonar_host
     commands:
       - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
+    depends_on:
+      - test
 
-  publish_npm:
-    image: plugins/npm
-    secrets: [npm_token]
-    username: iexecteam
-    email: dev@iex.ec
-    tag: latest
+  - name: test node 16
+    image: node:16
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
     when:
-      ref:
-        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+      event:
+        - tag
+    depends_on:
+      - test
+      - code analysis
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
 
-  publish_alpha_npm:
-    image: plugins/npm
-    secrets: [npm_token]
-    username: iexecteam
-    email: dev@iex.ec
-    tag: alpha
+  - name: test node 18
+    image: node:18
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      - npm -g install .
+      - npm test
     when:
-      ref: refs/tags/v[1-9]*.*[0-9].*[0-9]-alpha.*[0-9]
-
-  publish_dockerhub:
-    image: plugins/docker
-    repo: iexechub/iexec-sdk
-    secrets: [docker_username, docker_password]
-    tags:
-      - latest
-      - ${DRONE_TAG##v}
-    when:
-      ref:
-        include: refs/tags/v[1-9]*.*[0-9].*[0-9]
-        exclude: refs/tags/v[1-9]*.*[0-9].*[0-9]-*
+      event:
+        - tag
+    depends_on:
+      - test node 16
+      - code analysis
+      - token-chain
+      - native-chain
+      - token-chain-1s
+      - token-chain-openethereum
+      - token-sms-scone
+      - token-sms-gramine
+      - token-gateway
+      - token-watcher
+      - token-result-proxy
 
 services:
-  token-chain:
+  - name: token-chain
     image: iexechub/poco-chaintest:5.3.2-token
-    pull: true
+    pull: always
 
-  native-chain:
+  - name: native-chain
     image: iexechub/poco-chaintest:5.3.2-native
-    pull: true
+    pull: always
 
-  token-chain-1s:
+  - name: token-chain-1s
     image: iexechub/poco-chaintest:5.3.2-token
-    command: '--miner.blockTime 1'
-    pull: true
+    commands:
+      - node /app/dist/node/cli.js --chain.networkId 65535 --chain.chainId 65535 --chain.hardfork london --database.dbPath /ganachedb --miner.blockTime 1
+    pull: always
 
-  token-chain-openethereum:
+  - name: token-chain-openethereum
     image: iexechub/poco-chaintest:5.3.2-token-openethereum
-    pull: true
+    pull: always
 
-  token-sms-scone:
+  - name: token-sms-scone
     image: iexechub/iexec-sms:7.1.0
-    pull: true
+    pull: always
+    commands:
+      - sleep 10
+      - java -jar /app/iexec-sms.jar
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
-    expose:
-      - 13300
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     depends_on:
       - token-chain-openethereum
 
-  token-sms-gramine:
+  - name: token-sms-gramine
     image: iexechub/iexec-sms:7.1.0
-    pull: true
+    pull: always
+    commands:
+      - sleep 10
+      - java -jar /app/iexec-sms.jar
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
-    expose:
-      - 13300
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     depends_on:
       - token-chain-openethereum
 
-  token-result-proxy:
+  - name: ipfs
+    image: ipfs/go-ipfs:v0.9.1
+    pull: always
+
+  - name: token-result-proxy-mongo
+    pull: always
+    image: library/mongo:4.2
+    commands:
+      - mongod --bind_ip_all
+
+  - name: token-result-proxy
     image: iexechub/iexec-result-proxy:7.1.0
-    pull: true
+    pull: always
+    commands:
+      - sleep 10
+      - java -Djava.security.egd=file:/dev/./urandom -jar /iexec-result-proxy.jar
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=13202
-      - IEXEC_IPFS_HOST=ipfs
-    expose:
-      - 13200
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      MONGO_HOST: token-result-proxy-mongo
+      MONGO_PORT: 27017
+      IEXEC_IPFS_HOST: ipfs
     depends_on:
+      - ipfs
       - token-chain-openethereum
       - token-result-proxy-mongo
-      - ipfs
 
-  token-result-proxy-mongo:
-    pull: true
-    image: library/mongo:4.2
-    entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 13202"
-    expose:
-      - 13202
-
-  ipfs:
-    image: ipfs/go-ipfs:v0.9.1
-    pull: true
-
-  gateway-mongo:
+  - name: gateway-mongo
     image: mongo:latest
+    pull: always
 
-  gateway-redis:
+  - name: gateway-redis
     image: redis:alpine
-    command: redis-server --appendonly yes
+    pull: always
+    commands:
+      - redis-server --appendonly yes
 
-  token-watcher:
+  - name: token-watcher
     image: iexechub/iexec-market-watcher:6.2
+    pull: always
     commands:
       - sleep 10
       - cd /app
       - npm start
     environment:
-      - DEBUG=iexec-watcher*
-      - DEBUG_COLORS=true
-      - CHAIN=DEV
-      - CHAIN_ID=65535
-      - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - ETH_WS_HOST=ws://token-chain-openethereum:8546
-      - ETH_RPC_HOST=http://token-chain-openethereum:8545
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
+      CHAIN: DEV
+      CHAIN_ID: 65535
+      IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      ETH_WS_HOST: ws://token-chain-openethereum:8546
+      ETH_RPC_HOST: http://token-chain-openethereum:8545
+      MONGO_HOST: gateway-mongo
+      REDIS_HOST: gateway-redis
+    depends_on:
+      - token-chain-openethereum
+      - gateway-mongo
+      - gateway-redis
 
-  token-gateway:
+  - name: token-gateway
     image: iexechub/iexec-market-api:6.2
+    pull: always
     commands:
       - sleep 10
       - cd /app
       - npm start
     environment:
-      - DEBUG=iexec-market-api*
-      - DEBUG_COLORS=true
-      - CHAINS=DEV
-      - DEV_NATIVE=false
-      - DEV_ETH_RPC_HOST=http://token-chain-openethereum:8545
-      - DEV_CHAIN_ID=65535
-      - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
-      - RATE_LIMIT_MAX=10000
-      - RATE_LIMIT_PERIOD=60000
-      - MAX_OPEN_ORDERS_PER_WALLET=1000
+      CHAINS: DEV
+      DEV_NATIVE: false
+      DEV_ETH_RPC_HOST: http://token-chain-openethereum:8545
+      DEV_CHAIN_ID: 65535
+      DEV_IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
+      MONGO_HOST: gateway-mongo
+      REDIS_HOST: gateway-redis
+      RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_PERIOD: 60000
+      MAX_OPEN_ORDERS_PER_WALLET: 1000
+    depends_on:
+      - token-chain-openethereum
+      - gateway-mongo
+      - gateway-redis
+
+---
+kind: pipeline
+type: docker
+name: publish dry-run
+
+trigger:
+  event:
+    exclude:
+      - promote
+
+steps:
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: npm publish dry-run
+    image: node:18
+    commands:
+      - npm publish --dry-run
+
+  - name: docker publish dry-run
+    image: plugins/docker
+    pull: always
+    settings:
+      repo: iexechub/iexec-sdk
+      dockerfile: Dockerfile
+      dry_run: true
+
+---
+kind: pipeline
+type: docker
+name: publish nightly
+
+trigger:
+  event:
+    - promote
+  target:
+    - nightly
+  branch:
+    - next
+    - new
+
+steps:
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: set version nightly
+    image: node:18
+    commands:
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+
+  - name: npm publish
+    image: plugins/npm
+    pull: always
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: generate docker tag
+    image: node:18
+    # generates the .tags file for the docker plugin
+    commands:
+      - npm pkg get version | sed 's/"//g' > .tags
+
+  - name: docker publish
+    image: plugins/docker
+    pull: always
+    settings:
+      registry: docker-regis.iex.ec
+      repo: iexec-sdk
+      dockerfile: Dockerfile
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+
+---
+kind: pipeline
+type: docker
+name: publish latest
+
+# promote latest on tag semver tags
+trigger:
+  event:
+    - promote
+  target:
+    - latest
+  ref:
+    include:
+      - refs/tags/v[0-9]*.*[0-9].*[0-9]
+    exclude:
+      - refs/tags/v*.*.*.*
+      - refs/tags/v*-*
+      - refs/tags/v*[a-zA-Z]*
+
+steps:
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: npm publish
+    image: plugins/npm
+    pull: always
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: latest
+
+  - name: docker publish
+    image: plugins/docker
+    pull: always
+    settings:
+      repo: iexechub/iexec-sdk
+      dockerfile: Dockerfile
+      tags:
+        - latest
+        - ${DRONE_TAG##v}
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
