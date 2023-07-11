@@ -349,6 +349,7 @@ steps:
         from_secret: npm_username
       token:
         from_secret: npm_token
+      tag: ${DRONE_BRANCH}
 
   - name: generate docker tag
     image: node:18
@@ -361,12 +362,15 @@ steps:
     pull: always
     settings:
       registry: docker-regis.iex.ec
-      repo: iexec-sdk
+      repo: docker-regis.iex.ec/iexec-sdk
       dockerfile: Dockerfile
       username:
         from_secret: nexus-user
       password:
         from_secret: nexus-password
+      tags:
+        - ${DRONE_BRANCH}
+        - ${DRONE_BRANCH}-${DRONE_COMMIT}
 
 ---
 kind: pipeline
