@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { utils } from 'ethers';
-import { cipher, createBuffer } from '../libs/forge.js';
+import forgeAes from '../libs/forge-aes.js';
 import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
@@ -23,8 +23,11 @@ export const encryptAes256Cbc = async (
   let fileBuffer = await fileBufferSchema().validate(fileBytes);
 
   const iv = randomBytes(16);
-  const aesCbcCipher = cipher.createCipher('AES-CBC', createBuffer(keyBuffer));
-  aesCbcCipher.start({ iv: createBuffer(iv) });
+  const aesCbcCipher = forgeAes.cipher.createCipher(
+    'AES-CBC',
+    forgeAes.util.createBuffer(keyBuffer),
+  );
+  aesCbcCipher.start({ iv: forgeAes.util.createBuffer(iv) });
 
   const CHUNK_SIZE = 10 * 1000 * 1000;
   let encryptionBuffer = Buffer.from([]);
@@ -35,7 +38,7 @@ export const encryptAes256Cbc = async (
     // process chunk
     const chunk = fileBuffer.slice(0, CHUNK_SIZE);
     fileBuffer = fileBuffer.slice(CHUNK_SIZE);
-    aesCbcCipher.update(createBuffer(chunk));
+    aesCbcCipher.update(forgeAes.util.createBuffer(chunk));
   }
   aesCbcCipher.finish();
   const finalizationBuffer = Buffer.from(

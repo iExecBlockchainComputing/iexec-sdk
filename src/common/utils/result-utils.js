@@ -1,6 +1,7 @@
 import Debug from 'debug';
 import JSZip from 'jszip';
-import { pki, cipher, createBuffer } from '../libs/forge.js';
+import forgeAes from '../libs/forge-aes.js';
+import forgePki from '../libs/forge-pki.js';
 
 const debug = Debug('iexec:result-utils');
 
@@ -84,7 +85,9 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   debug('Decrypting results key');
   let aesKeyBuffer;
   try {
-    const key = pki.privateKeyFromPem(Buffer.from(beneficiaryKey).toString());
+    const key = forgePki.pki.privateKeyFromPem(
+      Buffer.from(beneficiaryKey).toString(),
+    );
     const base64EncodedResultsKey = key.decrypt(encryptedAesKeyBuffer);
     aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
   } catch (error) {
@@ -117,9 +120,9 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       base64EncodedEncryptedZip,
       'base64',
     );
-    const aesEcbDecipher = cipher.createDecipher(
+    const aesEcbDecipher = forgeAes.cipher.createDecipher(
       'AES-ECB',
-      createBuffer(aesKeyBuffer),
+      forgeAes.util.createBuffer(aesKeyBuffer),
     );
     aesEcbDecipher.start();
 
@@ -132,7 +135,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       // process chunk
       const chunk = encryptedOutZipBuffer.slice(0, CHUNK_SIZE);
       encryptedOutZipBuffer = encryptedOutZipBuffer.slice(CHUNK_SIZE);
-      aesEcbDecipher.update(createBuffer(chunk));
+      aesEcbDecipher.update(forgeAes.util.createBuffer(chunk));
     }
     aesEcbDecipher.finish();
     const finalizationBuffer = Buffer.from(
