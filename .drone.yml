@@ -351,12 +351,6 @@ steps:
         from_secret: npm_token
       tag: ${DRONE_BRANCH}
 
-  - name: generate docker tag
-    image: node:18
-    # generates the .tags file for the docker plugin
-    commands:
-      - npm pkg get version | sed 's/"//g' > .tags
-
   - name: docker publish
     image: plugins/docker
     pull: always
