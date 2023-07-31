@@ -10,7 +10,8 @@ import {
   fetchTaskOffchainInfo,
   fetchAllReplicatesLogs,
 } from '../../common/execution/debug.js';
-import { stringifyNestedBn, decryptResult } from '../../common/utils/utils.js';
+import { stringifyNestedBn } from '../../common/utils/utils.js';
+import { decryptResult } from '../../common/utils/result-utils.js';
 import {
   finalizeCli,
   addGlobalOptions,
