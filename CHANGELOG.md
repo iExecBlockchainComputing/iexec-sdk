@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.1] 2023-08-01
+
+### Changed
+
+- fix missing import causing `decryptResult()` to crash in browser
+
 ## [8.2.0] 2023-07-28
 
 ### Changed

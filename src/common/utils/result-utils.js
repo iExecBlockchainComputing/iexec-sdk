@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { Buffer } from 'buffer';
 import JSZip from 'jszip';
 import forgeAes from '../libs/forge-aes.js';
 import forgePki from '../libs/forge-pki.js';
