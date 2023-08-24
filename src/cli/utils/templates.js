@@ -25,16 +25,16 @@ export const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'hello-world-scone',
   type: 'DOCKER',
-  multiaddr: 'iexechub/python-hello-world:7.0.5-sconify-5.3.15-v12-production',
+  multiaddr: 'iexechub/python-hello-world:8.0.0-sconify-5.7.5-v12-production',
   checksum:
-    '0x14013dea6c0c8e1bd95b549a5bdc97383f45beeecf874d9c61cd34f21159364e',
+    '0xc9d25041956bfc6961d47294b528887879c26ad4110de17cf4b985ba51f93bd2',
   mrenclave: {
     framework: 'SCONE',
     version: 'v5',
     entrypoint: 'python /app/app.py',
     heapSize: 1073741824,
     fingerprint:
-      '9be0cccb597e038e9445f4c418c8f8335257a94d7331ba01ee52c43285e38aeb',
+      'a5b171bd7b8ecd9724b07d901c21f2d0c02d64339a818562a8554c7f60dec2cb',
   },
 };
 
