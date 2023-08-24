@@ -25,7 +25,7 @@ export const sconeTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'hello-world-scone',
   type: 'DOCKER',
-  multiaddr: 'iexechub/python-hello-world:7.0.5-sconify-5.3.15-v8-production',
+  multiaddr: 'iexechub/python-hello-world:7.0.5-sconify-5.3.15-v12-production',
   checksum:
     '0x14013dea6c0c8e1bd95b549a5bdc97383f45beeecf874d9c61cd34f21159364e',
   mrenclave: {
