@@ -33,6 +33,7 @@ import {
   checkDeployedDataset,
   checkDeployedWorkerpool,
   resolveTeeFrameworkFromApp,
+  transferApp,
 } from '../../common/protocol/registries.js';
 import { showCategory } from '../../common/protocol/category.js';
 import {
@@ -1407,6 +1408,50 @@ requestRun
         {
           raw: {
             orderHash,
+          },
+        },
+      );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const transfer = cli.command('transfer <appAddress>');
+addGlobalOptions(transfer);
+addWalletLoadOptions(transfer);
+transfer
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .option(...option.force())
+  .option(...option.to())
+  .description(desc.transferObj(objName))
+  .action(async (objAddress, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.force) {
+        await prompt.transferObj(objName, objAddress, opts.to, chain.id);
+      }
+      spinner.start(`Transferring ${objName} ${objAddress}...`);
+      const { txHash, address, to } = await transferApp(
+        chain.contracts,
+        objAddress,
+        opts.to,
+      );
+      spinner.succeed(
+        `Successfully transferred ${objName} ${address} ownership to ${to}`,
+        {
+          raw: {
+            address,
+            to,
+            txHash,
           },
         },
       );
