@@ -149,6 +149,23 @@ export default class IExecWorkerpoolModule extends IExecModule {
     url: string,
   ): Promise<string | undefined>;
   /**
+   * **ONLY WORKERPOOL OWNER**
+   *
+   * transfer the ownership of a workerpool to the specified address
+   *
+   * _NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+   *
+   * example:
+   * ```js
+   * const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
+   * console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * ```
+   */
+  transferWorkerpool(
+    workerpoolAddress: Addressish,
+    to: Addressish,
+  ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
+  /**
    * Create an IExecWorkerpoolModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecWorkerpoolModule;

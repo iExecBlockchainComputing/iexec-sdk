@@ -2923,6 +2923,39 @@ describe('[app]', () => {
     );
   });
 
+  test('app.transferApp()', async () => {
+    const receiverAddress = getRandomAddress();
+    const iexecAppOwner = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+      },
+      {
+        hubAddress,
+      },
+    );
+    const { address } = await deployRandomApp(iexecAppOwner);
+    const iexecRandom = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          getRandomWallet().privateKey,
+        ),
+      },
+      {
+        hubAddress,
+      },
+    );
+    await expect(
+      iexecRandom.app.transferApp(address, receiverAddress),
+    ).rejects.toThrow(Error('Only app owner can transfer app ownership'));
+    const res = await iexecAppOwner.app.transferApp(address, receiverAddress);
+    expect(res.address).toBe(address);
+    expect(res.to).toBe(receiverAddress);
+    expect(res.txHash).toMatch(bytes32Regex);
+    const { app } = await iexecRandom.app.showApp(address);
+    expect(app.owner).toBe(receiverAddress);
+  });
+
   test('app.showApp()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3277,6 +3310,44 @@ describe('[dataset]', () => {
     ).resolves.toBe(true);
   });
 
+  test('dataset.transferDataset()', async () => {
+    const receiverAddress = getRandomAddress();
+    const iexecDatasetOwner = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+      },
+      {
+        hubAddress,
+      },
+    );
+    const { address } = await deployRandomDataset(iexecDatasetOwner);
+    const iexecRandom = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          getRandomWallet().privateKey,
+        ),
+      },
+      {
+        hubAddress,
+      },
+    );
+    await expect(
+      iexecRandom.dataset.transferDataset(address, receiverAddress),
+    ).rejects.toThrow(
+      Error('Only dataset owner can transfer dataset ownership'),
+    );
+    const res = await iexecDatasetOwner.dataset.transferDataset(
+      address,
+      receiverAddress,
+    );
+    expect(res.address).toBe(address);
+    expect(res.to).toBe(receiverAddress);
+    expect(res.txHash).toMatch(bytes32Regex);
+    const { dataset } = await iexecRandom.dataset.showDataset(address);
+    expect(dataset.owner).toBe(receiverAddress);
+  });
+
   test('dataset.showDataset()', async () => {
     const signer = utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY);
     const iexec = new IExec(
@@ -3575,6 +3646,44 @@ describe('[workerpool]', () => {
     await expect(
       iexec.workerpool.checkDeployedWorkerpool(predictedAddress),
     ).resolves.toBe(true);
+  });
+
+  test('workerpool.transferWorkerpool()', async () => {
+    const receiverAddress = getRandomAddress();
+    const iexecWorkerpoolOwner = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(tokenChainUrl, PRIVATE_KEY),
+      },
+      {
+        hubAddress,
+      },
+    );
+    const { address } = await deployRandomWorkerpool(iexecWorkerpoolOwner);
+    const iexecRandom = new IExec(
+      {
+        ethProvider: utils.getSignerFromPrivateKey(
+          tokenChainUrl,
+          getRandomWallet().privateKey,
+        ),
+      },
+      {
+        hubAddress,
+      },
+    );
+    await expect(
+      iexecRandom.workerpool.transferWorkerpool(address, receiverAddress),
+    ).rejects.toThrow(
+      Error('Only workerpool owner can transfer workerpool ownership'),
+    );
+    const res = await iexecWorkerpoolOwner.workerpool.transferWorkerpool(
+      address,
+      receiverAddress,
+    );
+    expect(res.address).toBe(address);
+    expect(res.to).toBe(receiverAddress);
+    expect(res.txHash).toMatch(bytes32Regex);
+    const { workerpool } = await iexecRandom.workerpool.showWorkerpool(address);
+    expect(workerpool.owner).toBe(receiverAddress);
   });
 
   test('workerpool.setWorkerpoolApiUrl()', async () => {
