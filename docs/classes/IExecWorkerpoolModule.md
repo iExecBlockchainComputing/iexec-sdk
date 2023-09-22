@@ -30,6 +30,7 @@ module exposing workerpool methods
 - [setWorkerpoolApiUrl](IExecWorkerpoolModule.md#setworkerpoolapiurl)
 - [showUserWorkerpool](IExecWorkerpoolModule.md#showuserworkerpool)
 - [showWorkerpool](IExecWorkerpoolModule.md#showworkerpool)
+- [transferWorkerpool](IExecWorkerpoolModule.md#transferworkerpool)
 - [fromConfig](IExecWorkerpoolModule.md#fromconfig)
 
 ## Constructors
@@ -271,6 +272,35 @@ console.log('workerpool:', workerpool);
 #### Returns
 
 `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
+
+___
+
+### transferWorkerpool
+
+▸ **transferWorkerpool**(`workerpoolAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
+
+**ONLY WORKERPOOL OWNER**
+
+transfer the ownership of a workerpool to the specified address
+
+_NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+
+example:
+```js
+const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
+console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `to` | `string` |
+
+#### Returns
+
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 ___
 

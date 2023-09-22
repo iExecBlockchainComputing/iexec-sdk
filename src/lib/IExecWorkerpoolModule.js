@@ -6,6 +6,7 @@ import {
   countUserWorkerpools,
   predictWorkerpoolAddress,
   checkDeployedWorkerpool,
+  transferWorkerpool,
 } from '../common/protocol/registries.js';
 import { setWorkerpoolApiUrl } from '../common/execution/workerpool.js';
 import { getWorkerpoolApiUrl } from '../common/execution/debug.js';
@@ -46,6 +47,12 @@ export default class IExecWorkerpoolModule extends IExecModule {
       checkDeployedWorkerpool(
         await this.config.resolveContractsClient(),
         address,
+      );
+    this.transferWorkerpool = async (address, to) =>
+      transferWorkerpool(
+        await this.config.resolveContractsClient(),
+        address,
+        to,
       );
   }
 }

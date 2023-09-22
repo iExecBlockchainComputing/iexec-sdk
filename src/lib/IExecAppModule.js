@@ -7,6 +7,7 @@ import {
   predictAppAddress,
   checkDeployedApp,
   resolveTeeFrameworkFromApp,
+  transferApp,
 } from '../common/protocol/registries.js';
 import { checkAppSecretExists } from '../common/sms/check.js';
 import { pushAppSecret } from '../common/sms/push.js';
@@ -66,5 +67,7 @@ export default class IExecAppModule extends IExecModule {
       predictAppAddress(await this.config.resolveContractsClient(), app);
     this.checkDeployedApp = async (address) =>
       checkDeployedApp(await this.config.resolveContractsClient(), address);
+    this.transferApp = async (address, to) =>
+      transferApp(await this.config.resolveContractsClient(), address, to);
   }
 }

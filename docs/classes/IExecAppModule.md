@@ -30,6 +30,7 @@ module exposing app methods
 - [pushAppSecret](IExecAppModule.md#pushappsecret)
 - [showApp](IExecAppModule.md#showapp)
 - [showUserApp](IExecAppModule.md#showuserapp)
+- [transferApp](IExecAppModule.md#transferapp)
 - [fromConfig](IExecAppModule.md#fromconfig)
 
 ## Constructors
@@ -283,6 +284,35 @@ console.log('app:', app);
 #### Returns
 
 `Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
+
+___
+
+### transferApp
+
+▸ **transferApp**(`appAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
+
+**ONLY APP OWNER**
+
+transfer the ownership of an app to the specified address
+
+_NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+
+example:
+```js
+const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
+console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `to` | `string` |
+
+#### Returns
+
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 ___
 
