@@ -232,6 +232,23 @@ export default class IExecAppModule extends IExecModule {
     options?: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
+   * **ONLY APP OWNER**
+   *
+   * transfer the ownership of an app to the specified address
+   *
+   * _NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+   *
+   * example:
+   * ```js
+   * const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
+   * console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * ```
+   */
+  transferApp(
+    appAddress: Addressish,
+    to: Addressish,
+  ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
+  /**
    * Create an IExecAppModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecAppModule;

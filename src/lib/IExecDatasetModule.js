@@ -6,6 +6,7 @@ import {
   countUserDatasets,
   predictDatasetAddress,
   checkDeployedDataset,
+  transferDataset,
 } from '../common/protocol/registries.js';
 import { checkWeb3SecretExists } from '../common/sms/check.js';
 import { pushWeb3Secret } from '../common/sms/push.js';
@@ -63,5 +64,7 @@ export default class IExecDatasetModule extends IExecModule {
       );
     this.checkDeployedDataset = async (address) =>
       checkDeployedDataset(await this.config.resolveContractsClient(), address);
+    this.transferDataset = async (address, to) =>
+      transferDataset(await this.config.resolveContractsClient(), address, to);
   }
 }

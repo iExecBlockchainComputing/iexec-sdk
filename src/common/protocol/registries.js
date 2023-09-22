@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { getAddress } from '../wallet/address.js';
 import {
   addressSchema,
   appSchema,
@@ -91,9 +92,7 @@ const predictObjAddress =
       );
       const args = createArgs[objName].map((e) => obj[e]);
       const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
-      return await wrapCall(
-        registryContract[predictFunctionName](...args),
-      );
+      return await wrapCall(registryContract[predictFunctionName](...args));
     } catch (error) {
       debug('predictObjAddress()', error);
       throw error;
@@ -437,6 +436,73 @@ export const showUserWorkerpool = async (
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
 };
+
+const transferObj =
+  (objName = throwIfMissing()) =>
+  async (
+    contracts = throwIfMissing(),
+    address = throwIfMissing(),
+    to = throwIfMissing(),
+  ) => {
+    try {
+      checkSigner(contracts);
+      const walletAddress = await getAddress(contracts);
+      const objOwner = await getObjOwner(objName)(contracts, address);
+      if (walletAddress !== objOwner) {
+        throw Error(`Only ${objName} owner can transfer ${objName} ownership`);
+      }
+      const registryContract = await wrapCall(
+        contracts.fetchRegistryContract(objName),
+      );
+      const tx = await wrapSend(
+        registryContract['safeTransferFrom(address,address,uint256)'](
+          walletAddress,
+          to,
+          address,
+          contracts.txOptions,
+        ),
+      );
+      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+      const txHash = txReceipt.transactionHash;
+      return { address, to, txHash };
+    } catch (error) {
+      debug('transferObj()', error);
+      throw error;
+    }
+  };
+
+export const transferApp = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  to = throwIfMissing(),
+) =>
+  transferObj(APP)(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+  );
+
+export const transferDataset = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  to = throwIfMissing(),
+) =>
+  transferObj(DATASET)(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+  );
+
+export const transferWorkerpool = async (
+  contracts = throwIfMissing(),
+  address = throwIfMissing(),
+  to = throwIfMissing(),
+) =>
+  transferObj(WORKERPOOL)(
+    contracts,
+    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+  );
 
 export const resolveTeeFrameworkFromApp = async (
   app,

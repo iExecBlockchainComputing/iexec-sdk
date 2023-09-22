@@ -743,6 +743,7 @@ Commands:
 - [unpublish](#iexec-app-unpublish)
 - [run](#iexec-app-run)
 - [request-execution](#iexec-app-request-execution)
+- [transfer](#iexec-app-transfer)
 
 #### iexec app init
 
@@ -1015,6 +1016,32 @@ Options:
 | --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
+#### iexec app transfer
+
+transfer the ownership of the app to an address
+
+Usage:
+
+```sh
+iexec app transfer <appAddress> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
+
 ### iexec dataset
 
 manage iExec datasets
@@ -1036,6 +1063,7 @@ Commands:
 - [check-secret](#iexec-dataset-check-secret)
 - [publish](#iexec-dataset-publish)
 - [unpublish](#iexec-dataset-unpublish)
+- [transfer](#iexec-dataset-transfer)
 
 #### iexec dataset init
 
@@ -1251,6 +1279,32 @@ Options:
 | --force | force perform action without prompting user |
 | --all | unpublish all orders |
 
+#### iexec dataset transfer
+
+transfer the ownership of the dataset to an address
+
+Usage:
+
+```sh
+iexec dataset transfer <datasetAddress> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
+
 ### iexec workerpool
 
 manage iExec workerpools
@@ -1270,6 +1324,7 @@ Commands:
 - [count](#iexec-workerpool-count)
 - [publish](#iexec-workerpool-publish)
 - [unpublish](#iexec-workerpool-unpublish)
+- [transfer](#iexec-workerpool-transfer)
 
 #### iexec workerpool init
 
@@ -1440,6 +1495,32 @@ Options:
 | --chain \<name\> | chain name from "chain.json" |
 | --force | force perform action without prompting user |
 | --all | unpublish all orders |
+
+#### iexec workerpool transfer
+
+transfer the ownership of the workerpool to an address
+
+Usage:
+
+```sh
+iexec workerpool transfer <workerpoolAddress> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 ### iexec requester
 

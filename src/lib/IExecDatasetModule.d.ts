@@ -238,6 +238,23 @@ export default class IExecDatasetModule extends IExecModule {
     },
   ): Promise<boolean>;
   /**
+   * **ONLY DATASET OWNER**
+   *
+   * transfer the ownership of a dataset to the specified address
+   *
+   * _NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+   *
+   * example:
+   * ```js
+   * const { address, to, txHash } = await transferDataset(datasetAddress, receiverAddress);
+   * console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * ```
+   */
+  transferDataset(
+    datasetAddress: Addressish,
+    to: Addressish,
+  ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
+  /**
    * Create an IExecDatasetModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecDatasetModule;

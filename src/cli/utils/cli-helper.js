@@ -132,6 +132,8 @@ export const desc = {
   cancelOrder: (objName) => `cancel a signed ${objName}`,
   publish: (objName) => `publish a signed ${objName}`,
   unpublish: (objName) => `unpublish a signed ${objName}`,
+  transferObj: (objName) =>
+    `transfer the ownership of the ${objName} to an address`,
   pushDatasetSecret: () =>
     'push the dataset secret to the secret management service (default push the last secret generated, use --secret-path <secretPath> to overwrite)',
   pushResultKey: () =>
@@ -558,6 +560,10 @@ export const prompt = {
   transfer: (currency, amount, chainName, to, chainId) =>
     question(
       `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
+    ),
+  transferObj: (objName, objAddress, to, chainId) =>
+    question(
+      `Do you want to transfer the ownership of the ${objName} ${objAddress} to ${to} [chainId: ${chainId}]`,
     ),
   wrap: (amount, chainId) =>
     question(

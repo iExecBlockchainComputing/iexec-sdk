@@ -33,6 +33,7 @@ module exposing dataset methods
 - [pushDatasetSecret](IExecDatasetModule.md#pushdatasetsecret)
 - [showDataset](IExecDatasetModule.md#showdataset)
 - [showUserDataset](IExecDatasetModule.md#showuserdataset)
+- [transferDataset](IExecDatasetModule.md#transferdataset)
 - [fromConfig](IExecDatasetModule.md#fromconfig)
 
 ## Constructors
@@ -372,6 +373,35 @@ console.log('dataset:', dataset);
 #### Returns
 
 `Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
+
+___
+
+### transferDataset
+
+▸ **transferDataset**(`datasetAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
+
+**ONLY DATASET OWNER**
+
+transfer the ownership of a dataset to the specified address
+
+_NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
+
+example:
+```js
+const { address, to, txHash } = await transferDataset(datasetAddress, receiverAddress);
+console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHash}`);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
+| `to` | `string` |
+
+#### Returns
+
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 ___
 

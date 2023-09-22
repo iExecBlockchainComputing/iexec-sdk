@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.0] 2023-09-22
+
+### Added
+
+- add transfer methods allowing to transfer the ownership of apps, datasets and workerpools
+
 ## [8.2.1] 2023-08-01
 
 ### Changed
