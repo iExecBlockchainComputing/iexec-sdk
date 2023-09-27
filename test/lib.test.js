@@ -2946,6 +2946,9 @@ describe('[app]', () => {
       },
     );
     await expect(
+      iexecRandom.app.transferApp(getRandomAddress(), receiverAddress),
+    ).rejects.toThrow(Error('Invalid app address'));
+    await expect(
       iexecRandom.app.transferApp(address, receiverAddress),
     ).rejects.toThrow(Error('Only app owner can transfer app ownership'));
     const res = await iexecAppOwner.app.transferApp(address, receiverAddress);
@@ -3333,6 +3336,9 @@ describe('[dataset]', () => {
       },
     );
     await expect(
+      iexecRandom.dataset.transferDataset(getRandomAddress(), receiverAddress),
+    ).rejects.toThrow(Error('Invalid dataset address'));
+    await expect(
       iexecRandom.dataset.transferDataset(address, receiverAddress),
     ).rejects.toThrow(
       Error('Only dataset owner can transfer dataset ownership'),
@@ -3670,6 +3676,12 @@ describe('[workerpool]', () => {
         hubAddress,
       },
     );
+    await expect(
+      iexecRandom.workerpool.transferWorkerpool(
+        getRandomAddress(),
+        receiverAddress,
+      ),
+    ).rejects.toThrow(Error('Invalid workerpool address'));
     await expect(
       iexecRandom.workerpool.transferWorkerpool(address, receiverAddress),
     ).rejects.toThrow(
