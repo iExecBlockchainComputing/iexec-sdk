@@ -171,6 +171,14 @@ export default class IExecOrderbookModule extends IExecModule {
        * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
     },
   ): Promise<PaginableOrders<PublishedApporder>>;
   /**
@@ -212,6 +220,14 @@ export default class IExecOrderbookModule extends IExecModule {
        * filter by maximum tag accepted
        */
       maxTag?: Tag | HumanSingleTag[];
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
     },
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
@@ -263,6 +279,14 @@ export default class IExecOrderbookModule extends IExecModule {
      * filter by minimum trust required
      */
     minTrust?: BNish;
+    /**
+     * index of the page to fetch
+     */
+    page?: number;
+    /**
+     * size of the page to fetch
+     */
+    pageSize?: number;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find the best paying request orders for computing resource.
@@ -313,6 +337,14 @@ export default class IExecOrderbookModule extends IExecModule {
      * filter by maximum trust required
      */
     maxTrust?: BNish;
+    /**
+     * index of the page to fetch
+     */
+    page?: number;
+    /**
+     * size of the page to fetch
+     */
+    pageSize?: number;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find a published apporder by orderHash.

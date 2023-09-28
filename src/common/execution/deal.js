@@ -32,7 +32,13 @@ export const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
-  { appAddress, datasetAddress, workerpoolAddress } = {},
+  {
+    appAddress,
+    datasetAddress,
+    workerpoolAddress,
+    page = 0,
+    pageSize = 20,
+  } = {},
 ) => {
   try {
     const vRequesterAddress = await addressSchema({
@@ -66,6 +72,15 @@ export const fetchRequesterDeals = async (
       }),
       ...(workerpoolAddress && {
         workerpool: vWorkerpoolAddress,
+      }),
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
       }),
     };
     const response = await wrapPaginableRequest(jsonApi.get)({
@@ -358,6 +373,7 @@ export const fetchDealsByOrderHash = async (
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
+  { page = 0, pageSize = 20 } = {},
 ) => {
   try {
     const vChainId = await chainIdSchema().validate(chainId);
@@ -366,6 +382,15 @@ export const fetchDealsByOrderHash = async (
     const query = {
       chainId: vChainId,
       [hashName]: vOrderHash,
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
+      }),
     };
     const response = await jsonApi.get({
       api: iexecGatewayURL,
