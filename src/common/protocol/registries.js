@@ -447,6 +447,10 @@ const transferObj =
     try {
       checkSigner(contracts);
       const walletAddress = await getAddress(contracts);
+      const deployed = await checkDeployedObj(objName)(contracts, address);
+      if (!deployed) {
+        throw Error(`Invalid ${objName} address`);
+      }
       const objOwner = await getObjOwner(objName)(contracts, address);
       if (walletAddress !== objOwner) {
         throw Error(`Only ${objName} owner can transfer ${objName} ownership`);

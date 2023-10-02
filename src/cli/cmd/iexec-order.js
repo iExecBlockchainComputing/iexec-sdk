@@ -516,11 +516,13 @@ fill
               .validate(requestOrder)
           ).tag,
           (await apporderSchema().label('apporder').validate(appOrder)).tag,
-          (
-            await datasetorderSchema()
+          ... useDataset ? 
+          [ 
+            (await datasetorderSchema()
               .label('datasetorder')
               .validate(datasetOrder)
-          ).tag,
+            ).tag 
+          ] : [],
         ]);
         await checkAppRequirements(
           {
@@ -537,24 +539,26 @@ fill
             } to skip preflight requirement check)`,
           );
         });
-        await checkDatasetRequirements(
-          {
-            contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain, {
-              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-            }),
-          },
-          datasetOrder,
-          { tagOverride: resolvedTag },
-        ).catch((e) => {
-          throw Error(
-            `Dataset requirements check failed: ${
-              e.message
-            } (If you consider this is not an issue, use ${
-              option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
-          );
-        });
+        if (useDataset) {
+          await checkDatasetRequirements(
+            {
+              contracts: chain.contracts,
+              smsURL: getSmsUrlFromChain(chain, {
+                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
+              }),
+            },
+            datasetOrder,
+            { tagOverride: resolvedTag },
+          ).catch((e) => {
+            throw Error(
+              `Dataset requirements check failed: ${
+                e.message
+              } (If you consider this is not an issue, use ${
+                option.skipPreflightCheck()[0]
+              } to skip preflight requirement check)`,
+            );
+          });
+        }
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
