@@ -156,7 +156,7 @@ services:
       - gateway
 
   token-watcher:
-    image: iexechub/iexec-market-watcher:6.2
+    image: iexechub/iexec-market-watcher:6.3
     restart: unless-stopped
     environment:
       - DEBUG=iexec-watcher*
@@ -177,7 +177,7 @@ services:
       - blockchain
 
   token-gateway:
-    image: iexechub/iexec-market-api:6.2
+    image: iexechub/iexec-market-api:6.3
     restart: unless-stopped
     ports:
       - 13000:3000

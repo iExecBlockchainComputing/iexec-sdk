@@ -101,17 +101,19 @@ const responseToJson = async (response) => {
   throw new Error('The http response is not of JSON type');
 };
 
-export const wrapPaginableRequest = (request) => async (args) =>
-  request(args).then(({ nextPage, ...rest }) => ({
+export const wrapPaginableRequest = (request) => async (args) => {
+  const { pageIndex = 0 } = args.query;
+  return request(args).then(({ nextPage, ...rest }) => ({
     ...rest,
     ...(nextPage && {
       more: () =>
         wrapPaginableRequest(request)({
           ...args,
-          query: { ...args.query, page: nextPage },
+          query: { ...args.query, pageIndex: pageIndex + 1 },
         }),
     }),
   }));
+};
 
 export const jsonApi = {
   get: (args) =>

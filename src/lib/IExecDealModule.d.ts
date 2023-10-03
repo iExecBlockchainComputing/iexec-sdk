@@ -245,10 +245,27 @@ export default class IExecDealModule extends IExecModule {
    */
   fetchRequesterDeals(
     requesterAddress: Addressish,
-    filters?: {
+    options?: {
+      /**
+       * filter by app
+       */
       appAddress?: Addressish;
+      /**
+       * filter by dataset
+       */
       datasetAddress?: Addressish;
+      /**
+       * filter by workerpool
+       */
       workerpoolAddress?: Addressish;
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
     },
   ): Promise<PaginableDeals>;
   /**
@@ -263,7 +280,19 @@ export default class IExecDealModule extends IExecModule {
    * console.log('last deal:', deals[0]);
    * ```
    */
-  fetchDealsByApporder(apporderHash: OrderHash): Promise<PaginableDeals>;
+  fetchDealsByApporder(
+    apporderHash: OrderHash,
+    options?: {
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
+    },
+  ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified datasetorder.
    *
@@ -278,6 +307,16 @@ export default class IExecDealModule extends IExecModule {
    */
   fetchDealsByDatasetorder(
     datasetorderHash: OrderHash,
+    options?: {
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
+    },
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified workerpoolorder.
@@ -293,6 +332,16 @@ export default class IExecDealModule extends IExecModule {
    */
   fetchDealsByWorkerpoolorder(
     workerpoolorderHash: OrderHash,
+    options?: {
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
+    },
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified requestorder.
@@ -308,6 +357,16 @@ export default class IExecDealModule extends IExecModule {
    */
   fetchDealsByRequestorder(
     requestorderHash: OrderHash,
+    options?: {
+      /**
+       * index of the page to fetch
+       */
+      page?: number;
+      /**
+       * size of the page to fetch
+       */
+      pageSize?: number;
+    },
   ): Promise<PaginableDeals>;
   /**
    * Create an IExecDealModule instance using an IExecConfig instance

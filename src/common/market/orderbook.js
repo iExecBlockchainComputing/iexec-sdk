@@ -19,7 +19,16 @@ export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   app = throwIfMissing(),
-  { dataset, workerpool, requester, minTag, maxTag, minVolume } = {},
+  {
+    dataset,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+  } = {},
 ) => {
   try {
     const query = {
@@ -51,6 +60,15 @@ export const fetchAppOrderbook = async (
       ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
       }),
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
+      }),
     };
     const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
@@ -71,7 +89,16 @@ export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
   dataset = throwIfMissing(),
-  { app, workerpool, requester, minTag, maxTag, minVolume } = {},
+  {
+    app,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+  } = {},
 ) => {
   try {
     const query = {
@@ -103,6 +130,15 @@ export const fetchDatasetOrderbook = async (
       ...(maxTag !== undefined && {
         maxTag: await tagSchema().validate(maxTag),
       }),
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
+      }),
     };
     const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
@@ -133,6 +169,8 @@ export const fetchWorkerpoolOrderbook = async (
     app,
     dataset,
     requester,
+    page = 0,
+    pageSize = 20,
   } = {},
 ) => {
   try {
@@ -176,6 +214,15 @@ export const fetchWorkerpoolOrderbook = async (
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
+      }),
     };
     const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
       api: iexecGatewayURL,
@@ -206,6 +253,8 @@ export const fetchRequestOrderbook = async (
     maxTag,
     maxTrust,
     minVolume,
+    page = 0,
+    pageSize = 20,
   } = {},
 ) => {
   try {
@@ -248,6 +297,15 @@ export const fetchRequestOrderbook = async (
       }),
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
+      }),
+      ...(page !== undefined && {
+        pageIndex: await positiveIntSchema().label('page').validate(page),
+      }),
+      ...(pageSize !== undefined && {
+        pageSize: await positiveStrictIntSchema()
+          .min(10)
+          .label('pageSize')
+          .validate(pageSize),
       }),
     };
     const { ok, ...response } = await wrapPaginableRequest(jsonApi.get)({
