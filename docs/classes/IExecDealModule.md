@@ -124,7 +124,7 @@ ___
 
 ### fetchDealsByApporder
 
-▸ **fetchDealsByApporder**(`apporderHash`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+▸ **fetchDealsByApporder**(`apporderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified apporder.
 
@@ -139,9 +139,12 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `apporderHash` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `apporderHash` | `string` | - |
+| `options?` | `Object` | - |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 
 #### Returns
 
@@ -151,7 +154,7 @@ ___
 
 ### fetchDealsByDatasetorder
 
-▸ **fetchDealsByDatasetorder**(`datasetorderHash`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+▸ **fetchDealsByDatasetorder**(`datasetorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified datasetorder.
 
@@ -166,9 +169,12 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `datasetorderHash` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `datasetorderHash` | `string` | - |
+| `options?` | `Object` | - |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 
 #### Returns
 
@@ -178,7 +184,7 @@ ___
 
 ### fetchDealsByRequestorder
 
-▸ **fetchDealsByRequestorder**(`requestorderHash`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+▸ **fetchDealsByRequestorder**(`requestorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified requestorder.
 
@@ -193,9 +199,12 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `requestorderHash` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `requestorderHash` | `string` | - |
+| `options?` | `Object` | - |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 
 #### Returns
 
@@ -205,7 +214,7 @@ ___
 
 ### fetchDealsByWorkerpoolorder
 
-▸ **fetchDealsByWorkerpoolorder**(`workerpoolorderHash`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+▸ **fetchDealsByWorkerpoolorder**(`workerpoolorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified workerpoolorder.
 
@@ -220,9 +229,12 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `workerpoolorderHash` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `workerpoolorderHash` | `string` | - |
+| `options?` | `Object` | - |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 
 #### Returns
 
@@ -232,7 +244,7 @@ ___
 
 ### fetchRequesterDeals
 
-▸ **fetchRequesterDeals**(`requesterAddress`, `filters?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+▸ **fetchRequesterDeals**(`requesterAddress`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
 
 fetch the latest deals of the requester optionally filtered by specified filters.
 
@@ -247,13 +259,15 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `requesterAddress` | `string` |
-| `filters?` | `Object` |
-| `filters.appAddress?` | `string` |
-| `filters.datasetAddress?` | `string` |
-| `filters.workerpoolAddress?` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `requesterAddress` | `string` | - |
+| `options?` | `Object` | - |
+| `options.appAddress?` | `string` | filter by app |
+| `options.datasetAddress?` | `string` | filter by dataset |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
+| `options.workerpoolAddress?` | `string` | filter by workerpool |
 
 #### Returns
 

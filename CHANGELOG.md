@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.4.0] 2023-10-03
+
+### Added
+
+- add pagination options (`page` and `pageSize`) to `orderbook` and `deal` fetch methods
+
+### Changed
+
+- fix `iexec order fill` command when no dataset is provided
+- fix error message in `iexec app show`
+- fix ambiguous error message when trying to transfer an asset not deployed
+
 ## [8.3.0] 2023-09-22
 
 ### Added

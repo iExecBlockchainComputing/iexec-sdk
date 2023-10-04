@@ -90,6 +90,8 @@ console.log('total orders:', count);
 | `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
 | `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
 | `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -149,6 +151,8 @@ console.log('total orders:', count);
 | `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
 | `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
 | `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -210,6 +214,8 @@ console.log('total orders:', count);
 | `options.maxTrust?` | [`BNish`](../modules.md#bnish) | filter by maximum trust required |
 | `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
 | `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 | `options.requester?` | `string` | filter by requester |
 | `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
@@ -271,6 +277,8 @@ console.log('total orders:', count);
 | `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
 | `options.minTrust?` | [`BNish`](../modules.md#bnish) | filter by minimum trust required |
 | `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | filter by workerpool |
 
