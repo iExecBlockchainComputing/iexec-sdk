@@ -1,4 +1,7 @@
 {
+  "env": {
+    "es2020": true
+  },
   "plugins": ["sonarjs"],
   "extends": [
     "airbnb-base",
@@ -37,6 +40,8 @@
     "max-classes-per-file": "off",
     "max-len": "off",
     "import/prefer-default-export": "off",
-    "import/extensions": ["error", "always"]
+    "import/extensions": ["error", "always"],
+    "sonarjs/cognitive-complexity": ["warn", 15],
+    "sonarjs/no-duplicate-string": "off"
   }
 }
