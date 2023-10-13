@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { Wallet } from 'ethers';
+import { Wallet, JsonRpcProvider } from 'ethers';
 
 export const execAsync = (cmd) =>
   new Promise((res, rej) => {
@@ -73,3 +73,51 @@ export const getRandomWallet = () => {
 };
 
 export const getRandomAddress = () => getRandomWallet().address;
+
+export class InjectedProvider {
+  constructor(rpcUrl, privateKey) {
+    this.signer = new Wallet(privateKey, new JsonRpcProvider(rpcUrl));
+  }
+
+  async request(args) {
+    const { method, params } = args;
+    let rpcPromise;
+    switch (method) {
+      case 'eth_requestAccounts':
+      case 'eth_accounts':
+        rpcPromise = Promise.resolve([this.signer.address]);
+        break;
+      case 'eth_chainId':
+        rpcPromise = this.signer.provider
+          .getNetwork()
+          .then((network) => network.chainId.toString());
+        break;
+      case 'personal_sign':
+        rpcPromise = this.signer.signMessage(params[0]);
+        break;
+      case 'eth_signTypedData_v3':
+      case 'eth_signTypedData_v4':
+        rpcPromise = (async () => {
+          const typedData = JSON.parse(params[1]);
+          const { EIP712Domain, ...types } = typedData.types;
+          const { message, domain } = typedData;
+          return this.signer.signTypedData(domain, types, message);
+        })();
+        break;
+      case 'eth_call':
+        rpcPromise = this.provider.call(params[0]);
+        break;
+      case 'eth_sendTransaction':
+        rpcPromise = (async () => {
+          const { gas, ...gasStripped } = params[0];
+          const transaction = await this.signer.sendTransaction(gasStripped);
+          return transaction.hash;
+        })();
+        break;
+      default:
+        rpcPromise = Promise.reject(Error('not implemented'));
+        break;
+    }
+    return rpcPromise;
+  }
+}
