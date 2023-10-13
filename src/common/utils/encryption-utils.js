@@ -1,13 +1,11 @@
 import { Buffer } from 'buffer';
-import { utils } from 'ethers';
+import { randomBytes, sha256 } from 'ethers';
 import forgeAes from '../libs/forge-aes.js';
 import {
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
   throwIfMissing,
 } from './validator.js';
-
-const { randomBytes, sha256 } = utils;
 
 export const generateAes256Key = () =>
   Buffer.from(randomBytes(32)).toString('base64');

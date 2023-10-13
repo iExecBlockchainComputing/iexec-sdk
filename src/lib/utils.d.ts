@@ -32,7 +32,7 @@ export const getSignerFromPrivateKey: (
     /**
      * gas price override
      */
-    gasPrice?: string;
+    gasPrice?: bigint | number | string;
     /**
      * nonce override
      */

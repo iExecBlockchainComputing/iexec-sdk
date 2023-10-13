@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
-import { utils } from 'ethers';
+import { keccak256, getBytes } from 'ethers';
 import { getAddress } from '../wallet/address.js';
 import { httpRequest } from '../utils/api-utils.js';
 import {
@@ -9,11 +9,9 @@ import {
   throwIfMissing,
   positiveIntSchema,
 } from '../utils/validator.js';
-import { wrapPersonalSign } from '../utils/errorWrappers.js';
+import { wrapCall, wrapPersonalSign } from '../utils/errorWrappers.js';
 import { checkSigner } from '../utils/utils.js';
 import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
-
-const { keccak256, arrayify } = utils;
 
 const debug = Debug('iexec:sms');
 
@@ -21,7 +19,7 @@ const DOMAIN = 'IEXEC_SMS_DOMAIN';
 
 const concatenateAndHash = (...hexStringArray) => {
   const buffer = Buffer.concat(
-    hexStringArray.map((hexString) => Buffer.from(arrayify(hexString))),
+    hexStringArray.map((hexString) => Buffer.from(getBytes(hexString))),
   );
   return keccak256(buffer);
 };
@@ -81,7 +79,7 @@ export const pushWeb3Secret = async (
       vResourceAddress,
       secretValue,
     );
-    const binaryChallenge = arrayify(challenge);
+    const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
       contracts.signer.signMessage(binaryChallenge),
     );
@@ -137,7 +135,7 @@ export const pushWeb2Secret = async (
       secretName,
       secretValue,
     );
-    const binaryChallenge = arrayify(challenge);
+    const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
       contracts.signer.signMessage(binaryChallenge),
     );
@@ -198,7 +196,7 @@ export const pushRequesterSecret = async (
       secretName,
       secretValue,
     );
-    const binaryChallenge = arrayify(challenge);
+    const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
       contracts.signer.signMessage(binaryChallenge),
     );
@@ -247,7 +245,7 @@ export const pushAppSecret = async (
       vSecretIndex.toString(),
       secretValue,
     );
-    const binaryChallenge = arrayify(challenge);
+    const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
       contracts.signer.signMessage(binaryChallenge),
     );

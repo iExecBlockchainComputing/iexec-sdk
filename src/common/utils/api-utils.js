@@ -2,7 +2,7 @@ import Debug from 'debug';
 import fetch from 'cross-fetch';
 import querystring from 'query-string';
 import { hashEIP712 } from './sig-utils.js';
-import { wrapSignTypedData } from './errorWrappers.js';
+import { wrapCall, wrapSignTypedData } from './errorWrappers.js';
 
 const debug = Debug('iexec:api-utils');
 
@@ -160,12 +160,7 @@ export const getAuthorization =
         throw Error('Unexpected challenge format');
       }
       const sign = await wrapSignTypedData(
-        // use experiental ether Signer._signTypedData (to remove when signTypedData is included)
-        // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
-        /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
-        signer._signTypedData && typeof signer._signTypedData === 'function'
-          ? signer._signTypedData(domain, types, message)
-          : signer.signTypedData(domain, types, message),
+        signer.signTypedData(domain, types, message),
       );
       const hash = hashEIP712(typedData);
       const separator = '_';

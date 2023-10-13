@@ -13,9 +13,9 @@ import {
 } from '../protocol/registries.js';
 import { createObjParams } from '../execution/order-helper.js';
 import {
-  checkEvent,
+  checkEventFromLogs,
   getEventFromLogs,
-  ethersBnToBn,
+  bigIntToBn,
   getSalt,
   sumTags,
   findMissingBitsInTag,
@@ -165,7 +165,7 @@ const signedOrderToStruct = (orderName, orderObj) => {
 };
 
 const getEIP712Domain = async (contracts) => {
-  const iexecContract = await contracts.getIExecContract();
+  const iexecContract = contracts.getIExecContract();
   const { name, version, chainId, verifyingContract } = await wrapCall(
     iexecContract.domain(),
   );
@@ -292,7 +292,7 @@ export const getRemainingVolume = async (
     const orderHash = await computeOrderHash(contracts, orderName, order);
     const iexecContract = contracts.getIExecContract();
     const cons = await wrapCall(iexecContract.viewConsumed(orderHash));
-    const consumed = ethersBnToBn(cons);
+    const consumed = bigIntToBn(cons);
     return initial.sub(consumed);
   } catch (error) {
     debug('getRemainingVolume()', error);
@@ -324,14 +324,8 @@ const signOrder = async (
   const types = {
     [objDesc[orderName].primaryType]: objDesc[orderName].structMembers,
   };
-  const { signer } = contracts;
   const sign = await wrapSignTypedData(
-    // use experiential ether Signer._signTypedData (to remove when signTypedData is included)
-    // https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
-    /* eslint no-underscore-dangle: ["error", { "allow": ["_signTypedData"] }] */
-    signer._signTypedData && typeof signer._signTypedData === 'function'
-      ? signer._signTypedData(domain, types, saltedOrder)
-      : signer.signTypedData(domain, types, saltedOrder),
+    contracts.signer.signTypedData(domain, types, saltedOrder),
   );
   return { ...saltedOrder, sign };
 };
@@ -406,7 +400,7 @@ const cancelOrder = async (
       ),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-    if (!checkEvent(objDesc[orderName].cancelEvent, txReceipt.events))
+    if (!checkEventFromLogs(objDesc[orderName].cancelEvent, txReceipt.logs))
       throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return { order: orderObj, txHash: tx.hash };
   } catch (error) {
@@ -883,13 +877,13 @@ export const matchOrders = async (
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const matchEvent = 'OrdersMatched';
-    if (!checkEvent(matchEvent, txReceipt.events))
+    if (!checkEventFromLogs(matchEvent, txReceipt.logs))
       throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(
       matchEvent,
-      txReceipt.events,
+      txReceipt.logs,
     ).args;
-    return { dealid, volume: ethersBnToBn(volume), txHash: tx.hash };
+    return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };
   } catch (error) {
     debug('matchOrders() error', error);
     throw error;

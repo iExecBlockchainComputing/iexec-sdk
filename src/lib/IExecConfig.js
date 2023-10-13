@@ -1,8 +1,8 @@
 import Debug from 'debug';
-import { providers } from 'ethers';
+import { JsonRpcProvider, BrowserProvider } from 'ethers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { ConfigurationError } from '../common/utils/errors.js';
-import { EnhancedWallet, EnhancedWeb3Signer } from '../common/utils/signers.js';
+import { EnhancedWallet } from '../common/utils/signers.js';
 import {
   getChainDefaults,
   isEnterpriseEnabled,
@@ -58,9 +58,9 @@ export default class IExecConfig {
         });
       } else {
         try {
-          disposableProvider = new providers.Web3Provider(ethProvider);
+          disposableProvider = new BrowserProvider(ethProvider);
         } catch (err) {
-          debug('Web3Provider', err);
+          debug('BrowserProvider', err);
           throw Error('Unsupported provider');
         }
       }
@@ -91,7 +91,7 @@ export default class IExecConfig {
         .catch((err) => {
           throw Error(`Failed to detect network: ${err.message}`);
         });
-      return { chainId, name, ensAddress };
+      return { chainId: Number(chainId), name, ensAddress };
     })();
 
     networkPromise.catch((err) => {
@@ -118,15 +118,12 @@ export default class IExecConfig {
         ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
       };
       if (isEnhancedWalletProvider) {
-        if (
-          ethProvider.provider &&
-          ethProvider.provider.connection &&
-          ethProvider.provider.connection.url
-        ) {
+        if (ethProvider.provider instanceof JsonRpcProvider) {
           // case JsonRpcProvider
           signer = ethProvider.connect(
-            new providers.JsonRpcProvider(
-              ethProvider.provider.connection.url,
+            new JsonRpcProvider(
+              // eslint-disable-next-line no-underscore-dangle
+              ethProvider.provider._getConnection().url,
               networkOverride,
             ),
           );
@@ -146,12 +143,12 @@ export default class IExecConfig {
           network: networkOverride,
         });
       } else {
-        const web3SignerProvider = new EnhancedWeb3Signer(
+        const browserProvider = new BrowserProvider(
           ethProvider,
           networkOverride,
         );
-        signer = web3SignerProvider;
-        provider = signer.provider;
+        signer = await browserProvider.getSigner();
+        provider = browserProvider.provider;
       }
       return { provider, signer };
     })();

@@ -26,7 +26,7 @@ const nativeNetworks = {
 };
 
 const gasPriceByNetwork = {
-  134: '0x0',
+  134: 0n,
 };
 
 const getHubAddress = (chainId, flavour) => {
@@ -118,11 +118,7 @@ const createClient = ({
       if (!address) {
         throw Error(`no contract address provided`);
       }
-      return new Contract(
-        address,
-        contractDesc.abi,
-        ethSigner || ethProvider,
-      );
+      return new Contract(address, contractDesc.abi, ethSigner || ethProvider);
     } catch (error) {
       debug('getContract()', error);
       throw error;
@@ -234,7 +230,7 @@ class IExecContractsClient {
       isNative !== undefined ? !!isNative : getIsNative(stringChainId, flavour);
 
     const gasPriceOverride =
-      useGas === false ? '0x0' : getGasPriceOverride(stringChainId);
+      useGas === false ? 0n : getGasPriceOverride(stringChainId);
 
     const client = createClient({
       ethSigner: signer,

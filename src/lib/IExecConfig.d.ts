@@ -1,10 +1,13 @@
-export * from '../common/types.js';
-
-import { ExternalProvider } from '@ethersproject/providers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import { ProviderOptions, TeeFramework } from '../common/types.js';
 
+export interface Eip1193Provider {
+  request(request: {
+    method: string;
+    params?: Array<any> | Record<string, any>;
+  }): Promise<any>;
+}
 export interface IExecConfigArgs {
   /**
    * A web3 Eth provider or network name or chain id
@@ -15,7 +18,7 @@ export interface IExecConfigArgs {
    * - `"bellecour"` or `134` or `"134"` for iExec sidechain
    * - `"http://localhost:8545"` for local chain
    */
-  ethProvider: ExternalProvider | EnhancedWallet | string | number;
+  ethProvider: Eip1193Provider | EnhancedWallet | string | number;
   /**
    * flavour to use (default standard)
    */

@@ -2,6 +2,9 @@
   "env": {
     "es2020": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "plugins": ["sonarjs"],
   "extends": [
     "airbnb-base",

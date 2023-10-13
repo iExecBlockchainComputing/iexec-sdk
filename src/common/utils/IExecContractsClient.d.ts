@@ -1,6 +1,4 @@
-import { Provider } from '@ethersproject/abstract-provider';
-import { Signer } from '@ethersproject/abstract-signer';
-import { Contract } from '@ethersproject/contracts';
+import { Contract, Provider, Signer } from 'ethers';
 
 export default class IExecContractsClient {
   /**
@@ -75,7 +73,7 @@ export default class IExecContractsClient {
     /**
      * gasPrice override
      */
-    gasPrice?: string;
+    gasPrice?: bigint;
   };
   /**
    * number of block to wait for transactions confirmation

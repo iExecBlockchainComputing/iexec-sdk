@@ -1,7 +1,14 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
 import BnJs from 'bn.js';
-import { utils, BigNumber } from 'ethers';
+import {
+  getAddress,
+  randomBytes,
+  formatUnits,
+  parseUnits,
+  hexlify,
+  Result,
+} from 'ethers';
 // import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
 import { multiaddr } from '@multiformats/multiaddr';
@@ -10,18 +17,15 @@ import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
 
 export const BN = BnJs;
 
-const { getAddress, randomBytes, formatUnits, parseUnits, hexlify } = utils;
-
 const debug = Debug('iexec:utils');
 
 export const bytes32Regex = /^(0x)([0-9a-f]{2}){32}$/;
 export const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
-export const isEthersBn = (obj) =>
-  !!(obj._ethersType && obj._ethersType === 'BigNumber');
+export const isBigInt = (obj) => typeof obj === 'bigint';
 
-export const bnToEthersBn = (bn) => BigNumber.from(bn.toString());
-export const ethersBnToBn = (ethersBn) => new BN(ethersBn.toString());
+export const bnToBigInt = (bn) => BigInt(bn.toString());
+export const bigIntToBn = (bigInt) => new BN(bigInt.toString());
 
 const stringify = (val) => val.toString();
 
@@ -44,7 +48,7 @@ export const parseRLC = (value, defaultUnit = 'RLC') => {
   }
   const pow = unit === 'RLC' ? 9 : 0;
   try {
-    return ethersBnToBn(parseUnits(amount, pow));
+    return bigIntToBn(parseUnits(amount, pow));
   } catch (error) {
     debug('parseRLC()', error);
     throw Error('Invalid token amount');
@@ -53,7 +57,7 @@ export const parseRLC = (value, defaultUnit = 'RLC') => {
 
 export const formatEth = (wei) => {
   try {
-    return formatUnits(BigNumber.from(stringify(wei)));
+    return formatUnits(BigInt(stringify(wei)));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid wei');
@@ -72,7 +76,7 @@ export const parseEth = (value, defaultUnit = 'ether') => {
     throw Error('Invalid ether unit');
   }
   try {
-    return ethersBnToBn(parseUnits(amount, unit === 'eth' ? 'ether' : unit));
+    return bigIntToBn(parseUnits(amount, unit === 'eth' ? 'ether' : unit));
   } catch (error) {
     debug('formatEth()', error);
     throw Error('Invalid ether amount');
@@ -91,15 +95,14 @@ export const bnNRlcToBnWei = (bnNRlc) => {
   return new BN(weiString);
 };
 
-export const bnifyNestedEthersBn = (obj) => {
+export const bnifyNestedBigInt = (obj) => {
   const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
-    if (isEthersBn(v)) {
-      objOut[k] = ethersBnToBn(v);
-    } else if (typeof v === 'object' && v._hex)
-      objOut[k] = new BN(v._hex.substring(2), 16);
-    else if (typeof v === 'object') objOut[k] = bnifyNestedEthersBn(v);
+    if (isBigInt(v)) {
+      objOut[k] = bigIntToBn(v);
+    } else if (typeof v === 'object' && v !== null)
+      objOut[k] = bnifyNestedBigInt(v);
     else objOut[k] = v;
   });
   return objOut;
@@ -109,8 +112,9 @@ export const stringifyNestedBn = (obj) => {
   const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {
     const [k, v] = e;
-    if (v instanceof BN) objOut[k] = v.toString();
-    else if (typeof v === 'object') {
+    if (v instanceof BN) {
+      objOut[k] = v.toString();
+    } else if (typeof v === 'object' && v !== null) {
       objOut[k] = stringifyNestedBn(v);
     } else objOut[k] = v;
   });
@@ -145,40 +149,58 @@ export const humanToMultiaddrBuffer = (str, { strict = true } = {}) => {
   return multiaddrBuffer;
 };
 
-export const cleanRPC = (rpcObj) => {
-  const keys = Object.keys(rpcObj);
-  return keys.reduce((acc, curr) => {
-    if (Number.isNaN(parseInt(curr, 10))) {
-      let value;
-      if (
-        Array.isArray(rpcObj[curr]) &&
-        !rpcObj[curr].find((e) => typeof e === 'object')
-      ) {
-        value = rpcObj[curr];
-      } else if (typeof rpcObj[curr] === 'object') {
-        value = cleanRPC(rpcObj[curr]);
-      } else {
-        value = rpcObj[curr];
+// ethers v6 uses proxies, this helper extracts a plain objet from a Result from ethers
+export const formatEthersResult = (result) => {
+  if (!(result instanceof Result)) {
+    throw new TypeError(`value must be a ${Result.name}`);
+  }
+
+  // create a plain object from the proxy
+  const obj = result.toObject();
+
+  // check if obj is an array (may be empty)
+  if (obj._ !== undefined || Object.keys(obj).length === 0) {
+    const array = result.toArray();
+    return array.map((v) => {
+      // format nested
+      if (v instanceof Result) {
+        return formatEthersResult(v);
       }
-      return Object.assign(acc, { [curr]: value });
+      // convert bigints
+      if (typeof v === 'bigint') {
+        return bigIntToBn(v);
+      }
+      return v;
+    });
+  }
+
+  // is an object
+  Object.entries(obj).forEach(([k, v]) => {
+    // format nested
+    if (v instanceof Result) {
+      obj[k] = formatEthersResult(v);
     }
-    return acc;
-  }, {});
+    // convert bigints
+    else if (typeof v === 'bigint') {
+      obj[k] = bigIntToBn(v);
+    }
+  });
+  return obj;
 };
 
-export const checkEvent = (eventName, events) => {
-  let confirm = false;
-  events.forEach((event) => {
-    if (event.event === eventName) confirm = true;
+export const checkEventFromLogs = (eventName, logs) => {
+  let confirm = false; // todo rewrite
+  logs.forEach((log) => {
+    if (log.eventName === eventName) confirm = true;
   });
   return confirm;
 };
 
-export const getEventFromLogs = (eventName, events, { strict = true } = {}) => {
-  const eventFound = events.find((event) => event.event === eventName);
+export const getEventFromLogs = (eventName, logs, { strict = true } = {}) => {
+  const eventFound = logs.find((log) => log.eventName === eventName);
   if (!eventFound) {
     if (strict) throw new Error(`Unknown event ${eventName}`);
-    return {};
+    return {}; // todo change to undefined?
   }
   return eventFound;
 };
