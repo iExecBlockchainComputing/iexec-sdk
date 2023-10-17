@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
 import { gt } from 'semver';
-import { providers, Wallet, Contract } from 'ethers';
+import { JsonRpcProvider, Wallet, Contract } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
 import BN from 'bn.js';
@@ -91,18 +91,17 @@ console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
 
-const tokenChainRPC = new providers.JsonRpcProvider(tokenChainUrl);
+const tokenChainRPC = new JsonRpcProvider(tokenChainUrl);
 const tokenChainWallet = new Wallet(PRIVATE_KEY, tokenChainRPC);
 
-const nativeChainRPC = new providers.JsonRpcProvider(nativeChainUrl);
+const nativeChainRPC = new JsonRpcProvider(nativeChainUrl);
 const nativeChainWallet = new Wallet(PRIVATE_KEY, nativeChainRPC);
 
 const filePath = (fileName) => join(process.cwd(), fileName);
 
 const loadJSONFile = async (fileName) => {
   const fileJSON = await readFile(filePath(fileName), 'utf8');
-  const file = JSON.parse(fileJSON);
-  return file;
+  return JSON.parse(fileJSON);
 };
 
 const saveJSONToFile = async (json, fileName) => {
@@ -3556,7 +3555,7 @@ describe('[Common]', () => {
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
-      expect(res.error.message).toBe('invalid password');
+      expect(res.error.message).toBe('incorrect password');
       expect(res.error.name).toBe('Error');
       expect(res.wallet).toBeUndefined();
       expect(res.balance).toBeUndefined();
