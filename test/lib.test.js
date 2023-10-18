@@ -8512,19 +8512,10 @@ describe('[deal]', () => {
           })
           .catch(reject);
       }),
-      new Promise((resolve, reject) => {
-        sleep(5000).then(() => {
-          initializeTask(tokenChainWallet, hubAddress, dealid, 5)
-            .then(() => {
-              sleep(1000).then(() => {
-                initializeTask(tokenChainWallet, hubAddress, dealid, 0)
-                  .then(() => sleep(6000).then(resolve))
-                  .catch(reject);
-              });
-            })
-            .catch(reject);
-        });
-      }),
+      sleep(5000)
+        .then(() => initializeTask(tokenChainWallet, hubAddress, dealid, 5))
+        .then(() => sleep(1000))
+        .then(() => initializeTask(tokenChainWallet, hubAddress, dealid, 0)),
     ]);
 
     expect(obsDealComplete).toBeUndefined();
@@ -8734,13 +8725,9 @@ describe('[task]', () => {
             .catch(reject);
         });
       }),
-      new Promise((resolve, reject) => {
-        sleep(1000).then(() => {
-          initializeTask(tokenChainWallet, hubAddress, dealid, 0)
-            .then(resolve)
-            .catch(reject);
-        });
-      }),
+      sleep(1000).then(() =>
+        initializeTask(tokenChainWallet, hubAddress, dealid, 0),
+      ),
     ]);
 
     expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
