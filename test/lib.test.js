@@ -1244,7 +1244,7 @@ describe('[wallet]', () => {
     expect(initialBalance.wei).toBeInstanceOf(BN);
     expect(initialBalance.nRLC).toBeInstanceOf(BN);
     expect(
-      initialBalance.wei.eq(initialBalance.nRLC.mul(new BN(1000000000))),
+      initialBalance.wei.div(new BN(1000000000)).eq(initialBalance.nRLC),
     ).toBe(true);
     await iexec.wallet.sendRLC(10, NULL_ADDRESS);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
@@ -1254,7 +1254,7 @@ describe('[wallet]', () => {
     expect(finalBalance.nRLC.add(new BN(10)).lte(initialBalance.nRLC)).toBe(
       true,
     );
-    expect(finalBalance.wei.eq(finalBalance.nRLC.mul(new BN(1000000000)))).toBe(
+    expect(finalBalance.wei.div(new BN(1000000000)).eq(finalBalance.nRLC)).toBe(
       true,
     );
   });
