@@ -14,8 +14,8 @@
   ],
   "rules": {
     "default-param-last": "off",
-    "new-cap": 0,
-    "no-console": 0,
+    "new-cap": "off",
+    "no-console": "error",
     "no-underscore-dangle": [
       "error",
       {
@@ -46,5 +46,13 @@
     "import/extensions": ["error", "always"],
     "sonarjs/cognitive-complexity": ["warn", 15],
     "sonarjs/no-duplicate-string": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./src/cli/utils/cli-helper.js", "./src/lib/IExecConfig.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

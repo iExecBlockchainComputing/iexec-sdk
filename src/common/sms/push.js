@@ -9,7 +9,7 @@ import {
   throwIfMissing,
   positiveIntSchema,
 } from '../utils/validator.js';
-import { wrapCall, wrapPersonalSign } from '../utils/errorWrappers.js';
+import { wrapPersonalSign } from '../utils/errorWrappers.js';
 import { checkSigner } from '../utils/utils.js';
 import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
 
