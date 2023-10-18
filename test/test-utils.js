@@ -31,7 +31,7 @@ export const TEST_CHAINS = {
 
   // autoseal chain with iExec token
   token: {
-    rpcURL: DRONE ? 'http://token-chain:8545' : 'http://localhost:8545',
+    rpcURL: DRONE ? 'http://token-chain:8545' : 'http://localhost:18545',
     chainId: '65535',
     sconeSmsURL: DRONE
       ? 'http://token-sms-scone:13300'
