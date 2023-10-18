@@ -27,17 +27,17 @@ console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 const mainnetHost = INFURA_PROJECT_ID
   ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
   : 'mainnet';
-// 1 block / tx
-const tokenChainUrl = DRONE
+// TODO can be replaced by instamine chain to speedup tests
+const tokenChainInstamineUrl = DRONE
   ? 'http://token-chain:8545'
-  : 'http://localhost:8545';
-const nativeChainUrl = DRONE
-  ? 'http://native-chain:8545'
   : 'http://localhost:18545';
+const nativeChainInstamineUrl = DRONE
+  ? 'http://native-chain:8545'
+  : 'http://localhost:28545';
 // openethereum node (with ws)
 const tokenChainOpenethereumUrl = DRONE
-  ? 'http://token-chain-openethereum:8545'
-  : 'http://localhost:9545';
+  ? 'http://token-chain:8545'
+  : 'http://localhost:18545';
 // secret management service
 const sconeSms = DRONE
   ? 'http://token-sms-scone:13300'
@@ -91,10 +91,10 @@ console.log('enterpriseHubAddress', enterpriseHubAddress);
 
 // UTILS
 
-const tokenChainRPC = new JsonRpcProvider(tokenChainUrl);
+const tokenChainRPC = new JsonRpcProvider(tokenChainInstamineUrl);
 const tokenChainWallet = new Wallet(PRIVATE_KEY, tokenChainRPC);
 
-const nativeChainRPC = new JsonRpcProvider(nativeChainUrl);
+const nativeChainRPC = new JsonRpcProvider(nativeChainInstamineUrl);
 const nativeChainWallet = new Wallet(PRIVATE_KEY, nativeChainRPC);
 
 const filePath = (fileName) => join(process.cwd(), fileName);
@@ -151,7 +151,7 @@ const setTokenChain = (options) =>
       chains: {
         dev: {
           id: networkId,
-          host: tokenChainUrl,
+          host: tokenChainInstamineUrl,
           hub: hubAddress,
           sms: smsMap,
           resultProxy: resultProxyURL,
@@ -171,7 +171,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
       chains: {
         dev: {
           id: networkId,
-          host: tokenChainUrl,
+          host: tokenChainInstamineUrl,
           hub: hubAddress,
           sms: smsMap,
           resultProxy: resultProxyURL,
@@ -183,7 +183,7 @@ const setTokenEnterpriseChain = (defaultChain = 'dev') =>
         },
         'dev-enterprise': {
           id: networkId,
-          host: tokenChainUrl,
+          host: tokenChainInstamineUrl,
           hub: enterpriseHubAddress,
           flavour: 'enterprise',
           sms: smsMap,
@@ -206,7 +206,7 @@ const setNativeChain = (options) =>
       chains: {
         dev: {
           id: networkId,
-          host: nativeChainUrl,
+          host: nativeChainInstamineUrl,
           hub: hubAddress,
           native: true,
           useGas: false,
@@ -449,7 +449,7 @@ describe('[Mainchain]', () => {
     const raw = await execAsync(`${iexecPath} info --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
-    expect(res.host).toBe(tokenChainUrl);
+    expect(res.host).toBe(tokenChainInstamineUrl);
     expect(res.pocoVersion).toBeDefined();
     expect(res.hubAddress).toBe(hubAddress);
     expect(res.appRegistryAddress).toBeDefined();
@@ -2538,7 +2538,7 @@ describe('[Sidechain]', () => {
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.pocoVersion).toBeDefined();
-    expect(res.host).toBe(nativeChainUrl);
+    expect(res.host).toBe(nativeChainInstamineUrl);
     expect(res.hubAddress).toBe(nativeHubAddress);
     expect(res.appRegistryAddress).toBeDefined();
     expect(res.datasetRegistryAddress).toBeDefined();

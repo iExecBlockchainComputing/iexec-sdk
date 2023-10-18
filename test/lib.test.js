@@ -69,23 +69,21 @@ const mainnetHost = 'mainnet';
 const bellecourHost = 'https://bellecour.iex.ec';
 
 // 1 block / tx
-// TODO clean nodes
+// TODO can be replaced by instamine chain to speedup tests
 const tokenChainInstamineUrl = DRONE
-  ? 'http://token-chain-openethereum:8545'
-  : 'http://localhost:9545';
-//   ? 'http://token-chain:8545'
-//   : 'http://localhost:8545';
+  ? 'http://token-chain:8545'
+  : 'http://localhost:18545';
 const nativeChainInstamineUrl = DRONE
   ? 'http://native-chain:8545'
-  : 'http://localhost:18545';
+  : 'http://localhost:28545';
 // blocktime 1s for concurrent tx test
 const tokenChain1sUrl = DRONE
-  ? 'http://token-chain-1s:8545'
-  : 'http://localhost:28545';
+  ? 'http://token-chain:8545'
+  : 'http://localhost:18545';
 // openethereum node (with ws)
 const tokenChainOpenethereumUrl = DRONE
-  ? 'http://token-chain-openethereum:8545'
-  : 'http://localhost:9545';
+  ? 'http://token-chain:8545'
+  : 'http://localhost:18545';
 // secret management service
 const sconeSms = DRONE
   ? 'http://token-sms-scone:13300'

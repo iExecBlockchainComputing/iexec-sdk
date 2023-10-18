@@ -23,13 +23,13 @@ console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
 console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
 
-// 1 block / tx
-const tokenChainUrl = DRONE
+// TODO can be replaced by instamine chain to speedup tests
+const tokenChainInstamineUrl = DRONE
   ? 'http://token-chain:8545'
-  : 'http://localhost:8545';
-const nativeChainUrl = DRONE
-  ? 'http://native-chain:8545'
   : 'http://localhost:18545';
+const nativeChainInstamineUrl = DRONE
+  ? 'http://native-chain:8545'
+  : 'http://localhost:28545';
 // secret management service
 const sconeSms = DRONE
   ? 'http://token-sms-scone:13300'
@@ -407,7 +407,7 @@ describe('[IExecConfig]', () => {
     describe('read-only ethProvider from node url', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           { hubAddress },
         );
         const { provider, signer, chainId } =
@@ -443,7 +443,7 @@ describe('[IExecConfig]', () => {
     describe('read-only ethProvider with ens override', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, ensRegistryAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           { hubAddress, ensRegistryAddress },
         );
         const { provider, signer, chainId } =
@@ -466,7 +466,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           {
             ethProvider: utils.getSignerFromPrivateKey(
-              tokenChainUrl,
+              tokenChainInstamineUrl,
               PRIVATE_KEY,
             ),
           },
@@ -517,7 +517,7 @@ describe('[IExecConfig]', () => {
     describe('web3 provider', () => {
       test('InjectedProvider', async () => {
         const injectedProvider = new InjectedProvider(
-          tokenChainUrl,
+          tokenChainInstamineUrl,
           getRandomWallet().privateKey,
         );
         const config = new IExecConfig(
@@ -610,11 +610,11 @@ describe('[IExecConfig]', () => {
       });
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, bridgedNetworkConf })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           {
             hubAddress,
             bridgedNetworkConf: {
-              rpcURL: tokenChainUrl,
+              rpcURL: tokenChainInstamineUrl,
               chainId: '65535',
               hubAddress,
               bridgeAddress: utils.NULL_ADDRESS,
@@ -638,7 +638,7 @@ describe('[IExecConfig]', () => {
   describe('resolveChainId()', () => {
     test('success', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       await expect(config.resolveChainId()).resolves.toBe(networkId);
     });
@@ -667,7 +667,7 @@ describe('[IExecConfig]', () => {
     test('success with hubAddress on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { hubAddress },
       );
@@ -679,7 +679,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveContractsClient();
       await expect(promise).rejects.toThrow(
@@ -713,13 +713,13 @@ describe('[IExecConfig]', () => {
     test('success with bridgedNetworkConf on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
           bridgedNetworkConf: {
             chainId: networkId,
-            rpcURL: nativeChainUrl,
+            rpcURL: nativeChainInstamineUrl,
             hubAddress: nativeHubAddress,
             bridgeAddress: utils.NULL_ADDRESS,
           },
@@ -733,7 +733,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgedContractsClient();
       await expect(promise).rejects.toThrow(
@@ -769,7 +769,7 @@ describe('[IExecConfig]', () => {
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { hubAddress },
       );
@@ -782,7 +782,7 @@ describe('[IExecConfig]', () => {
     test('success with enterpriseSwapConf on custom enterprise chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -800,7 +800,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveStandardContractsClient();
       await expect(promise).rejects.toThrow(
@@ -813,7 +813,7 @@ describe('[IExecConfig]', () => {
     test('throw on unknown enterprise chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -842,7 +842,7 @@ describe('[IExecConfig]', () => {
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -858,7 +858,7 @@ describe('[IExecConfig]', () => {
     test('success with enterpriseSwapConf on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
@@ -888,7 +888,7 @@ describe('[IExecConfig]', () => {
     test('throw on unknown chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
@@ -1007,7 +1007,7 @@ describe('[IExecConfig]', () => {
     test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { smsURL: sconeSms },
       );
@@ -1016,7 +1016,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow(
@@ -1036,7 +1036,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw with invalid TEE framework', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveSmsURL({ teeFramework: 'foo' });
       await expect(promise).rejects.toThrow(
@@ -1069,7 +1069,7 @@ describe('[IExecConfig]', () => {
     test('success with resultProxyURL on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { resultProxyURL },
       );
@@ -1078,7 +1078,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveResultProxyURL();
       await expect(promise).rejects.toThrow(
@@ -1111,7 +1111,7 @@ describe('[IExecConfig]', () => {
     test('success when configured on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { iexecGatewayURL },
       );
@@ -1130,7 +1130,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).rejects.toThrow(
@@ -1161,7 +1161,7 @@ describe('[IExecConfig]', () => {
     test('success when configured on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
       );
@@ -1180,7 +1180,7 @@ describe('[IExecConfig]', () => {
     });
     test('success when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).rejects.toThrow(
@@ -1230,7 +1230,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgeAddress();
       await expect(promise).rejects.toThrow(
@@ -1290,7 +1290,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgeBackAddress();
       await expect(promise).rejects.toThrow(
@@ -1346,7 +1346,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveEnsPublicResolverAddress();
       await expect(promise).rejects.toThrow(
