@@ -1,9 +1,9 @@
 import Debug from 'debug';
 import {
   bigIntToBn,
-  bnifyNestedBigInt,
   getEventFromLogs,
   checkSigner,
+  formatEthersResult,
 } from '../utils/utils.js';
 import {
   uint256Schema,
@@ -62,16 +62,8 @@ export const showCategory = async (
   try {
     const vIndex = await uint256Schema().validate(index);
     const iexecContract = contracts.getIExecContract();
-    const categoryRPC = await wrapCall(iexecContract.viewCategory(vIndex));
-    const categoryPropNames = ['name', 'description', 'workClockTimeRef'];
-    const category = categoryRPC.reduce(
-      (acc, curr, i) =>
-        Object.assign(acc, {
-          [categoryPropNames[i]]: curr,
-        }),
-      {},
-    );
-    return bnifyNestedBigInt(category); // todo check if necessary
+    const category = await wrapCall(iexecContract.viewCategory(vIndex));
+    return formatEthersResult(category);
   } catch (error) {
     debug('showCategory()', error);
     throw error;

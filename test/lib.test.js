@@ -1179,6 +1179,24 @@ describe('[getSignerFromPrivateKey]', () => {
   });
 });
 
+describe('[hub]', () => {
+  test('hub.showCategory()', async () => {
+    const iexec = new IExec(
+      { ethProvider: tokenChainInstamineUrl },
+      {
+        hubAddress,
+        ensRegistryAddress,
+      },
+    );
+    const res = await iexec.hub.showCategory(0);
+    expect(res).toStrictEqual({
+      description: '{}',
+      name: 'XS',
+      workClockTimeRef: new BN(300),
+    });
+  });
+});
+
 describe('[wallet]', () => {
   test('wallet.getAddress()', async () => {
     const wallet = getRandomWallet();
