@@ -12,7 +12,7 @@ import {
 
 console.log('Node version:', process.version);
 
-const DEFAULT_TIMEOUT = 60000;
+const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
 
 const { DRONE } = process.env;

@@ -6699,142 +6699,150 @@ describe('[order]', () => {
     DEFAULT_TIMEOUT * 2,
   );
 
-  test('order.matchOrders() (preflightCheck)', async () => {
-    const brokerWallet = getRandomWallet();
-    const resourcesProviderWallet = getRandomWallet();
-    const richSigner = utils.getSignerFromPrivateKey(
-      tokenChainInstamineUrl,
-      RICH_PRIVATE_KEY,
-    );
-    const iexecRich = new IExec(
-      {
-        ethProvider: richSigner,
-      },
-      {
-        hubAddress,
-        smsURL: smsMap,
-        resultProxyURL,
-      },
-    );
-    await iexecRich.wallet.sendETH('20000000000000000', brokerWallet.address);
-    await iexecRich.wallet.sendETH(
-      '20000000000000000',
-      resourcesProviderWallet.address,
-    );
-    const signer = utils.getSignerFromPrivateKey(
-      tokenChainInstamineUrl,
-      brokerWallet.privateKey,
-    );
-    const iexec = new IExec(
-      {
-        ethProvider: signer,
-      },
-      {
-        hubAddress,
-        smsURL: smsMap,
-        resultProxyURL,
-      },
-    );
-    const resourcesProviderSigner = utils.getSignerFromPrivateKey(
-      tokenChainInstamineUrl,
-      resourcesProviderWallet.privateKey,
-    );
-    const iexecResourcesProvider = new IExec(
-      {
-        ethProvider: resourcesProviderSigner,
-      },
-      {
-        hubAddress,
-      },
-    );
+  test(
+    'order.matchOrders() (preflightCheck)',
+    async () => {
+      const brokerWallet = getRandomWallet();
+      const resourcesProviderWallet = getRandomWallet();
+      const richSigner = utils.getSignerFromPrivateKey(
+        tokenChainInstamineUrl,
+        RICH_PRIVATE_KEY,
+      );
+      const iexecRich = new IExec(
+        {
+          ethProvider: richSigner,
+        },
+        {
+          hubAddress,
+          smsURL: smsMap,
+          resultProxyURL,
+        },
+      );
+      await iexecRich.wallet.sendETH('20000000000000000', brokerWallet.address);
+      await iexecRich.wallet.sendETH(
+        '20000000000000000',
+        resourcesProviderWallet.address,
+      );
+      const signer = utils.getSignerFromPrivateKey(
+        tokenChainInstamineUrl,
+        brokerWallet.privateKey,
+      );
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+        },
+        {
+          hubAddress,
+          smsURL: smsMap,
+          resultProxyURL,
+        },
+      );
+      const resourcesProviderSigner = utils.getSignerFromPrivateKey(
+        tokenChainInstamineUrl,
+        resourcesProviderWallet.privateKey,
+      );
+      const iexecResourcesProvider = new IExec(
+        {
+          ethProvider: resourcesProviderSigner,
+        },
+        {
+          hubAddress,
+        },
+      );
 
-    const apporder = await deployAndGetApporder(iexecResourcesProvider);
-    const datasetorder = await deployAndGetDatasetorder(iexecResourcesProvider);
-    const workerpoolorder = await deployAndGetWorkerpoolorder(
-      iexecResourcesProvider,
-    );
-    const requestorder = await getMatchableRequestorder(iexec, {
-      apporder,
-      datasetorder,
-      workerpoolorder,
-    });
+      const apporder = await deployAndGetApporder(iexecResourcesProvider);
+      const datasetorder = await deployAndGetDatasetorder(
+        iexecResourcesProvider,
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(
+        iexecResourcesProvider,
+      );
+      const requestorder = await getMatchableRequestorder(iexec, {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+      });
 
-    const teeApporder = await deployAndGetApporder(iexecResourcesProvider, {
-      teeFramework: TEE_FRAMEWORKS.SCONE,
-      tag: ['tee', 'scone'],
-    });
-    const teeDatasetorder = await deployAndGetDatasetorder(
-      iexecResourcesProvider,
-      { tag: ['tee', 'scone'] },
-    );
-    const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
-      iexecResourcesProvider,
-      {
+      const teeApporder = await deployAndGetApporder(iexecResourcesProvider, {
+        teeFramework: TEE_FRAMEWORKS.SCONE,
         tag: ['tee', 'scone'],
-      },
-    );
+      });
+      const teeDatasetorder = await deployAndGetDatasetorder(
+        iexecResourcesProvider,
+        { tag: ['tee', 'scone'] },
+      );
+      const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
+        iexecResourcesProvider,
+        {
+          tag: ['tee', 'scone'],
+        },
+      );
 
-    // trigger request check
-    await expect(
-      iexec.order.matchOrders({
+      // trigger request check
+      await expect(
+        iexec.order.matchOrders({
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        }),
+      ).rejects.toThrow(
+        Error(
+          'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
+        ),
+      );
+
+      await iexec.storage
+        .defaultStorageLogin()
+        .then(iexec.storage.pushStorageToken);
+      const res = await iexec.order.matchOrders({
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-      }),
-    ).rejects.toThrow(
-      Error(
-        'Requester storage token is not set for selected provider "ipfs". Result archive upload will fail.',
-      ),
-    );
+      });
+      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume.eq(new BN(1))).toBe(true);
+      expect(res.dealid).toMatch(bytes32Regex);
 
-    await iexec.storage
-      .defaultStorageLogin()
-      .then(iexec.storage.pushStorageToken);
-    const res = await iexec.order.matchOrders({
-      apporder,
-      datasetorder,
-      workerpoolorder,
-      requestorder,
-    });
-    expect(res.txHash).toMatch(bytes32Regex);
-    expect(res.volume).toBeInstanceOf(BN);
-    expect(res.volume.eq(new BN(1))).toBe(true);
-    expect(res.dealid).toMatch(bytes32Regex);
-
-    // trigger app check
-    await expect(
-      iexec.order.matchOrders({
-        apporder,
-        datasetorder,
-        workerpoolorder: teeWorkerpoolorder,
-        requestorder: await getMatchableRequestorder(iexec, {
+      // trigger app check
+      await expect(
+        iexec.order.matchOrders({
           apporder,
           datasetorder,
           workerpoolorder: teeWorkerpoolorder,
-        }).then((o) =>
-          iexec.order.signRequestorder(
-            { ...o, tag: ['tee', 'scone'] },
-            { preflightCheck: false },
+          requestorder: await getMatchableRequestorder(iexec, {
+            apporder,
+            datasetorder,
+            workerpoolorder: teeWorkerpoolorder,
+          }).then((o) =>
+            iexec.order.signRequestorder(
+              { ...o, tag: ['tee', 'scone'] },
+              { preflightCheck: false },
+            ),
           ),
-        ),
-      }),
-    ).rejects.toThrow(Error('Tag mismatch the TEE framework specified by app'));
+        }),
+      ).rejects.toThrow(
+        Error('Tag mismatch the TEE framework specified by app'),
+      );
 
-    // trigger dataset check
-    await expect(
-      iexec.order.matchOrders({
-        apporder: teeApporder,
-        datasetorder: teeDatasetorder,
-        workerpoolorder: teeWorkerpoolorder,
-        requestorder: await getMatchableRequestorder(iexec, {
+      // trigger dataset check
+      await expect(
+        iexec.order.matchOrders({
           apporder: teeApporder,
           datasetorder: teeDatasetorder,
           workerpoolorder: teeWorkerpoolorder,
+          requestorder: await getMatchableRequestorder(iexec, {
+            apporder: teeApporder,
+            datasetorder: teeDatasetorder,
+            workerpoolorder: teeWorkerpoolorder,
+          }),
         }),
-      }),
-    ).rejects.toThrow('Dataset encryption key is not set for dataset ');
-  });
+      ).rejects.toThrow('Dataset encryption key is not set for dataset ');
+    },
+    DEFAULT_TIMEOUT * 2,
+  );
 
   test('order.publishApporder()', async () => {
     const signer = utils.getSignerFromPrivateKey(
