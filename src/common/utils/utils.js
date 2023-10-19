@@ -188,13 +188,8 @@ export const formatEthersResult = (result) => {
   return obj;
 };
 
-export const checkEventFromLogs = (eventName, logs) => {
-  let confirm = false; // todo rewrite
-  logs.forEach((log) => {
-    if (log.eventName === eventName) confirm = true;
-  });
-  return confirm;
-};
+export const checkEventFromLogs = (eventName, logs = []) =>
+  logs.find((log) => log.eventName === eventName) !== undefined;
 
 export const getEventFromLogs = (eventName, logs, { strict = true } = {}) => {
   const eventFound = logs.find((log) => log.eventName === eventName);
