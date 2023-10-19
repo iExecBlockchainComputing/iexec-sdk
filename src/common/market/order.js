@@ -879,10 +879,9 @@ export const matchOrders = async (
     const matchEvent = 'OrdersMatched';
     if (!checkEventFromLogs(matchEvent, txReceipt.logs))
       throw Error(`${matchEvent} not confirmed`);
-    const { dealid, volume } = getEventFromLogs(
-      matchEvent,
-      txReceipt.logs,
-    ).args;
+    const { dealid, volume } = getEventFromLogs(matchEvent, txReceipt.logs, {
+      strict: true,
+    }).args;
     return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };
   } catch (error) {
     debug('matchOrders() error', error);
