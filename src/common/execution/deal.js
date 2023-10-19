@@ -137,9 +137,7 @@ export const show = async (
       showCategory(contracts, deal.category),
       getTimeoutRatio(contracts),
     ]);
-    const finalTime = bigIntToBn(deal.startTime).add(
-      bigIntToBn(timeoutRatio).mul(bigIntToBn(workClockTimeRef)),
-    );
+    const finalTime = deal.startTime.add(timeoutRatio.mul(workClockTimeRef));
     const now = Math.floor(Date.now() / 1000);
     const deadlineReached = now >= finalTime.toNumber();
 
