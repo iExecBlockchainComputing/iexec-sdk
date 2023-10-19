@@ -9,7 +9,7 @@ export type BN = BNjs;
 /**
  * big number like
  */
-export type BNish = BN | string | number;
+export type BNish = BN | bigint | string | number;
 /**
  * ethereum address
  *
