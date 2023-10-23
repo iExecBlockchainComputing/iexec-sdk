@@ -112,8 +112,6 @@ const RICH_PRIVATE_KEY =
 
 // a random known address for deterministic hash
 const KNOWN_ADDRESS = '0x650ae1d365369129c326Cd15Bf91793b52B7cf59';
-const RICH_PRIVATE_KEY2 =
-  '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89';
 
 const networkId = 65535;
 const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
@@ -131,9 +129,6 @@ const tokenChainRPC = new JsonRpcProvider(tokenChainInstamineUrl);
 const tokenChainRPC1s = new JsonRpcProvider(tokenChain1sUrl);
 const tokenChainWallet = new Wallet(RICH_PRIVATE_KEY, tokenChainRPC);
 const whitelistAdminWallet = new Wallet(RICH_PRIVATE_KEY, tokenChainRPC);
-
-// const nativeChainRPC = new ethers.providers.JsonRpcProvider(nativeChainUrl);
-// const nativeChainWallet = new ethers.Wallet(PRIVATE_KEY, nativeChainRPC);
 
 const initializeTask = async (wallet, hub, dealid, idx) => {
   const hubContract = new Contract(
