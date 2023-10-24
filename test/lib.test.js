@@ -17,8 +17,8 @@ const { readFile, ensureDir, writeFile } = fsExtra;
 
 console.log('Node version:', process.version);
 
-// increased from 60 s with ganache to 120s
-const DEFAULT_TIMEOUT = 120000;
+// increased from 60s with ganache to 240s
+const DEFAULT_TIMEOUT = 240000;
 
 jest.setTimeout(DEFAULT_TIMEOUT);
 
