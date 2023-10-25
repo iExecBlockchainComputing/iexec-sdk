@@ -89,7 +89,7 @@ export const fetchRequesterDeals = async (
     if (response.ok && response.deals) {
       return response;
     }
-    throw Error('An error occured while getting deals');
+    throw Error('An error occurred while getting deals');
   } catch (error) {
     debug('fetchRequesterDeals()', error);
     throw error;
