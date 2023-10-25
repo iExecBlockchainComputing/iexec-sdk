@@ -1,3 +1,6 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
 import {
   JsonRpcProvider,
   FallbackProvider,
@@ -14,6 +17,10 @@ import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
 import { InjectedProvider, getRandomWallet } from './test-utils';
 
 console.log('Node version:', process.version);
+
+const DEFAULT_TIMEOUT = 10000;
+
+jest.setTimeout(DEFAULT_TIMEOUT);
 
 // CONFIG
 const { DRONE, INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
