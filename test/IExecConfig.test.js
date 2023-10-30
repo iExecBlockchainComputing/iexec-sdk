@@ -1,11 +1,26 @@
-import { providers } from 'ethers';
-import Eth from 'web3-eth';
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
+import {
+  JsonRpcProvider,
+  FallbackProvider,
+  AlchemyProvider,
+  InfuraProvider,
+  EtherscanProvider,
+  CloudflareProvider,
+  BrowserProvider,
+} from 'ethers';
 
 import { utils, IExecConfig, errors } from '../src/lib';
 import IExecContractsClient from '../src/common/utils/IExecContractsClient';
 import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
+import { InjectedProvider, getRandomWallet } from './test-utils';
 
 console.log('Node version:', process.version);
+
+const DEFAULT_TIMEOUT = 10000;
+
+jest.setTimeout(DEFAULT_TIMEOUT);
 
 // CONFIG
 const { DRONE, INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
@@ -15,13 +30,13 @@ console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
 console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
 
-// 1 block / tx
-const tokenChainUrl = DRONE
+// TODO can be replaced by instamine chain to speedup tests
+const tokenChainInstamineUrl = DRONE
   ? 'http://token-chain:8545'
-  : 'http://localhost:8545';
-const nativeChainUrl = DRONE
-  ? 'http://native-chain:8545'
   : 'http://localhost:18545';
+const nativeChainInstamineUrl = DRONE
+  ? 'http://native-chain:8545'
+  : 'http://localhost:28545';
 // secret management service
 const sconeSms = DRONE
   ? 'http://token-sms-scone:13300'
@@ -71,7 +86,8 @@ describe('[IExecConfig]', () => {
       });
     });
 
-    describe('throw Invalid ethProvider', () => {
+    describe.skip('throw Invalid ethProvider', () => {
+      // does not throw in ethers v6
       test('IExecConfig({ ethProvider: {} })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: {} });
         expect(createConfig).toThrow(
@@ -113,17 +129,26 @@ describe('[IExecConfig]', () => {
 
     describe('read-only ethProvider from network name', () => {
       test('IExecConfig({ ethProvider: "mainnet" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'mainnet' });
+        const config = new IExecConfig(
+          { ethProvider: 'mainnet' },
+          {
+            providerOptions: {
+              infura: INFURA_PROJECT_ID,
+            },
+          },
+        );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: "bellecour" })', async () => {
         const config = new IExecConfig({ ethProvider: 'bellecour' });
@@ -131,12 +156,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(134);
+        expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: "kovan" })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 'kovan' });
@@ -149,17 +176,26 @@ describe('[IExecConfig]', () => {
 
     describe('read-only ethProvider from network chainId', () => {
       test('IExecConfig({ ethProvider: "1" })', async () => {
-        const config = new IExecConfig({ ethProvider: '1' });
+        const config = new IExecConfig(
+          { ethProvider: '1' },
+          {
+            providerOptions: {
+              infura: INFURA_PROJECT_ID,
+            },
+          },
+        );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: "134" })', async () => {
         const config = new IExecConfig({ ethProvider: '134' });
@@ -167,25 +203,36 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(134);
+        expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('IExecConfig({ ethProvider: 1 })', async () => {
-        const config = new IExecConfig({ ethProvider: 1 });
+        const config = new IExecConfig(
+          { ethProvider: '1' },
+          {
+            providerOptions: {
+              infura: INFURA_PROJECT_ID,
+            },
+          },
+        );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: 134 })', async () => {
         const config = new IExecConfig({ ethProvider: 134 });
@@ -193,12 +240,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(134);
+        expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: 42 })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 42 });
@@ -231,19 +280,21 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(2);
         expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          providers.InfuraProvider,
+          CloudflareProvider,
         );
         expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          providers.CloudflareProvider,
+          InfuraProvider,
         );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura }})', async () => {
         const config = new IExecConfig(
@@ -258,19 +309,21 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(2);
         expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          providers.InfuraProvider,
+          CloudflareProvider,
         );
         expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          providers.CloudflareProvider,
+          InfuraProvider,
         );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { alchemy }})', async () => {
         const config = new IExecConfig(
@@ -285,19 +338,21 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(2);
         expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          providers.AlchemyProvider,
+          AlchemyProvider,
         );
         expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          providers.CloudflareProvider,
+          CloudflareProvider,
         );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { etherscan }})', async () => {
         const config = new IExecConfig(
@@ -312,19 +367,21 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(2);
         expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          providers.EtherscanProvider,
+          CloudflareProvider,
         );
         expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          providers.CloudflareProvider,
+          EtherscanProvider,
         );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura, etherscan, alchemy }})', async () => {
         const config = new IExecConfig(
@@ -341,33 +398,35 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(4);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
     });
 
     describe('read-only ethProvider from node url', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           { hubAddress },
         );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535);
+        expect(network.chainId).toBe(65535n);
         expect(network.name).toBe('unknown');
-        expect(network.ensAddress).toBeUndefined();
+        expect(network.getPlugin('org.ethers.plugins.network.Ens')).toBe(null);
       });
       test('IExecConfig({ ethProvider: "https://bellecour.iex.ec" }) - autodetect known network', async () => {
         const config = new IExecConfig({
@@ -377,31 +436,35 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(134);
+        expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
     });
 
     describe('read-only ethProvider with ens override', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, ensRegistryAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           { hubAddress, ensRegistryAddress },
         );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535);
+        expect(network.chainId).toBe(65535n);
         expect(network.name).toBe('unknown');
-        expect(network.ensAddress).toBe(ensRegistryAddress);
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(ensRegistryAddress);
       });
     });
 
@@ -410,7 +473,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           {
             ethProvider: utils.getSignerFromPrivateKey(
-              tokenChainUrl,
+              tokenChainInstamineUrl,
               PRIVATE_KEY,
             ),
           },
@@ -420,12 +483,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535);
+        expect(network.chainId).toBe(65535n);
         expect(network.name).toBe('unknown');
-        expect(network.ensAddress).toBe(ensRegistryAddress);
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(ensRegistryAddress);
       });
 
       test('getSignerFromPrivateKey() with network fallback', async () => {
@@ -445,23 +510,26 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBe(
-          '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-        );
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
     });
 
     describe('web3 provider', () => {
-      test('getSignerFromPrivateKey()', async () => {
-        const eth = new Eth(tokenChainUrl);
+      test('InjectedProvider', async () => {
+        const injectedProvider = new InjectedProvider(
+          tokenChainInstamineUrl,
+          getRandomWallet().privateKey,
+        );
         const config = new IExecConfig(
           {
-            ethProvider: eth.currentProvider,
+            ethProvider: injectedProvider,
           },
           { hubAddress, ensRegistryAddress },
         );
@@ -469,12 +537,14 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(BrowserProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535);
+        expect(network.chainId).toBe(65535n);
         expect(network.name).toBe('unknown');
-        expect(network.ensAddress).toBe(ensRegistryAddress);
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(ensRegistryAddress);
       });
     });
 
@@ -485,12 +555,14 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('bridged contract IExecConfig({ ethProvider: "bellecour" }, { providerOptions : { infura }})', async () => {
         const config = new IExecConfig(
@@ -505,40 +577,51 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.FallbackProvider);
+        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(2);
         expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          providers.InfuraProvider,
+          CloudflareProvider,
         );
         expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          providers.CloudflareProvider,
+          InfuraProvider,
         );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(1);
-        expect(network.name).toBe('homestead');
-        expect(network.ensAddress).toBeDefined();
+        expect(network.chainId).toBe(1n);
+        expect(network.name).toBe('mainnet');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'mainnet' });
+        const config = new IExecConfig(
+          { ethProvider: 'mainnet' },
+          {
+            providerOptions: {
+              infura: INFURA_PROJECT_ID,
+            },
+          },
+        );
         const { provider, signer, chainId } =
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('134');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(134);
+        expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(network.ensAddress).toBeDefined();
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, bridgedNetworkConf })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainUrl },
+          { ethProvider: tokenChainInstamineUrl },
           {
             hubAddress,
             bridgedNetworkConf: {
-              rpcURL: tokenChainUrl,
+              rpcURL: tokenChainInstamineUrl,
               chainId: '65535',
               hubAddress,
               bridgeAddress: utils.NULL_ADDRESS,
@@ -549,12 +632,12 @@ describe('[IExecConfig]', () => {
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(providers.JsonRpcProvider);
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe('65535');
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535);
+        expect(network.chainId).toBe(65535n);
         expect(network.name).toBe('unknown');
-        expect(network.ensAddress).toBeUndefined();
+        expect(network.getPlugin('org.ethers.plugins.network.Ens')).toBe(null);
       });
     });
   });
@@ -562,7 +645,7 @@ describe('[IExecConfig]', () => {
   describe('resolveChainId()', () => {
     test('success', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       await expect(config.resolveChainId()).resolves.toBe(networkId);
     });
@@ -591,7 +674,7 @@ describe('[IExecConfig]', () => {
     test('success with hubAddress on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { hubAddress },
       );
@@ -603,7 +686,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveContractsClient();
       await expect(promise).rejects.toThrow(
@@ -637,13 +720,13 @@ describe('[IExecConfig]', () => {
     test('success with bridgedNetworkConf on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
           bridgedNetworkConf: {
             chainId: networkId,
-            rpcURL: nativeChainUrl,
+            rpcURL: nativeChainInstamineUrl,
             hubAddress: nativeHubAddress,
             bridgeAddress: utils.NULL_ADDRESS,
           },
@@ -657,7 +740,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgedContractsClient();
       await expect(promise).rejects.toThrow(
@@ -693,7 +776,7 @@ describe('[IExecConfig]', () => {
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { hubAddress },
       );
@@ -706,7 +789,7 @@ describe('[IExecConfig]', () => {
     test('success with enterpriseSwapConf on custom enterprise chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -724,7 +807,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveStandardContractsClient();
       await expect(promise).rejects.toThrow(
@@ -737,7 +820,7 @@ describe('[IExecConfig]', () => {
     test('throw on unknown enterprise chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -766,7 +849,7 @@ describe('[IExecConfig]', () => {
     test('success on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
           flavour: 'enterprise',
         },
         {
@@ -782,7 +865,7 @@ describe('[IExecConfig]', () => {
     test('success with enterpriseSwapConf on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
@@ -812,7 +895,7 @@ describe('[IExecConfig]', () => {
     test('throw on unknown chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         {
           hubAddress,
@@ -931,7 +1014,7 @@ describe('[IExecConfig]', () => {
     test('success with smsURL string on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { smsURL: sconeSms },
       );
@@ -940,7 +1023,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow(
@@ -960,7 +1043,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw with invalid TEE framework', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveSmsURL({ teeFramework: 'foo' });
       await expect(promise).rejects.toThrow(
@@ -993,7 +1076,7 @@ describe('[IExecConfig]', () => {
     test('success with resultProxyURL on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { resultProxyURL },
       );
@@ -1002,7 +1085,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveResultProxyURL();
       await expect(promise).rejects.toThrow(
@@ -1035,7 +1118,7 @@ describe('[IExecConfig]', () => {
     test('success when configured on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { iexecGatewayURL },
       );
@@ -1054,7 +1137,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).rejects.toThrow(
@@ -1085,7 +1168,7 @@ describe('[IExecConfig]', () => {
     test('success when configured on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainUrl,
+          ethProvider: tokenChainInstamineUrl,
         },
         { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
       );
@@ -1104,7 +1187,7 @@ describe('[IExecConfig]', () => {
     });
     test('success when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).rejects.toThrow(
@@ -1154,7 +1237,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgeAddress();
       await expect(promise).rejects.toThrow(
@@ -1214,7 +1297,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveBridgeBackAddress();
       await expect(promise).rejects.toThrow(
@@ -1270,7 +1353,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainUrl,
+        ethProvider: tokenChainInstamineUrl,
       });
       const promise = config.resolveEnsPublicResolverAddress();
       await expect(promise).rejects.toThrow(

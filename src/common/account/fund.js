@@ -5,9 +5,9 @@ import { getAddress } from '../wallet/address.js';
 import { isInWhitelist } from '../wallet/enterprise.js';
 import { checkBalances } from '../wallet/balance.js';
 import {
-  checkEvent,
+  checkEventFromLogs,
   bnNRlcToBnWei,
-  bnToEthersBn,
+  bnToBigInt,
   checkSigner,
 } from '../utils/utils.js';
 import { NULL_BYTES } from '../utils/constant.js';
@@ -49,24 +49,21 @@ export const deposit = async (
         ),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEvent('Approval', txReceipt.events))
+      if (!checkEventFromLogs('Approval', txReceipt.logs))
         throw Error('Approval not confirmed');
-      if (!checkEvent('Transfer', txReceipt.events))
+      if (!checkEventFromLogs('Transfer', txReceipt.logs))
         throw Error('Transfer not confirmed');
       txHash = tx.hash;
     } else {
-      const weiAmount = bnToEthersBn(
-        bnNRlcToBnWei(new BN(vAmount)),
-      ).toHexString();
+      const weiAmount = bnToBigInt(bnNRlcToBnWei(new BN(vAmount)));
       const tx = await wrapSend(
         iexecContract.deposit({
           value: weiAmount,
-          gasPrice:
-            (contracts.txOptions && contracts.txOptions.gasPrice) || undefined,
+          ...contracts.txOptions,
         }),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEvent('Transfer', txReceipt.events))
+      if (!checkEventFromLogs('Transfer', txReceipt.logs))
         throw Error('Deposit not confirmed');
       txHash = tx.hash;
     }
@@ -102,7 +99,7 @@ export const withdraw = async (
       iexecContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-    if (!checkEvent('Transfer', txReceipt.events))
+    if (!checkEventFromLogs('Transfer', txReceipt.logs))
       throw Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {

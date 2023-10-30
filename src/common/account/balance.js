@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { ethersBnToBn } from '../utils/utils.js';
+import { bigIntToBn } from '../utils/utils.js';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 
@@ -18,8 +18,8 @@ export const checkBalance = async (
       iexecContract.viewAccount(vAddress),
     );
     return {
-      stake: ethersBnToBn(stake),
-      locked: ethersBnToBn(locked),
+      stake: bigIntToBn(stake),
+      locked: bigIntToBn(locked),
     };
   } catch (error) {
     debug('checkBalance()', error);

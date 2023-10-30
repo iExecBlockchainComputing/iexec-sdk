@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { Contract, utils } from 'ethers';
+import { Contract, namehash, id } from 'ethers';
 import { abi as RegistryEntryAbi } from '../generated/@iexec/poco/RegistryEntry.js';
 import { abi as ENSRegistryAbi } from '../generated/@ensdomains/registry/ENSRegistry.js';
 import { abi as FIFSRegistrarAbi } from '../generated/@ensdomains/registry/FIFSRegistrar.js';
@@ -69,7 +69,7 @@ export const registerFifsEns = async (
     const vLabel = await ensLabelSchema().validate(label);
     let registerTxHash;
     const name = `${vLabel}.${vDomain}`;
-    const labelHash = utils.id(vLabel);
+    const labelHash = id(vLabel);
     const address = await getAddress(contracts);
     const ownedBy = await getOwner(contracts, name);
     if (ownedBy === NULL_ADDRESS) {
@@ -140,7 +140,7 @@ export const obsConfigureResolution = (
               }).validate(address)
             : await getAddress(contracts);
         const vName = await ensDomainSchema().validate(name);
-        const nameHash = utils.namehash(vName);
+        const nameHash = namehash(vName);
         const walletAddress = await getAddress(contracts);
         const ensAddress = await getEnsRegistryAddress(contracts);
 
@@ -189,7 +189,7 @@ export const obsConfigureResolution = (
         if (abort) return;
         safeObserver.next({
           message: obsConfigureResolutionMessages.DESCRIBE_WORKFLOW,
-          addessType: addressIsContract ? 'CONTRACT' : 'EAO',
+          addressType: addressIsContract ? 'CONTRACT' : 'EAO',
           steps: ['SET_RESOLVER', 'SET_ADDR', 'SET_NAME'],
         });
 
@@ -252,11 +252,9 @@ export const obsConfigureResolution = (
           contracts.signer,
         );
         const addr = await wrapCall(
-          resolverContract.functions['addr(bytes32)'](nameHash),
+          resolverContract.getFunction('addr(bytes32)')(nameHash),
         );
-        const isAddrSet =
-          addr && addr[0] && addr[0].toLowerCase() === vAddress.toLowerCase();
-
+        const isAddrSet = addr && addr.toLowerCase() === vAddress.toLowerCase();
         if (!isAddrSet) {
           safeObserver.next({
             message: obsConfigureResolutionMessages.SET_ADDR_TX_REQUEST,
@@ -265,7 +263,7 @@ export const obsConfigureResolution = (
           });
           if (abort) return;
           const setAddrTx = await wrapSend(
-            resolverContract.functions['setAddr(bytes32,address)'](
+            resolverContract.getFunction('setAddr(bytes32,address)')(
               nameHash,
               vAddress,
               contracts.txOptions,

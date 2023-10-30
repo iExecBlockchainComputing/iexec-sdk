@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { Contract, utils } from 'ethers';
+import { Contract, namehash } from 'ethers';
 import { abi } from '../generated/@ensdomains/registry/ENSRegistry.js';
 import {
   throwIfMissing,
@@ -17,7 +17,7 @@ export const getOwner = async (
 ) => {
   try {
     const vName = await ensDomainSchema().validate(name);
-    const nameHash = utils.namehash(vName);
+    const nameHash = namehash(vName);
     const ensAddress = await getEnsRegistryAddress(contracts);
     const ensRegistryContract = new Contract(
       ensAddress,

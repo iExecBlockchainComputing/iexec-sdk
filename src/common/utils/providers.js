@@ -1,4 +1,4 @@
-import { getDefaultProvider, providers } from 'ethers';
+import { getDefaultProvider, JsonRpcProvider } from 'ethers';
 import { getChainDefaults, getId } from './config.js';
 
 export const getReadOnlyProvider = (host, options = {}) => {
@@ -24,12 +24,19 @@ export const getReadOnlyProvider = (host, options = {}) => {
   }
   // RPC endpoint
   if (resolvedHost.startsWith('http')) {
-    return new providers.JsonRpcProvider(resolvedHost, resolvedNetwork);
+    return new JsonRpcProvider(resolvedHost, resolvedNetwork);
   }
   // API provider
   const { quorum, ...providersOptionsRest } = providerOptions;
   // disable non configured providers when at least 1 is configured
-  const apiProvidersList = ['etherscan', 'infura', 'alchemy', 'pocket', 'ankr'];
+  const apiProvidersList = [
+    'etherscan',
+    'infura',
+    'alchemy',
+    'pocket',
+    'ankr',
+    'quicknode',
+  ];
   const nonConfiguredProviders = apiProvidersList.filter(
     (apiProvider) => !Object.keys(providersOptionsRest).includes(apiProvider),
   );

@@ -1,8 +1,8 @@
 import Debug from 'debug';
-import { utils } from 'ethers';
+import { AbiCoder, keccak256 } from 'ethers';
 import { showCategory } from '../protocol/category.js';
 import { getTimeoutRatio } from '../protocol/configuration.js';
-import { ethersBnToBn, BN, checkSigner } from '../utils/utils.js';
+import { bigIntToBn, BN, checkSigner } from '../utils/utils.js';
 import { jsonApi, wrapPaginableRequest } from '../utils/api-utils.js';
 import {
   chainIdSchema,
@@ -23,8 +23,6 @@ import {
 import { viewDeal, viewTask } from './common.js';
 import { obsTask } from './task.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
-
-const { defaultAbiCoder, keccak256 } = utils;
 
 const debug = Debug('iexec:execution:deal');
 
@@ -108,7 +106,7 @@ export const computeTaskId = async (
       await bytes32Schema().validate(dealid),
       await uint256Schema().validate(taskIdx),
     ];
-    const encoded = defaultAbiCoder.encode(encodedTypes, values);
+    const encoded = AbiCoder.defaultAbiCoder().encode(encodedTypes, values);
     return keccak256(encoded);
   } catch (error) {
     debug('computeTaskId()', error);
@@ -287,7 +285,7 @@ export const claim = async (
     initialized.sort(numericStringPropAscSort('idx'));
     notInitialized.sort(numericStringPropAscSort('idx'));
     const lastBlock = await wrapCall(contracts.provider.getBlock('latest'));
-    const blockGasLimit = ethersBnToBn(lastBlock.gasLimit);
+    const blockGasLimit = bigIntToBn(lastBlock.gasLimit);
     debug('blockGasLimit', blockGasLimit.toString());
     const iexecContract = contracts.getIExecContract();
     if (initialized.length > 0) {

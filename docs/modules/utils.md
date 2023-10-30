@@ -183,7 +183,7 @@ const iexec = new IExec({ ethProvider });
 | `host` | `string` | node RPC url |
 | `privateKey` | `string` | wallet private key |
 | `options?` | `Object` | - |
-| `options.gasPrice?` | `string` | gas price override |
+| `options.gasPrice?` | `string` \| `number` \| `bigint` | gas price override |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
 | `options.providers` | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options |
 

@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { toBeHex } from 'ethers';
 import { getAddress } from '../wallet/address.js';
 import {
   addressSchema,
@@ -12,25 +13,21 @@ import {
 import {
   getEventFromLogs,
   checkSigner,
-  bnifyNestedEthersBn,
+  bnifyNestedBigInt,
   checksummedAddress,
-  ethersBnToBn,
+  bigIntToBn,
   multiaddrHexToHuman,
   hexToBuffer,
   BN,
 } from '../utils/utils.js';
-import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant.js';
+import { APP, DATASET, WORKERPOOL } from '../utils/constant.js';
 import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 import { ObjectNotFoundError } from '../utils/errors.js';
 
 const debug = Debug('iexec:protocol:registries');
 
 const tokenIdToAddress = (tokenId) => {
-  const hexTokenId = tokenId.toHexString().substring(2);
-  const lowerCaseAddress = NULL_ADDRESS.substring(
-    0,
-    42 - hexTokenId.length,
-  ).concat(hexTokenId);
+  const lowerCaseAddress = toBeHex(tokenId, 20);
   return checksummedAddress(lowerCaseAddress);
 };
 
@@ -125,12 +122,12 @@ const deployObj =
         registryContract[createFunctionName](...args, contracts.txOptions),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      const event = getEventFromLogs('Transfer', txReceipt.events, {
+      const event = getEventFromLogs('Transfer', txReceipt.logs, {
         strict: true,
       });
       const { tokenId } = event.args;
       const address = tokenIdToAddress(tokenId);
-      const txHash = txReceipt.transactionHash;
+      const txHash = tx.hash;
       return { address, txHash };
     } catch (error) {
       debug('deployObj()', error);
@@ -224,17 +221,17 @@ const showObjByAddress =
       if (!isDeployed)
         throw new ObjectNotFoundError(objName, objAddress, contracts.chainId);
       const contract = contracts.getContract(objName, vAddress);
-      const readableProps = Object.values(contract.interface.functions)
-        .filter((fragment) => fragment.constant)
+      const readableProps = Object.values(contract.interface.fragments)
+        .filter((fragment) => fragment.stateMutability === 'view')
         .map((fragment) => fragment.name);
       const values = await Promise.all(
         readableProps.map((e) => wrapCall(contract[e]())),
       );
-      const objProps = values.reduce(
+      const objFromProps = values.reduce(
         (acc, curr, i) => ({ ...acc, [readableProps[i]]: curr }),
         {},
       );
-      const obj = bnifyNestedEthersBn(objProps);
+      const obj = bnifyNestedBigInt(objFromProps);
       return { obj, objAddress: vAddress };
     } catch (error) {
       debug('showObjByAddress()', error);
@@ -253,7 +250,7 @@ const countUserObj =
         contracts.fetchRegistryContract(objName),
       );
       const objCount = await wrapCall(registryContract.balanceOf(vAddress));
-      return ethersBnToBn(objCount);
+      return bigIntToBn(objCount);
     } catch (error) {
       debug('countObj()', error);
       throw error;
@@ -466,8 +463,8 @@ const transferObj =
           contracts.txOptions,
         ),
       );
-      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      const txHash = txReceipt.transactionHash;
+      await wrapWait(tx.wait(contracts.confirms));
+      const txHash = tx.hash;
       return { address, to, txHash };
     } catch (error) {
       debug('transferObj()', error);

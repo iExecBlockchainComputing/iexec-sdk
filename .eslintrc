@@ -1,4 +1,10 @@
 {
+  "env": {
+    "es2020": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "plugins": ["sonarjs"],
   "extends": [
     "airbnb-base",
@@ -8,8 +14,8 @@
   ],
   "rules": {
     "default-param-last": "off",
-    "new-cap": 0,
-    "no-console": 0,
+    "new-cap": "off",
+    "no-console": "error",
     "no-underscore-dangle": [
       "error",
       {
@@ -37,6 +43,16 @@
     "max-classes-per-file": "off",
     "max-len": "off",
     "import/prefer-default-export": "off",
-    "import/extensions": ["error", "always"]
-  }
+    "import/extensions": ["error", "always"],
+    "sonarjs/cognitive-complexity": ["warn", 15],
+    "sonarjs/no-duplicate-string": "off"
+  },
+  "overrides": [
+    {
+      "files": ["./src/cli/utils/cli-helper.js", "./src/lib/IExecConfig.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

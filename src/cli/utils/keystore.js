@@ -2,7 +2,7 @@ import Debug from 'debug';
 import os from 'os';
 import path from 'path';
 import fsExtra from 'fs-extra';
-import { Wallet, utils } from 'ethers';
+import { SigningKey, Wallet } from 'ethers';
 import { checksummedAddress } from '../../common/utils/utils.js';
 import { NULL_ADDRESS } from '../../common/utils/constant.js';
 import {
@@ -12,8 +12,6 @@ import {
   loadEncryptedWalletConf,
 } from './fs.js';
 import { prompt, option, computeWalletLoadOptions } from './cli-helper.js';
-
-const { computePublicKey } = utils;
 
 const debug = Debug('iexec:keystore');
 
@@ -41,7 +39,7 @@ const walletFromPrivKey = (privateKey) => {
   const signerWallet = new Wallet(privateKey);
   const wallet = {
     privateKey: signerWallet.privateKey,
-    publicKey: computePublicKey(signerWallet.privateKey),
+    publicKey: SigningKey.computePublicKey(signerWallet.privateKey, false),
     address: signerWallet.address,
   };
   return { wallet, signerWallet };
@@ -57,7 +55,10 @@ const decrypt = async (encryptedJSON, password) => {
     return wallet;
   } catch (error) {
     debug('decrypt()', error);
-    throw error;
+    if (error.shortMessage) {
+      throw Error(error.shortMessage)
+    }
+    throw Error('Failed to decrypt wallet');
   }
 };
 

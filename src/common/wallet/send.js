@@ -1,9 +1,8 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import { BigNumber } from 'ethers';
 import {
-  ethersBnToBn,
-  bnToEthersBn,
+  bigIntToBn,
+  bnToBigInt,
   bnNRlcToBnWei,
   checkSigner,
 } from '../utils/utils.js';
@@ -25,7 +24,7 @@ const sendNativeToken = async (
   contracts = throwIfMissing(),
   value = throwIfMissing(),
   to = throwIfMissing(),
-  { defaultGasPrice } = {},
+  { gasFees = {} } = {},
 ) => {
   try {
     checkSigner(contracts);
@@ -33,17 +32,13 @@ const sendNativeToken = async (
       ethProvider: contracts.provider,
     }).validate(to);
     const vValue = await uint256Schema().validate(value);
-    const hexValue = BigNumber.from(vValue).toHexString();
-    if (!contracts.signer) throw Error('Missing Signer');
     const tx = await wrapSend(
       contracts.signer.sendTransaction({
         data: '0x',
         to: vAddress,
-        value: hexValue,
-        gasPrice:
-          (contracts.txOptions && contracts.txOptions.gasPrice) ||
-          defaultGasPrice ||
-          undefined,
+        value: BigInt(vValue),
+        ...contracts.txOptions,
+        ...gasFees,
       }),
     );
     await wrapWait(tx.wait(contracts.confirms));
@@ -67,7 +62,7 @@ const sendERC20 = async (
   try {
     const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
-      rlcContract.transfer(vAddress, vAmount, contracts.txOptions),
+      rlcContract.transfer(vAddress, bnToBigInt(vAmount), contracts.txOptions),
     );
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
@@ -162,31 +157,49 @@ export const sweep = async (
       try {
         const sendERC20TxHash = await sendERC20(
           contracts,
-          bnToEthersBn(balances.nRLC),
+          balances.nRLC,
           vAddressTo,
         );
         Object.assign(res, { sendERC20TxHash });
       } catch (error) {
         debug('error', error);
-        errors.push(`Failed to transfer ERC20': ${error.message}`);
+        errors.push(`Failed to transfer ERC20: ${error.message}`);
         throw Error(`Failed to sweep ERC20, sweep aborted. errors: ${errors}`);
       }
       balances = await checkBalances(contracts, userAddress);
     }
-    const gasPrice =
-      contracts.txOptions && contracts.txOptions.gasPrice
-        ? ethersBnToBn(BigNumber.from(contracts.txOptions.gasPrice))
-        : ethersBnToBn(await contracts.provider.getGasPrice());
-    const gasLimit = new BN(21000);
-    const txFee = gasPrice.mul(gasLimit);
-    const sweepNative = balances.wei.sub(txFee);
-    if (balances.wei.gt(new BN(txFee))) {
+
+    let maxGasPrice;
+    const gasFees = {
+      gasPrice: contracts.txOptions && contracts.txOptions.gasPrice,
+    };
+    if (gasFees.gasPrice === undefined) {
+      const networkGasFees = await contracts.provider.getFeeData();
+      if (
+        (networkGasFees.gasPrice || 0n) < (networkGasFees.maxFeePerGas || 0n)
+      ) {
+        gasFees.gasPrice = undefined;
+        gasFees.maxFeePerGas = networkGasFees.maxFeePerGas || 0n;
+        gasFees.maxPriorityFeePerGas = gasFees.maxFeePerGas; // pay all
+      } else {
+        gasFees.gasPrice = networkGasFees.gasPrice || 0n;
+      }
+    }
+    if ((gasFees.gasPrice || 0n) < (gasFees.maxFeePerGas || 0n)) {
+      maxGasPrice = gasFees.maxFeePerGas;
+    } else {
+      maxGasPrice = gasFees.gasPrice;
+    }
+
+    const txFee = maxGasPrice * 21000n; // send native tx
+    const sweepNativeBn = balances.wei.sub(bigIntToBn(txFee));
+    if (sweepNativeBn.gt(new BN(0))) {
       try {
         const sendNativeTxHash = await sendNativeToken(
           contracts,
-          bnToEthersBn(sweepNative),
+          sweepNativeBn,
           vAddressTo,
-          { defaultGasPrice: gasPrice.toString() },
+          { gasFees },
         );
         Object.assign(res, { sendNativeTxHash });
       } catch (error) {

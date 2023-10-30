@@ -1,6 +1,10 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
-import { checkEvent, checkSigner, FETCH_INTERVAL } from '../utils/utils.js';
+import {
+  checkEventFromLogs,
+  checkSigner,
+  FETCH_INTERVAL,
+} from '../utils/utils.js';
 import { NULL_BYTES } from '../utils/constant.js';
 import { bytes32Schema, throwIfMissing } from '../utils/validator.js';
 import { ObjectNotFoundError } from '../utils/errors.js';
@@ -24,9 +28,7 @@ export const TASK_STATUS_MAP = {
 const decodeTaskResult = (results) => {
   try {
     if (results !== NULL_BYTES) {
-      return JSON.parse(
-        Buffer.from(results.substr(2), 'hex').toString('utf8'),
-      );
+      return JSON.parse(Buffer.from(results.substr(2), 'hex').toString('utf8'));
     }
   } catch (e) {
     // nothing to do
@@ -201,7 +203,7 @@ export const claim = async (
     );
 
     const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));
-    if (!checkEvent('TaskClaimed', claimTxReceipt.events))
+    if (!checkEventFromLogs('TaskClaimed', claimTxReceipt.logs))
       throw Error('TaskClaimed not confirmed');
 
     return claimTx.hash;

@@ -130,7 +130,7 @@ transaction options
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `gasPrice?` | `string` | gasPrice override |
+| `gasPrice?` | `bigint` | gasPrice override |
 
 ## Methods
 

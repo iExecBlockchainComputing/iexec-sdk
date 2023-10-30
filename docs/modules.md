@@ -92,7 +92,7 @@ ___
 
 ### BNish
 
-Ƭ **BNish**: [`BN`](modules.md#bn) \| `string` \| `number`
+Ƭ **BNish**: [`BN`](modules.md#bn) \| `bigint` \| `string` \| `number`
 
 big number like
 

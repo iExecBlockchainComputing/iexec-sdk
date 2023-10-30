@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { ethersBnToBn, truncateBnWeiToBnNRlc } from '../utils/utils.js';
+import { bigIntToBn, truncateBnWeiToBnNRlc } from '../utils/utils.js';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 
@@ -15,11 +15,11 @@ export const getRlcBalance = async (
   const { isNative } = contracts;
   if (isNative) {
     const weiBalance = await contracts.provider.getBalance(vAddress);
-    return truncateBnWeiToBnNRlc(ethersBnToBn(weiBalance));
+    return truncateBnWeiToBnNRlc(bigIntToBn(weiBalance));
   }
   const rlcContract = await wrapCall(contracts.fetchTokenContract());
   const nRlcBalance = await wrapCall(rlcContract.balanceOf(vAddress));
-  return ethersBnToBn(nRlcBalance);
+  return bigIntToBn(nRlcBalance);
 };
 
 export const getEthBalance = async (
@@ -30,7 +30,7 @@ export const getEthBalance = async (
     ethProvider: contracts.provider,
   }).validate(address);
   const weiBalance = await contracts.provider.getBalance(vAddress);
-  return ethersBnToBn(weiBalance);
+  return bigIntToBn(weiBalance);
 };
 
 export const checkBalances = async (

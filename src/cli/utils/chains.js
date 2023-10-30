@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { ethers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import {
   getChainDefaults,
   isEnterpriseEnabled,
@@ -40,7 +40,7 @@ const createChainFromConf = (
     const chain = { ...chainConf };
     const provider =
       chainConf.host && chainConf.host.indexOf('http') === 0
-        ? new ethers.providers.JsonRpcProvider(chainConf.host, {
+        ? new JsonRpcProvider(chainConf.host, {
             ensAddress: chainConf.ensRegistry,
             chainId: parseInt(chainConf.id, 10),
             name: chainName,
@@ -62,7 +62,7 @@ const createChainFromConf = (
       chain.bridgedNetwork = { ...bridgeConf };
       const bridgeProvider =
         bridgeConf.host && bridgeConf.host.indexOf('http') === 0
-          ? new ethers.providers.JsonRpcProvider(bridgeConf.host, {
+          ? new JsonRpcProvider(bridgeConf.host, {
               ensAddress: bridgeConf.ensRegistry,
               chainId: parseInt(bridgeConf.id, 10),
             })

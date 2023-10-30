@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import Debug from 'debug';
 import { string, number, object, mixed, boolean, array, lazy } from 'yup';
-import { utils } from 'ethers';
+import { getAddress, isAddress, namehash } from 'ethers';
 import {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -20,8 +20,6 @@ import {
   STORAGE_PROVIDERS,
   ANY,
 } from './constant.js';
-
-const { getAddress, namehash, isAddress } = utils;
 
 const debug = Debug('validators');
 

@@ -1,3 +1,6 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
 import { TEST_CHAINS, execAsync, getRandomAddress } from './test-utils';
 import {
   setDatasetUniqueName,
@@ -8,6 +11,9 @@ import {
 } from './cli-test-utils';
 
 console.log('Node version:', process.version);
+
+const DEFAULT_TIMEOUT = 120000;
+jest.setTimeout(DEFAULT_TIMEOUT);
 
 const { DRONE } = process.env;
 const iexecPath = DRONE ? 'iexec' : 'node ../../src/cli/cmd/iexec.js';

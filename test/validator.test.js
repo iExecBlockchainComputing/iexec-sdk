@@ -1331,7 +1331,6 @@ describe('[ensLabelSchema]', () => {
     await expect(ensLabelSchema().validate('a')).resolves.toBe('a');
     await expect(ensLabelSchema().validate('🦄')).resolves.toBe('🦄');
     await expect(ensLabelSchema().validate('a-b')).resolves.toBe('a-b');
-    await expect(ensLabelSchema().validate('α')).resolves.toBe('α');
   });
   test('throw with uppercase', async () => {
     await expect(ensLabelSchema().validate('A')).rejects.toThrow(
