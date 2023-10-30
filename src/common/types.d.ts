@@ -1,10 +1,10 @@
-import BNjs from 'bn.js';
+import BN from 'bn.js';
 
 export * from './utils/IExecContractsClient.js';
 export * from './utils/reactive.js';
 export * from './utils/signers.js';
 
-export type BN = BNjs;
+
 
 /**
  * big number like

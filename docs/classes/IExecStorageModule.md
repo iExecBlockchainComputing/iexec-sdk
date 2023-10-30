@@ -31,7 +31,7 @@ module exposing storage methods
 
 ### constructor
 
-• **new IExecStorageModule**(`configOrArgs`, `options?`)
+• **new IExecStorageModule**(`configOrArgs`, `options?`): [`IExecStorageModule`](IExecStorageModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -41,6 +41,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecStorageModule`](IExecStorageModule.md)
 
 #### Inherited from
 
@@ -153,7 +157,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecStorageModule`](IExecStorageModule.md)
+▸ **fromConfig**(`config`): [`IExecStorageModule`](IExecStorageModule.md)
 
 Create an IExecStorageModule instance using an IExecConfig instance
 

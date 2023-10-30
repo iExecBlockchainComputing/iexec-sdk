@@ -1,16 +1,10 @@
-import { BlockTag, Provider } from '@ethersproject/abstract-provider';
-import { Wallet } from '@ethersproject/wallet';
-import { BytesLike } from '@ethersproject/bytes';
-import {
-  ExternallyOwnedAccount,
-  TypedDataDomain,
-  TypedDataField,
-} from '@ethersproject/abstract-signer';
-import { SigningKey } from '@ethersproject/signing-key';
+
+import { Wallet, BlockTag, TypedDataDomain, TypedDataField, SigningKey, Provider } from 'ethers';
+
 
 export class EnhancedWallet extends Wallet {
   constructor(
-    privateKey: BytesLike | ExternallyOwnedAccount | SigningKey,
+    privateKey: string | SigningKey,
     provider?: Provider,
     options?: {
       gasPrice?: string;

@@ -37,7 +37,7 @@ module exposing ENS methods
 
 ### constructor
 
-• **new IExecENSModule**(`configOrArgs`, `options?`)
+• **new IExecENSModule**(`configOrArgs`, `options?`): [`IExecENSModule`](IExecENSModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -47,6 +47,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecENSModule`](IExecENSModule.md)
 
 #### Inherited from
 
@@ -358,7 +362,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecENSModule`](IExecENSModule.md)
+▸ **fromConfig**(`config`): [`IExecENSModule`](IExecENSModule.md)
 
 Create an IExecENSModule instance using an IExecConfig instance
 

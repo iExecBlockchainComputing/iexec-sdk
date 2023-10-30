@@ -30,7 +30,7 @@ module exposing result methods
 
 ### constructor
 
-• **new IExecResultModule**(`configOrArgs`, `options?`)
+• **new IExecResultModule**(`configOrArgs`, `options?`): [`IExecResultModule`](IExecResultModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -40,6 +40,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecResultModule`](IExecResultModule.md)
 
 #### Inherited from
 
@@ -133,7 +137,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecResultModule`](IExecResultModule.md)
+▸ **fromConfig**(`config`): [`IExecResultModule`](IExecResultModule.md)
 
 Create an IExecResultModule instance using an IExecConfig instance
 

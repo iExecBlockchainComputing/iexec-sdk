@@ -26,7 +26,7 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 
 ### constructor
 
-• **new Web3ProviderSendError**(`message`, `originalError`)
+• **new Web3ProviderSendError**(`message`, `originalError`): [`Web3ProviderSendError`](errors.Web3ProviderSendError.md)
 
 #### Parameters
 
@@ -34,6 +34,10 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 | :------ | :------ |
 | `message` | `string` |
 | `originalError` | `Error` |
+
+#### Returns
+
+[`Web3ProviderSendError`](errors.Web3ProviderSendError.md)
 
 #### Inherited from
 

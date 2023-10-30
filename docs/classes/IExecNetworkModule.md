@@ -29,7 +29,7 @@ module exposing network methods
 
 ### constructor
 
-• **new IExecNetworkModule**(`configOrArgs`, `options?`)
+• **new IExecNetworkModule**(`configOrArgs`, `options?`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -39,6 +39,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecNetworkModule`](IExecNetworkModule.md)
 
 #### Inherited from
 
@@ -80,7 +84,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecNetworkModule`](IExecNetworkModule.md)
+▸ **fromConfig**(`config`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
 Create an IExecNetworkModule instance using an IExecConfig instance
 

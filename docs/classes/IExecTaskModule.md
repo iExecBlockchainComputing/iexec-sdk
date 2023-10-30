@@ -32,7 +32,7 @@ module exposing task methods
 
 ### constructor
 
-• **new IExecTaskModule**(`configOrArgs`, `options?`)
+• **new IExecTaskModule**(`configOrArgs`, `options?`): [`IExecTaskModule`](IExecTaskModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -42,6 +42,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecTaskModule`](IExecTaskModule.md)
 
 #### Inherited from
 
@@ -191,7 +195,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecTaskModule`](IExecTaskModule.md)
+▸ **fromConfig**(`config`): [`IExecTaskModule`](IExecTaskModule.md)
 
 Create an IExecTaskModule instance using an IExecConfig instance
 

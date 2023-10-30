@@ -70,7 +70,7 @@ const sources = [
     { dir: '@ensdomains/registry', minifier: minifiers.contract },
   ],
   [
-    '@ensdomains/ens-contracts/artifacts/contracts/registry/ReverseRegistrar.sol/ReverseRegistrar.json',
+    '@ensdomains/ens-contracts/artifacts/contracts/reverseRegistrar/ReverseRegistrar.sol/ReverseRegistrar.json',
     { dir: '@ensdomains/registry', minifier: minifiers.contract },
   ],
   [

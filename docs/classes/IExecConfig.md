@@ -42,7 +42,7 @@ const wallet = IExecWalletModule.fromConfig(config);
 
 ### constructor
 
-• **new IExecConfig**(`args`, `options?`)
+• **new IExecConfig**(`args`, `options?`): [`IExecConfig`](IExecConfig.md)
 
 Create an IExecConfig instance consumable by IExecModules
 
@@ -67,6 +67,10 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 | :------ | :------ |
 | `args` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecConfig`](IExecConfig.md)
 
 ## Methods
 

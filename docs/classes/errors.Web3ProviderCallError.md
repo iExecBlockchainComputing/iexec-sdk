@@ -26,7 +26,7 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 
 ### constructor
 
-• **new Web3ProviderCallError**(`message`, `originalError`)
+• **new Web3ProviderCallError**(`message`, `originalError`): [`Web3ProviderCallError`](errors.Web3ProviderCallError.md)
 
 #### Parameters
 
@@ -34,6 +34,10 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 | :------ | :------ |
 | `message` | `string` |
 | `originalError` | `Error` |
+
+#### Returns
+
+[`Web3ProviderCallError`](errors.Web3ProviderCallError.md)
 
 #### Inherited from
 

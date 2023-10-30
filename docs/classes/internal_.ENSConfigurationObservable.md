@@ -24,7 +24,11 @@
 
 ### constructor
 
-• **new ENSConfigurationObservable**()
+• **new ENSConfigurationObservable**(): [`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)
+
+#### Returns
+
+[`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)
 
 #### Inherited from
 

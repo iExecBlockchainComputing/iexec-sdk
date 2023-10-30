@@ -40,7 +40,7 @@ module exposing wallet methods
 
 ### constructor
 
-• **new IExecWalletModule**(`configOrArgs`, `options?`)
+• **new IExecWalletModule**(`configOrArgs`, `options?`): [`IExecWalletModule`](IExecWalletModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -50,6 +50,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecWalletModule`](IExecWalletModule.md)
 
 #### Inherited from
 
@@ -394,7 +398,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecWalletModule`](IExecWalletModule.md)
+▸ **fromConfig**(`config`): [`IExecWalletModule`](IExecWalletModule.md)
 
 Create an IExecWalletModule instance using an IExecConfig instance
 

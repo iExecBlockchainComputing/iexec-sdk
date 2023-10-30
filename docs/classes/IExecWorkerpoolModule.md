@@ -37,7 +37,7 @@ module exposing workerpool methods
 
 ### constructor
 
-• **new IExecWorkerpoolModule**(`configOrArgs`, `options?`)
+• **new IExecWorkerpoolModule**(`configOrArgs`, `options?`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -47,6 +47,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 #### Inherited from
 
@@ -306,7 +310,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
+▸ **fromConfig**(`config`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 Create an IExecWorkerpoolModule instance using an IExecConfig instance
 
