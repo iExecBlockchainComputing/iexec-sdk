@@ -193,7 +193,6 @@
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "commander": "^10.0.0",
-    "cross-fetch": "^3.1.5",
     "debug": "^4.3.4",
     "ethers": "^6.8.0",
     "fs-extra": "^11.1.0",
