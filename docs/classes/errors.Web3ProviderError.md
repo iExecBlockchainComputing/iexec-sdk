@@ -32,7 +32,7 @@ Web3ProviderError encapsulate an error thrown by the web3 provider.
 
 ### constructor
 
-• **new Web3ProviderError**(`message`, `originalError`)
+• **new Web3ProviderError**(`message`, `originalError`): [`Web3ProviderError`](errors.Web3ProviderError.md)
 
 #### Parameters
 
@@ -40,6 +40,10 @@ Web3ProviderError encapsulate an error thrown by the web3 provider.
 | :------ | :------ |
 | `message` | `string` |
 | `originalError` | `Error` |
+
+#### Returns
+
+[`Web3ProviderError`](errors.Web3ProviderError.md)
 
 #### Overrides
 

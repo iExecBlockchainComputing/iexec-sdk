@@ -24,7 +24,11 @@
 
 ### constructor
 
-• **new BridgeObservable**()
+• **new BridgeObservable**(): [`BridgeObservable`](internal_.BridgeObservable.md)
+
+#### Returns
+
+[`BridgeObservable`](internal_.BridgeObservable.md)
 
 #### Inherited from
 

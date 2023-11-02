@@ -195,7 +195,7 @@ ___
 
 ### parseEth
 
-▸ **parseEth**(`value`, `defaultUnit?`): `BN`
+▸ **parseEth**(`value`, `defaultUnit?`): [`BN`](../classes/utils.BN.md)
 
 parse a string formatted Eht value in wei big number
 
@@ -216,13 +216,13 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Returns
 
-`BN`
+[`BN`](../classes/utils.BN.md)
 
 ___
 
 ### parseRLC
 
-▸ **parseRLC**(`value`, `defaultUnit?`): `BN`
+▸ **parseRLC**(`value`, `defaultUnit?`): [`BN`](../classes/utils.BN.md)
 
 parse a string formatted RLC value in nRLC big number
 
@@ -243,7 +243,7 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Returns
 
-`BN`
+[`BN`](../classes/utils.BN.md)
 
 ___
 

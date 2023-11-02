@@ -36,7 +36,7 @@ module exposing orderbook methods
 
 ### constructor
 
-• **new IExecOrderbookModule**(`configOrArgs`, `options?`)
+• **new IExecOrderbookModule**(`configOrArgs`, `options?`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -46,6 +46,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 #### Inherited from
 
@@ -315,7 +319,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
+▸ **fromConfig**(`config`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 Create an IExecOrderbookModule instance using an IExecConfig instance
 

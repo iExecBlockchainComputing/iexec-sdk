@@ -28,7 +28,11 @@
 
 ### constructor
 
-• **new Observable**()
+• **new Observable**(): [`Observable`](Observable.md)
+
+#### Returns
+
+[`Observable`](Observable.md)
 
 ## Methods
 

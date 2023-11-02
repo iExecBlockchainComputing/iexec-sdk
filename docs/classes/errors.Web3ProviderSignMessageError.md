@@ -26,7 +26,7 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 ### constructor
 
-• **new Web3ProviderSignMessageError**(`message`, `originalError`)
+• **new Web3ProviderSignMessageError**(`message`, `originalError`): [`Web3ProviderSignMessageError`](errors.Web3ProviderSignMessageError.md)
 
 #### Parameters
 
@@ -34,6 +34,10 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 | :------ | :------ |
 | `message` | `string` |
 | `originalError` | `Error` |
+
+#### Returns
+
+[`Web3ProviderSignMessageError`](errors.Web3ProviderSignMessageError.md)
 
 #### Inherited from
 

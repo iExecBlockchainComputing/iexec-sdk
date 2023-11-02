@@ -25,7 +25,7 @@ const generatePackage = async (fileName) => {
 
   // create fallback package for unsupported exports map cases
   await fsPromises
-    .rmdir(dirName, { recursive: true, force: true })
+    .rm(dirName, { recursive: true, force: true })
     .catch(() => {});
   await fsPromises.mkdir(dirName, { recursive: true });
   await fsPromises.writeFile(

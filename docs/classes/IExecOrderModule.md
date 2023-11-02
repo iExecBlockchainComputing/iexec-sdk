@@ -61,7 +61,7 @@ module exposing order methods
 
 ### constructor
 
-• **new IExecOrderModule**(`configOrArgs`, `options?`)
+• **new IExecOrderModule**(`configOrArgs`, `options?`): [`IExecOrderModule`](IExecOrderModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -71,6 +71,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecOrderModule`](IExecOrderModule.md)
 
 #### Inherited from
 
@@ -1020,7 +1024,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecOrderModule`](IExecOrderModule.md)
+▸ **fromConfig**(`config`): [`IExecOrderModule`](IExecOrderModule.md)
 
 Create an IExecOrderModule instance using an IExecConfig instance
 

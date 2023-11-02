@@ -10,7 +10,7 @@ trigger:
 
 steps:
   - name: test
-    image: node:14
+    image: node:18
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -22,7 +22,6 @@ steps:
     commands:
       - apt update
       - apt install xxd
-      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
@@ -52,8 +51,8 @@ steps:
     depends_on:
       - test
 
-  - name: test node 16
-    image: node:16
+  - name: test node 20
+    image: node:20
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -76,40 +75,6 @@ steps:
         - tag
     depends_on:
       - test
-      - code analysis
-      - token-chain
-      - native-chain
-      - token-chain
-      - token-sms-scone
-      - token-sms-gramine
-      - token-gateway
-      - token-watcher
-      - token-result-proxy
-
-  - name: test node 18
-    image: node:18
-    pull: always
-    environment:
-      ALCHEMY_API_KEY:
-        from_secret: alchemy_api_key
-      INFURA_PROJECT_ID:
-        from_secret: infura_project_id
-      ETHERSCAN_API_KEY:
-        from_secret: etherscan_api_key
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      event:
-        - tag
-    depends_on:
-      - test node 16
       - code analysis
       - token-chain
       - native-chain

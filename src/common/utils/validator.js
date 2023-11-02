@@ -735,7 +735,7 @@ export const ensDomainSchema = () =>
     .test(
       'no-empty-label',
       '${originalValue} is not a valid ENS domain (domain cannot have empty labels)',
-      async (value) => {
+      (value) => {
         try {
           const nameArray = value.split('.');
           const hasEmptyLabels =

@@ -24,7 +24,11 @@
 
 ### constructor
 
-• **new TaskObservable**()
+• **new TaskObservable**(): [`TaskObservable`](internal_.TaskObservable.md)
+
+#### Returns
+
+[`TaskObservable`](internal_.TaskObservable.md)
 
 #### Inherited from
 

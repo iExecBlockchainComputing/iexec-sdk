@@ -58,7 +58,7 @@ module base
 
 ### constructor
 
-• **new IExecModule**(`configOrArgs`, `options?`)
+• **new IExecModule**(`configOrArgs`, `options?`): [`IExecModule`](IExecModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -68,6 +68,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecModule`](IExecModule.md)
 
 ## Properties
 
@@ -81,7 +85,7 @@ current IExecConfig
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
+▸ **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
 
 Create an IExecModule instance using an IExecConfig instance
 

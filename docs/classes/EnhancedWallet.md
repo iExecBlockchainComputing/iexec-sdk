@@ -22,17 +22,21 @@
 
 ### constructor
 
-• **new EnhancedWallet**(`privateKey`, `provider?`, `options?`)
+• **new EnhancedWallet**(`privateKey`, `provider?`, `options?`): [`EnhancedWallet`](EnhancedWallet.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `privateKey` | `BytesLike` \| `ExternallyOwnedAccount` \| `SigningKey` |
+| `privateKey` | `string` \| `SigningKey` |
 | `provider?` | `Provider` |
 | `options?` | `Object` |
 | `options.gasPrice?` | `string` |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> |
+
+#### Returns
+
+[`EnhancedWallet`](EnhancedWallet.md)
 
 #### Overrides
 
@@ -55,3 +59,7 @@ Wallet.constructor
 #### Returns
 
 `Promise`<`string`\>
+
+#### Overrides
+
+Wallet.signTypedData

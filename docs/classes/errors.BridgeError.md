@@ -27,13 +27,17 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 ### constructor
 
-• **new BridgeError**(`message?`)
+• **new BridgeError**(`message?`): [`BridgeError`](errors.BridgeError.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `message?` | `string` |
+
+#### Returns
+
+[`BridgeError`](errors.BridgeError.md)
 
 #### Inherited from
 

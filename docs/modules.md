@@ -44,7 +44,6 @@
 
 - [Address](modules.md#address)
 - [Addressish](modules.md#addressish)
-- [BN](modules.md#bn)
 - [BNish](modules.md#bnish)
 - [Bytes](modules.md#bytes)
 - [Bytes32](modules.md#bytes32)
@@ -84,15 +83,9 @@ ethereum address or ENS
 
 ___
 
-### BN
-
-Ƭ **BN**: `BNjs`
-
-___
-
 ### BNish
 
-Ƭ **BNish**: [`BN`](modules.md#bn) \| `bigint` \| `string` \| `number`
+Ƭ **BNish**: `BN` \| `bigint` \| `string` \| `number`
 
 big number like
 
@@ -174,7 +167,7 @@ ___
 
 ### NRLCAmount
 
-Ƭ **NRLCAmount**: `number` \| `string` \| [`BN`](modules.md#bn)
+Ƭ **NRLCAmount**: `number` \| `string` \| `BN`
 
 nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
 
@@ -253,7 +246,7 @@ ___
 
 ### WeiAmount
 
-Ƭ **WeiAmount**: `number` \| `string` \| [`BN`](modules.md#bn)
+Ƭ **WeiAmount**: `number` \| `string` \| `BN`
 
 wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,000,000,000 wei).
 
