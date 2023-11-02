@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.5.0] 2023-11-02
+
+### Changed
+
+- upgraded to `ethers@6`, this upgrade is internal and should not change the way developers interact with `iexec`
+- updated dependencies
+- [BREAKING] drop support for node 16
+
 ## [8.4.0] 2023-10-03
 
 ### Added
