@@ -24,7 +24,11 @@
 
 ### constructor
 
-• **new DealObservable**()
+• **new DealObservable**(): [`DealObservable`](internal_.DealObservable.md)
+
+#### Returns
+
+[`DealObservable`](internal_.DealObservable.md)
 
 #### Inherited from
 

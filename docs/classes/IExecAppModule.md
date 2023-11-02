@@ -37,7 +37,7 @@ module exposing app methods
 
 ### constructor
 
-• **new IExecAppModule**(`configOrArgs`, `options?`)
+• **new IExecAppModule**(`configOrArgs`, `options?`): [`IExecAppModule`](IExecAppModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -47,6 +47,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecAppModule`](IExecAppModule.md)
 
 #### Inherited from
 
@@ -318,7 +322,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecAppModule`](IExecAppModule.md)
+▸ **fromConfig**(`config`): [`IExecAppModule`](IExecAppModule.md)
 
 Create an IExecAppModule instance using an IExecConfig instance
 

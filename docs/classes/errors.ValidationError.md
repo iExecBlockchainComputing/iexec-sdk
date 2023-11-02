@@ -22,7 +22,7 @@ ValidationError is thrown when a method is called with missing or unexpected par
 
 ### constructor
 
-• **new ValidationError**(`errorOrErrors`, `value?`, `field?`, `type?`)
+• **new ValidationError**(`errorOrErrors`, `value?`, `field?`, `type?`, `disableStack?`): [`ValidationError`](errors.ValidationError.md)
 
 #### Parameters
 
@@ -32,6 +32,11 @@ ValidationError is thrown when a method is called with missing or unexpected par
 | `value?` | `any` |
 | `field?` | `string` |
 | `type?` | `string` |
+| `disableStack?` | `boolean` |
+
+#### Returns
+
+[`ValidationError`](errors.ValidationError.md)
 
 #### Inherited from
 

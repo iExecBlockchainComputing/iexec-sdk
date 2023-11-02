@@ -2,7 +2,7 @@ import Debug from 'debug';
 import BN from 'bn.js';
 import { Contract } from 'ethers';
 import {
-  ethersBnToBn,
+  bigIntToBn,
   truncateBnWeiToBnNRlc,
   bnNRlcToBnWei,
   formatRLC,
@@ -112,18 +112,18 @@ export const obsBridgeToSidechain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: ethersBnToBn(minPerTx),
-          maxPerTx: ethersBnToBn(maxPerTx),
-          dailyLimit: ethersBnToBn(dailyLimit),
+          minPerTx: bigIntToBn(minPerTx),
+          maxPerTx: bigIntToBn(maxPerTx),
+          dailyLimit: bigIntToBn(dailyLimit),
         });
-        if (new BN(vAmount).lt(ethersBnToBn(minPerTx))) {
+        if (new BN(vAmount).lt(bigIntToBn(minPerTx))) {
           throw Error(
             `Minimum amount allowed to bridge is ${formatRLC(
               minPerTx.toString(),
             )} RLC`,
           );
         }
-        if (new BN(vAmount).gt(ethersBnToBn(maxPerTx))) {
+        if (new BN(vAmount).gt(bigIntToBn(maxPerTx))) {
           throw Error(
             `Maximum amount allowed to bridge is ${formatRLC(
               maxPerTx.toString(),
@@ -168,7 +168,7 @@ export const obsBridgeToSidechain = (
             const parsedLog = erc20Interface.parseLog(logs[0]);
             if (parsedLog.args.to === vBridgeAddress) {
               totalSpentPerDay = totalSpentPerDay.add(
-                ethersBnToBn(parsedLog.args.value),
+                bigIntToBn(parsedLog.args.value),
               );
             }
           }
@@ -179,7 +179,7 @@ export const obsBridgeToSidechain = (
         if (abort) return;
         await processTransferLogs(transferLogs);
         if (abort) return;
-        const withinLimit = totalSpentPerDay.lt(ethersBnToBn(dailyLimit));
+        const withinLimit = totalSpentPerDay.lt(bigIntToBn(dailyLimit));
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_LIMIT_CHECKED,
@@ -367,21 +367,21 @@ export const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_POLICY_CHECKED,
-          minPerTx: ethersBnToBn(minPerTx),
-          maxPerTx: ethersBnToBn(maxPerTx),
-          dailyLimit: ethersBnToBn(dailyLimit),
+          minPerTx: bigIntToBn(minPerTx),
+          maxPerTx: bigIntToBn(maxPerTx),
+          dailyLimit: bigIntToBn(dailyLimit),
         });
-        if (bnWeiValue.lt(ethersBnToBn(minPerTx))) {
+        if (bnWeiValue.lt(bigIntToBn(minPerTx))) {
           throw Error(
             `Minimum amount allowed to bridge is ${formatRLC(
-              truncateBnWeiToBnNRlc(ethersBnToBn(minPerTx)),
+              truncateBnWeiToBnNRlc(bigIntToBn(minPerTx)),
             )} RLC`,
           );
         }
-        if (bnWeiValue.gt(ethersBnToBn(maxPerTx))) {
+        if (bnWeiValue.gt(bigIntToBn(maxPerTx))) {
           throw Error(
             `Maximum amount allowed to bridge is ${formatRLC(
-              truncateBnWeiToBnNRlc(ethersBnToBn(maxPerTx)),
+              truncateBnWeiToBnNRlc(bigIntToBn(maxPerTx)),
             )} RLC`,
           );
         }
@@ -404,14 +404,14 @@ export const obsBridgeToMainchain = (
         if (abort) return;
         safeObserver.next({
           message: obsBridgeMessages.BRIDGE_LIMIT_CHECKED,
-          totalSpentPerDay: ethersBnToBn(totalSpentPerDay),
+          totalSpentPerDay: bigIntToBn(totalSpentPerDay),
         });
         if (!withinLimit) {
           throw Error(
             `Amount to bridge would exceed bridge daily limit. ${formatRLC(
-              truncateBnWeiToBnNRlc(ethersBnToBn(totalSpentPerDay)),
+              truncateBnWeiToBnNRlc(bigIntToBn(totalSpentPerDay)),
             )}/${formatRLC(
-              truncateBnWeiToBnNRlc(ethersBnToBn(dailyLimit)),
+              truncateBnWeiToBnNRlc(bigIntToBn(dailyLimit)),
             )} RLC already bridged today`,
           );
         }

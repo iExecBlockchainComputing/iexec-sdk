@@ -37,7 +37,7 @@ module exposing deal methods
 
 ### constructor
 
-• **new IExecDealModule**(`configOrArgs`, `options?`)
+• **new IExecDealModule**(`configOrArgs`, `options?`): [`IExecDealModule`](IExecDealModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -47,6 +47,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecDealModule`](IExecDealModule.md)
 
 #### Inherited from
 
@@ -336,7 +340,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecDealModule`](IExecDealModule.md)
+▸ **fromConfig**(`config`): [`IExecDealModule`](IExecDealModule.md)
 
 Create an IExecDealModule instance using an IExecConfig instance
 

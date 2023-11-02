@@ -10,7 +10,7 @@ trigger:
 
 steps:
   - name: test
-    image: node:14
+    image: node:18
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -22,7 +22,6 @@ steps:
     commands:
       - apt update
       - apt install xxd
-      - npm i -g npm@8
       - node -v
       - npm -v
       - npm ci
@@ -32,8 +31,7 @@ steps:
     depends_on:
       - token-chain
       - native-chain
-      - token-chain-1s
-      - token-chain-openethereum
+      - token-chain
       - token-sms-scone
       - token-sms-gramine
       - token-gateway
@@ -53,8 +51,8 @@ steps:
     depends_on:
       - test
 
-  - name: test node 16
-    image: node:16
+  - name: test node 20
+    image: node:20
     pull: always
     environment:
       ALCHEMY_API_KEY:
@@ -80,43 +78,7 @@ steps:
       - code analysis
       - token-chain
       - native-chain
-      - token-chain-1s
-      - token-chain-openethereum
-      - token-sms-scone
-      - token-sms-gramine
-      - token-gateway
-      - token-watcher
-      - token-result-proxy
-
-  - name: test node 18
-    image: node:18
-    pull: always
-    environment:
-      ALCHEMY_API_KEY:
-        from_secret: alchemy_api_key
-      INFURA_PROJECT_ID:
-        from_secret: infura_project_id
-      ETHERSCAN_API_KEY:
-        from_secret: etherscan_api_key
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-      - npm -g install .
-      - npm test
-    when:
-      event:
-        - tag
-    depends_on:
-      - test node 16
-      - code analysis
       - token-chain
-      - native-chain
-      - token-chain-1s
-      - token-chain-openethereum
       - token-sms-scone
       - token-sms-gramine
       - token-gateway
@@ -125,21 +87,11 @@ steps:
 
 services:
   - name: token-chain
-    image: iexechub/poco-chaintest:5.3.2-token
+    image: iexechub/poco-chaintest:5.3.2-token-openethereum
     pull: always
 
   - name: native-chain
-    image: iexechub/poco-chaintest:5.3.2-native
-    pull: always
-
-  - name: token-chain-1s
-    image: iexechub/poco-chaintest:5.3.2-token
-    commands:
-      - node /app/dist/node/cli.js --chain.networkId 65535 --chain.chainId 65535 --chain.hardfork london --database.dbPath /ganachedb --miner.blockTime 1
-    pull: always
-
-  - name: token-chain-openethereum
-    image: iexechub/poco-chaintest:5.3.2-token-openethereum
+    image: iexechub/poco-chaintest:5.3.2-native-openethereum
     pull: always
 
   - name: token-sms-scone
@@ -150,7 +102,7 @@ services:
       - java -jar /app/iexec-sms.jar
     environment:
       TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain:8545
       IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
       IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
@@ -164,7 +116,7 @@ services:
       IEXEC_SCONE_CAS_HOST: foo
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     depends_on:
-      - token-chain-openethereum
+      - token-chain
 
   - name: token-sms-gramine
     image: iexechub/iexec-sms:7.1.0
@@ -174,7 +126,7 @@ services:
       - java -jar /app/iexec-sms.jar
     environment:
       TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain:8545
       IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
       IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
@@ -188,7 +140,7 @@ services:
       IEXEC_SCONE_CAS_HOST: foo
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     depends_on:
-      - token-chain-openethereum
+      - token-chain
 
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
@@ -207,15 +159,15 @@ services:
       - sleep 10
       - java -Djava.security.egd=file:/dev/./urandom -jar /iexec-result-proxy.jar
     environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://token-chain-openethereum:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://token-chain-openethereum:8545
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://token-chain:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://token-chain:8545
       IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       MONGO_HOST: token-result-proxy-mongo
       MONGO_PORT: 27017
       IEXEC_IPFS_HOST: ipfs
     depends_on:
       - ipfs
-      - token-chain-openethereum
+      - token-chain
       - token-result-proxy-mongo
 
   - name: gateway-mongo
@@ -239,12 +191,12 @@ services:
       CHAIN: DEV
       CHAIN_ID: 65535
       IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      ETH_WS_HOST: ws://token-chain-openethereum:8546
-      ETH_RPC_HOST: http://token-chain-openethereum:8545
+      ETH_WS_HOST: ws://token-chain:8546
+      ETH_RPC_HOST: http://token-chain:8545
       MONGO_HOST: gateway-mongo
       REDIS_HOST: gateway-redis
     depends_on:
-      - token-chain-openethereum
+      - token-chain
       - gateway-mongo
       - gateway-redis
 
@@ -258,7 +210,7 @@ services:
     environment:
       CHAINS: DEV
       DEV_NATIVE: false
-      DEV_ETH_RPC_HOST: http://token-chain-openethereum:8545
+      DEV_ETH_RPC_HOST: http://token-chain:8545
       DEV_CHAIN_ID: 65535
       DEV_IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       MONGO_HOST: gateway-mongo
@@ -267,7 +219,7 @@ services:
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
     depends_on:
-      - token-chain-openethereum
+      - token-chain
       - gateway-mongo
       - gateway-redis
 

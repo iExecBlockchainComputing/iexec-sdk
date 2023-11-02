@@ -1,15 +1,15 @@
-import BNjs from 'bn.js';
+import BN from 'bn.js';
 
 export * from './utils/IExecContractsClient.js';
 export * from './utils/reactive.js';
 export * from './utils/signers.js';
 
-export type BN = BNjs;
+
 
 /**
  * big number like
  */
-export type BNish = BN | string | number;
+export type BNish = BN | bigint | string | number;
 /**
  * ethereum address
  *

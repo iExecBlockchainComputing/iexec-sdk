@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { Contract, utils } from 'ethers';
+import { Contract, namehash } from 'ethers';
 import { abi } from '../generated/@ensdomains/resolvers/PublicResolver.js';
 import {
   throwIfMissing,
@@ -22,7 +22,7 @@ export const readTextRecord = async (
   try {
     const vName = await ensDomainSchema().validate(name);
     const vKey = await textRecordKeySchema().validate(key);
-    const node = utils.namehash(vName);
+    const node = namehash(vName);
     const currentResolver = await wrapCall(
       contracts.provider.getResolver(vName),
     );
@@ -55,7 +55,7 @@ export const setTextRecord = async (
     const vName = await ensDomainSchema().validate(name);
     const vKey = await textRecordKeySchema().validate(key);
     const vValue = await textRecordValueSchema().validate(value);
-    const node = utils.namehash(vName);
+    const node = namehash(vName);
     const currentResolver = await wrapCall(
       contracts.provider.getResolver(vName),
     );

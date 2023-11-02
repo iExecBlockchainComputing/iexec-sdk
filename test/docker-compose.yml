@@ -8,41 +8,23 @@ networks:
 services:
   token-chain:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.2-token'
-    expose:
-      - 8545
-    ports:
-      - 8545:8545
-    networks:
-      - blockchain
-
-  native-chain:
-    restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.2-native'
-    expose:
-      - 8545
-    ports:
-      - 18545:8545
-    networks:
-      - blockchain
-
-  token-chain-1s:
-    restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.2-token'
-    command: '--miner.blockTime 1'
-    ports:
-      - 28545:8545
-    networks:
-      - blockchain
-
-  token-chain-openethereum:
-    restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
     expose:
       - 8545
       - 8546
     ports:
-      - 9545:8545
+      - 18545:8545
+    networks:
+      - blockchain
+
+  native-chain:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:5.3.2-native-openethereum'
+    expose:
+      - 8545
+      - 8546
+    ports:
+      - 28545:8545
     networks:
       - blockchain
 
@@ -51,7 +33,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain:8545
       - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
       - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
@@ -67,7 +49,7 @@ services:
     ports:
       - 13301:13300
     depends_on:
-      - token-chain-openethereum
+      - token-chain
     networks:
       - blockchain
 
@@ -76,7 +58,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain-openethereum:8545
+      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain:8545
       - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
       - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
@@ -92,7 +74,7 @@ services:
     ports:
       - 13302:13300
     depends_on:
-      - token-chain-openethereum
+      - token-chain
     networks:
       - blockchain
 
@@ -100,8 +82,8 @@ services:
     image: iexechub/iexec-result-proxy:7.1.0
     restart: unless-stopped
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain-openethereum:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain-openethereum:8545
+      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain:8545
+      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain:8545
       - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=token-result-proxy-mongo
       - MONGO_PORT=13202
@@ -109,7 +91,7 @@ services:
     ports:
       - 13200:13200
     depends_on:
-      - token-chain-openethereum
+      - token-chain
       - token-result-proxy-mongo
       - ipfs
     networks:
@@ -164,12 +146,12 @@ services:
       - CHAIN=DEV
       - CHAIN_ID=65535
       - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - ETH_WS_HOST=ws://token-chain-openethereum:8546
-      - ETH_RPC_HOST=http://token-chain-openethereum:8545
+      - ETH_WS_HOST=ws://token-chain:8546
+      - ETH_RPC_HOST=http://token-chain:8545
       - MONGO_HOST=gateway-mongo
       - REDIS_HOST=gateway-redis
     depends_on:
-      - token-chain-openethereum
+      - token-chain
       - gateway-redis
       - gateway-mongo
     networks:
@@ -186,7 +168,7 @@ services:
       - DEBUG_COLORS=true
       - CHAINS=DEV
       - DEV_NATIVE=false
-      - DEV_ETH_RPC_HOST=http://token-chain-openethereum:8545
+      - DEV_ETH_RPC_HOST=http://token-chain:8545
       - DEV_CHAIN_ID=65535
       - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
       - MONGO_HOST=gateway-mongo
@@ -195,7 +177,7 @@ services:
       - RATE_LIMIT_PERIOD=60000
       - MAX_OPEN_ORDERS_PER_WALLET=1000
     depends_on:
-      - token-chain-openethereum
+      - token-chain
       - gateway-redis
       - gateway-mongo
     networks:

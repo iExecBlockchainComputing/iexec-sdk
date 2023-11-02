@@ -32,7 +32,7 @@ module exposing account methods
 
 ### constructor
 
-• **new IExecAccountModule**(`configOrArgs`, `options?`)
+• **new IExecAccountModule**(`configOrArgs`, `options?`): [`IExecAccountModule`](IExecAccountModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -42,6 +42,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecAccountModule`](IExecAccountModule.md)
 
 #### Inherited from
 
@@ -166,7 +170,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecAccountModule`](IExecAccountModule.md)
+▸ **fromConfig**(`config`): [`IExecAccountModule`](IExecAccountModule.md)
 
 Create an IExecAccountModule instance using an IExecConfig instance
 

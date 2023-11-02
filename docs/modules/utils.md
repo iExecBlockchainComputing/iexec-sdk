@@ -183,7 +183,7 @@ const iexec = new IExec({ ethProvider });
 | `host` | `string` | node RPC url |
 | `privateKey` | `string` | wallet private key |
 | `options?` | `Object` | - |
-| `options.gasPrice?` | `string` | gas price override |
+| `options.gasPrice?` | `string` \| `number` \| `bigint` | gas price override |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
 | `options.providers` | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options |
 
@@ -195,7 +195,7 @@ ___
 
 ### parseEth
 
-▸ **parseEth**(`value`, `defaultUnit?`): `BN`
+▸ **parseEth**(`value`, `defaultUnit?`): [`BN`](../classes/utils.BN.md)
 
 parse a string formatted Eht value in wei big number
 
@@ -216,13 +216,13 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Returns
 
-`BN`
+[`BN`](../classes/utils.BN.md)
 
 ___
 
 ### parseRLC
 
-▸ **parseRLC**(`value`, `defaultUnit?`): `BN`
+▸ **parseRLC**(`value`, `defaultUnit?`): [`BN`](../classes/utils.BN.md)
 
 parse a string formatted RLC value in nRLC big number
 
@@ -243,7 +243,7 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Returns
 
-`BN`
+[`BN`](../classes/utils.BN.md)
 
 ___
 

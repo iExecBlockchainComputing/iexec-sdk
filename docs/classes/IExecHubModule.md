@@ -32,7 +32,7 @@ module exposing hub methods
 
 ### constructor
 
-• **new IExecHubModule**(`configOrArgs`, `options?`)
+• **new IExecHubModule**(`configOrArgs`, `options?`): [`IExecHubModule`](IExecHubModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -42,6 +42,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecHubModule`](IExecHubModule.md)
 
 #### Inherited from
 
@@ -158,7 +162,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecHubModule`](IExecHubModule.md)
+▸ **fromConfig**(`config`): [`IExecHubModule`](IExecHubModule.md)
 
 Create an IExecHubModule instance using an IExecConfig instance
 

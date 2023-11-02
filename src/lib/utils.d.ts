@@ -1,8 +1,7 @@
-import { BlockTag } from '@ethersproject/abstract-provider';
+import { BlockTag } from 'ethers';
 import BNJS from 'bn.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import {
-  BN as BNtype,
   WeiAmount,
   NRLCAmount,
   HumanSingleTag,
@@ -32,7 +31,7 @@ export const getSignerFromPrivateKey: (
     /**
      * gas price override
      */
-    gasPrice?: string;
+    gasPrice?: bigint | number | string;
     /**
      * nonce override
      */
@@ -77,7 +76,7 @@ export const NULL_BYTES32: string;
  * console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
  * ```
  */
-export const parseEth: (value: string, defaultUnit?: string) => BNtype;
+export const parseEth: (value: string, defaultUnit?: string) => BN;
 /**
  * parse a string formatted RLC value in nRLC big number
  *
@@ -89,7 +88,7 @@ export const parseEth: (value: string, defaultUnit?: string) => BNtype;
  * console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
  * ```
  */
-export const parseRLC: (value: string, defaultUnit?: string) => BNtype;
+export const parseRLC: (value: string, defaultUnit?: string) => BN;
 /**
  * format a wei amount in Eth
  *

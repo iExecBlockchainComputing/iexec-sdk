@@ -30,7 +30,7 @@ module exposing secrets methods
 
 ### constructor
 
-• **new IExecSecretsModule**(`configOrArgs`, `options?`)
+• **new IExecSecretsModule**(`configOrArgs`, `options?`): [`IExecSecretsModule`](IExecSecretsModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -40,6 +40,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecSecretsModule`](IExecSecretsModule.md)
 
 #### Inherited from
 
@@ -121,7 +125,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecSecretsModule`](IExecSecretsModule.md)
+▸ **fromConfig**(`config`): [`IExecSecretsModule`](IExecSecretsModule.md)
 
 Create an IExecSecretsModule instance using an IExecConfig instance
 

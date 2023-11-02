@@ -2,7 +2,7 @@ import Debug from 'debug';
 import { NULL_ADDRESS, NULL_BYTES32 } from '../utils/constant.js';
 import { ObjectNotFoundError } from '../utils/errors.js';
 import { wrapCall } from '../utils/errorWrappers.js';
-import { bnifyNestedEthersBn, cleanRPC } from '../utils/utils.js';
+import { formatEthersResult } from '../utils/utils.js';
 import { throwIfMissing, bytes32Schema } from '../utils/validator.js';
 
 const debug = Debug('iexec:execution:common');
@@ -15,9 +15,8 @@ export const viewDeal = async (
     const vDealid = await bytes32Schema().validate(dealid);
     const { chainId } = contracts;
     const iexecContract = contracts.getIExecContract();
-    const deal = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewDeal(vDealid))),
-    );
+    const viewDealResult = await wrapCall(iexecContract.viewDeal(vDealid));
+    const deal = formatEthersResult(viewDealResult);
     const dealExists =
       deal && deal.app && deal.app.pointer && deal.app.pointer !== NULL_ADDRESS;
     if (!dealExists) {
@@ -39,9 +38,11 @@ export const viewTask = async (
     const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
     const iexecContract = contracts.getIExecContract();
-    const task = bnifyNestedEthersBn(
-      cleanRPC(await wrapCall(iexecContract.viewTask(vTaskId))),
+    const task = formatEthersResult(
+      await wrapCall(iexecContract.viewTask(vTaskId)),
     );
+    // cast BN to number to keep view task interface
+    task.status = task.status.toNumber();
     if (task.dealid === NULL_BYTES32 && strict) {
       throw new ObjectNotFoundError('task', vTaskId, chainId);
     }

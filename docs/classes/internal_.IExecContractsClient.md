@@ -36,7 +36,7 @@
 
 ### constructor
 
-• **new IExecContractsClient**(`args`)
+• **new IExecContractsClient**(`args`): [`IExecContractsClient`](internal_.IExecContractsClient.md)
 
 Create a client for IExec contracts
 
@@ -53,6 +53,10 @@ Create a client for IExec contracts
 | `args.provider` | `Provider` | ethers Provider |
 | `args.signer?` | `Signer` | ethers Signer, required to sign transactions and messages |
 | `args.useGas?` | `boolean` | if false set the gasPrice to 0 (default true) |
+
+#### Returns
+
+[`IExecContractsClient`](internal_.IExecContractsClient.md)
 
 ## Properties
 
@@ -130,7 +134,7 @@ transaction options
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `gasPrice?` | `string` | gasPrice override |
+| `gasPrice?` | `bigint` | gasPrice override |
 
 ## Methods
 
@@ -190,7 +194,7 @@ ___
 
 ### fetchTokenContract
 
-▸ `Optional` **fetchTokenContract**(`resourceName`): `Promise`<`Contract`\>
+▸ **fetchTokenContract**(`resourceName`): `Promise`<`Contract`\>
 
 fetch the IExec token Contract instance, not available when isNative is true
 

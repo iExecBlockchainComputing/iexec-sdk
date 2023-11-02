@@ -3,7 +3,6 @@ import { Option } from 'commander';
 import Ora from 'ora';
 import inquirer from 'inquirer';
 import { render } from 'prettyjson';
-import BN from 'bn.js';
 import { isAbsolute, join } from 'path';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
@@ -836,12 +835,10 @@ export const computeTxOptions = async (opts) => {
   let confirms;
   if (opts.gasPrice) {
     debug('opts.gasPrice', opts.gasPrice);
-    const bnGasPrice = new BN(
-      await weiAmountSchema({ defaultUnit: 'wei' })
-        .label('gas-price')
-        .validate(opts.gasPrice),
-    );
-    gasPrice = '0x'.concat(bnGasPrice.toString('hex'));
+    const stringGasPrice = await weiAmountSchema({ defaultUnit: 'wei' })
+      .label('gas-price')
+      .validate(opts.gasPrice);
+    gasPrice = BigInt(stringGasPrice);
   }
   debug('gasPrice', gasPrice);
   if (opts.confirms !== undefined) {
@@ -853,7 +850,6 @@ export const computeTxOptions = async (opts) => {
       });
   }
   debug('confirms', confirms);
-
   return { gasPrice, confirms };
 };
 

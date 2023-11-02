@@ -7,11 +7,12 @@ const debug = Debug('iexec:ens:registry');
 
 export const getEnsRegistryAddress = async (contracts = throwIfMissing()) => {
   try {
-    const { ensAddress } = await wrapCall(contracts.provider.getNetwork());
-    if (!ensAddress) {
+    const network = await wrapCall(contracts.provider.getNetwork());
+    const ensPlugin = network.getPlugin('org.ethers.plugins.network.Ens');
+    if (!ensPlugin || !ensPlugin.address) {
       throw new ConfigurationError('Network does not support ENS');
     }
-    return ensAddress;
+    return ensPlugin.address;
   } catch (e) {
     debug('getEnsRegistryAddress()', e);
     throw e;

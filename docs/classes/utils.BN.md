@@ -32,7 +32,7 @@ const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
 
 ### constructor
 
-• **new BN**(`number`, `base?`, `endian?`)
+• **new BN**(`number`, `base?`, `endian?`): [`BN`](utils.BN.md)
 
 #### Parameters
 
@@ -42,11 +42,15 @@ const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
 | `base?` | `number` \| ``"hex"`` |
 | `endian?` | `Endianness` |
 
+#### Returns
+
+[`BN`](utils.BN.md)
+
 #### Inherited from
 
 BNJS.constructor
 
-• **new BN**(`number`, `endian?`)
+• **new BN**(`number`, `endian?`): [`BN`](utils.BN.md)
 
 #### Parameters
 
@@ -54,6 +58,10 @@ BNJS.constructor
 | :------ | :------ |
 | `number` | `string` \| `number` \| `BN` \| `Buffer` \| `Uint8Array` \| `number`[] |
 | `endian?` | `Endianness` |
+
+#### Returns
+
+[`BN`](utils.BN.md)
 
 #### Inherited from
 

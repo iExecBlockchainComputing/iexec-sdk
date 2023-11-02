@@ -22,13 +22,17 @@ ValidationError is thrown when the current configuration does not allow to perfo
 
 ### constructor
 
-• **new ConfigurationError**(`message?`)
+• **new ConfigurationError**(`message?`): [`ConfigurationError`](errors.ConfigurationError.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `message?` | `string` |
+
+#### Returns
+
+[`ConfigurationError`](errors.ConfigurationError.md)
 
 #### Inherited from
 

@@ -28,7 +28,7 @@ ObjectNotFoundError is thrown when trying to access an unknown resource.
 
 ### constructor
 
-• **new ObjectNotFoundError**(`objName`, `objId`, `chainId`)
+• **new ObjectNotFoundError**(`objName`, `objId`, `chainId`): [`ObjectNotFoundError`](errors.ObjectNotFoundError.md)
 
 #### Parameters
 
@@ -37,6 +37,10 @@ ObjectNotFoundError is thrown when trying to access an unknown resource.
 | `objName` | `string` |
 | `objId` | `string` |
 | `chainId` | `string` |
+
+#### Returns
+
+[`ObjectNotFoundError`](errors.ObjectNotFoundError.md)
 
 #### Overrides
 

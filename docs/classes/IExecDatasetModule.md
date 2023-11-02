@@ -40,7 +40,7 @@ module exposing dataset methods
 
 ### constructor
 
-• **new IExecDatasetModule**(`configOrArgs`, `options?`)
+• **new IExecDatasetModule**(`configOrArgs`, `options?`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -50,6 +50,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExecDatasetModule`](IExecDatasetModule.md)
 
 #### Inherited from
 
@@ -407,7 +411,7 @@ ___
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExecDatasetModule`](IExecDatasetModule.md)
+▸ **fromConfig**(`config`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
 Create an IExecDatasetModule instance using an IExecConfig instance
 

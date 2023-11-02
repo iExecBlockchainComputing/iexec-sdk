@@ -43,7 +43,7 @@ module exposing all the iExec SDK modules
 
 ### constructor
 
-• **new IExec**(`configOrArgs`, `options?`)
+• **new IExec**(`configOrArgs`, `options?`): [`IExec`](IExec.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -53,6 +53,10 @@ Create an IExecModule instance using an IExecConfig like
 | :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
 | `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+
+#### Returns
+
+[`IExec`](IExec.md)
 
 #### Inherited from
 
@@ -194,7 +198,7 @@ workerpool module
 
 ### fromConfig
 
-▸ `Static` **fromConfig**(`config`): [`IExec`](IExec.md)
+▸ **fromConfig**(`config`): [`IExec`](IExec.md)
 
 Create an IExec instance using an IExecConfig instance
 
