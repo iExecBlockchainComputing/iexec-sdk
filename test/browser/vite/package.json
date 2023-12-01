@@ -11,6 +11,6 @@
     "iexec": "file:../../.."
   },
   "devDependencies": {
-    "vite": "^4.1.0"
+    "vite": "^5.0.4"
   }
 }
