@@ -1,6 +1,7 @@
 import IExec from 'iexec/IExec';
 import * as utils from 'iexec/utils';
 
+const iexecSdkVersion = document.getElementById('iexec-sdk-version');
 const networkOutput = document.getElementById('network');
 const addressOutput = document.getElementById('address');
 const rlcWalletOutput = document.getElementById('rlc-wallet');
@@ -656,6 +657,9 @@ const init = async () => {
     const iexec = new IExec({
       ethProvider,
     });
+    if (iexec.version) {
+      iexecSdkVersion.innerText = `iexec v${iexec.version}`;
+    }
 
     const { chainId } = await iexec.network.getNetwork();
     networkOutput.innerText = chainId;
