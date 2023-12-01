@@ -652,7 +652,7 @@ const init = async () => {
       throw Error('Missing window.ethereum');
     }
 
-    await ethProvider.enable();
+    await ethProvider.request({ method: "eth_requestAccounts" });
 
     const iexec = new IExec({
       ethProvider,
