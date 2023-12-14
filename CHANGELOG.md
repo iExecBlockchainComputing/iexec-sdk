@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.5.1] 2023-12-14
+
+### Changed
+
+- Fix regression causing browser providers (metamask) to prompt unlock screen on IExec instantiation
+
 ## [8.5.0] 2023-11-02
 
 ### Changed
