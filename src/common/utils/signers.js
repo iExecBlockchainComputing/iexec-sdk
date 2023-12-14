@@ -1,4 +1,4 @@
-import { Wallet } from 'ethers';
+import { Wallet, BrowserProvider, AbstractSigner } from 'ethers';
 import { getReadOnlyProvider } from './providers.js';
 
 export class EnhancedWallet extends Wallet {
@@ -49,6 +49,45 @@ export class EnhancedWallet extends Wallet {
       gasPrice = BigInt(this._options.gasPrice);
     }
     return super.sendTransaction({ gasPrice, ...tx });
+  }
+}
+
+export class BrowserProviderSigner extends AbstractSigner {
+  constructor(...args) {
+    super(new BrowserProvider(...args));
+  }
+
+  getAddress() {
+    return this.provider.getSigner().then((signer) => signer.getAddress());
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  connect() {
+    throw Error('Unsupported');
+  }
+
+  signMessage(message) {
+    return this.provider
+      .getSigner()
+      .then((signer) => signer.signMessage(message));
+  }
+
+  signTypedData(domain, types, value) {
+    return this.provider
+      .getSigner()
+      .then((signer) => signer.signTypedData(domain, types, value));
+  }
+
+  signTransaction(tx) {
+    return this.provider
+      .getSigner()
+      .then((signer) => signer.signTransaction(tx));
+  }
+
+  sendTransaction(tx) {
+    return this.provider
+      .getSigner()
+      .then((signer) => signer.sendTransaction(tx));
   }
 }
 
