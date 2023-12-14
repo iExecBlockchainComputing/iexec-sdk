@@ -2,7 +2,10 @@ import Debug from 'debug';
 import { JsonRpcProvider, BrowserProvider } from 'ethers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { ConfigurationError } from '../common/utils/errors.js';
-import { EnhancedWallet } from '../common/utils/signers.js';
+import {
+  EnhancedWallet,
+  BrowserProviderSigner,
+} from '../common/utils/signers.js';
 import {
   getChainDefaults,
   isEnterpriseEnabled,
@@ -143,12 +146,12 @@ export default class IExecConfig {
           network: networkOverride,
         });
       } else {
-        const browserProvider = new BrowserProvider(
+        const browserSigner = new BrowserProviderSigner(
           ethProvider,
           networkOverride,
         );
-        signer = await browserProvider.getSigner();
-        provider = browserProvider.provider;
+        signer = browserSigner;
+        provider = browserSigner.provider;
       }
       return { provider, signer };
     })();
