@@ -3,6 +3,8 @@
 import { program as cli } from 'commander';
 import Debug from 'debug';
 import { join } from 'path';
+import { Readable } from 'stream';
+import { finished } from 'stream/promises';
 import fsExtra from 'fs-extra';
 import { show, claim, obsTask } from '../../common/execution/task.js';
 import { fetchTaskResults } from '../../common/execution/result.js';
@@ -145,7 +147,7 @@ showTask
             await writeFile(resultPath, result);
           } else {
             const stream = createWriteStream(resultPath);
-            await res.body.pipe(stream);
+            await finished(Readable.fromWeb(res.body).pipe(stream));
           }
         } else {
           spinner.info(
