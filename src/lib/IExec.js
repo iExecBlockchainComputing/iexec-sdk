@@ -1,4 +1,3 @@
-import { version } from '../common/generated/sdk/package.js';
 import IExecModule from './IExecModule.js';
 import IExecAccountModule from './IExecAccountModule.js';
 import IExecAppModule from './IExecAppModule.js';
@@ -20,7 +19,6 @@ export default class IExec extends IExecModule {
   constructor(...args) {
     super(...args);
 
-    this.version = version;
     this.wallet = IExecWalletModule.fromConfig(this.config);
     this.account = IExecAccountModule.fromConfig(this.config);
     this.app = IExecAppModule.fromConfig(this.config);
