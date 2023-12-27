@@ -91,7 +91,7 @@ export const obsBridgeToSidechain = (
           await getAddress(contracts),
         );
         if (balance.lt(new BN(vAmount))) {
-          throw Error('Amount to bridge exceed wallet balance');
+          throw Error('Amount to bridge exceeds wallet balance');
         }
 
         // check bridge policy
@@ -344,7 +344,7 @@ export const obsBridgeToMainchain = (
           await getAddress(contracts),
         );
         if (balance.lt(new BN(vAmount))) {
-          throw Error('Amount to bridge exceed wallet balance');
+          throw Error('Amount to bridge exceeds wallet balance');
         }
         const sidechainBridgeContract = new Contract(
           vBridgeAddress,
