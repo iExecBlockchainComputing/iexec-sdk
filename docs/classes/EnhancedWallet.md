@@ -14,10 +14,6 @@
 
 - [constructor](EnhancedWallet.md#constructor)
 
-### Methods
-
-- [signTypedData](EnhancedWallet.md#signtypeddata)
-
 ## Constructors
 
 ### constructor
@@ -41,25 +37,3 @@
 #### Overrides
 
 Wallet.constructor
-
-## Methods
-
-### signTypedData
-
-▸ **signTypedData**(`domain`, `types`, `value`): `Promise`<`string`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `domain` | `TypedDataDomain` |
-| `types` | `Record`<`string`, `TypedDataField`[]\> |
-| `value` | `Record`<`string`, `any`\> |
-
-#### Returns
-
-`Promise`<`string`\>
-
-#### Overrides
-
-Wallet.signTypedData
