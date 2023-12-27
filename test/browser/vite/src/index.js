@@ -654,6 +654,7 @@ const init = async () => {
 
     await ethProvider.request({ method: "eth_requestAccounts" });
 
+    console.log('Initialize iExec SDK...');
     const iexec = new IExec({
       ethProvider,
     });
@@ -664,7 +665,9 @@ const init = async () => {
     const { chainId } = await iexec.network.getNetwork();
     networkOutput.innerText = chainId;
 
+    console.log('Refresh user wallet...');
     await refreshUser(iexec)();
+    console.log('Check user storage...');
     await checkStorage(iexec)();
 
     accountDepositButton.addEventListener('click', deposit(iexec));
@@ -723,7 +726,7 @@ const init = async () => {
     resultsShowTaskButton.disabled = false;
     resultsDownloadButton.disabled = false;
     resultsDecryptButton.disabled = false;
-    console.log('initialized');
+    console.log('All initialized ✅');
   } catch (e) {
     console.error(e.message);
   }

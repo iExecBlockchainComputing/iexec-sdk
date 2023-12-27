@@ -28,3 +28,6 @@ button {
   padding-left: 10px;
   border-left: 3px solid #fae900;
 }
+#iexec-sdk-version {
+  min-height: 20px; /* Avoid layout shift when version gets defined */
+}
