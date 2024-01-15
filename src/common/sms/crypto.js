@@ -1,6 +1,5 @@
 export async function getCrypto() {
-  let crypto = globalThis.crypto;
-  if (crypto) {
+  if (globalThis.crypto) {
     // Browser and Node >= 20
     return { crypto, CryptoKey };
   }
