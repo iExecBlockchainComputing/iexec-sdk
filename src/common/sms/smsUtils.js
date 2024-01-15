@@ -1,9 +1,13 @@
+import { Buffer } from 'buffer';
+import { getCrypto } from './crypto.js';
+
 export const formatSecretValue = async (secretValue) => {
   if (!secretValue) {
     return '';
   }
 
-  if (globalThis.CryptoKey && secretValue instanceof CryptoKey) {
+  const { CryptoKey } = await getCrypto();
+  if (secretValue instanceof CryptoKey) {
     return await formatCryptoKey(secretValue);
   }
 
@@ -17,15 +21,7 @@ export const formatSecretValue = async (secretValue) => {
   return secretValue;
 };
 
-// Universal base64 encode = works for both Node.js and browsers
-const toBase64 = (string) => {
-  // Prefer to use Buffer.toString('base64') in Node.js
-  if (globalThis.Buffer) {
-    return Buffer.from(string, 'utf8').toString('base64');
-  }
-  // For browsers
-  return btoa(string);
-};
+const toBase64 = (string) => Buffer.from(string, 'utf8').toString('base64');
 
 /**
  * Format Crypto public key for SMS and POST COMPUTE
@@ -34,7 +30,7 @@ const toBase64 = (string) => {
  */
 const formatCryptoKey = async (publicKey) => {
   const publicKeyAsPem = await publicAsPem(publicKey);
-  return btoa(publicKeyAsPem);
+  return toBase64(publicKeyAsPem);
 };
 
 /**
@@ -42,9 +38,12 @@ const formatCryptoKey = async (publicKey) => {
  * @param publicKey CryptoKey (https://developer.mozilla.org/fr/docs/Web/API/CryptoKey)
  */
 const publicAsPem = async (publicKey) => {
+  const { crypto } = await getCrypto();
   const publicKeyAsBuffer = await crypto.subtle.exportKey('spki', publicKey);
 
-  let body = btoa(String.fromCharCode(...new Uint8Array(publicKeyAsBuffer)));
+  let body = toBase64(
+    String.fromCharCode(...new Uint8Array(publicKeyAsBuffer)),
+  );
   body = body.match(/.{1,64}/g).join('\n');
 
   return `-----BEGIN PUBLIC KEY-----\n${body}\n-----END PUBLIC KEY-----`;
