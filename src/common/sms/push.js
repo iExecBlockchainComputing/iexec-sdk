@@ -12,7 +12,6 @@ import {
 import { wrapPersonalSign } from '../utils/errorWrappers.js';
 import { checkSigner } from '../utils/utils.js';
 import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
-import { formatSecretValue } from './smsUtils.js';
 
 const debug = Debug('iexec:sms');
 
@@ -109,10 +108,6 @@ export const pushWeb3Secret = async (
   }
 };
 
-// secretValue can be:
-// - a PEM public key
-// - a PEM public key base64-encoded
-// - a Browser CryptoKey
 export const pushWeb2Secret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
@@ -124,8 +119,7 @@ export const pushWeb2Secret = async (
     checkSigner(contracts);
     const ownerAddress = await getAddress(contracts);
     await stringSchema().validate(secretName, { strict: true });
-    let formattedSecretValue = await formatSecretValue(secretValue);
-    await stringSchema().validate(formattedSecretValue, { strict: true });
+    await stringSchema().validate(secretValue, { strict: true });
     const secretExists = await checkWeb2SecretExists(
       contracts,
       smsURL,
@@ -139,7 +133,7 @@ export const pushWeb2Secret = async (
     const challenge = getChallengeForSetWeb2Secret(
       ownerAddress,
       secretName,
-      formattedSecretValue,
+      secretValue,
     );
     const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
@@ -152,7 +146,7 @@ export const pushWeb2Secret = async (
         ownerAddress,
         secretName,
       },
-      body: formattedSecretValue,
+      body: secretValue,
       headers: {
         Authorization: auth,
       },
