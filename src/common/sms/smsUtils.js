@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import { getCrypto } from './crypto.js';
 
-export const formatSecretValue = async (secretValue) => {
+export const formatEncryptionKey = async (secretValue) => {
   if (!secretValue) {
     return '';
   }

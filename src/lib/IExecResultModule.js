@@ -1,7 +1,7 @@
 import IExecModule from './IExecModule.js';
 import { checkWeb2SecretExists } from '../common/sms/check.js';
 import { pushWeb2Secret } from '../common/sms/push.js';
-import { formatSecretValue } from '../common/sms/smsUtils.js';
+import { formatEncryptionKey } from '../common/sms/smsUtils.js';
 import { getResultEncryptionKeyName } from '../common/utils/secrets-utils.js';
 
 export default class IExecResultModule extends IExecModule {
@@ -26,7 +26,7 @@ export default class IExecResultModule extends IExecModule {
       // - a PEM public key
       // - a PEM public key base64-encoded
       // - a Browser CryptoKey
-      const formattedPublicKey = await formatSecretValue(publicKey);
+      const formattedPublicKey = await formatEncryptionKey(publicKey);
       return pushWeb2Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
