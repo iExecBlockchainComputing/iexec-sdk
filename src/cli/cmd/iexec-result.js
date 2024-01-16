@@ -239,7 +239,8 @@ pushSecret
           publicKeyName(address),
         );
       }
-      const secretToPush = await readFile(secretFilePath, 'utf8');
+      const publicKey = await readFile(secretFilePath, 'utf8');
+      const secretToPush = Buffer.from(publicKey, 'utf8').toString('base64');
       const { isPushed, isUpdated } = await pushWeb2Secret(
         contracts,
         sms,
