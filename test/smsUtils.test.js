@@ -1,15 +1,15 @@
 // @jest/global comes with jest
 import crypto from 'node:crypto';
-import { formatSecretValue } from '../src/common/sms/smsUtils.js';
+import { formatEncryptionKey } from '../src/common/sms/smsUtils.js';
 
-describe('formatSecretValue', function () {
+describe('formatEncryptionKey', function () {
   describe('When secretValue is a base64 string', function () {
     it('should not change it', async function () {
       // --- GIVEN
       const secretValue = 'RG8geW91IGtub3cgaG93IHRvIHJlYWQgYmFzZTY0Pw==';
 
       // --- WHEN
-      const formattedSecretValue = await formatSecretValue(secretValue);
+      const formattedSecretValue = await formatEncryptionKey(secretValue);
 
       // --- THEN
       expect(formattedSecretValue).toBe(secretValue);
@@ -35,7 +35,7 @@ VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
 -----END PUBLIC KEY-----`;
 
       // --- WHEN
-      const formattedSecretValue = await formatSecretValue(secretValue);
+      const formattedSecretValue = await formatEncryptionKey(secretValue);
 
       // --- THEN
       expect(formattedSecretValue).toBe(
@@ -69,7 +69,7 @@ VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
       );
 
       // --- WHEN
-      const formattedSecretValue = await formatSecretValue(keyPair.publicKey);
+      const formattedSecretValue = await formatEncryptionKey(keyPair.publicKey);
 
       // --- THEN
       expect(
