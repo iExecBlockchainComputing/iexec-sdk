@@ -1,10 +1,10 @@
 // @jest/global comes with jest
-import crypto from 'node:crypto';
+import { getCrypto } from '../src/common/sms/crypto.js';
 import { formatEncryptionKey } from '../src/common/sms/smsUtils.js';
 
-describe('formatEncryptionKey', function () {
-  describe('When secretValue is a base64 string', function () {
-    it('should not change it', async function () {
+describe('formatEncryptionKey', () => {
+  describe('When secretValue is a base64 string', () => {
+    it('should not change it', async () => {
       // --- GIVEN
       const secretValue = 'RG8geW91IGtub3cgaG93IHRvIHJlYWQgYmFzZTY0Pw==';
 
@@ -16,8 +16,8 @@ describe('formatEncryptionKey', function () {
     });
   });
 
-  describe('When secretValue is a PEM public key', function () {
-    it('should encode it into base64', async function () {
+  describe('When secretValue is a PEM public key', () => {
+    it('should encode it into base64', async () => {
       // --- GIVEN
       const secretValue = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0gKRKKNCLe1O+A8nRsOc
@@ -44,17 +44,19 @@ VOlIzoTeJjL+SgBZBa+xVC0CAwEAAQ==
     });
   });
 
-  describe('When secretValue is a browser CryptoKey', function () {
-    beforeAll(() => {
+  describe('When secretValue is a browser CryptoKey', () => {
+    beforeAll(async () => {
+      const { crypto, CryptoKey } = await getCrypto();
       Object.defineProperty(globalThis, 'crypto', {
-        value: crypto.webcrypto,
+        value: crypto,
       });
       Object.defineProperty(globalThis, 'CryptoKey', {
-        value: crypto.webcrypto.CryptoKey,
+        value: CryptoKey,
       });
     });
 
-    it('should format it the correct way', async function () {
+    it('should format it the correct way', async () => {
+      const { crypto } = await getCrypto();
       // --- GIVEN
       const isExtractable = true;
       const keyPair = await crypto.subtle.generateKey(
