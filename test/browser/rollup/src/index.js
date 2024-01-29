@@ -1,6 +1,7 @@
 import IExec from 'iexec/IExec';
 import * as utils from 'iexec/utils';
 
+const iexecSdkVersion = document.getElementById('iexec-sdk-version');
 const networkOutput = document.getElementById('network');
 const addressOutput = document.getElementById('address');
 const rlcWalletOutput = document.getElementById('rlc-wallet');
@@ -651,16 +652,22 @@ const init = async () => {
       throw Error('Missing window.ethereum');
     }
 
-    await ethProvider.enable();
+    await ethProvider.request({ method: 'eth_requestAccounts' });
 
+    console.log('Initialize iExec SDK...');
     const iexec = new IExec({
       ethProvider,
     });
+    if (iexec.version) {
+      iexecSdkVersion.innerText = `iexec v${iexec.version}`;
+    }
 
     const { chainId } = await iexec.network.getNetwork();
     networkOutput.innerText = chainId;
 
+    console.log('Refresh user wallet...');
     await refreshUser(iexec)();
+    console.log('Check user storage...');
     await checkStorage(iexec)();
 
     accountDepositButton.addEventListener('click', deposit(iexec));
@@ -719,7 +726,7 @@ const init = async () => {
     resultsShowTaskButton.disabled = false;
     resultsDownloadButton.disabled = false;
     resultsDecryptButton.disabled = false;
-    console.log('initialized');
+    console.log('All initialized ✅');
   } catch (e) {
     console.error(e.message);
   }

@@ -1,8 +1,7 @@
 {
   "name": "parcel",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
+  "private": true,
   "scripts": {
     "start": "parcel serve index.html --open"
   },
@@ -10,7 +9,8 @@
     "iexec": "file:../../.."
   },
   "devDependencies": {
-    "parcel": "^2.8.3"
+    "parcel": "^2.10.3",
+    "process": "^0.11.10"
   },
   "@parcel/resolver-default": {
     "packageExports": true

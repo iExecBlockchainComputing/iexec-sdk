@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.5.2] 2024-01-24
+
+### Added
+
+- expose package `version` in `IExecModule`
+- accept `CryptoKey` in `iexec.result.pushResultEncryptionKey(key)`
+
+### Changed
+
+- fix encryption key formatting issue in `iexec.result.pushResultEncryptionKey(key)`
+
 ## [8.5.1] 2023-12-21
 
 ### Changed

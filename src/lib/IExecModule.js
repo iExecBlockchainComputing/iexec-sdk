@@ -1,3 +1,4 @@
+import { version } from '../common/generated/sdk/package.js';
 import IExecConfig from './IExecConfig.js';
 
 export default class IExecModule {
@@ -10,6 +11,7 @@ export default class IExecModule {
     } else {
       this.config = new IExecConfig(...args);
     }
+    this.version = version;
   }
 
   static fromConfig(config) {
