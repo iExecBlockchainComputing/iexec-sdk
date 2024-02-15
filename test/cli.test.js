@@ -1226,7 +1226,7 @@ describe('[Mainchain]', () => {
       'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
       `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${mainchainDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
       "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'gramine')",
-      'requestorder: Request requirements check failed: Requester storage token is not set for selected provider "ipfs". Result archive upload will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+      `requestorder: Request requirements check failed: Dataset encryption key is not set for dataset ${mainchainDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
     ]);
   });
 
