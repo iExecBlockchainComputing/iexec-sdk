@@ -4780,6 +4780,47 @@ describe('[order]', () => {
     );
   });
 
+  test('order.signRequestorder() preflightCheck dropbox storage', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainInstamineUrl,
+      getRandomWallet().privateKey,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        resultProxyURL,
+        smsURL: smsMap,
+      },
+    );
+    const order = await iexec.order.createRequestorder({
+      app: getRandomAddress(),
+      category: 5,
+      tag: ['tee', 'scone'],
+      params: {
+        iexec_result_storage_provider: 'dropbox',
+      },
+    });
+
+    await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
+      Error(
+        'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
+      ),
+    );
+
+    await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+    const res = await iexec.order.signRequestorder(order);
+    expect(res.salt).toMatch(bytes32Regex);
+    expect(res.sign).toMatch(signRegex);
+    expect(res).toEqual({
+      ...order,
+      ...{ params: JSON.stringify(order.params) },
+      ...{ sign: res.sign, salt: res.salt },
+    });
+  });
+
   test('order.signRequestorder() preflightCheck result encryption', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,

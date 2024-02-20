@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.5.3] 2024-xx-xx
+## Next
 
 ### Changed
 
-- remove storage initialization preflight checks on request orders
+- remove ipfs initialization preflight checks on request orders
 
 ## [8.5.2] 2024-01-24
 
