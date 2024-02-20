@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- remove ipfs initialization preflight checks on request orders
+
 ## [8.5.2] 2024-01-24
 
 ### Added
