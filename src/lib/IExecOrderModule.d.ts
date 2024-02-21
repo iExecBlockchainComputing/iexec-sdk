@@ -549,7 +549,7 @@ export default class IExecOrderModule extends IExecModule {
     params?: RequestorderParams | string;
 
     /**
-     * address of the smart contract for on-chain callback with the execution result.
+     * address of the smart contract for on-chain callback with the execution result
      */
     callback?: Address;
     /**
