@@ -547,6 +547,11 @@ export default class IExecOrderModule extends IExecModule {
      * execution parameters
      */
     params?: RequestorderParams | string;
+
+    /**
+     * address of the smart contract for on-chain callback with the execution result
+     */
+    callback?: Address;
     /**
      * app max price per task
      *
