@@ -67,6 +67,8 @@ export const hexnumberSchema = () =>
 export const uint256Schema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid uint256' });
 
+export const booleanSchema = () => boolean();
+
 const amountErrorMessage = ({ originalValue }) =>
   `${
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue

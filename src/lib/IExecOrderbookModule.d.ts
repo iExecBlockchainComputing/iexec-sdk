@@ -179,6 +179,18 @@ export default class IExecOrderbookModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
+      /**
+       * filters out dataset orders allowing “any” restrict
+       */
+      isDatasetStrict?: boolean;
+      /**
+       * filters out request orders allowing “any” restrict
+       */
+      isRequesterStrict?: boolean;
+      /**
+       * filters out workerpool orders allowing “any” restrict
+       */
+      isWorkerpoolStrict?: boolean;
     },
   ): Promise<PaginableOrders<PublishedApporder>>;
   /**
@@ -228,6 +240,18 @@ export default class IExecOrderbookModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
+      /**
+      * filters out app orders allowing “any” restrict
+      */
+      isAppStrict?: boolean;
+      /**
+      * filters out request orders allowing “any” restrict
+      */
+      isRequesterStrict?: boolean;
+      /**
+      * filters out workerpool orders allowing “any” restrict
+      */
+      isWorkerpoolStrict?: boolean;
     },
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
@@ -287,6 +311,18 @@ export default class IExecOrderbookModule extends IExecModule {
      * size of the page to fetch
      */
     pageSize?: number;
+          /**
+       * filters out dataset orders allowing “any” restrict
+       */
+          isDatasetStrict?: boolean;
+          /**
+           * filters out request orders allowing “any” restrict
+           */
+          isRequesterStrict?: boolean;
+          /**
+           * filters out workerpool orders allowing “any” restrict
+           */
+          isAppStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find the best paying request orders for computing resource.
@@ -345,6 +381,18 @@ export default class IExecOrderbookModule extends IExecModule {
      * size of the page to fetch
      */
     pageSize?: number;
+          /**
+       * filters out dataset orders allowing “any” restrict
+       */
+          isDatasetStrict?: boolean;
+          /**
+           * filters out request orders allowing “any” restrict
+           */
+          isAppStrict?: boolean;
+          /**
+           * filters out workerpool orders allowing “any” restrict
+           */
+          isWorkerpoolStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find a published apporder by orderHash.

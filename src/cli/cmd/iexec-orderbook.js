@@ -38,6 +38,7 @@ orderbookApp
   .option(...option.includeDatasetSpecific())
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
+  .option(...option.isDatasetStrict())
   .description(desc.showObj('app orderbook', 'marketplace'))
   .action(async (app, opts) => {
     await checkUpdate(opts);
@@ -55,6 +56,9 @@ orderbookApp
         maxTag,
         minVolume,
         raw,
+        isDatasetStrict,
+        isWorkerpoolStrict,
+        isRequesterStrict,
       } = opts;
 
       const request = fetchAppOrderbook(
@@ -68,6 +72,9 @@ orderbookApp
           minTag: tag !== undefined ? tag : requireTag,
           maxTag: tag !== undefined ? tag : maxTag,
           minVolume,
+          isDatasetStrict,
+          isWorkerpoolStrict,
+          isRequesterStrict,
         },
       );
       const fetchMessage = info.showing(objName);
@@ -144,6 +151,9 @@ orderbookDataset
   .option(...option.includeAppSpecific())
   .option(...option.includeWorkerpoolSpecific())
   .option(...option.includeRequesterSpecific())
+  .option(...option.isAppStrict())
+  .option(...option.isRequesterStrict())
+  .option(...option.isWorkerpoolStrict())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (dataset, opts) => {
     await checkUpdate(opts);
@@ -161,6 +171,9 @@ orderbookDataset
         maxTag,
         requireTag,
         raw,
+        isAppStrict,
+        isRequesterStrict,
+        isWorkerpoolStrict,
       } = opts;
 
       const request = fetchDatasetOrderbook(
@@ -174,6 +187,9 @@ orderbookDataset
           minTag: tag !== undefined ? tag : requireTag,
           maxTag: tag !== undefined ? tag : maxTag,
           minVolume,
+          isAppStrict,
+          isRequesterStrict,
+          isWorkerpoolStrict,
         },
       );
       const fetchMessage = info.showing(objName);
@@ -252,6 +268,9 @@ orderbookWorkerpool
   .option(...option.includeAppSpecific())
   .option(...option.includeDatasetSpecific())
   .option(...option.includeRequesterSpecific())
+  .option(...option.isDatasetStrict())
+  .option(...option.isAppStrict())
+  .option(...option.isRequesterStrict())
   .description(desc.showObj('workerpools orderbook', 'marketplace'))
   .action(async (workerpool, opts) => {
     await checkUpdate(opts);
@@ -271,6 +290,9 @@ orderbookWorkerpool
         minVolume,
         minTrust,
         raw,
+        isAppStrict,
+        isRequesterStrict,
+        isDatasetStrict,
       } = opts;
 
       const request = fetchWorkerpoolOrderbook(
@@ -286,6 +308,9 @@ orderbookWorkerpool
           app,
           dataset,
           requester,
+          isAppStrict,
+          isRequesterStrict,
+          isDatasetStrict,
         },
       );
       const fetchMessage = info.showing(objName);
@@ -372,6 +397,9 @@ orderbookRequester
   .option(...option.filterDatasetSpecific())
   .option(...option.filterBeneficiarySpecific())
   .option(...option.includeWorkerpoolSpecific())
+  .option(...option.isDatasetStrict())
+  .option(...option.isAppStrict())
+  .option(...option.isWorkerpoolStrict())
   .description(desc.showObj('requesters orderbook', 'marketplace'))
   .action(async (address, opts) => {
     await checkUpdate(opts);
@@ -392,6 +420,9 @@ orderbookRequester
         maxTrust,
         minVolume,
         raw,
+        isAppStrict,
+        isWorkerpoolStrict,
+        isDatasetStrict,
       } = opts;
 
       const request = fetchRequestOrderbook(
@@ -408,6 +439,9 @@ orderbookRequester
           dataset,
           workerpool,
           beneficiary,
+          isAppStrict,
+          isWorkerpoolStrict,
+          isDatasetStrict,
         },
       );
       const fetchMessage = info.showing(objName);
