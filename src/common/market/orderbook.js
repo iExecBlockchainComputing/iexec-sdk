@@ -45,25 +45,19 @@ export const fetchAppOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
-      ...(isDatasetStrict && {
-        isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
-      }),
+      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
-      ...(isWorkerpoolStrict && {
-        isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
-      }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
-      ...(isRequesterStrict && {
-        isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
-      }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
@@ -126,26 +120,20 @@ export const fetchDatasetOrderbook = async (
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
-      ...(isAppStrict && {
-          isAppStrict: await booleanSchema().validate(isAppStrict),
-        }),
+      isAppStrict: await booleanSchema().validate(isAppStrict),
       }),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
-      ...(isWorkerpoolStrict && {
-        isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
-      }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
-      ...(isRequesterStrict && {
-        isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
-      }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
@@ -215,25 +203,19 @@ export const fetchWorkerpoolOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(app),
       }),
-      ...(isAppStrict && {
-        isAppStrict: await booleanSchema().validate(isAppStrict),
-      }),
+      isAppStrict: await booleanSchema().validate(isAppStrict),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
-      ...(isDatasetStrict && {
-        isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
-      }),
+      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
-      ...(isRequesterStrict && {
-        isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
-      }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minTag && {
         minTag: await tagSchema().validate(minTag),
       }),
@@ -292,8 +274,6 @@ export const fetchRequestOrderbook = async (
     minVolume,
     page = 0,
     pageSize = 20,
-    isAppStrict = false,
-    isDatasetStrict = false,
     isWorkerpoolStrict = false,
   } = {},
 ) => {
@@ -316,25 +296,17 @@ export const fetchRequestOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(app),
       }),
-      ...(isAppStrict && {
-        isAppStrict: await booleanSchema().validate(isAppStrict),
-      }),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
-      }),
-      ...(isDatasetStrict && {
-        isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
       }),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
-      ...(isWorkerpoolStrict && {
-        isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
-      }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(minTag !== undefined && {
         minTag: await tagSchema().validate(minTag),
       }),

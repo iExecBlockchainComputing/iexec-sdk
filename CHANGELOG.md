@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 - expose package `version` in `IExecModule`
 - accept `CryptoKey` in `iexec.result.pushResultEncryptionKey(key)`
+- strict mode `isRequesterStrict, isAppStrict, isDatasetStrict, isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook(), fetchAppOrderbook(), fetchDatasetOrderbook(), fetchWorkerpooltOrderbook(),`, defaults to false
 
 ### Changed
 

@@ -180,15 +180,15 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       pageSize?: number;
       /**
-       * filters out dataset orders allowing “any” restrict
+       * filters out orders allowing “any” dataset (default: `false`)
        */
       isDatasetStrict?: boolean;
       /**
-       * filters out request orders allowing “any” restrict
+       * filters out orders allowing “any” requester (default: `false`)
        */
       isRequesterStrict?: boolean;
       /**
-       * filters out workerpool orders allowing “any” restrict
+       * filters out orders allowing “any” workerpool (default: `false`)
        */
       isWorkerpoolStrict?: boolean;
     },
@@ -241,15 +241,15 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       pageSize?: number;
       /**
-      * filters out app orders allowing “any” restrict
+      * filters out orders allowing “any” app (default: `false`)
       */
       isAppStrict?: boolean;
       /**
-      * filters out request orders allowing “any” restrict
+      * filters out orders allowing “any” requester (default: `false`)
       */
       isRequesterStrict?: boolean;
       /**
-      * filters out workerpool orders allowing “any” restrict
+      * filters out orders allowing “any” workerpool (default: `false`)
       */
       isWorkerpoolStrict?: boolean;
     },
@@ -311,18 +311,18 @@ export default class IExecOrderbookModule extends IExecModule {
      * size of the page to fetch
      */
     pageSize?: number;
-          /**
-       * filters out dataset orders allowing “any” restrict
-       */
-          isDatasetStrict?: boolean;
-          /**
-           * filters out request orders allowing “any” restrict
-           */
-          isRequesterStrict?: boolean;
-          /**
-           * filters out workerpool orders allowing “any” restrict
-           */
-          isAppStrict?: boolean;
+    /**
+    * filters out orders allowing “any” dataset (default: `false`)
+    */
+    isDatasetStrict?: boolean;
+    /**
+    * filters out orders allowing “any” requester (default: `false`)
+    */
+    isRequesterStrict?: boolean;
+    /**
+    * filters out orders allowing “any” app (default: `false`)
+    */
+    isAppStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find the best paying request orders for computing resource.
@@ -381,18 +381,10 @@ export default class IExecOrderbookModule extends IExecModule {
      * size of the page to fetch
      */
     pageSize?: number;
-          /**
-       * filters out dataset orders allowing “any” restrict
-       */
-          isDatasetStrict?: boolean;
-          /**
-           * filters out request orders allowing “any” restrict
-           */
-          isAppStrict?: boolean;
-          /**
-           * filters out workerpool orders allowing “any” restrict
-           */
-          isWorkerpoolStrict?: boolean;
+    /**
+    * filters out orders allowing “any” workerpool (default: `false`)
+    */
+    isWorkerpoolStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
    * find a published apporder by orderHash.

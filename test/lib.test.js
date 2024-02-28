@@ -11,7 +11,6 @@ import { execAsync } from './test-utils';
 import { utils, IExec, errors } from '../src/lib';
 import { sleep, bytes32Regex, addressRegex } from '../src/common/utils/utils';
 import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
-import { dataset } from '../src/cli/utils/templates';
 
 const { NULL_ADDRESS } = utils;
 const { readFile, ensureDir, writeFile } = fsExtra;
@@ -7619,7 +7618,7 @@ describe('[orderbook]', () => {
     expect(res7.count >= 32).toBe(true);
   });
 
-  test.only('orderbook.fetchAppOrderbook() strict', async () => {
+  test('orderbook.fetchAppOrderbook() strict', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       RICH_PRIVATE_KEY,
@@ -7652,8 +7651,7 @@ describe('[orderbook]', () => {
       .signApporder(emptyAppOrder)
       .then((o) => iexec.order.publishApporder(o));
     // reset to empty
-    emptyAppOrder.datasetrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyAppOrder.datasetrestrict = NULL_ADDRESS;
 
     // 4: workerpool restricted order
     const workerpoolAddress = getRandomAddress();
@@ -7662,8 +7660,7 @@ describe('[orderbook]', () => {
       .signApporder(emptyAppOrder)
       .then((o) => iexec.order.publishApporder(o));
     // reset to empty
-    emptyAppOrder.workerpoolrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyAppOrder.workerpoolrestrict = NULL_ADDRESS;
 
     // 5: requester restricted order
     const requesterAddress = getRandomAddress();
@@ -7672,8 +7669,7 @@ describe('[orderbook]', () => {
       .signApporder(emptyAppOrder)
       .then((o) => iexec.order.publishApporder(o));
     // reset to empty
-    emptyAppOrder.requesterrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyAppOrder.requesterrestrict = NULL_ADDRESS;
 
     // all orders (1,2,3,4,5)
     const allAppOrders = await iexec.orderbook.fetchAppOrderbook(appAddress, {
@@ -7690,22 +7686,22 @@ describe('[orderbook]', () => {
     expect(unrestrictedAppOrders.count).toBe(2);
     expect(unrestrictedAppOrders.orders.length).toBe(2);
     expect(unrestrictedAppOrders.orders[0].order.datasetrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedAppOrders.orders[0].order.workerpoolrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedAppOrders.orders[1].order.datasetrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedAppOrders.orders[0].order.workerpoolrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
 
     // all orders without dataset restriction(1,2) and with dataset restriction(3)
@@ -7895,7 +7891,7 @@ describe('[orderbook]', () => {
     expect(res7.count >= 33).toBe(true);
   });
 
-  test.only('orderbook.fetchDatasetOrderbook() strict', async () => {
+  test('orderbook.fetchDatasetOrderbook() strict', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       RICH_PRIVATE_KEY,
@@ -7915,41 +7911,48 @@ describe('[orderbook]', () => {
     const datasetAddress = emptyDatasetOrder.dataset;
 
     await iexec.order
-      .signDatasetorder(emptyDatasetOrder, {preflightCheck: false})
-      .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
     await iexec.order
-      .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-      .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
 
     // 3: app restricted order
     const appAddress = getRandomAddress();
     emptyDatasetOrder.apprestrict = appAddress;
     await iexec.order
-      .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-      .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
     // reset to empty
-    emptyDatasetOrder.apprestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyDatasetOrder.apprestrict = NULL_ADDRESS;
 
     // 4: workerpool restricted order
     const workerpoolAddress = getRandomAddress();
     emptyDatasetOrder.workerpoolrestrict = workerpoolAddress;
     await iexec.order
-      .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-      .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
     // reset to empty
-    emptyDatasetOrder.workerpoolrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyDatasetOrder.workerpoolrestrict = NULL_ADDRESS;
 
     // 5: requester restricted order
     const requesterAddress = getRandomAddress();
     emptyDatasetOrder.requesterrestrict = requesterAddress;
     await iexec.order
-      .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-      .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
     // reset to empty
-    emptyDatasetOrder.requesterrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyDatasetOrder.requesterrestrict = NULL_ADDRESS;
 
     // all orders (1,2,3,4,5)
     const allADatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
@@ -7969,22 +7972,22 @@ describe('[orderbook]', () => {
     expect(unrestrictedDatasetOrders.count).toBe(2);
     expect(unrestrictedDatasetOrders.orders.length).toBe(2);
     expect(unrestrictedDatasetOrders.orders[0].order.apprestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(
       unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
-    ).toEqual('0x0000000000000000000000000000000000000000');
+    ).toEqual(NULL_ADDRESS);
     expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(unrestrictedDatasetOrders.orders[1].order.apprestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(
       unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
-    ).toEqual('0x0000000000000000000000000000000000000000');
+    ).toEqual(NULL_ADDRESS);
     expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
 
     // all orders without app restriction(1,2) and with app restriction(3)
@@ -8002,9 +8005,7 @@ describe('[orderbook]', () => {
     );
     expect(appStrictAppOrder.count).toBe(1);
     expect(appStrictAppOrder.orders.length).toBe(1);
-    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(
-      appAddress
-    );
+    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(appAddress);
 
     // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
     const workerpoolRestrictedAppOrders =
@@ -8046,7 +8047,7 @@ describe('[orderbook]', () => {
       requesterAddress,
     );
 
-    // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
+    // all orders with app, requester, workerpool restriction and not strict (1,2,3,4,5)
     const unstrictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
       datasetAddress,
       {
@@ -8061,7 +8062,7 @@ describe('[orderbook]', () => {
     expect(unstrictAppOrders.count).toBe(5);
     expect(unstrictAppOrders.orders.length).toBe(5);
 
-    // all orders with requester, dataset, workerpool restriction and strict
+    // all orders with app, requester, workerpool restriction and strict
     const strictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
       datasetAddress,
       {
@@ -8173,7 +8174,7 @@ describe('[orderbook]', () => {
     expect(res7.count).toBe(res8.count);
   });
 
-  test.only('orderbook.fetchWorkerpoolOrderbook() strict', async () => {
+  test('orderbook.fetchWorkerpoolOrderbook() strict', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
       RICH_PRIVATE_KEY,
@@ -8205,8 +8206,7 @@ describe('[orderbook]', () => {
       .signWorkerpoolorder(emptyWorkerpoolOrder)
       .then((o) => iexec.order.publishWorkerpoolorder(o));
     // reset to empty
-    emptyWorkerpoolOrder.apprestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyWorkerpoolOrder.apprestrict = NULL_ADDRESS;
 
     // 4: dataset restricted order
     const datasetAddress = getRandomAddress();
@@ -8215,8 +8215,7 @@ describe('[orderbook]', () => {
       .signWorkerpoolorder(emptyWorkerpoolOrder)
       .then((o) => iexec.order.publishWorkerpoolorder(o));
     // reset to empty
-    emptyWorkerpoolOrder.datasetrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyWorkerpoolOrder.datasetrestrict = NULL_ADDRESS;
 
     // 5: requester restricted order
     const requesterAddress = getRandomAddress();
@@ -8225,67 +8224,65 @@ describe('[orderbook]', () => {
       .signWorkerpoolorder(emptyWorkerpoolOrder)
       .then((o) => iexec.order.publishWorkerpoolorder(o));
     // reset to empty
-    emptyWorkerpoolOrder.requesterrestrict =
-      '0x0000000000000000000000000000000000000000';
+    emptyWorkerpoolOrder.requesterrestrict = NULL_ADDRESS;
 
     // all orders (1,2,3,4,5)
-    const allWorkerpoolOrders = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      {
-        workerpool: workerpoolAddress,
-        app: 'any',
-        requester: 'any',
-        dataset: 'any',
-      },
-    );
+    const allWorkerpoolOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: 'any',
+      requester: 'any',
+      dataset: 'any',
+    });
 
     expect(allWorkerpoolOrders.count).toBe(5);
     expect(allWorkerpoolOrders.orders.length).toBe(5);
 
     // all orders without restrictions (1, 2)
     const unrestrictedWorkerpoolOrders =
-      await iexec.orderbook.fetchWorkerpoolOrderbook({workerpool: workerpoolAddress});
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+      });
     expect(unrestrictedWorkerpoolOrders.count).toBe(2);
     expect(unrestrictedWorkerpoolOrders.orders.length).toBe(2);
     expect(unrestrictedWorkerpoolOrders.orders[0].order.apprestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(
       unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
-    ).toEqual('0x0000000000000000000000000000000000000000');
-    expect(unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
-    );
+    ).toEqual(NULL_ADDRESS);
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+    ).toEqual(NULL_ADDRESS);
     expect(unrestrictedWorkerpoolOrders.orders[1].order.apprestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
+      NULL_ADDRESS,
     );
     expect(
       unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
-    ).toEqual('0x0000000000000000000000000000000000000000');
-    expect(unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict).toEqual(
-      '0x0000000000000000000000000000000000000000',
-    );
+    ).toEqual(NULL_ADDRESS);
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+    ).toEqual(NULL_ADDRESS);
 
     // all orders without app restriction(1,2) and with app restriction(3)
-    const appRestrictedAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      { workerpool: workerpoolAddress,
-        app: appAddress },
-    );
+    const appRestrictedAppOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        app: appAddress,
+      });
     expect(appRestrictedAppOrders.count).toBe(3);
     expect(appRestrictedAppOrders.orders.length).toBe(3);
 
     // all orders with app restriction and strict(3)
-    const appStrictAppOrder = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      { workerpool: workerpoolAddress,
-        app: appAddress, isAppStrict: true },
-    );
-
+    const appStrictAppOrder = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: true,
+    });
     expect(appStrictAppOrder.count).toBe(1);
     expect(appStrictAppOrder.orders.length).toBe(1);
-    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(
-      appAddress
-    );
+    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(appAddress);
 
-    // all orders without datasets restriction(1,2) and with dataset restriction(4)
+    // all orders without dataset restriction(1,2) and with dataset restriction(4)
     const datasetRestrictedWorkerpoolOrders =
       await iexec.orderbook.fetchWorkerpoolOrderbook({
         workerpool: workerpoolAddress,
@@ -8301,7 +8298,6 @@ describe('[orderbook]', () => {
         dataset: datasetAddress,
         isDatasetStrict: true,
       });
-
     expect(datasetStrictAppOrder.count).toBe(1);
     expect(datasetStrictAppOrder.orders.length).toBe(1);
     expect(datasetStrictAppOrder.orders[0].order.datasetrestrict).toEqual(
@@ -8324,43 +8320,37 @@ describe('[orderbook]', () => {
         requester: requesterAddress,
         isRequesterStrict: true,
       });
-
     expect(requesterStrictAppOrders.count).toBe(1);
     expect(requesterStrictAppOrders.orders.length).toBe(1);
     expect(requesterStrictAppOrders.orders[0].order.requesterrestrict).toEqual(
-      requesterAddress
+      requesterAddress,
     );
 
     // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
-    const unstrictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      {
-        workerpool: workerpoolAddress,
-        app: appAddress,
-        isAppStrict: false,
-        requester: requesterAddress,
-        isRequesterStrict: false,
-        dataset: datasetAddress,
-        isDatasetStrict: false,
-      },
-    );
+    const unstrictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: false,
+      requester: requesterAddress,
+      isRequesterStrict: false,
+      dataset: datasetAddress,
+      isDatasetStrict: false,
+    });
     expect(unstrictAppOrders.count).toBe(5);
     expect(unstrictAppOrders.orders.length).toBe(5);
 
     // all orders with requester, dataset, workerpool restriction and strict
-    const strictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook(
-      {
-        workerpool: workerpoolAddress,
-        app: appAddress,
-        isAppStrict: true,
-        requester: requesterAddress,
-        isRequesterStrict: true,
-        dataset: datasetAddress,
-        isDatasetStrict: true,
-      },
-    );
+    const strictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: true,
+      requester: requesterAddress,
+      isRequesterStrict: true,
+      dataset: datasetAddress,
+      isDatasetStrict: true,
+    });
     expect(strictAppOrders.count).toBe(0);
     expect(strictAppOrders.orders.length).toBe(0);
-
   });
 
   test('orderbook.fetchRequestOrderbook()', async () => {
@@ -8449,7 +8439,7 @@ describe('[orderbook]', () => {
   });
 });
 
-test.only('orderbook.fetchRequesterOrderbook() strict', async () => {
+test('orderbook.fetchRequesterOrderbook() strict', async () => {
   const signer = utils.getSignerFromPrivateKey(
     tokenChainOpenethereumUrl,
     RICH_PRIVATE_KEY,
@@ -8461,174 +8451,110 @@ test.only('orderbook.fetchRequesterOrderbook() strict', async () => {
     {
       hubAddress,
       iexecGatewayURL,
+      resultProxyURL: 'https://result-proxy.iex.ec',
+      smsURL: 'https://sms.iex.ec',
     },
   );
 
-  // 1 and 2: orders without any restrictions
-  const emptyDatasetOrder = await deployAndGetDatasetorder(iexec);
-  const datasetAddress = emptyDatasetOrder.dataset;
+  const requesterAddress = iexec.wallet.getAddress();
 
+  const apporder = await deployAndGetApporder(iexec);
+  const appAddress = apporder.app;
   await iexec.order
-    .signDatasetorder(emptyDatasetOrder, {preflightCheck: false})
-    .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+    .signApporder(apporder)
+    .then((o) => iexec.order.publishApporder(o));
+
+  const datasetorder = await deployAndGetDatasetorder(iexec);
+  const datasetAddress = datasetorder.dataset;
   await iexec.order
-    .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-    .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
+    .signDatasetorder(datasetorder)
+    .then((o) => iexec.order.publishDatasetorder(o, { preflightCheck: false }));
 
-  // 3: app restricted order
-  const appAddress = getRandomAddress();
-  emptyDatasetOrder.apprestrict = appAddress;
+  const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+  const workerpoolAddress = workerpoolorder.workerpool;
   await iexec.order
-    .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-    .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
-  // reset to empty
-  emptyDatasetOrder.apprestrict =
-    '0x0000000000000000000000000000000000000000';
+    .signWorkerpoolorder(workerpoolorder)
+    .then((o) =>
+      iexec.order.publishWorkerpoolorder(o, { preflightCheck: false }),
+    );
 
-  // 4: workerpool restricted order
-  const workerpoolAddress = getRandomAddress();
-  emptyDatasetOrder.workerpoolrestrict = workerpoolAddress;
+  // first: request order for app without restrictions
   await iexec.order
-    .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-    .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
-  // reset to empty
-  emptyDatasetOrder.workerpoolrestrict =
-    '0x0000000000000000000000000000000000000000';
+    .createRequestorder({
+      requester: requesterAddress,
+      app: appAddress,
+      appmaxprice: apporder.appprice,
+      dataset: NULL_ADDRESS,
+      datasetmaxprice: 0,
+      workerpool: NULL_ADDRESS,
+      workerpoolmaxprice: 0,
+      category: 1,
+      trust: 0,
+      volume: 1,
+    })
+    .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }))
+    .then((o) => iexec.order.publishRequestorder(o, { preflightCheck: false }));
 
-  // 5: requester restricted order
-  const requesterAddress = getRandomAddress();
-  emptyDatasetOrder.requesterrestrict = requesterAddress;
+  // second: request order for app with workerpool and dataset restrictions
   await iexec.order
-    .signDatasetorder(emptyDatasetOrder,  {preflightCheck: false})
-    .then((o) => iexec.order.publishDatasetorder(o, {preflightCheck: false}));
-  // reset to empty
-  emptyDatasetOrder.requesterrestrict =
-    '0x0000000000000000000000000000000000000000';
-
-  // all orders (1,2,3,4,5)
-  const allADatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
-    datasetAddress,
-    {
-      app: 'any',
-      requester: 'any',
-      workerpool: 'any',
-    },
-  );
-  expect(allADatasetOrders.count).toBe(5);
-  expect(allADatasetOrders.orders.length).toBe(5);
-
-  // all orders without restrictions (1, 2)
-  const unrestrictedDatasetOrders =
-    await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
-  expect(unrestrictedDatasetOrders.count).toBe(2);
-  expect(unrestrictedDatasetOrders.orders.length).toBe(2);
-  expect(unrestrictedDatasetOrders.orders[0].order.apprestrict).toEqual(
-    '0x0000000000000000000000000000000000000000',
-  );
-  expect(
-    unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
-  ).toEqual('0x0000000000000000000000000000000000000000');
-  expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
-    '0x0000000000000000000000000000000000000000',
-  );
-  expect(unrestrictedDatasetOrders.orders[1].order.apprestrict).toEqual(
-    '0x0000000000000000000000000000000000000000',
-  );
-  expect(
-    unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
-  ).toEqual('0x0000000000000000000000000000000000000000');
-  expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
-    '0x0000000000000000000000000000000000000000',
-  );
-
-  // all orders without app restriction(1,2) and with app restriction(3)
-  const appRestrictedAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
-    datasetAddress,
-    { app: appAddress },
-  );
-  expect(appRestrictedAppOrders.count).toBe(3);
-  expect(appRestrictedAppOrders.orders.length).toBe(3);
-
-  // all orders with app restriction and strict(3)
-  const appStrictAppOrder = await iexec.orderbook.fetchDatasetOrderbook(
-    datasetAddress,
-    { app: appAddress, isAppStrict: true },
-  );
-  expect(appStrictAppOrder.count).toBe(1);
-  expect(appStrictAppOrder.orders.length).toBe(1);
-  expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(
-    appAddress
-  );
-
-  // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
-  const workerpoolRestrictedAppOrders =
-    await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+    .createRequestorder({
+      requester: requesterAddress,
+      app: appAddress,
+      appmaxprice: apporder.appprice,
+      dataset: datasetAddress,
+      datasetmaxprice: 0,
       workerpool: workerpoolAddress,
-    });
-  expect(workerpoolRestrictedAppOrders.count).toBe(3);
-  expect(workerpoolRestrictedAppOrders.orders.length).toBe(3);
+      workerpoolmaxprice: 0,
+      category: 1,
+      trust: 0,
+      volume: 1,
+    })
+    .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }))
+    .then((o) => iexec.order.publishRequestorder(o, { preflightCheck: false }));
 
-  // all orders with workerpool restriction and strict(4)
-  const workerpoolStrictAppOrder =
-    await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+  // request orders restricted by app - always strict (1,2)
+  const appRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      workerpool: 'any',
+      app: appAddress,
+    });
+  expect(appRestrictedRequestOrders.count).toBe(2);
+  expect(appRestrictedRequestOrders.orders.length).toBe(2);
+
+  // request orders restricted by dataset - always strict (2)
+  const datasetRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      dataset: datasetAddress,
+      workerpool: 'any',
+    });
+  expect(datasetRestrictedRequestOrders.count).toBe(1);
+  expect(datasetRestrictedRequestOrders.orders.length).toBe(1);
+
+  // request orders restricted by workerpool (2)
+  const workerpoolRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      workerpool: workerpoolAddress,
+      app: appAddress,
+    });
+  expect(workerpoolRestrictedRequestOrders.count).toBe(2);
+  expect(workerpoolRestrictedRequestOrders.orders.length).toBe(2);
+
+  // request orders restricted by workerpool and strict (1)
+  const workerpoolSrictRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
       workerpool: workerpoolAddress,
       isWorkerpoolStrict: true,
+      app: appAddress,
     });
-  expect(workerpoolStrictAppOrder.count).toBe(1);
-  expect(workerpoolStrictAppOrder.orders.length).toBe(1);
-  expect(workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict).toEqual(
+  expect(workerpoolSrictRequestOrders.count).toBe(1);
+  expect(workerpoolSrictRequestOrders.orders.length).toBe(1);
+  expect(workerpoolSrictRequestOrders.orders[0].order.workerpool).toEqual(
     workerpoolAddress,
   );
-
-  // all orders without requester restriction(1,2) and with requester restriction(5)
-  const requesterRestrictedAppOrders =
-    await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
-      requester: requesterAddress,
-    });
-  expect(requesterRestrictedAppOrders.count).toBe(3);
-  expect(requesterRestrictedAppOrders.orders.length).toBe(3);
-
-  // all orders with requester restriction and strict(5)
-  const requesterStrictAppOrders =
-    await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
-      requester: requesterAddress,
-      isRequesterStrict: true,
-    });
-  expect(requesterStrictAppOrders.count).toBe(1);
-  expect(requesterStrictAppOrders.orders.length).toBe(1);
-  expect(requesterStrictAppOrders.orders[0].order.requesterrestrict).toEqual(
-    requesterAddress,
-  );
-
-  // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
-  const unstrictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
-    datasetAddress,
-    {
-      app: appAddress,
-      isAppStrict: false,
-      requester: requesterAddress,
-      isRequesterStrict: false,
-      workerpool: workerpoolAddress,
-      isWorkerpoolStrict: false,
-    },
-  );
-  expect(unstrictAppOrders.count).toBe(5);
-  expect(unstrictAppOrders.orders.length).toBe(5);
-
-  // all orders with requester, dataset, workerpool restriction and strict
-  const strictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
-    datasetAddress,
-    {
-      app: appAddress,
-      isAppStrict: true,
-      requester: requesterAddress,
-      isRequesterStrict: true,
-      workerpool: workerpoolAddress,
-      isWorkerpoolStrict: true,
-    },
-  );
-  expect(strictAppOrders.count).toBe(0);
-  expect(strictAppOrders.orders.length).toBe(0);
 });
 
 describe('[deal]', () => {
