@@ -602,9 +602,8 @@ describe('[workflow]', () => {
       category: noDurationCatId,
       volume: '1000',
     });
-    workerpoolorderToClaim = await iexec.order.signWorkerpoolorder(
-      orderToClaim,
-    );
+    workerpoolorderToClaim =
+      await iexec.order.signWorkerpoolorder(orderToClaim);
     expect(workerpoolorderToClaim.sign).toBeDefined();
   });
 
@@ -1315,14 +1314,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendETH(5, receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(true);
     expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
@@ -1349,14 +1346,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendETH('0.5 gwei', receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(
       finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei),
@@ -1408,14 +1403,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendRLC(5, receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
     expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
@@ -1440,14 +1433,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendRLC('0.5 RLC', receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
     expect(
@@ -1478,14 +1469,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendRLC(5, receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
     expect(
@@ -1520,14 +1509,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     const txHash = await iexec.wallet.sendRLC('0.000005 RLC', receiverAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      receiverAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(receiverAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC)).toBe(
       true,
@@ -1566,14 +1553,12 @@ describe('[wallet]', () => {
       },
     );
     const initialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverInitialBalance = await iexec.wallet.checkBalances(
-      randomAddress,
-    );
+    const receiverInitialBalance =
+      await iexec.wallet.checkBalances(randomAddress);
     const txHash = await iexec.wallet.sendRLC(5, randomAddress);
     const finalBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
-    const receiverFinalBalance = await iexec.wallet.checkBalances(
-      randomAddress,
-    );
+    const receiverFinalBalance =
+      await iexec.wallet.checkBalances(randomAddress);
     expect(txHash).toMatch(bytes32Regex);
     expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(true);
     expect(
@@ -2526,9 +2511,8 @@ describe('[account]', () => {
         hubAddress,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.deposit(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2559,9 +2543,8 @@ describe('[account]', () => {
         hubAddress,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.deposit('0.005 RLC');
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2596,9 +2579,8 @@ describe('[account]', () => {
         hubAddress,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const { nRLC } = await iexec.wallet.checkBalances(RICH_ADDRESS);
     await expect(iexec.account.deposit(nRLC.add(new BN(1)))).rejects.toThrow(
@@ -2630,9 +2612,8 @@ describe('[account]', () => {
         useGas: false,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.deposit(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2665,9 +2646,8 @@ describe('[account]', () => {
         useGas: false,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.deposit('0.005 RLC');
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2704,9 +2684,8 @@ describe('[account]', () => {
         useGas: false,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const { nRLC } = await iexec.wallet.checkBalances(RICH_ADDRESS);
     await expect(iexec.account.deposit(nRLC.add(new BN(1)))).rejects.toThrow(
@@ -2737,9 +2716,8 @@ describe('[account]', () => {
         hubAddress: enterpriseHubAddress,
       },
     );
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.deposit(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2791,9 +2769,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.withdraw(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2825,9 +2802,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10000);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.withdraw('0.000005 RLC');
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2861,9 +2837,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const { stake } = await iexec.account.checkBalance(RICH_ADDRESS);
     await expect(iexec.account.withdraw(stake.add(new BN(1)))).rejects.toThrow(
@@ -2896,9 +2871,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.withdraw(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2932,9 +2906,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10000);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.withdraw('0.000005 RLC');
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -2970,9 +2943,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const { stake } = await iexec.account.checkBalance(RICH_ADDRESS);
     await expect(iexec.account.withdraw(stake.add(new BN(1)))).rejects.toThrow(
@@ -3022,9 +2994,8 @@ describe('[account]', () => {
       },
     );
     await iexec.account.deposit(10);
-    const accountInitialBalance = await iexec.account.checkBalance(
-      RICH_ADDRESS,
-    );
+    const accountInitialBalance =
+      await iexec.account.checkBalance(RICH_ADDRESS);
     const walletInitialBalance = await iexec.wallet.checkBalances(RICH_ADDRESS);
     const res = await iexec.account.withdraw(5);
     const accountFinalBalance = await iexec.account.checkBalance(RICH_ADDRESS);
@@ -3825,14 +3796,12 @@ describe('[dataset]', () => {
     );
     const datasetDeployRes = await deployRandomDataset(iexec);
     const datasetAddress = datasetDeployRes.address;
-    const withoutSecretRes = await iexec.dataset.checkDatasetSecretExists(
-      datasetAddress,
-    );
+    const withoutSecretRes =
+      await iexec.dataset.checkDatasetSecretExists(datasetAddress);
     expect(withoutSecretRes).toBe(false);
     await iexec.dataset.pushDatasetSecret(datasetAddress, 'oops');
-    const withSecretRes = await iexec.dataset.checkDatasetSecretExists(
-      datasetAddress,
-    );
+    const withSecretRes =
+      await iexec.dataset.checkDatasetSecretExists(datasetAddress);
     expect(withSecretRes).toBe(true);
 
     const datasetDeployedGramine = await deployRandomDataset(iexec);
@@ -3919,9 +3888,8 @@ describe('[workerpool]', () => {
       owner: await iexec.wallet.getAddress(),
       description: `workerpool${getId()}`,
     };
-    const predictedAddress = await iexec.workerpool.predictWorkerpoolAddress(
-      workerpool,
-    );
+    const predictedAddress =
+      await iexec.workerpool.predictWorkerpoolAddress(workerpool);
     await expect(
       iexec.workerpool.checkDeployedWorkerpool(predictedAddress),
     ).resolves.toBe(false);
@@ -4082,9 +4050,8 @@ describe('[workerpool]', () => {
       },
     );
     const userAddress = await iexec.wallet.getAddress();
-    const resBeforeDeploy = await iexec.workerpool.countUserWorkerpools(
-      userAddress,
-    );
+    const resBeforeDeploy =
+      await iexec.workerpool.countUserWorkerpools(userAddress);
     await deployRandomWorkerpool(iexec);
     const res = await iexec.workerpool.countUserWorkerpools(userAddress);
     expect(resBeforeDeploy).toBeInstanceOf(BN);
@@ -4892,9 +4859,8 @@ describe('[order]', () => {
     await iexecDatasetConsumer.storage
       .defaultStorageLogin()
       .then(iexecDatasetConsumer.storage.pushStorageToken);
-    const { address: dataset } = await deployRandomDataset(
-      iexecDatasetProvider,
-    );
+    const { address: dataset } =
+      await deployRandomDataset(iexecDatasetProvider);
 
     // non tee pass
     await expect(
@@ -5282,9 +5248,8 @@ describe('[order]', () => {
 
       const apporderTemplate = await deployAndGetApporder(iexec);
       const datasetorderTemplate = await deployAndGetDatasetorder(iexec);
-      const workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
-        iexecPoolManager,
-      );
+      const workerpoolorderTemplate =
+        await deployAndGetWorkerpoolorder(iexecPoolManager);
       const requestorderTemplate = await getMatchableRequestorder(iexec, {
         apporder: apporderTemplate,
         datasetorder: datasetorderTemplate,
@@ -5432,9 +5397,8 @@ describe('[order]', () => {
           `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
         ),
       );
-      const workerpoolorderAddressMismatch = await deployAndGetWorkerpoolorder(
-        iexec,
-      );
+      const workerpoolorderAddressMismatch =
+        await deployAndGetWorkerpoolorder(iexec);
       await expect(
         iexec.order.matchOrders(
           {
@@ -5962,12 +5926,10 @@ describe('[order]', () => {
       );
 
       const apporderTemplate = await deployAndGetApporder(iexecAppDev);
-      const datasetorderTemplate = await deployAndGetDatasetorder(
-        iexecDatasetDev,
-      );
-      const workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
-        iexecPoolManager,
-      );
+      const datasetorderTemplate =
+        await deployAndGetDatasetorder(iexecDatasetDev);
+      const workerpoolorderTemplate =
+        await deployAndGetWorkerpoolorder(iexecPoolManager);
       const requestorderTemplate = await getMatchableRequestorder(
         iexecRequester,
         {
@@ -6086,9 +6048,8 @@ describe('[order]', () => {
       ).rejects.toThrow(Error('requestorder invalid sign'));
 
       // address mismatch
-      const apporderAddressMismatch = await deployAndGetApporder(
-        iexecRequester,
-      );
+      const apporderAddressMismatch =
+        await deployAndGetApporder(iexecRequester);
       await expect(
         iexecRequester.order.matchOrders(
           {
@@ -6104,9 +6065,8 @@ describe('[order]', () => {
           `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`,
         ),
       );
-      const datasetorderAddressMismatch = await deployAndGetDatasetorder(
-        iexecRequester,
-      );
+      const datasetorderAddressMismatch =
+        await deployAndGetDatasetorder(iexecRequester);
       await expect(
         iexecRequester.order.matchOrders(
           {
@@ -6122,9 +6082,8 @@ describe('[order]', () => {
           `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
         ),
       );
-      const workerpoolorderAddressMismatch = await deployAndGetWorkerpoolorder(
-        iexecRequester,
-      );
+      const workerpoolorderAddressMismatch =
+        await deployAndGetWorkerpoolorder(iexecRequester);
       await expect(
         iexecRequester.order.matchOrders(
           {
@@ -7174,12 +7133,10 @@ describe('[order]', () => {
     );
     const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
     const orderHash = await iexec.order.publishWorkerpoolorder(workerpoolorder);
-    const lastWorkerpoolorder = await iexec.order.signWorkerpoolorder(
-      workerpoolorder,
-    );
-    const lastOrderHash = await iexec.order.publishWorkerpoolorder(
-      lastWorkerpoolorder,
-    );
+    const lastWorkerpoolorder =
+      await iexec.order.signWorkerpoolorder(workerpoolorder);
+    const lastOrderHash =
+      await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
     const unpublishLastRes = await iexec.order.unpublishLastWorkerpoolorder(
       workerpoolorder.workerpool,
     );
@@ -7361,12 +7318,10 @@ describe('[order]', () => {
     );
     const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
     const orderHash = await iexec.order.publishWorkerpoolorder(workerpoolorder);
-    const lastWorkerpoolorder = await iexec.order.signWorkerpoolorder(
-      workerpoolorder,
-    );
-    const lastOrderHash = await iexec.order.publishWorkerpoolorder(
-      lastWorkerpoolorder,
-    );
+    const lastWorkerpoolorder =
+      await iexec.order.signWorkerpoolorder(workerpoolorder);
+    const lastOrderHash =
+      await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
     const unpublishAllRes = await iexec.order.unpublishAllWorkerpoolorders(
       workerpoolorder.workerpool,
     );
@@ -7663,6 +7618,180 @@ describe('[orderbook]', () => {
     expect(res7.count >= 32).toBe(true);
   });
 
+  test('orderbook.fetchAppOrderbook() strict', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      RICH_PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        iexecGatewayURL,
+      },
+    );
+
+    // 1 and 2: orders without any restrictions
+    const emptyAppOrder = await deployAndGetApporder(iexec);
+    const appAddress = emptyAppOrder.app;
+
+    await iexec.order
+      .signApporder(emptyAppOrder)
+      .then((o) => iexec.order.publishApporder(o));
+    await iexec.order
+      .signApporder(emptyAppOrder)
+      .then((o) => iexec.order.publishApporder(o));
+
+    // 3: dataset restricted order
+    const datasetAddress = getRandomAddress();
+    emptyAppOrder.datasetrestrict = datasetAddress;
+    await iexec.order
+      .signApporder(emptyAppOrder)
+      .then((o) => iexec.order.publishApporder(o));
+    // reset to empty
+    emptyAppOrder.datasetrestrict = NULL_ADDRESS;
+
+    // 4: workerpool restricted order
+    const workerpoolAddress = getRandomAddress();
+    emptyAppOrder.workerpoolrestrict = workerpoolAddress;
+    await iexec.order
+      .signApporder(emptyAppOrder)
+      .then((o) => iexec.order.publishApporder(o));
+    // reset to empty
+    emptyAppOrder.workerpoolrestrict = NULL_ADDRESS;
+
+    // 5: requester restricted order
+    const requesterAddress = getRandomAddress();
+    emptyAppOrder.requesterrestrict = requesterAddress;
+    await iexec.order
+      .signApporder(emptyAppOrder)
+      .then((o) => iexec.order.publishApporder(o));
+    // reset to empty
+    emptyAppOrder.requesterrestrict = NULL_ADDRESS;
+
+    // all orders (1,2,3,4,5)
+    const allAppOrders = await iexec.orderbook.fetchAppOrderbook(appAddress, {
+      dataset: 'any',
+      requester: 'any',
+      workerpool: 'any',
+    });
+    expect(allAppOrders.count).toBe(5);
+    expect(allAppOrders.orders.length).toBe(5);
+
+    // all orders without restrictions (1, 2)
+    const unrestrictedAppOrders =
+      await iexec.orderbook.fetchAppOrderbook(appAddress);
+    expect(unrestrictedAppOrders.count).toBe(2);
+    expect(unrestrictedAppOrders.orders.length).toBe(2);
+    expect(unrestrictedAppOrders.orders[0].order.datasetrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedAppOrders.orders[0].order.workerpoolrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedAppOrders.orders[1].order.datasetrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedAppOrders.orders[0].order.workerpoolrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+
+    // all orders without dataset restriction(1,2) and with dataset restriction(3)
+    const datasetRestrictedAppOrders = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      { dataset: datasetAddress },
+    );
+    expect(datasetRestrictedAppOrders.count).toBe(3);
+    expect(datasetRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with dataset restriction and strict(3)
+    const datasetStrictAppOrder = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      { dataset: datasetAddress, isDatasetStrict: true },
+    );
+    expect(datasetStrictAppOrder.count).toBe(1);
+    expect(datasetStrictAppOrder.orders.length).toBe(1);
+    expect(datasetStrictAppOrder.orders[0].order.datasetrestrict).toEqual(
+      datasetAddress,
+    );
+
+    // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
+    const workerpoolRestrictedAppOrders =
+      await iexec.orderbook.fetchAppOrderbook(appAddress, {
+        workerpool: workerpoolAddress,
+      });
+    expect(workerpoolRestrictedAppOrders.count).toBe(3);
+    expect(workerpoolRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with workerpool restriction and strict(4)
+    const workerpoolStrictAppOrder = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      { workerpool: workerpoolAddress, isWorkerpoolStrict: true },
+    );
+    expect(workerpoolStrictAppOrder.count).toBe(1);
+    expect(workerpoolStrictAppOrder.orders.length).toBe(1);
+    expect(workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict).toEqual(
+      workerpoolAddress,
+    );
+
+    // all orders without requester restriction(1,2) and with requester restriction(5)
+    const requesterRestrictedAppOrders =
+      await iexec.orderbook.fetchAppOrderbook(appAddress, {
+        requester: requesterAddress,
+      });
+    expect(requesterRestrictedAppOrders.count).toBe(3);
+    expect(requesterRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with requester restriction and strict(5)
+    const requesterStrictAppOrders = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      { requester: requesterAddress, isRequesterStrict: true },
+    );
+    expect(requesterStrictAppOrders.count).toBe(1);
+    expect(requesterStrictAppOrders.orders.length).toBe(1);
+    expect(requesterStrictAppOrders.orders[0].order.requesterrestrict).toEqual(
+      requesterAddress,
+    );
+
+    // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
+    const unstrictAppOrders = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      {
+        dataset: datasetAddress,
+        isDatasetStrict: false,
+        requester: requesterAddress,
+        isRequesterStrict: false,
+        workerpool: workerpoolAddress,
+        isWorkerpoolStrict: false,
+      },
+    );
+    expect(unstrictAppOrders.count).toBe(5);
+    expect(unstrictAppOrders.orders.length).toBe(5);
+
+    // all orders with requester, dataset, workerpool restriction and strict
+    const strictAppOrders = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+      {
+        dataset: datasetAddress,
+        isDatasetStrict: true,
+        requester: requesterAddress,
+        isRequesterStrict: true,
+        workerpool: workerpoolAddress,
+        isWorkerpoolStrict: true,
+      },
+    );
+    expect(strictAppOrders.count).toBe(0);
+    expect(strictAppOrders.orders.length).toBe(0);
+  });
+
   test('orderbook.fetchDatasetOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
@@ -7762,6 +7891,193 @@ describe('[orderbook]', () => {
     expect(res7.count >= 33).toBe(true);
   });
 
+  test('orderbook.fetchDatasetOrderbook() strict', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      RICH_PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        iexecGatewayURL,
+      },
+    );
+
+    // 1 and 2: orders without any restrictions
+    const emptyDatasetOrder = await deployAndGetDatasetorder(iexec);
+    const datasetAddress = emptyDatasetOrder.dataset;
+
+    await iexec.order
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
+    await iexec.order
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
+
+    // 3: app restricted order
+    const appAddress = getRandomAddress();
+    emptyDatasetOrder.apprestrict = appAddress;
+    await iexec.order
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
+    // reset to empty
+    emptyDatasetOrder.apprestrict = NULL_ADDRESS;
+
+    // 4: workerpool restricted order
+    const workerpoolAddress = getRandomAddress();
+    emptyDatasetOrder.workerpoolrestrict = workerpoolAddress;
+    await iexec.order
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
+    // reset to empty
+    emptyDatasetOrder.workerpoolrestrict = NULL_ADDRESS;
+
+    // 5: requester restricted order
+    const requesterAddress = getRandomAddress();
+    emptyDatasetOrder.requesterrestrict = requesterAddress;
+    await iexec.order
+      .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
+      .then((o) =>
+        iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+      );
+    // reset to empty
+    emptyDatasetOrder.requesterrestrict = NULL_ADDRESS;
+
+    // all orders (1,2,3,4,5)
+    const allADatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetAddress,
+      {
+        app: 'any',
+        requester: 'any',
+        workerpool: 'any',
+      },
+    );
+    expect(allADatasetOrders.count).toBe(5);
+    expect(allADatasetOrders.orders.length).toBe(5);
+
+    // all orders without restrictions (1, 2)
+    const unrestrictedDatasetOrders =
+      await iexec.orderbook.fetchDatasetOrderbook(datasetAddress);
+    expect(unrestrictedDatasetOrders.count).toBe(2);
+    expect(unrestrictedDatasetOrders.orders.length).toBe(2);
+    expect(unrestrictedDatasetOrders.orders[0].order.apprestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(
+      unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
+    ).toEqual(NULL_ADDRESS);
+    expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(unrestrictedDatasetOrders.orders[1].order.apprestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(
+      unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
+    ).toEqual(NULL_ADDRESS);
+    expect(unrestrictedDatasetOrders.orders[0].order.requesterrestrict).toEqual(
+      NULL_ADDRESS,
+    );
+
+    // all orders without app restriction(1,2) and with app restriction(3)
+    const appRestrictedAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetAddress,
+      { app: appAddress },
+    );
+    expect(appRestrictedAppOrders.count).toBe(3);
+    expect(appRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with app restriction and strict(3)
+    const appStrictAppOrder = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetAddress,
+      { app: appAddress, isAppStrict: true },
+    );
+    expect(appStrictAppOrder.count).toBe(1);
+    expect(appStrictAppOrder.orders.length).toBe(1);
+    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(appAddress);
+
+    // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
+    const workerpoolRestrictedAppOrders =
+      await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+        workerpool: workerpoolAddress,
+      });
+    expect(workerpoolRestrictedAppOrders.count).toBe(3);
+    expect(workerpoolRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with workerpool restriction and strict(4)
+    const workerpoolStrictAppOrder =
+      await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+        workerpool: workerpoolAddress,
+        isWorkerpoolStrict: true,
+      });
+    expect(workerpoolStrictAppOrder.count).toBe(1);
+    expect(workerpoolStrictAppOrder.orders.length).toBe(1);
+    expect(workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict).toEqual(
+      workerpoolAddress,
+    );
+
+    // all orders without requester restriction(1,2) and with requester restriction(5)
+    const requesterRestrictedAppOrders =
+      await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+        requester: requesterAddress,
+      });
+    expect(requesterRestrictedAppOrders.count).toBe(3);
+    expect(requesterRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with requester restriction and strict(5)
+    const requesterStrictAppOrders =
+      await iexec.orderbook.fetchDatasetOrderbook(datasetAddress, {
+        requester: requesterAddress,
+        isRequesterStrict: true,
+      });
+    expect(requesterStrictAppOrders.count).toBe(1);
+    expect(requesterStrictAppOrders.orders.length).toBe(1);
+    expect(requesterStrictAppOrders.orders[0].order.requesterrestrict).toEqual(
+      requesterAddress,
+    );
+
+    // all orders with app, requester, workerpool restriction and not strict (1,2,3,4,5)
+    const unstrictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetAddress,
+      {
+        app: appAddress,
+        isAppStrict: false,
+        requester: requesterAddress,
+        isRequesterStrict: false,
+        workerpool: workerpoolAddress,
+        isWorkerpoolStrict: false,
+      },
+    );
+    expect(unstrictAppOrders.count).toBe(5);
+    expect(unstrictAppOrders.orders.length).toBe(5);
+
+    // all orders with app, requester, workerpool restriction and strict
+    const strictAppOrders = await iexec.orderbook.fetchDatasetOrderbook(
+      datasetAddress,
+      {
+        app: appAddress,
+        isAppStrict: true,
+        requester: requesterAddress,
+        isRequesterStrict: true,
+        workerpool: workerpoolAddress,
+        isWorkerpoolStrict: true,
+      },
+    );
+    expect(strictAppOrders.count).toBe(0);
+    expect(strictAppOrders.orders.length).toBe(0);
+  });
+
   test('orderbook.fetchWorkerpoolOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
@@ -7858,6 +8174,185 @@ describe('[orderbook]', () => {
     expect(res7.count).toBe(res8.count);
   });
 
+  test('orderbook.fetchWorkerpoolOrderbook() strict', async () => {
+    const signer = utils.getSignerFromPrivateKey(
+      tokenChainOpenethereumUrl,
+      RICH_PRIVATE_KEY,
+    );
+    const iexec = new IExec(
+      {
+        ethProvider: signer,
+      },
+      {
+        hubAddress,
+        iexecGatewayURL,
+      },
+    );
+
+    // 1 and 2: orders without any restrictions
+    const emptyWorkerpoolOrder = await deployAndGetWorkerpoolorder(iexec);
+    const workerpoolAddress = emptyWorkerpoolOrder.workerpool;
+    await iexec.order
+      .signWorkerpoolorder(emptyWorkerpoolOrder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+    await iexec.order
+      .signWorkerpoolorder(emptyWorkerpoolOrder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+
+    // 3: app restricted order
+    const appAddress = getRandomAddress();
+    emptyWorkerpoolOrder.apprestrict = appAddress;
+    await iexec.order
+      .signWorkerpoolorder(emptyWorkerpoolOrder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+    // reset to empty
+    emptyWorkerpoolOrder.apprestrict = NULL_ADDRESS;
+
+    // 4: dataset restricted order
+    const datasetAddress = getRandomAddress();
+    emptyWorkerpoolOrder.datasetrestrict = datasetAddress;
+    await iexec.order
+      .signWorkerpoolorder(emptyWorkerpoolOrder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+    // reset to empty
+    emptyWorkerpoolOrder.datasetrestrict = NULL_ADDRESS;
+
+    // 5: requester restricted order
+    const requesterAddress = getRandomAddress();
+    emptyWorkerpoolOrder.requesterrestrict = requesterAddress;
+    await iexec.order
+      .signWorkerpoolorder(emptyWorkerpoolOrder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+    // reset to empty
+    emptyWorkerpoolOrder.requesterrestrict = NULL_ADDRESS;
+
+    // all orders (1,2,3,4,5)
+    const allWorkerpoolOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: 'any',
+      requester: 'any',
+      dataset: 'any',
+    });
+
+    expect(allWorkerpoolOrders.count).toBe(5);
+    expect(allWorkerpoolOrders.orders.length).toBe(5);
+
+    // all orders without restrictions (1, 2)
+    const unrestrictedWorkerpoolOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+      });
+    expect(unrestrictedWorkerpoolOrders.count).toBe(2);
+    expect(unrestrictedWorkerpoolOrders.orders.length).toBe(2);
+    expect(unrestrictedWorkerpoolOrders.orders[0].order.apprestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
+    ).toEqual(NULL_ADDRESS);
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+    ).toEqual(NULL_ADDRESS);
+    expect(unrestrictedWorkerpoolOrders.orders[1].order.apprestrict).toEqual(
+      NULL_ADDRESS,
+    );
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
+    ).toEqual(NULL_ADDRESS);
+    expect(
+      unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+    ).toEqual(NULL_ADDRESS);
+
+    // all orders without app restriction(1,2) and with app restriction(3)
+    const appRestrictedAppOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        app: appAddress,
+      });
+    expect(appRestrictedAppOrders.count).toBe(3);
+    expect(appRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with app restriction and strict(3)
+    const appStrictAppOrder = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: true,
+    });
+    expect(appStrictAppOrder.count).toBe(1);
+    expect(appStrictAppOrder.orders.length).toBe(1);
+    expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(appAddress);
+
+    // all orders without dataset restriction(1,2) and with dataset restriction(4)
+    const datasetRestrictedWorkerpoolOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        dataset: datasetAddress,
+      });
+    expect(datasetRestrictedWorkerpoolOrders.count).toBe(3);
+    expect(datasetRestrictedWorkerpoolOrders.orders.length).toBe(3);
+
+    // all orders with dataset restriction and strict(4)
+    const datasetStrictAppOrder =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        dataset: datasetAddress,
+        isDatasetStrict: true,
+      });
+    expect(datasetStrictAppOrder.count).toBe(1);
+    expect(datasetStrictAppOrder.orders.length).toBe(1);
+    expect(datasetStrictAppOrder.orders[0].order.datasetrestrict).toEqual(
+      datasetAddress,
+    );
+
+    // all orders without requester restriction(1,2) and with requester restriction(5)
+    const requesterRestrictedAppOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        requester: requesterAddress,
+      });
+    expect(requesterRestrictedAppOrders.count).toBe(3);
+    expect(requesterRestrictedAppOrders.orders.length).toBe(3);
+
+    // all orders with requester restriction and strict(5)
+    const requesterStrictAppOrders =
+      await iexec.orderbook.fetchWorkerpoolOrderbook({
+        workerpool: workerpoolAddress,
+        requester: requesterAddress,
+        isRequesterStrict: true,
+      });
+    expect(requesterStrictAppOrders.count).toBe(1);
+    expect(requesterStrictAppOrders.orders.length).toBe(1);
+    expect(requesterStrictAppOrders.orders[0].order.requesterrestrict).toEqual(
+      requesterAddress,
+    );
+
+    // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
+    const unstrictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: false,
+      requester: requesterAddress,
+      isRequesterStrict: false,
+      dataset: datasetAddress,
+      isDatasetStrict: false,
+    });
+    expect(unstrictAppOrders.count).toBe(5);
+    expect(unstrictAppOrders.orders.length).toBe(5);
+
+    // all orders with requester, dataset, workerpool restriction and strict
+    const strictAppOrders = await iexec.orderbook.fetchWorkerpoolOrderbook({
+      workerpool: workerpoolAddress,
+      app: appAddress,
+      isAppStrict: true,
+      requester: requesterAddress,
+      isRequesterStrict: true,
+      dataset: datasetAddress,
+      isDatasetStrict: true,
+    });
+    expect(strictAppOrders.count).toBe(0);
+    expect(strictAppOrders.orders.length).toBe(0);
+  });
+
   test('orderbook.fetchRequestOrderbook()', async () => {
     const signer = utils.getSignerFromPrivateKey(
       tokenChainOpenethereumUrl,
@@ -7944,6 +8439,124 @@ describe('[orderbook]', () => {
   });
 });
 
+test('orderbook.fetchRequesterOrderbook() strict', async () => {
+  const signer = utils.getSignerFromPrivateKey(
+    tokenChainOpenethereumUrl,
+    RICH_PRIVATE_KEY,
+  );
+  const iexec = new IExec(
+    {
+      ethProvider: signer,
+    },
+    {
+      hubAddress,
+      iexecGatewayURL,
+      resultProxyURL: 'https://result-proxy.iex.ec',
+      smsURL: 'https://sms.iex.ec',
+    },
+  );
+
+  const requesterAddress = iexec.wallet.getAddress();
+
+  const apporder = await deployAndGetApporder(iexec);
+  const appAddress = apporder.app;
+  await iexec.order
+    .signApporder(apporder)
+    .then((o) => iexec.order.publishApporder(o));
+
+  const datasetorder = await deployAndGetDatasetorder(iexec);
+  const datasetAddress = datasetorder.dataset;
+  await iexec.order
+    .signDatasetorder(datasetorder)
+    .then((o) => iexec.order.publishDatasetorder(o, { preflightCheck: false }));
+
+  const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+  const workerpoolAddress = workerpoolorder.workerpool;
+  await iexec.order
+    .signWorkerpoolorder(workerpoolorder)
+    .then((o) =>
+      iexec.order.publishWorkerpoolorder(o, { preflightCheck: false }),
+    );
+
+  // first: request order for app without restrictions
+  await iexec.order
+    .createRequestorder({
+      requester: requesterAddress,
+      app: appAddress,
+      appmaxprice: apporder.appprice,
+      dataset: NULL_ADDRESS,
+      datasetmaxprice: 0,
+      workerpool: NULL_ADDRESS,
+      workerpoolmaxprice: 0,
+      category: 1,
+      trust: 0,
+      volume: 1,
+    })
+    .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }))
+    .then((o) => iexec.order.publishRequestorder(o, { preflightCheck: false }));
+
+  // second: request order for app with workerpool and dataset restrictions
+  await iexec.order
+    .createRequestorder({
+      requester: requesterAddress,
+      app: appAddress,
+      appmaxprice: apporder.appprice,
+      dataset: datasetAddress,
+      datasetmaxprice: 0,
+      workerpool: workerpoolAddress,
+      workerpoolmaxprice: 0,
+      category: 1,
+      trust: 0,
+      volume: 1,
+    })
+    .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }))
+    .then((o) => iexec.order.publishRequestorder(o, { preflightCheck: false }));
+
+  // request orders restricted by app - always strict (1,2)
+  const appRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      workerpool: 'any',
+      app: appAddress,
+    });
+  expect(appRestrictedRequestOrders.count).toBe(2);
+  expect(appRestrictedRequestOrders.orders.length).toBe(2);
+
+  // request orders restricted by dataset - always strict (2)
+  const datasetRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      dataset: datasetAddress,
+      workerpool: 'any',
+    });
+  expect(datasetRestrictedRequestOrders.count).toBe(1);
+  expect(datasetRestrictedRequestOrders.orders.length).toBe(1);
+
+  // request orders restricted by workerpool (2)
+  const workerpoolRestrictedRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      workerpool: workerpoolAddress,
+      app: appAddress,
+    });
+  expect(workerpoolRestrictedRequestOrders.count).toBe(2);
+  expect(workerpoolRestrictedRequestOrders.orders.length).toBe(2);
+
+  // request orders restricted by workerpool and strict (1)
+  const workerpoolSrictRequestOrders =
+    await iexec.orderbook.fetchRequestOrderbook({
+      requester: requesterAddress,
+      workerpool: workerpoolAddress,
+      isWorkerpoolStrict: true,
+      app: appAddress,
+    });
+  expect(workerpoolSrictRequestOrders.count).toBe(1);
+  expect(workerpoolSrictRequestOrders.orders.length).toBe(1);
+  expect(workerpoolSrictRequestOrders.orders[0].order.workerpool).toEqual(
+    workerpoolAddress,
+  );
+});
+
 describe('[deal]', () => {
   test('deal.fetchRequesterDeals()', async () => {
     const signer = utils.getSignerFromPrivateKey(
@@ -7983,9 +8596,8 @@ describe('[deal]', () => {
       { preflightCheck: false },
     );
     await sleep(5000);
-    const resAfterMatch = await iexec.deal.fetchRequesterDeals(
-      requesterAddress,
-    );
+    const resAfterMatch =
+      await iexec.deal.fetchRequesterDeals(requesterAddress);
     expect(res.count).toBe(resAfterMatch.count - 1);
     const resAppFiltered = await iexec.deal.fetchRequesterDeals(
       requesterAddress,
@@ -8140,9 +8752,8 @@ describe('[deal]', () => {
       { preflightCheck: false },
     );
     await sleep(5000);
-    const resAfterMatch = await iexec.deal.fetchDealsByWorkerpoolorder(
-      orderHash,
-    );
+    const resAfterMatch =
+      await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
     expect(resAfterMatch.count).toBe(1);
     expect(resAfterMatch.deals[0].dealid).toBe(dealid);
     expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
@@ -9490,9 +10101,8 @@ describe('[ens]', () => {
     expect(appDomain).toBe('apps.iexec.eth');
     const datasetDomain = await iexec.ens.getDefaultDomain(datasetAddress);
     expect(datasetDomain).toBe('datasets.iexec.eth');
-    const workerpoolDomain = await iexec.ens.getDefaultDomain(
-      workerpoolAddress,
-    );
+    const workerpoolDomain =
+      await iexec.ens.getDefaultDomain(workerpoolAddress);
     expect(workerpoolDomain).toBe('pools.iexec.eth');
     const defaultDomain = await iexec.ens.getDefaultDomain(getRandomAddress());
     expect(defaultDomain).toBe('users.iexec.eth');

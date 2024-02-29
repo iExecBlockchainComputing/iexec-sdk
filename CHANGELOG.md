@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Added
+
+- strict mode `isRequesterStrict, isAppStrict, isDatasetStrict, isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook(), fetchAppOrderbook(), fetchDatasetOrderbook(), fetchWorkerpooltOrderbook(),`, defaults to false
+
 ### Changed
 
 - remove ipfs initialization preflight checks on request orders

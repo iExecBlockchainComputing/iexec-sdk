@@ -9,6 +9,7 @@ import {
   positiveStrictIntSchema,
   tagSchema,
   throwIfMissing,
+  booleanSchema,
 } from '../utils/validator.js';
 
 const debug = Debug('iexec:market:orderbook');
@@ -28,6 +29,9 @@ export const fetchAppOrderbook = async (
     minVolume,
     page = 0,
     pageSize = 20,
+    isDatasetStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
   } = {},
 ) => {
   try {
@@ -41,16 +45,19 @@ export const fetchAppOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
+      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
@@ -98,6 +105,9 @@ export const fetchDatasetOrderbook = async (
     minVolume,
     page = 0,
     pageSize = 20,
+    isAppStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
   } = {},
 ) => {
   try {
@@ -110,17 +120,20 @@ export const fetchDatasetOrderbook = async (
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
+      isAppStrict: await booleanSchema().validate(isAppStrict),
       }),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minVolume && {
         minVolume: await positiveStrictIntSchema().validate(minVolume),
       }),
@@ -171,6 +184,9 @@ export const fetchWorkerpoolOrderbook = async (
     requester,
     page = 0,
     pageSize = 20,
+    isAppStrict = false,
+    isDatasetStrict = false,
+    isRequesterStrict = false,
   } = {},
 ) => {
   try {
@@ -187,16 +203,19 @@ export const fetchWorkerpoolOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(app),
       }),
+      isAppStrict: await booleanSchema().validate(isAppStrict),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(dataset),
       }),
+      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(requester),
       }),
+      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
       ...(minTag && {
         minTag: await tagSchema().validate(minTag),
       }),
@@ -255,6 +274,7 @@ export const fetchRequestOrderbook = async (
     minVolume,
     page = 0,
     pageSize = 20,
+    isWorkerpoolStrict = false,
   } = {},
 ) => {
   try {
@@ -286,6 +306,7 @@ export const fetchRequestOrderbook = async (
           ethProvider: contracts.provider,
         }).validate(workerpool),
       }),
+      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
       ...(minTag !== undefined && {
         minTag: await tagSchema().validate(minTag),
       }),

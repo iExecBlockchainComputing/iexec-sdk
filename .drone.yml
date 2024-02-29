@@ -181,7 +181,7 @@ services:
       - redis-server --appendonly yes
 
   - name: token-watcher
-    image: iexechub/iexec-market-watcher:6.3
+    image: iexechub/iexec-market-watcher:6.4
     pull: always
     commands:
       - sleep 10
@@ -201,7 +201,7 @@ services:
       - gateway-redis
 
   - name: token-gateway
-    image: iexechub/iexec-market-api:6.3
+    image: iexechub/iexec-market-api:6.4
     pull: always
     commands:
       - sleep 10
