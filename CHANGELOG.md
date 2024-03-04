@@ -2,15 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [8.6.0] 2024-03-04
 
 ### Added
 
-- strict mode `isRequesterStrict, isAppStrict, isDatasetStrict, isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook(), fetchAppOrderbook(), fetchDatasetOrderbook(), fetchWorkerpooltOrderbook(),`, defaults to false
+- strict mode `isRequesterStrict`, `isAppStrict`, `isDatasetStrict`, `isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook()`, `fetchAppOrderbook()`, `fetchDatasetOrderbook()`, `fetchWorkerpoolOrderbook()`, defaults to false
 
 ### Changed
 
 - remove ipfs initialization preflight checks on request orders
+- Typescript fixes
 
 ## [8.5.2] 2024-01-24
 
