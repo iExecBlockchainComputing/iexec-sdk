@@ -4,7 +4,7 @@ export async function getCrypto() {
     return { crypto, CryptoKey };
   }
   // Node <= 18
-  const nodeCrypto = await import('node:crypto');
+  const nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
   return {
     crypto: nodeCrypto.webcrypto,
     CryptoKey: nodeCrypto.webcrypto.CryptoKey,
