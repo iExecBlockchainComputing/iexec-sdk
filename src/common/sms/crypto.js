@@ -1,7 +1,7 @@
 export async function getCrypto() {
   if (globalThis.crypto) {
     // Browser and Node >= 20
-    return { crypto, CryptoKey };
+    return { crypto: globalThis.crypto, CryptoKey };
   }
   // Node <= 18 and webpack (needs polyfill)
   const crypto = await import('crypto');
