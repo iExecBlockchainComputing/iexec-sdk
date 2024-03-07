@@ -3,10 +3,10 @@ export async function getCrypto() {
     // Browser and Node >= 20
     return { crypto, CryptoKey };
   }
-  // Node <= 18
-  const nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
+  // Node <= 18 and webpack (needs polyfill)
+  const crypto = await import('crypto');
   return {
-    crypto: nodeCrypto.webcrypto,
-    CryptoKey: nodeCrypto.webcrypto.CryptoKey,
+    crypto: crypto.webcrypto,
+    CryptoKey: crypto.webcrypto.CryptoKey,
   };
 }
