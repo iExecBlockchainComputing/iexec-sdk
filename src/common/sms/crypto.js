@@ -4,7 +4,7 @@ export async function getCrypto() {
     return { crypto: globalThis.crypto, CryptoKey };
   }
   // Node <= 18 and webpack (needs polyfill)
-  const crypto = await import('crypto');
+  const crypto = await import(/* webpackIgnore: true */ 'crypto');
   return {
     crypto: crypto.webcrypto,
     CryptoKey: crypto.webcrypto.CryptoKey,
