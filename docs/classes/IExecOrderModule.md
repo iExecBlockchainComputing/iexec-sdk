@@ -281,6 +281,7 @@ const requestorderTemplate = await createRequestorder({
 | `overrides.app` | `string` | app to run |
 | `overrides.appmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | app max price per task default `0` |
 | `overrides.beneficiary?` | `string` | beneficiary default connected wallet address |
+| `overrides.callback?` | `string` | address of the smart contract for on-chain callback with the execution result |
 | `overrides.category` | [`BNish`](../modules.md#bnish) | computation category |
 | `overrides.dataset?` | `string` | dataset to use default none |
 | `overrides.datasetmaxprice?` | [`NRLCAmount`](../modules.md#nrlcamount) | dataset max price per task default `0` |

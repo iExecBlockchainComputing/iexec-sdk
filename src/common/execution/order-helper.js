@@ -95,10 +95,9 @@ export const checkRequestRequirements = async (
       );
     }
   }
-  // check storage token
+
+  // check dropbox storage token
   if (
-    paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
-      STORAGE_PROVIDERS.IPFS ||
     paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
       STORAGE_PROVIDERS.DROPBOX
   ) {
@@ -118,6 +117,7 @@ export const checkRequestRequirements = async (
       );
     }
   }
+
   // check tee dataset encryption key
   if (dataset && dataset !== NULL_ADDRESS && isTee) {
     const isDatasetSecretSet = await checkWeb3SecretExists(

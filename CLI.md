@@ -1837,6 +1837,9 @@ Options:
 | --dataset \<address\> | include private orders for specified dataset |
 | --workerpool \<address\> | include private orders for specified workerpool |
 | --requester \<address\> | include private orders for specified requester |
+| --dataset-strict | fetch orders created strictly for the specified dataset |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
+| --requester-strict | fetch orders created strictly for the specified requester |
 
 #### iexec orderbook dataset
 
@@ -1862,6 +1865,9 @@ Options:
 | --app \<address\> | include private orders for specified app |
 | --workerpool \<address\> | include private orders for specified workerpool |
 | --requester \<address\> | include private orders for specified requester |
+| --app-strict | fetch orders created strictly for the specified app |
+| --requester-strict | fetch orders created strictly for the specified requester |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
 
 #### iexec orderbook workerpool
 
@@ -1889,6 +1895,9 @@ Options:
 | --app \<address\> | include private orders for specified app |
 | --dataset \<address\> | include private orders for specified dataset |
 | --requester \<address\> | include private orders for specified requester |
+| --dataset-strict | fetch orders created strictly for the specified dataset |
+| --app-strict | fetch orders created strictly for the specified app |
+| --requester-strict | fetch orders created strictly for the specified requester |
 
 #### iexec orderbook requester
 
@@ -1917,6 +1926,7 @@ Options:
 | --dataset \<address\> | filter by dataset |
 | --beneficiary \<address\> | filter by beneficiary |
 | --workerpool \<address\> | include private orders for specified workerpool |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
 
 ### iexec deal
 

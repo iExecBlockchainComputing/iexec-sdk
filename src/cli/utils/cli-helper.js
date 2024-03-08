@@ -366,6 +366,22 @@ export const option = {
     '--skip-preflight-check',
     'skip preflight check, this may result in task execution fail',
   ],
+  isAppStrict: () => [
+    '--app-strict',
+    'fetch orders created strictly for the specified app',
+  ],
+  isDatasetStrict: () => [
+    '--dataset-strict',
+    'fetch orders created strictly for the specified dataset',
+  ],
+  isWorkerpoolStrict: () => [
+    '--workerpool-strict',
+    'fetch orders created strictly for the specified workerpool',
+  ],
+  isRequesterStrict: () => [
+    '--requester-strict',
+    'fetch orders created strictly for the specified requester',
+  ],
 };
 
 export const optionCreator = {
