@@ -149,7 +149,9 @@
     "generate-packages": "node generatePackages.cjs",
     "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
     "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
-    "generate-cli-doc": "node generateCliDoc.cjs"
+    "generate-cli-doc": "node generateCliDoc.cjs",
+    "stop-test-stack": "cd test && docker compose down --remove-orphans",
+    "start-test-stack": "cd test && npm run stop-test-stack && node prepare-test-env.js && docker compose up -d"
   },
   "files": [
     "src/",
