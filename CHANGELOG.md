@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.6.1] 2024-03-11
+
+### Changed
+
+- fix bundling issue occurring in webpack due to conditional import of node builtin in node context
+
 ## [8.6.0] 2024-03-04
 
 ### Added
