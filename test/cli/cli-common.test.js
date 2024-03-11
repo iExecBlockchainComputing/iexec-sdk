@@ -1,5 +1,10 @@
 import { execAsync } from '../test-utils';
-import { globalSetup, globalTeardown } from './cli-test-utils';
+import {
+  globalSetup,
+  globalTeardown,
+  loadJSONFile,
+  saveJSONToFile,
+} from './cli-test-utils';
 
 const { DRONE } = process.env;
 const iexecPath = DRONE ? 'iexec' : 'node ../../../src/cli/cmd/iexec.js';
@@ -54,5 +59,33 @@ describe('cli common', () => {
     const out = await execAsync(`${iexecPath} app show --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown option '--test'")).not.toBe(-1);
+  });
+});
+
+describe('chain.json', () => {
+  beforeAll(async () => {
+    await execAsync(`${iexecPath} init --skip-wallet --force`);
+    await loadJSONFile('chain.json').then((obj) => {
+      const chainJson = {
+        ...obj,
+        providers: {
+          infura: process.env.INFURA_PROJECT_ID,
+        },
+      };
+      saveJSONToFile(chainJson, 'chain.json');
+    });
+  });
+
+  test('no "native" overwrites in templates', async () => {
+    const { chains } = await loadJSONFile('chain.json');
+    expect(chains.mainnet.native).toBeUndefined();
+    expect(chains.bellecour.native).toBeUndefined();
+  });
+
+  test('bellecour is native', async () => {
+    const raw = await execAsync(`${iexecPath} info --chain bellecour --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.useNative).toBe(true);
   });
 });

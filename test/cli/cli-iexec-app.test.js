@@ -31,7 +31,7 @@ describe('iexec app', () => {
   let userFirstDeployedAppAddress;
 
   beforeAll(async () => {
-    await globalSetup('iexec-app');
+    await globalSetup('cli-iexec-app');
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();

@@ -24,7 +24,7 @@ describe('iexec workerpool', () => {
   let userFirstDeployedWorkerpoolAddress;
 
   beforeAll(async () => {
-    await globalSetup('iexec-workerpool');
+    await globalSetup('cli-iexec-workerpool');
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();

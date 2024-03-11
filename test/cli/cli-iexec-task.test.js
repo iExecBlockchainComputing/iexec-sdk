@@ -27,7 +27,7 @@ describe('iexec task', () => {
   let noDurationCatid;
 
   beforeAll(async () => {
-    await globalSetup('iexec-task');
+    await globalSetup('cli-iexec-task');
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();

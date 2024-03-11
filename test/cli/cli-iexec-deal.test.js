@@ -27,7 +27,7 @@ describe('iexec deal', () => {
   let dealid;
 
   beforeAll(async () => {
-    await globalSetup('iexec-deal');
+    await globalSetup('cli-iexec-deal');
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();

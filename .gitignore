@@ -45,3 +45,6 @@ dist/**
 IExec*/**
 utils/**
 errors/**
+
+# env
+.env
