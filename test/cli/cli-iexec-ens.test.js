@@ -1,11 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, runIExecCliRaw } from '../test-utils';
+import { TEST_CHAINS, execAsync } from '../test-utils';
 import {
   globalSetup,
   globalTeardown,
   iexecPath,
+  runIExecCliRaw,
   setChain,
   setRandomWallet,
 } from './cli-test-utils';
@@ -58,6 +59,20 @@ describe('iexec ens', () => {
       expect(res.setResolverTxHash).toMatch(bytes32Regex);
       expect(res.setAddrTxHash).toMatch(bytes32Regex);
       expect(res.setNameTxHash).toMatch(bytes32Regex);
+      await testChain.provider.getTransaction(res.registerTxHash).then((tx) => {
+        expect(tx.gasPrice.toString()).toBe('0');
+      });
+      await testChain.provider
+        .getTransaction(res.setResolverTxHash)
+        .then((tx) => {
+          expect(tx.gasPrice.toString()).toBe('0');
+        });
+      await testChain.provider.getTransaction(res.setAddrTxHash).then((tx) => {
+        expect(tx.gasPrice.toString()).toBe('0');
+      });
+      await testChain.provider.getTransaction(res.setNameTxHash).then((tx) => {
+        expect(tx.gasPrice.toString()).toBe('0');
+      });
 
       const showAddressRes = await runIExecCliRaw(`${iexecPath} wallet show`);
       expect(showAddressRes.ens).toBe(expectedEns);

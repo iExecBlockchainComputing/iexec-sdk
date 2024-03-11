@@ -22,6 +22,11 @@ export const globalTeardown = async () => {
   process.chdir('../../..');
 };
 
+export const runIExecCliRaw = (cmd) =>
+  execAsync(`${cmd} --raw`)
+    .catch((e) => e.message)
+    .then(JSON.parse);
+
 export const filePath = (fileName) => join(process.cwd(), fileName);
 
 export const checkExists = async (file) => pathExists(file);
@@ -58,7 +63,7 @@ export const removeWallet = () => remove('./wallet.json').catch(() => {});
 
 export const setChain =
   (chain) =>
-  (chainOptions = {}, providerOptions = {}) => {
+  (chainOptions = {}, providerOptions = {}) =>
     saveJSONToFile(
       {
         default: 'dev',
@@ -72,6 +77,8 @@ export const setChain =
             resultProxy: chain.resultProxyURL,
             ensRegistry: chain.ensRegistryAddress,
             ensPublicResolver: chain.ensPublicResolverAddress,
+            useGas: chain.useGas,
+            native: chain.isNative,
             ...chainOptions,
           },
           bellecour: {},
@@ -84,7 +91,6 @@ export const setChain =
       },
       CHAIN_JSON,
     );
-  };
 
 export const setAppUniqueName = async () => {
   const iexecJson = await loadJSONFile(IEXEC_JSON);

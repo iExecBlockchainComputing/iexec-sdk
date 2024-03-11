@@ -1,17 +1,13 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import {
-  TEST_CHAINS,
-  execAsync,
-  initializeTask,
-  runIExecCliRaw,
-} from '../test-utils';
+import { TEST_CHAINS, execAsync, initializeTask } from '../test-utils';
 import {
   editCategory,
   globalSetup,
   globalTeardown,
   iexecPath,
+  runIExecCliRaw,
   setChain,
   setChainsPocoAdminWallet,
   setRandomWallet,

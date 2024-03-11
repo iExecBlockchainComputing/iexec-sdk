@@ -5,13 +5,14 @@ import {
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
-  runIExecCliRaw,
+  getRandomWallet,
 } from '../test-utils';
 import {
   editCategory,
   globalSetup,
   globalTeardown,
   iexecPath,
+  runIExecCliRaw,
   setAppUniqueName,
   setChain,
   setChainsPocoAdminWallet,
@@ -27,7 +28,7 @@ const testChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec app', () => {
   let userWallet;
-  let userFirstDeployedApp;
+  let userFirstDeployedAppAddress;
 
   beforeAll(async () => {
     await globalSetup('iexec-app');
@@ -38,10 +39,8 @@ describe('iexec app', () => {
     userWallet = await setRandomWallet();
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
-    const deployed = await execAsync(`${iexecPath} app deploy --raw`).then(
-      JSON.parse,
-    );
-    userFirstDeployedApp = deployed.address;
+    const deployed = await runIExecCliRaw(`${iexecPath} app deploy`);
+    userFirstDeployedAppAddress = deployed.address;
   });
 
   afterAll(async () => {
@@ -99,6 +98,9 @@ describe('iexec app', () => {
       expect(res.ok).toBe(true);
       expect(res.address).toBeDefined();
       expect(res.txHash).toBeDefined();
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 
@@ -121,18 +123,18 @@ describe('iexec app', () => {
       const raw = await execAsync(`${iexecPath} app show 0 --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.address).toBe(userFirstDeployedApp);
+      expect(res.address).toBe(userFirstDeployedAppAddress);
       expect(res.app).toBeDefined();
       expect(res.app.owner).toBe(userWallet.address);
     });
 
     test('iexec app show [appAddress]', async () => {
       const raw = await execAsync(
-        `${iexecPath} app show ${userFirstDeployedApp} --raw`,
+        `${iexecPath} app show ${userFirstDeployedAppAddress} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
-      expect(res.address).toBe(userFirstDeployedApp);
+      expect(res.address).toBe(userFirstDeployedAppAddress);
       expect(res.app).toBeDefined();
       expect(res.app.owner).toBe(userWallet.address);
     });
@@ -173,6 +175,9 @@ describe('iexec app', () => {
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
       expect(res.txHash).toBeDefined();
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 
@@ -391,6 +396,140 @@ describe('iexec app', () => {
       expect(res.failedTasks[0].status).toBe(0);
       expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
       expect(res.failedTasks[0].taskTimedOut).toBe(true);
+    });
+  });
+
+  describe('push-secret / check-secret', () => {
+    test('check-secret', async () => {
+      await setAppUniqueName();
+      const { address: appAddress } = await runIExecCliRaw(
+        `${iexecPath} app deploy`,
+      );
+      const resNotPushed = await runIExecCliRaw(
+        `${iexecPath} app check-secret ${appAddress}`,
+      );
+      expect(resNotPushed.ok).toBe(true);
+      expect(resNotPushed.isSecretSet).toBe(false);
+
+      // only owner can push
+      const unauthorizedWallet = getRandomWallet();
+      await runIExecCliRaw(
+        `${iexecPath} wallet import ${unauthorizedWallet.privateKey} --password test`,
+      );
+      const pushUnauthorized = await runIExecCliRaw(
+        `${iexecPath} app push-secret  ${appAddress} --secret-value foo --wallet-address ${unauthorizedWallet.address} --password test`,
+      );
+      expect(pushUnauthorized.ok).toBe(false);
+      await runIExecCliRaw(
+        `${iexecPath} app push-secret ${appAddress} --secret-value foo`,
+      );
+      const resPushed = await runIExecCliRaw(
+        `${iexecPath} app check-secret ${appAddress}`,
+      );
+      expect(resPushed.ok).toBe(true);
+      expect(resPushed.isSecretSet).toBe(true);
+
+      const resGramineNotPushed = await runIExecCliRaw(
+        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
+      );
+      expect(resGramineNotPushed.ok).toBe(true);
+      expect(resGramineNotPushed.isSecretSet).toBe(false);
+      await runIExecCliRaw(
+        `${iexecPath} app push-secret ${appAddress} --secret-value foo --tee-framework gramine`,
+      );
+      const resGraminePushed = await runIExecCliRaw(
+        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
+      );
+      expect(resGraminePushed.ok).toBe(true);
+      expect(resGraminePushed.isSecretSet).toBe(true);
+    });
+  });
+
+  describe('publish', () => {
+    test('from deployed', async () => {
+      await setAppUniqueName();
+      const { address } = await runIExecCliRaw(`${iexecPath} app deploy`);
+      const res = await runIExecCliRaw(`${iexecPath} app publish --force`);
+      expect(res.ok).toBe(true);
+      expect(res.orderHash).toBeDefined();
+      const orderShowRes = JSON.parse(
+        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+      );
+      expect(orderShowRes.apporder.order).toEqual({
+        app: address,
+        appprice: 0,
+        volume: 1000000,
+        tag: NULL_BYTES32,
+        datasetrestrict: NULL_ADDRESS,
+        workerpoolrestrict: NULL_ADDRESS,
+        requesterrestrict: NULL_ADDRESS,
+        sign: orderShowRes.apporder.order.sign,
+        salt: orderShowRes.apporder.order.salt,
+      });
+    });
+
+    test('from app address with options', async () => {
+      await expect(
+        execAsync(
+          `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --tag tee,scone --force`,
+        ),
+      ).rejects.toThrow('Tag mismatch the TEE framework specified by app');
+      const res = await runIExecCliRaw(
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --force`,
+      );
+      expect(res.ok).toBe(true);
+      expect(res.orderHash).toBeDefined();
+      const orderShowRes = JSON.parse(
+        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+      );
+      expect(orderShowRes.apporder.order).toEqual({
+        app: userFirstDeployedAppAddress,
+        appprice: 100000000,
+        volume: 100,
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        datasetrestrict: NULL_ADDRESS,
+        workerpoolrestrict: NULL_ADDRESS,
+        requesterrestrict: NULL_ADDRESS,
+        sign: orderShowRes.apporder.order.sign,
+        salt: orderShowRes.apporder.order.salt,
+      });
+    });
+  });
+
+  describe('unpublish', () => {
+    test('latest from deployed', async () => {
+      await setAppUniqueName();
+      await runIExecCliRaw(`${iexecPath} app deploy`);
+      await runIExecCliRaw(`${iexecPath} app publish --force`);
+      const { orderHash: lastOrderHash } = await runIExecCliRaw(
+        `${iexecPath} app publish --force`,
+      );
+      const res = await runIExecCliRaw(`${iexecPath} app unpublish --force`);
+      expect(res.ok).toBe(true);
+      expect(res.unpublished).toBe(lastOrderHash);
+      await runIExecCliRaw(`${iexecPath} app unpublish --force`);
+      const resErr = await runIExecCliRaw(`${iexecPath} app unpublish --force`);
+      expect(resErr.ok).toBe(false);
+    });
+
+    test('from app address --all', async () => {
+      const { orderHash } = await runIExecCliRaw(
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`,
+      );
+      const { orderHash: lastOrderHash } = await runIExecCliRaw(
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`,
+      );
+      const res = await runIExecCliRaw(
+        `${iexecPath} app unpublish ${userFirstDeployedAppAddress} --all --force`,
+      );
+      expect(res.ok).toBe(true);
+      expect(res.unpublished).toEqual(
+        expect.arrayContaining([orderHash, lastOrderHash]),
+      );
+      const resErr = await runIExecCliRaw(
+        `${iexecPath} app unpublish --all --force --raw`,
+      );
+      expect(resErr.ok).toBe(false);
     });
   });
 });

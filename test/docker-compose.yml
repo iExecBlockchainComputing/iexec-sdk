@@ -1,6 +1,22 @@
 version: '3.9'
 
 services:
+  bellecour-gas-fork:
+    restart: 'no'
+    image: ghcr.io/foundry-rs/foundry:latest
+    entrypoint: anvil
+    command: '--host 0.0.0.0 --port 8555 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --fork-block-number $BELLECOUR_FORK_BLOCK --chain-id 1134 --gas-limit 6700000'
+    expose:
+      - 8555
+    ports:
+      - 8555:8555
+    healthcheck:
+      test: nc -z 0.0.0.0 8555
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
   bellecour-fork:
     restart: 'no'
     image: ghcr.io/foundry-rs/foundry:latest
@@ -24,6 +40,8 @@ services:
       context: .
       dockerfile: impersonate-for-tests.Dockerfile
     depends_on:
+      bellecour-gas-fork:
+        condition: service_healthy
       bellecour-fork:
         condition: service_healthy
 

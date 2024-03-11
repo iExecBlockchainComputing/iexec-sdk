@@ -1,11 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, runIExecCliRaw } from '../test-utils';
+import { TEST_CHAINS, execAsync } from '../test-utils';
 import {
   globalSetup,
   globalTeardown,
   iexecPath,
+  runIExecCliRaw,
   setChain,
   setChainsPocoAdminWallet,
   setRandomWallet,
@@ -79,6 +80,9 @@ describe('iexec category', () => {
       expect(res.ok).toBe(true);
       expect(res.catid).toBeDefined();
       expect(res.txHash).toBeDefined();
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 });
