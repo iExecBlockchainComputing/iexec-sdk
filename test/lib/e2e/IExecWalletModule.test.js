@@ -27,7 +27,7 @@ describe('wallet', () => {
       const res = await iexec.wallet.getAddress();
       expect(res).toBe(wallet.address);
     });
-    test('require a connected wallet', async () => {
+    test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         readOnly: true,
       });
@@ -82,10 +82,7 @@ describe('wallet', () => {
     });
     describe('token chain', () => {
       test('expose bridged balances (bellecour) on mainnet', async () => {
-        const iexec = new IExec(
-          { ethProvider: 'mainnet' },
-          { providerOptions: { infura: INFURA_PROJECT_ID } },
-        );
+        const iexec = new IExec({ ethProvider: 'mainnet' });
         const address = getRandomAddress();
         const balance = await iexec.wallet.checkBridgedBalances(address);
         expect(balance.nRLC).toStrictEqual(new BN(0));
@@ -95,6 +92,17 @@ describe('wallet', () => {
   });
 
   describe('sendETH()', () => {
+    test('require a signer', async () => {
+      const { iexec } = getTestConfig(tokenTestChain)({ readOnly: true });
+      await expect(
+        iexec.wallet.sendETH(10, getRandomAddress()),
+      ).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
     describe('token chain', () => {
       test('sends wei', async () => {
         const receiverAddress = getRandomAddress();
@@ -161,6 +169,17 @@ describe('wallet', () => {
   });
 
   describe('sendRLC()', () => {
+    test('require a signer', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(
+        iexec.wallet.sendRLC(10, getRandomAddress()),
+      ).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
     describe('native chain', () => {
       test('sends nRLC', async () => {
         const receiverAddress = getRandomAddress();
