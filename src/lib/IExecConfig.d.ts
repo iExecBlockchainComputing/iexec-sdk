@@ -141,7 +141,7 @@ export default class IExecConfig {
    * - using a private key server side
    *
    * ```js
-   * const { getSignerFromPrivateKey } = require('iexec/utils');
+   * import { getSignerFromPrivateKey } from 'iexec/utils';
    * const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
    * ```
    */
