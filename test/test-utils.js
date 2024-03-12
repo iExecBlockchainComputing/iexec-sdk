@@ -1,5 +1,7 @@
 import { exec } from 'child_process';
 import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import { IExec } from '../src/lib';
+import { getSignerFromPrivateKey } from '../src/lib/utils';
 
 export const execAsync = (cmd) =>
   new Promise((res, rej) => {
@@ -179,9 +181,27 @@ export const setBalance = (chain) => async (address, weiAmount) => {
 export const setNRlcBalance = (chain) => async (address, nRlcAmount) => {
   if (chain.isNative || chain.defaults?.isNative) {
     const weiAmount = BigInt(`${nRlcAmount}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
-    return setBalance(chain)(address, weiAmount);
+    await setBalance(chain)(address, weiAmount);
+    return;
   }
-  throw Error('Not implemented for non native RLC');
+  const iexec = new IExec(
+    {
+      ethProvider: getSignerFromPrivateKey(
+        chain.rpcURL,
+        chain.richWallet.privateKey,
+      ),
+    },
+    { hubAddress: chain.hubAddress },
+  );
+  const { nRLC } = await iexec.wallet.checkBalances(address);
+  const delta = BigInt(`${nRlcAmount}`) - BigInt(`${nRLC}`);
+  if (delta < 0n) {
+    console.warn(
+      `setNRlcBalance: aborted - current balance exceed target balance`,
+    );
+    return;
+  }
+  await iexec.wallet.sendRLC(`${delta}`, address);
 };
 
 export const initializeTask = (chain) => async (dealid, idx) => {

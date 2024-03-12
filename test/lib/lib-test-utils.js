@@ -5,14 +5,7 @@ import { getRandomWallet } from '../test-utils';
 
 export const getTestConfig =
   (chain) =>
-  ({ privateKey, options = {} } = {}) => {
-    const wallet = privateKey ? new Wallet(privateKey) : getRandomWallet();
-
-    const ethProvider = getSignerFromPrivateKey(
-      chain.rpcURL,
-      wallet.privateKey,
-    );
-
+  ({ privateKey, readOnly = false, options = {} } = {}) => {
     const configOptions = {
       bridgeAddress: options.bridgeAddress ?? chain.bridgeAddress,
       bridgedNetworkConf:
@@ -35,8 +28,26 @@ export const getTestConfig =
       smsURL: options.smsURL ?? chain.smsURL,
       useGas: options.useGas ?? chain.useGas,
     };
+
+    if (readOnly) {
+      return {
+        iexec: new IExec({ ethProvider: chain.rpcURL }, configOptions),
+      };
+    }
+
+    const wallet = privateKey ? new Wallet(privateKey) : getRandomWallet();
+    const ethProvider = getSignerFromPrivateKey(
+      chain.rpcURL,
+      wallet.privateKey,
+    );
     return {
       iexec: new IExec({ ethProvider }, configOptions),
       wallet,
     };
   };
+
+export const ONE_ETH = 10n ** 18n;
+
+export const ONE_RLC = 10n ** 9n;
+
+export const ONE_GWEI = 10n ** 9n;
