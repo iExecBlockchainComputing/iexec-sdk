@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - remove ipfs initialization preflight checks on request orders
+- fix `--gas-price` option not being enforced on every commands
 
 ## [8.5.2] 2024-01-24
 
