@@ -15,39 +15,13 @@ const { DRONE } = process.env;
 
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
-  // token: {
-  //   rpcURL: DRONE ? 'http://token-chain:8545' : 'http://localhost:8555',
-  //   chainId: '65535',
-  //   sconeSmsURL: DRONE
-  //     ? 'http://token-sms-scone:13300'
-  //     : 'http://localhost:13301',
-  //   gramineSmsURL: DRONE
-  //     ? 'http://token-sms-gramine:13300'
-  //     : 'http://localhost:13302',
-  //   marketURL: undefined, // no market connected
-  //   resultProxyURL: DRONE
-  //     ? 'http://token-result-proxy:13200'
-  //     : 'http://localhost:13200',
-  //   hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-  //   enterpriseHubAddress: '0xb80C02d24791fA92fA8983f15390274698A75D23',
-  //   ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
-  //   ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
-  //   pocoAdminWallet: new Wallet(
-  //     '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-  //   ),
-  //   richWallet: new Wallet(
-  //     '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-  //   ),
-  //   provider: new JsonRpcProvider(
-  //     DRONE ? 'http://token-chain:8545' : 'http://localhost:8555',
-  //   ),
-  // },
-
-  'bellecour-gas-fork': {
-    rpcURL: DRONE ? 'http://bellecour-gas-fork:8555' : 'http://localhost:8555',
-    chainId: '1134',
-    useGas: true,
-    isNative: true,
+  'custom-token-chain': {
+    rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+    chainId: '65535',
+    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
+    enterpriseHubAddress: '0xb80C02d24791fA92fA8983f15390274698A75D23',
+    ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
+    ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
@@ -55,11 +29,9 @@ export const TEST_CHAINS = {
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
     provider: new JsonRpcProvider(
-      DRONE ? 'http://bellecour-gas-fork:8555' : 'http://localhost:8555',
+      DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
     ),
-    hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-    ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-    ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+    isAnvil: false,
   },
 
   'bellecour-fork': {
@@ -89,6 +61,7 @@ export const TEST_CHAINS = {
       isNative: true,
       useGas: false,
     },
+    isAnvil: true,
   },
 };
 
@@ -163,18 +136,27 @@ export class InjectedProvider {
 }
 
 export const setBalance = (chain) => async (address, amount) => {
-  await fetch(chain.rpcURL, {
-    method: 'POST',
-    body: JSON.stringify({
-      method: 'anvil_setBalance',
-      params: [address, ethers.toBeHex(amount)],
-      id: 1,
-      jsonrpc: '2.0',
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  if (chain.isAnvil) {
+    await fetch(chain.rpcURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        method: 'anvil_setBalance',
+        params: [address, ethers.toBeHex(amount)],
+        id: 1,
+        jsonrpc: '2.0',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } else {
+    const currentBalance = await chain.provider.getBalance(address);
+    const delta = BigInt(amount) - currentBalance;
+    const tx = await chain.richWallet
+      .connect(chain.provider)
+      .sendTransaction({ to: address, value: delta });
+    await tx.wait();
+  }
 };
 
 export const initializeTask = (chain) => async (dealid, idx) => {

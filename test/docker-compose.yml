@@ -1,17 +1,29 @@
 version: '3.9'
 
 services:
-  bellecour-gas-fork:
-    restart: 'no'
-    image: ghcr.io/foundry-rs/foundry:latest
-    entrypoint: anvil
-    command: '--host 0.0.0.0 --port 8555 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --fork-block-number $BELLECOUR_FORK_BLOCK --chain-id 1134 --gas-limit 6700000'
+  custom-token-chain:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
     expose:
-      - 8555
+      - 8545
     ports:
-      - 8555:8555
+      - 18545:8545
     healthcheck:
-      test: nc -z 0.0.0.0 8555
+      test: nc -z 0.0.0.0 8545
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  custom-native-chain:
+    restart: unless-stopped
+    image: 'iexechub/poco-chaintest:5.3.2-native-openethereum'
+    expose:
+      - 8545
+    ports:
+      - 28545:8545
+    healthcheck:
+      test: nc -z 0.0.0.0 8545
       interval: 10s
       timeout: 5s
       retries: 3
@@ -40,8 +52,6 @@ services:
       context: .
       dockerfile: impersonate-for-tests.Dockerfile
     depends_on:
-      bellecour-gas-fork:
-        condition: service_healthy
       bellecour-fork:
         condition: service_healthy
 
