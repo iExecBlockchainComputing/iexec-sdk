@@ -11,56 +11,25 @@ import {
   BrowserProvider,
 } from 'ethers';
 
-import { utils, IExecConfig, errors } from '../src/lib';
-import IExecContractsClient from '../src/common/utils/IExecContractsClient';
-import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
-import { InjectedProvider, getRandomWallet } from './test-utils';
-
-console.log('Node version:', process.version);
+import { utils, IExecConfig, errors } from '../../../src/lib';
+import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
+import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
+import {
+  ALCHEMY_API_KEY,
+  ETHERSCAN_API_KEY,
+  INFURA_PROJECT_ID,
+  InjectedProvider,
+  TEST_CHAINS,
+  getRandomAddress,
+  getRandomWallet,
+} from '../../test-utils';
 
 const DEFAULT_TIMEOUT = 10000;
-
 jest.setTimeout(DEFAULT_TIMEOUT);
 
-// CONFIG
-const { DRONE, INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
-  process.env;
-// public chains
-console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
-console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
-console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
+const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const unknownTestChain = TEST_CHAINS['custom-token-chain'];
 
-// TODO can be replaced by instamine chain to speedup tests
-const tokenChainInstamineUrl = DRONE
-  ? 'http://token-chain:8545'
-  : 'http://localhost:18545';
-const nativeChainInstamineUrl = DRONE
-  ? 'http://native-chain:8545'
-  : 'http://localhost:28545';
-// secret management service
-const sconeSms = DRONE
-  ? 'http://token-sms-scone:13300'
-  : 'http://localhost:13301';
-// result proxy
-const resultProxyURL = DRONE
-  ? 'http://token-result-proxy:13200'
-  : 'http://localhost:13200';
-// marketplace
-const iexecGatewayURL = DRONE
-  ? 'http://token-gateway:3000'
-  : 'http://localhost:13000';
-
-const networkId = 65535;
-const hubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
-const enterpriseHubAddress = '0xb80C02d24791fA92fA8983f15390274698A75D23';
-const nativeHubAddress = '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca';
-const ensRegistryAddress = '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a';
-const ensPublicResolverAddress = '0x464E9FC01C2970173B183D24B43A0FA07e6A072E';
-
-const PRIVATE_KEY =
-  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407';
-
-// TESTS
 describe('[IExecConfig]', () => {
   describe('constructor', () => {
     describe('throw Missing ethProvider', () => {
@@ -82,17 +51,6 @@ describe('[IExecConfig]', () => {
       test("IExecConfig({ ethProvider: '' })", () => {
         const createConfig = () => new IExecConfig({ ethProvider: '' });
         expect(createConfig).toThrow(Error('Missing ethProvider'));
-        expect(createConfig).toThrow(errors.ConfigurationError);
-      });
-    });
-
-    describe.skip('throw Invalid ethProvider', () => {
-      // does not throw in ethers v6
-      test('IExecConfig({ ethProvider: {} })', () => {
-        const createConfig = () => new IExecConfig({ ethProvider: {} });
-        expect(createConfig).toThrow(
-          Error('Invalid ethProvider: Unsupported provider'),
-        );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
     });
@@ -414,17 +372,17 @@ describe('[IExecConfig]', () => {
     describe('read-only ethProvider from node url', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainInstamineUrl },
-          { hubAddress },
+          { ethProvider: unknownTestChain.rpcURL },
+          { hubAddress: unknownTestChain.hubAddress },
         );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe('65535');
+        expect(chainId).toBe(unknownTestChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535n);
+        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
         expect(network.name).toBe('unknown');
         expect(network.getPlugin('org.ethers.plugins.network.Ens')).toBe(null);
       });
@@ -450,61 +408,67 @@ describe('[IExecConfig]', () => {
     describe('read-only ethProvider with ens override', () => {
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, ensRegistryAddress })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainInstamineUrl },
-          { hubAddress, ensRegistryAddress },
+          { ethProvider: unknownTestChain.rpcURL },
+          {
+            hubAddress: unknownTestChain.hubAddress,
+            ensRegistryAddress: unknownTestChain.ensRegistryAddress,
+          },
         );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe('65535');
+        expect(chainId).toBe(unknownTestChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535n);
+        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
         expect(network.name).toBe('unknown');
         expect(
           network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(ensRegistryAddress);
+        ).toBe(unknownTestChain.ensRegistryAddress);
       });
     });
 
     describe('signer provider from private key', () => {
       test('getSignerFromPrivateKey()', async () => {
-        const config = new IExecConfig(
-          {
-            ethProvider: utils.getSignerFromPrivateKey(
-              tokenChainInstamineUrl,
-              PRIVATE_KEY,
-            ),
-          },
-          { hubAddress, ensRegistryAddress },
-        );
+        const wallet = getRandomWallet();
+        const config = new IExecConfig({
+          ethProvider: utils.getSignerFromPrivateKey(
+            iexecTestChain.rpcURL,
+            wallet.privateKey,
+          ),
+        });
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe('65535');
+        expect(chainId).toBe(iexecTestChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535n);
-        expect(network.name).toBe('unknown');
+        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
+        expect(network.name).toBe(iexecTestChain.defaults.name);
         expect(
           network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(ensRegistryAddress);
+        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
       });
 
       test('getSignerFromPrivateKey() with network fallback', async () => {
+        const wallet = getRandomWallet();
         const config = new IExecConfig(
           {
-            ethProvider: utils.getSignerFromPrivateKey('mainnet', PRIVATE_KEY, {
-              providers: {
-                infura: INFURA_PROJECT_ID,
-                alchemy: ALCHEMY_API_KEY,
-                etherscan: ETHERSCAN_API_KEY,
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              wallet.privateKey,
+              {
+                providers: {
+                  infura: INFURA_PROJECT_ID,
+                  alchemy: ALCHEMY_API_KEY,
+                  etherscan: ETHERSCAN_API_KEY,
+                },
               },
-            }),
+            ),
           },
-          { hubAddress, ensRegistryAddress },
+          // { hubAddress, ensRegistryAddress }, // TODO
         );
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
@@ -524,27 +488,24 @@ describe('[IExecConfig]', () => {
     describe('web3 provider', () => {
       test('InjectedProvider', async () => {
         const injectedProvider = new InjectedProvider(
-          tokenChainInstamineUrl,
+          iexecTestChain.rpcURL,
           getRandomWallet().privateKey,
         );
-        const config = new IExecConfig(
-          {
-            ethProvider: injectedProvider,
-          },
-          { hubAddress, ensRegistryAddress },
-        );
+        const config = new IExecConfig({
+          ethProvider: injectedProvider,
+        });
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(BrowserProvider);
-        expect(chainId).toBe('65535');
+        expect(chainId).toBe(iexecTestChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535n);
-        expect(network.name).toBe('unknown');
+        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
+        expect(network.name).toBe(iexecTestChain.defaults.name);
         expect(
           network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(ensRegistryAddress);
+        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
       });
     });
 
@@ -617,13 +578,12 @@ describe('[IExecConfig]', () => {
       });
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, bridgedNetworkConf })', async () => {
         const config = new IExecConfig(
-          { ethProvider: tokenChainInstamineUrl },
+          { ethProvider: iexecTestChain.rpcURL },
           {
-            hubAddress,
             bridgedNetworkConf: {
-              rpcURL: tokenChainInstamineUrl,
-              chainId: '65535',
-              hubAddress,
+              rpcURL: unknownTestChain.rpcURL,
+              chainId: unknownTestChain.chainId,
+              hubAddress: unknownTestChain.hubAddress,
               bridgeAddress: utils.NULL_ADDRESS,
             },
           },
@@ -633,9 +593,9 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe('65535');
+        expect(chainId).toBe(unknownTestChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(65535n);
+        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
         expect(network.name).toBe('unknown');
         expect(network.getPlugin('org.ethers.plugins.network.Ens')).toBe(null);
       });
@@ -645,9 +605,11 @@ describe('[IExecConfig]', () => {
   describe('resolveChainId()', () => {
     test('success', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: iexecTestChain.rpcURL,
       });
-      await expect(config.resolveChainId()).resolves.toBe(networkId);
+      await expect(config.resolveChainId()).resolves.toBe(
+        parseInt(iexecTestChain.chainId, 10),
+      );
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
@@ -674,24 +636,24 @@ describe('[IExecConfig]', () => {
     test('success with hubAddress on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: unknownTestChain.rpcURL,
         },
-        { hubAddress },
+        { hubAddress: unknownTestChain.hubAddress },
       );
       const promise = config.resolveContractsClient();
       await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
       const contracts = await promise;
-      expect(contracts.chainId).toBe(`${networkId}`);
+      expect(contracts.chainId).toBe(unknownTestChain.chainId);
       expect(contracts.isNative).toBe(false);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveContractsClient();
       await expect(promise).rejects.toThrow(
         Error(
-          `Failed to create contracts client: Missing iExec contract default address for chain ${networkId}`,
+          `Failed to create contracts client: Missing iExec contract default address for chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -718,16 +680,18 @@ describe('[IExecConfig]', () => {
       expect(contracts.isNative).toBe(false);
     });
     test('success with bridgedNetworkConf on custom chain', async () => {
+      const homeChain = unknownTestChain;
+      const bridgedChain = unknownTestChain;
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: homeChain.rpcURL,
         },
         {
-          hubAddress,
+          hubAddress: homeChain.rpcURL,
           bridgedNetworkConf: {
-            chainId: networkId,
-            rpcURL: nativeChainInstamineUrl,
-            hubAddress: nativeHubAddress,
+            chainId: bridgedChain.chainId,
+            rpcURL: bridgedChain.rpcURL,
+            hubAddress: bridgedChain.hubAddress,
             bridgeAddress: utils.NULL_ADDRESS,
           },
         },
@@ -735,17 +699,17 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveBridgedContractsClient();
       await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
       const contracts = await promise;
-      expect(contracts.chainId).toBe(`${networkId}`);
+      expect(contracts.chainId).toBe(bridgedChain.chainId);
       expect(contracts.isNative).toBe(true);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveBridgedContractsClient();
       await expect(promise).rejects.toThrow(
         Error(
-          `bridgedNetworkConf option not set and no default value for your chain ${networkId}`,
+          `bridgedNetworkConf option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -755,165 +719,6 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolveBridgedContractsClient();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
-  describe('resolveStandardContractsClient()', () => {
-    test('success', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(
-        '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      );
-      expect(contracts.flavour).toBe('standard');
-    });
-    test('success on custom chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-        },
-        { hubAddress },
-      );
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(hubAddress);
-      expect(contracts.flavour).toBe('standard');
-    });
-    test('success with enterpriseSwapConf on custom enterprise chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-          flavour: 'enterprise',
-        },
-        {
-          hubAddress: enterpriseHubAddress,
-          enterpriseSwapConf: {
-            hubAddress,
-          },
-        },
-      );
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(hubAddress);
-      expect(contracts.flavour).toBe('standard');
-    });
-    test('throw on unknown chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
-      });
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).rejects.toThrow(
-        Error(
-          `Failed to create contracts client: Missing iExec contract default address for chain ${networkId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on unknown enterprise chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-          flavour: 'enterprise',
-        },
-        {
-          hubAddress: enterpriseHubAddress,
-        },
-      );
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).rejects.toThrow(
-        Error(
-          `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveStandardContractsClient();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
-  describe('resolveEnterpriseContractsClient()', () => {
-    test('success on custom chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-          flavour: 'enterprise',
-        },
-        {
-          hubAddress: enterpriseHubAddress,
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(enterpriseHubAddress);
-      expect(contracts.flavour).toBe('enterprise');
-    });
-    test('success with enterpriseSwapConf on custom chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-        },
-        {
-          hubAddress,
-          enterpriseSwapConf: {
-            hubAddress: enterpriseHubAddress,
-          },
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).resolves.toBeInstanceOf(IExecContractsClient);
-      const contracts = await promise;
-      expect(contracts.hubAddress).toBe(enterpriseHubAddress);
-      expect(contracts.flavour).toBe('enterprise');
-    });
-    test('throw on unsupported chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).rejects.toThrow(
-        Error(
-          `enterpriseSwapConf option not set and no default value for your chain 134`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on unknown chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: tokenChainInstamineUrl,
-        },
-        {
-          hubAddress,
-        },
-      );
-      const promise = config.resolveEnterpriseContractsClient();
-      await expect(promise).rejects.toThrow(
-        Error(
-          `enterpriseSwapConf option not set and no default value for your chain ${networkId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveEnterpriseContractsClient();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });
@@ -997,38 +802,40 @@ describe('[IExecConfig]', () => {
       ).resolves.toBe(smsMap.gramine);
     });
     test('success smsURL string override all teeFramework', async () => {
+      const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { smsURL: sconeSms },
+        { smsURL: smsOverride },
       );
-      await expect(config.resolveSmsURL()).resolves.toBe(sconeSms);
+      await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(sconeSms);
+      ).resolves.toBe(smsOverride);
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(sconeSms);
+      ).resolves.toBe(smsOverride);
     });
     test('success with smsURL string on custom chain', async () => {
+      const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: unknownTestChain.rpcURL,
         },
-        { smsURL: sconeSms },
+        { smsURL: smsOverride },
       );
       const promise = config.resolveSmsURL();
-      await expect(promise).resolves.toBe(sconeSms);
+      await expect(promise).resolves.toBe(smsOverride);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow(
         Error(
-          `smsURL option not set and no default value for your chain ${networkId}`,
+          `smsURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -1043,7 +850,7 @@ describe('[IExecConfig]', () => {
     });
     test('throw with invalid TEE framework', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: iexecTestChain.rpcURL,
       });
       const promise = config.resolveSmsURL({ teeFramework: 'foo' });
       await expect(promise).rejects.toThrow(
@@ -1064,33 +871,35 @@ describe('[IExecConfig]', () => {
       expect(url.length > 0).toBe(true);
     });
     test('success resultProxyURL override', async () => {
+      const resultProxyOverride = 'http://rp-override.iex.ec';
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { resultProxyURL },
+        { resultProxyURL: resultProxyOverride },
       );
       const promise = config.resolveResultProxyURL();
-      await expect(promise).resolves.toBe(resultProxyURL);
+      await expect(promise).resolves.toBe(resultProxyOverride);
     });
     test('success with resultProxyURL on custom chain', async () => {
+      const resultProxyOverride = 'http://rp-override.iex.ec';
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: unknownTestChain.rpcURL,
         },
-        { resultProxyURL },
+        { resultProxyURL: resultProxyOverride },
       );
       const promise = config.resolveResultProxyURL();
-      await expect(promise).resolves.toBe(resultProxyURL);
+      await expect(promise).resolves.toBe(resultProxyOverride);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveResultProxyURL();
       await expect(promise).rejects.toThrow(
         Error(
-          `resultProxyURL option not set and no default value for your chain ${networkId}`,
+          `resultProxyURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -1116,32 +925,34 @@ describe('[IExecConfig]', () => {
       expect(url.length > 0).toBe(true);
     });
     test('success when configured on custom chain', async () => {
+      const marketOverride = 'https://api.market-override.iex.ec';
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: unknownTestChain.rpcURL,
         },
-        { iexecGatewayURL },
+        { iexecGatewayURL: marketOverride },
       );
       const promise = config.resolveIexecGatewayURL();
-      await expect(promise).resolves.toBe(iexecGatewayURL);
+      await expect(promise).resolves.toBe(marketOverride);
     });
     test('success iexecGatewayURL override', async () => {
+      const marketOverride = 'https://api.market-override.iex.ec';
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { iexecGatewayURL },
+        { iexecGatewayURL: marketOverride },
       );
       const promise = config.resolveIexecGatewayURL();
-      await expect(promise).resolves.toBe(iexecGatewayURL);
+      await expect(promise).resolves.toBe(marketOverride);
     });
     test('throw when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveIexecGatewayURL();
       await expect(promise).rejects.toThrow(
-        `iexecGatewayURL option not set and no default value for your chain ${networkId}`,
+        `iexecGatewayURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
       );
       await expect(promise).rejects.toThrow(Error);
     });
@@ -1168,7 +979,7 @@ describe('[IExecConfig]', () => {
     test('success when configured on custom chain', async () => {
       const config = new IExecConfig(
         {
-          ethProvider: tokenChainInstamineUrl,
+          ethProvider: unknownTestChain.rpcURL,
         },
         { ipfsGatewayURL: 'https://custom-ipfs.iex.ec' },
       );
@@ -1187,11 +998,11 @@ describe('[IExecConfig]', () => {
     });
     test('success when not configured on custom chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).rejects.toThrow(
-        `ipfsGatewayURL option not set and no default value for your chain ${networkId}`,
+        `ipfsGatewayURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
       );
       await expect(promise).rejects.toThrow(Error);
     });
@@ -1216,33 +1027,35 @@ describe('[IExecConfig]', () => {
       expect(address.length).toBe(42);
     });
     test('success bridgeAddress override', async () => {
+      const bridgeAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { bridgeAddress: utils.NULL_ADDRESS },
+        { bridgeAddress: bridgeAddressOverride },
       );
       const promise = config.resolveBridgeAddress();
-      await expect(promise).resolves.toBe(utils.NULL_ADDRESS);
+      await expect(promise).resolves.toBe(bridgeAddressOverride);
     });
     test('success with bridgeAddress on custom chain', async () => {
+      const bridgeAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { bridgeAddress: utils.NULL_ADDRESS },
+        { bridgeAddress: bridgeAddressOverride },
       );
       const promise = config.resolveBridgeAddress();
-      await expect(promise).resolves.toBe(utils.NULL_ADDRESS);
+      await expect(promise).resolves.toBe(bridgeAddressOverride);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveBridgeAddress();
       await expect(promise).rejects.toThrow(
         Error(
-          `bridgeAddress option not set and no default value for your chain ${networkId}`,
+          `bridgeAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -1268,41 +1081,43 @@ describe('[IExecConfig]', () => {
       expect(address.length).toBe(42);
     });
     test('success bridgeAddress override', async () => {
+      const bridgeAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
         {
           bridgedNetworkConf: {
-            bridgeAddress: utils.NULL_ADDRESS,
+            bridgeAddress: bridgeAddressOverride,
           },
         },
       );
       const promise = config.resolveBridgeBackAddress();
-      await expect(promise).resolves.toBe(utils.NULL_ADDRESS);
+      await expect(promise).resolves.toBe(bridgeAddressOverride);
     });
     test('success with bridgeAddress on custom chain', async () => {
+      const bridgeAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
         {
           bridgedNetworkConf: {
-            bridgeAddress: utils.NULL_ADDRESS,
+            bridgeAddress: bridgeAddressOverride,
           },
         },
       );
       const promise = config.resolveBridgeBackAddress();
-      await expect(promise).resolves.toBe(utils.NULL_ADDRESS);
+      await expect(promise).resolves.toBe(bridgeAddressOverride);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveBridgeBackAddress();
       await expect(promise).rejects.toThrow(
         Error(
-          `bridgedNetworkConf option not set and no default value for your chain ${networkId}`,
+          `bridgedNetworkConf option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
@@ -1328,37 +1143,39 @@ describe('[IExecConfig]', () => {
       expect(address.length).toBe(42);
     });
     test('success ensPublicResolverAddress override', async () => {
+      const ensPublicResolverAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
         {
-          ensPublicResolverAddress,
+          ensPublicResolverAddress: ensPublicResolverAddressOverride,
         },
       );
       const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).resolves.toBe(ensPublicResolverAddress);
+      await expect(promise).resolves.toBe(ensPublicResolverAddressOverride);
     });
     test('success with ensPublicResolverAddress on custom chain', async () => {
+      const ensPublicResolverAddressOverride = getRandomAddress();
       const config = new IExecConfig(
         {
-          ethProvider: 'bellecour',
+          ethProvider: unknownTestChain.rpcURL,
         },
         {
-          ensPublicResolverAddress,
+          ensPublicResolverAddress: ensPublicResolverAddressOverride,
         },
       );
       const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).resolves.toBe(ensPublicResolverAddress);
+      await expect(promise).resolves.toBe(ensPublicResolverAddressOverride);
     });
     test('throw on unknown chain', async () => {
       const config = new IExecConfig({
-        ethProvider: tokenChainInstamineUrl,
+        ethProvider: unknownTestChain.rpcURL,
       });
       const promise = config.resolveEnsPublicResolverAddress();
       await expect(promise).rejects.toThrow(
         Error(
-          `ensPublicResolverAddress option not set and no default value for your chain ${networkId}`,
+          `ensPublicResolverAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);

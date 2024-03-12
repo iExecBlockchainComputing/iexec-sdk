@@ -13,6 +13,13 @@ export const execAsync = (cmd) =>
 
 const { DRONE } = process.env;
 
+export const { INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
+  process.env;
+
+console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
+console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
+console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
+
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
   'custom-token-chain': {
@@ -60,6 +67,7 @@ export const TEST_CHAINS = {
       ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
       isNative: true,
       useGas: false,
+      name: 'bellecour',
     },
     isAnvil: true,
   },

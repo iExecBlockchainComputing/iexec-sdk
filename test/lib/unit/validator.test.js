@@ -3,8 +3,8 @@ import BN from 'bn.js';
 import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
-import { ValidationError } from '../src/common/utils/errors';
-import { TEE_FRAMEWORKS } from '../src/common/utils/constant';
+import { ValidationError } from '../../../src/common/utils/errors';
+import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
 import {
   uint256Schema,
   weiAmountSchema,
@@ -27,18 +27,15 @@ import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
   addressOrAnySchema,
-} from '../src/common/utils/validator';
+} from '../../../src/common/utils/validator';
+import { INFURA_PROJECT_ID } from '../../test-utils';
 
 const { readFile } = fsExtra;
 
-const { INFURA_PROJECT_ID } = process.env;
-// public chains
-console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 const mainnetHost = INFURA_PROJECT_ID
   ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
   : 'mainnet';
 
-// TESTS
 describe('[positiveIntSchema]', () => {
   test('int', async () => {
     await expect(positiveIntSchema().validate(48)).resolves.toBe(48);
