@@ -38,9 +38,12 @@ export const TEST_CHAINS = {
     provider: new JsonRpcProvider(
       DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
     ),
+    defaults: {
+      isNative: false,
+      useGas: true,
+    },
     isAnvil: false,
   },
-
   'bellecour-fork': {
     rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
     chainId: '134',
@@ -143,13 +146,13 @@ export class InjectedProvider {
   }
 }
 
-export const setBalance = (chain) => async (address, amount) => {
+export const setBalance = (chain) => async (address, weiAmount) => {
   if (chain.isAnvil) {
     await fetch(chain.rpcURL, {
       method: 'POST',
       body: JSON.stringify({
         method: 'anvil_setBalance',
-        params: [address, ethers.toBeHex(amount)],
+        params: [address, ethers.toBeHex(weiAmount)],
         id: 1,
         jsonrpc: '2.0',
       }),
@@ -159,12 +162,26 @@ export const setBalance = (chain) => async (address, amount) => {
     });
   } else {
     const currentBalance = await chain.provider.getBalance(address);
-    const delta = BigInt(amount) - currentBalance;
+    const delta = BigInt(`${weiAmount}`) - currentBalance;
+    if (delta < 0n) {
+      console.warn(
+        `setBalance: aborted - current balance exceed target balance`,
+      );
+      return;
+    }
     const tx = await chain.richWallet
       .connect(chain.provider)
       .sendTransaction({ to: address, value: delta });
     await tx.wait();
   }
+};
+
+export const setNRlcBalance = (chain) => async (address, nRlcAmount) => {
+  if (chain.isNative || chain.defaults?.isNative) {
+    const weiAmount = BigInt(`${nRlcAmount}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
+    return setBalance(chain)(address, weiAmount);
+  }
+  throw Error('Not implemented for non native RLC');
 };
 
 export const initializeTask = (chain) => async (dealid, idx) => {
