@@ -53,7 +53,7 @@ export const TEST_CHAINS = {
     gramineSmsURL: DRONE
       ? 'http://sms-gramine:13309'
       : 'http://localhost:13309',
-    marketURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
+    iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
     resultProxyURL: DRONE
       ? 'http://result-proxy:13200'
       : 'http://localhost:13200',

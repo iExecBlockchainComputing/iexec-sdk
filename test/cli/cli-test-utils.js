@@ -73,7 +73,7 @@ export const setChain =
             host: chain.rpcURL,
             hub: chain.hubAddress,
             sms: chain.smsMap,
-            iexecGateway: chain.marketURL,
+            iexecGateway: chain.iexecGatewayURL,
             resultProxy: chain.resultProxyURL,
             ensRegistry: chain.ensRegistryAddress,
             ensPublicResolver: chain.ensPublicResolverAddress,

@@ -1,7 +1,14 @@
 import { Wallet } from 'ethers';
 import { IExec } from '../../src/lib';
 import { getSignerFromPrivateKey } from '../../src/lib/utils';
-import { getRandomWallet } from '../test-utils';
+import { getId, getRandomWallet } from '../test-utils';
+import { TEE_FRAMEWORKS } from '../../src/common/utils/constant';
+
+export const ONE_ETH = 10n ** 18n;
+
+export const ONE_RLC = 10n ** 9n;
+
+export const ONE_GWEI = 10n ** 9n;
 
 export const getTestConfig =
   (chain) =>
@@ -25,7 +32,7 @@ export const getTestConfig =
       isNative: options.isNative ?? chain.isNative,
       providerOptions: options.providerOptions ?? chain.providerOptions,
       resultProxyURL: options.resultProxyURL ?? chain.resultProxyURL,
-      smsURL: options.smsURL ?? chain.smsURL,
+      smsURL: options.smsURL ?? chain.smsMap,
       useGas: options.useGas ?? chain.useGas,
     };
 
@@ -46,8 +53,36 @@ export const getTestConfig =
     };
   };
 
-export const ONE_ETH = 10n ** 18n;
+export const deployRandomApp = async (iexec, { owner, teeFramework } = {}) =>
+  iexec.app.deployApp({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `app${getId()}`,
+    type: 'DOCKER',
+    multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+    checksum:
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+    mrenclave: teeFramework && {
+      framework: teeFramework,
+      version: 'v1',
+      fingerprint: 'fingerprint',
+      ...(teeFramework.toLowerCase() === TEE_FRAMEWORKS.SCONE && {
+        entrypoint: 'entrypoint.sh',
+        heapSize: 4096,
+      }),
+    },
+  });
 
-export const ONE_RLC = 10n ** 9n;
+export const deployRandomDataset = async (iexec, { owner } = {}) =>
+  iexec.dataset.deployDataset({
+    owner: owner || (await iexec.wallet.getAddress()),
+    name: `dataset${getId()}`,
+    multiaddr: '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
+    checksum:
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+  });
 
-export const ONE_GWEI = 10n ** 9n;
+export const deployRandomWorkerpool = async (iexec, { owner } = {}) =>
+  iexec.workerpool.deployWorkerpool({
+    owner: owner || (await iexec.wallet.getAddress()),
+    description: `workerpool${getId()}`,
+  });
