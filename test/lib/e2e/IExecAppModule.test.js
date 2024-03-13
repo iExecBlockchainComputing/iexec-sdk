@@ -273,7 +273,7 @@ describe('app', () => {
       // check inferred teeFramework with teeFramework option
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: 'gramine',
+          teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).resolves.toBe(true);
     });
@@ -289,7 +289,7 @@ describe('app', () => {
       await iexec.app.pushAppSecret(address, 'foo');
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: 'scone',
+          teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
       ).resolves.toBe(false);
       // validate teeFramework
@@ -331,7 +331,7 @@ describe('app', () => {
       // check inferred teeFramework with teeFramework option
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: 'gramine',
+          teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).rejects.toThrow(
         Error(`Secret already exists for ${appAddress} and can't be updated`),
@@ -364,17 +364,17 @@ describe('app', () => {
       );
       await expect(
         iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: 'gramine',
+          teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).resolves.toBe(false);
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: 'gramine',
+          teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).resolves.toBe(true);
       await expect(
         iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: 'gramine',
+          teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).resolves.toBe(true);
 
