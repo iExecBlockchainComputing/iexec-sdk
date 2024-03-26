@@ -211,7 +211,7 @@ describe('deal', () => {
   });
 
   describe('obsDeal()', () => {
-    test('emits deals updates', async () => {
+    test('emits deal updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { iexec: iexecAdmin } = getTestConfig(iexecTestChain)({
         privateKey: iexecTestChain.pocoAdminWallet.privateKey,
