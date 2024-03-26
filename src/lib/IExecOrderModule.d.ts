@@ -646,7 +646,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signWorkerpoolorder(
-    workerpoolorder: SignedWorkerpoolorder,
+    workerpoolorder: SignableWorkerpoolorder,
   ): Promise<SignedWorkerpoolorder>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**

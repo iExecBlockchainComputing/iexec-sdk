@@ -691,7 +691,7 @@ const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `workerpoolorder` | [`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md) |
+| `workerpoolorder` | [`SignableWorkerpoolorder`](../interfaces/internal_.SignableWorkerpoolorder.md) |
 
 #### Returns
 
