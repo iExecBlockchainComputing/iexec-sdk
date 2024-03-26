@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers';
 import { IExec } from '../../src/lib';
-import { getSignerFromPrivateKey } from '../../src/lib/utils';
+import { NULL_ADDRESS, getSignerFromPrivateKey } from '../../src/lib/utils';
 import { getId, getRandomWallet } from '../test-utils';
 import { TEE_FRAMEWORKS } from '../../src/common/utils/constant';
 
@@ -86,3 +86,111 @@ export const deployRandomWorkerpool = async (iexec, { owner } = {}) =>
     owner: owner || (await iexec.wallet.getAddress()),
     description: `workerpool${getId()}`,
   });
+
+export const deployAndGetApporder = async (
+  iexec,
+  {
+    teeFramework,
+    appprice = 0,
+    volume = 1,
+    datasetrestrict,
+    workerpoolrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const appDeployRes = await deployRandomApp(iexec, { teeFramework });
+  const app = appDeployRes.address;
+  return iexec.order
+    .createApporder({
+      app,
+      appprice,
+      volume,
+      tag,
+      datasetrestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+    })
+    .then((order) =>
+      iexec.order.signApporder(order, { preflightCheck: false }),
+    );
+};
+
+export const deployAndGetDatasetorder = async (
+  iexec,
+  {
+    datasetprice = 0,
+    volume = 1,
+    apprestrict,
+    workerpoolrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const datasetDeployRes = await deployRandomDataset(iexec);
+  const dataset = datasetDeployRes.address;
+  return iexec.order
+    .createDatasetorder({
+      dataset,
+      datasetprice,
+      volume,
+      tag,
+      apprestrict,
+      workerpoolrestrict,
+      requesterrestrict,
+    })
+    .then((order) =>
+      iexec.order.signDatasetorder(order, { preflightCheck: false }),
+    );
+};
+
+export const deployAndGetWorkerpoolorder = async (
+  iexec,
+  {
+    category = 0,
+    workerpoolprice = 0,
+    volume = 1,
+    trust,
+    apprestrict,
+    datasetrestrict,
+    requesterrestrict,
+    tag,
+  } = {},
+) => {
+  const workerpoolDeployRes = await deployRandomWorkerpool(iexec);
+  const workerpool = workerpoolDeployRes.address;
+  return iexec.order
+    .createWorkerpoolorder({
+      workerpool,
+      workerpoolprice,
+      volume,
+      category,
+      trust,
+      tag,
+      apprestrict,
+      datasetrestrict,
+      requesterrestrict,
+    })
+    .then(iexec.order.signWorkerpoolorder);
+};
+
+export const getMatchableRequestorder = async (
+  iexec,
+  { apporder, datasetorder, workerpoolorder } = {},
+) => {
+  const address = await iexec.wallet.getAddress();
+  return iexec.order
+    .createRequestorder({
+      requester: address,
+      app: apporder.app,
+      appmaxprice: apporder.appprice,
+      dataset: datasetorder ? datasetorder.dataset : NULL_ADDRESS,
+      datasetmaxprice: datasetorder ? datasetorder.datasetprice : 0,
+      workerpool: workerpoolorder.workerpool,
+      workerpoolmaxprice: workerpoolorder.workerpoolprice,
+      category: workerpoolorder.category,
+      trust: workerpoolorder.trust,
+      volume: workerpoolorder.volume,
+    })
+    .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }));
+};
