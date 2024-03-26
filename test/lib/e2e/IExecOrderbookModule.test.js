@@ -976,7 +976,7 @@ describe('orderbook', () => {
       expect(res4.count).toBe(res5.count);
     });
 
-    test.only('strict option allow filtering only orders for specified workerpool', async () => {
+    test('strict option allow filtering only orders for specified workerpool', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
         readOnly: true,
