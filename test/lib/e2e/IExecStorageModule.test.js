@@ -1,7 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest, describe, test } from '@jest/globals';
-import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils';
 import { TEST_CHAINS } from '../../test-utils';
 

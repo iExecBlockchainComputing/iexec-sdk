@@ -1,0 +1,308 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest, describe, test } from '@jest/globals';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+import JSZip from 'jszip';
+import { utils } from '../../../src/lib';
+import { BN } from '../../../src/lib/utils';
+
+const DEFAULT_TIMEOUT = 120000;
+jest.setTimeout(DEFAULT_TIMEOUT);
+
+describe('utils', () => {
+  describe('parseEth()', () => {
+    test("parseEth('4.2')", () => {
+      const res = utils.parseEth('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+
+    test('parseEth(4.2)', () => {
+      const res = utils.parseEth(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+
+    test('parseEth(new BN(42))', () => {
+      const res = utils.parseEth(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000000000000'))).toBe(true);
+    });
+
+    test("parseEth('4.2 ether')", () => {
+      const res = utils.parseEth('4.2 ether');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000000000000'))).toBe(true);
+    });
+
+    test("parseEth('4.2 gwei')", () => {
+      const res = utils.parseEth('4.2 gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+
+    test("parseEth('4.2', 'gwei')", () => {
+      const res = utils.parseEth('4.2', 'gwei');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+
+    test("parseEth('4.2 foo')", () => {
+      expect(() => utils.parseEth('4.2 foo')).toThrow(
+        Error('Invalid ether unit'),
+      );
+    });
+
+    test("parseEth('4.2 wei')", () => {
+      expect(() => utils.parseEth('4.2 wei')).toThrow(
+        Error('Invalid ether amount'),
+      );
+    });
+  });
+
+  describe('parseRLC()', () => {
+    test("parseRLC('4.2')", () => {
+      const res = utils.parseRLC('4.2');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+
+    test('parseRLC(4.2)', () => {
+      const res = utils.parseRLC(4.2);
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+
+    test('parseRLC(new BN(42))', () => {
+      const res = utils.parseRLC(new BN(42));
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42000000000'))).toBe(true);
+    });
+
+    test("parseRLC('4.2 RLC')", () => {
+      const res = utils.parseRLC('4.2 RLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('4200000000'))).toBe(true);
+    });
+
+    test("parseRLC('42 nRLC')", () => {
+      const res = utils.parseRLC('42 nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+
+    test("parseRLC('42', 'nRLC')", () => {
+      const res = utils.parseRLC('42', 'nRLC');
+      expect(res instanceof BN).toBe(true);
+      expect(res.eq(new BN('42'))).toBe(true);
+    });
+
+    test("parseRLC('4.2 nRLC')", () => {
+      expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
+        Error('Invalid token amount'),
+      );
+    });
+
+    test("parseRLC('4.2 foo')", () => {
+      expect(() => utils.parseRLC('4.2 foo')).toThrow(
+        Error('Invalid token unit'),
+      );
+    });
+  });
+
+  describe('formatEth', () => {
+    test("formatEth('4200000000000000000')", () => {
+      const res = utils.formatEth('4200000000000000000');
+      expect(res).toBe('4.2');
+    });
+
+    test('formatEth(42)', () => {
+      const res = utils.formatEth(42);
+      expect(res).toBe('0.000000000000000042');
+    });
+
+    test("formatEth(new BN('4200000000000000000'))", () => {
+      const res = utils.formatEth(new BN('4200000000000000000'));
+      expect(res).toBe('4.2');
+    });
+  });
+
+  describe('formatRLC()', () => {
+    test("formatRLC('4200000000000000000')", () => {
+      const res = utils.formatRLC('4200000000000000000');
+      expect(res).toBe('4200000000.0');
+    });
+
+    test('formatRLC(42)', () => {
+      const res = utils.formatRLC(42);
+      expect(res).toBe('0.000000042');
+    });
+
+    test("formatRLC(new BN('4200000000000000000'))", () => {
+      const res = utils.formatRLC(new BN('4200000000000000000'));
+      expect(res).toBe('4200000000.0');
+    });
+  });
+
+  describe('encodeTag()', () => {
+    test("encodeTag(['tee'])", () => {
+      expect(utils.encodeTag(['tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      );
+    });
+
+    test("encodeTag(['scone'])", () => {
+      expect(utils.encodeTag(['scone'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      );
+    });
+
+    test("encodeTag(['gramine'])", () => {
+      expect(utils.encodeTag(['gramine'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000004',
+      );
+    });
+
+    test("encodeTag(['gpu'])", () => {
+      expect(utils.encodeTag(['gpu'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000100',
+      );
+    });
+
+    test("encodeTag(['gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+
+    test("encodeTag(['gpu','tee','gpu','tee'])", () => {
+      expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+
+    test('encodeTag unknown tag', () => {
+      expect(() => utils.encodeTag(['tee', 'foo'])).toThrow('Unknown tag foo');
+    });
+  });
+
+  describe('decodeTag()', () => {
+    test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000003')", () => {
+      expect(
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000003',
+        ),
+      ).toStrictEqual(['tee', 'scone']);
+    });
+
+    test('decodeTag unknown bit tag', () => {
+      expect(() =>
+        utils.decodeTag(
+          '0x000000000000000000000000000000000000000000000000000000000000000a',
+        ),
+      ).toThrow(Error('Unknown bit 3 in tag'));
+    });
+  });
+
+  describe('sumTags()', () => {
+    test('sumTags from Bytes32', () => {
+      expect(
+        utils.sumTags([
+          '0x0000000000000000000000000000000000000000000000000000000000000100',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000101',
+      );
+    });
+
+    test('sumTags unknown bit tag', () => {
+      expect(
+        utils.sumTags([
+          '0x0000000000000000000000000000000000000000000000000000000000000101',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ]),
+      ).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000103',
+      );
+    });
+
+    test('sumTags invalid bytes32', () => {
+      expect(() =>
+        utils.sumTags([
+          '0x000000000000000000000000000000000000000000000000000000000000000z',
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+        ]),
+      ).toThrow('tag must be bytes32 hex string');
+    });
+  });
+
+  describe('decryptResult()', () => {
+    test('decrypts the result with a binary key', async () => {
+      const encZip = await readFile(
+        join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedResults.zip',
+        ),
+      );
+      const beneficiaryKey = await readFile(
+        join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key'),
+      );
+      const res = await utils.decryptResult(encZip, beneficiaryKey);
+      const resContent = [];
+      const resZip = await new JSZip().loadAsync(res);
+      resZip.forEach((relativePath, zipEntry) => {
+        resContent.push(zipEntry);
+      });
+      expect(resContent.length).toBe(3);
+      expect(resContent[0].name).toBe('computed.json');
+      expect(resContent[1].name).toBe('volume.fspf');
+      expect(resContent[2].name).toBe('result.txt');
+    });
+
+    test('decrypts the result with a string key', async () => {
+      const encZip = await readFile(
+        join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedResults.zip',
+        ),
+      );
+      const beneficiaryKey = (
+        await readFile(
+          join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key'),
+        )
+      ).toString();
+      const res = await utils.decryptResult(encZip, beneficiaryKey);
+      const resContent = [];
+      const resZip = await new JSZip().loadAsync(res);
+      resZip.forEach((relativePath, zipEntry) => {
+        resContent.push(zipEntry);
+      });
+      expect(resContent.length).toBe(3);
+      expect(resContent[0].name).toBe('computed.json');
+      expect(resContent[1].name).toBe('volume.fspf');
+      expect(resContent[2].name).toBe('result.txt');
+    });
+
+    test('fails to decrypt the result with the wrong key', async () => {
+      const encZip = await readFile(
+        join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedResults.zip',
+        ),
+      );
+      const beneficiaryKey = await readFile(
+        join(process.cwd(), 'test/inputs/beneficiaryKeys/unexpected_key'),
+      );
+      const err = await utils
+        .decryptResult(encZip, beneficiaryKey)
+        .catch((e) => e);
+      expect(err).toEqual(
+        new Error('Failed to decrypt results key with beneficiary key'),
+      );
+    });
+  });
+});
