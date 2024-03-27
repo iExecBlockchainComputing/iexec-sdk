@@ -29,7 +29,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
 const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
-describe.only('order', () => {
+describe('order', () => {
   describe('createApporder()', () => {
     test('creates a default apporder template', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
