@@ -1,6 +1,6 @@
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
-import { ProviderOptions, TeeFramework } from '../common/types.js';
+import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
 
 export interface Eip1193Provider {
   request(request: {
@@ -107,7 +107,7 @@ export interface IExecConfigOptions {
   /**
    * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
    */
-  providerOptions?: ProviderOptions;
+  providerOptions?: ProviderOptions | AnyRecord;
 }
 
 /**

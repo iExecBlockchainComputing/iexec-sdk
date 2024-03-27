@@ -9,6 +9,7 @@
 ### Properties
 
 - [alchemy](ProviderOptions.md#alchemy)
+- [cloudflare](ProviderOptions.md#cloudflare)
 - [etherscan](ProviderOptions.md#etherscan)
 - [infura](ProviderOptions.md#infura)
 - [quorum](ProviderOptions.md#quorum)
@@ -20,6 +21,14 @@
 • `Optional` **alchemy**: `string`
 
 [Alchemy](https://alchemyapi.io/) API key
+
+___
+
+### cloudflare
+
+• `Optional` **cloudflare**: `boolean`
+
+allow Cloudflare provider
 
 ___
 

@@ -45,6 +45,7 @@
 
 - [Address](modules.md#address)
 - [Addressish](modules.md#addressish)
+- [AnyRecord](modules.md#anyrecord)
 - [BNish](modules.md#bnish)
 - [Bytes](modules.md#bytes)
 - [Bytes32](modules.md#bytes32)
@@ -81,6 +82,12 @@ ___
 Ƭ **Addressish**: [`Address`](modules.md#address) \| [`ENS`](modules.md#ens)
 
 ethereum address or ENS
+
+___
+
+### AnyRecord
+
+Ƭ **AnyRecord**: `Record`<`string`, `any`\>
 
 ___
 

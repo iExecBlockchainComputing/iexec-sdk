@@ -91,6 +91,9 @@ describe('[IExecConfig]', () => {
           { ethProvider: 'mainnet' },
           {
             providerOptions: {
+              cloudflare: true,
+              alchemy: ALCHEMY_API_KEY,
+              etherscan: ETHERSCAN_API_KEY,
               infura: INFURA_PROJECT_ID,
             },
           },
@@ -138,6 +141,9 @@ describe('[IExecConfig]', () => {
           { ethProvider: '1' },
           {
             providerOptions: {
+              cloudflare: true,
+              alchemy: ALCHEMY_API_KEY,
+              etherscan: ETHERSCAN_API_KEY,
               infura: INFURA_PROJECT_ID,
             },
           },
@@ -172,9 +178,12 @@ describe('[IExecConfig]', () => {
       });
       test('IExecConfig({ ethProvider: 1 })', async () => {
         const config = new IExecConfig(
-          { ethProvider: '1' },
+          { ethProvider: 1 },
           {
             providerOptions: {
+              cloudflare: true,
+              alchemy: ALCHEMY_API_KEY,
+              etherscan: ETHERSCAN_API_KEY,
               infura: INFURA_PROJECT_ID,
             },
           },
@@ -224,11 +233,12 @@ describe('[IExecConfig]', () => {
     });
 
     describe('read-only ethProvider with API keys', () => {
-      test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura, quorum: 1 }})', async () => {
+      test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura, alchemy, quorum: 1 }})', async () => {
         const config = new IExecConfig(
           { ethProvider: 'mainnet' },
           {
             providerOptions: {
+              alchemy: ALCHEMY_API_KEY,
               infura: INFURA_PROJECT_ID,
               quorum: 1,
             },
@@ -239,13 +249,6 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(FallbackProvider);
-        expect(provider.providerConfigs.length).toBe(2);
-        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          CloudflareProvider,
-        );
-        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          InfuraProvider,
-        );
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
@@ -267,14 +270,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(FallbackProvider);
-        expect(provider.providerConfigs.length).toBe(2);
-        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          CloudflareProvider,
-        );
-        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          InfuraProvider,
-        );
+        expect(provider).toBeInstanceOf(InfuraProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
@@ -296,14 +292,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(FallbackProvider);
-        expect(provider.providerConfigs.length).toBe(2);
-        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          AlchemyProvider,
-        );
-        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          CloudflareProvider,
-        );
+        expect(provider).toBeInstanceOf(AlchemyProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
@@ -325,14 +314,7 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(FallbackProvider);
-        expect(provider.providerConfigs.length).toBe(2);
-        expect(provider.providerConfigs[0].provider).toBeInstanceOf(
-          CloudflareProvider,
-        );
-        expect(provider.providerConfigs[1].provider).toBeInstanceOf(
-          EtherscanProvider,
-        );
+        expect(provider).toBeInstanceOf(EtherscanProvider);
         expect(chainId).toBe('1');
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
@@ -341,11 +323,12 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBeDefined();
       });
-      test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura, etherscan, alchemy }})', async () => {
+      test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { cloudflare, infura, etherscan, alchemy }})', async () => {
         const config = new IExecConfig(
           { ethProvider: 'mainnet' },
           {
             providerOptions: {
+              cloudflare: true,
               infura: INFURA_PROJECT_ID,
               alchemy: ALCHEMY_API_KEY,
               etherscan: ETHERSCAN_API_KEY,
@@ -356,7 +339,6 @@ describe('[IExecConfig]', () => {
           await config.resolveContractsClient();
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider).toBeInstanceOf(FallbackProvider);
         expect(provider.providerConfigs.length).toBe(4);
         expect(chainId).toBe('1');
@@ -454,22 +436,20 @@ describe('[IExecConfig]', () => {
 
       test('getSignerFromPrivateKey() with network fallback', async () => {
         const wallet = getRandomWallet();
-        const config = new IExecConfig(
-          {
-            ethProvider: utils.getSignerFromPrivateKey(
-              'mainnet',
-              wallet.privateKey,
-              {
-                providers: {
-                  infura: INFURA_PROJECT_ID,
-                  alchemy: ALCHEMY_API_KEY,
-                  etherscan: ETHERSCAN_API_KEY,
-                },
+        const config = new IExecConfig({
+          ethProvider: utils.getSignerFromPrivateKey(
+            'mainnet',
+            wallet.privateKey,
+            {
+              providers: {
+                cloudflare: true,
+                infura: INFURA_PROJECT_ID,
+                alchemy: ALCHEMY_API_KEY,
+                etherscan: ETHERSCAN_API_KEY,
               },
-            ),
-          },
-          // { hubAddress, ensRegistryAddress }, // TODO
-        );
+            },
+          ),
+        });
         const { provider, signer, chainId } =
           await config.resolveContractsClient();
         expect(signer).toBeDefined();
@@ -530,6 +510,7 @@ describe('[IExecConfig]', () => {
           { ethProvider: 'bellecour' },
           {
             providerOptions: {
+              cloudflare: true,
               infura: INFURA_PROJECT_ID,
             },
           },
@@ -559,6 +540,9 @@ describe('[IExecConfig]', () => {
           { ethProvider: 'mainnet' },
           {
             providerOptions: {
+              cloudflare: true,
+              alchemy: ALCHEMY_API_KEY,
+              etherscan: ETHERSCAN_API_KEY,
               infura: INFURA_PROJECT_ID,
             },
           },

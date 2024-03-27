@@ -89,11 +89,12 @@ export default class IExecConfig {
     }
 
     const networkPromise = (async () => {
-      const { chainId, name, ensAddress } = await disposableProvider
-        .getNetwork()
-        .catch((err) => {
-          throw Error(`Failed to detect network: ${err.message}`);
-        });
+      const network = await disposableProvider.getNetwork().catch((err) => {
+        throw Error(`Failed to detect network: ${err.message}`);
+      });
+      const { chainId, name } = network;
+      const ensPlugin = network.getPlugin('org.ethers.plugins.network.Ens');
+      const ensAddress = ensPlugin ? ensPlugin.address : undefined;
       return { chainId: Number(chainId), name, ensAddress };
     })();
 

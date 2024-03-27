@@ -14,7 +14,9 @@ import {
   getId,
   getRandomAddress,
   txHashRegex,
+  INFURA_PROJECT_ID,
 } from '../../test-utils';
+import { IExec } from '../../../src/lib';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -25,6 +27,22 @@ describe('ens', () => {
   describe('ens resolution', () => {
     test('resolve ens on iExec sidechain', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
+      expect(balance.wei).toBeInstanceOf(BN);
+      expect(balance.nRLC).toBeInstanceOf(BN);
+    });
+
+    test('resolve ens on mainnet', async () => {
+      const iexec = new IExec(
+        { ethProvider: 'mainnet' },
+        {
+          providerOptions: {
+            cloudflare: 1,
+            infura: INFURA_PROJECT_ID,
+            quorum: 1,
+          },
+        },
+      );
       const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
       expect(balance.wei).toBeInstanceOf(BN);
       expect(balance.nRLC).toBeInstanceOf(BN);
