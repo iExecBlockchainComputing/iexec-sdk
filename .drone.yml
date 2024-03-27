@@ -261,8 +261,6 @@ steps:
       - result-proxy-healthy
       - market-api-healthy
       - ipfs-healthy
-      - graphnode-healthy
-      - subgraph-deploy
       - custom-token-chain-healthy
 
   ### START LOCAL STACK END ###
