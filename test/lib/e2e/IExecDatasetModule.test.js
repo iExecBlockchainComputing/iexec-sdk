@@ -7,13 +7,14 @@ import fsExtra from 'fs-extra';
 import { deployRandomDataset, getTestConfig } from '../lib-test-utils';
 import {
   TEST_CHAINS,
+  TEE_FRAMEWORKS,
+  addressRegex,
+  txHashRegex,
   execAsync,
   getId,
   getRandomAddress,
 } from '../../test-utils';
-import { addressRegex, bytes32Regex } from '../../../src/common/utils/utils';
 import { errors } from '../../../src/lib';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 
@@ -143,7 +144,7 @@ describe('dataset', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       };
       const res = await iexec.dataset.deployDataset(dataset);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       expect(res.address).toMatch(addressRegex);
     });
 
@@ -247,7 +248,7 @@ describe('dataset', () => {
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       const { dataset } = await iexecRandom.dataset.showDataset(address);
       expect(dataset.owner).toBe(receiverAddress);
     });
@@ -314,7 +315,7 @@ describe('dataset', () => {
       const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
       const encryptedFileChecksum =
         await iexec.dataset.computeEncryptedFileChecksum(encryptedFileBytes);
-      expect(encryptedFileChecksum).toMatch(bytes32Regex);
+      expect(encryptedFileChecksum).toMatch(txHashRegex);
     });
   });
 

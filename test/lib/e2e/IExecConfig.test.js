@@ -13,13 +13,13 @@ import {
 
 import { utils, IExecConfig, errors } from '../../../src/lib';
 import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
 import {
   ALCHEMY_API_KEY,
   ETHERSCAN_API_KEY,
   INFURA_PROJECT_ID,
   InjectedProvider,
   TEST_CHAINS,
+  TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
 } from '../../test-utils';

@@ -3,8 +3,13 @@
 import { jest, describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils';
-import { addressRegex, bytes32Regex } from '../../../src/common/utils/utils';
+import {
+  TEST_CHAINS,
+  addressRegex,
+  getId,
+  getRandomAddress,
+  txHashRegex,
+} from '../../test-utils';
 import { errors } from '../../../src/lib';
 
 const DEFAULT_TIMEOUT = 120000;
@@ -128,7 +133,7 @@ describe('workerpool', () => {
         description: `workerpool${getId()}`,
       };
       const res = await iexec.workerpool.deployWorkerpool(workerpool);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       expect(res.address).toMatch(addressRegex);
     });
 
@@ -228,7 +233,7 @@ describe('workerpool', () => {
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       const { workerpool } =
         await iexecRandom.workerpool.showWorkerpool(address);
       expect(workerpool.owner).toBe(receiverAddress);
@@ -284,7 +289,7 @@ describe('workerpool', () => {
         address,
         'https://my-workerpool.com',
       );
-      expect(res).toMatch(bytes32Regex);
+      expect(res).toMatch(txHashRegex);
     });
   });
 });

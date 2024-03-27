@@ -7,10 +7,15 @@ import {
   getMatchableRequestorder,
   getTestConfig,
 } from '../lib-test-utils';
-import { TEST_CHAINS, initializeTask } from '../../test-utils';
-import { sleep } from '../../../src/common/utils/utils';
-import { NULL_BYTES32 } from '../../../src/lib/utils';
-import { ObjectNotFoundError } from '../../../src/lib/errors';
+import {
+  NULL_BYTES32,
+  TEST_CHAINS,
+  initializeTask,
+  sleep,
+} from '../../test-utils';
+import { errors } from '../../../src/lib/index';
+
+const { ObjectNotFoundError } = errors;
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

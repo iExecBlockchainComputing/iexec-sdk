@@ -15,12 +15,12 @@ import {
 } from '../lib-test-utils';
 import {
   TEST_CHAINS,
+  TEE_FRAMEWORKS,
   getRandomAddress,
   setNRlcBalance,
+  txHashRegex,
+  NULL_ADDRESS,
 } from '../../test-utils';
-import { bytes32Regex } from '../../../src/common/utils/utils';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
-import { NULL_ADDRESS } from '../../../src/lib/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -296,7 +296,7 @@ describe.only('order', () => {
       });
 
       const res = await iexec.order.signApporder(order);
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -363,7 +363,7 @@ describe.only('order', () => {
       const res = await iexec.order.signDatasetorder(order, {
         preflightCheck: false,
       });
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -439,7 +439,7 @@ describe.only('order', () => {
       });
 
       const res = await iexec.order.signWorkerpoolorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -459,7 +459,7 @@ describe.only('order', () => {
       const res = await iexec.order.signRequestorder(order, {
         preflightCheck: false,
       });
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -516,7 +516,7 @@ describe.only('order', () => {
 
       await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
       const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -542,7 +542,7 @@ describe.only('order', () => {
       );
       await iexec.result.pushResultEncryptionKey('oops');
       const res = await iexec.order.signRequestorder(order);
-      expect(res.salt).toMatch(bytes32Regex);
+      expect(res.salt).toMatch(txHashRegex);
       expect(res.sign).toMatch(signRegex);
       expect(res).toEqual({
         ...order,
@@ -751,7 +751,7 @@ describe.only('order', () => {
         sign: '0xdcd90a96f4c5cd05a0f907220e173a038e01e2a647bd9c8e04714be5dd4f986b0478cb69cf46b3cb3eb05ee74d2b91868bee4d96a89bc79ac8d8cccc96810bf21c',
       };
       const res = await iexec.order.hashRequestorder(order);
-      expect(res).toMatch(bytes32Regex);
+      expect(res).toMatch(txHashRegex);
       expect(res).toBe(
         '0x8096dd3852b29d6e86b03505ded47fbc96b0bacc9be097f11de3a747ee0e4283',
       );
@@ -764,7 +764,7 @@ describe.only('order', () => {
       const order = await deployAndGetApporder(iexec);
       const res = await iexec.order.cancelApporder(order);
       expect(res.order).toEqual(order);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       await expect(iexec.order.cancelApporder(order)).rejects.toThrow(
         Error('apporder already canceled'),
       );
@@ -777,7 +777,7 @@ describe.only('order', () => {
       const order = await deployAndGetDatasetorder(iexec);
       const res = await iexec.order.cancelDatasetorder(order);
       expect(res.order).toEqual(order);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       await expect(iexec.order.cancelDatasetorder(order)).rejects.toThrow(
         Error('datasetorder already canceled'),
       );
@@ -790,7 +790,7 @@ describe.only('order', () => {
       const order = await deployAndGetWorkerpoolorder(iexec);
       const res = await iexec.order.cancelWorkerpoolorder(order);
       expect(res.order).toEqual(order);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       await expect(iexec.order.cancelWorkerpoolorder(order)).rejects.toThrow(
         Error('workerpoolorder already canceled'),
       );
@@ -814,7 +814,7 @@ describe.only('order', () => {
         );
       const res = await iexec.order.cancelRequestorder(order);
       expect(res.order).toEqual(order);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       await expect(iexec.order.cancelRequestorder(order)).rejects.toThrow(
         Error('requestorder already canceled'),
       );
@@ -826,7 +826,7 @@ describe.only('order', () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const apporder = await deployAndGetApporder(iexec);
       const orderHash = await iexec.order.publishApporder(apporder);
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
   });
 
@@ -835,7 +835,7 @@ describe.only('order', () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const datasetorder = await deployAndGetDatasetorder(iexec);
       const orderHash = await iexec.order.publishDatasetorder(datasetorder);
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
 
     test('preflightChecks dataset secret exists for tee tag', async () => {
@@ -858,7 +858,7 @@ describe.only('order', () => {
         }),
         { preflightCheck: false },
       );
-      expect(orderHashSkipPreflight).toMatch(bytes32Regex);
+      expect(orderHashSkipPreflight).toMatch(txHashRegex);
 
       await iexec.dataset.pushDatasetSecret(datasetAddress, 'foo');
 
@@ -867,7 +867,7 @@ describe.only('order', () => {
           preflightCheck: false,
         }),
       );
-      expect(orderHashPreflight).toMatch(bytes32Regex);
+      expect(orderHashPreflight).toMatch(txHashRegex);
     });
   });
 
@@ -877,7 +877,7 @@ describe.only('order', () => {
       const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
       const orderHash =
         await iexec.order.publishWorkerpoolorder(workerpoolorder);
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
   });
 
@@ -905,7 +905,7 @@ describe.only('order', () => {
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         preflightCheck: false,
       });
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
 
     test('preflightCheck result encryption key', async () => {
@@ -950,7 +950,7 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
 -----END PUBLIC KEY-----`,
       );
       const orderHash = await iexec.order.publishRequestorder(requestorder);
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
 
     test('preflightCheck dropbox token', async () => {
@@ -981,7 +981,7 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
       );
       await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
       const orderHash = await iexec.order.publishRequestorder(requestorder);
-      expect(orderHash).toMatch(bytes32Regex);
+      expect(orderHash).toMatch(txHashRegex);
     });
   });
 
@@ -1957,10 +1957,10 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
           },
           { preflightCheck: false },
         );
-        expect(res.txHash).toMatch(bytes32Regex);
+        expect(res.txHash).toMatch(txHashRegex);
         expect(res.volume).toBeInstanceOf(BN);
         expect(res.volume.eq(new BN(1))).toBe(true);
-        expect(res.dealid).toMatch(bytes32Regex);
+        expect(res.dealid).toMatch(txHashRegex);
       },
       DEFAULT_TIMEOUT * 2,
     );
@@ -2005,10 +2005,10 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
           workerpoolorder,
           requestorder,
         });
-        expect(res.txHash).toMatch(bytes32Regex);
+        expect(res.txHash).toMatch(txHashRegex);
         expect(res.volume).toBeInstanceOf(BN);
         expect(res.volume.eq(new BN(1))).toBe(true);
-        expect(res.dealid).toMatch(bytes32Regex);
+        expect(res.dealid).toMatch(txHashRegex);
 
         // trigger app check
         await expect(

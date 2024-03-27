@@ -10,10 +10,10 @@ import {
 } from '../lib-test-utils';
 import {
   TEST_CHAINS,
+  NULL_ADDRESS,
   addToLooseEqualExpectExtension,
   getRandomAddress,
 } from '../../test-utils';
-import { NULL_ADDRESS } from '../../../src/lib/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

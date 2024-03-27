@@ -1,7 +1,14 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, getRandomAddress } from '../test-utils';
+import {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  TEST_CHAINS,
+  execAsync,
+  getRandomAddress,
+  txHashRegex,
+} from '../test-utils';
 import {
   setDatasetUniqueName,
   setChain,
@@ -12,8 +19,6 @@ import {
   iexecPath,
   checkExists,
 } from './cli-test-utils';
-import { NULL_ADDRESS, NULL_BYTES32 } from '../../src/common/utils/constant';
-import { bytes32Regex } from '../../src/common/utils/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -159,11 +164,11 @@ describe('iexec dataset', () => {
       expect(res.encryptedFiles[0].original).toBeDefined();
       expect(res.encryptedFiles[0].encrypted).toBeDefined();
       expect(res.encryptedFiles[0].key).toBeDefined();
-      expect(res.encryptedFiles[0].checksum).toMatch(bytes32Regex);
+      expect(res.encryptedFiles[0].checksum).toMatch(txHashRegex);
       expect(res.encryptedFiles[1].original).toBeDefined();
       expect(res.encryptedFiles[1].encrypted).toBeDefined();
       expect(res.encryptedFiles[1].key).toBeDefined();
-      expect(res.encryptedFiles[1].checksum).toMatch(bytes32Regex);
+      expect(res.encryptedFiles[1].checksum).toMatch(txHashRegex);
       expect(await checkExists('.secrets/datasets/dataset.key')).toBe(true);
       expect(await checkExists('.secrets/datasets/dataset.txt.key')).toBe(true);
       expect(await checkExists('.secrets/datasets/dataset.zip.key')).toBe(true);

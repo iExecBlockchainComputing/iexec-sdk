@@ -10,9 +10,9 @@ import {
   getRandomWallet,
   setBalance,
   setNRlcBalance,
+  txHashRegex,
 } from '../../test-utils';
 import { IExec } from '../../../src/lib';
-import { bytes32Regex } from '../../../src/common/utils/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -115,7 +115,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(
           true,
         );
@@ -141,7 +141,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(
           finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei),
         ).toBe(true);
@@ -192,7 +192,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
           true,
         );
@@ -227,7 +227,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(
           finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC),
         ).toBe(true);
@@ -262,7 +262,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
           true,
@@ -289,7 +289,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(bytes32Regex);
+        expect(txHash).toMatch(txHashRegex);
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(
           finalBalance.nRLC.add(new BN('500000000')).eq(initialBalance.nRLC),
@@ -326,7 +326,7 @@ describe('wallet', () => {
         const receiverFinalBalance = await iexec.wallet.checkBalances(
           receiverWallet.address,
         );
-        expect(res.sendNativeTxHash).toMatch(bytes32Regex);
+        expect(res.sendNativeTxHash).toMatch(txHashRegex);
         expect(res.sendERC20TxHash).toBeUndefined();
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
@@ -366,8 +366,8 @@ describe('wallet', () => {
         const receiverFinalBalance = await iexec.wallet.checkBalances(
           receiverWallet.address,
         );
-        expect(res.sendNativeTxHash).toMatch(bytes32Regex);
-        expect(res.sendERC20TxHash).toMatch(bytes32Regex);
+        expect(res.sendNativeTxHash).toMatch(txHashRegex);
+        expect(res.sendERC20TxHash).toMatch(txHashRegex);
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
         expect(finalBalance.wei.eq(new BN(0))).toBe(true);
@@ -440,7 +440,7 @@ describe('wallet', () => {
           receiverWallet.address,
         );
         expect(res.sendNativeTxHash).toBeUndefined();
-        expect(res.sendERC20TxHash).toMatch(bytes32Regex);
+        expect(res.sendERC20TxHash).toMatch(txHashRegex);
         expect(res.errors.length).toBe(1);
         expect(res.errors[0]).toBe(
           "Failed to transfer native token': Tx fees are greater than wallet balance",

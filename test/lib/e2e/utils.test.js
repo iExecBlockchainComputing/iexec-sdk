@@ -4,7 +4,6 @@ import { jest, describe, test } from '@jest/globals';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import JSZip from 'jszip';
-import { IExec, utils } from '../../../src/lib';
 import {
   ALCHEMY_API_KEY,
   ETHERSCAN_API_KEY,
@@ -13,12 +12,13 @@ import {
   getId,
   getRandomWallet,
   setBalance,
+  txHashRegex,
 } from '../../test-utils';
 import { ONE_ETH, getTestConfigOptions } from '../lib-test-utils';
-import { bytes32Regex } from '../../../src/common/utils/utils';
-import { NULL_ADDRESS } from '../../../src/lib/utils';
 
-const { BN } = utils;
+import { IExec, utils } from '../../../src/lib';
+
+const { BN, NULL_ADDRESS } = utils;
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -387,7 +387,7 @@ describe('utils', () => {
       const { registerTxHash: tx0 } = await iexec.ens.claimName(
         `name-${getId()}`,
       );
-      expect(tx0).toMatch(bytes32Regex);
+      expect(tx0).toMatch(txHashRegex);
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
         Error('nonce too low'),
@@ -398,7 +398,7 @@ describe('utils', () => {
       const { registerTxHash: tx1 } = await iexec.ens.claimName(
         `name-${getId()}`,
       );
-      expect(tx1).toMatch(bytes32Regex);
+      expect(tx1).toMatch(txHashRegex);
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
         Error('nonce too low'),
@@ -409,7 +409,7 @@ describe('utils', () => {
       const { registerTxHash: tx2 } = await iexec.ens.claimName(
         `name-${getId()}`,
       );
-      expect(tx2).toMatch(bytes32Regex);
+      expect(tx2).toMatch(txHashRegex);
     });
 
     test(

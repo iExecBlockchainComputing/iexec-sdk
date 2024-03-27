@@ -2,8 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest, describe, test } from '@jest/globals';
 import { getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS } from '../../test-utils';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
+import { TEST_CHAINS, TEE_FRAMEWORKS } from '../../test-utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

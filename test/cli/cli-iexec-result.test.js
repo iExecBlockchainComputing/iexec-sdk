@@ -1,8 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEE_FRAMEWORKS } from '../../src/common/utils/constant';
-import { TEST_CHAINS, execAsync, getRandomAddress } from '../test-utils';
+import {
+  TEST_CHAINS,
+  TEE_FRAMEWORKS,
+  execAsync,
+  getRandomAddress,
+} from '../test-utils';
 import {
   globalSetup,
   globalTeardown,

@@ -1,7 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, initializeTask } from '../test-utils';
+import {
+  TEST_CHAINS,
+  NULL_BYTES32,
+  execAsync,
+  initializeTask,
+} from '../test-utils';
 import {
   editCategory,
   globalSetup,
@@ -12,7 +17,6 @@ import {
   setChainsPocoAdminWallet,
   setRandomWallet,
 } from './cli-test-utils';
-import { NULL_BYTES32 } from '../../src/common/utils/constant';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -20,7 +24,6 @@ jest.setTimeout(DEFAULT_TIMEOUT);
 const testChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec task', () => {
-  let userWallet;
   let userApp;
   let userWorkerpool;
   let userDataset;
@@ -38,7 +41,7 @@ describe('iexec task', () => {
     const createCatRes = await runIExecCliRaw(`${iexecPath} category create`);
     noDurationCatid = createCatRes.catid;
     // restore user wallet
-    userWallet = await setRandomWallet();
+    await setRandomWallet();
     await execAsync(`${iexecPath} app init`);
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);

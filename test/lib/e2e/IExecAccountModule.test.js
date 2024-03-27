@@ -9,9 +9,9 @@ import {
   getRandomAddress,
   setBalance,
   setNRlcBalance,
+  txHashRegex,
 } from '../../test-utils';
 import { IExec } from '../../../src/lib';
-import { bytes32Regex } from '../../../src/common/utils/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -104,7 +104,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(bytes32Regex);
+        expect(res.txHash).toMatch(txHashRegex);
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
@@ -135,7 +135,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(bytes32Regex);
+        expect(res.txHash).toMatch(txHashRegex);
         expect(res.amount).toBe('5000000');
         expect(
           accountFinalBalance.stake
@@ -199,7 +199,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(bytes32Regex);
+        expect(res.txHash).toMatch(txHashRegex);
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
@@ -280,7 +280,7 @@ describe('account', () => {
       const walletFinalBalance = await iexec.wallet.checkBalances(
         wallet.address,
       );
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       expect(res.amount).toBe('5');
       expect(
         accountFinalBalance.stake
@@ -312,7 +312,7 @@ describe('account', () => {
       const walletFinalBalance = await iexec.wallet.checkBalances(
         wallet.address,
       );
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       expect(res.amount).toBe('5000');
       expect(
         accountFinalBalance.stake

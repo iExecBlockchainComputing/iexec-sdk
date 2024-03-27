@@ -2,6 +2,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
 import {
+  NULL_ADDRESS,
+  NULL_BYTES32,
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
@@ -19,7 +21,6 @@ import {
   setRandomWallet,
   setWallet,
 } from './cli-test-utils';
-import { NULL_ADDRESS, NULL_BYTES32 } from '../../src/common/utils/constant';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

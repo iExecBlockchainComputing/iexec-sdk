@@ -2,7 +2,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest, describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
-import { errors } from '../../../src/lib';
 import {
   TEST_CHAINS,
   getId,
@@ -10,6 +9,7 @@ import {
   setNRlcBalance,
 } from '../../test-utils';
 import { getTestConfig } from '../lib-test-utils';
+import { errors } from '../../../src/lib';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

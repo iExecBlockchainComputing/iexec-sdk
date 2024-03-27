@@ -3,10 +3,15 @@
 import { jest, describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomApp, getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils';
-import { addressRegex, bytes32Regex } from '../../../src/common/utils/utils';
+import {
+  TEST_CHAINS,
+  TEE_FRAMEWORKS,
+  addressRegex,
+  getId,
+  getRandomAddress,
+  txHashRegex,
+} from '../../test-utils';
 import { errors } from '../../../src/lib';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -150,7 +155,7 @@ describe('app', () => {
           '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       };
       const res = await iexec.app.deployApp(app);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       expect(res.address).toMatch(addressRegex);
     });
 
@@ -247,7 +252,7 @@ describe('app', () => {
       const res = await iexecAppOwner.app.transferApp(address, receiverAddress);
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(bytes32Regex);
+      expect(res.txHash).toMatch(txHashRegex);
       const { app } = await iexecRandom.app.showApp(address);
       expect(app.owner).toBe(receiverAddress);
     });

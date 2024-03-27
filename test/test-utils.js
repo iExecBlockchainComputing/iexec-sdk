@@ -3,6 +3,14 @@ import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
 import { IExec } from '../src/lib';
 import { getSignerFromPrivateKey } from '../src/lib/utils';
 
+export {
+  TEE_FRAMEWORKS,
+  NULL_ADDRESS,
+  NULL_BYTES,
+  NULL_BYTES32,
+} from '../src/common/utils/constant';
+export { sleep } from '../src/common/utils/utils';
+
 // compare object with nested number or string number
 export const addToLooseEqualExpectExtension = (expect) => {
   expect.extend({
@@ -33,6 +41,9 @@ export const addToLooseEqualExpectExtension = (expect) => {
     },
   });
 };
+
+export const txHashRegex = /^(0x)([0-9a-f]{2}){32}$/;
+export const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
 
 export const execAsync = (cmd) =>
   new Promise((res, rej) => {

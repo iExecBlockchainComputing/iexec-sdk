@@ -3,8 +3,7 @@ import { BN } from 'bn.js';
 import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
-import { ValidationError } from '../../../src/common/utils/errors';
-import { TEE_FRAMEWORKS } from '../../../src/common/utils/constant';
+import { INFURA_PROJECT_ID, TEE_FRAMEWORKS } from '../../test-utils';
 import {
   uint256Schema,
   weiAmountSchema,
@@ -28,7 +27,9 @@ import {
   teeFrameworkSchema,
   addressOrAnySchema,
 } from '../../../src/common/utils/validator';
-import { INFURA_PROJECT_ID } from '../../test-utils';
+import { errors } from '../../../src/lib/index';
+
+const { ValidationError } = errors;
 
 const { readFile } = fsExtra;
 

@@ -1,7 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync } from '../test-utils';
+import { TEST_CHAINS, execAsync, txHashRegex } from '../test-utils';
 import {
   globalSetup,
   globalTeardown,
@@ -10,7 +10,6 @@ import {
   setChain,
   setRandomWallet,
 } from './cli-test-utils';
-import { bytes32Regex } from '../../src/common/utils/utils';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -55,10 +54,10 @@ describe('iexec ens', () => {
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(userWallet.address);
-      expect(res.registerTxHash).toMatch(bytes32Regex);
-      expect(res.setResolverTxHash).toMatch(bytes32Regex);
-      expect(res.setAddrTxHash).toMatch(bytes32Regex);
-      expect(res.setNameTxHash).toMatch(bytes32Regex);
+      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.setResolverTxHash).toMatch(txHashRegex);
+      expect(res.setAddrTxHash).toMatch(txHashRegex);
+      expect(res.setNameTxHash).toMatch(txHashRegex);
       await testChain.provider.getTransaction(res.registerTxHash).then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
       });
@@ -91,10 +90,10 @@ describe('iexec ens', () => {
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(app);
-      expect(res.registerTxHash).toMatch(bytes32Regex);
-      expect(res.setResolverTxHash).toMatch(bytes32Regex);
-      expect(res.setAddrTxHash).toMatch(bytes32Regex);
-      expect(res.setNameTxHash).toMatch(bytes32Regex);
+      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.setResolverTxHash).toMatch(txHashRegex);
+      expect(res.setAddrTxHash).toMatch(txHashRegex);
+      expect(res.setNameTxHash).toMatch(txHashRegex);
 
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} app show ${app}`,
@@ -115,10 +114,10 @@ describe('iexec ens', () => {
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(dataset);
-      expect(res.registerTxHash).toMatch(bytes32Regex);
-      expect(res.setResolverTxHash).toMatch(bytes32Regex);
-      expect(res.setAddrTxHash).toMatch(bytes32Regex);
-      expect(res.setNameTxHash).toMatch(bytes32Regex);
+      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.setResolverTxHash).toMatch(txHashRegex);
+      expect(res.setAddrTxHash).toMatch(txHashRegex);
+      expect(res.setNameTxHash).toMatch(txHashRegex);
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} dataset show ${dataset}`,
       );
@@ -138,10 +137,10 @@ describe('iexec ens', () => {
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(workerpool);
-      expect(res.registerTxHash).toMatch(bytes32Regex);
-      expect(res.setResolverTxHash).toMatch(bytes32Regex);
-      expect(res.setAddrTxHash).toMatch(bytes32Regex);
-      expect(res.setNameTxHash).toMatch(bytes32Regex);
+      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.setResolverTxHash).toMatch(txHashRegex);
+      expect(res.setAddrTxHash).toMatch(txHashRegex);
+      expect(res.setNameTxHash).toMatch(txHashRegex);
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} workerpool show ${workerpool}`,
       );

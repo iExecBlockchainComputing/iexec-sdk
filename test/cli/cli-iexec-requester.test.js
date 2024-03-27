@@ -1,7 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, getRandomAddress } from '../test-utils';
+import {
+  TEST_CHAINS,
+  TEE_FRAMEWORKS,
+  execAsync,
+  getRandomAddress,
+} from '../test-utils';
 import {
   globalSetup,
   globalTeardown,
@@ -9,7 +14,6 @@ import {
   setChain,
   setRandomWallet,
 } from './cli-test-utils';
-import { TEE_FRAMEWORKS } from '../../src/common/utils/constant';
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);

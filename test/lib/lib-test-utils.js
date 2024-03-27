@@ -1,8 +1,13 @@
 import { Wallet } from 'ethers';
-import { IExec } from '../../src/lib';
-import { NULL_ADDRESS, getSignerFromPrivateKey } from '../../src/lib/utils';
-import { getId, getRandomWallet } from '../test-utils';
-import { TEE_FRAMEWORKS } from '../../src/common/utils/constant';
+import {
+  NULL_ADDRESS,
+  TEE_FRAMEWORKS,
+  getId,
+  getRandomWallet,
+} from '../test-utils';
+import { IExec, utils } from '../../src/lib';
+
+const { getSignerFromPrivateKey } = utils;
 
 export const ONE_ETH = 10n ** 18n;
 
