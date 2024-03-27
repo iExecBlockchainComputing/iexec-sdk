@@ -4,8 +4,21 @@ import { jest, describe, test } from '@jest/globals';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import JSZip from 'jszip';
-import { utils } from '../../../src/lib';
-import { BN } from '../../../src/lib/utils';
+import { IExec, utils } from '../../../src/lib';
+import {
+  ALCHEMY_API_KEY,
+  ETHERSCAN_API_KEY,
+  INFURA_PROJECT_ID,
+  TEST_CHAINS,
+  getId,
+  getRandomWallet,
+  setBalance,
+} from '../../test-utils';
+import { ONE_ETH, getTestConfigOptions } from '../lib-test-utils';
+import { bytes32Regex } from '../../../src/common/utils/utils';
+import { NULL_ADDRESS } from '../../../src/lib/utils';
+
+const { BN } = utils;
 
 const DEFAULT_TIMEOUT = 120000;
 jest.setTimeout(DEFAULT_TIMEOUT);
@@ -303,6 +316,265 @@ describe('utils', () => {
       expect(err).toEqual(
         new Error('Failed to decrypt results key with beneficiary key'),
       );
+    });
+  });
+
+  describe('getSignerFromPrivateKey()', () => {
+    const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+    const tokenTestChain = TEST_CHAINS['custom-token-chain'];
+
+    test('gasPrice option allows to specify gasPrice', async () => {
+      const gasPrice = '123456789';
+      const wallet = getRandomWallet();
+      const iexec = new IExec(
+        {
+          ethProvider: utils.getSignerFromPrivateKey(
+            tokenTestChain.rpcURL,
+            wallet.privateKey,
+            {
+              gasPrice,
+            },
+          ),
+        },
+        getTestConfigOptions(tokenTestChain)(),
+      );
+      await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
+      const { registerTxHash: txHash } = await iexec.ens.claimName(
+        `name-${getId()}`,
+      );
+      const tx = await tokenTestChain.provider.getTransaction(txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe(gasPrice);
+    });
+
+    test('getTransactionCount option allows custom nonce management', async () => {
+      const wallet = getRandomWallet();
+
+      const createNonceProvider = (address) => {
+        const initNoncePromise = iexecTestChain.provider.getTransactionCount(
+          address,
+          'latest',
+        );
+        let i = 0;
+        const getNonce = () =>
+          initNoncePromise.then((initNonce) => initNonce + i);
+        const increaseNonce = () => {
+          i += 1;
+        };
+        return {
+          getNonce,
+          increaseNonce,
+        };
+      };
+
+      const nonceProvider = createNonceProvider(wallet.address);
+
+      const signer = utils.getSignerFromPrivateKey(
+        iexecTestChain.rpcURL,
+        wallet.privateKey,
+        {
+          getTransactionCount: nonceProvider.getNonce,
+        },
+      );
+
+      const iexec = new IExec(
+        {
+          ethProvider: signer,
+        },
+        getTestConfigOptions(iexecTestChain)(),
+      );
+
+      const { registerTxHash: tx0 } = await iexec.ens.claimName(
+        `name-${getId()}`,
+      );
+      expect(tx0).toMatch(bytes32Regex);
+
+      await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
+        Error('nonce too low'),
+      );
+
+      nonceProvider.increaseNonce();
+
+      const { registerTxHash: tx1 } = await iexec.ens.claimName(
+        `name-${getId()}`,
+      );
+      expect(tx1).toMatch(bytes32Regex);
+
+      await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
+        Error('nonce too low'),
+      );
+
+      nonceProvider.increaseNonce();
+
+      const { registerTxHash: tx2 } = await iexec.ens.claimName(
+        `name-${getId()}`,
+      );
+      expect(tx2).toMatch(bytes32Regex);
+    });
+
+    test(
+      'providers option allow passing JSON RPC API providers api keys',
+      async () => {
+        const providerOptions = {
+          infura: INFURA_PROJECT_ID,
+          alchemy: ALCHEMY_API_KEY,
+          etherscan: ETHERSCAN_API_KEY,
+        };
+        const alchemyFailQuorumFail = {
+          ...providerOptions,
+          alchemy: 'FAIL',
+          quorum: 3,
+        };
+        const alchemyFailQuorumPass = {
+          ...providerOptions,
+          alchemy: 'FAIL',
+          quorum: 2,
+        };
+        const infuraFailQuorumFail = {
+          ...providerOptions,
+          infura: 'FAIL',
+          quorum: 3,
+        };
+        const infuraFailQuorumPass = {
+          ...providerOptions,
+          infura: 'FAIL',
+          quorum: 2,
+        };
+        const etherscanFailQuorumFail = {
+          ...providerOptions,
+          etherscan: 'FAIL',
+          quorum: 3,
+        };
+        const etherscanFailQuorumPass = {
+          ...providerOptions,
+          etherscan: 'FAIL',
+          quorum: 2,
+        };
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: alchemyFailQuorumFail,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).rejects.toThrow();
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: alchemyFailQuorumPass,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).resolves.toBeDefined();
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: etherscanFailQuorumFail,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).rejects.toThrow();
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: etherscanFailQuorumPass,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).resolves.toBeDefined();
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: infuraFailQuorumFail,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).rejects.toThrow();
+        await expect(
+          new IExec({
+            ethProvider: utils.getSignerFromPrivateKey(
+              'mainnet',
+              getRandomWallet().privateKey,
+              {
+                providers: infuraFailQuorumPass,
+              },
+            ),
+          }).wallet.checkBalances(NULL_ADDRESS),
+        ).resolves.toBeDefined();
+      },
+      DEFAULT_TIMEOUT * 2,
+    );
+
+    test('providers option is ignored with RPC host', async () => {
+      const alchemyFailQuorumFail = {
+        alchemy: 'FAIL',
+        quorum: 3,
+      };
+      const infuraFailQuorumFail = {
+        infura: 'FAIL',
+        quorum: 3,
+      };
+      const etherscanFailQuorumFail = {
+        etherscan: 'FAIL',
+        quorum: 3,
+      };
+      await expect(
+        new IExec(
+          {
+            ethProvider: utils.getSignerFromPrivateKey(
+              tokenTestChain.rpcURL,
+              getRandomWallet().privateKey,
+              {
+                providers: alchemyFailQuorumFail,
+              },
+            ),
+          },
+          getTestConfigOptions(tokenTestChain)(),
+        ).wallet.checkBalances(NULL_ADDRESS),
+      ).resolves.toBeDefined();
+      await expect(
+        new IExec(
+          {
+            ethProvider: utils.getSignerFromPrivateKey(
+              tokenTestChain.rpcURL,
+              getRandomWallet().privateKey,
+              {
+                providers: etherscanFailQuorumFail,
+              },
+            ),
+          },
+          getTestConfigOptions(tokenTestChain)(),
+        ).wallet.checkBalances(NULL_ADDRESS),
+      ).resolves.toBeDefined();
+      await expect(
+        new IExec(
+          {
+            ethProvider: utils.getSignerFromPrivateKey(
+              tokenTestChain.rpcURL,
+              getRandomWallet().privateKey,
+              {
+                providers: infuraFailQuorumFail,
+              },
+            ),
+          },
+          getTestConfigOptions(tokenTestChain)(),
+        ).wallet.checkBalances(NULL_ADDRESS),
+      ).resolves.toBeDefined();
     });
   });
 });
