@@ -9,82 +9,6 @@ trigger:
       - pull_request
 
 steps:
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
-
-  - name: build
-    image: node:18
-    pull: always
-    commands:
-      - npm run build
-    depends_on:
-      - install
-
-  - name: test
-    image: node:18
-    pull: always
-    environment:
-      ALCHEMY_API_KEY:
-        from_secret: alchemy_api_key
-      INFURA_PROJECT_ID:
-        from_secret: infura_project_id
-      ETHERSCAN_API_KEY:
-        from_secret: etherscan_api_key
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm -g install .
-      - npm test
-    depends_on:
-      - build
-      - stack-ready
-
-  - name: code analysis
-    image: sonarsource/sonar-scanner-cli
-    pull: always
-    environment:
-      SONAR_TOKEN:
-        from_secret: sonar_token
-      SONAR_HOST:
-        from_secret: sonar_host
-    commands:
-      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
-    depends_on:
-      - test
-
-  - name: test node 20
-    image: node:20
-    pull: always
-    environment:
-      ALCHEMY_API_KEY:
-        from_secret: alchemy_api_key
-      INFURA_PROJECT_ID:
-        from_secret: infura_project_id
-      ETHERSCAN_API_KEY:
-        from_secret: etherscan_api_key
-    commands:
-      - apt update
-      - apt install xxd
-      - node -v
-      - npm -v
-      - npm -g install .
-      - npm test
-    when:
-      event:
-        - tag
-    depends_on:
-      - build
-      - stack-ready
-      - test
-
   ##### START LOCAL STACK #####
 
   - name: prepare-local-stack-env
@@ -342,6 +266,82 @@ steps:
       - custom-token-chain-healthy
 
   ### START LOCAL STACK END ###
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - npm run build
+    depends_on:
+      - install
+
+  - name: test
+    image: node:18
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm -g install .
+      - npm test
+    depends_on:
+      - build
+      - stack-ready
+
+  - name: code analysis
+    image: sonarsource/sonar-scanner-cli
+    pull: always
+    environment:
+      SONAR_TOKEN:
+        from_secret: sonar_token
+      SONAR_HOST:
+        from_secret: sonar_host
+    commands:
+      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
+    depends_on:
+      - test
+
+  - name: test node 20
+    image: node:20
+    pull: always
+    environment:
+      ALCHEMY_API_KEY:
+        from_secret: alchemy_api_key
+      INFURA_PROJECT_ID:
+        from_secret: infura_project_id
+      ETHERSCAN_API_KEY:
+        from_secret: etherscan_api_key
+    commands:
+      - apt update
+      - apt install xxd
+      - node -v
+      - npm -v
+      - npm -g install .
+      - npm test
+    when:
+      event:
+        - tag
+    depends_on:
+      - build
+      - stack-ready
+      - test
 
 ---
 kind: pipeline
