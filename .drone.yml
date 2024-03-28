@@ -14,7 +14,7 @@ steps:
   - name: prepare-local-stack-env
     image: node
     commands:
-      - node tests/scripts/prepare-test-env.js
+      - node test/scripts/prepare-test-env.js
 
   - name: bellecour-fork
     detach: true
