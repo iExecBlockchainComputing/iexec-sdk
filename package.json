@@ -141,7 +141,7 @@
     "npm": ">=8"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
+    "test": "npm run prepare-for-test && NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
     "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
     "generate-json-es-modules": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
@@ -151,7 +151,8 @@
     "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
     "generate-cli-doc": "node generateCliDoc.cjs",
     "stop-test-stack": "cd test && docker compose down --remove-orphans",
-    "start-test-stack": "cd test && npm run stop-test-stack && node prepare-test-env.js && docker compose up -d"
+    "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose up -d",
+    "prepare-for-test": "node test/scripts/prepare-bellecour-fork-for-tests.js"
   },
   "files": [
     "src/",

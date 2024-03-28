@@ -31,16 +31,6 @@ services:
       retries: 3
       start_period: 30s
 
-  impersonate-for-tests:
-    restart: 'on-failure'
-    image: impersonate-for-tests
-    build:
-      context: .
-      dockerfile: impersonate-for-tests.Dockerfile
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
-
   sms:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped

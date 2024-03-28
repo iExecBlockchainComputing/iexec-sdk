@@ -14,7 +14,7 @@ steps:
   - name: prepare-local-stack-env
     image: node
     commands:
-      - node tests/prepare-test-env.js
+      - node tests/scripts/prepare-test-env.js
 
   - name: bellecour-fork
     detach: true
@@ -224,18 +224,6 @@ steps:
       - market-api
       - market-watcher
 
-  - name: impersonate-for-tests
-    image: ghcr.io/foundry-rs/foundry:latest
-    commands:
-      # add tokens to test wallet (1_000_000_000*10^18 wei = 1000 RLC)
-      - cast rpc anvil_setBalance 0x7bd4783FDCAD405A28052a0d1f11236A741da593 "0x033b2e3c9fd0803ce8000000" --rpc-url http://bellecour-fork:8545'
-      # transfer PoCo ownership to test wallet
-      - cast rpc anvil_impersonateAccount 0x4611b943aa1d656fc669623b5da08756a7e288e9 --rpc-url http://bellecour-fork:8545
-      - cast send 0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f "transferOwnership(address)" 0x7bd4783FDCAD405A28052a0d1f11236A741da593 --from 0x4611b943aa1d656fc669623b5da08756a7e288e9 --gas-price 0 --legacy --unlocked --rpc-url http://bellecour-fork:8545
-      - cast rpc anvil_stopImpersonatingAccount 0x4611b943aa1d656fc669623b5da08756a7e288e9 --rpc-url http://bellecour-fork:8545
-    depends_on:
-      - bellecour-fork-healthy
-
   - name: custom-token-chain
     detach: true
     image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
@@ -255,7 +243,6 @@ steps:
       - echo "all services ready"
     depends_on:
       - bellecour-fork-healthy
-      - impersonate-for-tests
       - sms-healthy
       - sms-gramine-healthy
       - result-proxy-healthy
