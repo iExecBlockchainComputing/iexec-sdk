@@ -1,19 +1,11 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils';
-import {
-  TEST_CHAINS,
-  addressRegex,
-  getId,
-  getRandomAddress,
-  txHashRegex,
-} from '../../test-utils';
+import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils';
+import '../../jest-setup';
 import { errors } from '../../../src/lib';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -33,7 +25,7 @@ describe('workerpool', () => {
       const res = await readOnlyIExec.workerpool.showWorkerpool(address);
       expect(res.objAddress).toBe(address);
       expect(res.workerpool.owner).toBe(workerpool.owner);
-      expect(res.workerpool.registry).toMatch(addressRegex);
+      expect(res.workerpool.registry).toBeAddress();
       expect(res.workerpool.schedulerRewardRatioPolicy).toBeInstanceOf(BN);
       expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
       expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
@@ -73,7 +65,7 @@ describe('workerpool', () => {
       );
       expect(res.objAddress).toBe(address);
       expect(res.workerpool.owner).toBe(workerpool.owner);
-      expect(res.workerpool.registry).toMatch(addressRegex);
+      expect(res.workerpool.registry).toBeAddress();
       expect(res.workerpool.schedulerRewardRatioPolicy).toBeInstanceOf(BN);
       expect(res.workerpool.workerStakeRatioPolicy).toBeInstanceOf(BN);
       expect(res.workerpool.workerpoolDescription).toBe(workerpool.description);
@@ -133,8 +125,8 @@ describe('workerpool', () => {
         description: `workerpool${getId()}`,
       };
       const res = await iexec.workerpool.deployWorkerpool(workerpool);
-      expect(res.txHash).toMatch(txHashRegex);
-      expect(res.address).toMatch(addressRegex);
+      expect(res.txHash).toBeTxHash();
+      expect(res.address).toBeAddress();
     });
 
     test('cannot deploy twice with the same params', async () => {
@@ -233,7 +225,7 @@ describe('workerpool', () => {
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       const { workerpool } =
         await iexecRandom.workerpool.showWorkerpool(address);
       expect(workerpool.owner).toBe(receiverAddress);
@@ -289,7 +281,7 @@ describe('workerpool', () => {
         address,
         'https://my-workerpool.com',
       );
-      expect(res).toMatch(txHashRegex);
+      expect(res).toBeTxHash();
     });
   });
 });

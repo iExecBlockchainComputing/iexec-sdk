@@ -1,13 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   NULL_ADDRESS,
   NULL_BYTES32,
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
-  txHashRegex,
 } from '../test-utils';
 import {
   setDatasetUniqueName,
@@ -19,9 +18,7 @@ import {
   iexecPath,
   checkExists,
 } from './cli-test-utils';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import '../jest-setup';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
@@ -164,11 +161,11 @@ describe('iexec dataset', () => {
       expect(res.encryptedFiles[0].original).toBeDefined();
       expect(res.encryptedFiles[0].encrypted).toBeDefined();
       expect(res.encryptedFiles[0].key).toBeDefined();
-      expect(res.encryptedFiles[0].checksum).toMatch(txHashRegex);
+      expect(res.encryptedFiles[0].checksum).toBeTxHash();
       expect(res.encryptedFiles[1].original).toBeDefined();
       expect(res.encryptedFiles[1].encrypted).toBeDefined();
       expect(res.encryptedFiles[1].key).toBeDefined();
-      expect(res.encryptedFiles[1].checksum).toMatch(txHashRegex);
+      expect(res.encryptedFiles[1].checksum).toBeTxHash();
       expect(await checkExists('.secrets/datasets/dataset.key')).toBe(true);
       expect(await checkExists('.secrets/datasets/dataset.txt.key')).toBe(true);
       expect(await checkExists('.secrets/datasets/dataset.zip.key')).toBe(true);

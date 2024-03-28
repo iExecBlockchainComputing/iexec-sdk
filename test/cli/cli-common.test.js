@@ -1,3 +1,6 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { describe, test } from '@jest/globals';
 import { execAsync } from '../test-utils';
 import {
   globalSetup,
@@ -5,6 +8,7 @@ import {
   loadJSONFile,
   saveJSONToFile,
 } from './cli-test-utils';
+import '../jest-setup';
 
 const { DRONE } = process.env;
 const iexecPath = DRONE ? 'iexec' : 'node ../../../src/cli/cmd/iexec.js';

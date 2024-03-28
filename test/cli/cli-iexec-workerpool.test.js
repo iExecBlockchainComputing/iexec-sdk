@@ -1,13 +1,12 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   TEST_CHAINS,
   NULL_ADDRESS,
   NULL_BYTES32,
   execAsync,
   getRandomAddress,
-  txHashRegex,
 } from '../test-utils';
 import {
   setWorkerpoolUniqueDescription,
@@ -18,9 +17,7 @@ import {
   setRandomWallet,
   iexecPath,
 } from './cli-test-utils';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import '../jest-setup';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
@@ -81,7 +78,7 @@ describe('iexec workerpool', () => {
       expect(res.ok).toBe(true);
       expect(res.address).toBe(userFirstDeployedWorkerpoolAddress);
       expect(res.url).toBe('https://my-workerpool.com');
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       await testChain.provider.getTransaction(res.txHash).then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
       });

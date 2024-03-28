@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   deployAndGetApporder,
   deployAndGetDatasetorder,
@@ -8,19 +8,10 @@ import {
   getMatchableRequestorder,
   getTestConfig,
 } from '../lib-test-utils';
-import {
-  TEST_CHAINS,
-  NULL_ADDRESS,
-  addToLooseEqualExpectExtension,
-  getRandomAddress,
-} from '../../test-utils';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import { TEST_CHAINS, NULL_ADDRESS, getRandomAddress } from '../../test-utils';
+import '../../jest-setup';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
-
-addToLooseEqualExpectExtension(expect);
 
 describe('orderbook', () => {
   describe('fetchApporder()', () => {

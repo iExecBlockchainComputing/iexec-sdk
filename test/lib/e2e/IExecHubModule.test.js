@@ -1,12 +1,10 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils';
 import { TEST_CHAINS } from '../../test-utils';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import '../../jest-setup';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

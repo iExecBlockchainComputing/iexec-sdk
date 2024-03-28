@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils';
 import {
@@ -10,12 +10,9 @@ import {
   getRandomWallet,
   setBalance,
   setNRlcBalance,
-  txHashRegex,
 } from '../../test-utils';
+import '../../jest-setup';
 import { IExec } from '../../../src/lib';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const tokenTestChain = TEST_CHAINS['custom-token-chain'];
@@ -115,7 +112,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(
           true,
         );
@@ -141,7 +138,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(
           finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei),
         ).toBe(true);
@@ -192,7 +189,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
           true,
         );
@@ -227,7 +224,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(
           finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC),
         ).toBe(true);
@@ -262,7 +259,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
           true,
@@ -289,7 +286,7 @@ describe('wallet', () => {
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
-        expect(txHash).toMatch(txHashRegex);
+        expect(txHash).toBeTxHash();
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(
           finalBalance.nRLC.add(new BN('500000000')).eq(initialBalance.nRLC),
@@ -326,7 +323,7 @@ describe('wallet', () => {
         const receiverFinalBalance = await iexec.wallet.checkBalances(
           receiverWallet.address,
         );
-        expect(res.sendNativeTxHash).toMatch(txHashRegex);
+        expect(res.sendNativeTxHash).toBeTxHash();
         expect(res.sendERC20TxHash).toBeUndefined();
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
@@ -366,8 +363,8 @@ describe('wallet', () => {
         const receiverFinalBalance = await iexec.wallet.checkBalances(
           receiverWallet.address,
         );
-        expect(res.sendNativeTxHash).toMatch(txHashRegex);
-        expect(res.sendERC20TxHash).toMatch(txHashRegex);
+        expect(res.sendNativeTxHash).toBeTxHash();
+        expect(res.sendERC20TxHash).toBeTxHash();
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
         expect(finalBalance.wei.eq(new BN(0))).toBe(true);
@@ -440,7 +437,7 @@ describe('wallet', () => {
           receiverWallet.address,
         );
         expect(res.sendNativeTxHash).toBeUndefined();
-        expect(res.sendERC20TxHash).toMatch(txHashRegex);
+        expect(res.sendERC20TxHash).toBeTxHash();
         expect(res.errors.length).toBe(1);
         expect(res.errors[0]).toBe(
           "Failed to transfer native token': Tx fees are greater than wallet balance",

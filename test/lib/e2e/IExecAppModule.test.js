@@ -1,20 +1,16 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomApp, getTestConfig } from '../lib-test-utils';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
-  addressRegex,
   getId,
   getRandomAddress,
-  txHashRegex,
 } from '../../test-utils';
+import '../../jest-setup';
 import { errors } from '../../../src/lib';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -45,7 +41,7 @@ describe('app', () => {
       const res = await readOnlyIExec.app.showApp(address);
       expect(res.objAddress).toBe(address);
       expect(res.app.owner).toBe(app.owner);
-      expect(res.app.registry).toMatch(addressRegex);
+      expect(res.app.registry).toBeAddress();
       expect(res.app.appName).toBe(app.name);
       expect(res.app.appType).toBe(app.type);
       expect(res.app.appMultiaddr).toBe(app.multiaddr);
@@ -90,7 +86,7 @@ describe('app', () => {
       const res = await readOnlyIExec.app.showUserApp(0, wallet.address);
       expect(res.objAddress).toBe(address);
       expect(res.app.owner).toBe(app.owner);
-      expect(res.app.registry).toMatch(addressRegex);
+      expect(res.app.registry).toBeAddress();
       expect(res.app.appName).toBe(app.name);
       expect(res.app.appType).toBe(app.type);
       expect(res.app.appMultiaddr).toBe(app.multiaddr);
@@ -155,8 +151,8 @@ describe('app', () => {
           '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       };
       const res = await iexec.app.deployApp(app);
-      expect(res.txHash).toMatch(txHashRegex);
-      expect(res.address).toMatch(addressRegex);
+      expect(res.txHash).toBeTxHash();
+      expect(res.address).toBeAddress();
     });
 
     test('cannot deploy twice with the same params', async () => {
@@ -252,7 +248,7 @@ describe('app', () => {
       const res = await iexecAppOwner.app.transferApp(address, receiverAddress);
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       const { app } = await iexecRandom.app.showApp(address);
       expect(app.owner).toBe(receiverAddress);
     });

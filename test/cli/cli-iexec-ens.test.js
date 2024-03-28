@@ -1,7 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest } from '@jest/globals';
-import { TEST_CHAINS, execAsync, txHashRegex } from '../test-utils';
+import { describe, test } from '@jest/globals';
+import { TEST_CHAINS, execAsync } from '../test-utils';
 import {
   globalSetup,
   globalTeardown,
@@ -10,9 +10,7 @@ import {
   setChain,
   setRandomWallet,
 } from './cli-test-utils';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import '../jest-setup';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
@@ -51,13 +49,14 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${userWallet.address.toLowerCase()}`,
       );
+      console.log(JSON.stringify(res, null, 2));
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(userWallet.address);
-      expect(res.registerTxHash).toMatch(txHashRegex);
-      expect(res.setResolverTxHash).toMatch(txHashRegex);
-      expect(res.setAddrTxHash).toMatch(txHashRegex);
-      expect(res.setNameTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
+      expect(res.setResolverTxHash).toBeTxHash();
+      expect(res.setAddrTxHash).toBeTxHash();
+      expect(res.setNameTxHash).toBeTxHash();
       await testChain.provider.getTransaction(res.registerTxHash).then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
       });
@@ -87,13 +86,15 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${app.toLowerCase()} --for ${app}`,
       );
+      console.log(JSON.stringify(res, null, 2));
+
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(app);
-      expect(res.registerTxHash).toMatch(txHashRegex);
-      expect(res.setResolverTxHash).toMatch(txHashRegex);
-      expect(res.setAddrTxHash).toMatch(txHashRegex);
-      expect(res.setNameTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
+      expect(res.setResolverTxHash).toBeTxHash();
+      expect(res.setAddrTxHash).toBeTxHash();
+      expect(res.setNameTxHash).toBeTxHash();
 
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} app show ${app}`,
@@ -111,13 +112,15 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`,
       );
+      console.log(JSON.stringify(res, null, 2));
+
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(dataset);
-      expect(res.registerTxHash).toMatch(txHashRegex);
-      expect(res.setResolverTxHash).toMatch(txHashRegex);
-      expect(res.setAddrTxHash).toMatch(txHashRegex);
-      expect(res.setNameTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
+      expect(res.setResolverTxHash).toBeTxHash();
+      expect(res.setAddrTxHash).toBeTxHash();
+      expect(res.setNameTxHash).toBeTxHash();
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} dataset show ${dataset}`,
       );
@@ -134,13 +137,15 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${workerpool.toLowerCase()} --for ${workerpool} --raw`,
       );
+      console.log(JSON.stringify(res, null, 2));
+
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(workerpool);
-      expect(res.registerTxHash).toMatch(txHashRegex);
-      expect(res.setResolverTxHash).toMatch(txHashRegex);
-      expect(res.setAddrTxHash).toMatch(txHashRegex);
-      expect(res.setNameTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
+      expect(res.setResolverTxHash).toBeTxHash();
+      expect(res.setAddrTxHash).toBeTxHash();
+      expect(res.setNameTxHash).toBeTxHash();
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} workerpool show ${workerpool}`,
       );

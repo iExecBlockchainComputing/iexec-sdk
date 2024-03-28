@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   JsonRpcProvider,
   FallbackProvider,
@@ -10,9 +10,6 @@ import {
   CloudflareProvider,
   BrowserProvider,
 } from 'ethers';
-
-import { utils, IExecConfig, errors } from '../../../src/lib';
-import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
 import {
   ALCHEMY_API_KEY,
   ETHERSCAN_API_KEY,
@@ -23,9 +20,10 @@ import {
   getRandomAddress,
   getRandomWallet,
 } from '../../test-utils';
+import '../../jest-setup';
 
-const DEFAULT_TIMEOUT = 10000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import { utils, IExecConfig, errors } from '../../../src/lib';
+import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];

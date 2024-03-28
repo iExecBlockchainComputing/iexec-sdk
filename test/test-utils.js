@@ -11,40 +11,6 @@ export {
 } from '../src/common/utils/constant';
 export { sleep } from '../src/common/utils/utils';
 
-// compare object with nested number or string number
-export const addToLooseEqualExpectExtension = (expect) => {
-  expect.extend({
-    toLooseEqual(received, target) {
-      const stringifyNestedNumbers = (obj) => {
-        const objOut = {};
-        Object.entries(obj).forEach((e) => {
-          const [k, v] = e;
-          if (typeof v === 'number') objOut[k] = v.toString();
-          else if (typeof v === 'object') {
-            objOut[k] = stringifyNestedNumbers(v);
-          } else objOut[k] = v;
-        });
-        return objOut;
-      };
-      return {
-        pass: this.equals(
-          stringifyNestedNumbers(received),
-          stringifyNestedNumbers(target),
-        ),
-        message: () =>
-          `not loosely equal \nreceived: ${JSON.stringify(
-            received,
-            null,
-            2,
-          )}\nexpected: ${JSON.stringify(target, null, 2)}`,
-      };
-    },
-  });
-};
-
-export const txHashRegex = /^(0x)([0-9a-f]{2}){32}$/;
-export const addressRegex = /^(0x)([0-9a-fA-F]{2}){20}$/;
-
 export const execAsync = (cmd) =>
   new Promise((res, rej) => {
     exec(cmd, (error, stdout, stderr) => {

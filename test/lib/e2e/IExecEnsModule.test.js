@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
   deployRandomApp,
@@ -13,13 +13,10 @@ import {
   NULL_ADDRESS,
   getId,
   getRandomAddress,
-  txHashRegex,
   INFURA_PROJECT_ID,
 } from '../../test-utils';
+import '../../jest-setup';
 import { IExec } from '../../../src/lib';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -133,7 +130,7 @@ describe('ens', () => {
       const name = `${label}.users.iexec.eth`;
       const res = await iexec.ens.claimName(label);
 
-      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
       expect(res.name).toBe(name);
 
       const resClaimSame = await iexec.ens.claimName(label);
@@ -147,7 +144,7 @@ describe('ens', () => {
       const domain = 'apps.iexec.eth';
       const name = `${label}.${domain}`;
       const res = await iexec.ens.claimName(label, domain);
-      expect(res.registerTxHash).toMatch(txHashRegex);
+      expect(res.registerTxHash).toBeTxHash();
       expect(res.name).toBe(name);
       const resClaimSame = await iexec.ens.claimName(label, domain);
       expect(resClaimSame.registerTxHash).toBeUndefined();
@@ -187,9 +184,9 @@ describe('ens', () => {
       const configureRes = await iexec.ens.configureResolution(name);
       expect(configureRes.name).toBe(name);
       expect(configureRes.address).toBe(wallet.address);
-      expect(configureRes.setAddrTxHash).toMatch(txHashRegex);
-      expect(configureRes.setNameTxHash).toMatch(txHashRegex);
-      expect(configureRes.setResolverTxHash).toMatch(txHashRegex);
+      expect(configureRes.setAddrTxHash).toBeTxHash();
+      expect(configureRes.setNameTxHash).toBeTxHash();
+      expect(configureRes.setResolverTxHash).toBeTxHash();
 
       const reconfigureSameRes = await iexec.ens.configureResolution(name);
       expect(reconfigureSameRes.name).toBe(name);
@@ -213,9 +210,9 @@ describe('ens', () => {
       );
       expect(configureRes.name).toBe(name);
       expect(configureRes.address).toBe(app1.address);
-      expect(configureRes.setAddrTxHash).toMatch(txHashRegex);
-      expect(configureRes.setNameTxHash).toMatch(txHashRegex);
-      expect(configureRes.setResolverTxHash).toMatch(txHashRegex);
+      expect(configureRes.setAddrTxHash).toBeTxHash();
+      expect(configureRes.setNameTxHash).toBeTxHash();
+      expect(configureRes.setResolverTxHash).toBeTxHash();
 
       const reconfigureSameRes = await iexec.ens.configureResolution(
         name,
@@ -235,8 +232,8 @@ describe('ens', () => {
       );
       expect(reconfigureRes.name).toBe(name);
       expect(reconfigureRes.address).toBe(app2.address);
-      expect(reconfigureRes.setAddrTxHash).toMatch(txHashRegex);
-      expect(reconfigureRes.setNameTxHash).toMatch(txHashRegex);
+      expect(reconfigureRes.setAddrTxHash).toBeTxHash();
+      expect(reconfigureRes.setNameTxHash).toBeTxHash();
       expect(reconfigureRes.setResolverTxHash).toBeUndefined();
     });
 
@@ -520,7 +517,7 @@ describe('ens', () => {
       const key = `key_${getId()}`;
       const value = `value_${getId()}`;
       const res = await iexec.ens.setTextRecord(name, key, value);
-      expect(res).toMatch(txHashRegex);
+      expect(res).toBeTxHash();
     });
 
     test('can reset a text record', async () => {
@@ -533,7 +530,7 @@ describe('ens', () => {
 
       const key = `key_${getId()}`;
       const res = await iexec.ens.setTextRecord(name, key);
-      expect(res).toMatch(txHashRegex);
+      expect(res).toBeTxHash();
     });
   });
 

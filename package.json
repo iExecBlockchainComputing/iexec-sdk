@@ -141,7 +141,7 @@
     "npm": ">=8"
   },
   "scripts": {
-    "test": "npm run prepare-for-test && NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
+    "test": "npm run prepare-for-test && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
     "generate-json-es-modules": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",

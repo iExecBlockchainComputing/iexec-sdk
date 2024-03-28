@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   deployAndGetApporder,
   deployAndGetWorkerpoolorder,
@@ -13,12 +13,10 @@ import {
   initializeTask,
   sleep,
 } from '../../test-utils';
+import '../../jest-setup';
 import { errors } from '../../../src/lib/index';
 
 const { ObjectNotFoundError } = errors;
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

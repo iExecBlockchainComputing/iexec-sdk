@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
@@ -15,9 +15,7 @@ import {
   setChain,
   setRandomWallet,
 } from './cli-test-utils';
-
-const DEFAULT_TIMEOUT = 10000;
-jest.setTimeout(DEFAULT_TIMEOUT);
+import '../jest-setup';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 

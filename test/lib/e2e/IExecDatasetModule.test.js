@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { join } from 'path';
 import { BN } from 'bn.js';
 import fsExtra from 'fs-extra';
@@ -8,18 +8,14 @@ import { deployRandomDataset, getTestConfig } from '../lib-test-utils';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
-  addressRegex,
-  txHashRegex,
   execAsync,
   getId,
   getRandomAddress,
 } from '../../test-utils';
+import '../../jest-setup';
 import { errors } from '../../../src/lib';
 
 const { readFile, ensureDir, writeFile } = fsExtra;
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -42,7 +38,7 @@ describe('dataset', () => {
       const res = await readOnlyIExec.dataset.showDataset(address);
       expect(res.objAddress).toBe(address);
       expect(res.dataset.owner).toBe(dataset.owner);
-      expect(res.dataset.registry).toMatch(addressRegex);
+      expect(res.dataset.registry).toBeAddress();
       expect(res.dataset.datasetName).toBe(dataset.name);
       expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
       expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
@@ -83,7 +79,7 @@ describe('dataset', () => {
       );
       expect(res.objAddress).toBe(address);
       expect(res.dataset.owner).toBe(dataset.owner);
-      expect(res.dataset.registry).toMatch(addressRegex);
+      expect(res.dataset.registry).toBeAddress();
       expect(res.dataset.datasetName).toBe(dataset.name);
       expect(res.dataset.datasetMultiaddr).toBe(dataset.multiaddr);
       expect(res.dataset.datasetChecksum).toBe(dataset.checksum);
@@ -144,8 +140,8 @@ describe('dataset', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       };
       const res = await iexec.dataset.deployDataset(dataset);
-      expect(res.txHash).toMatch(txHashRegex);
-      expect(res.address).toMatch(addressRegex);
+      expect(res.txHash).toBeTxHash();
+      expect(res.address).toBeAddress();
     });
 
     test('cannot deploy twice with the same params', async () => {
@@ -248,7 +244,7 @@ describe('dataset', () => {
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       const { dataset } = await iexecRandom.dataset.showDataset(address);
       expect(dataset.owner).toBe(receiverAddress);
     });
@@ -315,7 +311,7 @@ describe('dataset', () => {
       const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
       const encryptedFileChecksum =
         await iexec.dataset.computeEncryptedFileChecksum(encryptedFileBytes);
-      expect(encryptedFileChecksum).toMatch(txHashRegex);
+      expect(encryptedFileChecksum).toBeTxHash();
     });
   });
 

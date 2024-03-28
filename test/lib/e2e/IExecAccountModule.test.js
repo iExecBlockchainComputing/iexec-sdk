@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { jest, describe, test } from '@jest/globals';
+import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils';
 import {
@@ -9,12 +9,9 @@ import {
   getRandomAddress,
   setBalance,
   setNRlcBalance,
-  txHashRegex,
 } from '../../test-utils';
+import '../../jest-setup';
 import { IExec } from '../../../src/lib';
-
-const DEFAULT_TIMEOUT = 120000;
-jest.setTimeout(DEFAULT_TIMEOUT);
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const tokenTestChain = TEST_CHAINS['custom-token-chain'];
@@ -104,7 +101,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(txHashRegex);
+        expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
@@ -135,7 +132,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(txHashRegex);
+        expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5000000');
         expect(
           accountFinalBalance.stake
@@ -199,7 +196,7 @@ describe('account', () => {
         const walletFinalBalance = await iexec.wallet.checkBalances(
           wallet.address,
         );
-        expect(res.txHash).toMatch(txHashRegex);
+        expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
@@ -280,7 +277,7 @@ describe('account', () => {
       const walletFinalBalance = await iexec.wallet.checkBalances(
         wallet.address,
       );
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       expect(res.amount).toBe('5');
       expect(
         accountFinalBalance.stake
@@ -312,7 +309,7 @@ describe('account', () => {
       const walletFinalBalance = await iexec.wallet.checkBalances(
         wallet.address,
       );
-      expect(res.txHash).toMatch(txHashRegex);
+      expect(res.txHash).toBeTxHash();
       expect(res.amount).toBe('5000');
       expect(
         accountFinalBalance.stake
