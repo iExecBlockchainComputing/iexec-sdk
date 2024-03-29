@@ -4,6 +4,7 @@ import {
   TEE_FRAMEWORKS,
   getId,
   getRandomWallet,
+  sleep,
 } from '../test-utils';
 import { IExec, utils } from '../../src/lib';
 
@@ -197,4 +198,48 @@ export const getMatchableRequestorder = async (
       volume: workerpoolorder.volume,
     })
     .then((o) => iexec.order.signRequestorder(o, { preflightCheck: false }));
+};
+
+export const runObservableSubscribe = (observable) => {
+  let unsubscribe;
+  const messages = [];
+  let completed = false;
+  let unsubscribed = false;
+  let error;
+
+  const obsPromise = new Promise((resolve) => {
+    const unsub = observable.subscribe({
+      next: (message) => {
+        messages.push(message);
+      },
+      error: (err) => {
+        error = err;
+        resolve();
+      },
+      complete: () => {
+        completed = true;
+        resolve();
+      },
+    });
+    unsubscribe = (resolveAfter = 5000) => {
+      unsub();
+      unsubscribed = true;
+      sleep(resolveAfter).then(resolve);
+    };
+  });
+
+  const wait = async () => {
+    await obsPromise;
+    return {
+      messages,
+      completed,
+      unsubscribed,
+      error,
+    };
+  };
+
+  return {
+    unsubscribe,
+    wait,
+  };
 };

@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test } from '@jest/globals';
+import { describe, test, expect } from '@jest/globals';
 import {
   TEST_CHAINS,
   adminCreateCategory,
