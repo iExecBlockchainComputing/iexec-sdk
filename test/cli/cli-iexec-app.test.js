@@ -5,19 +5,18 @@ import {
   NULL_ADDRESS,
   NULL_BYTES32,
   TEST_CHAINS,
+  adminCreateCategory,
   execAsync,
   getRandomAddress,
   getRandomWallet,
 } from '../test-utils';
 import {
-  editCategory,
   globalSetup,
   globalTeardown,
   iexecPath,
   runIExecCliRaw,
   setAppUniqueName,
   setChain,
-  setChainsPocoAdminWallet,
   setRandomWallet,
   setWallet,
 } from './cli-test-utils';
@@ -186,12 +185,11 @@ describe('iexec app', () => {
     let userDataset;
     let noDurationCatid;
     beforeAll(async () => {
-      // create category (require admin wallet)
-      await setChainsPocoAdminWallet(testChain)();
-      await execAsync(`${iexecPath} category init --raw`);
-      await editCategory({ workClockTimeRef: '0' });
-      const createCatRes = await runIExecCliRaw(`${iexecPath} category create`);
-      noDurationCatid = createCatRes.catid;
+      noDurationCatid = await adminCreateCategory(testChain)({
+        name: 'custom',
+        description: 'desc',
+        workClockTimeRef: '0',
+      }).then(({ catid }) => catid.toString());
       // restore user wallet
       await setWallet(userWallet.privateKey);
       await execAsync(`${iexecPath} app init`);

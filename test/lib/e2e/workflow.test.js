@@ -5,6 +5,7 @@ import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils';
 import {
   TEST_CHAINS,
+  adminCreateCategory,
   getId,
   initializeTask,
   setNRlcBalance,
@@ -22,10 +23,7 @@ describe('[workflow]', () => {
   let workerpoolorderToClaim;
 
   test('create category', async () => {
-    const { iexec } = getTestConfig(iexecTestChain)({
-      privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-    });
-    const res = await iexec.hub.createCategory({
+    const res = await adminCreateCategory(iexecTestChain)({
       name: 'custom',
       description: 'desc',
       workClockTimeRef: '0',

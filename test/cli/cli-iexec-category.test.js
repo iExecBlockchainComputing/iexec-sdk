@@ -73,6 +73,7 @@ describe('iexec category', () => {
     });
 
     test('iexec category create', async () => {
+      // may have nonce collision as admin wallet can be used at the same time in other tests
       const raw = await execAsync(`${iexecPath} category create --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);

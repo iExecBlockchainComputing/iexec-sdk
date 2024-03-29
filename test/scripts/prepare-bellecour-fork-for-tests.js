@@ -9,6 +9,8 @@ import {
 const { DRONE } = process.env;
 
 const IEXEC_HUB_ADDRESS = '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f';
+const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
+const TARGET_FAUCET_WALLET = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
 
@@ -103,9 +105,11 @@ const getIExecHubOwnership = async (targetOwner) => {
 
 const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);
-  const TARGET_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
-  await setBalance(TARGET_WALLET, 1000000n * 10n ** 18n);
-  await getIExecHubOwnership(TARGET_WALLET);
+
+  await setBalance(TARGET_POCO_ADMIN_WALLET, 1000000n * 10n ** 18n);
+  await getIExecHubOwnership(TARGET_POCO_ADMIN_WALLET);
+
+  await setBalance(TARGET_FAUCET_WALLET, 1000000n * 10n ** 18n);
 };
 
 main();

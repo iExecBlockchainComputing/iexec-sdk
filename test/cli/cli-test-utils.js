@@ -53,9 +53,6 @@ export const setWallet = async (privateKey) => {
 };
 export const setRandomWallet = () => setWallet();
 
-export const setChainsRichWallet = (chain) => () =>
-  setWallet(chain.richWallet.privateKey);
-
 export const setChainsPocoAdminWallet = (chain) => () =>
   setWallet(chain.pocoAdminWallet.privateKey);
 
@@ -114,12 +111,6 @@ export const setWorkerpoolUniqueDescription = async () => {
   iexecJson.workerpool.description = description;
   await saveJSONToFile(iexecJson, IEXEC_JSON);
   return description;
-};
-
-export const editCategory = async (overrides = {}) => {
-  const iexecJson = await loadJSONFile(IEXEC_JSON);
-  iexecJson.category = { ...iexecJson.category, ...overrides };
-  await saveJSONToFile(iexecJson, IEXEC_JSON);
 };
 
 const editOrder = (orderName) => async (override) => {

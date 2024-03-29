@@ -49,7 +49,6 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${userWallet.address.toLowerCase()}`,
       );
-      console.log(JSON.stringify(res, null, 2));
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(userWallet.address);
@@ -86,8 +85,6 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${app.toLowerCase()} --for ${app}`,
       );
-      console.log(JSON.stringify(res, null, 2));
-
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(app);
@@ -112,8 +109,6 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`,
       );
-      console.log(JSON.stringify(res, null, 2));
-
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(dataset);
@@ -137,8 +132,6 @@ describe('iexec ens', () => {
       const res = await runIExecCliRaw(
         `${iexecPath} ens register ${workerpool.toLowerCase()} --for ${workerpool} --raw`,
       );
-      console.log(JSON.stringify(res, null, 2));
-
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(workerpool);

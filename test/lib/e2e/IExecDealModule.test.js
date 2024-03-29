@@ -13,6 +13,7 @@ import {
   NULL_BYTES32,
   initializeTask,
   sleep,
+  adminCreateCategory,
 } from '../../test-utils';
 import '../../jest-setup';
 
@@ -217,11 +218,8 @@ describe('deal', () => {
   describe('obsDeal()', () => {
     test('emits deal updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAdmin } = getTestConfig(iexecTestChain)({
-        privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-      });
       const catid = (
-        await iexecAdmin.hub.createCategory({
+        await adminCreateCategory(iexecTestChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 10,
@@ -391,11 +389,8 @@ describe('deal', () => {
 
     test('exits on deal timeout', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAdmin } = getTestConfig(iexecTestChain)({
-        privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-      });
       const catid = (
-        await iexecAdmin.hub.createCategory({
+        await adminCreateCategory(iexecTestChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 2,

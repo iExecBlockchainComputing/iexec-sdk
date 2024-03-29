@@ -10,6 +10,7 @@ import {
 import {
   NULL_BYTES32,
   TEST_CHAINS,
+  adminCreateCategory,
   initializeTask,
   sleep,
 } from '../../test-utils';
@@ -24,11 +25,8 @@ describe('task', () => {
   describe('obsTask()', () => {
     test('emits task updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAdmin } = getTestConfig(iexecTestChain)({
-        privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-      });
       const catid = (
-        await iexecAdmin.hub.createCategory({
+        await adminCreateCategory(iexecTestChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 10,
@@ -173,11 +171,8 @@ describe('task', () => {
 
     test('exits on task (deal) timeout', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAdmin } = getTestConfig(iexecTestChain)({
-        privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-      });
       const catid = (
-        await iexecAdmin.hub.createCategory({
+        await adminCreateCategory(iexecTestChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 2,

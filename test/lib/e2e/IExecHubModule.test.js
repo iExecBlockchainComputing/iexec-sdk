@@ -3,7 +3,7 @@
 import { describe, test } from '@jest/globals';
 import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS } from '../../test-utils';
+import { TEST_CHAINS, adminCreateCategory } from '../../test-utils';
 import '../../jest-setup';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
@@ -22,10 +22,7 @@ describe('hub', () => {
   });
   describe('createCategory()', () => {
     test('admin can create category', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
-        privateKey: iexecTestChain.pocoAdminWallet.privateKey,
-      });
-      const res = await iexec.hub.createCategory({
+      const res = await adminCreateCategory(iexecTestChain)({
         description: 'foo',
         name: 'bar',
         workClockTimeRef: 10,

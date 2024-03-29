@@ -6,15 +6,14 @@ import {
   NULL_BYTES32,
   execAsync,
   initializeTask,
+  adminCreateCategory,
 } from '../test-utils';
 import {
-  editCategory,
   globalSetup,
   globalTeardown,
   iexecPath,
   runIExecCliRaw,
   setChain,
-  setChainsPocoAdminWallet,
   setRandomWallet,
 } from './cli-test-utils';
 import '../jest-setup';
@@ -32,12 +31,11 @@ describe('iexec task', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    // create category (require admin wallet)
-    await setChainsPocoAdminWallet(testChain)();
-    await execAsync(`${iexecPath} category init`);
-    await editCategory({ workClockTimeRef: '0' });
-    const createCatRes = await runIExecCliRaw(`${iexecPath} category create`);
-    noDurationCatid = createCatRes.catid;
+    noDurationCatid = await adminCreateCategory(testChain)({
+      name: 'custom',
+      description: 'desc',
+      workClockTimeRef: '0',
+    }).then(({ catid }) => catid.toString());
     // restore user wallet
     await setRandomWallet();
     await execAsync(`${iexecPath} app init`);
