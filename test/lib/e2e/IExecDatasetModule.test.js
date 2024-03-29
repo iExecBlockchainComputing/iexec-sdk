@@ -273,7 +273,10 @@ describe('dataset', () => {
       expect(encryptedBytes.length).toBe(224);
 
       // decrypt with openssl
-      const outDirPath = join(process.cwd(), 'test/out');
+      const outDirPath = join(
+        process.cwd(),
+        'tests-working-dir/lib/IExecDatasetModule',
+      );
       await ensureDir(outDirPath).then(() =>
         writeFile(join(outDirPath, 'dataset.enc'), encryptedBytes),
       );
