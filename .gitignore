@@ -24,17 +24,6 @@ node_modules
 .node_repl_history
 
 # test output
-test/out/
-test/UTC*
-test/wallet.json
-test/chain.json
-test/iexec.json
-test/orders.json
-test/deployed.json
-test/results.zip
-test/datasets/
-test/.secrets/
-test/logo.png
 test/tests-working-dir
 
 # sonar output
