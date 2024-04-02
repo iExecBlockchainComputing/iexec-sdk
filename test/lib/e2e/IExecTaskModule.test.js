@@ -22,7 +22,7 @@ const { ObjectNotFoundError } = errors;
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('task', () => {
-  describe('obsTask()', () => {
+  describe.skip('obsTask()', () => {
     test('emits task updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const catid = (

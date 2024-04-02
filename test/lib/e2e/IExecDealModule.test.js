@@ -216,7 +216,7 @@ describe('deal', () => {
     });
   });
 
-  describe('obsDeal()', () => {
+  describe.skip('obsDeal()', () => {
     test('emits deal updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const catid = (

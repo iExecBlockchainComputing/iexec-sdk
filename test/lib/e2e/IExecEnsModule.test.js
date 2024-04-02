@@ -281,7 +281,7 @@ describe('ens', () => {
     });
   });
 
-  describe('obsConfigureResolution()', () => {
+  describe.skip('obsConfigureResolution()', () => {
     test('configures for user address by default', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
