@@ -4,14 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Changed
+
+- fix `--gas-price` option not being enforced on every commands
+- Typescript fixes
+
+## [8.6.1] 2024-03-11
+
+### Changed
+
+- fix bundling issue occurring in webpack due to conditional import of node builtin in node context
+
+## [8.6.0] 2024-03-04
+
 ### Added
 
-- strict mode `isRequesterStrict, isAppStrict, isDatasetStrict, isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook(), fetchAppOrderbook(), fetchDatasetOrderbook(), fetchWorkerpooltOrderbook(),`, defaults to false
+- strict mode `isRequesterStrict`, `isAppStrict`, `isDatasetStrict`, `isWorkerpoolStrict` in corresponding orderbook methods `fetchRequestOrderbook()`, `fetchAppOrderbook()`, `fetchDatasetOrderbook()`, `fetchWorkerpoolOrderbook()`, defaults to false
 
 ### Changed
 
 - remove ipfs initialization preflight checks on request orders
-- fix `--gas-price` option not being enforced on every commands
+- Typescript fixes
 
 ## [8.5.2] 2024-01-24
 
