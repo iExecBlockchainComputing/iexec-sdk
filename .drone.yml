@@ -9,6 +9,266 @@ trigger:
       - pull_request
 
 steps:
+  ##### START LOCAL STACK #####
+
+  - name: prepare-local-stack-env
+    image: node
+    commands:
+      - node test/scripts/prepare-test-env.js
+
+  - name: bellecour-fork
+    detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
+    commands:
+      - anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0
+    depends_on:
+      - prepare-local-stack-env
+
+  - name: bellecour-fork-healthy
+    image: bash
+    commands:
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+    depends_on:
+      - bellecour-fork
+
+  - name: ipfs
+    image: ipfs/go-ipfs:v0.9.1
+    detach: true
+    expose:
+      - 8080
+      - 5001
+
+  - name: ipfs-healthy
+    image: bash
+    commands:
+      - while ! nc -z ipfs 8080 ; do sleep 1 ; done && echo "ipfs gateway ready"
+      - while ! nc -z ipfs 5001 ; do sleep 1 ; done && echo "ipfs upload ready"
+    depends_on:
+      - ipfs
+
+  - name: market-mongo
+    image: mongo:6.0.3
+    detach: true
+    expose:
+      - 27017
+
+  - name: market-mongo-healthy
+    image: bash
+    commands:
+      - while ! nc -z market-mongo 27017 ; do sleep 1 ; done && echo "market-mongo ready"
+    depends_on:
+      - market-mongo
+
+  - name: market-redis
+    image: redis:7.0.7-alpine
+    detach: true
+    commands:
+      - redis-server --appendonly yes
+    expose:
+      - 6379
+
+  - name: market-redis-healthy
+    image: bash
+    commands:
+      - while ! nc -z market-redis 6379 ; do sleep 1 ; done && echo "market-redis ready"
+    depends_on:
+      - market-redis
+
+  - name: result-proxy-mongo
+    image: library/mongo:4.2
+    detach: true
+    commands:
+      - mongod --bind_ip_all --port 13202
+    expose:
+      - 13202
+
+  - name: result-proxy-mongo-healthy
+    image: bash
+    commands:
+      - while ! nc -z result-proxy-mongo 13202 ; do sleep 1 ; done && echo "result-proxy-mongo ready"
+    depends_on:
+      - result-proxy-mongo
+
+  - name: sms
+    image: iexechub/iexec-sms:7.1.0
+    detach: true
+    environment:
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
+    expose:
+      - 13300
+    depends_on:
+      - bellecour-fork-healthy
+
+  - name: sms-healthy
+    image: bash
+    commands:
+      - while ! nc -z sms 13300 ; do sleep 1 ; done && echo "sms ready"
+    depends_on:
+      - sms
+
+  - name: sms-gramine
+    image: iexechub/iexec-sms:7.1.0
+    detach: true
+    environment:
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
+    expose:
+      - 13300
+    depends_on:
+      - bellecour-fork-healthy
+
+  - name: sms-gramine-healthy
+    image: bash
+    commands:
+      - while ! nc -z sms-gramine 13300 ; do sleep 1 ; done && echo "sms ready"
+    depends_on:
+      - sms
+
+  - name: result-proxy
+    image: iexechub/iexec-result-proxy:7.1.0
+    detach: true
+    environment:
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: result-proxy-mongo
+      MONGO_PORT: 13202
+      IEXEC_IPFS_HOST: ipfs
+    expose:
+      - 13200
+    depends_on:
+      - bellecour-fork-healthy
+      - ipfs-healthy
+      - result-proxy-mongo-healthy
+
+  - name: result-proxy-healthy
+    image: bash
+    commands:
+      - while ! nc -z result-proxy 13200 ; do sleep 1 ; done && echo "result-proxy ready"
+    depends_on:
+      - result-proxy
+
+  - name: market-watcher
+    image: iexechub/iexec-market-watcher:6.4
+    detach: true
+    environment:
+      CHAIN: BELLECOUR
+      ETH_WS_HOST: ws://bellecour-fork:8545
+      ETH_RPC_HOST: http://bellecour-fork:8545
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
+    commands:
+      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - cd /app
+      - npm start
+    depends_on:
+      - prepare-local-stack-env
+      - bellecour-fork-healthy
+      - market-redis-healthy
+      - market-mongo-healthy
+
+  - name: market-api
+    image: iexechub/iexec-market-api:6.4
+    detach: true
+    expose:
+      - 3000
+    environment:
+      CHAINS: BELLECOUR_FORK
+      BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
+      BELLECOUR_FORK_CHAIN_ID: 134
+      BELLECOUR_FORK_IS_NATIVE: 'true'
+      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
+      RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_PERIOD: 60000
+      MAX_OPEN_ORDERS_PER_WALLET: 1000
+    depends_on:
+      - bellecour-fork-healthy
+      - market-redis-healthy
+      - market-mongo-healthy
+
+  - name: market-api-healthy
+    image: bash
+    commands:
+      - while ! nc -z market-api 3000 ; do sleep 1 ; done && echo "market-api ready"
+    depends_on:
+      - market-api
+      - market-watcher
+
+  - name: custom-token-chain
+    detach: true
+    image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
+    expose:
+      - 8545
+
+  - name: custom-token-chain-healthy
+    image: bash
+    commands:
+      - while ! nc -z custom-token-chain 8545 ; do sleep 1 ; done && echo "custom-token-chain ready"
+    depends_on:
+      - custom-token-chain
+
+  - name: stack-ready
+    image: bash
+    commands:
+      - echo "all services ready"
+    depends_on:
+      - bellecour-fork-healthy
+      - sms-healthy
+      - sms-gramine-healthy
+      - result-proxy-healthy
+      - market-api-healthy
+      - ipfs-healthy
+      - custom-token-chain-healthy
+
+  ### START LOCAL STACK END ###
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - npm run build
+    depends_on:
+      - install
+
   - name: test
     image: node:18
     pull: always
@@ -24,19 +284,11 @@ steps:
       - apt install xxd
       - node -v
       - npm -v
-      - npm ci
-      - npm run build
       - npm -g install .
       - npm test
     depends_on:
-      - token-chain
-      - native-chain
-      - token-chain
-      - token-sms-scone
-      - token-sms-gramine
-      - token-gateway
-      - token-watcher
-      - token-result-proxy
+      - build
+      - stack-ready
 
   - name: code analysis
     image: sonarsource/sonar-scanner-cli
@@ -66,162 +318,15 @@ steps:
       - apt install xxd
       - node -v
       - npm -v
-      - npm ci
-      - npm run build
       - npm -g install .
       - npm test
     when:
       event:
         - tag
     depends_on:
+      - build
+      - stack-ready
       - test
-      - code analysis
-      - token-chain
-      - native-chain
-      - token-chain
-      - token-sms-scone
-      - token-sms-gramine
-      - token-gateway
-      - token-watcher
-      - token-result-proxy
-
-services:
-  - name: token-chain
-    image: iexechub/poco-chaintest:5.3.2-token-openethereum
-    pull: always
-
-  - name: native-chain
-    image: iexechub/poco-chaintest:5.3.2-native-openethereum
-    pull: always
-
-  - name: token-sms-scone
-    image: iexechub/iexec-sms:7.1.0
-    pull: always
-    commands:
-      - sleep 10
-      - java -jar /app/iexec-sms.jar
-    environment:
-      TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain:8545
-      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
-      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
-      IEXEC_SCONE_CAS_HOST: foo
-      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
-    depends_on:
-      - token-chain
-
-  - name: token-sms-gramine
-    image: iexechub/iexec-sms:7.1.0
-    pull: always
-    commands:
-      - sleep 10
-      - java -jar /app/iexec-sms.jar
-    environment:
-      TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://token-chain:8545
-      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
-      IEXEC_SMS_DISPLAY_DEBUG_SESSION: true
-      IEXEC_SCONE_CAS_HOST: foo
-      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
-    depends_on:
-      - token-chain
-
-  - name: ipfs
-    image: ipfs/go-ipfs:v0.9.1
-    pull: always
-
-  - name: token-result-proxy-mongo
-    pull: always
-    image: library/mongo:4.2
-    commands:
-      - mongod --bind_ip_all
-
-  - name: token-result-proxy
-    image: iexechub/iexec-result-proxy:7.1.0
-    pull: always
-    commands:
-      - sleep 10
-      - java -Djava.security.egd=file:/dev/./urandom -jar /iexec-result-proxy.jar
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://token-chain:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://token-chain:8545
-      IEXEC_HUB_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      MONGO_HOST: token-result-proxy-mongo
-      MONGO_PORT: 27017
-      IEXEC_IPFS_HOST: ipfs
-    depends_on:
-      - ipfs
-      - token-chain
-      - token-result-proxy-mongo
-
-  - name: gateway-mongo
-    image: mongo:latest
-    pull: always
-
-  - name: gateway-redis
-    image: redis:alpine
-    pull: always
-    commands:
-      - redis-server --appendonly yes
-
-  - name: token-watcher
-    image: iexechub/iexec-market-watcher:6.4
-    pull: always
-    commands:
-      - sleep 10
-      - cd /app
-      - npm start
-    environment:
-      CHAIN: DEV
-      CHAIN_ID: 65535
-      IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      ETH_WS_HOST: ws://token-chain:8546
-      ETH_RPC_HOST: http://token-chain:8545
-      MONGO_HOST: gateway-mongo
-      REDIS_HOST: gateway-redis
-    depends_on:
-      - token-chain
-      - gateway-mongo
-      - gateway-redis
-
-  - name: token-gateway
-    image: iexechub/iexec-market-api:6.4
-    pull: always
-    commands:
-      - sleep 10
-      - cd /app
-      - npm start
-    environment:
-      CHAINS: DEV
-      DEV_NATIVE: false
-      DEV_ETH_RPC_HOST: http://token-chain:8545
-      DEV_CHAIN_ID: 65535
-      DEV_IEXEC_ADDRESS: 0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      MONGO_HOST: gateway-mongo
-      REDIS_HOST: gateway-redis
-      RATE_LIMIT_MAX: 10000
-      RATE_LIMIT_PERIOD: 60000
-      MAX_OPEN_ORDERS_PER_WALLET: 1000
-    depends_on:
-      - token-chain
-      - gateway-mongo
-      - gateway-redis
 
 ---
 kind: pipeline

@@ -39,6 +39,45 @@ iexec help
 
 Check the [documentation](./CLI.md)
 
+## Contributing
+
+### Install
+
+```sh
+npm ci
+```
+
+### Build
+
+```sh
+npm run build
+```
+
+### Test
+
+Tests run on a local dockerized stack, the test stack must be started prior to running tests
+
+```sh
+# once before testing
+npm run start-test-stack
+```
+
+> -After some times the test stack may become desynchronized, run `npm run start-test-stack` to refresh it.
+>
+> `npm run stop-test-stack` will teardown the test stack
+
+Run tests when the stack is up
+
+```sh
+npm run test
+```
+
+> Some tests relies on RPC API providers, to have them running smoothly you can provide the following envs
+>
+> - ALCHEMY_API_KEY (obtained from <https://alchemy.com>)
+> - ETHERSCAN_API_KEY (obtained from <https://etherscan.io>)
+> - INFURA_PROJECT_ID (obtained from <https://infura.io>)
+
 ## Changelog
 
 Find changes in the [CHANGELOG](./CHANGELOG.md)
