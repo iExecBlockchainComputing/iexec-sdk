@@ -7,6 +7,7 @@ import {
   deployRandomDataset,
   deployRandomWorkerpool,
   getTestConfig,
+  runObservableSubscribe,
 } from '../lib-test-utils';
 import {
   TEST_CHAINS,
@@ -281,36 +282,22 @@ describe('ens', () => {
     });
   });
 
-  describe.skip('obsConfigureResolution()', () => {
+  describe('obsConfigureResolution()', () => {
     test('configures for user address by default', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
 
-      const configureMessages = [];
-      const reconfigureSameMessages = [];
-
       const configureObs = await iexec.ens.obsConfigureResolution(name);
 
-      await new Promise((resolve, reject) => {
-        configureObs.subscribe({
-          error: reject,
-          next: (data) => configureMessages.push(data),
-          complete: resolve,
-        });
-      });
+      const configureRes = await runObservableSubscribe(configureObs).wait();
+      // do not resend tx
+      const reconfigureSameRes =
+        await runObservableSubscribe(configureObs).wait();
 
-      await new Promise((resolve, reject) => {
-        configureObs.subscribe({
-          error: reject,
-          next: (data) => reconfigureSameMessages.push(data),
-          complete: resolve,
-        });
-      });
-
-      expect(configureMessages.length).toBe(10);
-      expect(reconfigureSameMessages.length).toBe(4);
+      expect(configureRes.messages.length).toBe(10);
+      expect(reconfigureSameRes.messages.length).toBe(4);
     });
 
     test('optionally configures for target address', async () => {
@@ -322,46 +309,26 @@ describe('ens', () => {
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
 
-      const configureMessages = [];
-      const reconfigureMessages = [];
-      const reconfigureSameMessages = [];
-
       const configureObs = await iexec.ens.obsConfigureResolution(
         name,
         app1.address,
       );
+      const configureRes = await runObservableSubscribe(configureObs).wait();
 
+      // reuse name for another app
       const reconfigureObs = await iexec.ens.obsConfigureResolution(
         name,
         app2.address,
       );
+      const reconfigureRes =
+        await runObservableSubscribe(reconfigureObs).wait();
+      // do not resend tx
+      const reconfigureSameRes =
+        await runObservableSubscribe(reconfigureObs).wait();
 
-      await new Promise((resolve, reject) => {
-        configureObs.subscribe({
-          error: reject,
-          next: (data) => configureMessages.push(data),
-          complete: resolve,
-        });
-      });
-
-      await new Promise((resolve, reject) => {
-        reconfigureObs.subscribe({
-          error: reject,
-          next: (data) => reconfigureMessages.push(data),
-          complete: resolve,
-        });
-      });
-
-      await new Promise((resolve, reject) => {
-        reconfigureObs.subscribe({
-          error: reject,
-          next: (data) => reconfigureSameMessages.push(data),
-          complete: resolve,
-        });
-      });
-      expect(configureMessages.length).toBe(10);
-      expect(reconfigureMessages.length).toBe(8);
-      expect(reconfigureSameMessages.length).toBe(4);
+      expect(configureRes.messages.length).toBe(10);
+      expect(reconfigureRes.messages.length).toBe(8);
+      expect(reconfigureSameRes.messages.length).toBe(4);
     });
 
     test('ens.obsConfigureResolution(name, address) throw with name not owned', async () => {
@@ -371,27 +338,11 @@ describe('ens', () => {
         wallet.address,
       );
 
-      const configureMessages = [];
-      let error;
-      let completed = false;
+      const configureRes = await runObservableSubscribe(configureObs).wait();
 
-      await new Promise((resolve) => {
-        configureObs.subscribe({
-          error: (err) => {
-            error = err;
-            resolve();
-          },
-          next: (data) => configureMessages.push(data),
-          complete: () => {
-            completed = true;
-            resolve();
-          },
-        });
-      });
-
-      expect(configureMessages.length).toBe(0);
-      expect(completed).toBe(false);
-      expect(error).toStrictEqual(
+      expect(configureRes.messages.length).toBe(0);
+      expect(configureRes.completed).toBe(false);
+      expect(configureRes.error).toStrictEqual(
         Error(
           `The current address ${wallet.address} is not owner of not-owned.eth`,
         ),
@@ -412,27 +363,11 @@ describe('ens', () => {
         app.address,
       );
 
-      const configureMessages = [];
-      let error;
-      let completed = false;
+      const configureRes = await runObservableSubscribe(configureObs).wait();
 
-      await new Promise((resolve) => {
-        configureObs.subscribe({
-          error: (err) => {
-            error = err;
-            resolve();
-          },
-          next: (data) => configureMessages.push(data),
-          complete: () => {
-            completed = true;
-            resolve();
-          },
-        });
-      });
-
-      expect(configureMessages.length).toBe(0);
-      expect(completed).toBe(false);
-      expect(error).toStrictEqual(
+      expect(configureRes.messages.length).toBe(0);
+      expect(configureRes.completed).toBe(false);
+      expect(configureRes.error).toStrictEqual(
         Error(
           `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`,
         ),
@@ -450,28 +385,11 @@ describe('ens', () => {
         name,
         targetAddress,
       );
+      const configureRes = await runObservableSubscribe(configureObs).wait();
 
-      const configureMessages = [];
-      let error;
-      let completed = false;
-
-      await new Promise((resolve) => {
-        configureObs.subscribe({
-          error: (err) => {
-            error = err;
-            resolve();
-          },
-          next: (data) => configureMessages.push(data),
-          complete: () => {
-            completed = true;
-            resolve();
-          },
-        });
-      });
-
-      expect(configureMessages.length).toBe(0);
-      expect(completed).toBe(false);
-      expect(error).toStrictEqual(
+      expect(configureRes.messages.length).toBe(0);
+      expect(configureRes.completed).toBe(false);
+      expect(configureRes.error).toStrictEqual(
         Error(
           `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`,
         ),
