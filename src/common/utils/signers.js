@@ -48,7 +48,7 @@ export class EnhancedWallet extends Wallet {
     if (this._options.gasPrice !== undefined) {
       gasPrice = BigInt(this._options.gasPrice);
     }
-    return super.sendTransaction({ gasPrice, ...tx });
+    return super.sendTransaction({ ...tx, gasPrice: tx.gasPrice ?? gasPrice });
   }
 }
 
