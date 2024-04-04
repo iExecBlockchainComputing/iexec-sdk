@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { Buffer } from 'buffer';
-import BnJs from 'bn.js';
+import { BN } from 'bn.js';
 import {
   getAddress,
   randomBytes,
@@ -15,7 +15,7 @@ import { multiaddr } from '@multiformats/multiaddr';
 import { ValidationError, ConfigurationError } from './errors.js';
 import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
 
-export const BN = BnJs;
+export { BN } from 'bn.js';
 
 const debug = Debug('iexec:utils');
 
