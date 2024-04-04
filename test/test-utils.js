@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import { exec } from 'child_process';
 import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
 import { IExec } from '../src/lib';
@@ -102,11 +103,7 @@ Object.keys(TEST_CHAINS).forEach((chain) => {
   }
 });
 
-let sequenceId = Date.now();
-export const getId = () => {
-  sequenceId += 1;
-  return sequenceId;
-};
+export const getId = () => randomInt(0, 1000000);
 
 export const getRandomWallet = () => {
   const { privateKey, publicKey, address } = Wallet.createRandom();
