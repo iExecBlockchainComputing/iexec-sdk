@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- fix `--gas-price` option not being enforced on every command
+- provider options for ethers provider are loosely type-checked to allow better control
+- Typescript fixes
+- move tests to the local fork of bellecour
+
 ## [8.6.1] 2024-03-11
 
 ### Changed
