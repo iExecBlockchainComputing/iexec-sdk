@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - provider options for ethers provider are loosely type-checked to allow better control
 - Typescript fixes
 - move tests to the local fork of bellecour
+- cache secrets existence when confirmed by the SMS
 
 ## [8.6.1] 2024-03-11
 
