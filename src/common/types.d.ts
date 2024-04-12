@@ -4,8 +4,6 @@ export * from './utils/IExecContractsClient.js';
 export * from './utils/reactive.js';
 export * from './utils/signers.js';
 
-
-
 /**
  * big number like
  */
@@ -146,6 +144,8 @@ export type Multiaddress = string | Buffer;
  */
 export type TeeFramework = 'scone' | 'gramine';
 
+export type AnyRecord = Record<string, any>;
+
 /**
  * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
  */
@@ -173,6 +173,10 @@ export interface ProviderOptions {
          */
         projectSecret: string;
       };
+  /**
+   * allow Cloudflare provider
+   */
+  cloudflare?: boolean;
   /**
    * the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
    */

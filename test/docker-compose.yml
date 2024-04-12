@@ -1,185 +1,193 @@
-version: '3.4'
-
-networks:
-  blockchain:
-  gateway:
-  resultproxy:
+version: '3.9'
 
 services:
-  token-chain:
+  custom-token-chain:
     restart: unless-stopped
     image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
     expose:
       - 8545
-      - 8546
     ports:
       - 18545:8545
-    networks:
-      - blockchain
+    healthcheck:
+      test: nc -z 0.0.0.0 8545
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  native-chain:
-    restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.2-native-openethereum'
+  bellecour-fork:
+    restart: 'no'
+    image: ghcr.io/foundry-rs/foundry:latest
+    entrypoint: anvil
+    command: '--host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --fork-block-number $BELLECOUR_FORK_BLOCK --chain-id 134 --gas-limit 6700000 --gas-price 0'
     expose:
       - 8545
-      - 8546
     ports:
-      - 28545:8545
-    networks:
-      - blockchain
+      - 8545:8545
+    healthcheck:
+      test: nc -z 0.0.0.0 8545
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  token-sms-scone:
+  sms:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     ports:
-      - 13301:13300
+      - 13300:13300
     depends_on:
-      - token-chain
-    networks:
-      - blockchain
+      bellecour-fork:
+        condition: service_healthy
 
-  token-sms-gramine:
+  sms-gramine:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
     environment:
-      - TZ=Europe/Paris
-      - IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS=http://token-chain:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT=9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      - IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE=docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      - IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT=face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      - IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB=4
-      - IEXEC_IGNORED_SGX_ADVISORIES=INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      - IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS=debug-mode,hyperthreading,outdated-tcb
-      - IEXEC_SMS_DISPLAY_DEBUG_SESSION=true
-      - IEXEC_SCONE_CAS_HOST=foo
-      - IEXEC_SMS_IMAGE_LAS_IMAGE=foo
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     ports:
-      - 13302:13300
+      - 13309:13300
     depends_on:
-      - token-chain
-    networks:
-      - blockchain
+      bellecour-fork:
+        condition: service_healthy
 
-  token-result-proxy:
+  result-proxy:
     image: iexechub/iexec-result-proxy:7.1.0
     restart: unless-stopped
     environment:
-      - IEXEC_PRIVATE_CHAIN_ADDRESS=http://token-chain:8545
-      - IEXEC_PUBLIC_CHAIN_ADDRESS=http://token-chain:8545
-      - IEXEC_HUB_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=token-result-proxy-mongo
-      - MONGO_PORT=13202
-      - IEXEC_IPFS_HOST=ipfs
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: result-proxy-mongo
+      MONGO_PORT: 13202
+      IEXEC_IPFS_HOST: ipfs
     ports:
       - 13200:13200
     depends_on:
-      - token-chain
-      - token-result-proxy-mongo
-      - ipfs
-    networks:
-      - blockchain
-      - resultproxy
+      bellecour-fork:
+        condition: service_healthy
+      result-proxy-mongo:
+        condition: service_started
+      ipfs:
+        condition: service_healthy
 
-  token-result-proxy-mongo:
+  result-proxy-mongo:
     restart: unless-stopped
     image: library/mongo:4.2
     entrypoint: '/bin/bash'
     command: -c "mongod --bind_ip_all --port 13202"
     expose:
       - 13202
-    networks:
-      - resultproxy
+    ports:
+      - 13202:13202
 
   ipfs:
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
     expose:
       - 8080
-    networks:
-      - resultproxy
+      - 5001
+    ports:
+      - 8080:8080
+      - 5001:5001
+    healthcheck:
+      test: nc -z 0.0.0.0 8080 && nc -z 0.0.0.0 5001
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  gateway-mongo:
-    image: mongo:latest
+  market-mongo:
+    image: mongo:6.0.3
     restart: unless-stopped
     expose:
       - 27017
     ports:
       - 27017:27017
-    networks:
-      - gateway
 
-  gateway-redis:
-    image: redis:alpine
+  market-redis:
+    image: redis:7.0.7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
     expose:
       - 6379
     ports:
       - 6379:6379
-    networks:
-      - gateway
+    healthcheck:
+      test: nc -z 0.0.0.0 6379
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  token-watcher:
+  market-watcher:
     image: iexechub/iexec-market-watcher:6.4
     restart: unless-stopped
     environment:
-      - DEBUG=iexec-watcher*
-      - DEBUG_COLORS=true
-      - CHAIN=DEV
-      - CHAIN_ID=65535
-      - IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - ETH_WS_HOST=ws://token-chain:8546
-      - ETH_RPC_HOST=http://token-chain:8545
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
+      CHAIN: BELLECOUR
+      START_BLOCK: $BELLECOUR_FORK_BLOCK
+      ETH_WS_HOST: ws://bellecour-fork:8545
+      ETH_RPC_HOST: http://bellecour-fork:8545
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
     depends_on:
-      - token-chain
-      - gateway-redis
-      - gateway-mongo
-    networks:
-      - gateway
-      - blockchain
+      bellecour-fork:
+        condition: service_healthy
+      market-redis:
+        condition: service_healthy
+      market-mongo:
+        condition: service_started
 
-  token-gateway:
+  market-api:
     image: iexechub/iexec-market-api:6.4
     restart: unless-stopped
     ports:
-      - 13000:3000
+      - 3000:3000
+    expose:
+      - 3000
     environment:
-      - DEBUG=iexec-market-api*
-      - DEBUG_COLORS=true
-      - CHAINS=DEV
-      - DEV_NATIVE=false
-      - DEV_ETH_RPC_HOST=http://token-chain:8545
-      - DEV_CHAIN_ID=65535
-      - DEV_IEXEC_ADDRESS=0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca
-      - MONGO_HOST=gateway-mongo
-      - REDIS_HOST=gateway-redis
-      - RATE_LIMIT_MAX=10000
-      - RATE_LIMIT_PERIOD=60000
-      - MAX_OPEN_ORDERS_PER_WALLET=1000
+      CHAINS: BELLECOUR_FORK
+      BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
+      BELLECOUR_FORK_CHAIN_ID: 134
+      BELLECOUR_FORK_IS_NATIVE: 'true'
+      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
+      RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_PERIOD: 60000
+      MAX_OPEN_ORDERS_PER_WALLET: 1000
     depends_on:
-      - token-chain
-      - gateway-redis
-      - gateway-mongo
-    networks:
-      - gateway
-      - blockchain
+      bellecour-fork:
+        condition: service_healthy
+      market-redis:
+        condition: service_healthy
+      market-mongo:
+        condition: service_started
