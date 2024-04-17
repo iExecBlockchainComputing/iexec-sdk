@@ -1,6 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
+import { Wallet } from 'ethers';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils';
 import {
@@ -350,6 +351,56 @@ describe('account', () => {
       expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
         true,
       );
+    });
+  });
+
+  describe('approve()', () => {
+    test('require a signer', async () => {
+      const spenderAddress = Wallet.createRandom().address;
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
+    test('rejects invalid address', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const spenderAddress = 'invalid_address';
+      const amount = 10;
+
+      await expect(
+        iexec.account.approve(amount, spenderAddress),
+      ).rejects.toThrow(
+        Error(`${spenderAddress} is not a valid ethereum address`),
+      );
+    });
+
+    test('rejects invalid amount', async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const spenderAddress = wallet.address;
+      const amount = 'invalid_amount';
+
+      await expect(
+        iexec.account.approve(amount, spenderAddress),
+      ).rejects.toThrow(Error(`${amount} is not a valid amount`));
+    });
+
+    test('prevents approve 0', async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const spenderAddress = wallet.address;
+
+      await expect(iexec.account.approve(0, spenderAddress)).rejects.toThrow(
+        Error('Approve amount must be greater than 0'),
+      );
+    });
+
+    test('approve succeeds', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const spenderAddress = Wallet.createRandom().address;
+      const txHash = await iexec.account.approve(10, spenderAddress);
+      expect(txHash).toBeDefined();
     });
   });
 });

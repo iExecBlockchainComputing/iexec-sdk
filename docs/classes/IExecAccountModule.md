@@ -27,6 +27,7 @@ module exposing account methods
 - [deposit](IExecAccountModule.md#deposit)
 - [withdraw](IExecAccountModule.md#withdraw)
 - [fromConfig](IExecAccountModule.md#fromconfig)
+- [approve](IExecAccountModule.md#approve)
 
 ## Constructors
 
@@ -165,7 +166,30 @@ console.log('tx:', txHash);
 #### Returns
 
 `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+___
 
+### approve
+
+▸ **approve**(`amount`, `spenderAddress`): `Promise`<{ `txHash`: `string` }\>
+
+approves the spender to use the account up to a specified amount, denoted in nRLC (1 nRLC = 1*10^-9 RLC).
+
+example:
+```js
+const txHash = await approve(amount, spenderAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<{`txHash`: `string`  }\>
 ___
 
 ### fromConfig
