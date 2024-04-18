@@ -4,7 +4,7 @@ import {
   addressSchema,
   nRlcAmountSchema,
   throwIfMissing,
-} from '../utils/validator.js'; // Ajout de l'import pour addressSchema et nRlcAmountSchema
+} from '../utils/validator.js';
 import { isInWhitelist } from '../wallet/enterprise.js';
 import { getAddress } from '../wallet/address.js';
 import { checkSigner } from '../utils/utils.js';
