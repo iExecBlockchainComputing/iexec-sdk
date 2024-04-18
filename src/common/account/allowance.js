@@ -17,8 +17,8 @@ export const approve = async (
   try {
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
-    if (new BN(vAmount).lte(new BN(0)))
-      throw Error('Approve amount must be greater than 0');
+    if (new BN(vAmount).lten(new BN(0)))
+      throw Error('Approve amount must be less than or equals 0');
 
     const vSpenderAddress = await addressSchema({
       ethProvider: contracts.provider,

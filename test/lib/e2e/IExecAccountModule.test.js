@@ -387,13 +387,13 @@ describe('account', () => {
       ).rejects.toThrow(Error(`${amount} is not a valid amount`));
     });
 
-    test('prevents approve 0', async () => {
+    test('prevents approve negative amount', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const spenderAddress = wallet.address;
 
-      await expect(iexec.account.approve(0, spenderAddress)).rejects.toThrow(
-        Error('Approve amount must be greater than 0'),
-      );
+      await expect(
+        iexec.account.approve(-0.0001, spenderAddress),
+      ).rejects.toThrow(Error('Approve amount must be less than or equals 0'));
     });
 
     test('approve succeeds', async () => {
