@@ -5,8 +5,6 @@ import {
   nRlcAmountSchema,
   throwIfMissing,
 } from '../utils/validator.js';
-import { isInWhitelist } from '../wallet/enterprise.js';
-import { getAddress } from '../wallet/address.js';
 import { checkSigner } from '../utils/utils.js';
 
 const debug = Debug('iexec:account:allowance');
@@ -21,11 +19,6 @@ export const approve = async (
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
       throw Error('Approve amount must be greater than 0');
-    if (contracts.flavour === 'enterprise') {
-      await isInWhitelist(contracts, await getAddress(contracts), {
-        strict: true,
-      });
-    }
 
     const vSpenderAddress = await addressSchema({
       ethProvider: contracts.provider,
