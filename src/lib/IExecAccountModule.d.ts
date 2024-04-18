@@ -11,6 +11,20 @@ export default class IExecAccountModule extends IExecModule {
   /**
    * **SIGNER REQUIRED**
    *
+   * approves the spender to use the account up to a specified amount, denoted in nRLC (1 nRLC = 1*10^-9 RLC).
+   *
+   * example:
+   * ```js
+   * const txHash = await approve(amount, spenderAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  approve(
+    amount: NRLCAmount,
+    spenderAddress: Addressish,
+  ): Promise<{ txHash: TxHash }>; /**
+   * **SIGNER REQUIRED**
+   *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
    *
    * example:
