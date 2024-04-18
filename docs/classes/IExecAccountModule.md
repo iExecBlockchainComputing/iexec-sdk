@@ -68,7 +68,7 @@ current IExecConfig
 
 ### approve
 
-▸ **approve**(`amount`, `spenderAddress`): `Promise`<{ `txHash`: `string`  }\>
+▸ **approve**(`amount`, `spenderAddress`): `Promise`<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -89,7 +89,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `txHash`: `string`  }\>
+`Promise`<`string`\>
 
 ___
 

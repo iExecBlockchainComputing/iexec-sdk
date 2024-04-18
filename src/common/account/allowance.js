@@ -32,7 +32,7 @@ export const approve = async (
     if (!checkEventFromLogs('Approval', txReceipt.logs))
       throw Error('Approve not confirmed');
 
-    return { txHash: tx.hash };
+    return tx.hash;
   } catch (error) {
     debug('approve()', error);
     throw error;
