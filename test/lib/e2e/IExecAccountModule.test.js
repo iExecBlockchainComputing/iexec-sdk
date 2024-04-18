@@ -389,10 +389,10 @@ describe('account', () => {
     test('prevents approve negative amount', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const spenderAddress = wallet.address;
-
+      const negativeAmount = -999;
       await expect(
-        iexec.account.approve(-0.0001, spenderAddress),
-      ).rejects.toThrow(Error('Approve amount must be less than or equals 0'));
+        iexec.account.approve(negativeAmount, spenderAddress),
+      ).rejects.toThrow(Error(`${negativeAmount} is not a valid amount`));
     });
 
     test('approve succeeds', async () => {
