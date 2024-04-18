@@ -9,6 +9,19 @@ import { Addressish, BN, NRLCAmount, TxHash } from '../common/types.js';
  */
 export default class IExecAccountModule extends IExecModule {
   /**
+   * checks the amount of allowance approved for the specified spender to use the account of the owner.
+   *
+   * example:
+   * ```js
+   * const allowanceAmount = await checkAllowance(ownerAddress, spenderAddress);
+   * console.log('allowance amount:', allowanceAmount);
+   * ```
+   */
+  checkAllowance(
+    ownerAddress: Addressish,
+    spenderAddress: Addressish,
+  ): Promise<NRLCAmount>;
+  /**
    * **SIGNER REQUIRED**
    *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
@@ -29,7 +42,7 @@ export default class IExecAccountModule extends IExecModule {
    * example:
    * ```js
    * const { amount, txHash } = await iexec.account.withdraw('1000000000');
-   * console.log('Withdrawn:', amount);
+   * console.log('Withdraw:', amount);
    * console.log('tx:', txHash);
    * ```
    */

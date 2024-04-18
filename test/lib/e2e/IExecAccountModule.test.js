@@ -352,4 +352,59 @@ describe('account', () => {
       );
     });
   });
+
+  describe('checkAllowance()', () => {
+    test('rejects invalid ownerAddress', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const ownerAddress = 'invalid_address';
+      const spenderAddress = getRandomAddress();
+
+      await expect(
+        iexec.account.checkAllowance(ownerAddress, spenderAddress),
+      ).rejects.toThrow(
+        Error(`${ownerAddress} is not a valid ethereum address`),
+      );
+    });
+
+    test('rejects invalid spenderAddress', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const ownerAddress = getRandomAddress();
+      const spenderAddress = "'invalid_address'";
+
+      await expect(
+        iexec.account.checkAllowance(ownerAddress, spenderAddress),
+      ).rejects.toThrow(
+        Error(`${spenderAddress} is not a valid ethereum address`),
+      );
+    });
+
+    test('return zero allowance if no approval exists', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const ownerAddress = getRandomAddress();
+      const spenderAddress = getRandomAddress();
+
+      const result = await iexec.account.checkAllowance(
+        ownerAddress,
+        spenderAddress,
+      );
+
+      expect(result).toEqual(new BN(0));
+    });
+
+    test('return the allowed amount as a BigNumber', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const ownerAddress = getRandomAddress();
+      const spenderAddress = getRandomAddress();
+      const allowanceValue = '10';
+
+      await iexec.account.approve(allowanceValue, spenderAddress);
+      const result = await iexec.account.checkAllowance(
+        ownerAddress,
+        spenderAddress,
+      );
+
+      expect(result).toBeInstanceOf(BN);
+      expect(result.toString()).toBe(allowanceValue);
+    });
+  });
 });

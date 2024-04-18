@@ -22,6 +22,7 @@ module exposing account methods
 
 ### Methods
 
+- [checkAllowance](IExecAccountModule.md#checkallowance)
 - [checkBalance](IExecAccountModule.md#checkbalance)
 - [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
 - [deposit](IExecAccountModule.md#deposit)
@@ -64,6 +65,31 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### checkAllowance
+
+▸ **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
+
+checks the amount of allowance approved for the specified spender to use the account of the owner.
+
+example:
+```js
+const allowanceAmount = await checkAllowance(ownerAddress, spenderAddress);
+console.log('allowance amount:', allowanceAmount);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ownerAddress` | `string` |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
+
+___
 
 ### checkBalance
 
@@ -152,7 +178,7 @@ withdraw some nRLC (1 nRLC = 1*10^-9 RLC) from user account to user wallet
 example:
 ```js
 const { amount, txHash } = await iexec.account.withdraw('1000000000');
-console.log('Withdrawn:', amount);
+console.log('Withdraw:', amount);
 console.log('tx:', txHash);
 ```
 
