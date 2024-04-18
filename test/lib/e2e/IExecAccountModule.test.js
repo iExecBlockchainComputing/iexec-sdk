@@ -1,7 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import { Wallet } from 'ethers';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils';
 import {
@@ -356,7 +355,7 @@ describe('account', () => {
 
   describe('approve()', () => {
     test('require a signer', async () => {
-      const spenderAddress = Wallet.createRandom().address;
+      const spenderAddress = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
         Error(
@@ -398,7 +397,7 @@ describe('account', () => {
 
     test('approve succeeds', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const spenderAddress = Wallet.createRandom().address;
+      const spenderAddress = getRandomAddress();
       const txHash = await iexec.account.approve(10, spenderAddress);
       expect(txHash).toBeDefined();
     });
