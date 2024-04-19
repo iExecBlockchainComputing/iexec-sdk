@@ -21,6 +21,19 @@ export default class IExecAccountModule extends IExecModule {
    */
   approve(amount: NRLCAmount, spenderAddress: Addressish): Promise<TxHash>;
   /**
+   * checks the amount of allowance approved for the specified spender to use the account of the owner.
+   *
+   * example:
+   * ```js
+   * const allowanceAmount = await checkAllowance(ownerAddress, spenderAddress);
+   * console.log('allowance amount:', allowanceAmount);
+   * ```
+   */
+  checkAllowance(
+    ownerAddress: Addressish,
+    spenderAddress: Addressish,
+  ): Promise<NRLCAmount>;
+  /**
    * **SIGNER REQUIRED**
    *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account

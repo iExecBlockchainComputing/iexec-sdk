@@ -23,6 +23,7 @@ module exposing account methods
 ### Methods
 
 - [approve](IExecAccountModule.md#approve)
+- [checkAllowance](IExecAccountModule.md#checkallowance)
 - [checkBalance](IExecAccountModule.md#checkbalance)
 - [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
 - [deposit](IExecAccountModule.md#deposit)
@@ -90,6 +91,31 @@ console.log('tx:', txHash);
 #### Returns
 
 `Promise`<`string`\>
+
+___
+
+### checkAllowance
+
+▸ **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
+
+checks the amount of allowance approved for the specified spender to use the account of the owner.
+
+example:
+```js
+const allowanceAmount = await checkAllowance(ownerAddress, spenderAddress);
+console.log('allowance amount:', allowanceAmount);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ownerAddress` | `string` |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
 
 ___
 

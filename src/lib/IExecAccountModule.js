@@ -1,7 +1,7 @@
 import IExecModule from './IExecModule.js';
 import { checkBalance } from '../common/account/balance.js';
 import { deposit, withdraw } from '../common/account/fund.js';
-import { approve } from '../common/account/allowance.js';
+import { approve, checkAllowance } from '../common/account/allowance.js';
 
 export default class IExecAccountModule extends IExecModule {
   constructor(...args) {
@@ -18,6 +18,12 @@ export default class IExecAccountModule extends IExecModule {
       approve(
         await this.config.resolveContractsClient(),
         nRlcAmount,
+        spenderAddress,
+      );
+    this.checkAllowance = async (ownerAddress, spenderAddress) =>
+      checkAllowance(
+        await this.config.resolveContractsClient(),
+        ownerAddress,
         spenderAddress,
       );
   }

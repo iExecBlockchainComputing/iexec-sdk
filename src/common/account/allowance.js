@@ -2,11 +2,11 @@ import Debug from 'debug';
 import BN from 'bn.js';
 import {
   addressSchema,
-  nRlcAmountSchema,
   throwIfMissing,
+  nRlcAmountSchema,
 } from '../utils/validator.js';
-import { checkSigner, checkEventFromLogs } from '../utils/utils.js';
-import { wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
+import { bigIntToBn, checkSigner, checkEventFromLogs } from '../utils/utils.js';
 
 const debug = Debug('iexec:account:allowance');
 
@@ -35,6 +35,30 @@ export const approve = async (
     return tx.hash;
   } catch (error) {
     debug('approve()', error);
+    throw error;
+  }
+};
+
+export const checkAllowance = async (
+  contracts = throwIfMissing(),
+  ownerAddress = throwIfMissing(),
+  spenderAddress = throwIfMissing(),
+) => {
+  try {
+    const vOwnerAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(ownerAddress);
+    const vSpenderAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(spenderAddress);
+
+    const iexecContract = contracts.getIExecContract();
+    const amount = await wrapCall(
+      iexecContract.allowance(vOwnerAddress, vSpenderAddress),
+    );
+    return bigIntToBn(amount);
+  } catch (error) {
+    debug('checkAllowance()', error);
     throw error;
   }
 };
