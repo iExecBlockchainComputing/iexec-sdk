@@ -62,3 +62,30 @@ export const checkAllowance = async (
     throw error;
   }
 };
+
+export const revokeApproval = async (
+  contracts = throwIfMissing(),
+  spenderAddress = throwIfMissing(),
+) => {
+  try {
+    checkSigner(contracts);
+    const vSpenderAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(spenderAddress);
+    const iexecContract = contracts.getIExecContract();
+    const tx = await wrapSend(
+      iexecContract.approve(vSpenderAddress, 0, contracts.txOptions),
+    );
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+
+    if (!checkEventFromLogs('Approval', txReceipt.logs))
+      throw Error(
+        'Failed to revoke approval: Approval of 0 amount not confirmed',
+      );
+
+    return tx.hash;
+  } catch (error) {
+    debug('revokeApproval()', error);
+    throw error;
+  }
+};

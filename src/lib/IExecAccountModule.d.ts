@@ -36,6 +36,18 @@ export default class IExecAccountModule extends IExecModule {
   /**
    * **SIGNER REQUIRED**
    *
+   * revokes the approval for the spender to use the account.
+   *
+   * example:
+   * ```js
+   * const txHash = await revokeApproval(spenderAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  revokeApproval(spenderAddress: Addressish): Promise<TxHash>;
+  /**
+   * **SIGNER REQUIRED**
+   *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
    *
    * example:
