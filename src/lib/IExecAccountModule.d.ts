@@ -42,7 +42,7 @@ export default class IExecAccountModule extends IExecModule {
    * example:
    * ```js
    * const { amount, txHash } = await iexec.account.withdraw('1000000000');
-   * console.log('Withdraw:', amount);
+   * console.log('Withdrawn:', amount);
    * console.log('tx:', txHash);
    * ```
    */
