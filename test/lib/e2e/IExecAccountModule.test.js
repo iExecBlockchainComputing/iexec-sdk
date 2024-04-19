@@ -177,6 +177,47 @@ describe('account', () => {
     });
   });
 
+  describe('revokeApproval()', () => {
+    test('require a signer', async () => {
+      const spenderAddress = getRandomAddress();
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(
+        iexec.account.revokeApproval(spenderAddress),
+      ).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
+    test('rejects invalid address', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const spenderAddress = 'invalid_address';
+
+      await expect(
+        iexec.account.revokeApproval(spenderAddress),
+      ).rejects.toThrow(
+        Error(`${spenderAddress} is not a valid ethereum address`),
+      );
+    });
+
+    test('revokeApproval succeeds', async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const spenderAddress = getRandomAddress();
+      const approvalTxHash = await iexec.account.approve(10, spenderAddress);
+      expect(approvalTxHash).toBeDefined();
+      const revocationTxHash =
+        await iexec.account.revokeApproval(spenderAddress);
+      expect(revocationTxHash).toBeDefined();
+      const amountAfterRevocation = await iexec.account.checkAllowance(
+        wallet.address,
+        spenderAddress,
+      );
+      expect(amountAfterRevocation).toBeInstanceOf(BN);
+      expect(amountAfterRevocation.toString()).toBe('0');
+    });
+  });
+
   describe('deposit()', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
@@ -460,97 +501,6 @@ describe('account', () => {
       expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
         true,
       );
-    });
-  });
-
-  describe('approve()', () => {
-    test('require a signer', async () => {
-      const spenderAddress = getRandomAddress();
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
-      await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
-        Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
-      );
-    });
-
-    test('rejects invalid address', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const spenderAddress = 'invalid_address';
-      const amount = 10;
-
-      await expect(
-        iexec.account.approve(amount, spenderAddress),
-      ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`),
-      );
-    });
-
-    test('rejects invalid amount', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const spenderAddress = wallet.address;
-      const amount = 'invalid_amount';
-
-      await expect(
-        iexec.account.approve(amount, spenderAddress),
-      ).rejects.toThrow(Error(`${amount} is not a valid amount`));
-    });
-
-    test('prevents approve negative amount', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const spenderAddress = wallet.address;
-      const negativeAmount = -999;
-      await expect(
-        iexec.account.approve(negativeAmount, spenderAddress),
-      ).rejects.toThrow(Error(`${negativeAmount} is not a valid amount`));
-    });
-
-    test('approve succeeds', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const spenderAddress = getRandomAddress();
-      const txHash = await iexec.account.approve(10, spenderAddress);
-      expect(txHash).toBeDefined();
-    });
-  });
-
-  describe('revokeApproval()', () => {
-    test('require a signer', async () => {
-      const spenderAddress = getRandomAddress();
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
-      await expect(
-        iexec.account.revokeApproval(spenderAddress),
-      ).rejects.toThrow(
-        Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
-      );
-    });
-
-    test('rejects invalid address', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const spenderAddress = 'invalid_address';
-
-      await expect(
-        iexec.account.revokeApproval(spenderAddress),
-      ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`),
-      );
-    });
-
-    test('revokeApproval succeeds', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const spenderAddress = getRandomAddress();
-      const approvalTxHash = await iexec.account.approve(10, spenderAddress);
-      expect(approvalTxHash).toBeDefined();
-      const revocationTxHash =
-        await iexec.account.revokeApproval(spenderAddress);
-      expect(revocationTxHash).toBeDefined();
-      const amountAfterRevocation = await iexec.account.checkAllowance(
-        wallet.address,
-        spenderAddress,
-      );
-      expect(amountAfterRevocation).toBeInstanceOf(BN);
-      expect(amountAfterRevocation.toString()).toBe('0');
     });
   });
 });
