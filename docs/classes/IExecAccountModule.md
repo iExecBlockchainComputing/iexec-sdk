@@ -146,6 +146,17 @@ ___
 
 ▸ **deposit**(`amount`): `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
 
+**SIGNER REQUIRED**
+
+deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
+
+example:
+```js
+const { amount, txHash } = await deposit('1000000000');
+console.log('Deposited:', amount);
+console.log('tx:', txHash);
+```
+
 #### Parameters
 
 | Name | Type |

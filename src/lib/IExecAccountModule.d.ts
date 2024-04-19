@@ -19,7 +19,8 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('tx:', txHash);
    * ```
    */
-  approve(amount: NRLCAmount, spenderAddress: Addressish): Promise<TxHash>; /**
+  approve(amount: NRLCAmount, spenderAddress: Addressish): Promise<TxHash>;
+  /**
    * **SIGNER REQUIRED**
    *
    * deposit some nRLC (1 nRLC = 1*10^-9 RLC) from user wallet to user account
