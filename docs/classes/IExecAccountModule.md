@@ -22,6 +22,7 @@ module exposing account methods
 
 ### Methods
 
+- [approve](IExecAccountModule.md#approve)
 - [checkAllowance](IExecAccountModule.md#checkallowance)
 - [checkBalance](IExecAccountModule.md#checkbalance)
 - [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
@@ -65,6 +66,33 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### approve
+
+▸ **approve**(`amount`, `spenderAddress`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
+
+approves the spender to use the account up to a specified amount, denoted in nRLC (1 nRLC = 1*10^-9 RLC).
+
+example:
+```js
+const txHash = await approve(amount, spenderAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
 
 ### checkAllowance
 
@@ -178,7 +206,7 @@ withdraw some nRLC (1 nRLC = 1*10^-9 RLC) from user account to user wallet
 example:
 ```js
 const { amount, txHash } = await iexec.account.withdraw('1000000000');
-console.log('Withdraw:', amount);
+console.log('Withdrawn:', amount);
 console.log('tx:', txHash);
 ```
 

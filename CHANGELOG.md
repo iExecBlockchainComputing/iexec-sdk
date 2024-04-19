@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Added
+
+- `account.approve(spender, amount)` to approve a spender to spend staked RLC from the user account
+- `account.checkAllowance(ownerAddress, spenderAddress)` to checks the amount of allowance approved for the specified spender to use the account of the owner.
+
 ### Changed
 
 - fix `--gas-price` option not being enforced on every command
