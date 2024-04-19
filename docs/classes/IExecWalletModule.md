@@ -135,7 +135,7 @@ ___
 
 ### checkBalances
 
-▸ **checkBalances**(`address`): `Promise`<{ `nRLC`: `BN` ; `wei`: `BN`  }\>
+▸ **checkBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
 
 check the wallet balances (native and iExec token) of specified address
 
@@ -154,13 +154,13 @@ console.log('ethereum wei:', wei.toString());
 
 #### Returns
 
-`Promise`<{ `nRLC`: `BN` ; `wei`: `BN`  }\>
+`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
 
 ___
 
 ### checkBridgedBalances
 
-▸ **checkBridgedBalances**(`address`): `Promise`<{ `nRLC`: `BN` ; `wei`: `BN`  }\>
+▸ **checkBridgedBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
 
 check the wallet balances (native and iExec token) of specified address on bridged chain
 
@@ -179,7 +179,7 @@ console.log('ethereum wei:', wei.toString());
 
 #### Returns
 
-`Promise`<{ `nRLC`: `BN` ; `wei`: `BN`  }\>
+`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
 
 ___
 

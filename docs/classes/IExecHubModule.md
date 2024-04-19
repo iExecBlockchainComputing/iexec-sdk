@@ -67,7 +67,7 @@ current IExecConfig
 
 ### countCategory
 
-▸ **countCategory**(): `Promise`<`BN`\>
+▸ **countCategory**(): `Promise`<[`BN`](utils.BN.md)\>
 
 count the created categories.
 
@@ -79,13 +79,13 @@ console.log('category count:', count);
 
 #### Returns
 
-`Promise`<`BN`\>
+`Promise`<[`BN`](utils.BN.md)\>
 
 ___
 
 ### createCategory
 
-▸ **createCategory**(`category`): `Promise`<{ `catid`: `BN` ; `txHash`: `string`  }\>
+▸ **createCategory**(`category`): `Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY IEXEC OWNER**
 
@@ -112,13 +112,13 @@ console.log('deployed with catid', catid);
 
 #### Returns
 
-`Promise`<{ `catid`: `BN` ; `txHash`: `string`  }\>
+`Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 ___
 
 ### getTimeoutRatio
 
-▸ **getTimeoutRatio**(): `Promise`<`BN`\>
+▸ **getTimeoutRatio**(): `Promise`<[`BN`](utils.BN.md)\>
 
 get the current `TimeoutRatio`
 
@@ -132,7 +132,7 @@ console.log('timeoutRatio:', timeoutRatio);
 
 #### Returns
 
-`Promise`<`BN`\>
+`Promise`<[`BN`](utils.BN.md)\>
 
 ___
 

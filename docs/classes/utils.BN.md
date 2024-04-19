@@ -38,7 +38,7 @@ const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
 
 | Name | Type |
 | :------ | :------ |
-| `number` | `string` \| `number` \| `BN` \| `Buffer` \| `Uint8Array` \| `number`[] |
+| `number` | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
 | `base?` | `number` \| ``"hex"`` |
 | `endian?` | `Endianness` |
 
@@ -56,7 +56,7 @@ BNJS.constructor
 
 | Name | Type |
 | :------ | :------ |
-| `number` | `string` \| `number` \| `BN` \| `Buffer` \| `Uint8Array` \| `number`[] |
+| `number` | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
 | `endian?` | `Endianness` |
 
 #### Returns

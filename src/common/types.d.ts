@@ -1,8 +1,10 @@
-import BN from 'bn.js';
+import { BN } from './bn.js';
 
 export * from './utils/IExecContractsClient.js';
 export * from './utils/reactive.js';
 export * from './utils/signers.js';
+
+export { BN } from './bn.js';
 
 /**
  * big number like

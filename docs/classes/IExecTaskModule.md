@@ -169,7 +169,7 @@ ___
 
 ### show
 
-▸ **show**(`taskid`): `Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: `BN` ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: `BN` ; `idx`: `BN` ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: `BN` ; `revealCounter`: `BN` ; `revealDeadline`: `BN` ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: `BN`  }\>
+▸ **show**(`taskid`): `Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: [`BN`](utils.BN.md) ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: [`BN`](utils.BN.md) ; `idx`: [`BN`](utils.BN.md) ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: [`BN`](utils.BN.md) ; `revealCounter`: [`BN`](utils.BN.md) ; `revealDeadline`: [`BN`](utils.BN.md) ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: [`BN`](utils.BN.md)  }\>
 
 show the details of a task.
 
@@ -189,7 +189,7 @@ console.log('task:', task);
 
 #### Returns
 
-`Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: `BN` ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: `BN` ; `idx`: `BN` ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: `BN` ; `revealCounter`: `BN` ; `revealDeadline`: `BN` ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: `BN`  }\>
+`Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: [`BN`](utils.BN.md) ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: [`BN`](utils.BN.md) ; `idx`: [`BN`](utils.BN.md) ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: [`BN`](utils.BN.md) ; `revealCounter`: [`BN`](utils.BN.md) ; `revealDeadline`: [`BN`](utils.BN.md) ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: [`BN`](utils.BN.md)  }\>
 
 ___
 

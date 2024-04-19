@@ -1,3 +1,5 @@
+export type * from '../common/types.js';
+
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';

@@ -1,4 +1,4 @@
-export * from '../common/types.js';
+export type * from '../common/types.js';
 
 export { default as IExec } from './IExec.js';
 export { default as IExecConfig } from './IExecConfig.js';

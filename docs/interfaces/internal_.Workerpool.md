@@ -36,13 +36,13 @@ ___
 
 ### schedulerRewardRatioPolicy
 
-• **schedulerRewardRatioPolicy**: `BN`
+• **schedulerRewardRatioPolicy**: [`BN`](../classes/utils.BN.md)
 
 ___
 
 ### workerStakeRatioPolicy
 
-• **workerStakeRatioPolicy**: `BN`
+• **workerStakeRatioPolicy**: [`BN`](../classes/utils.BN.md)
 
 ___
 

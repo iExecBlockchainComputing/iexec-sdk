@@ -121,7 +121,7 @@ ___
 
 ### checkBalance
 
-▸ **checkBalance**(`address`): `Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
+▸ **checkBalance**(`address`): `Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 check the account balance of specified address (stake is available nRLC, locked is escrowed nRLC)
 
@@ -140,13 +140,13 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Returns
 
-`Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
+`Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 ___
 
 ### checkBridgedBalance
 
-▸ **checkBridgedBalance**(`address`): `Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
+▸ **checkBridgedBalance**(`address`): `Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 check the account balance on bridged chain of specified address ie: when connected to mainnet, check the account ballance on bellecour
 example:
@@ -164,13 +164,13 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Returns
 
-`Promise`<{ `locked`: `BN` ; `stake`: `BN`  }\>
+`Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 ___
 
 ### deposit
 
-▸ **deposit**(`amount`): `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+▸ **deposit**(`amount`): `Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -191,13 +191,13 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+`Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 ___
 
 ### withdraw
 
-▸ **withdraw**(`amount`): `Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+▸ **withdraw**(`amount`): `Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -218,7 +218,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`<{ `amount`: `BN` ; `txHash`: `string`  }\>
+`Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 ___
 

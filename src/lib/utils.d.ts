@@ -1,13 +1,15 @@
 import { BlockTag } from 'ethers';
-import BNJS from 'bn.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import {
+  BN,
   WeiAmount,
   NRLCAmount,
   HumanSingleTag,
   Bytes32,
   ProviderOptions,
 } from '../common/types.js';
+
+export { BN } from '../common/bn.js';
 
 /**
  * create a signer connected to the specified blockchain host from a private key
@@ -43,20 +45,6 @@ export const getSignerFromPrivateKey: (
   },
 ) => EnhancedWallet;
 
-/**
- * class used for big numbers manipulation
- *
- * example:
- * ```js
- * const one = new BN(1);
- * const two = new BN('2');
- *
- * // work above Number.MAX_SAFE_INTEGER limit
- * const maxSafeInteger = new BN(Number.MAX_SAFE_INTEGER);
- * const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
- * ```
- */
-export class BN extends BNJS {}
 /**
  * ethereum null/zero address
  */

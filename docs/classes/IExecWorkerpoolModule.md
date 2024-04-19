@@ -96,7 +96,7 @@ ___
 
 ### countUserWorkerpools
 
-▸ **countUserWorkerpools**(`userAddress`): `Promise`<`BN`\>
+▸ **countUserWorkerpools**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the workerpools owned by an address.
 
@@ -114,7 +114,7 @@ console.log('workerpool count:', count);
 
 #### Returns
 
-`Promise`<`BN`\>
+`Promise`<[`BN`](utils.BN.md)\>
 
 ___
 

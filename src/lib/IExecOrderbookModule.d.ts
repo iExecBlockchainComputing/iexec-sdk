@@ -1,4 +1,4 @@
-export * from '../common/types.js';
+export type * from '../common/types.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
@@ -241,16 +241,16 @@ export default class IExecOrderbookModule extends IExecModule {
        */
       pageSize?: number;
       /**
-      * filters out orders allowing “any” app (default: `false`)
-      */
+       * filters out orders allowing “any” app (default: `false`)
+       */
       isAppStrict?: boolean;
       /**
-      * filters out orders allowing “any” requester (default: `false`)
-      */
+       * filters out orders allowing “any” requester (default: `false`)
+       */
       isRequesterStrict?: boolean;
       /**
-      * filters out orders allowing “any” workerpool (default: `false`)
-      */
+       * filters out orders allowing “any” workerpool (default: `false`)
+       */
       isWorkerpoolStrict?: boolean;
     },
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
@@ -312,16 +312,16 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     pageSize?: number;
     /**
-    * filters out orders allowing “any” dataset (default: `false`)
-    */
+     * filters out orders allowing “any” dataset (default: `false`)
+     */
     isDatasetStrict?: boolean;
     /**
-    * filters out orders allowing “any” requester (default: `false`)
-    */
+     * filters out orders allowing “any” requester (default: `false`)
+     */
     isRequesterStrict?: boolean;
     /**
-    * filters out orders allowing “any” app (default: `false`)
-    */
+     * filters out orders allowing “any” app (default: `false`)
+     */
     isAppStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
@@ -382,8 +382,8 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     pageSize?: number;
     /**
-    * filters out orders allowing “any” workerpool (default: `false`)
-    */
+     * filters out orders allowing “any” workerpool (default: `false`)
+     */
     isWorkerpoolStrict?: boolean;
   }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
   /**
