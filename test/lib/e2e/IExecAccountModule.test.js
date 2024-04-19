@@ -352,4 +352,54 @@ describe('account', () => {
       );
     });
   });
+
+  describe('approve()', () => {
+    test('require a signer', async () => {
+      const spenderAddress = getRandomAddress();
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
+    test('rejects invalid address', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const spenderAddress = 'invalid_address';
+      const amount = 10;
+
+      await expect(
+        iexec.account.approve(amount, spenderAddress),
+      ).rejects.toThrow(
+        Error(`${spenderAddress} is not a valid ethereum address`),
+      );
+    });
+
+    test('rejects invalid amount', async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const spenderAddress = wallet.address;
+      const amount = 'invalid_amount';
+
+      await expect(
+        iexec.account.approve(amount, spenderAddress),
+      ).rejects.toThrow(Error(`${amount} is not a valid amount`));
+    });
+
+    test('prevents approve negative amount', async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const spenderAddress = wallet.address;
+      const negativeAmount = -999;
+      await expect(
+        iexec.account.approve(negativeAmount, spenderAddress),
+      ).rejects.toThrow(Error(`${negativeAmount} is not a valid amount`));
+    });
+
+    test('approve succeeds', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const spenderAddress = getRandomAddress();
+      const txHash = await iexec.account.approve(10, spenderAddress);
+      expect(txHash).toBeDefined();
+    });
+  });
 });

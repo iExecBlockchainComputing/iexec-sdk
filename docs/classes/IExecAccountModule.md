@@ -22,6 +22,7 @@ module exposing account methods
 
 ### Methods
 
+- [approve](IExecAccountModule.md#approve)
 - [checkBalance](IExecAccountModule.md#checkbalance)
 - [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
 - [deposit](IExecAccountModule.md#deposit)
@@ -64,6 +65,33 @@ current IExecConfig
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
+
+### approve
+
+▸ **approve**(`amount`, `spenderAddress`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
+
+approves the spender to use the account up to a specified amount, denoted in nRLC (1 nRLC = 1*10^-9 RLC).
+
+example:
+```js
+const txHash = await approve(amount, spenderAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
 
 ### checkBalance
 

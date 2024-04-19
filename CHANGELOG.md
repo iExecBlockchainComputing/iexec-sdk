@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Added
+
+- `account.approve(spender, amount)` to approve a spender to spend staked RLC from the user account
+
 ### Changed
 
 - fix `--gas-price` option not being enforced on every command
