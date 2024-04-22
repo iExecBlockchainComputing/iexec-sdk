@@ -26,5 +26,7 @@ export default class IExecAccountModule extends IExecModule {
         ownerAddress,
         spenderAddress,
       );
+    this.revokeApproval = async (spenderAddress) =>
+      approve(await this.config.resolveContractsClient(), 0, spenderAddress);
   }
 }

@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `account.approve(spender, amount)` to approve a spender to spend staked RLC from the user account
-- `account.checkAllowance(ownerAddress, spenderAddress)` to checks the amount of allowance approved for the specified spender to use the account of the owner.
+- `account.checkAllowance(ownerAddress, spenderAddress)` to checks the amount of allowance approved for the specified spender to use the account of the owner
+- `account.revokeApproval(spenderAddress)` to revokes the approval for the spender to use the account
 
 ### Changed
 
