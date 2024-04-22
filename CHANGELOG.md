@@ -2,13 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [8.7.0] 2024-04-22
 
 ### Added
 
-- `account.approve(spender, amount)` to approve a spender to spend staked RLC from the user account
-- `account.checkAllowance(ownerAddress, spenderAddress)` to checks the amount of allowance approved for the specified spender to use the account of the owner
-- `account.revokeApproval(spenderAddress)` to revokes the approval for the spender to use the account
+- `account.approve(spenderAddress, amount)` to approve a spender to spend staked RLC from the user account
+- `account.checkAllowance(ownerAddress, spenderAddress)` to check the amount of allowance approved for the specified spender to use the account of the owner
+- `account.revokeApproval(spenderAddress)` to revoke the approval for the spender to use the account
 
 ### Changed
 
@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - provider options for ethers provider are loosely type-checked to allow better control
 - Typescript fixes
 - move tests to the local fork of bellecour
-- cache secrets existence when confirmed by the SMS
+- cache secrets' existence when confirmed by the SMS
 
 ## [8.6.1] 2024-03-11
 
