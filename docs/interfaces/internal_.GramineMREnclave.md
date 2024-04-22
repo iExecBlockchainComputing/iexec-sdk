@@ -24,9 +24,9 @@ ___
 
 ### framework
 
-• **framework**: ``"GRAMINE"``
+• **framework**: `string`
 
-TEE framework name
+TEE framework name 'GRAMINE'
 
 ___
 

@@ -34,9 +34,9 @@ ___
 
 ### framework
 
-• **framework**: ``"SCONE"``
+• **framework**: `string`
 
-TEE framework name
+TEE framework name 'SCONE'
 
 ___
 
