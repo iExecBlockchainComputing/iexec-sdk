@@ -24,10 +24,10 @@ module exposing account methods
 
 - [approve](IExecAccountModule.md#approve)
 - [checkAllowance](IExecAccountModule.md#checkallowance)
-- [revokeApproval](IExecAccountModule.md#revokeapproval)
 - [checkBalance](IExecAccountModule.md#checkbalance)
 - [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
 - [deposit](IExecAccountModule.md#deposit)
+- [revokeApproval](IExecAccountModule.md#revokeapproval)
 - [withdraw](IExecAccountModule.md#withdraw)
 - [fromConfig](IExecAccountModule.md#fromconfig)
 
@@ -117,31 +117,7 @@ console.log('allowance amount:', allowanceAmount);
 #### Returns
 
 `Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
-___
 
-### revokeApproval
-
-▸ **revokeApproval**(`spenderAddress`): `Promise`<`string`\>
-
-**SIGNER REQUIRED**
-
-revokes the approval for the spender to use the account.
-
-example:
-```js
-const txHash = await revokeApproval(spenderAddress);
-console.log('tx:', txHash);
-```
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `spenderAddress` | `string` |
-
-#### Returns
-
-`Promise`<`string`\>
 ___
 
 ### checkBalance
@@ -217,6 +193,32 @@ console.log('tx:', txHash);
 #### Returns
 
 `Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
+
+___
+
+### revokeApproval
+
+▸ **revokeApproval**(`spenderAddress`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
+
+revokes the approval for the spender to use the account.
+
+example:
+```js
+const txHash = await revokeApproval(spenderAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `spenderAddress` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 
