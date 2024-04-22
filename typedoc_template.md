@@ -184,9 +184,9 @@ import { errors } from 'iexec';
 
 # Live demos
 
-- [Buy computation](https://codesandbox.io/embed/876r7?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell application](https://codesandbox.io/embed/l4hh4?fontsize=14&hidenavigation=1&theme=dark)
-- [Deploy and sell dataset](https://codesandbox.io/embed/micsl?fontsize=14&hidenavigation=1&theme=dark)
+- [Buy computation](https://codesandbox.io/p/github/iExecBlockchainComputing/iexec-sdk-sandbox-buy-computation/main?file=%252Fsrc%252Findex.js)
+- [Deploy and sell application](https://codesandbox.io/p/github/iExecBlockchainComputing/iexec-sdk-sandbox-deploy-and-sell-application/main?file=%2Fsrc%2Findex.js)
+- [Deploy and sell dataset](https://codesandbox.io/p/github/iExecBlockchainComputing/iexec-sdk-sandbox-deploy-and-sell-dataset/main?file=%2Fsrc%2Findex.js)
 
 ---
 

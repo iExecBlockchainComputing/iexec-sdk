@@ -131,7 +131,7 @@ ___
 
 ### providerOptions
 
-• `Optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md)
+• `Optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../modules.md#anyrecord)
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 

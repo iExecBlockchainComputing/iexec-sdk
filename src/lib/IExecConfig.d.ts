@@ -1,6 +1,8 @@
+export type * from '../common/types.js';
+
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
-import { ProviderOptions, TeeFramework } from '../common/types.js';
+import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
 
 export interface Eip1193Provider {
   request(request: {
@@ -107,7 +109,7 @@ export interface IExecConfigOptions {
   /**
    * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
    */
-  providerOptions?: ProviderOptions;
+  providerOptions?: ProviderOptions | AnyRecord;
 }
 
 /**
@@ -141,7 +143,7 @@ export default class IExecConfig {
    * - using a private key server side
    *
    * ```js
-   * const { getSignerFromPrivateKey } = require('iexec/utils');
+   * import { getSignerFromPrivateKey } from 'iexec/utils';
    * const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
    * ```
    */

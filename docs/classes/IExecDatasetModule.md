@@ -160,7 +160,7 @@ ___
 
 ### countUserDatasets
 
-▸ **countUserDatasets**(`userAddress`): `Promise`<`BN`\>
+▸ **countUserDatasets**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the datasets owned by an address.
 
@@ -178,7 +178,7 @@ console.log('dataset count:', count);
 
 #### Returns
 
-`Promise`<`BN`\>
+`Promise`<[`BN`](utils.BN.md)\>
 
 ___
 

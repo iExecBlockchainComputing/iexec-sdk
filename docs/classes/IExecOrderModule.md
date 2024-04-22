@@ -429,7 +429,7 @@ ___
 
 ### matchOrders
 
-▸ **matchOrders**(`orders`, `options?`): `Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: `BN`  }\>
+▸ **matchOrders**(`orders`, `options?`): `Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: [`BN`](utils.BN.md)  }\>
 
 **SIGNER REQUIRED**
 
@@ -460,7 +460,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 
 #### Returns
 
-`Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: `BN`  }\>
+`Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: [`BN`](utils.BN.md)  }\>
 
 ___
 
@@ -691,7 +691,7 @@ const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
 
 | Name | Type |
 | :------ | :------ |
-| `workerpoolorder` | [`SignedWorkerpoolorder`](../interfaces/internal_.SignedWorkerpoolorder.md) |
+| `workerpoolorder` | [`SignableWorkerpoolorder`](../interfaces/internal_.SignableWorkerpoolorder.md) |
 
 #### Returns
 

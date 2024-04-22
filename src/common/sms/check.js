@@ -8,6 +8,21 @@ import {
 
 const debug = Debug('iexec:sms:check');
 
+const existingSecretsCache = {};
+
+const checkCache = ({ smsUrl, kindOfSecret, secretId }) =>
+  existingSecretsCache?.[smsUrl]?.[kindOfSecret]?.[secretId];
+
+const cacheSecretExists = ({ smsURL, kindOfSecret, secretId }) => {
+  if (!existingSecretsCache[smsURL]) {
+    existingSecretsCache[smsURL] = {};
+  }
+  if (!existingSecretsCache[smsURL][kindOfSecret]) {
+    existingSecretsCache[smsURL][kindOfSecret] = {};
+  }
+  existingSecretsCache[smsURL][kindOfSecret][secretId] = true;
+};
+
 // used for dataset key
 export const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
@@ -18,6 +33,12 @@ export const checkWeb3SecretExists = async (
     const vResourceAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(resourceAddress);
+    const kindOfSecret = 'web3';
+    const secretId = vResourceAddress;
+    const cached = checkCache({ smsURL, kindOfSecret, secretId });
+    if (cached !== undefined) {
+      return cached;
+    }
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: '/secrets/web3',
@@ -29,6 +50,7 @@ export const checkWeb3SecretExists = async (
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.ok) {
+      cacheSecretExists({ smsURL, kindOfSecret, secretId });
       return true;
     }
     if (res.status === 404) {
@@ -54,6 +76,12 @@ export const checkWeb2SecretExists = async (
     const vOwnerAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(ownerAddress);
+    const kindOfSecret = 'web2';
+    const secretId = `${vOwnerAddress}|${secretName}`;
+    const cached = checkCache({ smsURL, kindOfSecret, secretId });
+    if (cached !== undefined) {
+      return cached;
+    }
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: '/secrets/web2',
@@ -66,6 +94,7 @@ export const checkWeb2SecretExists = async (
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.ok) {
+      cacheSecretExists({ smsURL, kindOfSecret, secretId });
       return true;
     }
     if (res.status === 404) {
@@ -90,6 +119,12 @@ export const checkRequesterSecretExists = async (
     const vRequesterAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(requesterAddress);
+    const kindOfSecret = 'requester';
+    const secretId = `${vRequesterAddress}|${secretName}`;
+    const cached = checkCache({ smsURL, kindOfSecret, secretId });
+    if (cached !== undefined) {
+      return cached;
+    }
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: `/requesters/${vRequesterAddress}/secrets/${secretName}`,
@@ -98,6 +133,7 @@ export const checkRequesterSecretExists = async (
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.ok) {
+      cacheSecretExists({ smsURL, kindOfSecret, secretId });
       return true;
     }
     if (res.status === 404) {
@@ -123,6 +159,12 @@ export const checkAppSecretExists = async (
       ethProvider: contracts.provider,
     }).validate(appAddress);
     const vSecretIndex = await positiveIntSchema().validate(secretIndex);
+    const kindOfSecret = 'app';
+    const secretId = `${vAppAddress}|${vSecretIndex}`;
+    const cached = checkCache({ smsURL, kindOfSecret, secretId });
+    if (cached !== undefined) {
+      return cached;
+    }
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
@@ -131,6 +173,7 @@ export const checkAppSecretExists = async (
       throw Error(`SMS at ${smsURL} didn't answered`);
     });
     if (res.ok) {
+      cacheSecretExists({ smsURL, kindOfSecret, secretId });
       return true;
     }
     if (res.status === 404) {

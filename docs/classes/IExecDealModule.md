@@ -314,7 +314,7 @@ ___
 
 ### show
 
-▸ **show**(`dealid`): `Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `beneficiary`: `string` ; `botFirst`: `BN` ; `botSize`: `BN` ; `callback`: `string` ; `category`: `BN` ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: `BN` ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: `BN` ; `startTime`: `BN` ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: `BN` ; `workerStake`: `BN` ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  }  }\>
+▸ **show**(`dealid`): `Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `beneficiary`: `string` ; `botFirst`: [`BN`](utils.BN.md) ; `botSize`: [`BN`](utils.BN.md) ; `callback`: `string` ; `category`: [`BN`](utils.BN.md) ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: [`BN`](utils.BN.md) ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: [`BN`](utils.BN.md) ; `startTime`: [`BN`](utils.BN.md) ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: [`BN`](utils.BN.md) ; `workerStake`: [`BN`](utils.BN.md) ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  }  }\>
 
 show the details of a deal.
 
@@ -334,7 +334,7 @@ console.log('deal:', deal);
 
 #### Returns
 
-`Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `beneficiary`: `string` ; `botFirst`: `BN` ; `botSize`: `BN` ; `callback`: `string` ; `category`: `BN` ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: `BN` ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: `BN` ; `startTime`: `BN` ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: `BN` ; `workerStake`: `BN` ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: `BN`  }  }\>
+`Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `beneficiary`: `string` ; `botFirst`: [`BN`](utils.BN.md) ; `botSize`: [`BN`](utils.BN.md) ; `callback`: `string` ; `category`: [`BN`](utils.BN.md) ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: [`BN`](utils.BN.md) ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: [`BN`](utils.BN.md) ; `startTime`: [`BN`](utils.BN.md) ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: [`BN`](utils.BN.md) ; `workerStake`: [`BN`](utils.BN.md) ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  }  }\>
 
 ___
 

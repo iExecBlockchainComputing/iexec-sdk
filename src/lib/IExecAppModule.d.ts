@@ -15,9 +15,9 @@ import {
 
 export interface SconeMREnclave {
   /**
-   * TEE framework name
+   * TEE framework name 'SCONE'
    */
-  framework: 'SCONE';
+  framework: string;
   /**
    * app entrypoint path
    */
@@ -38,9 +38,9 @@ export interface SconeMREnclave {
 
 export interface GramineMREnclave {
   /**
-   * TEE framework name
+   * TEE framework name 'GRAMINE'
    */
-  framework: 'GRAMINE';
+  framework: string;
   /**
    * framework's protocol version
    */

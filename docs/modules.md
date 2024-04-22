@@ -4,6 +4,10 @@
 
 ## Table of contents
 
+### References
+
+- [BN](modules.md#bn)
+
 ### Modules
 
 - [&lt;internal\&gt;](modules/internal_.md)
@@ -45,6 +49,7 @@
 
 - [Address](modules.md#address)
 - [Addressish](modules.md#addressish)
+- [AnyRecord](modules.md#anyrecord)
 - [BNish](modules.md#bnish)
 - [Bytes](modules.md#bytes)
 - [Bytes32](modules.md#bytes32)
@@ -60,6 +65,12 @@
 - [TeeFramework](modules.md#teeframework)
 - [TxHash](modules.md#txhash)
 - [WeiAmount](modules.md#weiamount)
+
+## References
+
+### BN
+
+Re-exports [BN](classes/utils.BN.md)
 
 ## Type Aliases
 
@@ -84,9 +95,15 @@ ethereum address or ENS
 
 ___
 
+### AnyRecord
+
+Ƭ **AnyRecord**: `Record`<`string`, `any`\>
+
+___
+
 ### BNish
 
-Ƭ **BNish**: `BN` \| `bigint` \| `string` \| `number`
+Ƭ **BNish**: [`BN`](classes/utils.BN.md) \| `bigint` \| `string` \| `number`
 
 big number like
 
@@ -168,7 +185,7 @@ ___
 
 ### NRLCAmount
 
-Ƭ **NRLCAmount**: `number` \| `string` \| `BN`
+Ƭ **NRLCAmount**: `number` \| `string` \| [`BN`](classes/utils.BN.md)
 
 nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
 
@@ -247,7 +264,7 @@ ___
 
 ### WeiAmount
 
-Ƭ **WeiAmount**: `number` \| `string` \| `BN`
+Ƭ **WeiAmount**: `number` \| `string` \| [`BN`](classes/utils.BN.md)
 
 wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,000,000,000 wei).
 

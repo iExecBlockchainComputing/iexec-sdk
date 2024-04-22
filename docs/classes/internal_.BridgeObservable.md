@@ -63,7 +63,7 @@ data:
 | `callbacks` | `Object` |
 | `callbacks.complete` | () => `any` |
 | `callbacks.error` | (`error`: `Error`) => `any` |
-| `callbacks.next` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: `BN` ; `maxPerTx?`: `BN` ; `message`: `string` ; `minPerTx?`: `BN` ; `totalSpentPerDay?`: `BN` ; `txHash?`: `string`  }) => `any` |
+| `callbacks.next` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: `string` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
 
 #### Returns
 

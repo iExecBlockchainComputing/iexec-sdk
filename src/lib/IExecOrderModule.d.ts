@@ -1,4 +1,4 @@
-export * from '../common/types.js';
+export type * from '../common/types.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
@@ -646,7 +646,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signWorkerpoolorder(
-    workerpoolorder: SignedWorkerpoolorder,
+    workerpoolorder: SignableWorkerpoolorder,
   ): Promise<SignedWorkerpoolorder>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**

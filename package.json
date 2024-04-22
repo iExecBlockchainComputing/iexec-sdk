@@ -1,6 +1,6 @@
 {
   "name": "iexec",
-  "version": "8.6.1",
+  "version": "8.7.0",
   "description": "iExec SDK",
   "bin": {
     "iexec": "./dist/esm/cli/cmd/iexec.js"
@@ -141,15 +141,18 @@
     "npm": ">=8"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --detectOpenHandles --forceExit",
-    "build": "npm run generate-json-es-modules && npm run generate-dist && npm run generate-packages && npm run generate-doc",
     "lint": "eslint src",
-    "generate-json-es-modules": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
-    "generate-dist": "rimraf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
-    "generate-packages": "node generatePackages.cjs",
-    "generate-doc": "npm run generate-lib-doc && npm run generate-cli-doc",
-    "generate-lib-doc": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
-    "generate-cli-doc": "node generateCliDoc.cjs"
+    "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc",
+    "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "stop-test-stack": "cd test && docker compose down --remove-orphans",
+    "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose up -d",
+    "build:codegen": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
+    "build:dist": "rimraf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
+    "build:packages": "node generatePackages.cjs",
+    "build:doc": "npm run build:doc:lib && npm run build:doc:cli",
+    "build:doc:lib": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
+    "build:doc:cli": "node generateCliDoc.cjs",
+    "test:prepare": "node test/scripts/prepare-bellecour-fork-for-tests.js"
   },
   "files": [
     "src/",

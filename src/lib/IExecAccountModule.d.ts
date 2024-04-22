@@ -1,4 +1,4 @@
-export * from '../common/types.js';
+export type * from '../common/types.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
@@ -8,6 +8,43 @@ import { Addressish, BN, NRLCAmount, TxHash } from '../common/types.js';
  * module exposing account methods
  */
 export default class IExecAccountModule extends IExecModule {
+  /**
+   * **SIGNER REQUIRED**
+   *
+   * approves the spender to use the account up to a specified amount, denoted in nRLC (1 nRLC = 1*10^-9 RLC).
+   *
+   * example:
+   * ```js
+   * const txHash = await approve(amount, spenderAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  approve(amount: NRLCAmount, spenderAddress: Addressish): Promise<TxHash>;
+  /**
+   * checks the amount of allowance approved for the specified spender to use the account of the owner.
+   *
+   * example:
+   * ```js
+   * const allowanceAmount = await checkAllowance(ownerAddress, spenderAddress);
+   * console.log('allowance amount:', allowanceAmount);
+   * ```
+   */
+  checkAllowance(
+    ownerAddress: Addressish,
+    spenderAddress: Addressish,
+  ): Promise<NRLCAmount>;
+  /**
+   * **SIGNER REQUIRED**
+   *
+   * revokes the approval for the spender to use the account.
+   *
+   * example:
+   * ```js
+   * const txHash = await revokeApproval(spenderAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  revokeApproval(spenderAddress: Addressish): Promise<TxHash>;
   /**
    * **SIGNER REQUIRED**
    *

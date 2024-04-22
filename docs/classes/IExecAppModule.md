@@ -124,7 +124,7 @@ ___
 
 ### countUserApps
 
-▸ **countUserApps**(`userAddress`): `Promise`<`BN`\>
+▸ **countUserApps**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the apps owned by an address.
 
@@ -142,7 +142,7 @@ console.log('app count:', count);
 
 #### Returns
 
-`Promise`<`BN`\>
+`Promise`<[`BN`](utils.BN.md)\>
 
 ___
 

@@ -30,11 +30,12 @@ export const getReadOnlyProvider = (host, options = {}) => {
   const { quorum, ...providersOptionsRest } = providerOptions;
   // disable non configured providers when at least 1 is configured
   const apiProvidersList = [
+    'alchemy',
+    'ankr',
+    'cloudflare',
     'etherscan',
     'infura',
-    'alchemy',
-    'pocket',
-    'ankr',
+    'pocket', // currently commented in ethers
     'quicknode',
   ];
   const nonConfiguredProviders = apiProvidersList.filter(
