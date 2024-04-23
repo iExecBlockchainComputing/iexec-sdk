@@ -139,7 +139,7 @@ export default class IExecENSModule extends IExecModule {
   claimName(
     label: string,
     domain?: ENS,
-  ): Promise<{ registeredName: ENS; registerTxHash?: TxHash }>;
+  ): Promise<{ name: ENS; registerTxHash?: TxHash }>;
   /**
    * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
    *

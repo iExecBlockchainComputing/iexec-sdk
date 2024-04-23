@@ -72,7 +72,7 @@ current IExecConfig
 
 ### claimName
 
-▸ **claimName**(`label`, `domain?`): `Promise`<{ `registerTxHash?`: `string` ; `registeredName`: `string`  }\>
+▸ **claimName**(`label`, `domain?`): `Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
 register a subdomain (label) on an ENS FIFSRegistrar
 
@@ -98,7 +98,7 @@ console.log('registered:', name);
 
 #### Returns
 
-`Promise`<{ `registerTxHash?`: `string` ; `registeredName`: `string`  }\>
+`Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
 ___
 
