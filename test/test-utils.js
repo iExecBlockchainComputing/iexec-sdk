@@ -40,7 +40,7 @@ console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
   'custom-token-chain': {
-    rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+    rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://127.0.0.1:18545',
     chainId: '65535',
     hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
     enterpriseHubAddress: '0xb80C02d24791fA92fA8983f15390274698A75D23',
@@ -54,7 +54,7 @@ export const TEST_CHAINS = {
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
     provider: new JsonRpcProvider(
-      DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+      DRONE ? 'http://custom-token-chain:8545' : 'http://127.0.0.1:18545',
     ),
     defaults: {
       isNative: false,
@@ -63,16 +63,16 @@ export const TEST_CHAINS = {
     isAnvil: false,
   },
   'bellecour-fork': {
-    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
     chainId: '134',
-    sconeSmsURL: DRONE ? 'http://sms:13300' : 'http://localhost:13300',
+    sconeSmsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
     gramineSmsURL: DRONE
       ? 'http://sms-gramine:13300'
-      : 'http://localhost:13309',
-    iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
+      : 'http://127.0.0.1:13309',
+    iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
     resultProxyURL: DRONE
       ? 'http://result-proxy:13200'
-      : 'http://localhost:13200',
+      : 'http://127.0.0.1:13200',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
@@ -80,7 +80,7 @@ export const TEST_CHAINS = {
       '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
     ),
     provider: new JsonRpcProvider(
-      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
