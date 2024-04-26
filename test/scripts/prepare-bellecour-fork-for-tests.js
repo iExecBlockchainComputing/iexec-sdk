@@ -4,7 +4,7 @@ import {
   rpcURL,
   setBalance,
   getIExecHubOwnership,
-} from 'utils.js';
+} from './utils.js';
 
 const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);

@@ -128,7 +128,7 @@ export const deployContractFromArtifact = async (contractJson) => {
 
   try {
     const contract = await contractFactory.deploy();
-    await contract.waitForDeployment();
+    await contract.deploymentTransaction().wait();
     console.log(
       `${
         contractJson.contractName
