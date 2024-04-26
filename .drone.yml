@@ -9,7 +9,7 @@ trigger:
       - pull_request
 
 steps:
-- name: install
+  - name: install
     image: node:18
     pull: always
     commands:
@@ -17,7 +17,7 @@ steps:
       - npm -v
       - npm ci
       - npm run build
-      
+
   ##### START LOCAL STACK #####
 
   - name: prepare-local-stack-env
