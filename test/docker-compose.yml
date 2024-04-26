@@ -33,9 +33,10 @@ services:
 
   poco-upgrade:
     restart: 'no'
-    image: node:18.17.0
+    platform: linux/amd64
+    image: node:18
     entrypoint: /bin/bash
-    command: -c "cd /app && node -v && npm i ethers && chmod +x scripts/clone-poco.sh && scripts/clone-poco.sh && node scripts/update-poco.js"
+    command: -c "cd /app && npm i ethers && chmod +x scripts/clone-poco.sh && scripts/clone-poco.sh && node scripts/update-poco.js"
     volumes:
       - ./scripts/:/app/scripts
     depends_on:
