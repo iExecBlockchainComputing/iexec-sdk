@@ -9,6 +9,15 @@ trigger:
       - pull_request
 
 steps:
+- name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+      
   ##### START LOCAL STACK #####
 
   - name: prepare-local-stack-env
@@ -267,15 +276,6 @@ steps:
       - custom-token-chain-healthy
 
   ### START LOCAL STACK END ###
-
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run build
 
   - name: build
     image: node:18
