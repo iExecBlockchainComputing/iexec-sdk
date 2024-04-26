@@ -27,12 +27,26 @@ steps:
     depends_on:
       - prepare-local-stack-env
 
+  - name: clone-poco
+    image: node
+    commands:
+      - chmod +x test/scripts/clone-poco.sh && test/scripts/clone-poco.sh
+
+  - name: upgrade-poco
+    image: node
+    commands:
+      - node test/scripts/update-poco.js
+    depends_on:
+      - clone-poco
+      - bellecour-fork
+
   - name: bellecour-fork-healthy
     image: bash
     commands:
       - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
     depends_on:
       - bellecour-fork
+      - upgrade-poco
 
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
