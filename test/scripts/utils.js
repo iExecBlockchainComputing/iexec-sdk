@@ -7,6 +7,8 @@ import {
   formatEther,
   toBeHex,
 } from 'ethers';
+import { promises as fsPromises } from 'fs';
+import path from 'path'; // Import the path module
 
 const { DRONE } = process.env;
 
@@ -152,7 +154,7 @@ export const linkContractToProxy = async (
   // Join all signatures with semicolons
   const functionSignatures = signatures.join(';');
 
-  await proxy
+  const tx = await proxy
     .updateContract(
       contractAddress,
       functionSignatures,
@@ -162,8 +164,24 @@ export const linkContractToProxy = async (
       console.log(e);
       throw new Error(`Failed to link ${contractAddress}`);
     });
-
+  await tx.wait();
+  
   console.log(`Link ${contractAddress} to proxy`);
+};
+
+export const loadJsonFile = async (contractName, basePath) => {
+  const filePath = path.resolve(basePath, `${contractName}.json`);
+
+  try {
+    const data = await fsPromises.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(
+      `Failed to load and parse the JSON file for ${contractName}:`,
+      error,
+    );
+    return null;
+  }
 };
 
 export const TEST_CHAINS = {
