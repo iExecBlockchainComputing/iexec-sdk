@@ -8,7 +8,7 @@ import {
   toBeHex,
 } from 'ethers';
 import { promises as fsPromises } from 'fs';
-import path from 'path'; // Import the path module
+import path from 'path';
 
 const { DRONE } = process.env;
 
@@ -113,8 +113,7 @@ export const getIExecHubOwnership = async (targetOwner) => {
 
 export const deployContractFromArtifact = async (contractJson) => {
   if (!contractJson) {
-    console.error('Contract JSON is null, deployment aborted.');
-    return;
+    throw new Error('Artifact contract JSON is null, deployment aborted');
   }
 
   const wallet = TEST_CHAINS['bellecour-fork'].pocoAdminWallet.connect(
@@ -137,7 +136,7 @@ export const deployContractFromArtifact = async (contractJson) => {
     );
     return contract;
   } catch (error) {
-    console.error(`Failed to deploy ${contractJson.contractName}:`, error);
+    throw new Error(`Failed to deploy ${contractJson.contractName}:`, error);
   }
 };
 
@@ -162,10 +161,10 @@ export const linkContractToProxy = async (
     )
     .catch((e) => {
       console.log(e);
-      throw new Error(`Failed to link ${contractAddress}`);
+      throw new Error(`Failed to link ${contractAddress}`, e);
     });
   await tx.wait();
-  
+
   console.log(`Link ${contractAddress} to proxy`);
 };
 

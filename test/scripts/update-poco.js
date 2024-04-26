@@ -1,66 +1,66 @@
-import { getIExecHubOwnership } from './utils.js';
+import { Contract } from 'ethers';
 import {
   TEST_CHAINS,
   deployContractFromArtifact,
   linkContractToProxy,
   loadJsonFile,
+  getIExecHubOwnership,
 } from './utils.js';
-import { Contract } from 'ethers';
 
 const main = async () => {
   // Import JSON artifacts : Proxy
   const ERC1538Update = await loadJsonFile(
     'ERC1538UpdateDelegate',
-    '../PoCo/artifacts/@iexec/solidity/contracts/ERC1538/ERC1538Modules/ERC1538Update.sol/',
+    './PoCo/artifacts/@iexec/solidity/contracts/ERC1538/ERC1538Modules/ERC1538Update.sol/',
   );
   // Import JSON artifacts : Modules
   let IexecAccessors = await loadJsonFile(
     'IexecAccessorsDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecAccessorsDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecAccessorsDelegate.sol/',
   );
   let IexecAccessorsABILegacy = await loadJsonFile(
     'IexecAccessorsABILegacyDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecAccessorsABILegacyDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecAccessorsABILegacyDelegate.sol/',
   );
   let IexecCategoryManager = await loadJsonFile(
     'IexecCategoryManagerDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecCategoryManagerDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecCategoryManagerDelegate.sol/',
   );
   let IexecERC20 = await loadJsonFile(
     'IexecERC20Delegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecERC20Delegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecERC20Delegate.sol/',
   );
   let IexecEscrowNative = await loadJsonFile(
     'IexecEscrowNativeDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecEscrowNativeDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecEscrowNativeDelegate.sol/',
   );
   let IexecMaintenance = await loadJsonFile(
     'IexecMaintenanceDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecMaintenanceDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecMaintenanceDelegate.sol/',
   );
   let IexecMaintenanceExtra = await loadJsonFile(
     'IexecMaintenanceExtraDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecMaintenanceExtraDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecMaintenanceExtraDelegate.sol/',
   );
   let IexecOrderManagement = await loadJsonFile(
     'IexecOrderManagementDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecOrderManagementDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecOrderManagementDelegate.sol/',
   );
   let IexecPoco1 = await loadJsonFile(
     'IexecPoco1Delegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecPoco1Delegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecPoco1Delegate.sol/',
   );
   let IexecPoco2 = await loadJsonFile(
     'IexecPoco2Delegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecPoco2Delegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecPoco2Delegate.sol/',
   );
   let IexecRelay = await loadJsonFile(
     'IexecRelayDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/IexecRelayDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/IexecRelayDelegate.sol/',
   );
   let ENSIntegration = await loadJsonFile(
     'ENSIntegrationDelegate',
-    '../PoCo/artifacts/contracts/modules/delegates/ENSIntegrationDelegate.sol/',
+    './PoCo/artifacts/contracts/modules/delegates/ENSIntegrationDelegate.sol/',
   );
 
   getIExecHubOwnership(TEST_CHAINS['bellecour-fork'].pocoAdminWallet);
