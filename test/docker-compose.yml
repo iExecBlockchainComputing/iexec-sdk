@@ -36,7 +36,9 @@ services:
     platform: linux/amd64
     image: node:18
     entrypoint: /bin/bash
-    command: -c "cd /app && npm i ethers && chmod +x scripts/clone-poco.sh && scripts/clone-poco.sh && node scripts/update-poco.js"
+    environment:
+      DRONE: true
+    command: -c "cd /app && echo '{\"type\":\"module\"}' > package.json && npm i ethers && chmod +x scripts/clone-poco.sh && scripts/clone-poco.sh && node scripts/update-poco.js"
     volumes:
       - ./scripts/:/app/scripts
     depends_on:
