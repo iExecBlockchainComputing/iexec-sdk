@@ -13,4 +13,8 @@ cat ../test/scripts/voucher-deployment/iexec-voucher-contracts-patch/deploy.ts-r
 npx hardhat run deploy/deploy.ts --network bellecour-fork
 
 # update voucher config
-echo "export const VOUCHER_HUB_ADDRESS = '$(cat .VoucherHub.address)';" > ../test/bellecour-fork/voucher-config.js
+cd ..
+echo "export const VOUCHER_HUB_ADDRESS = '$(cat iexec-voucher-contracts/.VoucherHub.address)';" > test/bellecour-fork/voucher-config.js
+
+# cleanup
+rm -rf iexec-voucher-contracts
