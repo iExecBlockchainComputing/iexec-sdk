@@ -31,6 +31,23 @@ services:
       retries: 3
       start_period: 30s
 
+  # TODO: remove this once voucher is deployed on bellecour
+  bellecour-fork-voucher-deployment:
+    restart: 'no'
+    image: node:18.19
+    environment:
+      DRONE: true
+    entrypoint: /bin/bash
+    command: -c "cd /app && bash test/scripts/voucher-deployment/deploy.sh"
+    volumes:
+      # voucher deployment scripts
+      - ./scripts/voucher-deployment:/app/test/scripts/voucher-deployment
+      # bellecour-fork voucher config
+      - ./bellecour-fork:/app/test/bellecour-fork
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+
   sms:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
