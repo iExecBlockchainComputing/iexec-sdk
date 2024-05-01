@@ -31,16 +31,17 @@ services:
       retries: 3
       start_period: 30s
 
+  # TODO: remove this once voucher is deployed on bellecour
   poco-upgrade:
     restart: 'no'
     platform: linux/amd64
-    image: node:18
+    image: node:18.19
     entrypoint: /bin/bash
     environment:
       DRONE: true
-    command: -c "cd /app && echo '{\"type\":\"module\"}' > package.json && npm i ethers && chmod +x scripts/clone-poco.sh && scripts/clone-poco.sh && node scripts/update-poco.js"
+    command: -c "cd /app && chmod +x /app/test/scripts/poco-update/deploy.sh && /app/test/scripts/poco-update/deploy.sh"
     volumes:
-      - ./scripts/:/app/scripts
+      - ./scripts/poco-update:/app/test/scripts/poco-update
     depends_on:
       - bellecour-fork
 

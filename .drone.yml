@@ -36,19 +36,11 @@ steps:
     depends_on:
       - prepare-local-stack-env
 
-  - name: clone-poco
-    image: node
-    commands:
-      - chmod +x test/scripts/clone-poco.sh && test/scripts/clone-poco.sh
-    depends_on:
-      - install
-
   - name: upgrade-poco
-    image: node
+    image: node:18.19
     commands:
-      - node test/scripts/update-poco.js
+      - bash test/scripts/poco-update/deploy.sh
     depends_on:
-      - clone-poco
       - bellecour-fork
 
   - name: bellecour-fork-healthy

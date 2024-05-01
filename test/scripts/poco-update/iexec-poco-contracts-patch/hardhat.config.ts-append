@@ -1,0 +1,8 @@
+
+// appended for deployment on local fork
+config.networks!['bellecour-fork'] = {
+    hardfork: 'berlin',
+    gasPrice: 0,
+    blockGasLimit: 6_700_000,
+    url: process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+};
