@@ -143,7 +143,7 @@
   "scripts": {
     "lint": "eslint src",
     "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc",
-    "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest ./test --coverage",
     "stop-test-stack": "cd test && docker compose down --remove-orphans",
     "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose up -d",
     "build:codegen": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
