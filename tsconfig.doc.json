@@ -14,5 +14,6 @@
     "readme": "typedoc_template.md",
     // "internalNamespace": "{internal}",
     "excludeExternals": true
-  }
+  },
+  "include": ["src/**/*"]
 }
