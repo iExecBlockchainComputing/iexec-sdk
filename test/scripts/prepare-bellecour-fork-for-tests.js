@@ -199,7 +199,7 @@ const getVoucherManagementRoles = async (targetManager) => {
 
   console.log(
     `${targetManager} has role VOUCHER_MANAGER_ROLE: ${await voucherHubContract.hasRole(
-      ASSET_ELIGIBILITY_MANAGER_ROLE,
+      VOUCHER_MANAGER_ROLE,
       targetManager,
     )}`,
   );
