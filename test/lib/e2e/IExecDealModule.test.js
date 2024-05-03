@@ -8,17 +8,17 @@ import {
   getMatchableRequestorder,
   getTestConfig,
   runObservableSubscribe,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   NULL_BYTES32,
   initializeTask,
   sleep,
   adminCreateCategory,
-} from '../../test-utils';
-import '../../jest-setup';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
 
-import { errors } from '../../../src/lib/index';
+import { errors } from '../../../src/lib/index.js';
 
 const { ObjectNotFoundError } = errors;
 

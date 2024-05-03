@@ -7,9 +7,9 @@ import {
   deployAndGetWorkerpoolorder,
   getMatchableRequestorder,
   getTestConfig,
-} from '../lib-test-utils';
-import { TEST_CHAINS, NULL_ADDRESS, getRandomAddress } from '../../test-utils';
-import '../../jest-setup';
+} from '../lib-test-utils.js';
+import { TEST_CHAINS, NULL_ADDRESS, getRandomAddress } from '../../test-utils.js';
+import '../../jest-setup.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

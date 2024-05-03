@@ -1,9 +1,9 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import { getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS } from '../../test-utils';
-import '../../jest-setup';
+import { getTestConfig } from '../lib-test-utils.js';
+import { TEST_CHAINS } from '../../test-utils.js';
+import '../../jest-setup.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

@@ -19,11 +19,11 @@ import {
   TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
-} from '../../test-utils';
-import '../../jest-setup';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
 
-import { utils, IExecConfig, errors } from '../../../src/lib';
-import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
+import { utils, IExecConfig, errors } from '../../../src/lib/index.js';
+import IExecContractsClient from '../../../src/common/utils/IExecContractsClient.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];

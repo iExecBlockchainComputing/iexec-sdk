@@ -4,16 +4,16 @@ import { describe, test, expect } from '@jest/globals';
 import { join } from 'path';
 import { BN } from 'bn.js';
 import fsExtra from 'fs-extra';
-import { deployRandomDataset, getTestConfig } from '../lib-test-utils';
+import { deployRandomDataset, getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
   execAsync,
   getId,
   getRandomAddress,
-} from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 

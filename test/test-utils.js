@@ -1,16 +1,16 @@
 import { randomInt } from 'crypto';
 import { exec } from 'child_process';
 import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
-import { IExec } from '../src/lib';
-import { getSignerFromPrivateKey } from '../src/lib/utils';
-import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config';
+import { IExec } from '../src/lib/index.js';
+import { getSignerFromPrivateKey } from '../src/lib/utils.js';
+import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 
 export {
   TEE_FRAMEWORKS,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
-} from '../src/common/utils/constant';
+} from '../src/common/utils/constant.js';
 
 export const sleep = (ms) =>
   new Promise((res) => {

@@ -5,8 +5,8 @@ import {
   getId,
   getRandomWallet,
   sleep,
-} from '../test-utils';
-import { IExec, utils } from '../../src/lib';
+} from '../test-utils.js';
+import { IExec, utils } from '../../src/lib/index.js';
 
 const { getSignerFromPrivateKey } = utils;
 
