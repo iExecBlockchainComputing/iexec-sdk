@@ -31,6 +31,29 @@ services:
       retries: 3
       start_period: 30s
 
+  # TODO: remove this once voucher is deployed on bellecour
+  bellecour-fork-voucher-deployment:
+    restart: 'no'
+    # https://github.com/iExecBlockchainComputing/voucher-deployer
+    image: pierreiexec/voucher-deployer
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+    volumes:
+      - ./voucher-deployer/out:/app/out
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+
+  bellecour-fork-update-voucher-config:
+    image: bash
+    restart: 'no'
+    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
+    volumes:
+      - ./voucher-deployer/out:/app/voucher-deployer/out
+      - ./bellecour-fork:/app/bellecour-fork
+    depends_on:
+      bellecour-fork-voucher-deployment:
+        condition: service_completed_successfully
   sms:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
@@ -191,3 +214,27 @@ services:
         condition: service_healthy
       market-mongo:
         condition: service_started
+
+  stack-ready:
+    image: bash
+    command:
+      - echo "all services ready"
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      custom-token-chain:
+        condition: service_healthy
+      sms:
+        condition: service_started
+      sms-gramine:
+        condition: service_started
+      market-watcher:
+        condition: service_started
+      market-api:
+        condition: service_started
+      result-proxy:
+        condition: service_started
+      bellecour-fork-voucher-deployment:
+        condition: service_completed_successfully
+      bellecour-fork-update-voucher-config:
+        condition: service_completed_successfully

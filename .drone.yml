@@ -34,6 +34,18 @@ steps:
     depends_on:
       - bellecour-fork
 
+  - name: bellecour-fork-voucher-deployment
+    #  https://github.com/iExecBlockchainComputing/voucher-deployer
+    image: pierreiexec/voucher-deployer
+    pull: always
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+    commands:
+      - bash /app/entrypoint.sh
+      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./test/bellecour-fork/voucher-config.js
+    depends_on:
+      - bellecour-fork-healthy
+
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
     detach: true
@@ -249,6 +261,7 @@ steps:
       - market-api-healthy
       - ipfs-healthy
       - custom-token-chain-healthy
+      - bellecour-fork-voucher-deployment
 
   ### START LOCAL STACK END ###
 
