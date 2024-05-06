@@ -2,10 +2,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
-import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils';
-import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib';
+import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils.js';
+import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

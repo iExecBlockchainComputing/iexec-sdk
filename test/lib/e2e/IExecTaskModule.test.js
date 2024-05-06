@@ -6,16 +6,16 @@ import {
   deployAndGetWorkerpoolorder,
   getMatchableRequestorder,
   getTestConfig,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   NULL_BYTES32,
   TEST_CHAINS,
   adminCreateCategory,
   initializeTask,
   sleep,
-} from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib/index';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
 
 const { ObjectNotFoundError } = errors;
 

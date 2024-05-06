@@ -1,15 +1,16 @@
 import { randomInt } from 'crypto';
 import { exec } from 'child_process';
 import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
-import { IExec } from '../src/lib';
-import { getSignerFromPrivateKey } from '../src/lib/utils';
+import { IExec } from '../src/lib/index.js';
+import { getSignerFromPrivateKey } from '../src/lib/utils.js';
+import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 
 export {
   TEE_FRAMEWORKS,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
-} from '../src/common/utils/constant';
+} from '../src/common/utils/constant.js';
 
 export const sleep = (ms) =>
   new Promise((res) => {
@@ -78,6 +79,10 @@ export const TEST_CHAINS = {
     ),
     faucetWallet: new Wallet(
       '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
+    ),
+    voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',

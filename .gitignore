@@ -25,6 +25,7 @@ node_modules
 
 # test output
 test/tests-working-dir
+test/voucher-deployer
 
 # sonar output
 .scannerwork

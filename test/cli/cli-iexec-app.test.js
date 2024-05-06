@@ -9,7 +9,7 @@ import {
   execAsync,
   getRandomAddress,
   getRandomWallet,
-} from '../test-utils';
+} from '../test-utils.js';
 import {
   globalSetup,
   globalTeardown,
@@ -19,8 +19,8 @@ import {
   setChain,
   setRandomWallet,
   setWallet,
-} from './cli-test-utils';
-import '../jest-setup';
+} from './cli-test-utils.js';
+import '../jest-setup.js';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
