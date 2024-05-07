@@ -284,7 +284,7 @@ steps:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
     commands:
-      - bash /app/entrypoint.sh
+      - sh /app/entrypoint.sh
       - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./test/bellecour-fork/voucher-config.js
     depends_on:
       - bellecour-fork-healthy
