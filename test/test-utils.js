@@ -84,6 +84,9 @@ export const TEST_CHAINS = {
     voucherManagerWallet: new Wallet(
       '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
     ),
+    voucherSubgraphURL: DRONE
+      ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+      : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
     ),
