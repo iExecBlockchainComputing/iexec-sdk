@@ -217,7 +217,7 @@ const getVoucherManagementRoles = async (targetManager) => {
   );
 };
 
-export const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
+const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
   const RESOURCE_ABI = [
     {
       inputs: [],
@@ -251,16 +251,27 @@ export const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
       inputs: [
         {
           internalType: 'address',
-          name: 'newOwner',
+          name: 'from',
           type: 'address',
         },
+        {
+          internalType: 'address',
+          name: 'to',
+          type: 'address',
+        },
+        {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256',
+        },
       ],
-      name: 'transferOwnership',
+      name: 'safeTransferFrom',
       outputs: [],
       stateMutability: 'nonpayable',
       type: 'function',
     },
   ];
+
   const resourceContract = new Contract(
     resourceAddress,
     RESOURCE_ABI,
@@ -278,7 +289,9 @@ export const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
   await impersonate(resourceOwner);
   await resourceRegistryContract
     .connect(new JsonRpcSigner(provider, resourceOwner))
-    .transferOwnership(targetOwner, { gasPrice: 0 })
+    .safeTransferFrom(resourceOwner, targetOwner, resourceAddress, {
+      gasPrice: 0,
+    })
     .then((tx) => tx.wait());
   await stopImpersonate(resourceOwner);
 
@@ -292,8 +305,6 @@ const main = async () => {
   // prepare PoCo
   await setBalance(TARGET_POCO_ADMIN_WALLET, 1000000n * 10n ** 18n);
   await getIExecHubOwnership(TARGET_POCO_ADMIN_WALLET);
-  await getWorkerpoolOwnership(DEBUG_WORKERPOOL, DEBUG_WORKERPOOL_OWNER_WALLET);
-  await getWorkerpoolOwnership(PROD_WORKERPOOL, PROD_WORKERPOOL_OWNER_WALLET);
 
   // prepare faucet wallet
   await setBalance(TARGET_FAUCET_WALLET, 1000000n * 10n ** 18n);
@@ -301,6 +312,10 @@ const main = async () => {
   // prepare Voucher
   await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000n * 10n ** 18n);
   await getVoucherManagementRoles(TARGET_VOUCHER_MANAGER_WALLET);
+
+  // prepare workerpools
+  await getWorkerpoolOwnership(DEBUG_WORKERPOOL, DEBUG_WORKERPOOL_OWNER_WALLET);
+  await getWorkerpoolOwnership(PROD_WORKERPOOL, PROD_WORKERPOOL_OWNER_WALLET);
 };
 
 main();
