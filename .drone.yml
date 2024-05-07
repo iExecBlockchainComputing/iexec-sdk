@@ -34,18 +34,6 @@ steps:
     depends_on:
       - bellecour-fork
 
-  - name: bellecour-fork-voucher-deployment
-    #  https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
-    pull: always
-    environment:
-      RPC_URL: http://bellecour-fork:8545
-    commands:
-      - bash /app/entrypoint.sh
-      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./test/bellecour-fork/voucher-config.js
-    depends_on:
-      - bellecour-fork-healthy
-
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
     detach: true
@@ -103,6 +91,57 @@ steps:
       - while ! nc -z result-proxy-mongo 13202 ; do sleep 1 ; done && echo "result-proxy-mongo ready"
     depends_on:
       - result-proxy-mongo
+
+  - name: graphnode-postgres
+    image: postgres:12
+    detach: true
+    commands:
+      - docker-entrypoint.sh postgres -cshared_preload_libraries=pg_stat_statements
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: graphnode
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: graphnode-db
+
+  - name: graphnode-postgres-healthy
+    image: bash
+    commands:
+      - while ! nc -z graphnode-postgres 5432 ; do sleep 1 ; done && echo "graphnode-postgres ready"
+    depends_on:
+      - graphnode-postgres
+
+  - name: graphnode
+    image: graphprotocol/graph-node:v0.27.0
+    detach: true
+    expose:
+      - 8000
+      - 8020
+    environment:
+      postgres_host: graphnode-postgres
+      postgres_port: 5432
+      postgres_user: graphnode
+      postgres_pass: password
+      postgres_db: graphnode-db
+      ipfs: ipfs:5001
+      ethereum: bellecour:http://bellecour-fork:8545
+    commands:
+      - export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - echo $GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER
+      - start
+    depends_on:
+      - prepare-local-stack-env
+      - bellecour-fork-healthy
+      - ipfs-healthy
+      - graphnode-postgres-healthy
+
+  - name: graphnode-healthy
+    image: bash
+    commands:
+      - while ! nc -z graphnode 8020 ; do sleep 1 ; done && echo "graphnode admin ready"
+      - while ! nc -z graphnode 8000 ; do sleep 1 ; done && echo "graphnode gql ready"
+    depends_on:
+      - graphnode
 
   - name: sms
     image: iexechub/iexec-sms:7.1.0
@@ -236,6 +275,22 @@ steps:
       - market-api
       - market-watcher
 
+  - name: bellecour-fork-voucher-deployment
+    #  https://github.com/iExecBlockchainComputing/voucher-deployer
+    image: pierreiexec/voucher-deployer
+    pull: always
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+    commands:
+      - bash /app/entrypoint.sh
+      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./test/bellecour-fork/voucher-config.js
+    depends_on:
+      - bellecour-fork-healthy
+      - ipfs-healthy
+      - graphnode-healthy
+
   - name: custom-token-chain
     detach: true
     image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
@@ -260,6 +315,7 @@ steps:
       - result-proxy-healthy
       - market-api-healthy
       - ipfs-healthy
+      - graphnode-healthy
       - custom-token-chain-healthy
       - bellecour-fork-voucher-deployment
 
