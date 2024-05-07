@@ -87,6 +87,12 @@ export const TEST_CHAINS = {
     voucherSubgraphURL: DRONE
       ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
       : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+    ),
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+    ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
     ),
@@ -330,4 +336,47 @@ export const adminCreateCategory =
       }
     }
     return res;
+  };
+// TODO: use createVoucherType de VoucherHub
+export const createVoucherType =
+  (chain) =>
+  async (category, tryCount = 1) => {
+    const iexec = new IExec(
+      {
+        ethProvider: getSignerFromPrivateKey(
+          chain.rpcURL,
+          chain.voucherManagerWallet.privateKey,
+        ),
+      },
+      { hubAddress: chain.hubAddress },
+    );
+    let res;
+    try {
+      res = await iexec.hub.createCategory(category);
+    } catch (e) {
+      console.warn(
+        `Voucher create category: error (try count ${tryCount}) - ${e}`,
+      );
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        res = await createVoucherType(chain)(category, tryCount + 1);
+      } else {
+        throw Error(
+          `Failed to create category with voucher manager wallet wallet (tried ${tryCount} times)`,
+        );
+      }
+    }
+    return res;
+  };
+
+export const createVoucher =
+  (chain) =>
+  async ({ owner, type, amount }) => {
+    const VOUCHER_HUB_ABI = {};
+    const voucherHubContract = new Contract(
+      chain.voucherHubAddress,
+      VOUCHER_HUB_ABI,
+      owner,
+    );
+    return voucherHubContract.createVoucher(owner, type, amount);
   };

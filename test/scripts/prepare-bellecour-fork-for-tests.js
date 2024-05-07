@@ -6,7 +6,6 @@ import {
   keccak256,
   toBeHex,
 } from 'ethers';
-
 import { VOUCHER_HUB_ADDRESS } from '../bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
 
 const { DRONE } = process.env;
@@ -16,6 +15,12 @@ const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 const TARGET_FAUCET_WALLET = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
 const TARGET_VOUCHER_MANAGER_WALLET =
   '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C';
+const DEBUG_WORKERPOOL_OWNER_WALLET =
+  '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C';
+const PROD_WORKERPOOL_OWNER_WALLET =
+  '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C';
+const DEBUG_WORKERPOOL = '0xdb214a4a444d176e22030be1ed89da1b029320f2'; // 'debug-v8-bellecour.main.pools.iexec.eth';
+const PROD_WORKERPOOL = '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f'; // 'prod-v8-bellecour.main.pools.iexec.eth';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
 
@@ -212,12 +217,83 @@ const getVoucherManagementRoles = async (targetManager) => {
   );
 };
 
+export const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
+  const RESOURCE_ABI = [
+    {
+      inputs: [],
+      name: 'owner',
+      outputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'registry',
+      outputs: [
+        {
+          internalType: 'contract IRegistry',
+          name: '',
+          type: 'address',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+  const RESOURCE_REGISTRY_ABI = [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'newOwner',
+          type: 'address',
+        },
+      ],
+      name: 'transferOwnership',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+  const resourceContract = new Contract(
+    resourceAddress,
+    RESOURCE_ABI,
+    provider,
+  );
+
+  const resourceOwner = await resourceContract.owner();
+  const resourceRegistryAddress = await resourceContract.registry();
+  const resourceRegistryContract = new Contract(
+    resourceRegistryAddress,
+    RESOURCE_REGISTRY_ABI,
+    provider,
+  );
+
+  await impersonate(resourceOwner);
+  await resourceRegistryContract
+    .connect(new JsonRpcSigner(provider, resourceOwner))
+    .transferOwnership(targetOwner, { gasPrice: 0 })
+    .then((tx) => tx.wait());
+  await stopImpersonate(resourceOwner);
+
+  const newOwner = await resourceContract.owner();
+  console.log(`Workerpool ${resourceAddress} is now owned by ${newOwner}`);
+};
+
 const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);
 
   // prepare PoCo
   await setBalance(TARGET_POCO_ADMIN_WALLET, 1000000n * 10n ** 18n);
   await getIExecHubOwnership(TARGET_POCO_ADMIN_WALLET);
+  await getWorkerpoolOwnership(DEBUG_WORKERPOOL, DEBUG_WORKERPOOL_OWNER_WALLET);
+  await getWorkerpoolOwnership(PROD_WORKERPOOL, PROD_WORKERPOOL_OWNER_WALLET);
 
   // prepare faucet wallet
   await setBalance(TARGET_FAUCET_WALLET, 1000000n * 10n ** 18n);
