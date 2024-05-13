@@ -337,46 +337,123 @@ export const adminCreateCategory =
     }
     return res;
   };
-// TODO: use createVoucherType de VoucherHub
-export const createVoucherType =
-  (chain) =>
-  async (category, tryCount = 1) => {
-    const iexec = new IExec(
+export const createVoucherType = (chain) => async (description, duration) => {
+  const VOUCHER_HUB_ABI = {
+    inputs: [
       {
-        ethProvider: getSignerFromPrivateKey(
-          chain.rpcURL,
-          chain.voucherManagerWallet.privateKey,
-        ),
+        internalType: 'string',
+        name: 'description',
+        type: 'string',
       },
-      { hubAddress: chain.hubAddress },
-    );
-    let res;
-    try {
-      res = await iexec.hub.createCategory(category);
-    } catch (e) {
-      console.warn(
-        `Voucher create category: error (try count ${tryCount}) - ${e}`,
-      );
-      if (tryCount < 3) {
-        await sleep(3000 * tryCount);
-        res = await createVoucherType(chain)(category, tryCount + 1);
-      } else {
-        throw Error(
-          `Failed to create category with voucher manager wallet wallet (tried ${tryCount} times)`,
-        );
-      }
-    }
-    return res;
+      {
+        internalType: 'uint256',
+        name: 'duration',
+        type: 'uint256',
+      },
+    ],
+    name: 'createVoucherType',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   };
+  const voucherHubContract = new Contract(
+    chain.voucherHubAddress,
+    VOUCHER_HUB_ABI,
+    chain.voucherManagerWallet,
+  );
+  return voucherHubContract.createVoucherType(description, duration);
+};
 
-export const createVoucher =
-  (chain) =>
-  async ({ owner, type, amount }) => {
-    const VOUCHER_HUB_ABI = {};
-    const voucherHubContract = new Contract(
-      chain.voucherHubAddress,
-      VOUCHER_HUB_ABI,
-      owner,
-    );
-    return voucherHubContract.createVoucher(owner, type, amount);
+// TODO: update createWorkerpoolorder() parameters when it is specified
+const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
+  const iexec = new IExec(
+    {
+      ethProvider: getSignerFromPrivateKey(
+        chain.rpcURL,
+        chain.prodWorkerpoolOwnerWallet.privateKey,
+      ),
+    },
+    { hubAddress: chain.hubAddress },
+  );
+  const prodWorkerpoolOrder = await iexec.createWorkerpoolorder({
+    workerpool,
+    category: 0,
+    requesterrestrict: user,
+    volume: 1000,
+    workerpoolprice: 10000000000000000,
+  });
+  await iexec.publishWorkerpoolorder(prodWorkerpoolOrder);
+};
+
+export const createVoucher = async (chain, { owner, voucherType, value }) => {
+  const VOUCHER_HUB_ABI = {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'voucherType',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'createVoucher',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'voucherAddress',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
   };
+  const voucherHubContract = new Contract(
+    chain.voucherHubAddress,
+    VOUCHER_HUB_ABI,
+    chain.voucherManagerWallet,
+  );
+  const iexec = new IExec(
+    {
+      ethProvider: getSignerFromPrivateKey(
+        chain.rpcURL,
+        chain.voucherManagerWallet.privateKey,
+      ),
+    },
+    { hubAddress: chain.hubAddress },
+  );
+
+  // ensure RLC balance
+  await setNRlcBalance(chain)(await iexec.wallet.getAddress(), value);
+
+  // deposit RLC to voucherHub
+  const contractClient = await iexec.config.resolveContractsClient();
+  const iexecContract = await contractClient.getIExecContract();
+  await iexecContract.depositFor(chain.voucherHubAddress, {
+    value: value * 10n ** 9n,
+    gasPrice: 0,
+  });
+  const voucherAddress = await voucherHubContract.createVoucher(
+    owner,
+    voucherType,
+    value,
+  );
+  await createAndPublishWorkerpoolOrder(
+    chain,
+    'debug-v8-bellecour.main.pools.iexec.eth',
+    owner,
+  );
+  await createAndPublishWorkerpoolOrder(
+    chain,
+    'prod-v8-bellecour.main.pools.iexec.eth',
+    owner,
+  );
+  return voucherAddress;
+};
