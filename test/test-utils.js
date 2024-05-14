@@ -385,7 +385,7 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
   await iexec.publishWorkerpoolorder(prodWorkerpoolOrder);
 };
 
-export const createVoucher = async (chain, { owner, voucherType, value }) => {
+export const createVoucher =  (chain) => async ({ owner, voucherType, value }) => {
   const VOUCHER_HUB_ABI = {
     inputs: [
       {
