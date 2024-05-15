@@ -376,7 +376,7 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
     },
     { hubAddress: chain.hubAddress },
   );
-  const prodWorkerpoolOrder = await iexec.createWorkerpoolorder({
+  const workerpoolOrder = await iexec.createWorkerpoolorder({
     workerpool,
     category: 0,
     requesterrestrict: user,
@@ -384,7 +384,7 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
     workerpoolprice: 10000000000000000,
     tag: ['tee', 'scone'],
   });
-  await iexec.publishWorkerpoolorder(prodWorkerpoolOrder);
+  await iexec.publishWorkerpoolorder(workerpoolOrder);
 };
 
 export const createVoucher =
