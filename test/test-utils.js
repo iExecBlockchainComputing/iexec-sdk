@@ -376,14 +376,16 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
     },
     { hubAddress: chain.hubAddress },
   );
-  const workerpoolOrder = await iexec.order.createWorkerpoolorder({
-    workerpool,
-    category: 0,
-    requesterrestrict: user,
-    volume: 1000,
-    workerpoolprice: 10000000000000000,
-    tag: ['tee', 'scone'],
-  });
+  const workerpoolOrder = await iexec.order
+    .createWorkerpoolorder({
+      workerpool,
+      category: 0,
+      requesterrestrict: user,
+      volume: 1000,
+      workerpoolprice: 10000000000000000,
+      tag: ['tee', 'scone'],
+    })
+    .then((o) => iexec.order.signWorkerpoolorder(o));
   await iexec.publishWorkerpoolorder(workerpoolOrder);
 };
 
