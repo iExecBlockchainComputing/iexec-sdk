@@ -88,10 +88,10 @@ export const TEST_CHAINS = {
       ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
       : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
     debugWorkerpoolOwnerWallet: new Wallet(
-      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3',
     ),
     prodWorkerpoolOwnerWallet: new Wallet(
-      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc',
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
@@ -337,6 +337,7 @@ export const adminCreateCategory =
     }
     return res;
   };
+
 export const createVoucherType = (chain) => async (description, duration) => {
   const VOUCHER_HUB_ABI = {
     inputs: [
@@ -385,75 +386,77 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
   await iexec.publishWorkerpoolorder(prodWorkerpoolOrder);
 };
 
-export const createVoucher =  (chain) => async ({ owner, voucherType, value }) => {
-  const VOUCHER_HUB_ABI = {
-    inputs: [
+export const createVoucher =
+  (chain) =>
+  async ({ owner, voucherType, value }) => {
+    const VOUCHER_HUB_ABI = {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'owner',
+          type: 'address',
+        },
+        {
+          internalType: 'uint256',
+          name: 'voucherType',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'value',
+          type: 'uint256',
+        },
+      ],
+      name: 'createVoucher',
+      outputs: [
+        {
+          internalType: 'address',
+          name: 'voucherAddress',
+          type: 'address',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    };
+    const voucherHubContract = new Contract(
+      chain.voucherHubAddress,
+      VOUCHER_HUB_ABI,
+      chain.voucherManagerWallet,
+    );
+    const iexec = new IExec(
       {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
+        ethProvider: getSignerFromPrivateKey(
+          chain.rpcURL,
+          chain.voucherManagerWallet.privateKey,
+        ),
       },
-      {
-        internalType: 'uint256',
-        name: 'voucherType',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'createVoucher',
-    outputs: [
-      {
-        internalType: 'address',
-        name: 'voucherAddress',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
+      { hubAddress: chain.hubAddress },
+    );
+
+    // ensure RLC balance
+    await setNRlcBalance(chain)(await iexec.wallet.getAddress(), value);
+
+    // deposit RLC to voucherHub
+    const contractClient = await iexec.config.resolveContractsClient();
+    const iexecContract = await contractClient.getIExecContract();
+    await iexecContract.depositFor(chain.voucherHubAddress, {
+      value: value * 10n ** 9n,
+      gasPrice: 0,
+    });
+    const voucherAddress = await voucherHubContract.createVoucher(
+      owner,
+      voucherType,
+      value,
+    );
+    await createAndPublishWorkerpoolOrder(
+      chain,
+      'debug-v8-bellecour.main.pools.iexec.eth',
+      owner,
+    );
+    await createAndPublishWorkerpoolOrder(
+      chain,
+      'prod-v8-bellecour.main.pools.iexec.eth',
+      owner,
+    );
+    return voucherAddress;
   };
-  const voucherHubContract = new Contract(
-    chain.voucherHubAddress,
-    VOUCHER_HUB_ABI,
-    chain.voucherManagerWallet,
-  );
-  const iexec = new IExec(
-    {
-      ethProvider: getSignerFromPrivateKey(
-        chain.rpcURL,
-        chain.voucherManagerWallet.privateKey,
-      ),
-    },
-    { hubAddress: chain.hubAddress },
-  );
-
-  // ensure RLC balance
-  await setNRlcBalance(chain)(await iexec.wallet.getAddress(), value);
-
-  // deposit RLC to voucherHub
-  const contractClient = await iexec.config.resolveContractsClient();
-  const iexecContract = await contractClient.getIExecContract();
-  await iexecContract.depositFor(chain.voucherHubAddress, {
-    value: value * 10n ** 9n,
-    gasPrice: 0,
-  });
-  const voucherAddress = await voucherHubContract.createVoucher(
-    owner,
-    voucherType,
-    value,
-  );
-  await createAndPublishWorkerpoolOrder(
-    chain,
-    'debug-v8-bellecour.main.pools.iexec.eth',
-    owner,
-  );
-  await createAndPublishWorkerpoolOrder(
-    chain,
-    'prod-v8-bellecour.main.pools.iexec.eth',
-    owner,
-  );
-  return voucherAddress;
-};
