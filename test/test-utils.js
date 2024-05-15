@@ -382,6 +382,7 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
     requesterrestrict: user,
     volume: 1000,
     workerpoolprice: 10000000000000000,
+    tag: ['tee', 'scone'],
   });
   await iexec.publishWorkerpoolorder(prodWorkerpoolOrder);
 };
