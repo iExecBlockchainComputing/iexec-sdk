@@ -376,7 +376,7 @@ const createAndPublishWorkerpoolOrder = async (chain, workerpool, user) => {
     },
     { hubAddress: chain.hubAddress },
   );
-  const workerpoolOrder = await iexec.createWorkerpoolorder({
+  const workerpoolOrder = await iexec.order.createWorkerpoolorder({
     workerpool,
     category: 0,
     requesterrestrict: user,
