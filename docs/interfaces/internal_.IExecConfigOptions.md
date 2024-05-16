@@ -19,10 +19,12 @@
 - [iexecGatewayURL](internal_.IExecConfigOptions.md#iexecgatewayurl)
 - [ipfsGatewayURL](internal_.IExecConfigOptions.md#ipfsgatewayurl)
 - [isNative](internal_.IExecConfigOptions.md#isnative)
+- [pocoSubgraphURL](internal_.IExecConfigOptions.md#pocosubgraphurl)
 - [providerOptions](internal_.IExecConfigOptions.md#provideroptions)
 - [resultProxyURL](internal_.IExecConfigOptions.md#resultproxyurl)
 - [smsURL](internal_.IExecConfigOptions.md#smsurl)
 - [useGas](internal_.IExecConfigOptions.md#usegas)
+- [voucherSubgraphURL](internal_.IExecConfigOptions.md#vouchersubgraphurl)
 
 ## Properties
 
@@ -129,6 +131,14 @@ true if IExec contract use the chain native token (default false)
 
 ___
 
+### pocoSubgraphURL
+
+• `Optional` **pocoSubgraphURL**: `string`
+
+override the PoCo subgraph URL to target a custom instance
+
+___
+
 ### providerOptions
 
 • `Optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../modules.md#anyrecord)
@@ -158,3 +168,11 @@ ___
 • `Optional` **useGas**: `boolean`
 
 if false set the gasPrice to 0 (default true)
+
+___
+
+### voucherSubgraphURL
+
+• `Optional` **voucherSubgraphURL**: `string`
+
+override the voucher subgraph URL to target a custom instance

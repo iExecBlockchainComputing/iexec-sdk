@@ -32,6 +32,8 @@ const chainConfSchema = () =>
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
+    pocoSubgraph: string(),
+    voucherSubgraph: string(),
     native: boolean(),
     useGas: boolean().default(true),
     flavour: string().oneOf(['standard', 'enterprise']),
