@@ -64,7 +64,6 @@ required steps before following any other workflow.
 
 ```bash
 iexec init # create all required files
-iexec wallet get-RLC # ask iExec faucet for RLC
 iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
