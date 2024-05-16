@@ -5,6 +5,7 @@ import { IExec } from '../src/lib/index.js';
 import { getSignerFromPrivateKey } from '../src/lib/utils.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from '../src/common/utils/utils.js';
+import { getTestConfig } from './test-config-utils.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -411,25 +412,27 @@ const createAndPublishWorkerpoolOrder = async (
   workerpoolOwnerWallet,
   voucherOwnerAddress,
 ) => {
-  const iexec = new IExec(
-    {
-      ethProvider: getSignerFromPrivateKey(
-        chain.rpcURL,
-        workerpoolOwnerWallet.privateKey,
-      ),
-    },
-    { hubAddress: chain.hubAddress },
+  const { iexec } = getTestConfig(chain)({
+    privateKey: workerpoolOwnerWallet.privateKey,
+  });
+  const workerpoolprice = 1000;
+  const volume = 1000;
+
+  await setNRlcBalance(chain)(
+    await iexec.wallet.getAddress(),
+    volume * workerpoolprice,
   );
-  const workerpoolAddress = await iexec.ens.resolveName(workerpool);
+  await iexec.account.deposit(volume * workerpoolprice);
 
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
-    workerpool: workerpoolAddress,
+    workerpool,
     category: 0,
     requesterrestrict: voucherOwnerAddress,
-    volume: 1000,
-    workerpoolprice: 1000,
+    volume,
+    workerpoolprice,
     tag: ['tee', 'scone'],
   });
+
   await iexec.order
     .signWorkerpoolorder(workerpoolorder)
     .then((o) => iexec.order.publishWorkerpoolorder(o));
