@@ -978,7 +978,7 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
     });
-    test('success when not configured on custom chain', async () => {
+    test('throw when not configured on custom chain', async () => {
       const config = new IExecConfig({
         ethProvider: unknownTestChain.rpcURL,
       });
@@ -993,6 +993,60 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolveIpfsGatewayURL();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
+
+  describe('resolveVoucherSubgraphURL()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolveVoucherSubgraphURL();
+      const url = await promise;
+      expect(typeof url).toBe('string');
+      expect(url.length > 0).toBe(true);
+    });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolveVoucherSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('success voucherSubgraphURL override', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolveVoucherSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const promise = config.resolveVoucherSubgraphURL();
+      await expect(promise).rejects.toThrow(
+        `voucherSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolveVoucherSubgraphURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });

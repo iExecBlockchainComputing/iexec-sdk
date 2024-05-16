@@ -76,6 +76,13 @@ const iexecGatewayMap = {
   enterprise: {},
 };
 
+const voucherSubgraphMap = {
+  standard: {
+    134: 'https://todo.iex.ec', // TODO change with deployment url
+  },
+  enterprise: {},
+};
+
 const idMap = {
   mainnet: 1,
   bellecour: 134,
@@ -92,6 +99,8 @@ export const getChainDefaults = ({ id, flavour }) => ({
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
+  voucherSubgraph:
+    voucherSubgraphMap[flavour] && voucherSubgraphMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
   network: networkMap[id],

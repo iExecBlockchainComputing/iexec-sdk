@@ -36,6 +36,7 @@ export default class IExecConfig {
       resultProxyURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
     } = {},
@@ -384,6 +385,18 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    this.resolveVoucherSubgraphURL = async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const value = voucherSubgraphURL || chainConfDefaults.voucherSubgraph;
+      if (value !== undefined) {
+        return value;
+      }
+      throw new ConfigurationError(
+        `voucherSubgraphURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
