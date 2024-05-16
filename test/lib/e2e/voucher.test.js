@@ -18,7 +18,7 @@ describe('voucher test utils', () => {
       'test voucher type',
       42,
     );
-    expect(typeof voucherTypeId).toBe('number'); // or bigint or stringified number
+    expect(typeof voucherTypeId).toBe('bigint');
   });
   test('createVoucher should create a voucher and publish workerpool orders', async () => {
     const owner = getRandomAddress();
@@ -26,11 +26,13 @@ describe('voucher test utils', () => {
       'test voucher type',
       42,
     );
+
     await createVoucher(iexecTestChain)({
       owner,
       voucherType: voucherTypeId,
-      value: 48,
+      value: 48n,
     });
+
     const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
     const debugWorkerpoolOrderbook =
       await iexec.orderbook.fetchWorkerpoolOrderbook({
