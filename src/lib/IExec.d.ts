@@ -15,6 +15,7 @@ import IExecResultModule from './IExecResultModule.js';
 import IExecSecretsModule from './IExecSecretsModule.js';
 import IExecStorageModule from './IExecStorageModule.js';
 import IExecTaskModule from './IExecTaskModule.js';
+import IExecVoucherModule from './IExecVoucherModule.js';
 import IExecWalletModule from './IExecWalletModule.js';
 import IExecWorkerpoolModule from './IExecWorkerpoolModule.js';
 
@@ -74,6 +75,10 @@ export default class IExec extends IExecModule {
    * task module
    */
   task: IExecTaskModule;
+  /**
+   * voucher module
+   */
+  voucher: IExecVoucherModule;
   /**
    * wallet module
    */

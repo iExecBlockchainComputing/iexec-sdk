@@ -10,6 +10,7 @@
 - [DealObservable](../classes/internal_.DealObservable.md)
 - [ENSConfigurationObservable](../classes/internal_.ENSConfigurationObservable.md)
 - [IExecContractsClient](../classes/internal_.IExecContractsClient.md)
+- [IExecVoucherModule](../classes/internal_.IExecVoucherModule.md)
 - [TaskObservable](../classes/internal_.TaskObservable.md)
 
 ### Interfaces

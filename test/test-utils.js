@@ -342,68 +342,70 @@ export const adminCreateCategory =
     return res;
   };
 
-export const createVoucherType = (chain) => async (description, duration) => {
-  const VOUCHER_HUB_ABI = [
-    {
-      inputs: [
-        {
-          internalType: 'string',
-          name: 'description',
-          type: 'string',
-        },
-        {
-          internalType: 'uint256',
-          name: 'duration',
-          type: 'uint256',
-        },
-      ],
-      name: 'createVoucherType',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: 'uint256',
-          name: 'id',
-          type: 'uint256',
-        },
-        {
-          indexed: false,
-          internalType: 'string',
-          name: 'description',
-          type: 'string',
-        },
-        {
-          indexed: false,
-          internalType: 'uint256',
-          name: 'duration',
-          type: 'uint256',
-        },
-      ],
-      name: 'VoucherTypeCreated',
-      type: 'event',
-    },
-  ];
-  const voucherHubContract = new Contract(
-    chain.voucherHubAddress,
-    VOUCHER_HUB_ABI,
-    chain.provider,
-  );
-  const signer = chain.voucherManagerWallet.connect(chain.provider);
-  const createVoucherTypeTxHash = await voucherHubContract
-    .connect(signer)
-    .createVoucherType(description, duration);
-  const txReceipt = await createVoucherTypeTxHash.wait();
-  const { id } = getEventFromLogs('VoucherTypeCreated', txReceipt.logs, {
-    strict: true,
-  }).args;
+export const createVoucherType =
+  (chain) =>
+  async ({ description = 'test', duration = 1000 }) => {
+    const VOUCHER_HUB_ABI = [
+      {
+        inputs: [
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            internalType: 'uint256',
+            name: 'duration',
+            type: 'uint256',
+          },
+        ],
+        name: 'createVoucherType',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: 'uint256',
+            name: 'id',
+            type: 'uint256',
+          },
+          {
+            indexed: false,
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            indexed: false,
+            internalType: 'uint256',
+            name: 'duration',
+            type: 'uint256',
+          },
+        ],
+        name: 'VoucherTypeCreated',
+        type: 'event',
+      },
+    ];
+    const voucherHubContract = new Contract(
+      chain.voucherHubAddress,
+      VOUCHER_HUB_ABI,
+      chain.provider,
+    );
+    const signer = chain.voucherManagerWallet.connect(chain.provider);
+    const createVoucherTypeTxHash = await voucherHubContract
+      .connect(signer)
+      .createVoucherType(description, duration);
+    const txReceipt = await createVoucherTypeTxHash.wait();
+    const { id } = getEventFromLogs('VoucherTypeCreated', txReceipt.logs, {
+      strict: true,
+    }).args;
 
-  return id;
-};
+    return id;
+  };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
 const createAndPublishWorkerpoolOrder = async (
@@ -511,7 +513,7 @@ export const createVoucher =
 
     try {
       await iexecContract.depositFor(chain.voucherHubAddress, {
-        value: value * 10n ** 9n,
+        value: BigInt(value) * 10n ** 9n,
         gasPrice: 0,
       });
     } catch (error) {

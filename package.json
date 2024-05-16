@@ -134,6 +134,12 @@
       "import": "./dist/esm/lib/utils.js",
       "browser": "./dist/esm/lib/utils.js",
       "default": "./dist/esm/lib/utils.js"
+    },
+    "./IExecVoucherModule": {
+      "types": "./dist/esm/lib/IExecVoucherModule.d.ts",
+      "import": "./dist/esm/lib/IExecVoucherModule.js",
+      "browser": "./dist/esm/lib/IExecVoucherModule.js",
+      "default": "./dist/esm/lib/IExecVoucherModule.js"
     }
   },
   "engine": {
@@ -173,6 +179,7 @@
     "IExecSecretsModule",
     "IExecStorageModule",
     "IExecTaskModule",
+    "IExecVoucherModule",
     "IExecWalletModule",
     "IExecWorkerpoolModule",
     "errors",

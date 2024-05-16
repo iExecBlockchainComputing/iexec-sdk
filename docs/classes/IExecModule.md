@@ -40,6 +40,8 @@ module base
 
   ↳ [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
+  ↳ [`IExecVoucherModule`](internal_.IExecVoucherModule.md)
+
 ## Table of contents
 
 ### Constructors
