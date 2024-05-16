@@ -38,6 +38,7 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
 - [resolveSmsURL](IExecConfig.md#resolvesmsurl)
 - [resolveStandardContractsClient](IExecConfig.md#resolvestandardcontractsclient)
+- [resolveVoucherHubAddress](IExecConfig.md#resolvevoucherhubaddress)
 - [resolveVoucherSubgraphURL](IExecConfig.md#resolvevouchersubgraphurl)
 
 ## Constructors
@@ -236,6 +237,18 @@ resolve the current standard IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
+
+___
+
+### resolveVoucherHubAddress
+
+▸ **resolveVoucherHubAddress**(): `Promise`<`string`\>
+
+resolve the current VoucherHub contract address
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 

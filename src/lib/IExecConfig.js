@@ -26,6 +26,7 @@ export default class IExecConfig {
       hubAddress,
       ensRegistryAddress,
       ensPublicResolverAddress,
+      voucherHubAddress,
       isNative,
       useGas = true,
       confirms,
@@ -442,6 +443,18 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    this.resolveVoucherHubAddress = async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const value = voucherHubAddress || chainConfDefaults.voucherHub;
+      if (value !== undefined) {
+        return value;
+      }
+      throw new ConfigurationError(
+        `voucherHubAddress option not set and no default value for your chain ${chainId}`,
       );
     };
   }

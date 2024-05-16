@@ -16,6 +16,12 @@ const ensMap = {
   },
 };
 
+const voucherHubMap = {
+  standard: {
+    134: '0x000000000000000000000000000000000000dead', // TODO change with deployment address
+  },
+};
+
 const networkMap = {
   134: {
     name: 'bellecour',
@@ -103,6 +109,7 @@ export const getChainDefaults = ({ id, flavour }) => ({
   sms: smsMap[flavour] && smsMap[flavour][id],
   ensRegistry: ensMap[id] && ensMap[id].registry,
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
+  voucherHub: voucherHubMap[flavour] && voucherHubMap[flavour][id],
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
