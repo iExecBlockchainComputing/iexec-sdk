@@ -76,6 +76,13 @@ const iexecGatewayMap = {
   enterprise: {},
 };
 
+const pocoSubgraphMap = {
+  standard: {
+    134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5',
+  },
+  enterprise: {},
+};
+
 const voucherSubgraphMap = {
   standard: {
     134: 'https://todo.iex.ec', // TODO change with deployment url
@@ -99,6 +106,7 @@ export const getChainDefaults = ({ id, flavour }) => ({
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
+  pocoSubgraph: pocoSubgraphMap[flavour] && iexecGatewayMap[flavour][id],
   voucherSubgraph:
     voucherSubgraphMap[flavour] && voucherSubgraphMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],

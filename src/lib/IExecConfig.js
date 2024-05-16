@@ -36,6 +36,7 @@ export default class IExecConfig {
       resultProxyURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      pocoSubgraphURL,
       voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
@@ -385,6 +386,18 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    this.resolvePocoSubgraphURL = async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const value = pocoSubgraphURL || chainConfDefaults.pocoSubgraph;
+      if (value !== undefined) {
+        return value;
+      }
+      throw new ConfigurationError(
+        `pocoSubgraphURL option not set and no default value for your chain ${chainId}`,
       );
     };
 

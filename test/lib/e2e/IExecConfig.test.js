@@ -998,6 +998,60 @@ describe('[IExecConfig]', () => {
     });
   });
 
+  describe('resolvePocoSubgraphURL()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      const url = await promise;
+      expect(typeof url).toBe('string');
+      expect(url.length > 0).toBe(true);
+    });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        { pocoSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('success pocoSubgraphURL override', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { pocoSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).rejects.toThrow(
+        `pocoSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
+
   describe('resolveVoucherSubgraphURL()', () => {
     test('success', async () => {
       const config = new IExecConfig({

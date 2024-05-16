@@ -103,6 +103,10 @@ export interface IExecConfigOptions {
    */
   iexecGatewayURL?: string;
   /**
+   * override the PoCo subgraph URL to target a custom instance
+   */
+  pocoSubgraphURL?: string;
+  /**
    * override the voucher subgraph URL to target a custom instance
    */
   voucherSubgraphURL?: string;
@@ -188,6 +192,10 @@ export default class IExecConfig {
    * resolve the current IPFS gateway URL
    */
   resolveIpfsGatewayURL(): Promise<string>;
+  /**
+   * resolve the current PoCo subgraph URL
+   */
+  resolvePocoSubgraphURL(): Promise<string>;
   /**
    * resolve the current voucher subgraph URL
    */
