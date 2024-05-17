@@ -1,8 +1,11 @@
 import Debug from 'debug';
 import { Contract } from 'ethers';
 import { abi } from './abi/Voucher.js';
-import { throwIfMissing } from '../utils/validator.js';
+import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
+import { checkSigner } from '../utils/utils.js';
+import { getAddress } from '../wallet/address.js';
+import { wrapSend } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -28,6 +31,41 @@ export const fetchVoucherContract = async (
     return undefined;
   } catch (error) {
     debug('fetchVoucherContract()', error);
+    throw error;
+  }
+};
+
+export const authorizeRequester = async (
+  contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  requester,
+) => {
+  try {
+    checkSigner(contracts);
+    const userAddress = await getAddress(contracts);
+    const vRequester = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('requester')
+      .validate(requester);
+    const voucherContract = await fetchVoucherContract(
+      contracts,
+      voucherHubAddress,
+      userAddress,
+    );
+    if (!voucherContract) {
+      throw Error(`No Voucher found for address ${userAddress}`);
+    }
+    const tx = await wrapSend(
+      voucherContract
+        .connect(contracts.signer)
+        .authorizeAccount(vRequester, contracts.txOptions),
+    );
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('authorizeRequester()', error);
     throw error;
   }
 };

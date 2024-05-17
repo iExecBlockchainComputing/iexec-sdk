@@ -2,14 +2,14 @@ export type * from '../common/types.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Address, Addressish } from '../common/types.js';
+import { Address, Addressish, TxHash } from '../common/types.js';
 
 /**
  * module exposing voucher methods
  */
 export default class IExecVoucherModule extends IExecModule {
   /**
-   * return the address of the voucher contract of the specified address when the addres owns one
+   * return the address of the voucher contract of the specified address when the address owns one
    *
    * example:
    * ```js
@@ -17,7 +17,20 @@ export default class IExecVoucherModule extends IExecModule {
    * console.log('voucher contract address:', voucherAddress);
    * ```
    */
-  getVoucherAddress(address: Addressish): Promise<Address | undefined>;
+  getVoucherAddress(owner: Addressish): Promise<Address | undefined>;
+
+  /**
+   * **SIGNER REQUIRED**
+   *
+   * authorize a requester to use the voucher
+   *
+   * example:
+   * ```js
+   * const txHash = await authorizeRequester(ethAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  authorizeRequester(requester: Addressish): Promise<TxHash>;
   /**
    * Create an IExecVoucherModule instance using an IExecConfig instance
    */

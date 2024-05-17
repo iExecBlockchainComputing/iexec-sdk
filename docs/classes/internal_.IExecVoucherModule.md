@@ -24,6 +24,7 @@ module exposing voucher methods
 
 ### Methods
 
+- [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
 - [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
 - [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
 
@@ -64,11 +65,37 @@ current IExecConfig
 
 ## Methods
 
+### authorizeRequester
+
+▸ **authorizeRequester**(`requester`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
+
+authorize a requester to use the voucher
+
+example:
+```js
+const txHash = await authorizeRequester(ethAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `requester` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
 ### getVoucherAddress
 
-▸ **getVoucherAddress**(`address`): `Promise`<`string`\>
+▸ **getVoucherAddress**(`owner`): `Promise`<`string`\>
 
-return the address of the voucher contract of the specified address when the addres owns one
+return the address of the voucher contract of the specified address when the address owns one
 
 example:
 ```js
@@ -80,7 +107,7 @@ console.log('voucher contract address:', voucherAddress);
 
 | Name | Type |
 | :------ | :------ |
-| `address` | `string` |
+| `owner` | `string` |
 
 #### Returns
 
