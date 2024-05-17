@@ -28,6 +28,7 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // todo address
     ensPublicResolver: string(), // todo address
+    voucherHub: string(), // todo address
     sms: smsUrlOrMapSchema(),
     resultProxy: string(),
     ipfsGateway: string(),

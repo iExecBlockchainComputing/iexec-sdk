@@ -49,6 +49,10 @@ export interface IExecConfigOptions {
    */
   ensPublicResolverAddress?: string;
   /**
+   * override the VoucherHub contract address to target a custom instance
+   */
+  voucherHubAddress?: string;
+  /**
    * override the bridge contract address to target a custom instance
    */
   bridgeAddress?: string;
@@ -212,4 +216,8 @@ export default class IExecConfig {
    * resolve the current ENS public resolver contract address
    */
   resolveEnsPublicResolverAddress(): Promise<string>;
+  /**
+   * resolve the current VoucherHub contract address
+   */
+  resolveVoucherHubAddress(): Promise<string>;
 }

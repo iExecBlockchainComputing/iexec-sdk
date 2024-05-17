@@ -14,25 +14,20 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('voucher test utils', () => {
   test('createVoucherType should create a voucherType and return the id', async () => {
-    const voucherTypeId = await createVoucherType(iexecTestChain)(
-      'test voucher type',
-      42,
-    );
+    const voucherTypeId = await createVoucherType(iexecTestChain)({
+      description: 'test voucher type',
+      duration: 42,
+    });
     expect(typeof voucherTypeId).toBe('bigint');
   });
   test('createVoucher should create a voucher and publish workerpool orders', async () => {
     const owner = getRandomAddress();
-    const voucherTypeId = await createVoucherType(iexecTestChain)(
-      'test voucher type',
-      42,
-    );
-
+    const voucherTypeId = await createVoucherType(iexecTestChain)();
     await createVoucher(iexecTestChain)({
       owner,
       voucherType: voucherTypeId,
-      value: 48n,
+      value: 48,
     });
-
     const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
     const debugWorkerpoolOrderbook =
       await iexec.orderbook.fetchWorkerpoolOrderbook({

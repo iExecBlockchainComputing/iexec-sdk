@@ -1279,4 +1279,62 @@ describe('[IExecConfig]', () => {
       await expect(promise).rejects.toThrow(Error);
     });
   });
+
+  describe('resolveVoucherHubAddress()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolveVoucherHubAddress();
+      const address = await promise;
+      expect(typeof address).toBe('string');
+      expect(address.length).toBe(42);
+    });
+    test('success voucherHubAddress override', async () => {
+      const voucherHubAddressOverride = getRandomAddress();
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        {
+          voucherHubAddress: voucherHubAddressOverride,
+        },
+      );
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).resolves.toBe(voucherHubAddressOverride);
+    });
+    test('success with voucherHubAddress on custom chain', async () => {
+      const voucherHubAddressOverride = getRandomAddress();
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        {
+          voucherHubAddress: voucherHubAddressOverride,
+        },
+      );
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).resolves.toBe(voucherHubAddressOverride);
+    });
+    test('throw on unknown chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).rejects.toThrow(
+        Error(
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
+        ),
+      );
+      await expect(promise).rejects.toThrow(errors.ConfigurationError);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
 });
