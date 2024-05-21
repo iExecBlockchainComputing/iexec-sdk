@@ -81,4 +81,40 @@ describe('voucher', () => {
       expect(res).toBeTxHash();
     });
   });
+
+  describe('revokeRequesterAuthorization()', () => {
+    test('requires a signer', async () => {
+      const requester = getRandomAddress();
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(
+        iexec.voucher.revokeRequesterAuthorization(requester),
+      ).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
+    test('requires the user owns a voucher', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await expect(
+        iexec.voucher.revokeRequesterAuthorization(requester),
+      ).rejects.toThrow(
+        Error(`No Voucher found for address ${wallet.address}`),
+      );
+    });
+
+    test('revokes the requester authorization to use the voucher', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await createVoucher(iexecTestChain)({
+        owner: wallet.address,
+        voucherType,
+        value: 1000,
+      });
+      const res = await iexec.voucher.revokeRequesterAuthorization(requester);
+      expect(res).toBeTxHash();
+    });
+  });
 });

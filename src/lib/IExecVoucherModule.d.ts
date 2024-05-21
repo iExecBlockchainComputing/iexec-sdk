@@ -31,6 +31,20 @@ export default class IExecVoucherModule extends IExecModule {
    * ```
    */
   authorizeRequester(requester: Addressish): Promise<TxHash>;
+
+  /**
+   * **SIGNER REQUIRED**
+   *
+   * revoke the authorization previously granted to a requester to use the voucher
+   *
+   * example:
+   * ```js
+   * const txHash = await revokeRequesterAuthorization(ethAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  revokeRequesterAuthorization(requester: Addressish): Promise<TxHash>;
+
   /**
    * Create an IExecVoucherModule instance using an IExecConfig instance
    */
