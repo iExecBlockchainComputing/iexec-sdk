@@ -12,10 +12,10 @@ export default class IExecVoucherModule extends IExecModule {
       return fetchVoucherAddress(contracts, voucherHubAddress, owner);
     };
 
-    this.authorizeRequester = async (spender) => {
+    this.authorizeRequester = async (requester) => {
       const contracts = await this.config.resolveContractsClient();
       const voucherHubAddress = await this.config.resolveVoucherHubAddress();
-      return authorizeRequester(contracts, voucherHubAddress, spender);
+      return authorizeRequester(contracts, voucherHubAddress, requester);
     };
   }
 }
