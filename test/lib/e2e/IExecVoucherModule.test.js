@@ -69,7 +69,7 @@ describe('voucher', () => {
       );
     });
 
-    test('authorizes the requester to use the signer', async () => {
+    test('authorizes the requester to use the voucher', async () => {
       const requester = getRandomAddress();
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       await createVoucher(iexecTestChain)({
