@@ -5,7 +5,7 @@ import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
-import { wrapSend } from '../utils/errorWrappers.js';
+import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -56,6 +56,12 @@ export const authorizeRequester = async (
     );
     if (!voucherContract) {
       throw Error(`No Voucher found for address ${userAddress}`);
+    }
+    const isAuthorized = await wrapCall(
+      voucherContract.isAccountAuthorized(vRequester),
+    );
+    if (isAuthorized) {
+      throw Error(`${vRequester} is already authorized`);
     }
     const tx = await wrapSend(
       voucherContract
