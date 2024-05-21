@@ -80,6 +80,20 @@ describe('voucher', () => {
       const res = await iexec.voucher.authorizeRequester(requester);
       expect(res).toBeTxHash();
     });
+
+    test('throw when the requester is already authorized', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await createVoucher(iexecTestChain)({
+        owner: wallet.address,
+        voucherType,
+        value: 1000,
+      });
+      await iexec.voucher.authorizeRequester(requester);
+      await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
+        Error(`${requester} is already authorized`),
+      );
+    });
   });
 
   describe('revokeRequesterAuthorization()', () => {
