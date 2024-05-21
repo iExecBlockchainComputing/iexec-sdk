@@ -98,6 +98,12 @@ export const revokeRequesterAuthorization = async (
     if (!voucherContract) {
       throw Error(`No Voucher found for address ${userAddress}`);
     }
+    const isAuthorized = await wrapCall(
+      voucherContract.isAccountAuthorized(vRequester),
+    );
+    if (!isAuthorized) {
+      throw Error(`${vRequester} is not authorized`);
+    }
     const tx = await wrapSend(
       voucherContract
         .connect(contracts.signer)

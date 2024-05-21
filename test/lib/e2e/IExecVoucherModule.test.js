@@ -119,6 +119,19 @@ describe('voucher', () => {
       );
     });
 
+    test('throw when the requester is not previously authorized', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await createVoucher(iexecTestChain)({
+        owner: wallet.address,
+        voucherType,
+        value: 1000,
+      });
+      await expect(
+        iexec.voucher.revokeRequesterAuthorization(requester),
+      ).rejects.toThrow(Error(`${requester} is not authorized`));
+    });
+
     test('revokes the requester authorization to use the voucher', async () => {
       const requester = getRandomAddress();
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
@@ -127,6 +140,7 @@ describe('voucher', () => {
         voucherType,
         value: 1000,
       });
+      await iexec.voucher.authorizeRequester(requester);
       const res = await iexec.voucher.revokeRequesterAuthorization(requester);
       expect(res).toBeTxHash();
     });
