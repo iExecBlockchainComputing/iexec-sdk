@@ -75,7 +75,7 @@ authorize a requester to use the voucher
 
 example:
 ```js
-const txHash = await authorizeRequester(ethAddress);
+const txHash = await authorizeRequester(requesterAddress);
 console.log('tx:', txHash);
 ```
 
