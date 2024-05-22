@@ -13,7 +13,7 @@ export default class IExecVoucherModule extends IExecModule {
    *
    * example:
    * ```js
-   * const voucherAddress = await getVoucherAddress(ethAddress);
+   * const voucherAddress = await getVoucherAddress(ownerAddress);
    * console.log('voucher contract address:', voucherAddress);
    * ```
    */
@@ -26,7 +26,7 @@ export default class IExecVoucherModule extends IExecModule {
    *
    * example:
    * ```js
-   * const txHash = await authorizeRequester(ethAddress);
+   * const txHash = await authorizeRequester(requesterAddress);
    * console.log('tx:', txHash);
    * ```
    */
@@ -39,7 +39,7 @@ export default class IExecVoucherModule extends IExecModule {
    *
    * example:
    * ```js
-   * const txHash = await revokeRequesterAuthorization(ethAddress);
+   * const txHash = await revokeRequesterAuthorization(requesterAddress);
    * console.log('tx:', txHash);
    * ```
    */

@@ -76,7 +76,7 @@ authorize a requester to use the voucher
 
 example:
 ```js
-const txHash = await authorizeRequester(ethAddress);
+const txHash = await authorizeRequester(requesterAddress);
 console.log('tx:', txHash);
 ```
 
@@ -100,7 +100,7 @@ returns the address of the voucher contract for the specified address if the add
 
 example:
 ```js
-const voucherAddress = await getVoucherAddress(ethAddress);
+const voucherAddress = await getVoucherAddress(ownerAddress);
 console.log('voucher contract address:', voucherAddress);
 ```
 
@@ -126,7 +126,7 @@ revoke the authorization previously granted to a requester to use the voucher
 
 example:
 ```js
-const txHash = await revokeRequesterAuthorization(ethAddress);
+const txHash = await revokeRequesterAuthorization(requesterAddress);
 console.log('tx:', txHash);
 ```
 
