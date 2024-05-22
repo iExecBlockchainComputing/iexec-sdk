@@ -96,7 +96,7 @@ ___
 
 ▸ **getVoucherAddress**(`owner`): `Promise`<`string`\>
 
-return the address of the voucher contract of the specified address when the address owns one
+returns the address of the voucher contract for the specified address if the address owns a voucher
 
 example:
 ```js
