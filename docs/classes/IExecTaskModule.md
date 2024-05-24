@@ -40,8 +40,8 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -169,7 +169,7 @@ ___
 
 ### show
 
-▸ **show**(`taskid`): `Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: [`BN`](utils.BN.md) ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: [`BN`](utils.BN.md) ; `idx`: [`BN`](utils.BN.md) ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: [`BN`](utils.BN.md) ; `revealCounter`: [`BN`](utils.BN.md) ; `revealDeadline`: [`BN`](utils.BN.md) ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: [`BN`](utils.BN.md)  }\>
+▸ **show**(`taskid`): `Promise`<[`Task`](../interfaces/internal_.Task.md)\>
 
 show the details of a task.
 
@@ -189,7 +189,7 @@ console.log('task:', task);
 
 #### Returns
 
-`Promise`<{ `consensusValue`: `string` ; `contributionDeadline`: [`BN`](utils.BN.md) ; `contributors`: `string`[] ; `dealid`: `string` ; `finalDeadline`: [`BN`](utils.BN.md) ; `idx`: [`BN`](utils.BN.md) ; `resultDigest`: `string` ; `results`: `string` \| { `location?`: `string` ; `storage`: `string`  } ; `resultsCallback`: `string` ; `resultsTimestamp`: [`BN`](utils.BN.md) ; `revealCounter`: [`BN`](utils.BN.md) ; `revealDeadline`: [`BN`](utils.BN.md) ; `status`: `number` ; `statusName`: `string` ; `taskTimedOut`: `boolean` ; `taskid`: `string` ; `winnerCounter`: [`BN`](utils.BN.md)  }\>
+`Promise`<[`Task`](../interfaces/internal_.Task.md)\>
 
 ___
 

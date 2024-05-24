@@ -57,9 +57,9 @@ data:
 | Name | Type |
 | :------ | :------ |
 | `callbacks` | `Object` |
-| `callbacks.complete` | () => `any` |
-| `callbacks.error` | (`error`: `Error`) => `any` |
-| `callbacks.next` | (`data`: { `message`: `string`  }) => `any` |
+| `callbacks.complete?` | () => `any` |
+| `callbacks.error?` | (`error`: `Error`) => `any` |
+| `callbacks.next?` | (`data`: { `message`: ``"TASK_UPDATED"`` \| ``"TASK_COMPLETED"`` \| ``"TASK_TIMEDOUT"`` \| ``"TASK_FAILED"`` ; `task`: [`Task`](../interfaces/internal_.Task.md)  }) => `any` |
 
 #### Returns
 
