@@ -12,7 +12,7 @@ export class Observable {
       /**
        * callback to fire on incoming data
        */
-      next?: (data: any) => any;
+      next?: (data: Record<string, any> & { message: string }) => any;
       /**
        * callback to fire when the data emission is done
        *

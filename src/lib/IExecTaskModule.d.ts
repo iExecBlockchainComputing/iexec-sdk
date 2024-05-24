@@ -14,6 +14,26 @@ import {
   TxHash,
 } from '../common/types.js';
 
+interface Task {
+  taskid: Taskid;
+  idx: BN;
+  dealid: Dealid;
+  status: number;
+  statusName: string;
+  taskTimedOut: boolean;
+  contributionDeadline: BN;
+  revealDeadline: BN;
+  finalDeadline: BN;
+  consensusValue: Bytes32 | Bytes;
+  revealCounter: BN;
+  winnerCounter: BN;
+  contributors: Address[];
+  resultDigest: Bytes32 | Bytes;
+  results: { storage: string; location?: string } | Bytes;
+  resultsTimestamp: BN;
+  resultsCallback: Bytes;
+}
+
 declare class TaskObservable extends Observable {
   /**
    * subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
@@ -40,19 +60,26 @@ declare class TaskObservable extends Observable {
      * | `TASK_TIMEDOUT` | sent once when the deadline is reached before completion|
      * | `TASK_FAILED` | sent once when the task is claimed after a timeout |
      */
-    next: (data: { message: string }) => any;
+    next?: (data: {
+      message:
+        | 'TASK_UPDATED'
+        | 'TASK_COMPLETED'
+        | 'TASK_TIMEDOUT'
+        | 'TASK_FAILED';
+      task: Task;
+    }) => any;
     /**
      * callback fired once when the task is completed or when the deadline is reached
      *
      * no other callback is fired after firing `complete()`
      */
-    complete: () => any;
+    complete?: () => any;
     /**
      * callback fired once when an error occurs
      *
      * no other callback is fired after firing `error(error: Error)`
      */
-    error: (error: Error) => any;
+    error?: (error: Error) => any;
   }): /**
    * `unsubscribe: () => void` method, calling this method cancels the subscription
    *
@@ -76,25 +103,7 @@ export default class IExecTaskModule extends IExecModule {
    * console.log('task:', task);
    * ```
    */
-  show(taskid: Taskid): Promise<{
-    taskid: Taskid;
-    idx: BN;
-    dealid: Dealid;
-    status: number;
-    statusName: string;
-    taskTimedOut: boolean;
-    contributionDeadline: BN;
-    revealDeadline: BN;
-    finalDeadline: BN;
-    consensusValue: Bytes32 | Bytes;
-    revealCounter: BN;
-    winnerCounter: BN;
-    contributors: Address[];
-    resultDigest: Bytes32 | Bytes;
-    results: { storage: string; location?: string } | Bytes;
-    resultsTimestamp: BN;
-    resultsCallback: Bytes;
-  }>;
+  show(taskid: Taskid): Promise<Task>;
   /**
    * return an Observable with a `subscribe` method to monitor the task status changes.
    *

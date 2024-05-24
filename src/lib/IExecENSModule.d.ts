@@ -44,8 +44,18 @@ declare class ENSConfigurationObservable extends Observable {
      * | `SET_NAME_TX_SENT` | sent once if the name is not set | `txHash` |
      * | `SET_NAME_SUCCESS` | sent once | `name`,`address` |
      */
-    next: (data: {
-      message: string;
+    next?: (data: {
+      message:
+        | 'DESCRIBE_WORKFLOW'
+        | 'SET_RESOLVER_TX_REQUEST'
+        | 'SET_RESOLVER_TX_SENT'
+        | 'SET_RESOLVER_SUCCESS'
+        | 'SET_ADDR_TX_REQUEST'
+        | 'SET_ADDR_TX_SENT'
+        | 'SET_ADDR_SUCCESS'
+        | 'SET_NAME_TX_REQUEST'
+        | 'SET_NAME_TX_SENT'
+        | 'SET_NAME_SUCCESS';
       addressType?: string;
       steps?: string[];
       name?: ENS;
@@ -58,13 +68,13 @@ declare class ENSConfigurationObservable extends Observable {
      *
      * no other callback is fired after firing `complete()`
      */
-    complete: () => any;
+    complete?: () => any;
     /**
      * callback fired once when an error occurs
      *
      * no other callback is fired after firing `error(error: Error)`
      */
-    error: (error: Error) => any;
+    error?: (error: Error) => any;
   }): /**
    * `cancel: () => void` method, calling this method cancels the subscription and stops the configuration
    *

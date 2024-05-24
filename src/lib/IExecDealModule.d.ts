@@ -42,8 +42,8 @@ declare class DealObservable extends Observable {
      * | `DEAL_COMPLETED` | sent once all tasks are completed |
      * | `DEAL_TIMEDOUT` | sent once the timeout is reached before all tasks completion |
      */
-    next: (data: {
-      message: string;
+    next?: (data: {
+      message: 'DEAL_UPDATED' | 'DEAL_COMPLETED' | 'DEAL_TIMEDOUT';
       taskCount: number;
       completedTasksCount: number;
       failedTaksCount: number;
@@ -71,21 +71,21 @@ declare class DealObservable extends Observable {
       tasks: {
         taskid: Taskid;
         idx: BN;
-        dealid: Dealid;
-        status: number;
-        statusName: string;
-        taskTimedOut: boolean;
-        contributionDeadline: BN;
-        revealDeadline: BN;
-        finalDeadline: BN;
-        consensusValue: Bytes32 | Bytes;
-        revealCounter: BN;
-        winnerCounter: BN;
-        contributors: Address[];
-        resultDigest: Bytes32 | Bytes;
-        results: { storage: string; location?: string } | Bytes;
-        resultsTimestamp: BN;
-        resultsCallback: Bytes;
+        dealid?: Dealid;
+        status?: number;
+        statusName?: string;
+        taskTimedOut?: boolean;
+        contributionDeadline?: BN;
+        revealDeadline?: BN;
+        finalDeadline?: BN;
+        consensusValue?: Bytes32 | Bytes;
+        revealCounter?: BN;
+        winnerCounter?: BN;
+        contributors?: Address[];
+        resultDigest?: Bytes32 | Bytes;
+        results?: { storage: string; location?: string } | Bytes;
+        resultsTimestamp?: BN;
+        resultsCallback?: Bytes;
       }[];
     }) => any;
     /**
@@ -93,13 +93,13 @@ declare class DealObservable extends Observable {
      *
      * no other callback is fired after firing `complete()`
      */
-    complete: () => any;
+    complete?: () => any;
     /**
      * callback fired once when an error occurs
      *
      * no other callback is fired after firing `error(error: Error)`
      */
-    error: (error: Error) => any;
+    error?: (error: Error) => any;
   }): /**
    * `unsubscribe: () => void` method, calling this method cancels the subscription
    *
