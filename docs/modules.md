@@ -43,6 +43,9 @@
 
 ### Interfaces
 
+- [Eip1193Provider](interfaces/Eip1193Provider.md)
+- [IExecConfigArgs](interfaces/IExecConfigArgs.md)
+- [IExecConfigOptions](interfaces/IExecConfigOptions.md)
 - [ProviderOptions](interfaces/ProviderOptions.md)
 
 ### Type Aliases

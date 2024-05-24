@@ -1,4 +1,5 @@
 export type * from '../common/types.js';
+export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
@@ -47,7 +48,15 @@ declare class BridgeObservable extends Observable {
      * | `RECEIVE_TX_SUCCESS` | sent once if the bridged chain is configured | `txHash` |
      */
     next: (data: {
-      message: string;
+      message:
+        | 'CHECK_BRIDGE_POLICY'
+        | 'BRIDGE_POLICY_CHECKED'
+        | 'CHECK_BRIDGE_LIMIT'
+        | 'BRIDGE_LIMIT_CHECKED'
+        | 'SEND_TO_BRIDGE_TX_REQUEST'
+        | 'SEND_TO_BRIDGE_TX_SUCCESS'
+        | 'WAIT_RECEIVE_TX'
+        | 'RECEIVE_TX_SUCCESS';
       minPerTx?: BN;
       maxPerTx?: BN;
       dailyLimit?: BN;
