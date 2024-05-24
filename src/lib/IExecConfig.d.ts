@@ -1,4 +1,5 @@
 export type * from '../common/types.js';
+export type * from './IExecConfig.js';
 
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
