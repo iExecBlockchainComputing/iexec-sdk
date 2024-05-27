@@ -354,7 +354,7 @@ export const adminCreateCategory =
 
 export const createVoucherType =
   (chain) =>
-  async ({ description = 'test', duration = 1000 }) => {
+  async ({ description = 'test', duration = 1000 } = {}) => {
     const VOUCHER_HUB_ABI = [
       {
         inputs: [

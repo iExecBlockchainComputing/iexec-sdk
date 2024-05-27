@@ -7,6 +7,9 @@ import { getGraphQLClient } from '../utils/graphql-utils.js';
 import { checkAllowance } from '../account/allowance.js';
 import { getVoucherAuthorizedAccounts } from './subgraph/authorizedAccounts.js';
 import { getVoucherSponsoredAssets } from './subgraph/sponsoredAssets.js';
+import { checkSigner } from '../utils/utils.js';
+import { getAddress } from '../wallet/address.js';
+import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -94,4 +97,45 @@ export const showUserVoucher = async (
     allowanceAmount,
     authorizedAccounts,
   };
+};
+
+export const authorizeRequester = async (
+  contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  requester,
+) => {
+  try {
+    checkSigner(contracts);
+    const userAddress = await getAddress(contracts);
+    const vRequester = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('requester')
+      .validate(requester);
+    const voucherContract = await fetchVoucherContract(
+      contracts,
+      voucherHubAddress,
+      userAddress,
+    );
+    if (!voucherContract) {
+      throw Error(`No Voucher found for address ${userAddress}`);
+    }
+    const isAuthorized = await wrapCall(
+      voucherContract.isAccountAuthorized(vRequester),
+    );
+    if (isAuthorized) {
+      throw Error(`${vRequester} is already authorized`);
+    }
+    const tx = await wrapSend(
+      voucherContract
+        .connect(contracts.signer)
+        .authorizeAccount(vRequester, contracts.txOptions),
+    );
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('authorizeRequester()', error);
+    throw error;
+  }
 };

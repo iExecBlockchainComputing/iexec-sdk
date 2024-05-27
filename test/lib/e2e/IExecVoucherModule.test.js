@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect } from '@jest/globals';
+import { beforeAll, describe, test, expect } from '@jest/globals';
 import { getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
@@ -16,6 +16,11 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];
 
 describe('voucher', () => {
+  let voucherType;
+  beforeAll(async () => {
+    voucherType = await createVoucherType(iexecTestChain)({});
+  });
+
   describe('getVoucherAddress()', () => {
     test('requires voucherHubAddress to be configured', async () => {
       const owner = getRandomAddress();
@@ -36,7 +41,6 @@ describe('voucher', () => {
 
     test('returns voucher address when user has one', async () => {
       const owner = getRandomAddress();
-      const voucherType = await createVoucherType(iexecTestChain)({});
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner,
         voucherType,
@@ -76,7 +80,6 @@ describe('voucher', () => {
     test('returns voucher details when user has one', async () => {
       // initial setup
       const owner = getRandomAddress();
-      const voucherType = await createVoucherType(iexecTestChain)({});
       const voucherValue = 1000;
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner,
@@ -125,6 +128,52 @@ describe('voucher', () => {
       // expect(userVoucher.sponsoredWorkerpools).toContainEqual({
       //   id: workerpoolAddress,
       // });
+    });
+  });
+
+  describe('authorizeRequester()', () => {
+    test('requires a signer', async () => {
+      const requester = getRandomAddress();
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
+        Error(
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
+      );
+    });
+
+    test('requires the user owns a voucher', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
+        Error(`No Voucher found for address ${wallet.address}`),
+      );
+    });
+
+    test('authorizes the requester to use the voucher', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await createVoucher(iexecTestChain)({
+        owner: wallet.address,
+        voucherType,
+        value: 1000,
+      });
+      const res = await iexec.voucher.authorizeRequester(requester);
+      expect(res).toBeTxHash();
+    });
+
+    test('throw when the requester is already authorized', async () => {
+      const requester = getRandomAddress();
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      await createVoucher(iexecTestChain)({
+        owner: wallet.address,
+        voucherType,
+        value: 1000,
+      });
+      await iexec.voucher.authorizeRequester(requester);
+      await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
+        Error(`${requester} is already authorized`),
+      );
     });
   });
 });
