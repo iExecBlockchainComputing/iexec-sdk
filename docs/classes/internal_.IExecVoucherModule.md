@@ -26,6 +26,7 @@ module exposing voucher methods
 
 - [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
 - [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
+- [showUserVoucher](internal_.IExecVoucherModule.md#showuservoucher)
 - [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
 
 ## Constructors
@@ -112,6 +113,32 @@ console.log('voucher contract address:', voucherAddress);
 #### Returns
 
 `Promise`<`string`\>
+
+___
+
+### showUserVoucher
+
+▸ **showUserVoucher**(`owner`): `Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
+
+returns the user voucher information
+
+example:
+```js
+const userVoucher = await showUserVoucher(userAddress);
+console.log('owner:', userVoucher.owner);
+console.log('address:', userVoucher.address);
+console.log('balance:', userVoucher.balance);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `owner` | `string` |
+
+#### Returns
+
+`Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
 
 ___
 
