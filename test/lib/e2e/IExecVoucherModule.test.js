@@ -34,7 +34,7 @@ describe('voucher', () => {
 
     test('returns voucher address when user has one', async () => {
       const owner = getRandomAddress();
-      const voucherType = await createVoucherType(iexecTestChain)();
+      const voucherType = await createVoucherType(iexecTestChain)({});
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner,
         voucherType,
