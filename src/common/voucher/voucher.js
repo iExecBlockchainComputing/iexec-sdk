@@ -139,3 +139,44 @@ export const authorizeRequester = async (
     throw error;
   }
 };
+
+export const revokeRequesterAuthorization = async (
+  contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  requester,
+) => {
+  try {
+    checkSigner(contracts);
+    const userAddress = await getAddress(contracts);
+    const vRequester = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('requester')
+      .validate(requester);
+    const voucherContract = await fetchVoucherContract(
+      contracts,
+      voucherHubAddress,
+      userAddress,
+    );
+    if (!voucherContract) {
+      throw Error(`No Voucher found for address ${userAddress}`);
+    }
+    const isAuthorized = await wrapCall(
+      voucherContract.isAccountAuthorized(vRequester),
+    );
+    if (!isAuthorized) {
+      throw Error(`${vRequester} is not authorized`);
+    }
+    const tx = await wrapSend(
+      voucherContract
+        .connect(contracts.signer)
+        .unauthorizeAccount(vRequester, contracts.txOptions),
+    );
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    debug('revokeRequesterAuthorization()', error);
+    throw error;
+  }
+};

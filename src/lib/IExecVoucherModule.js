@@ -1,7 +1,10 @@
 import IExecModule from './IExecModule.js';
 import { fetchVoucherAddress } from '../common/voucher/voucherHub.js';
-import { showUserVoucher } from '../common/voucher/voucher.js';
-import { authorizeRequester } from '../common/voucher/voucher.js';
+import {
+  authorizeRequester,
+  revokeRequesterAuthorization,
+  showUserVoucher,
+} from '../common/voucher/voucher.js';
 
 export default class IExecVoucherModule extends IExecModule {
   constructor(...args) {
@@ -30,6 +33,16 @@ export default class IExecVoucherModule extends IExecModule {
       const contracts = await this.config.resolveContractsClient();
       const voucherHubAddress = await this.config.resolveVoucherHubAddress();
       return authorizeRequester(contracts, voucherHubAddress, requester);
+    };
+
+    this.revokeRequesterAuthorization = async (requester) => {
+      const contracts = await this.config.resolveContractsClient();
+      const voucherHubAddress = await this.config.resolveVoucherHubAddress();
+      return revokeRequesterAuthorization(
+        contracts,
+        voucherHubAddress,
+        requester,
+      );
     };
   }
 }
