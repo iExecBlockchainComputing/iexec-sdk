@@ -13,7 +13,7 @@ export default class IExecVoucherModule extends IExecModule {
    *
    * example:
    * ```js
-   * const voucherAddress = await getVoucherAddress(ethAddress);
+   * const voucherAddress = await getVoucherAddress(ownerAddress);
    * console.log('voucher contract address:', voucherAddress);
    * ```
    */
@@ -26,11 +26,25 @@ export default class IExecVoucherModule extends IExecModule {
    *
    * example:
    * ```js
-   * const txHash = await authorizeRequester(ethAddress);
+   * const txHash = await authorizeRequester(requesterAddress);
    * console.log('tx:', txHash);
    * ```
    */
   authorizeRequester(requester: Addressish): Promise<TxHash>;
+
+  /**
+   * **SIGNER REQUIRED**
+   *
+   * revoke the authorization previously granted to a requester to use the voucher
+   *
+   * example:
+   * ```js
+   * const txHash = await revokeRequesterAuthorization(requesterAddress);
+   * console.log('tx:', txHash);
+   * ```
+   */
+  revokeRequesterAuthorization(requester: Addressish): Promise<TxHash>;
+
   /**
    * Create an IExecVoucherModule instance using an IExecConfig instance
    */

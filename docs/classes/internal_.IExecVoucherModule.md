@@ -26,6 +26,7 @@ module exposing voucher methods
 
 - [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
 - [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
+- [revokeRequesterAuthorization](internal_.IExecVoucherModule.md#revokerequesterauthorization)
 - [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
 
 ## Constructors
@@ -75,7 +76,7 @@ authorize a requester to use the voucher
 
 example:
 ```js
-const txHash = await authorizeRequester(ethAddress);
+const txHash = await authorizeRequester(requesterAddress);
 console.log('tx:', txHash);
 ```
 
@@ -99,7 +100,7 @@ returns the address of the voucher contract for the specified address if the add
 
 example:
 ```js
-const voucherAddress = await getVoucherAddress(ethAddress);
+const voucherAddress = await getVoucherAddress(ownerAddress);
 console.log('voucher contract address:', voucherAddress);
 ```
 
@@ -108,6 +109,32 @@ console.log('voucher contract address:', voucherAddress);
 | Name | Type |
 | :------ | :------ |
 | `owner` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### revokeRequesterAuthorization
+
+▸ **revokeRequesterAuthorization**(`requester`): `Promise`<`string`\>
+
+**SIGNER REQUIRED**
+
+revoke the authorization previously granted to a requester to use the voucher
+
+example:
+```js
+const txHash = await revokeRequesterAuthorization(requesterAddress);
+console.log('tx:', txHash);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `requester` | `string` |
 
 #### Returns
 
