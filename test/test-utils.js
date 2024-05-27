@@ -1,11 +1,21 @@
 import { randomInt } from 'crypto';
 import { exec } from 'child_process';
-import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import {
+  Wallet,
+  JsonRpcProvider,
+  ethers,
+  Contract,
+  JsonRpcSigner,
+} from 'ethers';
 import { IExec } from '../src/lib/index.js';
 import { getSignerFromPrivateKey } from '../src/lib/utils.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from '../src/common/utils/utils.js';
 import { getTestConfig } from './test-config-utils.js';
+import {
+  impersonate,
+  stopImpersonate,
+} from './scripts/prepare-bellecour-fork-for-tests.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -564,4 +574,83 @@ export const createVoucher =
       console.error('Error getting voucher:', error);
       throw error;
     }
+  };
+
+export const authorizeAccount =
+  (chain) => async (voucherAddress, accountAddress) => {
+    const voucherContract = new Contract(
+      voucherAddress,
+      [
+        {
+          inputs: [],
+          name: 'owner',
+          outputs: [
+            {
+              internalType: 'address',
+              name: '',
+              type: 'address',
+            },
+          ],
+          stateMutability: 'view',
+          type: 'function',
+        },
+        {
+          inputs: [
+            {
+              internalType: 'address',
+              name: 'account',
+              type: 'address',
+            },
+          ],
+          name: 'authorizeAccount',
+          outputs: [],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ],
+      chain.provider,
+    );
+    const owner = await voucherContract.owner();
+    await impersonate(owner);
+    const authorizeAccountTxHash = await voucherContract
+      .connect(new JsonRpcSigner(chain.provider, owner))
+      .authorizeAccount(accountAddress, { gasPrice: 0 });
+    await authorizeAccountTxHash.wait();
+    await stopImpersonate(owner);
+    console.log(
+      `account ${accountAddress} added to authorizedAccounts for voucher ${voucherAddress} (tx: ${authorizeAccountTxHash.hash})`,
+    );
+  };
+
+export const addEligibleAsset =
+  (chain) => async (assetAddress, voucherTypeId) => {
+    const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
+      {
+        inputs: [
+          {
+            internalType: 'uint256',
+            name: 'voucherTypeId',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'asset',
+            type: 'address',
+          },
+        ],
+        name: 'addEligibleAsset',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ]);
+
+    const signer = chain.voucherManagerWallet.connect(chain.provider);
+    const tx = await voucherHubContract
+      .connect(signer)
+      .addEligibleAsset(voucherTypeId, assetAddress);
+    await tx.wait();
+    console.log(
+      `asset ${assetAddress} added to eligibleAssets for voucherType ${voucherTypeId} (tx: ${tx.hash})`,
+    );
   };

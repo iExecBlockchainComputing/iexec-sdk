@@ -43,7 +43,7 @@ const setBalance = async (address, weiAmount) => {
   console.log(`${address} wallet balance is now ${formatEther(balance)} RLC`);
 };
 
-const impersonate = async (address) => {
+export const impersonate = async (address) => {
   await fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
@@ -59,7 +59,7 @@ const impersonate = async (address) => {
   console.log(`impersonating ${address}`);
 };
 
-const stopImpersonate = async (address) => {
+export const stopImpersonate = async (address) => {
   await fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
