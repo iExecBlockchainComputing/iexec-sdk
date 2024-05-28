@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Typescript fixes
+- accept `CryptoKey` in `utils.decryptResult(encrypted, key)`
 
 ## [8.7.0] 2024-04-22
 
