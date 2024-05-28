@@ -65,8 +65,8 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 
 | Name | Type |
 | :------ | :------ |
-| `args` | [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+| `args` | [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 

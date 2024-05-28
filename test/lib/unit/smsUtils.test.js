@@ -1,5 +1,5 @@
 // @jest/global comes with jest
-import { getCrypto } from '../../../src/common/sms/crypto';
+import { getCrypto } from '../../../src/common/utils/crypto';
 import { formatEncryptionKey } from '../../../src/common/sms/smsUtils';
 
 describe('formatEncryptionKey', () => {

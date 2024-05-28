@@ -45,8 +45,8 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -72,7 +72,7 @@ current IExecConfig
 
 ### claimName
 
-▸ **claimName**(`label`, `domain?`): `Promise`<{ `registerTxHash?`: `string` ; `registeredName`: `string`  }\>
+▸ **claimName**(`label`, `domain?`): `Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
 register a subdomain (label) on an ENS FIFSRegistrar
 
@@ -98,7 +98,7 @@ console.log('registered:', name);
 
 #### Returns
 
-`Promise`<{ `registerTxHash?`: `string` ; `registeredName`: `string`  }\>
+`Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
 ___
 

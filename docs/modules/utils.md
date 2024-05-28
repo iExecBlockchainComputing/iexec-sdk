@@ -87,7 +87,7 @@ const binary = new Blob([decryptedFileBuffer]);
 | Name | Type |
 | :------ | :------ |
 | `encrypted` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
-| `beneficiaryKey` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
+| `beneficiaryKey` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` \| `CryptoKey` |
 
 #### Returns
 
