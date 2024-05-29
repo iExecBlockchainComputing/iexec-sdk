@@ -1,31 +1,29 @@
-[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / IExecConfigOptions
+[iexec](../README.md) / [Exports](../modules.md) / IExecConfigOptions
 
 # Interface: IExecConfigOptions
-
-[<internal>](../modules/internal_.md).IExecConfigOptions
 
 ## Table of contents
 
 ### Properties
 
-- [bridgeAddress](internal_.IExecConfigOptions.md#bridgeaddress)
-- [bridgedNetworkConf](internal_.IExecConfigOptions.md#bridgednetworkconf)
-- [confirms](internal_.IExecConfigOptions.md#confirms)
-- [defaultTeeFramework](internal_.IExecConfigOptions.md#defaultteeframework)
-- [ensPublicResolverAddress](internal_.IExecConfigOptions.md#enspublicresolveraddress)
-- [ensRegistryAddress](internal_.IExecConfigOptions.md#ensregistryaddress)
-- [enterpriseSwapConf](internal_.IExecConfigOptions.md#enterpriseswapconf)
-- [hubAddress](internal_.IExecConfigOptions.md#hubaddress)
-- [iexecGatewayURL](internal_.IExecConfigOptions.md#iexecgatewayurl)
-- [ipfsGatewayURL](internal_.IExecConfigOptions.md#ipfsgatewayurl)
-- [isNative](internal_.IExecConfigOptions.md#isnative)
-- [pocoSubgraphURL](internal_.IExecConfigOptions.md#pocosubgraphurl)
-- [providerOptions](internal_.IExecConfigOptions.md#provideroptions)
-- [resultProxyURL](internal_.IExecConfigOptions.md#resultproxyurl)
-- [smsURL](internal_.IExecConfigOptions.md#smsurl)
-- [useGas](internal_.IExecConfigOptions.md#usegas)
-- [voucherHubAddress](internal_.IExecConfigOptions.md#voucherhubaddress)
-- [voucherSubgraphURL](internal_.IExecConfigOptions.md#vouchersubgraphurl)
+- [bridgeAddress](IExecConfigOptions.md#bridgeaddress)
+- [bridgedNetworkConf](IExecConfigOptions.md#bridgednetworkconf)
+- [confirms](IExecConfigOptions.md#confirms)
+- [defaultTeeFramework](IExecConfigOptions.md#defaultteeframework)
+- [ensPublicResolverAddress](IExecConfigOptions.md#enspublicresolveraddress)
+- [ensRegistryAddress](IExecConfigOptions.md#ensregistryaddress)
+- [enterpriseSwapConf](IExecConfigOptions.md#enterpriseswapconf)
+- [hubAddress](IExecConfigOptions.md#hubaddress)
+- [iexecGatewayURL](IExecConfigOptions.md#iexecgatewayurl)
+- [ipfsGatewayURL](IExecConfigOptions.md#ipfsgatewayurl)
+- [isNative](IExecConfigOptions.md#isnative)
+- [pocoSubgraphURL](IExecConfigOptions.md#pocosubgraphurl)
+- [providerOptions](IExecConfigOptions.md#provideroptions)
+- [resultProxyURL](IExecConfigOptions.md#resultproxyurl)
+- [smsURL](IExecConfigOptions.md#smsurl)
+- [useGas](IExecConfigOptions.md#usegas)
+- [voucherHubAddress](IExecConfigOptions.md#voucherhubaddress)
+- [voucherSubgraphURL](IExecConfigOptions.md#vouchersubgraphurl)
 
 ## Properties
 

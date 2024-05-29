@@ -9,6 +9,7 @@
 ### Properties
 
 - [address](internal_.Voucher.md#address)
+- [allowanceAmount](internal_.Voucher.md#allowanceamount)
 - [authorizedAccounts](internal_.Voucher.md#authorizedaccounts)
 - [balance](internal_.Voucher.md#balance)
 - [expirationTimestamp](internal_.Voucher.md#expirationtimestamp)
@@ -16,12 +17,19 @@
 - [sponsoredApps](internal_.Voucher.md#sponsoredapps)
 - [sponsoredDatasets](internal_.Voucher.md#sponsoreddatasets)
 - [sponsoredWorkerpools](internal_.Voucher.md#sponsoredworkerpools)
+- [type](internal_.Voucher.md#type)
 
 ## Properties
 
 ### address
 
 • **address**: `string`
+
+___
+
+### allowanceAmount
+
+• **allowanceAmount**: [`BN`](../classes/utils.BN.md)
 
 ___
 
@@ -33,7 +41,7 @@ ___
 
 ### balance
 
-• **balance**: `string`
+• **balance**: [`BN`](../classes/utils.BN.md)
 
 ___
 
@@ -64,3 +72,9 @@ ___
 ### sponsoredWorkerpools
 
 • **sponsoredWorkerpools**: `string`[]
+
+___
+
+### type
+
+• **type**: [`BN`](../classes/utils.BN.md)

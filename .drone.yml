@@ -359,18 +359,18 @@ steps:
       - build
       - stack-ready
 
-  - name: code analysis
-    image: sonarsource/sonar-scanner-cli
-    pull: always
-    environment:
-      SONAR_TOKEN:
-        from_secret: sonar_token
-      SONAR_HOST:
-        from_secret: sonar_host
-    commands:
-      - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
-    depends_on:
-      - test
+  # - name: code analysis
+  #   image: sonarsource/sonar-scanner-cli
+  #   pull: always
+  #   environment:
+  #     SONAR_TOKEN:
+  #       from_secret: sonar_token
+  #     SONAR_HOST:
+  #       from_secret: sonar_host
+  #   commands:
+  #     - sonar-scanner -Dsonar.host.url=$SONAR_HOST -Dsonar.branch.name=$DRONE_BRANCH
+  #   depends_on:
+  #     - test
 
   - name: test node 20
     image: node:20

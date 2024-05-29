@@ -1,14 +1,12 @@
-[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / Eip1193Provider
+[iexec](../README.md) / [Exports](../modules.md) / Eip1193Provider
 
 # Interface: Eip1193Provider
-
-[<internal>](../modules/internal_.md).Eip1193Provider
 
 ## Table of contents
 
 ### Methods
 
-- [request](internal_.Eip1193Provider.md#request)
+- [request](Eip1193Provider.md#request)
 
 ## Methods
 

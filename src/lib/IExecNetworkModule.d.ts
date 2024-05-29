@@ -1,4 +1,5 @@
 export type * from '../common/types.js';
+export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';

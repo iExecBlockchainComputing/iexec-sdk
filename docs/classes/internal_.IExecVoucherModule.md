@@ -26,8 +26,8 @@ module exposing voucher methods
 
 - [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
 - [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
-- [showUserVoucher](internal_.IExecVoucherModule.md#showuservoucher)
 - [revokeRequesterAuthorization](internal_.IExecVoucherModule.md#revokerequesterauthorization)
+- [showUserVoucher](internal_.IExecVoucherModule.md#showuservoucher)
 - [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
 
 ## Constructors
@@ -42,8 +42,8 @@ Create an IExecModule instance using an IExecConfig like
 
 | Name | Type |
 | :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/internal_.IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/internal_.IExecConfigOptions.md) |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -117,6 +117,22 @@ console.log('voucher contract address:', voucherAddress);
 
 ___
 
+### revokeRequesterAuthorization
+
+▸ **revokeRequesterAuthorization**(`requester`): `Promise`<`string`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `requester` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
 ### showUserVoucher
 
 ▸ **showUserVoucher**(`owner`): `Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
@@ -126,23 +142,8 @@ returns the user voucher information
 example:
 ```js
 const userVoucher = await showUserVoucher(userAddress);
-console.log('owner:', userVoucher.owner);
 console.log('address:', userVoucher.address);
 console.log('balance:', userVoucher.balance);
-```
-
-### revokeRequesterAuthorization
-
-▸ **revokeRequesterAuthorization**(`requester`): `Promise`<`string`\>
-
-**SIGNER REQUIRED**
-
-revoke the authorization previously granted to a requester to use the voucher
-
-example:
-```js
-const txHash = await revokeRequesterAuthorization(requesterAddress);
-console.log('tx:', txHash);
 ```
 
 #### Parameters
@@ -154,12 +155,6 @@ console.log('tx:', txHash);
 #### Returns
 
 `Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
-
-| `requester` | `string` |
-
-#### Returns
-
-`Promise`<`string`\>
 
 ___
 
