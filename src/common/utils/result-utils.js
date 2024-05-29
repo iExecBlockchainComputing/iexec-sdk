@@ -3,10 +3,20 @@ import { Buffer } from 'buffer';
 import JSZip from 'jszip';
 import forgeAes from '../libs/forge-aes.js';
 import forgePki from '../libs/forge-pki.js';
+import { getCrypto, privateAsPem } from './crypto.js';
 
 const debug = Debug('iexec:result-utils');
 
 export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
+  const { CryptoKey } = await getCrypto();
+
+  let pemPrivateKey;
+  if (beneficiaryKey instanceof CryptoKey) {
+    pemPrivateKey = await privateAsPem(beneficiaryKey);
+  } else {
+    pemPrivateKey = Buffer.from(beneficiaryKey).toString();
+  }
+
   const ENC_KEY_FILE_NAME = 'aes-key.rsa';
   const ENC_RESULTS_FILE_NAME = 'iexec_out.zip.aes';
   const ENC_KEY_MAX_SIZE = 1000;
@@ -86,9 +96,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   debug('Decrypting results key');
   let aesKeyBuffer;
   try {
-    const key = forgePki.pki.privateKeyFromPem(
-      Buffer.from(beneficiaryKey).toString(),
-    );
+    const key = forgePki.pki.privateKeyFromPem(pemPrivateKey);
     const base64EncodedResultsKey = key.decrypt(encryptedAesKeyBuffer);
     aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
   } catch (error) {
