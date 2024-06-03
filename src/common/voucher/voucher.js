@@ -5,11 +5,10 @@ import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
 import { getGraphQLClient } from '../utils/graphql-utils.js';
 import { checkAllowance } from '../account/allowance.js';
-import { getVoucherAuthorizedAccounts } from './subgraph/authorizedAccounts.js';
-import { getVoucherSponsoredAssets } from './subgraph/sponsoredAssets.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
+import { getVoucherInfo } from './subgraph/voucherInfo.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -45,58 +44,65 @@ export const showUserVoucher = async (
   voucherHubAddress = throwIfMissing(),
   owner = throwIfMissing(),
 ) => {
-  const vOwner = await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(owner);
-  const voucherAddress = await fetchVoucherAddress(
-    contracts,
-    voucherHubAddress,
-    vOwner,
-  );
+  try {
+    const userAddress = await getAddress(contracts);
+    const validatedOwner = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('owner')
+      .validate(owner);
 
-  if (!voucherAddress) {
-    throw new Error('No voucher found for this user');
+    const voucherAddress = await fetchVoucherAddress(
+      contracts,
+      voucherHubAddress,
+      validatedOwner,
+    );
+
+    if (!voucherAddress) {
+      throw Error(`No Voucher found for address ${userAddress}`);
+    }
+
+    const voucherContract = await fetchVoucherContract(
+      contracts,
+      voucherHubAddress,
+      userAddress,
+    );
+
+    const fetchType = voucherContract.getType();
+    const fetchBalance = voucherContract.getBalance();
+    const fetchExpirationTimestamp = voucherContract.getExpiration();
+    const fetchAllowanceAmount = checkAllowance(
+      contracts,
+      validatedOwner,
+      voucherAddress,
+    );
+
+    const graphQLClient = getGraphQLClient(voucherSubgraphURL);
+    const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
+
+    const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
+      await Promise.all([
+        fetchType,
+        fetchBalance,
+        fetchExpirationTimestamp,
+        fetchAllowanceAmount,
+        fetchVoucherInfo,
+      ]);
+
+    return {
+      owner,
+      address: voucherAddress,
+      type,
+      balance,
+      allowanceAmount,
+      expirationTimestamp,
+      ...voucherInfo,
+    };
+  } catch (error) {
+    debug('showUserVoucher()', error);
+    throw error;
   }
-  const voucherContract = getVoucherContract(contracts, voucherAddress);
-
-  const type = await voucherContract.getType();
-  const balance = await voucherContract.getBalance();
-  const expirationTimestamp = await voucherContract.getExpiration();
-  const allowanceAmount = await checkAllowance(
-    contracts,
-    vOwner,
-    voucherAddress,
-  );
-  const graphQLClient = getGraphQLClient(voucherSubgraphURL);
-
-  const authorizedAccounts = await getVoucherAuthorizedAccounts(
-    graphQLClient,
-    voucherAddress,
-  );
-  const sponsoredAssets = await getVoucherSponsoredAssets(
-    graphQLClient,
-    voucherAddress,
-  );
-  const sponsoredApps = sponsoredAssets.filter((asset) => asset.type === 'app');
-  const sponsoredDatasets = sponsoredAssets.filter(
-    (asset) => asset.type === 'dataset',
-  );
-  const sponsoredWorkerpools = sponsoredAssets.filter(
-    (asset) => asset.type === 'workerpool',
-  );
-
-  return {
-    owner,
-    address: voucherAddress,
-    type,
-    balance,
-    expirationTimestamp,
-    sponsoredApps,
-    sponsoredDatasets,
-    sponsoredWorkerpools,
-    allowanceAmount,
-    authorizedAccounts,
-  };
 };
 
 export const authorizeRequester = async (

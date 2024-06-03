@@ -4,7 +4,7 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import { Address, Addressish, BN, TxHash } from '../common/types.js';
 
-interface Voucher {
+interface VoucherInfo {
   owner: Address;
   address: Address;
   type: BN;
@@ -14,10 +14,7 @@ interface Voucher {
   sponsoredDatasets: Address[];
   sponsoredWorkerpools: Address[];
   allowanceAmount: BN;
-  authorizedAccounts: AuthorizedAccount[];
-}
-interface AuthorizedAccount {
-  id: Address;
+  authorizedAccounts: Address[];
 }
 
 /**
@@ -58,7 +55,7 @@ export default class IExecVoucherModule extends IExecModule {
    * console.log('balance:', userVoucher.balance);
    * ```
    */
-  showUserVoucher(owner: Addressish): Promise<Voucher>;
+  showUserVoucher(owner: Addressish): Promise<VoucherInfo>;
 
   /* **SIGNER REQUIRED**
    *
