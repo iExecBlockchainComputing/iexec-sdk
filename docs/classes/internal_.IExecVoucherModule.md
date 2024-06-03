@@ -135,7 +135,7 @@ ___
 
 ### showUserVoucher
 
-▸ **showUserVoucher**(`owner`): `Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
+▸ **showUserVoucher**(`owner`): `Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
 returns the user voucher information
 
@@ -154,7 +154,7 @@ console.log('balance:', userVoucher.balance);
 
 #### Returns
 
-`Promise`<[`Voucher`](../interfaces/internal_.Voucher.md)\>
+`Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
 ___
 
