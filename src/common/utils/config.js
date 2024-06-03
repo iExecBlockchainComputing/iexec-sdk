@@ -91,7 +91,7 @@ const pocoSubgraphMap = {
 
 const voucherSubgraphMap = {
   standard: {
-    134: 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher/graphql', // TODO change with deployment url
+    134: 'https://todo.iex.ec', // TODO change with deployment url
   },
   enterprise: {},
 };

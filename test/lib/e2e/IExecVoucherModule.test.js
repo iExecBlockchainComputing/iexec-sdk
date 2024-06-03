@@ -1,14 +1,19 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { beforeAll, describe, test, expect } from '@jest/globals';
-import { getTestConfig } from '../lib-test-utils.js';
+import {
+  deployRandomApp,
+  deployRandomDataset,
+  deployRandomWorkerpool,
+  getTestConfig,
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
-  addEligibleAsset,
-  authorizeAccount,
+  addVoucherEligibleAsset,
   createVoucher,
   createVoucherType,
   getRandomAddress,
+  getRandomWallet,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 
@@ -79,55 +84,58 @@ describe('voucher', () => {
 
     test('returns voucher details when user has one', async () => {
       // initial setup
-      const owner = getRandomAddress();
+      const voucherOwnerWallet = getRandomWallet();
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: voucherOwnerWallet.privateKey,
+      });
       const voucherValue = 1000;
       const voucherAddress = await createVoucher(iexecTestChain)({
-        owner,
+        owner: voucherOwnerWallet.address,
         voucherType,
         value: voucherValue,
       });
 
       // authorize an account for the voucher
       const accountAddress = getRandomAddress();
-      await authorizeAccount(iexecTestChain)(voucherAddress, accountAddress);
+      await iexec.voucher.authorizeRequester(accountAddress);
 
       // add sponsored assets
-      const voucherTypeId = '0';
-      const appAddress = getRandomAddress();
-      const datasetAddress = getRandomAddress();
-      const workerpoolAddress = getRandomAddress();
+      const { address: appAddress } = await deployRandomApp(iexec);
+      const { address: datasetAddress } = await deployRandomDataset(iexec);
+      const { address: workerpoolAddress } =
+        await deployRandomWorkerpool(iexec);
 
-      await addEligibleAsset(iexecTestChain)(appAddress, voucherTypeId, 'app');
-      await addEligibleAsset(iexecTestChain)(
+      await addVoucherEligibleAsset(iexecTestChain)(appAddress, voucherType);
+      await addVoucherEligibleAsset(iexecTestChain)(
         datasetAddress,
-        voucherTypeId,
-        'dataset',
+        voucherType,
       );
-      await addEligibleAsset(iexecTestChain)(
+      await addVoucherEligibleAsset(iexecTestChain)(
         workerpoolAddress,
-        voucherTypeId,
-        'workerpool',
+        voucherType,
       );
 
       // call the function and check the results
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const userVoucher = await iexec.voucher.showUserVoucher(owner);
+      const userVoucher = await iexec.voucher.showUserVoucher(
+        voucherOwnerWallet.address,
+      );
 
-      expect(userVoucher.owner).toBe(owner);
+      expect(userVoucher.owner).toBe(voucherOwnerWallet.address);
       expect(userVoucher.address).toBe(voucherAddress);
       expect(userVoucher.balance).toEqual(BigInt(voucherValue));
       expect(typeof userVoucher.expirationTimestamp).toBe('bigint');
-      expect(userVoucher.authorizedAccounts).toContainEqual({
-        id: accountAddress.toLocaleLowerCase(),
-      });
-      // TODO : update test when we have EligibleAsset with type = 'app'| 'dataset' | 'workerpool'
-      // expect(userVoucher.sponsoredApps).toContainEqual({ id: appAddress });
-      // expect(userVoucher.sponsoredDatasets).toContainEqual({
-      //   id: datasetAddress,
-      // });
-      // expect(userVoucher.sponsoredWorkerpools).toContainEqual({
-      //   id: workerpoolAddress,
-      // });
+      expect(userVoucher.authorizedAccounts).toContainEqual(
+        accountAddress.toLocaleLowerCase(),
+      );
+      expect(userVoucher.sponsoredApps).toEqual([
+        appAddress.toLocaleLowerCase(),
+      ]);
+      expect(userVoucher.sponsoredDatasets).toEqual([
+        datasetAddress.toLocaleLowerCase(),
+      ]);
+      expect(userVoucher.sponsoredWorkerpools).toEqual([
+        workerpoolAddress.toLocaleLowerCase(),
+      ]);
     });
   });
 
