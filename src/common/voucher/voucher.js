@@ -45,42 +45,35 @@ export const showUserVoucher = async (
   owner = throwIfMissing(),
 ) => {
   try {
-    const userAddress = await getAddress(contracts);
-    const validatedOwner = await addressSchema({
+    const vOwner = await addressSchema({
       ethProvider: contracts.provider,
     })
       .required()
       .label('owner')
       .validate(owner);
-
     const voucherAddress = await fetchVoucherAddress(
       contracts,
       voucherHubAddress,
-      validatedOwner,
+      vOwner,
     );
-
     if (!voucherAddress) {
-      throw Error(`No Voucher found for address ${userAddress}`);
+      throw Error(`No Voucher found for address ${vOwner}`);
     }
-
     const voucherContract = await fetchVoucherContract(
       contracts,
       voucherHubAddress,
-      userAddress,
+      vOwner,
     );
-
     const fetchType = voucherContract.getType();
     const fetchBalance = voucherContract.getBalance();
     const fetchExpirationTimestamp = voucherContract.getExpiration();
     const fetchAllowanceAmount = checkAllowance(
       contracts,
-      validatedOwner,
+      vOwner,
       voucherAddress,
     );
-
     const graphQLClient = getGraphQLClient(voucherSubgraphURL);
     const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
-
     const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
       await Promise.all([
         fetchType,
@@ -89,7 +82,6 @@ export const showUserVoucher = async (
         fetchAllowanceAmount,
         fetchVoucherInfo,
       ]);
-
     return {
       owner,
       address: voucherAddress,

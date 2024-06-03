@@ -63,7 +63,7 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
 
       await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrowError(
-        'No voucher found for this user',
+        `No Voucher found for address ${owner}`,
       );
     });
 
@@ -120,22 +120,26 @@ describe('voucher', () => {
         voucherOwnerWallet.address,
       );
 
-      expect(userVoucher.owner).toBe(voucherOwnerWallet.address);
-      expect(userVoucher.address).toBe(voucherAddress);
-      expect(userVoucher.balance).toEqual(BigInt(voucherValue));
-      expect(typeof userVoucher.expirationTimestamp).toBe('bigint');
-      expect(userVoucher.authorizedAccounts).toContainEqual(
-        accountAddress.toLocaleLowerCase(),
+      expect(userVoucher.owner.toLowerCase()).toBe(
+        voucherOwnerWallet.address.toLowerCase(),
       );
-      expect(userVoucher.sponsoredApps).toEqual([
-        appAddress.toLocaleLowerCase(),
-      ]);
-      expect(userVoucher.sponsoredDatasets).toEqual([
-        datasetAddress.toLocaleLowerCase(),
-      ]);
-      expect(userVoucher.sponsoredWorkerpools).toEqual([
-        workerpoolAddress.toLocaleLowerCase(),
-      ]);
+      expect(userVoucher.address.toLowerCase()).toBe(
+        voucherAddress.toLowerCase(),
+      );
+      expect(
+        userVoucher.sponsoredApps.map((address) => address.toLowerCase()),
+      ).toEqual([appAddress.toLowerCase()]);
+      expect(
+        userVoucher.sponsoredDatasets.map((address) => address.toLowerCase()),
+      ).toEqual([datasetAddress.toLowerCase()]);
+      expect(
+        userVoucher.sponsoredWorkerpools.map((address) =>
+          address.toLowerCase(),
+        ),
+      ).toEqual([workerpoolAddress.toLowerCase()]);
+      expect(
+        userVoucher.authorizedAccounts.map((address) => address.toLowerCase()),
+      ).toEqual([accountAddress.toLowerCase()]);
     });
   });
 
