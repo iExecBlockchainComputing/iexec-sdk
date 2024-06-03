@@ -291,7 +291,7 @@ steps:
       - stack-ready
 
   - name: code analysis
-    image: sonarsource/sonar-scanner-cli
+    image: sonarsource/sonar-scanner-cli:5
     pull: always
     environment:
       SONAR_TOKEN:
