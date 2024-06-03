@@ -291,6 +291,9 @@ steps:
       - stack-ready
 
   - name: code analysis
+    # issue with sonarsource/sonar-scanner-cli:latest
+    # https://community.sonarsource.com/t/error-running-sonarsource-sonar-scanner-cli-latest/116539
+    # 5.0.1 is working
     image: sonarsource/sonar-scanner-cli:5
     pull: always
     environment:
