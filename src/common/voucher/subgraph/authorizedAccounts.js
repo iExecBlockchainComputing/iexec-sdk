@@ -1,5 +1,8 @@
+import Debug from 'debug';
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../utils/validator';
+
+const debug = Debug('iexec:voucher:accounts');
 
 export const getVoucherAuthorizedAccounts = async (
   graphQLClient = throwIfMissing(),
@@ -22,10 +25,7 @@ export const getVoucherAuthorizedAccounts = async (
     });
     return voucher.authorizedAccounts;
   } catch (error) {
-    console.error(
-      'Error fetching authorized accounts 0x0bdd3f18f60e95e489ad638df8db746fcc3c71e3',
-      error,
-    );
+    debug('getVoucherAuthorizedAccounts()', error);
     throw error;
   }
 };
