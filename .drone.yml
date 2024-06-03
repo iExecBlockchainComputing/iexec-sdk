@@ -447,6 +447,7 @@ trigger:
   branch:
     - next
     - new
+    - voucher
 
 steps:
   - name: install
@@ -457,15 +458,23 @@ steps:
       - npm -v
       - npm ci
 
-  - name: build
-    image: node:18
-    commands:
-      - npm run build
-
   - name: set version nightly
     image: node:18
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+
+  - name: set voucher version suffix
+    image: node:18
+    commands:
+      - eval npm pkg set version="$(npm pkg get version)-voucher"
+    when:
+      branch:
+        - voucher
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
 
   - name: npm publish
     image: plugins/npm
