@@ -3,6 +3,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
+  "include": ["src"],
   "typedocOptions": {
     "entryPoints": ["src/lib/index.d.ts"],
     "out": "docs",
