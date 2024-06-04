@@ -1,12 +1,20 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { beforeAll, describe, test, expect } from '@jest/globals';
-import { getTestConfig } from '../lib-test-utils.js';
+import { BN } from 'bn.js';
+import {
+  deployRandomApp,
+  deployRandomDataset,
+  deployRandomWorkerpool,
+  getTestConfig,
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
+  addVoucherEligibleAsset,
   createVoucher,
   createVoucherType,
   getRandomAddress,
+  getRandomWallet,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 
@@ -16,7 +24,7 @@ const unknownTestChain = TEST_CHAINS['custom-token-chain'];
 describe('voucher', () => {
   let voucherType;
   beforeAll(async () => {
-    voucherType = await createVoucherType(iexecTestChain)();
+    voucherType = await createVoucherType(iexecTestChain)({});
   });
 
   describe('getVoucherAddress()', () => {
@@ -47,6 +55,105 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       const res = await iexec.voucher.getVoucherAddress(owner);
       expect(res).toBe(voucherAddress);
+    });
+  });
+
+  describe('showUserVoucher()', () => {
+    test('throw error if user has no voucher', async () => {
+      const owner = getRandomAddress();
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+
+      await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrowError(
+        `No Voucher found for address ${owner}`,
+      );
+    });
+
+    test('throw error if owner address is not provided', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(iexec.voucher.showUserVoucher()).rejects.toThrowError(
+        'Missing parameter',
+      );
+    });
+
+    test('throw error if user address is not a valid ethereum address', async () => {
+      const owner = 'invalid_address';
+      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrowError(
+        `${owner} is not a valid ethereum address`,
+      );
+    });
+
+    test('returns voucher details when user has one', async () => {
+      // initial setup
+      const voucherOwnerWallet = getRandomWallet();
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: voucherOwnerWallet.privateKey,
+      });
+      const voucherValue = 1000;
+      const voucherAddress = await createVoucher(iexecTestChain)({
+        owner: voucherOwnerWallet.address,
+        voucherType,
+        value: voucherValue,
+      });
+
+      // authorize an account for the voucher
+      const accountAddress = getRandomAddress();
+      await iexec.voucher.authorizeRequester(accountAddress);
+      const accountAddress1 = getRandomAddress();
+      await iexec.voucher.authorizeRequester(accountAddress1);
+
+      // add sponsored assets
+      const { address: appAddress } = await deployRandomApp(iexec);
+      const { address: appAddress1 } = await deployRandomApp(iexec);
+      const { address: datasetAddress } = await deployRandomDataset(iexec);
+      const { address: datasetAddress1 } = await deployRandomDataset(iexec);
+      const { address: workerpoolAddress } =
+        await deployRandomWorkerpool(iexec);
+      const { address: workerpoolAddress1 } =
+        await deployRandomWorkerpool(iexec);
+
+      await addVoucherEligibleAsset(iexecTestChain)(appAddress, voucherType);
+      await addVoucherEligibleAsset(iexecTestChain)(appAddress1, voucherType);
+      await addVoucherEligibleAsset(iexecTestChain)(
+        datasetAddress,
+        voucherType,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        datasetAddress1,
+        voucherType,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        workerpoolAddress,
+        voucherType,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        workerpoolAddress1,
+        voucherType,
+      );
+
+      // call the function and check the results
+      const userVoucher = await iexec.voucher.showUserVoucher(
+        voucherOwnerWallet.address,
+      );
+
+      expect(userVoucher.type).toBeInstanceOf(BN);
+      expect(userVoucher.expirationTimestamp).toBeInstanceOf(BN);
+      expect(userVoucher.balance).toBeInstanceOf(BN);
+      expect(userVoucher.allowanceAmount).toBeInstanceOf(BN);
+      expect(userVoucher.owner).toBe(voucherOwnerWallet.address);
+      expect(userVoucher.address).toBe(voucherAddress);
+      expect([...userVoucher.sponsoredApps].sort()).toEqual(
+        [appAddress, appAddress1].sort(),
+      );
+      expect([...userVoucher.sponsoredDatasets].sort()).toEqual(
+        [datasetAddress, datasetAddress1].sort(),
+      );
+      expect([...userVoucher.sponsoredWorkerpools].sort()).toEqual(
+        [workerpoolAddress, workerpoolAddress1].sort(),
+      );
+      expect([...userVoucher.authorizedAccounts].sort()).toEqual(
+        [accountAddress, accountAddress1].sort(),
+      );
     });
   });
 

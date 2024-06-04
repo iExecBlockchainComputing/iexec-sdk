@@ -3,9 +3,12 @@ import { Contract } from 'ethers';
 import { abi } from './abi/Voucher.js';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
-import { checkSigner } from '../utils/utils.js';
+import { getGraphQLClient } from '../utils/graphql-utils.js';
+import { checkAllowance } from '../account/allowance.js';
+import { bigIntToBn, checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
+import { getVoucherInfo } from './subgraph/voucherInfo.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -31,6 +34,65 @@ export const fetchVoucherContract = async (
     return undefined;
   } catch (error) {
     debug('fetchVoucherContract()', error);
+    throw error;
+  }
+};
+
+export const showUserVoucher = async (
+  contracts = throwIfMissing(),
+  voucherSubgraphURL = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  owner = throwIfMissing(),
+) => {
+  try {
+    const vOwner = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('owner')
+      .validate(owner);
+    const voucherAddress = await fetchVoucherAddress(
+      contracts,
+      voucherHubAddress,
+      vOwner,
+    );
+    if (!voucherAddress) {
+      throw Error(`No Voucher found for address ${vOwner}`);
+    }
+    const voucherContract = await fetchVoucherContract(
+      contracts,
+      voucherHubAddress,
+      vOwner,
+    );
+    const fetchType = voucherContract.getType();
+    const fetchBalance = voucherContract.getBalance();
+    const fetchExpirationTimestamp = voucherContract.getExpiration();
+    const fetchAllowanceAmount = checkAllowance(
+      contracts,
+      vOwner,
+      voucherAddress,
+    );
+    const graphQLClient = getGraphQLClient(voucherSubgraphURL);
+    const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
+    const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
+      await Promise.all([
+        fetchType,
+        fetchBalance,
+        fetchExpirationTimestamp,
+        fetchAllowanceAmount,
+        fetchVoucherInfo,
+      ]);
+    return {
+      owner,
+      address: voucherAddress,
+      type: bigIntToBn(type),
+      balance: bigIntToBn(balance),
+      allowanceAmount: bigIntToBn(allowanceAmount),
+      expirationTimestamp: bigIntToBn(expirationTimestamp),
+      ...voucherInfo,
+    };
+  } catch (error) {
+    debug('showUserVoucher()', error);
     throw error;
   }
 };

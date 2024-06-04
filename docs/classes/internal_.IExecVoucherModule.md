@@ -27,6 +27,7 @@ module exposing voucher methods
 - [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
 - [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
 - [revokeRequesterAuthorization](internal_.IExecVoucherModule.md#revokerequesterauthorization)
+- [showUserVoucher](internal_.IExecVoucherModule.md#showuservoucher)
 - [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
 
 ## Constructors
@@ -120,16 +121,6 @@ ___
 
 ▸ **revokeRequesterAuthorization**(`requester`): `Promise`<`string`\>
 
-**SIGNER REQUIRED**
-
-revoke the authorization previously granted to a requester to use the voucher
-
-example:
-```js
-const txHash = await revokeRequesterAuthorization(requesterAddress);
-console.log('tx:', txHash);
-```
-
 #### Parameters
 
 | Name | Type |
@@ -139,6 +130,31 @@ console.log('tx:', txHash);
 #### Returns
 
 `Promise`<`string`\>
+
+___
+
+### showUserVoucher
+
+▸ **showUserVoucher**(`owner`): `Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
+
+returns the user voucher information
+
+example:
+```js
+const userVoucher = await showUserVoucher(userAddress);
+console.log('address:', userVoucher.address);
+console.log('balance:', userVoucher.balance);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `owner` | `string` |
+
+#### Returns
+
+`Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
 ___
 
