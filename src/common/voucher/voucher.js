@@ -5,7 +5,7 @@ import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
 import { getGraphQLClient } from '../utils/graphql-utils.js';
 import { checkAllowance } from '../account/allowance.js';
-import { checkSigner } from '../utils/utils.js';
+import { bigIntToBn, checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
 import { getVoucherInfo } from './subgraph/voucherInfo.js';
@@ -85,10 +85,10 @@ export const showUserVoucher = async (
     return {
       owner,
       address: voucherAddress,
-      type,
-      balance,
-      allowanceAmount,
-      expirationTimestamp,
+      type: bigIntToBn(type),
+      balance: bigIntToBn(balance),
+      allowanceAmount: bigIntToBn(allowanceAmount),
+      expirationTimestamp: bigIntToBn(expirationTimestamp),
       ...voucherInfo,
     };
   } catch (error) {

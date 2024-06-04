@@ -1,6 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { beforeAll, describe, test, expect } from '@jest/globals';
+import { BN } from 'bn.js';
 import {
   deployRandomApp,
   deployRandomDataset,
@@ -82,7 +83,7 @@ describe('voucher', () => {
       );
     });
 
-    test('returns voucher details when user has one', async () => {
+    test.only('returns voucher details when user has one', async () => {
       // initial setup
       const voucherOwnerWallet = getRandomWallet();
       const { iexec } = getTestConfig(iexecTestChain)({
@@ -120,6 +121,10 @@ describe('voucher', () => {
         voucherOwnerWallet.address,
       );
 
+      expect(userVoucher.type).toBeInstanceOf(BN);
+      expect(userVoucher.expirationTimestamp).toBeInstanceOf(BN);
+      expect(userVoucher.balance).toBeInstanceOf(BN);
+      expect(userVoucher.allowanceAmount).toBeInstanceOf(BN);
       expect(userVoucher.owner.toLowerCase()).toBe(
         voucherOwnerWallet.address.toLowerCase(),
       );
