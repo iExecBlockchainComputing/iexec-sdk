@@ -87,7 +87,7 @@ export const TEST_CHAINS = {
       '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
     ),
     voucherSubgraphURL: DRONE
-      ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+      ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
       : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
     debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
     debugWorkerpoolOwnerWallet: new Wallet(
