@@ -83,7 +83,7 @@ describe('voucher', () => {
       );
     });
 
-    test.only('returns voucher details when user has one', async () => {
+    test('returns voucher details when user has one', async () => {
       // initial setup
       const voucherOwnerWallet = getRandomWallet();
       const { iexec } = getTestConfig(iexecTestChain)({
@@ -99,20 +99,35 @@ describe('voucher', () => {
       // authorize an account for the voucher
       const accountAddress = getRandomAddress();
       await iexec.voucher.authorizeRequester(accountAddress);
+      const accountAddress1 = getRandomAddress();
+      await iexec.voucher.authorizeRequester(accountAddress1);
 
       // add sponsored assets
       const { address: appAddress } = await deployRandomApp(iexec);
+      const { address: appAddress1 } = await deployRandomApp(iexec);
       const { address: datasetAddress } = await deployRandomDataset(iexec);
+      const { address: datasetAddress1 } = await deployRandomDataset(iexec);
       const { address: workerpoolAddress } =
+        await deployRandomWorkerpool(iexec);
+      const { address: workerpoolAddress1 } =
         await deployRandomWorkerpool(iexec);
 
       await addVoucherEligibleAsset(iexecTestChain)(appAddress, voucherType);
+      await addVoucherEligibleAsset(iexecTestChain)(appAddress1, voucherType);
       await addVoucherEligibleAsset(iexecTestChain)(
         datasetAddress,
         voucherType,
       );
       await addVoucherEligibleAsset(iexecTestChain)(
+        datasetAddress1,
+        voucherType,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
         workerpoolAddress,
+        voucherType,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        workerpoolAddress1,
         voucherType,
       );
 
@@ -125,26 +140,20 @@ describe('voucher', () => {
       expect(userVoucher.expirationTimestamp).toBeInstanceOf(BN);
       expect(userVoucher.balance).toBeInstanceOf(BN);
       expect(userVoucher.allowanceAmount).toBeInstanceOf(BN);
-      expect(userVoucher.owner.toLowerCase()).toBe(
-        voucherOwnerWallet.address.toLowerCase(),
+      expect(userVoucher.owner).toBe(voucherOwnerWallet.address);
+      expect(userVoucher.address).toBe(voucherAddress);
+      expect([...userVoucher.sponsoredApps].sort()).toEqual(
+        [appAddress, appAddress1].sort(),
       );
-      expect(userVoucher.address.toLowerCase()).toBe(
-        voucherAddress.toLowerCase(),
+      expect([...userVoucher.sponsoredDatasets].sort()).toEqual(
+        [datasetAddress, datasetAddress1].sort(),
       );
-      expect(
-        userVoucher.sponsoredApps.map((address) => address.toLowerCase()),
-      ).toEqual([appAddress.toLowerCase()]);
-      expect(
-        userVoucher.sponsoredDatasets.map((address) => address.toLowerCase()),
-      ).toEqual([datasetAddress.toLowerCase()]);
-      expect(
-        userVoucher.sponsoredWorkerpools.map((address) =>
-          address.toLowerCase(),
-        ),
-      ).toEqual([workerpoolAddress.toLowerCase()]);
-      expect(
-        userVoucher.authorizedAccounts.map((address) => address.toLowerCase()),
-      ).toEqual([accountAddress.toLowerCase()]);
+      expect([...userVoucher.sponsoredWorkerpools].sort()).toEqual(
+        [workerpoolAddress, workerpoolAddress1].sort(),
+      );
+      expect([...userVoucher.authorizedAccounts].sort()).toEqual(
+        [accountAddress, accountAddress1].sort(),
+      );
     });
   });
 

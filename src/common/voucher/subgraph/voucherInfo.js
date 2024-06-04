@@ -1,7 +1,7 @@
 import Debug from 'debug';
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../utils/validator.js';
-import { getAddress } from 'ethers';
+import { checksummedAddress } from '../../utils/utils.js';
 
 const debug = Debug('iexec:voucher:info');
 
@@ -39,7 +39,7 @@ export const getVoucherInfo = async (
     const voucherInfo = response.voucher;
 
     const mapIds = (items) =>
-      items?.map((item) => getAddress(item.id.toLowerCase())) || [];
+      items?.map((item) => checksummedAddress(item.id.toLowerCase())) || [];
 
     const sponsoredApps = mapIds(voucherInfo?.voucherType?.sponsoredApps);
     const sponsoredDatasets = mapIds(
