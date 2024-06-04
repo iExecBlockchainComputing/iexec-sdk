@@ -344,7 +344,7 @@ export const adminCreateCategory =
 
 export const createVoucherType =
   (chain) =>
-  async ({ description = 'test', duration = 1000 } = {}, tryCount = 1) => {
+  async ({ description = 'test', duration = 1000 } = {}) => {
     const VOUCHER_HUB_ABI = [
       {
         inputs: [
@@ -396,31 +396,34 @@ export const createVoucherType =
       chain.provider,
     );
     const signer = chain.voucherManagerWallet.connect(chain.provider);
-    try {
-      const createVoucherTypeTxHash = await voucherHubContract
-        .connect(signer)
-        .createVoucherType(description, duration);
-      const txReceipt = await createVoucherTypeTxHash.wait();
-      const { id } = getEventFromLogs('VoucherTypeCreated', txReceipt.logs, {
-        strict: true,
-      }).args;
-      return id;
-    } catch (error) {
-      console.warn(
-        `Create voucher type: error (try count ${tryCount}) - ${error}`,
-      );
-      if (tryCount < 3) {
-        await sleep(3000 * tryCount);
-        return createVoucherType(chain)(
-          { description, duration },
-          tryCount + 1,
+
+    const retryableCreateVoucherType = async (tryCount = 1) => {
+      let id;
+      try {
+        const createVoucherTypeTxHash = await voucherHubContract
+          .connect(signer)
+          .createVoucherType(description, duration);
+        const txReceipt = await createVoucherTypeTxHash.wait();
+        id = getEventFromLogs('VoucherTypeCreated', txReceipt.logs, {
+          strict: true,
+        }).args.id;
+      } catch (error) {
+        console.warn(
+          `Error creating voucher type (try count ${tryCount}):`,
+          error,
         );
-      } else {
-        throw new Error(
-          `Failed to create voucher type (tried ${tryCount} times)`,
-        );
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          id = await retryableCreateVoucherType(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to create voucher after ${tryCount} attempts`,
+          );
+        }
       }
-    }
+      return id;
+    };
+    return retryableCreateVoucherType(); // return voucherType id (bigint)
   };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
@@ -440,7 +443,21 @@ const createAndPublishWorkerpoolOrder = async (
     await iexec.wallet.getAddress(),
     volume * workerpoolprice,
   );
-  await iexec.account.deposit(volume * workerpoolprice);
+
+  const retryableDeposit = async (tryCount = 1) => {
+    try {
+      await iexec.account.deposit(volume * workerpoolprice);
+    } catch (error) {
+      console.warn(`Error sending deposit (try count ${tryCount}):`, error);
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableDeposit(tryCount + 1);
+      } else {
+        throw new Error(`Failed to deposit after ${tryCount} attempts`);
+      }
+    }
+  };
+  await retryableDeposit();
 
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
     workerpool,
@@ -458,7 +475,7 @@ const createAndPublishWorkerpoolOrder = async (
 
 export const createVoucher =
   (chain) =>
-  async ({ owner, voucherType, value }, tryCount = 1) => {
+  async ({ owner, voucherType, value }) => {
     const VOUCHER_HUB_ABI = [
       {
         inputs: [
@@ -523,12 +540,28 @@ export const createVoucher =
     await setNRlcBalance(chain)(await iexec.wallet.getAddress(), value);
 
     const contractClient = await iexec.config.resolveContractsClient();
-    const iexecContract = await contractClient.getIExecContract();
+    const iexecContract = contractClient.getIExecContract();
 
-    await iexecContract.depositFor(chain.voucherHubAddress, {
-      value: BigInt(value) * 10n ** 9n,
-      gasPrice: 0,
-    });
+    const retryableDepositFor = async (tryCount = 1) => {
+      try {
+        const tx = await iexecContract.depositFor(chain.voucherHubAddress, {
+          value: BigInt(value) * 10n ** 9n,
+          gasPrice: 0,
+        });
+        await tx.wait();
+      } catch (e) {
+        console.warn(`Error sending depositFor (try count ${tryCount}):`, e);
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          await retryableDepositFor(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to depositFor voucher after ${tryCount} attempts`,
+          );
+        }
+      }
+    };
+    await retryableDepositFor();
 
     const voucherHubContract = new Contract(
       chain.voucherHubAddress,
@@ -538,23 +571,25 @@ export const createVoucher =
 
     const signer = chain.voucherManagerWallet.connect(chain.provider);
 
-    try {
-      const createVoucherTxHash = await voucherHubContract
-        .connect(signer)
-        .createVoucher(owner, voucherType, value);
-      await createVoucherTxHash.wait();
-    } catch (error) {
-      console.warn(`Error creating voucher (try count ${tryCount}):`, error);
-      if (tryCount < 3) {
-        await sleep(3000 * tryCount);
-        return await createVoucher(chain)(
-          { owner, voucherType, value },
-          tryCount + 1,
-        );
-      } else {
-        throw new Error(`Failed to create voucher after ${tryCount} attempts`);
+    const retryableCreateVoucher = async (tryCount = 1) => {
+      try {
+        const createVoucherTx = await voucherHubContract
+          .connect(signer)
+          .createVoucher(owner, voucherType, value);
+        await createVoucherTx.wait();
+      } catch (error) {
+        console.warn(`Error creating voucher (try count ${tryCount}):`, error);
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          await retryableCreateVoucher(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to create voucher after ${tryCount} attempts`,
+          );
+        }
       }
-    }
+    };
+    await retryableCreateVoucher();
 
     try {
       await createAndPublishWorkerpoolOrder(
@@ -583,8 +618,7 @@ export const createVoucher =
   };
 
 export const addVoucherEligibleAsset =
-  (chain) =>
-  async (assetAddress, voucherTypeId, tryCount = 1) => {
+  (chain) => async (assetAddress, voucherTypeId) => {
     const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
       {
         inputs: [
@@ -607,26 +641,27 @@ export const addVoucherEligibleAsset =
     ]);
 
     const signer = chain.voucherManagerWallet.connect(chain.provider);
-    try {
-      const tx = await voucherHubContract
-        .connect(signer)
-        .addEligibleAsset(voucherTypeId, assetAddress);
-      await tx.wait();
-    } catch (error) {
-      console.warn(
-        `Add voucher eligible asset: error (try count ${tryCount}) - ${error}`,
-      );
-      if (tryCount < 3) {
-        await sleep(3000 * tryCount);
-        return await addVoucherEligibleAsset(chain)(
-          assetAddress,
-          voucherTypeId,
-          tryCount + 1,
+
+    const retryableAddEligibleAsset = async (tryCount = 1) => {
+      try {
+        const tx = await voucherHubContract
+          .connect(signer)
+          .addEligibleAsset(voucherTypeId, assetAddress);
+        await tx.wait();
+      } catch (error) {
+        console.warn(
+          `Error adding eligible asset to voucher (try count ${tryCount}):`,
+          error,
         );
-      } else {
-        throw new Error(
-          `Failed to add eligible asset to voucher after ${tryCount} attempts`,
-        );
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          await retryableAddEligibleAsset(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to add eligible asset to voucher after ${tryCount} attempts`,
+          );
+        }
       }
-    }
+    };
+    await retryableAddEligibleAsset();
   };
