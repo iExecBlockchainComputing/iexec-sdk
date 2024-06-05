@@ -1,16 +1,11 @@
 import Debug from 'debug';
-import { Contract } from 'ethers';
-import { abi } from './abi/VoucherHub.js';
+
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 import { NULL_ADDRESS } from '../utils/constant.js';
+import { getVoucherHubContract } from '../utils/voucher-utils.js';
 
 const debug = Debug('iexec:voucher:voucherHub');
-
-const getVoucherHubContract = (
-  contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
-) => new Contract(voucherHubAddress, abi, contracts.provider);
 
 export const fetchVoucherAddress = async (
   contracts = throwIfMissing(),

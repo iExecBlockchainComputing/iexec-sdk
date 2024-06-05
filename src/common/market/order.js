@@ -24,6 +24,7 @@ import {
   checkSigner,
   TAG_MAP,
 } from '../utils/utils.js';
+import { fetchVoucherAddress } from '../voucher/voucherHub.js';
 import { hashEIP712 } from '../utils/sig-utils.js';
 import {
   NULL_BYTES,
@@ -60,6 +61,10 @@ import {
   wrapWait,
   wrapSignTypedData,
 } from '../utils/errorWrappers.js';
+import {
+  getVoucherContract,
+  getVoucherHubContract,
+} from '../utils/voucher-utils.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -184,6 +189,48 @@ const getContractOwner = async (
 ) => {
   const contractAddress = orderObj[objDesc[orderName].contractPropName];
   return objDesc[orderName].ownerMethod(contracts, contractAddress);
+};
+
+const getMatchOrdersTotalCost = (
+  matchableVolume,
+  appPrice,
+  datasetPrice,
+  workerpoolPrice,
+) => {
+  const bnMatchableVolume = new BN(matchableVolume);
+  const bnAppPrice = new BN(appPrice);
+  const bnDatasetPrice = new BN(datasetPrice);
+  const bnWorkerpoolPrice = new BN(workerpoolPrice);
+
+  return bnMatchableVolume.mul(
+    bnAppPrice.add(bnDatasetPrice).add(bnWorkerpoolPrice),
+  );
+};
+const getMatchOrdersSponsoredCostWithVoucher = (
+  appOrder,
+  datasetOrder,
+  workerpoolOrder,
+  matchableVolume,
+  balance,
+  isAppEligibleToMatchOrdersSponsoring,
+  isDatasetEligibleToMatchOrdersSponsoring,
+  isWorkerpoolEligibleToMatchOrdersSponsoring,
+) => {
+  const sponsoredAppPrice = isAppEligibleToMatchOrdersSponsoring
+    ? appOrder.appprice
+    : 0;
+  const sponsoredDatasetPrice = isDatasetEligibleToMatchOrdersSponsoring
+    ? datasetOrder.datasetprice
+    : 0;
+  const sponsoredWorkerpoolPrice = isWorkerpoolEligibleToMatchOrdersSponsoring
+    ? workerpoolOrder.workerpoolprice
+    : 0;
+  const sponsoredAmount = new BN(matchableVolume).mul(
+    new BN(sponsoredAppPrice)
+      .add(new BN(sponsoredDatasetPrice))
+      .add(new BN(sponsoredWorkerpoolPrice)),
+  );
+  return BN.min(sponsoredAmount, new BN(balance));
 };
 
 export const computeOrderHash = async (
@@ -1033,4 +1080,87 @@ export const createRequestorder = async (
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };
+};
+
+export const estimateMatchOrders = async (
+  contracts,
+  voucherHubAddress,
+  appOrder,
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder,
+  requestOrder,
+  useVoucher = false,
+) => {
+  const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
+    await Promise.all([
+      signedApporderSchema().validate(appOrder),
+      signedDatasetorderSchema().validate(datasetOrder),
+      signedWorkerpoolorderSchema().validate(workerpoolOrder),
+      signedRequestorderSchema().validate(requestOrder),
+    ]);
+  const matchableVolume = await getMatchableVolume(
+    contracts,
+    vAppOrder,
+    vDatasetOrder,
+    vWorkerpoolOrder,
+    vRequestOrder,
+  );
+  const totalCost = getMatchOrdersTotalCost(
+    matchableVolume,
+    vAppOrder.appprice,
+    vDatasetOrder.datasetprice,
+    vWorkerpoolOrder.workerpoolprice,
+  );
+  let sponsoredCost = 0;
+  if (useVoucher) {
+    const voucherAddress = await fetchVoucherAddress(
+      contracts,
+      voucherHubAddress,
+      requestOrder.requester,
+    );
+    const voucherContract = await getVoucherContract(contracts, voucherAddress);
+
+    const [balance, voucherTypeId] = await Promise.all([
+      voucherContract.getBalance(),
+      voucherContract.getType(),
+    ]);
+    const voucherHubContract = getVoucherHubContract(
+      contracts,
+      voucherHubAddress,
+    );
+
+    const [
+      isAppEligibleToMatchOrdersSponsoring,
+      isDatasetEligibleToMatchOrdersSponsoring,
+      isWorkerpoolEligibleToMatchOrdersSponsoring,
+    ] = await Promise.all([
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        appOrder.app,
+      ),
+
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        datasetOrder.dataset,
+      ),
+
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        workerpoolOrder.workerpool,
+      ),
+    ]);
+
+    sponsoredCost = getMatchOrdersSponsoredCostWithVoucher(
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      matchableVolume,
+      balance,
+      isAppEligibleToMatchOrdersSponsoring,
+      isDatasetEligibleToMatchOrdersSponsoring,
+      isWorkerpoolEligibleToMatchOrdersSponsoring,
+    );
+  }
+
+  return { total: totalCost, sponsored: sponsoredCost };
 };

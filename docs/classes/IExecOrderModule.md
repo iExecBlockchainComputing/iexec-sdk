@@ -30,6 +30,7 @@ module exposing order methods
 - [createDatasetorder](IExecOrderModule.md#createdatasetorder)
 - [createRequestorder](IExecOrderModule.md#createrequestorder)
 - [createWorkerpoolorder](IExecOrderModule.md#createworkerpoolorder)
+- [estimateMatchOrders](IExecOrderModule.md#estimatematchorders)
 - [hashApporder](IExecOrderModule.md#hashapporder)
 - [hashDatasetorder](IExecOrderModule.md#hashdatasetorder)
 - [hashRequestorder](IExecOrderModule.md#hashrequestorder)
@@ -328,6 +329,41 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 #### Returns
 
 `Promise`<[`WorkerpoolorderTemplate`](../interfaces/internal_.WorkerpoolorderTemplate.md)\>
+
+___
+
+### estimateMatchOrders
+
+▸ **estimateMatchOrders**(`«destructured»`): `Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+
+estimates the cost of matching the provided orders
+example:
+```js
+const orders = {
+  apporder,
+  datasetorder
+  workerpoolorder,
+  requestorder,
+};
+const result = await estimateMatchOrders({...orders, useVoucher: true});
+console.log(`total cost for matching orders: ${result.total} nRLC`);
+console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `«destructured»` | `Object` |
+| › `apporder` | `any` |
+| › `datasetorder` | `any` |
+| › `requestorder` | `any` |
+| › `useVoucher` | `any` |
+| › `workerpoolorder` | `any` |
+
+#### Returns
+
+`Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
 
 ___
 
