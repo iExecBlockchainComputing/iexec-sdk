@@ -1089,7 +1089,7 @@ export const estimateMatchOrders = async (
   datasetOrder = NULL_DATASETORDER,
   workerpoolOrder,
   requestOrder,
-  useVoucher = false,
+  useVoucher,
 ) => {
   const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
     await Promise.all([

@@ -391,13 +391,15 @@ describe('order', () => {
         value: 1000,
       });
 
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders({
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-        requestorder: requestorderTemplate,
-        useVoucher: true,
-      });
+      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+          requestorder: requestorderTemplate,
+        },
+        { useVoucher: true },
+      );
       expect(matchedOrdersCost.sponsored).toBeInstanceOf(BN);
       expect(matchedOrdersCost.total).toBeInstanceOf(BN);
     });
@@ -412,13 +414,15 @@ describe('order', () => {
         requesterWallet.address,
       );
 
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders({
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-        requestorder: requestorderTemplate,
-        useVoucher: true,
-      });
+      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+          requestorder: requestorderTemplate,
+        },
+        { useVoucher: true },
+      );
       expect(matchedOrdersCost.sponsored).toEqual(new BN(voucherInfo.balance));
     });
 

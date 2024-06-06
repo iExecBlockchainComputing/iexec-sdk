@@ -334,9 +334,10 @@ ___
 
 ### estimateMatchOrders
 
-▸ **estimateMatchOrders**(`«destructured»`): `Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
 
 estimates the cost of matching the provided orders
+
 example:
 ```js
 const orders = {
@@ -345,7 +346,7 @@ const orders = {
   workerpoolorder,
   requestorder,
 };
-const result = await estimateMatchOrders({...orders, useVoucher: true});
+const result = await estimateMatchOrders(orders, {useVoucher: true});
 console.log(`total cost for matching orders: ${result.total} nRLC`);
 console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 ```
@@ -354,12 +355,13 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 
 | Name | Type |
 | :------ | :------ |
-| `«destructured»` | `Object` |
-| › `apporder` | `any` |
-| › `datasetorder` | `any` |
-| › `requestorder` | `any` |
-| › `useVoucher` | `any` |
-| › `workerpoolorder` | `any` |
+| `orders` | `Object` |
+| `orders.apporder` | `any` |
+| `orders.datasetorder` | `any` |
+| `orders.requestorder` | `any` |
+| `orders.workerpoolorder` | `any` |
+| `options?` | `Object` |
+| `options.useVoucher` | `any` |
 
 #### Returns
 

@@ -365,13 +365,10 @@ export default class IExecOrderModule extends IExecModule {
       );
     };
 
-    this.estimateMatchOrders = async ({
-      apporder,
-      datasetorder,
-      workerpoolorder,
-      requestorder,
-      useVoucher,
-    }) => {
+    this.estimateMatchOrders = async (
+      { apporder, datasetorder, workerpoolorder, requestorder },
+      { useVoucher = false } = {},
+    ) => {
       const contracts = await this.config.resolveContractsClient();
       const voucherHubAddress = await this.config.resolveVoucherHubAddress();
       return estimateMatchOrders(
