@@ -471,13 +471,13 @@ export const abi = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'expiration',
+        name: 'voucherType',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'voucherType',
+        name: 'expiration',
         type: 'uint256',
       },
       {
@@ -507,6 +507,50 @@ export const abi = [
       },
     ],
     name: 'VoucherDebited',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'voucher',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'VoucherRefunded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'voucher',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'expiration',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'VoucherToppedUp',
     type: 'event',
   },
   {
@@ -844,6 +888,11 @@ export const abi = [
       {
         internalType: 'uint256',
         name: 'workerpoolPrice',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'volume',
         type: 'uint256',
       },
     ],
@@ -1191,6 +1240,19 @@ export const abi = [
     inputs: [
       {
         internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'refundVoucher',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
         name: 'voucherTypeId',
         type: 'uint256',
       },
@@ -1278,6 +1340,24 @@ export const abi = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'voucher',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'topUpVoucher',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {

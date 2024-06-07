@@ -17,28 +17,6 @@ export const abi = [
     type: 'error',
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnableInvalidOwner',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
-      },
-    ],
-    name: 'OwnableUnauthorizedAccount',
-    type: 'error',
-  },
-  {
     anonymous: false,
     inputs: [
       {
@@ -62,6 +40,19 @@ export const abi = [
       },
     ],
     name: 'AccountUnauthorized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'expiration',
+        type: 'uint256',
+      },
+    ],
+    name: 'ExpirationUpdated',
     type: 'event',
   },
   {
@@ -107,19 +98,13 @@ export const abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'taskId',
+        type: 'bytes32',
       },
     ],
-    name: 'OwnershipTransferred',
+    name: 'TaskClaimedWithVoucher',
     type: 'event',
   },
   {
@@ -131,6 +116,37 @@ export const abi = [
       },
     ],
     name: 'authorizeAccount',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'taskId',
+        type: 'bytes32',
+      },
+    ],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'dealId',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint256',
+        name: 'taskIndex',
+        type: 'uint256',
+      },
+    ],
+    name: 'claimBoost',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -210,7 +226,7 @@ export const abi = [
     inputs: [
       {
         internalType: 'address',
-        name: 'owner',
+        name: 'voucherOwner',
         type: 'address',
       },
       {
@@ -801,21 +817,14 @@ export const abi = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [
       {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
+        internalType: 'uint256',
+        name: 'expiration',
+        type: 'uint256',
       },
     ],
-    name: 'transferOwnership',
+    name: 'setExpiration',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
