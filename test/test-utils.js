@@ -527,41 +527,26 @@ export const createVoucher =
       },
     ];
 
-    const iexec = new IExec(
+    // deposit voucher value on VoucherHub with a random wallet
+    const voucherSponsorWallet = getRandomWallet();
+    const iexecVoucherSponsor = new IExec(
       {
         ethProvider: getSignerFromPrivateKey(
           chain.rpcURL,
-          chain.voucherManagerWallet.privateKey,
+          voucherSponsorWallet.privateKey,
         ),
       },
       { hubAddress: chain.hubAddress },
     );
-
-    await setNRlcBalance(chain)(await iexec.wallet.getAddress(), value);
-
-    const contractClient = await iexec.config.resolveContractsClient();
+    await setNRlcBalance(chain)(voucherSponsorWallet.address, value);
+    const contractClient =
+      await iexecVoucherSponsor.config.resolveContractsClient();
     const iexecContract = contractClient.getIExecContract();
-
-    const retryableDepositFor = async (tryCount = 1) => {
-      try {
-        const tx = await iexecContract.depositFor(chain.voucherHubAddress, {
-          value: BigInt(value) * 10n ** 9n,
-          gasPrice: 0,
-        });
-        await tx.wait();
-      } catch (e) {
-        console.warn(`Error sending depositFor (try count ${tryCount}):`, e);
-        if (tryCount < 3) {
-          await sleep(3000 * tryCount);
-          await retryableDepositFor(tryCount + 1);
-        } else {
-          throw new Error(
-            `Failed to depositFor voucher after ${tryCount} attempts`,
-          );
-        }
-      }
-    };
-    await retryableDepositFor();
+    const tx = await iexecContract.depositFor(chain.voucherHubAddress, {
+      value: BigInt(value) * 10n ** 9n,
+      gasPrice: 0,
+    });
+    await tx.wait();
 
     const voucherHubContract = new Contract(
       chain.voucherHubAddress,
