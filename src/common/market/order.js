@@ -1111,7 +1111,7 @@ export const estimateMatchOrders = async (
     vDatasetOrder.datasetprice,
     vWorkerpoolOrder.workerpoolprice,
   );
-  let sponsoredCost = 0;
+  let sponsoredCost = new BN(0);
   if (useVoucher) {
     const voucherAddress = await fetchVoucherAddress(
       contracts,
