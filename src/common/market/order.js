@@ -1118,6 +1118,9 @@ export const estimateMatchOrders = async (
       voucherHubAddress,
       requestOrder.requester,
     );
+    if (!voucherAddress) {
+      return { total: totalCost, sponsored: sponsoredCost };
+    }
     const voucherContract = await getVoucherContract(contracts, voucherAddress);
 
     const [balance, voucherTypeId] = await Promise.all([
