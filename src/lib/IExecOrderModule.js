@@ -309,8 +309,10 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
       },
-      { preflightCheck = true } = {},
+      { preflightCheck = true, useVoucher = false } = {},
     ) => {
+      const contracts = await this.config.resolveContractsClient();
+      const voucherHubAddress = await this.config.resolveVoucherHubAddress();
       if (preflightCheck === true) {
         const resolvedTag = sumTags([
           (
@@ -326,17 +328,18 @@ export default class IExecOrderModule extends IExecModule {
           ).tag,
         ]);
         return matchOrders(
-          await this.config.resolveContractsClient(),
+          contracts,
+          voucherHubAddress,
           await checkAppRequirements(
             {
-              contracts: await this.config.resolveContractsClient(),
+              contracts,
             },
             apporder,
             { tagOverride: resolvedTag },
           ).then(() => apporder),
           await checkDatasetRequirements(
             {
-              contracts: await this.config.resolveContractsClient(),
+              contracts,
               smsURL: await this.config.resolveSmsURL({
                 teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
@@ -347,21 +350,24 @@ export default class IExecOrderModule extends IExecModule {
           workerpoolorder,
           await checkRequestRequirements(
             {
-              contracts: await this.config.resolveContractsClient(),
+              contracts,
               smsURL: await this.config.resolveSmsURL({
                 teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
             },
             requestorder,
           ).then(() => requestorder),
+          useVoucher,
         );
       }
       return matchOrders(
-        await this.config.resolveContractsClient(),
+        contracts,
+        voucherHubAddress,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
+        useVoucher,
       );
     };
 

@@ -1034,6 +1034,7 @@ export default class IExecOrderModule extends IExecModule {
     },
     options?: {
       preflightCheck?: boolean;
+      useVoucher?: boolean;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**

@@ -495,6 +495,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 | `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
 | `options?` | `Object` |
 | `options.preflightCheck?` | `boolean` |
+| `options.useVoucher?` | `boolean` |
 
 #### Returns
 

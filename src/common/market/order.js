@@ -65,6 +65,7 @@ import {
   getVoucherContract,
   getVoucherHubContract,
 } from '../utils/voucher-utils.js';
+import { checkAllowance } from '../account/allowance.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -841,12 +842,100 @@ const getMatchableVolume = async (
   }
 };
 
+export const estimateMatchOrders = async (
+  contracts,
+  voucherHubAddress,
+  appOrder,
+  datasetOrder = NULL_DATASETORDER,
+  workerpoolOrder,
+  requestOrder,
+  useVoucher,
+) => {
+  const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
+    await Promise.all([
+      signedApporderSchema().validate(appOrder),
+      signedDatasetorderSchema().validate(datasetOrder),
+      signedWorkerpoolorderSchema().validate(workerpoolOrder),
+      signedRequestorderSchema().validate(requestOrder),
+    ]);
+  const matchableVolume = await getMatchableVolume(
+    contracts,
+    vAppOrder,
+    vDatasetOrder,
+    vWorkerpoolOrder,
+    vRequestOrder,
+  );
+  const totalCost = getMatchOrdersTotalCost(
+    matchableVolume,
+    vAppOrder.appprice,
+    vDatasetOrder.datasetprice,
+    vWorkerpoolOrder.workerpoolprice,
+  );
+  let sponsoredCost = new BN(0);
+  if (useVoucher) {
+    const voucherAddress = await fetchVoucherAddress(
+      contracts,
+      voucherHubAddress,
+      requestOrder.requester,
+    );
+    if (!voucherAddress) {
+      return { total: totalCost, sponsored: sponsoredCost };
+    }
+    const voucherContract = await getVoucherContract(contracts, voucherAddress);
+
+    const [balance, voucherTypeId] = await Promise.all([
+      voucherContract.getBalance(),
+      voucherContract.getType(),
+    ]);
+    const voucherHubContract = getVoucherHubContract(
+      contracts,
+      voucherHubAddress,
+    );
+
+    const [
+      isAppEligibleToMatchOrdersSponsoring,
+      isDatasetEligibleToMatchOrdersSponsoring,
+      isWorkerpoolEligibleToMatchOrdersSponsoring,
+    ] = await Promise.all([
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        appOrder.app,
+      ),
+
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        datasetOrder.dataset,
+      ),
+
+      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+        voucherTypeId,
+        workerpoolOrder.workerpool,
+      ),
+    ]);
+
+    sponsoredCost = getMatchOrdersSponsoredCostWithVoucher(
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      matchableVolume,
+      balance,
+      isAppEligibleToMatchOrdersSponsoring,
+      isDatasetEligibleToMatchOrdersSponsoring,
+      isWorkerpoolEligibleToMatchOrdersSponsoring,
+    );
+  }
+
+  return { total: totalCost, sponsored: sponsoredCost };
+};
+
 export const matchOrders = async (
   contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
   workerpoolOrder = throwIfMissing(),
   requestOrder = throwIfMissing(),
+  useVoucher = false,
 ) => {
   try {
     checkSigner(contracts);
@@ -885,15 +974,53 @@ export const matchOrders = async (
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
-      if (stake.lt(costPerTask)) {
-        throw new Error(
-          `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+      if (useVoucher) {
+        const voucherHubContract = getVoucherHubContract(
+          contracts,
+          voucherHubAddress,
         );
-      }
-      if (stake.lt(totalCost)) {
-        throw new Error(
-          `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
+        const voucherAddress = voucherHubContract.getVoucher(
+          vRequestOrder.requester,
         );
+        if (!voucherAddress) {
+          throw new Error(
+            `No voucher available for the requester ${vRequestOrder.requester}`,
+          );
+        }
+        const { total, sponsored } = await estimateMatchOrders(
+          contracts,
+          voucherHubAddress,
+          vAppOrder,
+          vDatasetOrder,
+          vWorkerpoolOrder,
+          vRequestOrder,
+          useVoucher,
+        );
+        if (total.gt(sponsored)) {
+          const allowance = await checkAllowance(
+            contracts,
+            vRequestOrder.requester,
+            voucherAddress,
+          );
+          const requiredAllowance = total.sub(sponsored);
+          if (allowance.lt(requiredAllowance)) {
+            const missingAmount = requiredAllowance.sub(allowance);
+            throw new Error(
+              `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
+            );
+          }
+        }
+      } else {
+        if (stake.lt(costPerTask)) {
+          throw new Error(
+            `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+          );
+        }
+        if (stake.lt(totalCost)) {
+          throw new Error(
+            `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
+          );
+        }
       }
     };
 
@@ -913,15 +1040,29 @@ export const matchOrders = async (
       vRequestOrder,
     );
     const iexecContract = contracts.getIExecContract();
-    const tx = await wrapSend(
-      iexecContract.matchOrders(
-        appOrderStruct,
-        datasetOrderStruct,
-        workerpoolOrderStruct,
-        requestOrderStruct,
-        contracts.txOptions,
-      ),
-    );
+    const voucherContract = getVoucherContract(contracts, voucherHubAddress);
+    let tx;
+    if (useVoucher) {
+      tx = await wrapSend(
+        voucherContract.matchOrders(
+          appOrderStruct,
+          datasetOrderStruct,
+          workerpoolOrderStruct,
+          requestOrderStruct,
+        ),
+      );
+    } else {
+      tx = await wrapSend(
+        iexecContract.matchOrders(
+          appOrderStruct,
+          datasetOrderStruct,
+          workerpoolOrderStruct,
+          requestOrderStruct,
+          contracts.txOptions,
+        ),
+      );
+    }
+
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const matchEvent = 'OrdersMatched';
     if (!checkEventFromLogs(matchEvent, txReceipt.logs))
@@ -1080,90 +1221,4 @@ export const createRequestorder = async (
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };
-};
-
-export const estimateMatchOrders = async (
-  contracts,
-  voucherHubAddress,
-  appOrder,
-  datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder,
-  requestOrder,
-  useVoucher,
-) => {
-  const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
-    await Promise.all([
-      signedApporderSchema().validate(appOrder),
-      signedDatasetorderSchema().validate(datasetOrder),
-      signedWorkerpoolorderSchema().validate(workerpoolOrder),
-      signedRequestorderSchema().validate(requestOrder),
-    ]);
-  const matchableVolume = await getMatchableVolume(
-    contracts,
-    vAppOrder,
-    vDatasetOrder,
-    vWorkerpoolOrder,
-    vRequestOrder,
-  );
-  const totalCost = getMatchOrdersTotalCost(
-    matchableVolume,
-    vAppOrder.appprice,
-    vDatasetOrder.datasetprice,
-    vWorkerpoolOrder.workerpoolprice,
-  );
-  let sponsoredCost = new BN(0);
-  if (useVoucher) {
-    const voucherAddress = await fetchVoucherAddress(
-      contracts,
-      voucherHubAddress,
-      requestOrder.requester,
-    );
-    if (!voucherAddress) {
-      return { total: totalCost, sponsored: sponsoredCost };
-    }
-    const voucherContract = await getVoucherContract(contracts, voucherAddress);
-
-    const [balance, voucherTypeId] = await Promise.all([
-      voucherContract.getBalance(),
-      voucherContract.getType(),
-    ]);
-    const voucherHubContract = getVoucherHubContract(
-      contracts,
-      voucherHubAddress,
-    );
-
-    const [
-      isAppEligibleToMatchOrdersSponsoring,
-      isDatasetEligibleToMatchOrdersSponsoring,
-      isWorkerpoolEligibleToMatchOrdersSponsoring,
-    ] = await Promise.all([
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        appOrder.app,
-      ),
-
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        datasetOrder.dataset,
-      ),
-
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        workerpoolOrder.workerpool,
-      ),
-    ]);
-
-    sponsoredCost = getMatchOrdersSponsoredCostWithVoucher(
-      vAppOrder,
-      vDatasetOrder,
-      vWorkerpoolOrder,
-      matchableVolume,
-      balance,
-      isAppEligibleToMatchOrdersSponsoring,
-      isDatasetEligibleToMatchOrdersSponsoring,
-      isWorkerpoolEligibleToMatchOrdersSponsoring,
-    );
-  }
-
-  return { total: totalCost, sponsored: sponsoredCost };
 };
