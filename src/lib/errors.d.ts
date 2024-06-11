@@ -42,3 +42,36 @@ export class BridgeError extends Error {
   sendTxHash?: string;
   originalError?: Error;
 }
+
+/**
+ * ApiCallError encapsulate an error occurring during a call to an API such as a network error or a server internal error.
+ */
+export class ApiCallError extends Error {
+  constructor(message: string, originalError: Error);
+  originalError?: Error;
+}
+
+/**
+ * SmsCallError encapsulate an error occurring during a call to the SMS API such as a network error or a server internal error.
+ */
+export class SmsCallError extends ApiCallError {}
+
+/**
+ * ResultProxyCallError encapsulate an error occurring during a call to the Result-Proxy API such as a network error or a server internal error.
+ */
+export class ResultProxyCallError extends ApiCallError {}
+
+/**
+ * MarketCallError encapsulate an error occurring during a call to the Market API such as a network error or a server internal error.
+ */
+export class MarketCallError extends ApiCallError {}
+
+/**
+ * IpfsGatewayCallError encapsulate an error occurring during a call to the IPFS gateway API such as a network error or a server internal error.
+ */
+export class IpfsGatewayCallError extends ApiCallError {}
+
+/**
+ * WorkerpoolCallError encapsulate an error occurring during a call to a workerpool API such as a network error or a server internal error.
+ */
+export class WorkerpoolCallError extends ApiCallError {}

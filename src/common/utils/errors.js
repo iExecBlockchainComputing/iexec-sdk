@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-identical-functions */
 export { ValidationError } from 'yup';
 
 const getPropsToCopy = (error) => {
@@ -73,5 +74,51 @@ export class BridgeError extends Error {
     if (originalError && typeof originalError === 'object') {
       Object.assign(this, getPropsToCopy(originalError));
     }
+  }
+}
+
+export class ApiCallError extends Error {
+  constructor(message, originalError) {
+    super(message);
+    this.name = this.constructor.name;
+    this.originalError = originalError;
+    if (originalError && typeof originalError === 'object') {
+      Object.assign(this, getPropsToCopy(originalError));
+    }
+  }
+}
+
+export class SmsCallError extends ApiCallError {
+  constructor(message, ...args) {
+    super(`SMS error: ${message}`, ...args);
+    this.name = this.constructor.name;
+  }
+}
+
+export class ResultProxyCallError extends ApiCallError {
+  constructor(message, ...args) {
+    super(`Result Proxy error: ${message}`, ...args);
+    this.name = this.constructor.name;
+  }
+}
+
+export class MarketCallError extends ApiCallError {
+  constructor(message, ...args) {
+    super(`Market API error: ${message}`, ...args);
+    this.name = this.constructor.name;
+  }
+}
+
+export class IpfsGatewayCallError extends ApiCallError {
+  constructor(message, ...args) {
+    super(`IPFS gateway error: ${message}`, ...args);
+    this.name = this.constructor.name;
+  }
+}
+
+export class WorkerpoolCallError extends ApiCallError {
+  constructor(message, ...args) {
+    super(`Workerpool API error: ${message}`, ...args);
+    this.name = this.constructor.name;
   }
 }
