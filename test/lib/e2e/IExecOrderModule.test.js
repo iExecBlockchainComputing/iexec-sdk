@@ -24,8 +24,6 @@ import {
   addVoucherEligibleAsset,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { deployApp } from '../../../src/common/protocol/registries.js';
-import { showUserVoucher } from '../../../src/common/voucher/voucher.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -461,6 +459,36 @@ describe('order', () => {
         requestorder: requestorderTemplate,
       });
 
+      expect(matchedOrdersCost.sponsored).toEqual(new BN(0));
+    });
+
+    test('should have sponsored amount as 0 when voucher expired', async () => {
+      const { iexec: iexecRequester, wallet: requesterWallet } =
+        getTestConfig(iexecTestChain)();
+
+      const requestorderTemplate = await getMatchableRequestorder(
+        iexecRequester,
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        },
+      );
+      const voucherType = await createVoucherType(iexecTestChain)({
+        description: 'test voucher type',
+        duration: 1,
+      });
+      await createVoucher(iexecTestChain)({
+        owner: await requesterWallet.getAddress(),
+        voucherType,
+        value: 100,
+      });
+      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders({
+        apporder: apporderTemplate,
+        datasetorder: datasetorderTemplate,
+        workerpoolorder: workerpoolorderTemplate,
+        requestorder: requestorderTemplate,
+      });
       expect(matchedOrdersCost.sponsored).toEqual(new BN(0));
     });
   });
