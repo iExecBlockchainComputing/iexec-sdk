@@ -882,7 +882,11 @@ export const estimateMatchOrders = async (
       return { total: totalCost, sponsored: sponsoredCost };
     }
     const voucherContract = await getVoucherContract(contracts, voucherAddress);
-
+    const voucherExpiration = voucherContract.getExpiration();
+    const now = Math.floor(Date.now() / 1000);
+    if (voucherExpiration <= now) {
+      return { total: totalCost, sponsored: sponsoredCost };
+    }
     const [balance, voucherTypeId] = await Promise.all([
       voucherContract.getBalance(),
       voucherContract.getType(),
