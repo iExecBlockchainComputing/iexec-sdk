@@ -350,7 +350,7 @@ describe('order', () => {
       );
       voucherTypeId = await createVoucherType(iexecTestChain)({
         description: 'test voucher type',
-        duration: 42,
+        duration: 60 * 60,
       });
 
       await addVoucherEligibleAsset(iexecTestChain)(
@@ -386,6 +386,23 @@ describe('order', () => {
         value: 1000,
       });
 
+      const matchableVolume = Math.min(
+        apporderTemplate.volume,
+        datasetorderTemplate.volume,
+        workerpoolorderTemplate.volume,
+      );
+      const total =
+        matchableVolume *
+        (Number(apporderTemplate.appprice) +
+          Number(datasetorderTemplate.datasetprice) +
+          Number(workerpoolorderTemplate.workerpoolprice));
+
+      const sponsored =
+        matchableVolume *
+        (Number(apporderTemplate.appprice) +
+          Number(datasetorderTemplate.datasetprice) +
+          Number(workerpoolorderTemplate.workerpoolprice));
+
       const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
         {
           apporder: apporderTemplate,
@@ -396,7 +413,9 @@ describe('order', () => {
         { useVoucher: true },
       );
       expect(matchedOrdersCost.sponsored).toBeInstanceOf(BN);
+      expect(matchedOrdersCost.sponsored).toEqual(new BN(sponsored));
       expect(matchedOrdersCost.total).toBeInstanceOf(BN);
+      expect(matchedOrdersCost.total).toEqual(new BN(total));
     });
 
     test('should return sponsored amount equal to voucher balance when voucher value is less than total cost', async () => {
