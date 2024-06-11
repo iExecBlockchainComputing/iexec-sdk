@@ -558,16 +558,6 @@ export const createVoucher =
 
     const retryableCreateVoucher = async (tryCount = 1) => {
       try {
-        const voucherHubBalance =
-          await iexecVoucherSponsor.account.checkBalance(
-            chain.voucherHubAddress,
-          );
-        console.log(
-          `voucherHubBalance.stake`,
-          voucherHubBalance.stake.toString(),
-        );
-        console.log(`value`, `${value}`);
-
         const createVoucherTx = await voucherHubContract
           .connect(signer)
           .createVoucher(owner, voucherType, value);
