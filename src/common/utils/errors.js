@@ -83,9 +83,6 @@ export class ApiCallError extends Error {
     super(message, { cause: originalError });
     this.name = this.constructor.name;
     this.originalError = originalError; // deprecated
-    if (originalError && typeof originalError === 'object') {
-      Object.assign(this, getPropsToCopy(originalError));
-    }
   }
 }
 
