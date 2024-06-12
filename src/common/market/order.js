@@ -1,5 +1,6 @@
 import Debug from 'debug';
 import BN from 'bn.js';
+import { Interface } from 'ethers';
 import { getAddress } from '../wallet/address.js';
 import { isInWhitelist } from '../wallet/enterprise.js';
 import { checkBalance } from '../account/balance.js';
@@ -23,6 +24,7 @@ import {
   tagBitToHuman,
   checkSigner,
   TAG_MAP,
+  parseTransactionLogs,
 } from '../utils/utils.js';
 import { fetchVoucherAddress } from '../voucher/voucherHub.js';
 import { hashEIP712 } from '../utils/sig-utils.js';
@@ -66,6 +68,7 @@ import {
   getVoucherHubContract,
 } from '../utils/voucher-utils.js';
 import { checkAllowance } from '../account/allowance.js';
+import { abi } from './abi/IexecPoco.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -972,20 +975,19 @@ export const matchOrders = async (
     const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
     const appPrice = new BN(vAppOrder.appprice);
     const datasetPrice = new BN(vDatasetOrder.datasetprice);
-
+    const voucherHubContract = getVoucherHubContract(
+      contracts,
+      voucherHubAddress,
+    );
+    const voucherAddress = await voucherHubContract.getVoucher(
+      vRequestOrder.requester,
+    );
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (useVoucher) {
-        const voucherHubContract = getVoucherHubContract(
-          contracts,
-          voucherHubAddress,
-        );
-        const voucherAddress = voucherHubContract.getVoucher(
-          vRequestOrder.requester,
-        );
         if (!voucherAddress) {
           throw new Error(
             `No voucher available for the requester ${vRequestOrder.requester}`,
@@ -1043,32 +1045,41 @@ export const matchOrders = async (
       REQUEST_ORDER,
       vRequestOrder,
     );
-    const iexecContract = contracts.getIExecContract();
-    const voucherContract = getVoucherContract(contracts, voucherHubAddress);
-    let tx;
-    if (useVoucher) {
-      tx = await wrapSend(
-        voucherContract.matchOrders(
-          appOrderStruct,
-          datasetOrderStruct,
-          workerpoolOrderStruct,
-          requestOrderStruct,
-        ),
-      );
-    } else {
-      tx = await wrapSend(
-        iexecContract.matchOrders(
-          appOrderStruct,
-          datasetOrderStruct,
-          workerpoolOrderStruct,
-          requestOrderStruct,
-          contracts.txOptions,
-        ),
-      );
-    }
-
-    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+    const voucherContract = getVoucherContract(contracts, voucherAddress);
     const matchEvent = 'OrdersMatched';
+    if (useVoucher) {
+      const pocoInterface = new Interface(abi);
+      const tx = await wrapSend(
+        voucherContract
+          .connect(contracts.signer)
+          .matchOrders(
+            appOrderStruct,
+            datasetOrderStruct,
+            workerpoolOrderStruct,
+            requestOrderStruct,
+          ),
+      );
+      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+      const events = parseTransactionLogs(txReceipt.logs, pocoInterface);
+      const matchedEvent = events.find((event) => event.name === matchEvent);
+      if (!matchedEvent) {
+        throw Error(`${matchEvent} not confirmed`);
+      }
+      const { dealid, volume } = matchedEvent.args;
+      return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };
+    }
+    const iexecContract = contracts.getIExecContract();
+    const tx = await wrapSend(
+      iexecContract.matchOrders(
+        appOrderStruct,
+        datasetOrderStruct,
+        workerpoolOrderStruct,
+        requestOrderStruct,
+        contracts.txOptions,
+      ),
+    );
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+
     if (!checkEventFromLogs(matchEvent, txReceipt.logs))
       throw Error(`${matchEvent} not confirmed`);
     const { dealid, volume } = getEventFromLogs(matchEvent, txReceipt.logs, {
