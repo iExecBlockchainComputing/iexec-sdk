@@ -31,7 +31,7 @@ services:
       retries: 3
       start_period: 30s
 
-  server-error-500:
+  service-internal-error:
     image: nginx:alpine
     volumes:
       - $PWD/mock/server/http500.nginx.conf:/etc/nginx/conf.d/default.conf
