@@ -30,6 +30,7 @@ ApiCallError encapsulate an error occurring during a call to an API such as a ne
 
 ### Properties
 
+- [cause](errors.ApiCallError.md#cause)
 - [originalError](errors.ApiCallError.md#originalerror)
 
 ## Constructors
@@ -55,6 +56,16 @@ Error.constructor
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead

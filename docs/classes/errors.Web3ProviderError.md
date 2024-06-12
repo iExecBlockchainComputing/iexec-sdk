@@ -26,6 +26,7 @@ Web3ProviderError encapsulate an error thrown by the web3 provider.
 
 ### Properties
 
+- [cause](errors.Web3ProviderError.md#cause)
 - [originalError](errors.Web3ProviderError.md#originalerror)
 
 ## Constructors
@@ -51,6 +52,16 @@ Error.constructor
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead

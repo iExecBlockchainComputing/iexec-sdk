@@ -20,6 +20,7 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 ### Properties
 
+- [cause](errors.BridgeError.md#cause)
 - [originalError](errors.BridgeError.md#originalerror)
 - [sendTxHash](errors.BridgeError.md#sendtxhash)
 
@@ -45,9 +46,19 @@ Error.constructor
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 ___
 

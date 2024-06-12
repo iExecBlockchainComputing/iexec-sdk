@@ -20,6 +20,7 @@ WorkerpoolCallError encapsulate an error occurring during a call to a workerpool
 
 ### Properties
 
+- [cause](errors.WorkerpoolCallError.md#cause)
 - [originalError](errors.WorkerpoolCallError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ WorkerpoolCallError encapsulate an error occurring during a call to a workerpool
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

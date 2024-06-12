@@ -20,6 +20,7 @@ IpfsGatewayCallError encapsulate an error occurring during a call to the IPFS ga
 
 ### Properties
 
+- [cause](errors.IpfsGatewayCallError.md#cause)
 - [originalError](errors.IpfsGatewayCallError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ IpfsGatewayCallError encapsulate an error occurring during a call to the IPFS ga
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

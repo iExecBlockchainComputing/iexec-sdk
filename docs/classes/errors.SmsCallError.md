@@ -20,6 +20,7 @@ SmsCallError encapsulate an error occurring during a call to the SMS API such as
 
 ### Properties
 
+- [cause](errors.SmsCallError.md#cause)
 - [originalError](errors.SmsCallError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ SmsCallError encapsulate an error occurring during a call to the SMS API such as
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

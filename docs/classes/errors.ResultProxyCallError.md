@@ -20,6 +20,7 @@ ResultProxyCallError encapsulate an error occurring during a call to the Result-
 
 ### Properties
 
+- [cause](errors.ResultProxyCallError.md#cause)
 - [originalError](errors.ResultProxyCallError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ ResultProxyCallError encapsulate an error occurring during a call to the Result-
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

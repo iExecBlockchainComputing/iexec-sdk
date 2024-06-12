@@ -20,6 +20,7 @@ MarketCallError encapsulate an error occurring during a call to the Market API s
 
 ### Properties
 
+- [cause](errors.MarketCallError.md#cause)
 - [originalError](errors.MarketCallError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ MarketCallError encapsulate an error occurring during a call to the Market API s
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

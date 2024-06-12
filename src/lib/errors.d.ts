@@ -12,7 +12,11 @@ export class ConfigurationError extends Error {}
  */
 export class Web3ProviderError extends Error {
   constructor(message: string, originalError: Error);
+  /**
+   * @deprecated use Error cause instead
+   */
   originalError?: Error;
+  cause?: Error;
 }
 /**
  * Web3ProviderCallError encapsulate an error thrown by the web3 provider during a web3 call.
@@ -40,7 +44,11 @@ export class ObjectNotFoundError extends Error {
  */
 export class BridgeError extends Error {
   sendTxHash?: string;
+  /**
+   * @deprecated use Error cause instead
+   */
   originalError?: Error;
+  cause?: Error;
 }
 
 /**
@@ -48,7 +56,11 @@ export class BridgeError extends Error {
  */
 export class ApiCallError extends Error {
   constructor(message: string, originalError: Error);
+  /**
+   * @deprecated use Error cause instead
+   */
   originalError?: Error;
+  cause?: Error;
 }
 
 /**

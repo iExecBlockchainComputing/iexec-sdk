@@ -20,6 +20,7 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 
 ### Properties
 
+- [cause](errors.Web3ProviderSendError.md#cause)
 - [originalError](errors.Web3ProviderSendError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ Web3ProviderSendError encapsulate an error thrown by the web3 provider during a 
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[Web3ProviderError](errors.Web3ProviderError.md).[cause](errors.Web3ProviderError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 

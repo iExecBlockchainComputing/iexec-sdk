@@ -20,6 +20,7 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 ### Properties
 
+- [cause](errors.Web3ProviderSignMessageError.md#cause)
 - [originalError](errors.Web3ProviderSignMessageError.md#originalerror)
 
 ## Constructors
@@ -45,9 +46,23 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 ## Properties
 
+### cause
+
+• `Optional` **cause**: `Error`
+
+#### Inherited from
+
+[Web3ProviderError](errors.Web3ProviderError.md).[cause](errors.Web3ProviderError.md#cause)
+
+___
+
 ### originalError
 
 • `Optional` **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 #### Inherited from
 
