@@ -418,6 +418,43 @@ describe('order', () => {
       expect(matchedOrdersCost.total).toEqual(new BN(total));
     });
 
+    test('should not return sponsored amount greater than voucher balance', async () => {
+      const { iexec: iexecRequester, wallet: requesterWallet } =
+        getTestConfig(iexecTestChain)();
+
+      const requestorderTemplate = await getMatchableRequestorder(
+        iexecRequester,
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        },
+      );
+
+      await createVoucher(iexecTestChain)({
+        owner: await requesterWallet.getAddress(),
+        voucherType: voucherTypeId,
+        value: 5,
+      });
+
+      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
+        {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+          requestorder: requestorderTemplate,
+        },
+        { useVoucher: true },
+      );
+
+      expect(matchedOrdersCost.sponsored).toBeInstanceOf(BN);
+      expect(matchedOrdersCost.sponsored).toEqual(new BN(5));
+      expect(matchedOrdersCost.total).toBeInstanceOf(BN);
+      expect(matchedOrdersCost.total.gt(matchedOrdersCost.sponsored)).toBe(
+        true,
+      );
+    });
+
     test('should return sponsored amount equal to voucher balance when voucher value is less than total cost', async () => {
       const { iexec: iexecRequester, wallet: requesterWallet } =
         getTestConfig(iexecTestChain)();
