@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Added
+
+- a generic `ApiCallError` is thrown when a network error occurs while connecting to a service or when the service returns a HTTP 5xx status code, each service has a dedicated inherited error class
+  - `SmsCallError` for SMS call errors
+  - `ResultProxyCallError` for Result Proxy call errors
+  - `MarketCallError` for Market API call errors
+  - `IpfsGatewayCallError` for IPFS gateway call errors
+  - `WorkerpoolCallError` for workerpool API call errors
+- Error `cause` is now set in errors everywhere `originalError` was used
+
+### Changed
+
+- [DEPRECATED] `originalError` is deprecated in favor of Error `cause`
+
 ## [8.8.0] 2024-05-28
 
 ### Changed
