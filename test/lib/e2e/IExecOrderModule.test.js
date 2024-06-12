@@ -10,6 +10,7 @@ import {
   deployRandomApp,
   deployRandomDataset,
   deployRandomWorkerpool,
+  expectAsyncCustomError,
   getMatchableRequestorder,
   getTestConfig,
 } from '../lib-test-utils';
@@ -19,8 +20,11 @@ import {
   getRandomAddress,
   setNRlcBalance,
   NULL_ADDRESS,
+  SERVICE_UNREACHABLE_URL,
+  SERVICE_HTTP_500_URL,
 } from '../../test-utils';
 import '../../jest-setup';
+import { MarketCallError } from '../../../src/lib/errors';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -321,32 +325,34 @@ describe('order', () => {
         iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
       ).resolves.toBeDefined();
     });
-  });
 
-  test('preflightCheck fails with invalid tag', async () => {
-    const { iexec } = getTestConfig(iexecTestChain)();
-    const order = await iexec.order.createApporder({
-      app: getRandomAddress(),
+    test('preflightCheck fails with invalid tag', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const order = await iexec.order.createApporder({
+        app: getRandomAddress(),
+      });
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['tee'] }),
+      ).rejects.toThrow(
+        Error(
+          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        ),
+      );
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['scone'] }),
+      ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['gramine'] }),
+      ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
+      await expect(
+        iexec.order.signApporder({
+          ...order,
+          tag: ['tee', 'scone', 'gramine'],
+        }),
+      ).rejects.toThrow(
+        Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      );
     });
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['tee'] }),
-    ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
-    );
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['scone'] }),
-    ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signApporder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 
   describe('signDatasetorder()', () => {
@@ -818,532 +824,597 @@ describe('order', () => {
     });
   });
 
-  describe('publishApporder()', () => {
-    test('publishes the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const orderHash = await iexec.order.publishApporder(apporder);
-      expect(orderHash).toBeTxHash();
-    });
-  });
-
-  describe('publishDatasetorder()', () => {
-    test('publishes the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const orderHash = await iexec.order.publishDatasetorder(datasetorder);
-      expect(orderHash).toBeTxHash();
-    });
-
-    test('preflightChecks dataset secret exists for tee tag', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const datasetorder = await deployAndGetDatasetorder(iexec, {
-        tag: ['tee', 'scone'],
+  describe('publish...order()', () => {
+    test("throw a MarketCallError when the SMS can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          iexecGatewayURL: SERVICE_UNREACHABLE_URL,
+        },
       });
-      const datasetAddress = datasetorder.dataset;
-      await expect(
-        iexec.order.publishDatasetorder(datasetorder),
-      ).rejects.toThrow(
-        Error(
-          `Dataset encryption key is not set for dataset ${datasetAddress} in the SMS. Dataset decryption will fail.`,
-        ),
-      );
-
-      const orderHashSkipPreflight = await iexec.order.publishDatasetorder(
-        await iexec.order.signDatasetorder(datasetorder, {
-          preflightCheck: false,
-        }),
-        { preflightCheck: false },
-      );
-      expect(orderHashSkipPreflight).toBeTxHash();
-
-      await iexec.dataset.pushDatasetSecret(datasetAddress, 'foo');
-
-      const orderHashPreflight = await iexec.order.publishDatasetorder(
-        await iexec.order.signDatasetorder(datasetorder, {
-          preflightCheck: false,
-        }),
-      );
-      expect(orderHashPreflight).toBeTxHash();
-    });
-  });
-
-  describe('publishWorkerpoolorder()', () => {
-    test('publishes the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const orderHash =
-        await iexec.order.publishWorkerpoolorder(workerpoolorder);
-      expect(orderHash).toBeTxHash();
-    });
-  });
-
-  describe('publishRequestorder()', () => {
-    test('publishes the order (skip preflightCheck)', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      await iexec.order.publishApporder(apporder);
       const requestorder = await iexec.order
-        .createRequestorder({
-          requester: await iexec.wallet.getAddress(),
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          dataset: NULL_ADDRESS,
-          datasetmaxprice: 0,
-          workerpool: NULL_ADDRESS,
-          workerpoolmaxprice: 0,
-          category: 1,
-          trust: 0,
-          volume: 1,
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
-        );
-      const orderHash = await iexec.order.publishRequestorder(requestorder, {
-        preflightCheck: false,
-      });
-      expect(orderHash).toBeTxHash();
-    });
-
-    test('preflightCheck result encryption key', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexecAppDev, {
-        teeFramework: TEE_FRAMEWORKS.SCONE,
-        tag: ['tee', 'scone'],
-      });
-      await iexecAppDev.order.publishApporder(apporder);
-      const requestorder = await iexec.order
-        .createRequestorder({
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          category: 1,
-          params: { iexec_result_encryption: true },
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
-        );
-      await expect(
+        .createRequestorder({ app: getRandomAddress(), category: 0 })
+        .then(iexec.order.signRequestorder);
+      await expectAsyncCustomError(
         iexec.order.publishRequestorder(requestorder),
-      ).rejects.toThrow(
-        Error(
-          'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
-        ),
+        {
+          constructor: MarketCallError,
+          message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
       );
-      await iexec.result.pushResultEncryptionKey(
-        `-----BEGIN PUBLIC KEY-----
-MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA29Y2NYC08oFJ8GxPR3dK
-kI+Au+6keWHZ8CXs9f54WrXlNusNqqhOH7h4fQKaNHhptqSutmo6xYwmen4eUqe6
-72NnmTeBpexvlHj16uDqgVoySVMaYMSwexRr+n7BQ2NWYntYc3r0ZjBACK7NMyrb
-fp4W5UNGKDk3pq0ukPQQ8IGAUhZPPsncVpOSq65Ks1aI1vBSM6UzHCks582H1b0N
-qO40vWd0Zd/8Lb/iHW6NDJXGgM0K/gRYz5hG3w0q9BvwN4mhHX1+2PWtuImv7np7
-CWU5edVJYQ1E5mXARLVUzYLmDXM1nvckkLVAdGOvsXv8P60z+Q2zpIvK14+xm5Cf
-EpAA5gOT+IQwcSOxuBstKpS8TXBXGvG8wsgJkK2docS9C8CIQU1OkI0EW4N7ViSA
-hH2kM6sRIN3g8nmfiiSTu1YAynaMcXe0H/0zl8fXE1c3wi2X2S/SFwxMSwPG5yTB
-2qLo9x75C8WUZC+uUP6VZcQE9B93F7DLzhd6O1VisGHefPQ/dF6rRreRwGI+JzL9
-ROsm42L6N5HwSodD4x7Hil6nw2FdgK5/RkTRa47gtTTcSKFUAFB/YivDDBhyCqSx
-oSEDTczO+ZMeoYGNQwiFpetTB7E4zNfxofllEvMax3/VOFurRbwDlMavD0LPeRM6
-MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
------END PUBLIC KEY-----`,
-      );
-      const orderHash = await iexec.order.publishRequestorder(requestorder);
-      expect(orderHash).toBeTxHash();
     });
 
-    test('preflightCheck dropbox token', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexecAppDev, {
-        teeFramework: TEE_FRAMEWORKS.SCONE,
-        tag: ['tee', 'scone'],
+    test('throw a MarketCallError when the SMS encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          iexecGatewayURL: SERVICE_HTTP_500_URL,
+        },
       });
-      await iexecAppDev.order.publishApporder(apporder);
       const requestorder = await iexec.order
-        .createRequestorder({
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          category: 1,
-          params: { iexec_result_storage_provider: 'dropbox' },
+        .createRequestorder({ app: getRandomAddress(), category: 0 })
+        .then(iexec.order.signRequestorder);
+      await expectAsyncCustomError(
+        iexec.order.publishRequestorder(requestorder),
+        {
+          constructor: MarketCallError,
+          message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
+    describe('publishApporder()', () => {
+      test('publishes the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const orderHash = await iexec.order.publishApporder(apporder);
+        expect(orderHash).toBeTxHash();
+      });
+    });
+
+    describe('publishDatasetorder()', () => {
+      test('publishes the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const orderHash = await iexec.order.publishDatasetorder(datasetorder);
+        expect(orderHash).toBeTxHash();
+      });
+
+      test('preflightChecks dataset secret exists for tee tag', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const datasetorder = await deployAndGetDatasetorder(iexec, {
           tag: ['tee', 'scone'],
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+        });
+        const datasetAddress = datasetorder.dataset;
+        await expect(
+          iexec.order.publishDatasetorder(datasetorder),
+        ).rejects.toThrow(
+          Error(
+            `Dataset encryption key is not set for dataset ${datasetAddress} in the SMS. Dataset decryption will fail.`,
+          ),
         );
-      await expect(
-        iexec.order.publishRequestorder(requestorder),
-      ).rejects.toThrow(
-        Error(
-          'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
-        ),
-      );
-      await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
-      const orderHash = await iexec.order.publishRequestorder(requestorder);
-      expect(orderHash).toBeTxHash();
-    });
-  });
 
-  describe('unpublishApporder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const orderHash = await iexec.order.publishApporder(apporder);
-      const unpublishRes = await iexec.order.unpublishApporder(orderHash);
-      expect(unpublishRes).toBe(orderHash);
-      await expect(iexec.order.unpublishApporder(orderHash)).rejects.toThrow(
-        Error(
-          `API error: apporder with orderHash ${orderHash} is not published`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishDatasetorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
-        preflightCheck: false,
-      });
-      const unpublishRes = await iexec.order.unpublishDatasetorder(orderHash);
-      expect(unpublishRes).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishDatasetorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `API error: datasetorder with orderHash ${orderHash} is not published`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishWorkerpoolorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const orderHash =
-        await iexec.order.publishWorkerpoolorder(workerpoolorder);
-      const unpublishRes =
-        await iexec.order.unpublishWorkerpoolorder(orderHash);
-      expect(unpublishRes).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishWorkerpoolorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `API error: workerpoolorder with orderHash ${orderHash} is not published`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishRequestorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      await iexec.order.publishApporder(apporder);
-      const requestorder = await iexec.order
-        .createRequestorder({
-          requester: await iexec.wallet.getAddress(),
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          dataset: NULL_ADDRESS,
-          datasetmaxprice: 0,
-          workerpool: NULL_ADDRESS,
-          workerpoolmaxprice: 0,
-          category: 1,
-          trust: 0,
-          volume: 1,
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+        const orderHashSkipPreflight = await iexec.order.publishDatasetorder(
+          await iexec.order.signDatasetorder(datasetorder, {
+            preflightCheck: false,
+          }),
+          { preflightCheck: false },
         );
-      const orderHash = await iexec.order.publishRequestorder(requestorder, {
-        preflightCheck: false,
-      });
-      const unpublishRes = await iexec.order.unpublishRequestorder(orderHash);
-      expect(unpublishRes).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishRequestorder(orderHash),
-      ).rejects.toThrow(
-        Error(
-          `API error: requestorder with orderHash ${orderHash} is not published`,
-        ),
-      );
-    });
-  });
+        expect(orderHashSkipPreflight).toBeTxHash();
 
-  describe('unpublishLastApporder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const orderHash = await iexec.order.publishApporder(apporder);
-      const lastApporder = await iexec.order.signApporder(apporder);
-      const lastOrderHash = await iexec.order.publishApporder(lastApporder);
-      const unpublishLastRes = await iexec.order.unpublishLastApporder(
-        apporder.app,
-      );
-      expect(unpublishLastRes).toBe(lastOrderHash);
-      const unpublishLast2Res = await iexec.order.unpublishLastApporder(
-        apporder.app,
-      );
-      expect(unpublishLast2Res).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishLastApporder(apporder.app),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
-        ),
-      );
-    });
-  });
+        await iexec.dataset.pushDatasetSecret(datasetAddress, 'foo');
 
-  describe('unpublishLastDatasetorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
-        preflightCheck: false,
-      });
-      const lastDatasetorder = await iexec.order.signDatasetorder(
-        datasetorder,
-        {
-          preflightCheck: false,
-        },
-      );
-      const lastOrderHash = await iexec.order.publishDatasetorder(
-        lastDatasetorder,
-        { preflightCheck: false },
-      );
-      const unpublishLastRes = await iexec.order.unpublishLastDatasetorder(
-        datasetorder.dataset,
-      );
-      expect(unpublishLastRes).toBe(lastOrderHash);
-      const unpublishLast2Res = await iexec.order.unpublishLastDatasetorder(
-        datasetorder.dataset,
-      );
-      expect(unpublishLast2Res).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishLastDatasetorder(datasetorder.dataset),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishLastWorkerpoolorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const orderHash =
-        await iexec.order.publishWorkerpoolorder(workerpoolorder);
-      const lastWorkerpoolorder =
-        await iexec.order.signWorkerpoolorder(workerpoolorder);
-      const lastOrderHash =
-        await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
-      const unpublishLastRes = await iexec.order.unpublishLastWorkerpoolorder(
-        workerpoolorder.workerpool,
-      );
-      expect(unpublishLastRes).toBe(lastOrderHash);
-      const unpublishLast2Res = await iexec.order.unpublishLastWorkerpoolorder(
-        workerpoolorder.workerpool,
-      );
-      expect(unpublishLast2Res).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishLastRequestorder()', () => {
-    test('unpublish the order', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      await iexec.order.publishApporder(apporder);
-      const requestorder = await iexec.order
-        .createRequestorder({
-          requester: await iexec.wallet.getAddress(),
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          dataset: NULL_ADDRESS,
-          datasetmaxprice: 0,
-          workerpool: NULL_ADDRESS,
-          workerpoolmaxprice: 0,
-          category: 1,
-          trust: 0,
-          volume: 1,
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+        const orderHashPreflight = await iexec.order.publishDatasetorder(
+          await iexec.order.signDatasetorder(datasetorder, {
+            preflightCheck: false,
+          }),
         );
-      const orderHash = await iexec.order.publishRequestorder(requestorder, {
-        preflightCheck: false,
+        expect(orderHashPreflight).toBeTxHash();
       });
-      const lastRequestorder = await iexec.order.signRequestorder(
-        requestorder,
-        {
-          preflightCheck: false,
-        },
-      );
-      const lastOrderHash = await iexec.order.publishRequestorder(
-        lastRequestorder,
-        { preflightCheck: false },
-      );
-      const unpublishLastRes = await iexec.order.unpublishLastRequestorder(
-        requestorder.requester,
-      );
-      expect(unpublishLastRes).toBe(lastOrderHash);
-      const unpublishLast2Res = await iexec.order.unpublishLastRequestorder(
-        requestorder.requester,
-      );
-      expect(unpublishLast2Res).toBe(orderHash);
-      await expect(
-        iexec.order.unpublishLastRequestorder(requestorder.requester),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
-        ),
-      );
     });
-  });
 
-  describe('unpublishAllApporders()', () => {
-    test('unpublish all orders', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const orderHash = await iexec.order.publishApporder(apporder);
-      const lastApporder = await iexec.order.signApporder(apporder);
-      const lastOrderHash = await iexec.order.publishApporder(lastApporder);
-      const unpublishAllRes = await iexec.order.unpublishAllApporders(
-        apporder.app,
-      );
-      expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
-      );
-      expect(unpublishAllRes.length).toBe(2);
-      await expect(
-        iexec.order.unpublishAllApporders(apporder.app),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishAllDatasetorders()', () => {
-    test('unpublish all orders', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
-        preflightCheck: false,
+    describe('publishWorkerpoolorder()', () => {
+      test('publishes the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const orderHash =
+          await iexec.order.publishWorkerpoolorder(workerpoolorder);
+        expect(orderHash).toBeTxHash();
       });
-      const lastDatasetorder = await iexec.order.signDatasetorder(
-        datasetorder,
-        {
+    });
+
+    describe('publishRequestorder()', () => {
+      test('publishes the order (skip preflightCheck)', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        await iexec.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            requester: await iexec.wallet.getAddress(),
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            dataset: NULL_ADDRESS,
+            datasetmaxprice: 0,
+            workerpool: NULL_ADDRESS,
+            workerpoolmaxprice: 0,
+            category: 1,
+            trust: 0,
+            volume: 1,
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        const orderHash = await iexec.order.publishRequestorder(requestorder, {
           preflightCheck: false,
-        },
-      );
-      const lastOrderHash = await iexec.order.publishDatasetorder(
-        lastDatasetorder,
-        { preflightCheck: false },
-      );
-      const unpublishAllRes = await iexec.order.unpublishAllDatasetorders(
-        datasetorder.dataset,
-      );
-      expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
-      );
-      expect(unpublishAllRes.length).toBe(2);
-      await expect(
-        iexec.order.unpublishAllDatasetorders(datasetorder.dataset),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
-        ),
-      );
-    });
-  });
+        });
+        expect(orderHash).toBeTxHash();
+      });
 
-  describe('unpublishAllWorkerpoolorders()', () => {
-    test('unpublish all orders', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const orderHash =
-        await iexec.order.publishWorkerpoolorder(workerpoolorder);
-      const lastWorkerpoolorder =
-        await iexec.order.signWorkerpoolorder(workerpoolorder);
-      const lastOrderHash =
-        await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
-      const unpublishAllRes = await iexec.order.unpublishAllWorkerpoolorders(
-        workerpoolorder.workerpool,
-      );
-      expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
-      );
-      expect(unpublishAllRes.length).toBe(2);
-      await expect(
-        iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
-        ),
-      );
-    });
-  });
-
-  describe('unpublishAllRequestorders()', () => {
-    test('unpublish all orders', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      await iexec.order.publishApporder(apporder);
-      const requestorder = await iexec.order
-        .createRequestorder({
-          requester: await iexec.wallet.getAddress(),
-          app: apporder.app,
-          appmaxprice: apporder.appprice,
-          dataset: NULL_ADDRESS,
-          datasetmaxprice: 0,
-          workerpool: NULL_ADDRESS,
-          workerpoolmaxprice: 0,
-          category: 1,
-          trust: 0,
-          volume: 1,
-        })
-        .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+      test('preflightCheck result encryption key', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexecAppDev, {
+          teeFramework: TEE_FRAMEWORKS.SCONE,
+          tag: ['tee', 'scone'],
+        });
+        await iexecAppDev.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            category: 1,
+            params: { iexec_result_encryption: true },
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        await expect(
+          iexec.order.publishRequestorder(requestorder),
+        ).rejects.toThrow(
+          Error(
+            'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
+          ),
         );
-      const orderHash = await iexec.order.publishRequestorder(requestorder, {
-        preflightCheck: false,
+        await iexec.result.pushResultEncryptionKey(
+          `-----BEGIN PUBLIC KEY-----
+  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA29Y2NYC08oFJ8GxPR3dK
+  kI+Au+6keWHZ8CXs9f54WrXlNusNqqhOH7h4fQKaNHhptqSutmo6xYwmen4eUqe6
+  72NnmTeBpexvlHj16uDqgVoySVMaYMSwexRr+n7BQ2NWYntYc3r0ZjBACK7NMyrb
+  fp4W5UNGKDk3pq0ukPQQ8IGAUhZPPsncVpOSq65Ks1aI1vBSM6UzHCks582H1b0N
+  qO40vWd0Zd/8Lb/iHW6NDJXGgM0K/gRYz5hG3w0q9BvwN4mhHX1+2PWtuImv7np7
+  CWU5edVJYQ1E5mXARLVUzYLmDXM1nvckkLVAdGOvsXv8P60z+Q2zpIvK14+xm5Cf
+  EpAA5gOT+IQwcSOxuBstKpS8TXBXGvG8wsgJkK2docS9C8CIQU1OkI0EW4N7ViSA
+  hH2kM6sRIN3g8nmfiiSTu1YAynaMcXe0H/0zl8fXE1c3wi2X2S/SFwxMSwPG5yTB
+  2qLo9x75C8WUZC+uUP6VZcQE9B93F7DLzhd6O1VisGHefPQ/dF6rRreRwGI+JzL9
+  ROsm42L6N5HwSodD4x7Hil6nw2FdgK5/RkTRa47gtTTcSKFUAFB/YivDDBhyCqSx
+  oSEDTczO+ZMeoYGNQwiFpetTB7E4zNfxofllEvMax3/VOFurRbwDlMavD0LPeRM6
+  MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
+  -----END PUBLIC KEY-----`,
+        );
+        const orderHash = await iexec.order.publishRequestorder(requestorder);
+        expect(orderHash).toBeTxHash();
       });
-      const lastRequestorder = await iexec.order.signRequestorder(
-        requestorder,
-        {
-          preflightCheck: false,
+
+      test('preflightCheck dropbox token', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexecAppDev, {
+          teeFramework: TEE_FRAMEWORKS.SCONE,
+          tag: ['tee', 'scone'],
+        });
+        await iexecAppDev.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            category: 1,
+            params: { iexec_result_storage_provider: 'dropbox' },
+            tag: ['tee', 'scone'],
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        await expect(
+          iexec.order.publishRequestorder(requestorder),
+        ).rejects.toThrow(
+          Error(
+            'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
+          ),
+        );
+        await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
+        const orderHash = await iexec.order.publishRequestorder(requestorder);
+        expect(orderHash).toBeTxHash();
+      });
+    });
+  });
+
+  describe('unpublish...order()', () => {
+    test("throw a MarketCallError when the SMS can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          iexecGatewayURL: SERVICE_UNREACHABLE_URL,
         },
-      );
-      const lastOrderHash = await iexec.order.publishRequestorder(
-        lastRequestorder,
-        { preflightCheck: false },
-      );
-      const unpublishAllRes = await iexec.order.unpublishAllRequestorders(
-        requestorder.requester,
-      );
-      expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
-      );
-      expect(unpublishAllRes.length).toBe(2);
-      await expect(
-        iexec.order.unpublishAllRequestorders(requestorder.requester),
-      ).rejects.toThrow(
-        Error(
-          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
-        ),
-      );
+      });
+      await expectAsyncCustomError(iexec.order.unpublishAllRequestorders(), {
+        constructor: MarketCallError,
+        message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+      });
+    });
+
+    test('throw a MarketCallError when the SMS encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          iexecGatewayURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(iexec.order.unpublishAllRequestorders(), {
+        constructor: MarketCallError,
+        message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+      });
+    });
+
+    describe('unpublishApporder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const orderHash = await iexec.order.publishApporder(apporder);
+        const unpublishRes = await iexec.order.unpublishApporder(orderHash);
+        expect(unpublishRes).toBe(orderHash);
+        await expect(iexec.order.unpublishApporder(orderHash)).rejects.toThrow(
+          Error(
+            `API error: apporder with orderHash ${orderHash} is not published`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishDatasetorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
+          preflightCheck: false,
+        });
+        const unpublishRes = await iexec.order.unpublishDatasetorder(orderHash);
+        expect(unpublishRes).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishDatasetorder(orderHash),
+        ).rejects.toThrow(
+          Error(
+            `API error: datasetorder with orderHash ${orderHash} is not published`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishWorkerpoolorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const orderHash =
+          await iexec.order.publishWorkerpoolorder(workerpoolorder);
+        const unpublishRes =
+          await iexec.order.unpublishWorkerpoolorder(orderHash);
+        expect(unpublishRes).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishWorkerpoolorder(orderHash),
+        ).rejects.toThrow(
+          Error(
+            `API error: workerpoolorder with orderHash ${orderHash} is not published`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishRequestorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        await iexec.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            requester: await iexec.wallet.getAddress(),
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            dataset: NULL_ADDRESS,
+            datasetmaxprice: 0,
+            workerpool: NULL_ADDRESS,
+            workerpoolmaxprice: 0,
+            category: 1,
+            trust: 0,
+            volume: 1,
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        const orderHash = await iexec.order.publishRequestorder(requestorder, {
+          preflightCheck: false,
+        });
+        const unpublishRes = await iexec.order.unpublishRequestorder(orderHash);
+        expect(unpublishRes).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishRequestorder(orderHash),
+        ).rejects.toThrow(
+          Error(
+            `API error: requestorder with orderHash ${orderHash} is not published`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishLastApporder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const orderHash = await iexec.order.publishApporder(apporder);
+        const lastApporder = await iexec.order.signApporder(apporder);
+        const lastOrderHash = await iexec.order.publishApporder(lastApporder);
+        const unpublishLastRes = await iexec.order.unpublishLastApporder(
+          apporder.app,
+        );
+        expect(unpublishLastRes).toBe(lastOrderHash);
+        const unpublishLast2Res = await iexec.order.unpublishLastApporder(
+          apporder.app,
+        );
+        expect(unpublishLast2Res).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishLastApporder(apporder.app),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishLastDatasetorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
+          preflightCheck: false,
+        });
+        const lastDatasetorder = await iexec.order.signDatasetorder(
+          datasetorder,
+          {
+            preflightCheck: false,
+          },
+        );
+        const lastOrderHash = await iexec.order.publishDatasetorder(
+          lastDatasetorder,
+          { preflightCheck: false },
+        );
+        const unpublishLastRes = await iexec.order.unpublishLastDatasetorder(
+          datasetorder.dataset,
+        );
+        expect(unpublishLastRes).toBe(lastOrderHash);
+        const unpublishLast2Res = await iexec.order.unpublishLastDatasetorder(
+          datasetorder.dataset,
+        );
+        expect(unpublishLast2Res).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishLastDatasetorder(datasetorder.dataset),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishLastWorkerpoolorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const orderHash =
+          await iexec.order.publishWorkerpoolorder(workerpoolorder);
+        const lastWorkerpoolorder =
+          await iexec.order.signWorkerpoolorder(workerpoolorder);
+        const lastOrderHash =
+          await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
+        const unpublishLastRes = await iexec.order.unpublishLastWorkerpoolorder(
+          workerpoolorder.workerpool,
+        );
+        expect(unpublishLastRes).toBe(lastOrderHash);
+        const unpublishLast2Res =
+          await iexec.order.unpublishLastWorkerpoolorder(
+            workerpoolorder.workerpool,
+          );
+        expect(unpublishLast2Res).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishLastRequestorder()', () => {
+      test('unpublish the order', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        await iexec.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            requester: await iexec.wallet.getAddress(),
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            dataset: NULL_ADDRESS,
+            datasetmaxprice: 0,
+            workerpool: NULL_ADDRESS,
+            workerpoolmaxprice: 0,
+            category: 1,
+            trust: 0,
+            volume: 1,
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        const orderHash = await iexec.order.publishRequestorder(requestorder, {
+          preflightCheck: false,
+        });
+        const lastRequestorder = await iexec.order.signRequestorder(
+          requestorder,
+          {
+            preflightCheck: false,
+          },
+        );
+        const lastOrderHash = await iexec.order.publishRequestorder(
+          lastRequestorder,
+          { preflightCheck: false },
+        );
+        const unpublishLastRes = await iexec.order.unpublishLastRequestorder(
+          requestorder.requester,
+        );
+        expect(unpublishLastRes).toBe(lastOrderHash);
+        const unpublishLast2Res = await iexec.order.unpublishLastRequestorder(
+          requestorder.requester,
+        );
+        expect(unpublishLast2Res).toBe(orderHash);
+        await expect(
+          iexec.order.unpublishLastRequestorder(requestorder.requester),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishAllApporders()', () => {
+      test('unpublish all orders', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const orderHash = await iexec.order.publishApporder(apporder);
+        const lastApporder = await iexec.order.signApporder(apporder);
+        const lastOrderHash = await iexec.order.publishApporder(lastApporder);
+        const unpublishAllRes = await iexec.order.unpublishAllApporders(
+          apporder.app,
+        );
+        expect(unpublishAllRes).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        expect(unpublishAllRes.length).toBe(2);
+        await expect(
+          iexec.order.unpublishAllApporders(apporder.app),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishAllDatasetorders()', () => {
+      test('unpublish all orders', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
+          preflightCheck: false,
+        });
+        const lastDatasetorder = await iexec.order.signDatasetorder(
+          datasetorder,
+          {
+            preflightCheck: false,
+          },
+        );
+        const lastOrderHash = await iexec.order.publishDatasetorder(
+          lastDatasetorder,
+          { preflightCheck: false },
+        );
+        const unpublishAllRes = await iexec.order.unpublishAllDatasetorders(
+          datasetorder.dataset,
+        );
+        expect(unpublishAllRes).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        expect(unpublishAllRes.length).toBe(2);
+        await expect(
+          iexec.order.unpublishAllDatasetorders(datasetorder.dataset),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishAllWorkerpoolorders()', () => {
+      test('unpublish all orders', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const orderHash =
+          await iexec.order.publishWorkerpoolorder(workerpoolorder);
+        const lastWorkerpoolorder =
+          await iexec.order.signWorkerpoolorder(workerpoolorder);
+        const lastOrderHash =
+          await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
+        const unpublishAllRes = await iexec.order.unpublishAllWorkerpoolorders(
+          workerpoolorder.workerpool,
+        );
+        expect(unpublishAllRes).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        expect(unpublishAllRes.length).toBe(2);
+        await expect(
+          iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
+          ),
+        );
+      });
+    });
+
+    describe('unpublishAllRequestorders()', () => {
+      test('unpublish all orders', async () => {
+        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        await iexec.order.publishApporder(apporder);
+        const requestorder = await iexec.order
+          .createRequestorder({
+            requester: await iexec.wallet.getAddress(),
+            app: apporder.app,
+            appmaxprice: apporder.appprice,
+            dataset: NULL_ADDRESS,
+            datasetmaxprice: 0,
+            workerpool: NULL_ADDRESS,
+            workerpoolmaxprice: 0,
+            category: 1,
+            trust: 0,
+            volume: 1,
+          })
+          .then((o) =>
+            iexec.order.signRequestorder(o, { preflightCheck: false }),
+          );
+        const orderHash = await iexec.order.publishRequestorder(requestorder, {
+          preflightCheck: false,
+        });
+        const lastRequestorder = await iexec.order.signRequestorder(
+          requestorder,
+          {
+            preflightCheck: false,
+          },
+        );
+        const lastOrderHash = await iexec.order.publishRequestorder(
+          lastRequestorder,
+          { preflightCheck: false },
+        );
+        const unpublishAllRes = await iexec.order.unpublishAllRequestorders(
+          requestorder.requester,
+        );
+        expect(unpublishAllRes).toEqual(
+          expect.arrayContaining([orderHash, lastOrderHash]),
+        );
+        expect(unpublishAllRes.length).toBe(2);
+        await expect(
+          iexec.order.unpublishAllRequestorders(requestorder.requester),
+        ).rejects.toThrow(
+          Error(
+            `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
+          ),
+        );
+      });
     });
   });
 

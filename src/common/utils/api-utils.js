@@ -68,14 +68,14 @@ export const httpRequest =
       .catch((error) => {
         debug(`httpRequest() fetch:`, error);
         throw new ApiCallErrorClass(
-          `Connection to ${baseURL} failed with a network error`,
+          `Connection to ${api} failed with a network error`,
           error,
         );
       })
       .then((response) => {
         if (response.status >= 500 && response.status <= 599) {
           throw new ApiCallErrorClass(
-            `Server at ${baseURL} encountered an internal error`,
+            `Server at ${api} encountered an internal error`,
             Error(
               `Server internal error: ${response.status} ${response.statusText}`,
             ),

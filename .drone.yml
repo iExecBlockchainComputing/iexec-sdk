@@ -16,6 +16,14 @@ steps:
     commands:
       - node test/scripts/prepare-test-env.js
 
+  - name: server-error-500
+    image: nginx:alpine
+    expose:
+      - 80
+    commands:
+      - cp test/mock/server/http500.nginx.conf /etc/nginx/conf.d/default.conf
+      - nginx
+
   - name: bellecour-fork
     detach: true
     image: ghcr.io/foundry-rs/foundry:v1.0.0
