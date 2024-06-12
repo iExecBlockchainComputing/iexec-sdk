@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).ResultProxyCallError
 
-ResultProxyCallError encapsulate an error occurring during a call to the Result-Proxy API such as a network error or a server internal error.
+ResultProxyCallError encapsulate an error occurring during a call to the Result Proxy API such as a network error or a server internal error.
 
 ## Hierarchy
 

@@ -69,7 +69,7 @@ export class ApiCallError extends Error {
 export class SmsCallError extends ApiCallError {}
 
 /**
- * ResultProxyCallError encapsulate an error occurring during a call to the Result-Proxy API such as a network error or a server internal error.
+ * ResultProxyCallError encapsulate an error occurring during a call to the Result Proxy API such as a network error or a server internal error.
  */
 export class ResultProxyCallError extends ApiCallError {}
 
