@@ -47,7 +47,7 @@ describe('deal', () => {
       );
     });
 
-    test('throw a SmsCallError when the SMS encounters an error', async () => {
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
       const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
@@ -142,7 +142,7 @@ describe('deal', () => {
       );
     });
 
-    test('throw a SmsCallError when the SMS encounters an error', async () => {
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
       const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {

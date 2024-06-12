@@ -825,7 +825,7 @@ describe('order', () => {
   });
 
   describe('publish...order()', () => {
-    test("throw a MarketCallError when the SMS can't be reached", async () => {
+    test("throw a MarketCallError when the Market API can't be reached", async () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -843,7 +843,7 @@ describe('order', () => {
       );
     });
 
-    test('throw a MarketCallError when the SMS encounters an error', async () => {
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -1027,7 +1027,7 @@ describe('order', () => {
   });
 
   describe('unpublish...order()', () => {
-    test("throw a MarketCallError when the SMS can't be reached", async () => {
+    test("throw a MarketCallError when the Market API can't be reached", async () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -1039,7 +1039,7 @@ describe('order', () => {
       });
     });
 
-    test('throw a MarketCallError when the SMS encounters an error', async () => {
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
