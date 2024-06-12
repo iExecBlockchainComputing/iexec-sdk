@@ -45,7 +45,7 @@ console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
 console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
 
 export const SERVICE_HTTP_500_URL = DRONE
-  ? 'http://server-error-500'
+  ? 'http://server-error-500:80'
   : 'http://localhost:5500';
 
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
