@@ -518,7 +518,7 @@ export const createVoucher =
         outputs: [
           {
             internalType: 'address',
-            name: '',
+            name: 'voucherAddress',
             type: 'address',
           },
         ],

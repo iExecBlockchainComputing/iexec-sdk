@@ -1037,6 +1037,26 @@ export default class IExecOrderModule extends IExecModule {
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**
+   * estimates the cost of matching the provided orders
+   *
+   * example:
+   * ```js
+   * const orders = {
+   *   apporder,
+   *   datasetorder
+   *   workerpoolorder,
+   *   requestorder,
+   * };
+   * const result = await estimateMatchOrders(orders, {useVoucher: true});
+   * console.log(`total cost for matching orders: ${result.total} nRLC`);
+   * console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
+   * ```
+   */
+  estimateMatchOrders(
+    orders: { apporder; datasetorder; workerpoolorder; requestorder },
+    options?: { useVoucher },
+  ): Promise<{ total: NRlcAmount; sponsored: NRlcAmount }>;
+  /**
    * Create an IExecOrderModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecOrderModule;

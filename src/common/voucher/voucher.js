@@ -1,21 +1,15 @@
 import Debug from 'debug';
-import { Contract } from 'ethers';
-import { abi } from './abi/Voucher.js';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { fetchVoucherAddress } from './voucherHub.js';
-import { getGraphQLClient } from '../utils/graphql-utils.js';
 import { checkAllowance } from '../account/allowance.js';
 import { bigIntToBn, checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
 import { getVoucherInfo } from './subgraph/voucherInfo.js';
+import { getGraphQLClient } from '../utils/graphql-utils.js';
+import { getVoucherContract } from '../utils/voucher-utils.js';
 
 const debug = Debug('iexec:voucher:voucher');
-
-const getVoucherContract = (
-  contracts = throwIfMissing(),
-  voucherAddress = throwIfMissing(),
-) => new Contract(voucherAddress, abi, contracts.provider);
 
 export const fetchVoucherContract = async (
   contracts = throwIfMissing(),
