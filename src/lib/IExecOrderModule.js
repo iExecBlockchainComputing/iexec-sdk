@@ -312,7 +312,10 @@ export default class IExecOrderModule extends IExecModule {
       { preflightCheck = true, useVoucher = false } = {},
     ) => {
       const contracts = await this.config.resolveContractsClient();
-      const voucherHubAddress = await this.config.resolveVoucherHubAddress();
+      let voucherHubAddress;
+      if (useVoucher) {
+        voucherHubAddress = await this.config.resolveVoucherHubAddress();
+      }
       if (preflightCheck === true) {
         const resolvedTag = sumTags([
           (

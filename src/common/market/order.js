@@ -937,7 +937,7 @@ export const estimateMatchOrders = async (
 
 export const matchOrders = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   appOrder = throwIfMissing(),
   datasetOrder = NULL_DATASETORDER,
   workerpoolOrder = throwIfMissing(),
@@ -975,19 +975,20 @@ export const matchOrders = async (
     const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
     const appPrice = new BN(vAppOrder.appprice);
     const datasetPrice = new BN(vDatasetOrder.datasetprice);
-    const voucherHubContract = getVoucherHubContract(
-      contracts,
-      voucherHubAddress,
-    );
-    const voucherAddress = await voucherHubContract.getVoucher(
-      vRequestOrder.requester,
-    );
+    let voucherAddress;
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (useVoucher) {
+        const voucherHubContract = getVoucherHubContract(
+          contracts,
+          voucherHubAddress,
+        );
+        voucherAddress = await voucherHubContract.getVoucher(
+          vRequestOrder.requester,
+        );
         if (!voucherAddress) {
           throw new Error(
             `No voucher available for the requester ${vRequestOrder.requester}`,
@@ -1045,9 +1046,9 @@ export const matchOrders = async (
       REQUEST_ORDER,
       vRequestOrder,
     );
-    const voucherContract = getVoucherContract(contracts, voucherAddress);
     const matchEvent = 'OrdersMatched';
     if (useVoucher) {
+      const voucherContract = getVoucherContract(contracts, voucherAddress);
       const pocoInterface = new Interface(abi);
       const tx = await wrapSend(
         voucherContract
