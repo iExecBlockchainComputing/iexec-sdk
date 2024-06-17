@@ -1,6 +1,5 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import { Interface } from 'ethers';
 import { getAddress } from '../wallet/address.js';
 import { isInWhitelist } from '../wallet/enterprise.js';
 import { checkBalance } from '../account/balance.js';
@@ -15,7 +14,6 @@ import {
 import { createObjParams } from '../execution/order-helper.js';
 import {
   checkEventFromLogs,
-  getEventFromLogs,
   bigIntToBn,
   getSalt,
   sumTags,
@@ -68,7 +66,6 @@ import {
   getVoucherHubContract,
 } from '../utils/voucher-utils.js';
 import { checkAllowance } from '../account/allowance.js';
-import { abi } from './abi/IexecPoco.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -975,25 +972,30 @@ export const matchOrders = async (
     const workerpoolPrice = new BN(vWorkerpoolOrder.workerpoolprice);
     const appPrice = new BN(vAppOrder.appprice);
     const datasetPrice = new BN(vDatasetOrder.datasetprice);
+
+    // resolve voucher address if used
     let voucherAddress;
+    if (useVoucher) {
+      const voucherHubContract = getVoucherHubContract(
+        contracts,
+        voucherHubAddress,
+      );
+      voucherAddress = await voucherHubContract.getVoucher(
+        vRequestOrder.requester,
+      );
+      if (!voucherAddress) {
+        throw new Error(
+          `No voucher available for the requester ${vRequestOrder.requester}`,
+        );
+      }
+    }
+
     // account stake check
     const checkRequesterSolvabilityAsync = async () => {
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (useVoucher) {
-        const voucherHubContract = getVoucherHubContract(
-          contracts,
-          voucherHubAddress,
-        );
-        voucherAddress = await voucherHubContract.getVoucher(
-          vRequestOrder.requester,
-        );
-        if (!voucherAddress) {
-          throw new Error(
-            `No voucher available for the requester ${vRequestOrder.requester}`,
-          );
-        }
         const { total, sponsored } = await estimateMatchOrders(
           contracts,
           voucherHubAddress,
@@ -1046,11 +1048,12 @@ export const matchOrders = async (
       REQUEST_ORDER,
       vRequestOrder,
     );
-    const matchEvent = 'OrdersMatched';
+
+    let tx;
+    const iexecContract = contracts.getIExecContract();
     if (useVoucher) {
       const voucherContract = getVoucherContract(contracts, voucherAddress);
-      const pocoInterface = new Interface(abi);
-      const tx = await wrapSend(
+      tx = await wrapSend(
         voucherContract
           .connect(contracts.signer)
           .matchOrders(
@@ -1060,32 +1063,28 @@ export const matchOrders = async (
             requestOrderStruct,
           ),
       );
-      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      const events = parseTransactionLogs(txReceipt.logs, pocoInterface);
-      const matchedEvent = events.find((event) => event.name === matchEvent);
-      if (!matchedEvent) {
-        throw Error(`${matchEvent} not confirmed`);
-      }
-      const { dealid, volume } = matchedEvent.args;
-      return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };
+    } else {
+      tx = await wrapSend(
+        iexecContract.matchOrders(
+          appOrderStruct,
+          datasetOrderStruct,
+          workerpoolOrderStruct,
+          requestOrderStruct,
+          contracts.txOptions,
+        ),
+      );
     }
-    const iexecContract = contracts.getIExecContract();
-    const tx = await wrapSend(
-      iexecContract.matchOrders(
-        appOrderStruct,
-        datasetOrderStruct,
-        workerpoolOrderStruct,
-        requestOrderStruct,
-        contracts.txOptions,
-      ),
-    );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-
-    if (!checkEventFromLogs(matchEvent, txReceipt.logs))
+    const events = parseTransactionLogs(
+      txReceipt.logs,
+      iexecContract.interface,
+    );
+    const matchEvent = 'OrdersMatched';
+    const orderMatchedEvent = events.find((event) => event.name === matchEvent);
+    if (!orderMatchedEvent) {
       throw Error(`${matchEvent} not confirmed`);
-    const { dealid, volume } = getEventFromLogs(matchEvent, txReceipt.logs, {
-      strict: true,
-    }).args;
+    }
+    const { dealid, volume } = orderMatchedEvent.args;
     return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };
   } catch (error) {
     debug('matchOrders() error', error);
