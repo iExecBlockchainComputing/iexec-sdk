@@ -516,13 +516,15 @@ fill
               .validate(requestOrder)
           ).tag,
           (await apporderSchema().label('apporder').validate(appOrder)).tag,
-          ... useDataset ? 
-          [ 
-            (await datasetorderSchema()
-              .label('datasetorder')
-              .validate(datasetOrder)
-            ).tag 
-          ] : [],
+          ...(useDataset
+            ? [
+                (
+                  await datasetorderSchema()
+                    .label('datasetorder')
+                    .validate(datasetOrder)
+                ).tag,
+              ]
+            : []),
         ]);
         await checkAppRequirements(
           {
@@ -582,6 +584,7 @@ fill
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await matchOrders(
         chain.contracts,
+        chain.voucherHub,
         appOrder,
         useDataset ? datasetOrder : undefined,
         workerpoolOrder,
