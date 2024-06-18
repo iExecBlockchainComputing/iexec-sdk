@@ -11,12 +11,24 @@ export class ConfigurationError extends Error {}
  * Web3ProviderError encapsulates an error thrown by the web3 provider.
  */
 export class Web3ProviderError extends Error {
-  constructor(message: string, originalError: Error);
+  constructor(
+    /**
+     * A descriptive error message detailing the nature of the error.
+     */
+    message: string,
+    /**
+     * The original Error object that caused this web3 provider error.
+     */
+    originalError: Error,
+  );
   /**
-   * @deprecated use Error cause instead
+   * @deprecated use Error cause instead.
    */
-  originalError?: Error;
-  cause?: Error;
+  originalError: Error;
+  /**
+   * The original Error object that caused this web3 provider error.
+   */
+  cause: Error;
 }
 /**
  * Web3ProviderCallError encapsulates an error thrown by the web3 provider during a web3 call.
@@ -31,36 +43,86 @@ export class Web3ProviderSendError extends Web3ProviderError {}
  */
 export class Web3ProviderSignMessageError extends Web3ProviderError {}
 /**
- * ObjectNotFoundError is thrown when trying to access an unknown resource.
+ * ObjectNotFoundError is thrown when trying to access an unknown onchain resource.
  */
 export class ObjectNotFoundError extends Error {
-  constructor(objName: string, objId: string, chainId: string);
-  objName?: string;
-  objId?: string;
-  chainId?: string;
+  constructor(
+    /**
+     * Name of the resource.
+     */
+    objName: string,
+    /**
+     * Id or address of the resource.
+     */
+    objId: string,
+    /**
+     * Chain id of the blockchain.
+     */
+    chainId: string,
+  );
+  /**
+   * Name of the resource.
+   */
+  objName: string;
+  /**
+   * Id or address of the resource.
+   */
+  objId: string;
+  /**
+   * Chain id of the blockchain.
+   */
+  chainId: string;
 }
 /**
  * BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfer confirmation.
  */
 export class BridgeError extends Error {
-  sendTxHash?: string;
+  constructor(
+    /**
+     * The original Error object that caused this API call error.
+     */
+    originalError: Error,
+    /**
+     * Hash of the transaction sending the value to the bridge contract.
+     */
+    sendTxHash: string,
+  );
+  /**
+   * Hash of the transaction sending the value to the bridge contract.
+   */
+  sendTxHash: string;
   /**
    * @deprecated use Error cause instead
    */
-  originalError?: Error;
-  cause?: Error;
+  originalError: Error;
+  /**
+   * The original Error object that caused this API call error.
+   */
+  cause: Error;
 }
 
 /**
  * ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server-side internal error.
  */
 export class ApiCallError extends Error {
-  constructor(message: string, originalError: Error);
+  constructor(
+    /**
+     * A descriptive error message detailing the nature of the error.
+     */
+    message: string,
+    /**
+     * The original Error object that caused this API call error.
+     */
+    originalError: Error,
+  );
   /**
-   * @deprecated use Error cause instead
+   * @deprecated use Error cause instead.
    */
-  originalError?: Error;
-  cause?: Error;
+  originalError: Error;
+  /**
+   * The original Error object that caused this API call error.
+   */
+  cause: Error;
 }
 
 /**
