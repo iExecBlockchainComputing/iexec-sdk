@@ -203,8 +203,9 @@ export default class IExecConfig {
   resolvePocoSubgraphURL(): Promise<string>;
   /**
    * resolve the current voucher subgraph URL
+   * returns `null` if not available
    */
-  resolveVoucherSubgraphURL(): Promise<string>;
+  resolveVoucherSubgraphURL(): Promise<string | null>;
   /**
    * resolve the current bridge contract address
    */
@@ -219,6 +220,7 @@ export default class IExecConfig {
   resolveEnsPublicResolverAddress(): Promise<string>;
   /**
    * resolve the current VoucherHub contract address
+   * returns `null` if not available
    */
-  resolveVoucherHubAddress(): Promise<string>;
+  resolveVoucherHubAddress(): Promise<string | null>;
 }

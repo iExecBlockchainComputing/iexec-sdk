@@ -1086,15 +1086,12 @@ describe('[IExecConfig]', () => {
         'https://custom-subgraph.iex.ec/subgraph/name',
       );
     });
-    test('throw when not configured on custom chain', async () => {
+    test('returns null when not configured on custom chain', async () => {
       const config = new IExecConfig({
         ethProvider: unknownTestChain.rpcURL,
       });
-      const promise = config.resolveVoucherSubgraphURL();
-      await expect(promise).rejects.toThrow(
-        `voucherSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
-      );
-      await expect(promise).rejects.toThrow(Error);
+      const res = await config.resolveVoucherSubgraphURL();
+      expect(res).toBe(null);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({
@@ -1316,17 +1313,12 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveVoucherHubAddress();
       await expect(promise).resolves.toBe(voucherHubAddressOverride);
     });
-    test('throw on unknown chain', async () => {
+    test('returns null on unknown chain', async () => {
       const config = new IExecConfig({
         ethProvider: unknownTestChain.rpcURL,
       });
-      const promise = config.resolveVoucherHubAddress();
-      await expect(promise).rejects.toThrow(
-        Error(
-          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
+      const res = await config.resolveVoucherHubAddress();
+      expect(res).toBe(null);
     });
     test('throw on network error', async () => {
       const config = new IExecConfig({

@@ -6,8 +6,10 @@ import { bigIntToBn, checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { wrapCall, wrapSend } from '../utils/errorWrappers.js';
 import { getVoucherInfo } from './subgraph/voucherInfo.js';
-import { getGraphQLClient } from '../utils/graphql-utils.js';
-import { getVoucherContract } from '../utils/voucher-utils.js';
+import {
+  getVoucherContract,
+  getVoucherSubgraphClient,
+} from '../utils/voucher-utils.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -34,8 +36,8 @@ export const fetchVoucherContract = async (
 
 export const showUserVoucher = async (
   contracts = throwIfMissing(),
-  voucherSubgraphURL = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherSubgraphURL,
+  voucherHubAddress,
   owner = throwIfMissing(),
 ) => {
   try {
@@ -66,7 +68,10 @@ export const showUserVoucher = async (
       vOwner,
       voucherAddress,
     );
-    const graphQLClient = getGraphQLClient(voucherSubgraphURL);
+    const graphQLClient = getVoucherSubgraphClient(
+      contracts,
+      voucherSubgraphURL,
+    );
     const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
     const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
       await Promise.all([

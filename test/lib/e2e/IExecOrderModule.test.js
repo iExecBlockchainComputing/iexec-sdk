@@ -3,6 +3,7 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
+  ONE_ETH,
   ONE_RLC,
   deployAndGetApporder,
   deployAndGetDatasetorder,
@@ -22,8 +23,10 @@ import {
   createVoucher,
   createVoucherType,
   addVoucherEligibleAsset,
+  setBalance,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
+import { ConfigurationError } from '../../../src/lib/errors.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -2259,63 +2262,200 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
       ).rejects.toThrow('Dataset encryption key is not set for dataset ');
     });
 
-    test('should throw error for insufficient voucher allowance', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+    describe('useVoucher option', () => {
+      test('requires voucherHubAddress to be configured when useVoucher is true', async () => {
+        const noVoucherTestChain = TEST_CHAINS['custom-token-chain'];
+        const options = {
+          resultProxyURL: 'https://result-proxy.iex.ec',
+          smsURL: 'https://sms.iex.ec',
+        };
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(noVoucherTestChain)({
+            options,
+          });
+        const { iexec: iexecResourcesProvider, wallet: providerWallet } =
+          getTestConfig(noVoucherTestChain)({
+            options,
+          });
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
-        volume: 10,
-        appprice: 5,
+        await setBalance(noVoucherTestChain)(requesterWallet.address, ONE_ETH);
+        await setBalance(noVoucherTestChain)(providerWallet.address, ONE_ETH);
+
+        const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecResourcesProvider,
+          {
+            volume: 7,
+            datasetprice: 1,
+          },
+        );
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecResourcesProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        await setNRlcBalance(noVoucherTestChain)(requesterWallet.address, 100);
+        await iexecRequester.account.deposit(100);
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true },
+          ),
+        ).rejects.toThrow(
+          new ConfigurationError(
+            `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`,
+          ),
+        );
+        // match orders without useVoucher should pass
+        const res = await iexecRequester.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { useVoucher: false },
+        );
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume.eq(new BN(5))).toBe(true);
+        expect(res.dealid).toBeTxHash();
       });
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-        {
-          volume: 7,
-          datasetprice: 1,
-        },
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-        { volume: 5, workerpoolprice: 1 },
-      );
-      const requestorder = await getMatchableRequestorder(iexecRequester, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
+
+      test('should throw error for insufficient voucher allowance', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+        const { iexec: iexecResourcesProvider } =
+          getTestConfig(iexecTestChain)();
+
+        const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecResourcesProvider,
+          {
+            volume: 7,
+            datasetprice: 1,
+          },
+        );
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecResourcesProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+        const voucherTypeId = await createVoucherType(iexecTestChain)({
+          description: 'test voucher type',
+          duration: 42,
+        });
+        await addVoucherEligibleAsset(iexecTestChain)(
+          datasetorder.dataset,
+          voucherTypeId,
+        );
+        await addVoucherEligibleAsset(iexecTestChain)(
+          workerpoolorder.workerpool,
+          voucherTypeId,
+        );
+        const voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000,
+        });
+        const allowance = await iexecRequester.account.checkAllowance(
+          requestorder.requester,
+          voucherAddress,
+        );
+        const { total, sponsored } =
+          await iexecRequester.order.estimateMatchOrders(
+            { apporder, datasetorder, workerpoolorder, requestorder },
+            { preflightCheck: true, useVoucher: true },
+          );
+
+        const requiredAmount = total.sub(sponsored);
+        const missingAmount = requiredAmount.sub(allowance);
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true },
+          ),
+        ).rejects.toThrow(
+          Error(
+            `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
+          ),
+        );
       });
-      const voucherTypeId = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 42,
-      });
-      await addVoucherEligibleAsset(iexecTestChain)(
-        datasetorder.dataset,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        workerpoolorder.workerpool,
-        voucherTypeId,
-      );
-      const voucherAddress = await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 1000,
-      });
-      const allowance = await iexecRequester.account.checkAllowance(
-        requestorder.requester,
-        voucherAddress,
-      );
-      const { total, sponsored } =
-        await iexecRequester.order.estimateMatchOrders(
-          { apporder, datasetorder, workerpoolorder, requestorder },
-          { preflightCheck: true, useVoucher: true },
+
+      test('should match orders with voucher when user deposits to cover the missing amount', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+        const { iexec: iexecResourcesProvider } =
+          getTestConfig(iexecTestChain)();
+
+        const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecResourcesProvider,
+          {
+            volume: 7,
+            datasetprice: 1,
+          },
+        );
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecResourcesProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+        const voucherTypeId = await createVoucherType(iexecTestChain)({
+          description: 'test voucher type',
+          duration: 42,
+        });
+        await addVoucherEligibleAsset(iexecTestChain)(
+          datasetorder.dataset,
+          voucherTypeId,
+        );
+        await addVoucherEligibleAsset(iexecTestChain)(
+          workerpoolorder.workerpool,
+          voucherTypeId,
         );
 
-      const requiredAmount = total.sub(sponsored);
-      const missingAmount = requiredAmount.sub(allowance);
-
-      await expect(
-        iexecRequester.order.matchOrders(
+        const voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000,
+        });
+        await setNRlcBalance(iexecTestChain)(requesterWallet.address, 30);
+        await iexecRequester.account.deposit(30);
+        await iexecRequester.account.approve(25, voucherAddress);
+        const res = await iexecRequester.order.matchOrders(
           {
             apporder,
             datasetorder,
@@ -2323,70 +2463,12 @@ MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
             requestorder,
           },
           { useVoucher: true },
-        ),
-      ).rejects.toThrow(
-        Error(
-          `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
-        ),
-      );
-    });
-
-    test('should match orders with voucher when user deposits to cover the missing amount', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
-
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
-        volume: 10,
-        appprice: 5,
+        );
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume.eq(new BN(5))).toBe(true);
+        expect(res.dealid).toBeTxHash();
       });
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-        {
-          volume: 7,
-          datasetprice: 1,
-        },
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-        { volume: 5, workerpoolprice: 1 },
-      );
-      const requestorder = await getMatchableRequestorder(iexecRequester, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
-      const voucherTypeId = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 42,
-      });
-      await addVoucherEligibleAsset(iexecTestChain)(
-        datasetorder.dataset,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        workerpoolorder.workerpool,
-        voucherTypeId,
-      );
-
-      const voucherAddress = await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 1000,
-      });
-      await setNRlcBalance(iexecTestChain)(requesterWallet.address, 30);
-      await iexecRequester.account.deposit(30);
-      await iexecRequester.account.approve(25, voucherAddress);
-      const tx = await iexecRequester.order.matchOrders(
-        {
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
-        },
-        { useVoucher: true },
-      );
-      expect(tx).toBeDefined();
     });
   });
 });
