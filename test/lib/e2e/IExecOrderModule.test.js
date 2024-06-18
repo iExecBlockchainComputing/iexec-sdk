@@ -358,225 +358,305 @@ describe('order', () => {
   });
 
   describe('estimateMatchOrders()', () => {
-    let iexecProvider;
-    let apporderTemplate;
-    let datasetorderTemplate;
-    let workerpoolorderTemplate;
-    let voucherTypeId;
+    test('estimates the total cost', async () => {
+      const noVoucherTestChain = TEST_CHAINS['custom-token-chain'];
+      const options = {
+        resultProxyURL: 'https://result-proxy.iex.ec',
+        smsURL: 'https://sms.iex.ec',
+      };
+      const { iexec: iexecRequester } = getTestConfig(noVoucherTestChain)({
+        options,
+      });
+      const { iexec: iexecResourcesProvider, wallet: providerWallet } =
+        getTestConfig(noVoucherTestChain)({
+          options,
+        });
 
-    beforeAll(async () => {
-      const providerConfig = getTestConfig(iexecTestChain)();
-      iexecProvider = providerConfig.iexec;
-      apporderTemplate = await deployAndGetApporder(iexecProvider, {
+      await setBalance(noVoucherTestChain)(providerWallet.address, ONE_ETH);
+
+      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
         volume: 10,
         appprice: 5,
       });
-      datasetorderTemplate = await deployAndGetDatasetorder(iexecProvider, {
-        volume: 7,
-        datasetprice: 1,
-      });
-      workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
-        iexecProvider,
+      const datasetorder = await deployAndGetDatasetorder(
+        iexecResourcesProvider,
+        {
+          volume: 7,
+          datasetprice: 1,
+        },
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(
+        iexecResourcesProvider,
         { volume: 5, workerpoolprice: 1 },
       );
-      voucherTypeId = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 60 * 60,
+      const requestorder = await getMatchableRequestorder(iexecRequester, {
+        apporder,
+        datasetorder,
+        workerpoolorder,
       });
 
-      await addVoucherEligibleAsset(iexecTestChain)(
-        apporderTemplate.app,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        datasetorderTemplate.dataset,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        workerpoolorderTemplate.workerpool,
-        voucherTypeId,
-      );
+      const res = await iexecRequester.order.estimateMatchOrders({
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      });
+      expect(res.sponsored).toBeInstanceOf(BN);
+      expect(res.sponsored).toEqual(new BN(0));
+      expect(res.total).toBeInstanceOf(BN);
+      expect(res.total).toEqual(new BN(35));
     });
 
-    test('should return total cost and sponsored amount when using voucher', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
+    describe('with useVoucher', () => {
+      let iexecProvider;
+      let apporderTemplate;
+      let datasetorderTemplate;
+      let workerpoolorderTemplate;
+      let voucherTypeId;
+      let expectedTotal;
 
-      const requestorderTemplate = await getMatchableRequestorder(
-        iexecRequester,
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-        },
-      );
+      beforeAll(async () => {
+        const providerConfig = getTestConfig(iexecTestChain)();
+        iexecProvider = providerConfig.iexec;
+        apporderTemplate = await deployAndGetApporder(iexecProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        datasetorderTemplate = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 7,
+          datasetprice: 1,
+        });
+        workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
 
-      await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 1000,
+        const matchableVolume = new BN(5); // min volume among orders
+        expectedTotal = new BN(5 + 1 + 1).mul(matchableVolume); // volume * orders unit prices
+
+        voucherTypeId = await createVoucherType(iexecTestChain)({
+          description: 'test voucher type',
+          duration: 60 * 60,
+        });
+
+        await addVoucherEligibleAsset(iexecTestChain)(
+          apporderTemplate.app,
+          voucherTypeId,
+        );
+        await addVoucherEligibleAsset(iexecTestChain)(
+          datasetorderTemplate.dataset,
+          voucherTypeId,
+        );
+        await addVoucherEligibleAsset(iexecTestChain)(
+          workerpoolorderTemplate.workerpool,
+          voucherTypeId,
+        );
       });
 
-      const matchableVolume = Math.min(
-        apporderTemplate.volume,
-        datasetorderTemplate.volume,
-        workerpoolorderTemplate.volume,
-      );
-      const total =
-        matchableVolume *
-        (Number(apporderTemplate.appprice) +
-          Number(datasetorderTemplate.datasetprice) +
-          Number(workerpoolorderTemplate.workerpoolprice));
+      test('requires voucherHubAddress to be configured when useVoucher is true', async () => {
+        const noVoucherTestChain = TEST_CHAINS['custom-token-chain'];
+        const options = {
+          resultProxyURL: 'https://result-proxy.iex.ec',
+          smsURL: 'https://sms.iex.ec',
+        };
+        const { iexec: iexecRequester } = getTestConfig(noVoucherTestChain)({
+          options,
+        });
+        const { iexec: iexecResourcesProvider, wallet: providerWallet } =
+          getTestConfig(noVoucherTestChain)({
+            options,
+          });
 
-      const sponsored =
-        matchableVolume *
-        (Number(apporderTemplate.appprice) +
-          Number(datasetorderTemplate.datasetprice) +
-          Number(workerpoolorderTemplate.workerpoolprice));
+        await setBalance(noVoucherTestChain)(providerWallet.address, ONE_ETH);
 
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
-        {
+        const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecResourcesProvider,
+          {
+            volume: 7,
+            datasetprice: 1,
+          },
+        );
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecResourcesProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        await expect(
+          iexecRequester.order.estimateMatchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true },
+          ),
+        ).rejects.toThrow(
+          new ConfigurationError(
+            `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`,
+          ),
+        );
+        // estimate match orders without useVoucher should pass
+        const res = await iexecRequester.order.estimateMatchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { useVoucher: false },
+        );
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(new BN(0));
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(new BN(35));
+      });
+
+      test('should have sponsored amount as 0 when useVoucher is false', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const requestorderTemplate = await getMatchableRequestorder(
+          iexecRequester,
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+          },
+        );
+
+        await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 100,
+        });
+
+        const res = await iexecRequester.order.estimateMatchOrders({
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
           requestorder: requestorderTemplate,
-        },
-        { useVoucher: true },
-      );
-      expect(matchedOrdersCost.sponsored).toBeInstanceOf(BN);
-      expect(matchedOrdersCost.sponsored).toEqual(new BN(sponsored));
-      expect(matchedOrdersCost.total).toBeInstanceOf(BN);
-      expect(matchedOrdersCost.total).toEqual(new BN(total));
-    });
+        });
 
-    test('should not return sponsored amount greater than voucher balance', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-
-      const requestorderTemplate = await getMatchableRequestorder(
-        iexecRequester,
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-        },
-      );
-
-      await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 5,
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(new BN(0));
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(expectedTotal);
       });
 
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
-        {
+      test('should return total cost and sponsored amount when using voucher', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const requestorderTemplate = await getMatchableRequestorder(
+          iexecRequester,
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+          },
+        );
+
+        await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000,
+        });
+
+        const res = await iexecRequester.order.estimateMatchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { useVoucher: true },
+        );
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(expectedTotal);
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(expectedTotal);
+      });
+
+      test('should return sponsored amount equal to voucher balance when voucher value is less than total cost', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const requestorderTemplate = await getMatchableRequestorder(
+          iexecRequester,
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+          },
+        );
+
+        await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 10,
+        });
+        const voucherInfo = await iexecRequester.voucher.showUserVoucher(
+          requesterWallet.address,
+        );
+
+        const res = await iexecRequester.order.estimateMatchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder: requestorderTemplate,
+          },
+          { useVoucher: true },
+        );
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(new BN(voucherInfo.balance));
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(expectedTotal);
+      });
+
+      test('should have sponsored amount as 0 when voucher expired', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const requestorderTemplate = await getMatchableRequestorder(
+          iexecRequester,
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+          },
+        );
+        const voucherType = await createVoucherType(iexecTestChain)({
+          description: 'test voucher type',
+          duration: 1,
+        });
+        await createVoucher(iexecTestChain)({
+          owner: await requesterWallet.getAddress(),
+          voucherType,
+          value: 100,
+        });
+
+        const res = await iexecRequester.order.estimateMatchOrders({
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
           requestorder: requestorderTemplate,
-        },
-        { useVoucher: true },
-      );
-
-      expect(matchedOrdersCost.sponsored).toBeInstanceOf(BN);
-      expect(matchedOrdersCost.sponsored).toEqual(new BN(5));
-      expect(matchedOrdersCost.total).toBeInstanceOf(BN);
-      expect(matchedOrdersCost.total.gt(matchedOrdersCost.sponsored)).toBe(
-        true,
-      );
-    });
-
-    test('should return sponsored amount equal to voucher balance when voucher value is less than total cost', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-
-      const requestorderTemplate = await getMatchableRequestorder(
-        iexecRequester,
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-        },
-      );
-
-      await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 10,
+        });
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(new BN(0));
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(expectedTotal);
       });
-      const voucherInfo = await iexecRequester.voucher.showUserVoucher(
-        requesterWallet.address,
-      );
-
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders(
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-          requestorder: requestorderTemplate,
-        },
-        { useVoucher: true },
-      );
-      expect(matchedOrdersCost.sponsored).toEqual(new BN(voucherInfo.balance));
-    });
-
-    test('should have sponsored amount as 0 when useVoucher is false', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-
-      const requestorderTemplate = await getMatchableRequestorder(
-        iexecRequester,
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-        },
-      );
-
-      await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType: voucherTypeId,
-        value: 100,
-      });
-
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders({
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-        requestorder: requestorderTemplate,
-      });
-
-      expect(matchedOrdersCost.sponsored).toEqual(new BN(0));
-    });
-
-    test('should have sponsored amount as 0 when voucher expired', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-
-      const requestorderTemplate = await getMatchableRequestorder(
-        iexecRequester,
-        {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
-        },
-      );
-      const voucherType = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 1,
-      });
-      await createVoucher(iexecTestChain)({
-        owner: await requesterWallet.getAddress(),
-        voucherType,
-        value: 100,
-      });
-      const matchedOrdersCost = await iexecRequester.order.estimateMatchOrders({
-        apporder: apporderTemplate,
-        datasetorder: datasetorderTemplate,
-        workerpoolorder: workerpoolorderTemplate,
-        requestorder: requestorderTemplate,
-      });
-      expect(matchedOrdersCost.sponsored).toEqual(new BN(0));
     });
   });
 
