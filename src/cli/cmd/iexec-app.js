@@ -243,7 +243,8 @@ show
       if (!isAddress && !userAddress)
         throw Error(`Missing option ${option.user()[0]} or wallet`);
 
-      if (!addressOrIndex) throw Error(info.missingAddressOrDeployed(objName, chain.id));
+      if (!addressOrIndex)
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
       spinner.start(info.showing(objName));
 
       let res;
@@ -1091,6 +1092,7 @@ run
       spinner.start('Submitting deal');
       const { dealid, volume, txHash } = await matchOrders(
         chain.contracts,
+        chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
