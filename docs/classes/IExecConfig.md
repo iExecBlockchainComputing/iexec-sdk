@@ -242,22 +242,24 @@ ___
 
 ### resolveVoucherHubAddress
 
-▸ **resolveVoucherHubAddress**(): `Promise`<`string`\>
+▸ **resolveVoucherHubAddress**(): `Promise`<``null`` \| `string`\>
 
 resolve the current VoucherHub contract address
+returns `null` if not available
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
 
 ___
 
 ### resolveVoucherSubgraphURL
 
-▸ **resolveVoucherSubgraphURL**(): `Promise`<`string`\>
+▸ **resolveVoucherSubgraphURL**(): `Promise`<``null`` \| `string`\>
 
 resolve the current voucher subgraph URL
+returns `null` if not available
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
