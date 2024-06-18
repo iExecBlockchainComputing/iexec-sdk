@@ -38,11 +38,11 @@ describe('voucher', () => {
       );
     });
 
-    test('returns undefined if user has no voucher', async () => {
+    test('returns null if user has no voucher', async () => {
       const owner = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       const res = await iexec.voucher.getVoucherAddress(owner);
-      expect(res).toBeUndefined();
+      expect(res).toBe(null);
     });
 
     test('returns voucher address when user has one', async () => {

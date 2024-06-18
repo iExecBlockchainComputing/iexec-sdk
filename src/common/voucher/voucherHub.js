@@ -21,7 +21,7 @@ export const fetchVoucherAddress = async (
       voucherHubAddress,
     );
     const address = await wrapCall(voucherHubContract.getVoucher(vOwner));
-    return address !== NULL_ADDRESS ? address : undefined;
+    return address !== NULL_ADDRESS ? address : null;
   } catch (error) {
     debug('fetchVoucherAddress()', error);
     throw error;
