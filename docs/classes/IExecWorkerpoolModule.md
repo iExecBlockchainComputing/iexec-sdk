@@ -149,7 +149,7 @@ ___
 
 ### getWorkerpoolApiUrl
 
-▸ **getWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
+▸ **getWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`undefined` \| `string`\>
 
 read the workerpool API url on the blockchain
 
@@ -170,7 +170,7 @@ console.log('workerpool API url:', url);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`undefined` \| `string`\>
 
 ___
 
