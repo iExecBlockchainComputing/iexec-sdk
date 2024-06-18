@@ -53,7 +53,7 @@ AbstractSigner.constructor
 
 | Name | Type |
 | :------ | :------ |
-| `provider` | `Provider` |
+| `provider` | ``null`` \| `Provider` |
 
 #### Returns
 
