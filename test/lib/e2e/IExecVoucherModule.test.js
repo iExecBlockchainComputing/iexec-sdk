@@ -59,6 +59,32 @@ describe('voucher', () => {
   });
 
   describe('showUserVoucher()', () => {
+    test('requires voucherHubAddress to be configured', async () => {
+      const owner = getRandomAddress();
+      const { iexec } = getTestConfig(unknownTestChain)({
+        readOnly: true,
+        options: { voucherSubgraphURL: 'http://voucher-subgraph.iex.ec' },
+      });
+      await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrow(
+        Error(
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
+        ),
+      );
+    });
+
+    test('requires voucherSubgraphURL to be configured', async () => {
+      const owner = getRandomAddress();
+      const { iexec } = getTestConfig(unknownTestChain)({
+        readOnly: true,
+        options: { voucherHubAddress: getRandomAddress() },
+      });
+      await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrow(
+        Error(
+          `voucherSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
+        ),
+      );
+    });
+
     test('throw error if user has no voucher', async () => {
       const owner = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
@@ -158,6 +184,17 @@ describe('voucher', () => {
   });
 
   describe('authorizeRequester()', () => {
+    test('requires voucherHubAddress to be configured', async () => {
+      const { iexec } = getTestConfig(unknownTestChain)();
+      await expect(
+        iexec.voucher.authorizeRequester(getRandomAddress()),
+      ).rejects.toThrow(
+        Error(
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
+        ),
+      );
+    });
+
     test('requires a signer', async () => {
       const requester = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
@@ -204,6 +241,17 @@ describe('voucher', () => {
   });
 
   describe('revokeRequesterAuthorization()', () => {
+    test('requires voucherHubAddress to be configured', async () => {
+      const { iexec } = getTestConfig(unknownTestChain)();
+      await expect(
+        iexec.voucher.revokeRequesterAuthorization(getRandomAddress()),
+      ).rejects.toThrow(
+        Error(
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
+        ),
+      );
+    });
+
     test('requires a signer', async () => {
       const requester = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });

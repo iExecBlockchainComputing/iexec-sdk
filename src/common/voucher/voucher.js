@@ -47,6 +47,10 @@ export const showUserVoucher = async (
       .required()
       .label('owner')
       .validate(owner);
+    const graphQLClient = getVoucherSubgraphClient(
+      contracts,
+      voucherSubgraphURL,
+    );
     const voucherAddress = await fetchVoucherAddress(
       contracts,
       voucherHubAddress,
@@ -67,10 +71,6 @@ export const showUserVoucher = async (
       contracts,
       vOwner,
       voucherAddress,
-    );
-    const graphQLClient = getVoucherSubgraphClient(
-      contracts,
-      voucherSubgraphURL,
     );
     const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
     const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
