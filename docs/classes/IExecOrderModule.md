@@ -356,12 +356,12 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 | Name | Type |
 | :------ | :------ |
 | `orders` | `Object` |
-| `orders.apporder` | `any` |
-| `orders.datasetorder` | `any` |
-| `orders.requestorder` | `any` |
-| `orders.workerpoolorder` | `any` |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
 | `options?` | `Object` |
-| `options.useVoucher` | `any` |
+| `options.useVoucher?` | `boolean` |
 
 #### Returns
 
