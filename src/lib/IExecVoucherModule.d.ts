@@ -30,7 +30,7 @@ export default class IExecVoucherModule extends IExecModule {
    * console.log('voucher contract address:', voucherAddress);
    * ```
    */
-  getVoucherAddress(owner: Addressish): Promise<Address | undefined>;
+  getVoucherAddress(owner: Addressish): Promise<Address | null>;
 
   /**
    * **SIGNER REQUIRED**

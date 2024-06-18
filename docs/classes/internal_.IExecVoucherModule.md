@@ -95,7 +95,7 @@ ___
 
 ### getVoucherAddress
 
-▸ **getVoucherAddress**(`owner`): `Promise`<`string`\>
+▸ **getVoucherAddress**(`owner`): `Promise`<``null`` \| `string`\>
 
 returns the address of the voucher contract for the specified address if the address owns a voucher
 
@@ -113,7 +113,7 @@ console.log('voucher contract address:', voucherAddress);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
 
 ___
 
