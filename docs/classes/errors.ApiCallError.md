@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).ApiCallError
 
-ApiCallError encapsulate an error occurring during a call to an API such as a network error or a server internal error.
+ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server-side internal error.
 
 ## Hierarchy
 
@@ -41,10 +41,10 @@ ApiCallError encapsulate an error occurring during a call to an API such as a ne
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `string` |
-| `originalError` | `Error` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this API call error. |
 
 #### Returns
 
@@ -58,14 +58,16 @@ Error.constructor
 
 ### cause
 
-• `Optional` **cause**: `Error`
+• **cause**: `Error`
+
+The original Error object that caused this API call error.
 
 ___
 
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
 
 **`Deprecated`**
 
-use Error cause instead
+use Error cause instead.

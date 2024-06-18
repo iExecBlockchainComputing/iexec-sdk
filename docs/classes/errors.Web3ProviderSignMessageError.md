@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).Web3ProviderSignMessageError
 
-Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider during a message signature.
+Web3ProviderSignMessageError encapsulates an error thrown by the web3 provider during a message signature.
 
 ## Hierarchy
 
@@ -31,10 +31,10 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `string` |
-| `originalError` | `Error` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this web3 provider error. |
 
 #### Returns
 
@@ -48,7 +48,9 @@ Web3ProviderSignMessageError encapsulate an error thrown by the web3 provider du
 
 ### cause
 
-• `Optional` **cause**: `Error`
+• **cause**: `Error`
+
+The original Error object that caused this web3 provider error.
 
 #### Inherited from
 
@@ -58,11 +60,11 @@ ___
 
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
 
 **`Deprecated`**
 
-use Error cause instead
+use Error cause instead.
 
 #### Inherited from
 

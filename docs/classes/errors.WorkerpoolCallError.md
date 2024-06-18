@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).WorkerpoolCallError
 
-WorkerpoolCallError encapsulate an error occurring during a call to a workerpool API such as a network error or a server internal error.
+WorkerpoolCallError encapsulates an error occurring during a call to a workerpool API such as a network error or a server-side internal error.
 
 ## Hierarchy
 
@@ -31,10 +31,10 @@ WorkerpoolCallError encapsulate an error occurring during a call to a workerpool
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `string` |
-| `originalError` | `Error` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this API call error. |
 
 #### Returns
 
@@ -48,7 +48,9 @@ WorkerpoolCallError encapsulate an error occurring during a call to a workerpool
 
 ### cause
 
-• `Optional` **cause**: `Error`
+• **cause**: `Error`
+
+The original Error object that caused this API call error.
 
 #### Inherited from
 
@@ -58,11 +60,11 @@ ___
 
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
 
 **`Deprecated`**
 
-use Error cause instead
+use Error cause instead.
 
 #### Inherited from
 

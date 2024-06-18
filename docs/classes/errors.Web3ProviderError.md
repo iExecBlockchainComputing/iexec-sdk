@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).Web3ProviderError
 
-Web3ProviderError encapsulate an error thrown by the web3 provider.
+Web3ProviderError encapsulates an error thrown by the web3 provider.
 
 ## Hierarchy
 
@@ -37,10 +37,10 @@ Web3ProviderError encapsulate an error thrown by the web3 provider.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `string` |
-| `originalError` | `Error` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this web3 provider error. |
 
 #### Returns
 
@@ -54,14 +54,16 @@ Error.constructor
 
 ### cause
 
-• `Optional` **cause**: `Error`
+• **cause**: `Error`
+
+The original Error object that caused this web3 provider error.
 
 ___
 
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
 
 **`Deprecated`**
 
-use Error cause instead
+use Error cause instead.
