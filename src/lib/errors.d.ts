@@ -52,7 +52,7 @@ export class BridgeError extends Error {
 }
 
 /**
- * ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server internal error.
+ * ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server-side internal error.
  */
 export class ApiCallError extends Error {
   constructor(message: string, originalError: Error);
@@ -64,26 +64,26 @@ export class ApiCallError extends Error {
 }
 
 /**
- * SmsCallError encapsulates an error occurring during a call to the SMS API such as a network error or a server internal error.
+ * SmsCallError encapsulates an error occurring during a call to the SMS API such as a network error or a server-side internal error.
  */
 export class SmsCallError extends ApiCallError {}
 
 /**
- * ResultProxyCallError encapsulates an error occurring during a call to the Result Proxy API such as a network error or a server internal error.
+ * ResultProxyCallError encapsulates an error occurring during a call to the Result Proxy API such as a network error or a server-side internal error.
  */
 export class ResultProxyCallError extends ApiCallError {}
 
 /**
- * MarketCallError encapsulates an error occurring during a call to the Market API such as a network error or a server internal error.
+ * MarketCallError encapsulates an error occurring during a call to the Market API such as a network error or a server-side internal error.
  */
 export class MarketCallError extends ApiCallError {}
 
 /**
- * IpfsGatewayCallError encapsulates an error occurring during a call to the IPFS gateway API such as a network error or a server internal error.
+ * IpfsGatewayCallError encapsulates an error occurring during a call to the IPFS gateway API such as a network error or a server-side internal error.
  */
 export class IpfsGatewayCallError extends ApiCallError {}
 
 /**
- * WorkerpoolCallError encapsulates an error occurring during a call to a workerpool API such as a network error or a server internal error.
+ * WorkerpoolCallError encapsulates an error occurring during a call to a workerpool API such as a network error or a server-side internal error.
  */
 export class WorkerpoolCallError extends ApiCallError {}
