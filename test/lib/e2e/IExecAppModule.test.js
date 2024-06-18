@@ -2,15 +2,22 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
-import { deployRandomApp, getTestConfig } from '../lib-test-utils';
+import {
+  deployRandomApp,
+  expectAsyncCustomError,
+  getTestConfig,
+} from '../lib-test-utils';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
   getId,
   getRandomAddress,
+  SERVICE_UNREACHABLE_URL,
+  SERVICE_HTTP_500_URL,
 } from '../../test-utils';
 import '../../jest-setup';
 import { errors } from '../../../src/lib';
+import { SmsCallError } from '../../../src/lib/errors';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -255,6 +262,45 @@ describe('app', () => {
   });
 
   describe('checkAppSecretExists()', () => {
+    let randomAppAddress;
+    beforeAll(async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const { address } = await deployRandomApp(iexec);
+      randomAppAddress = address;
+    });
+
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        readOnlyIExec.app.checkAppSecretExists(randomAppAddress),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        readOnlyIExec.app.checkAppSecretExists(randomAppAddress),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('checks an app secret exist on SMS inferred from app TEE framework', async () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
@@ -303,6 +349,47 @@ describe('app', () => {
   });
 
   describe('pushAppSecret()', () => {
+    let randomAppAddress;
+    let randomAppOwnerWallet;
+    beforeAll(async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { address } = await deployRandomApp(iexec);
+      randomAppAddress = address;
+      randomAppOwnerWallet = wallet;
+    });
+
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: randomAppOwnerWallet.privateKey,
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexec.app.pushAppSecret(randomAppAddress, 'foo'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: randomAppOwnerWallet.privateKey,
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexec.app.pushAppSecret(randomAppAddress, 'foo'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('only owner can push secret', async () => {
       const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =

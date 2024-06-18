@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).ObjectNotFoundError
 
-ObjectNotFoundError is thrown when trying to access an unknown resource.
+ObjectNotFoundError is thrown when trying to access an unknown onchain resource.
 
 ## Hierarchy
 
@@ -32,11 +32,11 @@ ObjectNotFoundError is thrown when trying to access an unknown resource.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `objName` | `string` |
-| `objId` | `string` |
-| `chainId` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `objName` | `string` | Name of the resource. |
+| `objId` | `string` | Id or address of the resource. |
+| `chainId` | `string` | Chain id of the blockchain. |
 
 #### Returns
 
@@ -50,16 +50,22 @@ Error.constructor
 
 ### chainId
 
-• `Optional` **chainId**: `string`
+• **chainId**: `string`
+
+Chain id of the blockchain.
 
 ___
 
 ### objId
 
-• `Optional` **objId**: `string`
+• **objId**: `string`
+
+Id or address of the resource.
 
 ___
 
 ### objName
 
-• `Optional` **objName**: `string`
+• **objName**: `string`
+
+Name of the resource.

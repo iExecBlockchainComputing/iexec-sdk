@@ -2,6 +2,7 @@ import Debug from 'debug';
 import querystring from 'query-string';
 import { hashEIP712 } from './sig-utils.js';
 import { wrapSignTypedData } from './errorWrappers.js';
+import { ApiCallError } from './errors.js';
 
 const debug = Debug('iexec:api-utils');
 
@@ -33,7 +34,14 @@ const makeHeaders = (method, headers, body) => {
 
 export const httpRequest =
   (method) =>
-  async ({ api, endpoint = '', query = {}, body = {}, headers = {} }) => {
+  async ({
+    api,
+    endpoint = '',
+    query = {},
+    body = {},
+    headers = {},
+    ApiCallErrorClass = ApiCallError,
+  }) => {
     debug(
       'httpRequest()',
       '\nmethod',
@@ -56,22 +64,26 @@ export const httpRequest =
       method,
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
-    }).catch((error) => {
-      debug(`httpRequest() fetch:`, error);
-      throw Error(`Connection to ${baseURL} failed with a network error`);
-    });
+    })
+      .catch((error) => {
+        debug(`httpRequest() fetch:`, error);
+        throw new ApiCallErrorClass(
+          `Connection to ${api} failed with a network error`,
+          error,
+        );
+      })
+      .then((response) => {
+        if (response.status >= 500 && response.status <= 599) {
+          throw new ApiCallErrorClass(
+            `Server at ${api} encountered an internal error`,
+            Error(
+              `Server internal error: ${response.status} ${response.statusText}`,
+            ),
+          );
+        }
+        return response;
+      });
   };
-
-const checkResponseOk = (response) => {
-  if (!response.ok) {
-    throw Error(
-      `API call error: ${response.status} ${
-        response.statusText ? response.statusText : ''
-      }`,
-    );
-  }
-  return response;
-};
 
 const responseToJson = async (response) => {
   const contentType = response.headers.get('Content-Type');
@@ -84,18 +96,7 @@ const responseToJson = async (response) => {
       .then((json) => json && json.error)
       .catch(() => {});
     if (errorMessage) throw new Error(`API error: ${errorMessage}`);
-    throw Error(
-      `API error: ${response.status} ${
-        response.statusText ? response.statusText : ''
-      }`,
-    );
-  }
-  if (!response.ok) {
-    throw Error(
-      `API error: ${response.status} ${
-        response.statusText ? response.statusText : ''
-      }`,
-    );
+    throw Error(`API error: ${response.status} ${response.statusText}`);
   }
   throw new Error('The http response is not of JSON type');
 };
@@ -137,39 +138,54 @@ export const downloadZipApi = {
     httpRequest('GET')({
       ...args,
       ...{ headers: { Accept: 'application/zip', ...args.headers } },
-    }).then(checkResponseOk),
+    }).then((response) => {
+      if (!response.ok) {
+        throw Error(
+          `API error: ${response.status} ${
+            response.statusText ? response.statusText : ''
+          }`,
+        );
+      }
+      return response;
+    }),
 };
 
-export const getAuthorization =
-  (api, endpoint = '/challenge') =>
-  async (chainId, address, signer) => {
-    try {
-      const challenge = await jsonApi.get({
-        api,
-        endpoint,
-        query: {
-          chainId,
-          address,
-        },
-      });
-      const typedData = challenge.data || challenge;
-      const { domain, message } = typedData || {};
-      const { EIP712Domain, ...types } = typedData.types || {};
-      if (!domain || !types || !message) {
-        throw Error('Unexpected challenge format');
-      }
-      const sign = await wrapSignTypedData(
-        signer.signTypedData(domain, types, message),
-      );
-      const hash = hashEIP712(typedData);
-      const separator = '_';
-      return hash
-        .concat(separator)
-        .concat(sign)
-        .concat(separator)
-        .concat(address);
-    } catch (error) {
-      debug('getAuthorization()', error);
-      throw Error(`Failed to get authorization: ${error}`);
+export const getAuthorization = async ({
+  api,
+  endpoint,
+  ApiCallErrorClass,
+  chainId,
+  address,
+  signer,
+}) => {
+  const challenge = await jsonApi.get({
+    api,
+    endpoint,
+    query: {
+      chainId,
+      address,
+    },
+    ApiCallErrorClass,
+  });
+  try {
+    const typedData = challenge.data || challenge;
+    const { domain, message } = typedData || {};
+    const { EIP712Domain, ...types } = typedData.types || {};
+    if (!domain || !types || !message) {
+      throw Error('Unexpected challenge format');
     }
-  };
+    const sign = await wrapSignTypedData(
+      signer.signTypedData(domain, types, message),
+    );
+    const hash = hashEIP712(typedData);
+    const separator = '_';
+    return hash
+      .concat(separator)
+      .concat(sign)
+      .concat(separator)
+      .concat(address);
+  } catch (error) {
+    debug('getAuthorization()', error);
+    throw Error(`Failed to get authorization: ${error}`);
+  }
+};

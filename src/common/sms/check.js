@@ -5,6 +5,7 @@ import {
   throwIfMissing,
   positiveIntSchema,
 } from '../utils/validator.js';
+import { SmsCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:sms:check');
 
@@ -45,9 +46,7 @@ export const checkWeb3SecretExists = async (
       query: {
         secretAddress: vResourceAddress,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       cacheSecretExists({ smsURL, kindOfSecret, secretId });
@@ -89,9 +88,7 @@ export const checkWeb2SecretExists = async (
         ownerAddress: vOwnerAddress,
         secretName,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       cacheSecretExists({ smsURL, kindOfSecret, secretId });
@@ -128,9 +125,7 @@ export const checkRequesterSecretExists = async (
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: `/requesters/${vRequesterAddress}/secrets/${secretName}`,
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       cacheSecretExists({ smsURL, kindOfSecret, secretId });
@@ -168,9 +163,7 @@ export const checkAppSecretExists = async (
     const res = await httpRequest('HEAD')({
       api: smsURL,
       endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       cacheSecretExists({ smsURL, kindOfSecret, secretId });

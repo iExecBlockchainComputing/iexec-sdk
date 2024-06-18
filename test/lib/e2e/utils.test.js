@@ -387,7 +387,7 @@ describe('utils', () => {
       expect(tx0).toBeTxHash();
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        Error('nonce too low'),
+        'nonce too low',
       );
 
       nonceProvider.increaseNonce();
@@ -398,7 +398,7 @@ describe('utils', () => {
       expect(tx1).toBeTxHash();
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        Error('nonce too low'),
+        'nonce too low',
       );
 
       nonceProvider.increaseNonce();

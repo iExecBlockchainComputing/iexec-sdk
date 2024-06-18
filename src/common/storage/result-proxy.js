@@ -3,6 +3,7 @@ import { getAddress } from '../wallet/address.js';
 import { getAuthorization, httpRequest } from '../utils/api-utils.js';
 import { throwIfMissing } from '../utils/validator.js';
 import { checkSigner } from '../utils/utils.js';
+import { ResultProxyCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:storage:result-proxy');
 
@@ -13,18 +14,20 @@ export const login = async (
   try {
     checkSigner(contracts);
     const userAddress = await getAddress(contracts);
-    const authorization = await getAuthorization(
-      resultProxyURL,
-      '/results/challenge',
-    )(contracts.chainId, userAddress, contracts.signer);
+    const authorization = await getAuthorization({
+      api: resultProxyURL,
+      endpoint: '/results/challenge',
+      chainId: contracts.chainId,
+      address: userAddress,
+      signer: contracts.signer,
+      ApiCallErrorClass: ResultProxyCallError,
+    });
     const res = await httpRequest('POST')({
       api: resultProxyURL,
       endpoint: '/results/login',
       query: { chainId: contracts.chainId },
       body: authorization,
-    }).catch((e) => {
-      debug(e);
-      throw Error(`Result Proxy at ${resultProxyURL} didn't answered`);
+      ApiCallErrorClass: ResultProxyCallError,
     });
     if (res.ok) {
       return await res.text();
