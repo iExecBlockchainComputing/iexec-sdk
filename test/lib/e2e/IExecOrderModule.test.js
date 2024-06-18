@@ -327,6 +327,34 @@ describe('order', () => {
         iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
       ).resolves.toBeDefined();
     });
+
+    test('preflightCheck fails with invalid tag', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const order = await iexec.order.createApporder({
+        app: getRandomAddress(),
+      });
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['tee'] }),
+      ).rejects.toThrow(
+        Error(
+          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        ),
+      );
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['scone'] }),
+      ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
+      await expect(
+        iexec.order.signApporder({ ...order, tag: ['gramine'] }),
+      ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
+      await expect(
+        iexec.order.signApporder({
+          ...order,
+          tag: ['tee', 'scone', 'gramine'],
+        }),
+      ).rejects.toThrow(
+        Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      );
+    });
   });
 
   describe('estimateMatchOrders()', () => {
@@ -550,32 +578,6 @@ describe('order', () => {
       });
       expect(matchedOrdersCost.sponsored).toEqual(new BN(0));
     });
-  });
-
-  test('preflightCheck fails with invalid tag', async () => {
-    const { iexec } = getTestConfig(iexecTestChain)();
-    const order = await iexec.order.createApporder({
-      app: getRandomAddress(),
-    });
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['tee'] }),
-    ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
-    );
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['scone'] }),
-    ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signApporder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signApporder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 
   describe('signDatasetorder()', () => {
