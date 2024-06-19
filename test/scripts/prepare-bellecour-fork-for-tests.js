@@ -182,20 +182,18 @@ const getVoucherManagementRoles = async (targetManager) => {
 
   await impersonate(defaultAdmin);
 
-  const VOUCHER_MANAGER_ROLE = keccak256(Buffer.from('VOUCHER_MANAGER_ROLE'));
+  const MINTER_ROLE = keccak256(Buffer.from('MINTER_ROLE'));
 
-  const ASSET_ELIGIBILITY_MANAGER_ROLE = keccak256(
-    Buffer.from('ASSET_ELIGIBILITY_MANAGER_ROLE'),
-  );
+  const MANAGER_ROLE = keccak256(Buffer.from('MANAGER_ROLE'));
 
   await voucherHubContract
     .connect(new JsonRpcSigner(provider, defaultAdmin))
-    .grantRole(VOUCHER_MANAGER_ROLE, targetManager, { gasPrice: 0 })
+    .grantRole(MINTER_ROLE, targetManager, { gasPrice: 0 })
     .then((tx) => tx.wait());
 
   await voucherHubContract
     .connect(new JsonRpcSigner(provider, defaultAdmin))
-    .grantRole(ASSET_ELIGIBILITY_MANAGER_ROLE, targetManager, {
+    .grantRole(MANAGER_ROLE, targetManager, {
       gasPrice: 0,
     })
     .then((tx) => tx.wait());
@@ -203,15 +201,15 @@ const getVoucherManagementRoles = async (targetManager) => {
   await stopImpersonate(defaultAdmin);
 
   console.log(
-    `${targetManager} has role VOUCHER_MANAGER_ROLE: ${await voucherHubContract.hasRole(
-      VOUCHER_MANAGER_ROLE,
+    `${targetManager} has role MINTER_ROLE: ${await voucherHubContract.hasRole(
+      MINTER_ROLE,
       targetManager,
     )}`,
   );
 
   console.log(
-    `${targetManager} has role ASSET_ELIGIBILITY_MANAGER_ROLE: ${await voucherHubContract.hasRole(
-      ASSET_ELIGIBILITY_MANAGER_ROLE,
+    `${targetManager} has role MANAGER_ROLE: ${await voucherHubContract.hasRole(
+      MANAGER_ROLE,
       targetManager,
     )}`,
   );
