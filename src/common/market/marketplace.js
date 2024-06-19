@@ -18,6 +18,7 @@ import {
   bytes32Schema,
   throwIfMissing,
 } from '../utils/validator.js';
+import { MarketCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:market:marketplace');
 
@@ -46,11 +47,14 @@ const publishOrder = async (
     checkSigner(contracts);
     const address = await getAddress(contracts);
     const body = { order: signedOrder };
-    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
+    const authorization = await getAuthorization({
+      api: iexecGatewayURL,
+      endpoint: '/challenge',
       chainId,
       address,
-      contracts.signer,
-    );
+      signer: contracts.signer,
+      ApiCallErrorClass: MarketCallError,
+    });
     const response = await jsonApi.post({
       api: iexecGatewayURL,
       endpoint: apiEndpoints[orderName],
@@ -59,6 +63,7 @@ const publishOrder = async (
       },
       body,
       headers: { authorization },
+      ApiCallErrorClass: MarketCallError,
     });
     if (response.ok && response.published && response.published.orderHash) {
       return response.published.orderHash;
@@ -147,11 +152,14 @@ const unpublishOrder = async (
       body[addressFieldNames[orderName]] = address;
     }
     const userAddress = await getAddress(contracts);
-    const authorization = await getAuthorization(iexecGatewayURL, '/challenge')(
-      contracts.chainId,
-      userAddress,
-      contracts.signer,
-    );
+    const authorization = await getAuthorization({
+      api: iexecGatewayURL,
+      endpoint: '/challenge',
+      chainId: contracts.chainId,
+      address: userAddress,
+      signer: contracts.signer,
+      ApiCallErrorClass: MarketCallError,
+    });
     const response = await jsonApi.put({
       api: iexecGatewayURL,
       endpoint: apiEndpoints[orderName],
@@ -160,6 +168,7 @@ const unpublishOrder = async (
       },
       body,
       headers: { authorization },
+      ApiCallErrorClass: MarketCallError,
     });
     if (response.ok && response.unpublished) {
       return response.unpublished;
@@ -395,6 +404,7 @@ export const fetchPublishedOrderByHash = async (
       api: iexecGatewayURL,
       endpoint: `${apiEndpoints[orderName]}/${vOrderHash}`,
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     return res;
   } catch (error) {

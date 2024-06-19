@@ -174,7 +174,7 @@ ___
 
 ### getOwner
 
-▸ **getOwner**(`name`): `Promise`<`string`\>
+▸ **getOwner**(`name`): `Promise`<``null`` \| `string`\>
 
 get the address of the ENS name's owner.
 
@@ -192,13 +192,13 @@ console.log('iexec.eth owner:', owner);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
 
 ___
 
 ### lookupAddress
 
-▸ **lookupAddress**(`address`): `Promise`<`string`\>
+▸ **lookupAddress**(`address`): `Promise`<``null`` \| `string`\>
 
 lookup to find the ENS name of an ethereum address
 
@@ -216,7 +216,7 @@ console.log('ENS name:', name);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
 
 ___
 
@@ -303,7 +303,7 @@ ___
 
 ### resolveName
 
-▸ **resolveName**(`name`): `Promise`<`string`\>
+▸ **resolveName**(`name`): `Promise`<``null`` \| `string`\>
 
 resolve the ENS name to an ethereum address if a resolver is configured for the name
 
@@ -321,7 +321,7 @@ console.log('me.users.iexec.eth:', address);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<``null`` \| `string`\>
 
 ___
 

@@ -5,6 +5,7 @@ import {
   deployAndGetApporder,
   deployAndGetDatasetorder,
   deployAndGetWorkerpoolorder,
+  expectAsyncCustomError,
   getMatchableRequestorder,
   getTestConfig,
   runObservableSubscribe,
@@ -15,16 +16,53 @@ import {
   initializeTask,
   sleep,
   adminCreateCategory,
+  SERVICE_UNREACHABLE_URL,
+  getRandomBytes32,
+  SERVICE_HTTP_500_URL,
+  getRandomAddress,
 } from '../../test-utils';
 import '../../jest-setup';
 
 import { errors } from '../../../src/lib/index';
+import { MarketCallError } from '../../../src/lib/errors';
 
 const { ObjectNotFoundError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('deal', () => {
   describe('fetchRequesterDeals()', () => {
+    test("throw a MarketCallError when the Market API can't be reached", async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          iexecGatewayURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.deal.fetchRequesterDeals(getRandomAddress()),
+        {
+          constructor: MarketCallError,
+          message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          iexecGatewayURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.deal.fetchRequesterDeals(getRandomAddress()),
+        {
+          constructor: MarketCallError,
+          message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('shows past deals', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const requesterAddress = await iexec.wallet.getAddress();
@@ -87,132 +125,169 @@ describe('deal', () => {
     });
   });
 
-  describe('fetchDealsByApporder()', () => {
-    test('shows past deals', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
-      const orderHash = await iexec.order.hashApporder(apporder);
-      const res = await iexec.deal.fetchDealsByApporder(orderHash);
-      expect(res.count).toBe(0);
-      const { dealid } = await iexec.order.matchOrders(
-        {
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
+  describe('fetchDealsBy...order()', () => {
+    test("throw a MarketCallError when the Market API can't be reached", async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          iexecGatewayURL: SERVICE_UNREACHABLE_URL,
         },
-        { preflightCheck: false },
-      );
-      await sleep(5000);
-      const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
-      expect(resAfterMatch.count).toBe(1);
-      expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-      expect(resAfterMatch.deals[0].app.pointer).toBe(apporder.app);
-    });
-  });
-
-  describe('fetchDealsByDatasetorder()', () => {
-    test('shows past deals', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
       });
-      const orderHash = await iexec.order.hashDatasetorder(datasetorder);
-      const res = await iexec.deal.fetchDealsByDatasetorder(orderHash);
-      expect(res.count).toBe(0);
-      const { dealid } = await iexec.order.matchOrders(
+      await expectAsyncCustomError(
+        iexecReadOnly.deal.fetchDealsByApporder(getRandomBytes32()),
         {
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
+          constructor: MarketCallError,
+          message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
         },
-        { preflightCheck: false },
-      );
-      await sleep(5000);
-      const resAfterMatch =
-        await iexec.deal.fetchDealsByDatasetorder(orderHash);
-      expect(resAfterMatch.count).toBe(1);
-      expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-      expect(resAfterMatch.deals[0].dataset.pointer).toBe(datasetorder.dataset);
-    });
-  });
-
-  describe('fetchDealsByWorkerpoolorder()', () => {
-    test('shows past deals', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
-      const orderHash = await iexec.order.hashWorkerpoolorder(workerpoolorder);
-      const res = await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
-      expect(res.count).toBe(0);
-      const { dealid } = await iexec.order.matchOrders(
-        {
-          apporder,
-          datasetorder,
-          workerpoolorder,
-          requestorder,
-        },
-        { preflightCheck: false },
-      );
-      await sleep(5000);
-      const resAfterMatch =
-        await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
-      expect(resAfterMatch.count).toBe(1);
-      expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-      expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
-        workerpoolorder.workerpool,
       );
     });
-  });
 
-  describe('fetchDealsByRequestorder()', () => {
-    test('shows past deals', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const apporder = await deployAndGetApporder(iexec);
-      const datasetorder = await deployAndGetDatasetorder(iexec);
-      const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
-      const requestorder = await getMatchableRequestorder(iexec, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
+    test('throw a MarketCallError when the Market API encounters an error', async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          iexecGatewayURL: SERVICE_HTTP_500_URL,
+        },
       });
-      const orderHash = await iexec.order.hashRequestorder(requestorder);
-      const res = await iexec.deal.fetchDealsByRequestorder(orderHash);
-      expect(res.count).toBe(0);
-      const { dealid } = await iexec.order.matchOrders(
+      await expectAsyncCustomError(
+        iexecReadOnly.deal.fetchDealsByApporder(getRandomBytes32()),
         {
+          constructor: MarketCallError,
+          message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
+    describe('fetchDealsByApporder()', () => {
+      test('shows past deals', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const requestorder = await getMatchableRequestorder(iexec, {
           apporder,
           datasetorder,
           workerpoolorder,
-          requestorder,
-        },
-        { preflightCheck: false },
-      );
-      await sleep(5000);
-      const resAfterMatch =
-        await iexec.deal.fetchDealsByRequestorder(orderHash);
-      expect(resAfterMatch.count).toBe(1);
-      expect(resAfterMatch.deals[0].dealid).toBe(dealid);
-      expect(resAfterMatch.deals[0].requester).toBe(requestorder.requester);
+        });
+        const orderHash = await iexec.order.hashApporder(apporder);
+        const res = await iexec.deal.fetchDealsByApporder(orderHash);
+        expect(res.count).toBe(0);
+        const { dealid } = await iexec.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { preflightCheck: false },
+        );
+        await sleep(5000);
+        const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
+        expect(resAfterMatch.count).toBe(1);
+        expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+        expect(resAfterMatch.deals[0].app.pointer).toBe(apporder.app);
+      });
+    });
+
+    describe('fetchDealsByDatasetorder()', () => {
+      test('shows past deals', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const requestorder = await getMatchableRequestorder(iexec, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+        const orderHash = await iexec.order.hashDatasetorder(datasetorder);
+        const res = await iexec.deal.fetchDealsByDatasetorder(orderHash);
+        expect(res.count).toBe(0);
+        const { dealid } = await iexec.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { preflightCheck: false },
+        );
+        await sleep(5000);
+        const resAfterMatch =
+          await iexec.deal.fetchDealsByDatasetorder(orderHash);
+        expect(resAfterMatch.count).toBe(1);
+        expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+        expect(resAfterMatch.deals[0].dataset.pointer).toBe(
+          datasetorder.dataset,
+        );
+      });
+    });
+
+    describe('fetchDealsByWorkerpoolorder()', () => {
+      test('shows past deals', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const requestorder = await getMatchableRequestorder(iexec, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+        const orderHash =
+          await iexec.order.hashWorkerpoolorder(workerpoolorder);
+        const res = await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
+        expect(res.count).toBe(0);
+        const { dealid } = await iexec.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { preflightCheck: false },
+        );
+        await sleep(5000);
+        const resAfterMatch =
+          await iexec.deal.fetchDealsByWorkerpoolorder(orderHash);
+        expect(resAfterMatch.count).toBe(1);
+        expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+        expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
+          workerpoolorder.workerpool,
+        );
+      });
+    });
+
+    describe('fetchDealsByRequestorder()', () => {
+      test('shows past deals', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const apporder = await deployAndGetApporder(iexec);
+        const datasetorder = await deployAndGetDatasetorder(iexec);
+        const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
+        const requestorder = await getMatchableRequestorder(iexec, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+        const orderHash = await iexec.order.hashRequestorder(requestorder);
+        const res = await iexec.deal.fetchDealsByRequestorder(orderHash);
+        expect(res.count).toBe(0);
+        const { dealid } = await iexec.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { preflightCheck: false },
+        );
+        await sleep(5000);
+        const resAfterMatch =
+          await iexec.deal.fetchDealsByRequestorder(orderHash);
+        expect(resAfterMatch.count).toBe(1);
+        expect(resAfterMatch.deals[0].dealid).toBe(dealid);
+        expect(resAfterMatch.deals[0].requester).toBe(requestorder.requester);
+      });
     });
   });
 

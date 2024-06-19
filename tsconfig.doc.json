@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strictNullChecks": true
   },
+  "include": ["src"],
   "typedocOptions": {
     "entryPoints": ["src/lib/index.d.ts"],
     "out": "docs",
@@ -12,7 +14,6 @@
       "typedoc-plugin-markdown"
     ],
     "readme": "typedoc_template.md",
-    // "internalNamespace": "{internal}",
     "excludeExternals": true
   }
 }
