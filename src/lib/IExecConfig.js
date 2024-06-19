@@ -403,15 +403,12 @@ export default class IExecConfig {
     };
 
     this.resolveVoucherSubgraphURL = async () => {
-      const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = voucherSubgraphURL || chainConfDefaults.voucherSubgraph;
       if (value !== undefined) {
         return value;
       }
-      throw new ConfigurationError(
-        `voucherSubgraphURL option not set and no default value for your chain ${chainId}`,
-      );
+      return null;
     };
 
     this.resolveBridgeAddress = async () => {
@@ -447,15 +444,12 @@ export default class IExecConfig {
     };
 
     this.resolveVoucherHubAddress = async () => {
-      const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
       const value = voucherHubAddress || chainConfDefaults.voucherHub;
       if (value !== undefined) {
         return value;
       }
-      throw new ConfigurationError(
-        `voucherHubAddress option not set and no default value for your chain ${chainId}`,
-      );
+      return null;
     };
   }
 }

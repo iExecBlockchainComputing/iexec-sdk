@@ -1054,8 +1054,15 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   estimateMatchOrders(
-    orders: { apporder; datasetorder; workerpoolorder; requestorder },
-    options?: { useVoucher },
+    orders: {
+      apporder: ConsumableApporder;
+      datasetorder?: ConsumableDatasetorder;
+      workerpoolorder: ConsumableWorkerpoolorder;
+      requestorder: ConsumableRequestorder;
+    },
+    options?: {
+      useVoucher?: boolean;
+    },
   ): Promise<{ total: NRlcAmount; sponsored: NRlcAmount }>;
   /**
    * Create an IExecOrderModule instance using an IExecConfig instance
