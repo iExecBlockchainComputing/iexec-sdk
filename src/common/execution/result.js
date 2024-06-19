@@ -2,6 +2,7 @@ import Debug from 'debug';
 import { show } from './task.js';
 import { downloadZipApi } from '../utils/api-utils.js';
 import { bytes32Schema, throwIfMissing } from '../utils/validator.js';
+import { IpfsGatewayCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:execution:result');
 
@@ -13,8 +14,12 @@ const downloadFromIpfs = async (
     return await downloadZipApi.get({
       api: ipfsGatewayURL,
       endpoint: ipfsAddress,
+      ApiCallErrorClass: IpfsGatewayCallError,
     });
   } catch (error) {
+    if (error instanceof IpfsGatewayCallError) {
+      throw error;
+    }
     throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
   }
 };

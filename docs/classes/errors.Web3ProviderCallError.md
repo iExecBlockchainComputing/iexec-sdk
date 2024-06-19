@@ -4,7 +4,7 @@
 
 [errors](../modules/errors.md).Web3ProviderCallError
 
-Web3ProviderCallError encapsulate an error thrown by the web3 provider during a web3 call.
+Web3ProviderCallError encapsulates an error thrown by the web3 provider during a web3 call.
 
 ## Hierarchy
 
@@ -20,6 +20,7 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 
 ### Properties
 
+- [cause](errors.Web3ProviderCallError.md#cause)
 - [originalError](errors.Web3ProviderCallError.md#originalerror)
 
 ## Constructors
@@ -30,10 +31,10 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `string` |
-| `originalError` | `Error` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this web3 provider error. |
 
 #### Returns
 
@@ -45,9 +46,25 @@ Web3ProviderCallError encapsulate an error thrown by the web3 provider during a 
 
 ## Properties
 
+### cause
+
+• **cause**: `Error`
+
+The original Error object that caused this web3 provider error.
+
+#### Inherited from
+
+[Web3ProviderError](errors.Web3ProviderError.md).[cause](errors.Web3ProviderError.md#cause)
+
+___
+
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead.
 
 #### Inherited from
 

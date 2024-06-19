@@ -20,6 +20,7 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 ### Properties
 
+- [cause](errors.BridgeError.md#cause)
 - [originalError](errors.BridgeError.md#originalerror)
 - [sendTxHash](errors.BridgeError.md#sendtxhash)
 
@@ -27,30 +28,45 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 ### constructor
 
-• **new BridgeError**(`message?`): [`BridgeError`](errors.BridgeError.md)
+• **new BridgeError**(`originalError`, `sendTxHash`): [`BridgeError`](errors.BridgeError.md)
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message?` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `originalError` | `Error` | The original Error object that caused this API call error. |
+| `sendTxHash` | `string` | Hash of the transaction sending the value to the bridge contract. |
 
 #### Returns
 
 [`BridgeError`](errors.BridgeError.md)
 
-#### Inherited from
+#### Overrides
 
 Error.constructor
 
 ## Properties
 
+### cause
+
+• **cause**: `Error`
+
+The original Error object that caused this API call error.
+
+___
+
 ### originalError
 
-• `Optional` **originalError**: `Error`
+• **originalError**: `Error`
+
+**`Deprecated`**
+
+use Error cause instead
 
 ___
 
 ### sendTxHash
 
-• `Optional` **sendTxHash**: `string`
+• **sendTxHash**: `string`
+
+Hash of the transaction sending the value to the bridge contract.

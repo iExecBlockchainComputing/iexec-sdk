@@ -1,6 +1,13 @@
 import { randomInt } from 'crypto';
 import { exec } from 'child_process';
-import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import {
+  Wallet,
+  JsonRpcProvider,
+  ethers,
+  Contract,
+  hexlify,
+  randomBytes,
+} from 'ethers';
 import { IExec } from '../src/lib/index.js';
 import { getSignerFromPrivateKey } from '../src/lib/utils.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
@@ -39,6 +46,12 @@ export const { INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
 console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
 console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
+
+export const SERVICE_HTTP_500_URL = DRONE
+  ? 'http://service-internal-error:80'
+  : 'http://localhost:5500';
+
+export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
 
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
@@ -130,6 +143,7 @@ export const getRandomWallet = () => {
 
 export const getRandomAddress = () => getRandomWallet().address;
 
+export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
   constructor(rpcUrl, privateKey) {
     this.signer = new Wallet(privateKey, new JsonRpcProvider(rpcUrl));
