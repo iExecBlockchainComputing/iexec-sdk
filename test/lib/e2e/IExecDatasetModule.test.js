@@ -4,16 +4,24 @@ import { describe, test, expect } from '@jest/globals';
 import { join } from 'path';
 import { BN } from 'bn.js';
 import fsExtra from 'fs-extra';
-import { deployRandomDataset, getTestConfig } from '../lib-test-utils.js';
+import {
+  deployRandomDataset,
+  getTestConfig,
+  expectAsyncCustomError,
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
   execAsync,
   getId,
   getRandomAddress,
+  SERVICE_HTTP_500_URL,
+  SERVICE_UNREACHABLE_URL,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
+
+const { SmsCallError } = errors;
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 
@@ -319,6 +327,45 @@ describe('dataset', () => {
   });
 
   describe('checkDatasetSecretExists()', () => {
+    let randomDatasetAddress;
+    beforeAll(async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const { address } = await deployRandomDataset(iexec);
+      randomDatasetAddress = address;
+    });
+
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        readOnlyIExec.dataset.checkDatasetSecretExists(randomDatasetAddress),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        readOnlyIExec.dataset.checkDatasetSecretExists(randomDatasetAddress),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('checks a dataset secret exist on default TEE framework SMS', async () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
@@ -368,6 +415,47 @@ describe('dataset', () => {
   });
 
   describe('pushDatasetSecret()', () => {
+    let randomDatasetAddress;
+    let randomDatasetOwnerWallet;
+    beforeAll(async () => {
+      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { address } = await deployRandomDataset(iexec);
+      randomDatasetAddress = address;
+      randomDatasetOwnerWallet = wallet;
+    });
+
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: randomDatasetOwnerWallet.privateKey,
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexec.dataset.pushDatasetSecret(randomDatasetAddress, 'foo'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        privateKey: randomDatasetOwnerWallet.privateKey,
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexec.dataset.pushDatasetSecret(randomDatasetAddress, 'foo'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('only owner can push secret', async () => {
       const { iexec: iexecDatasetOwner } = getTestConfig(iexecTestChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =

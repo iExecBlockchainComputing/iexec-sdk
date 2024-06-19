@@ -1,3 +1,6 @@
+// @jest/global comes with jest
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { expect } from '@jest/globals';
 import { NULL_ADDRESS, TEE_FRAMEWORKS, getId, sleep } from '../test-utils.js';
 
 export { getTestConfig, getTestConfigOptions } from '../test-config-utils.js';
@@ -192,4 +195,21 @@ export const runObservableSubscribe = (observable) => {
     unsubscribe,
     wait,
   };
+};
+
+export const expectAsyncCustomError = async (
+  executor,
+  { constructor, message },
+) => {
+  const didNotThrowError = Error('Did not throw');
+  try {
+    await executor;
+    throw didNotThrowError;
+  } catch (e) {
+    if (e === didNotThrowError) {
+      throw e;
+    }
+    expect(e).toBeInstanceOf(constructor);
+    expect(e.message).toBe(message);
+  }
 };

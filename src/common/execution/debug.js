@@ -13,6 +13,7 @@ import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
 import { jsonApi, getAuthorization } from '../utils/api-utils.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
+import { WorkerpoolCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:execution:debug');
 
@@ -82,6 +83,7 @@ export const fetchTaskOffchainInfo = async (
     return await jsonApi.get({
       api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
+      ApiCallErrorClass: WorkerpoolCallError,
     });
   } catch (error) {
     debug('fetchTaskOffchainInfo()', error);
@@ -105,14 +107,19 @@ export const fetchAllReplicatesLogs = async (
         `Only task requester ${requester} can access replicates logs`,
       );
     }
-    const authorization = await getAuthorization(
-      workerpoolApiUrl,
-      '/tasks/logs/challenge',
-    )(contracts.chainId, userAddress, contracts.signer);
+    const authorization = await getAuthorization({
+      api: workerpoolApiUrl,
+      endpoint: '/tasks/logs/challenge',
+      chainId: contracts.chainId,
+      address: userAddress,
+      signer: contracts.signer,
+      ApiCallErrorClass: WorkerpoolCallError,
+    });
     const json = await jsonApi.get({
       api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}/logs`,
       headers: { Authorization: authorization },
+      ApiCallErrorClass: WorkerpoolCallError,
     });
     const { computeLogsList = [] } = json;
     return computeLogsList.map(({ walletAddress, stdout, stderr }) => ({

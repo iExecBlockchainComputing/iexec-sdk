@@ -12,6 +12,7 @@ import {
 import { wrapPersonalSign } from '../utils/errorWrappers.js';
 import { checkSigner } from '../utils/utils.js';
 import { checkWeb2SecretExists, checkRequesterSecretExists } from './check.js';
+import { SmsCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:sms');
 
@@ -93,9 +94,7 @@ export const pushWeb3Secret = async (
       headers: {
         Authorization: auth,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     return handleNonUpdatablePushSecret({
       response: res,
@@ -150,9 +149,7 @@ export const pushWeb2Secret = async (
       headers: {
         Authorization: auth,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       return {
@@ -207,9 +204,7 @@ export const pushRequesterSecret = async (
       headers: {
         Authorization: auth,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {
       return {
@@ -256,9 +251,7 @@ export const pushAppSecret = async (
       headers: {
         Authorization: auth,
       },
-    }).catch((e) => {
-      debug(e);
-      throw Error(`SMS at ${smsURL} didn't answered`);
+      ApiCallErrorClass: SmsCallError,
     });
     return handleNonUpdatablePushSecret({
       response: res,

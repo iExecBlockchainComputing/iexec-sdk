@@ -1,14 +1,46 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import { getTestConfig } from '../lib-test-utils.js';
-import { TEST_CHAINS } from '../../test-utils.js';
+import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
+import {
+  SERVICE_HTTP_500_URL,
+  SERVICE_UNREACHABLE_URL,
+  TEST_CHAINS,
+  getRandomAddress,
+} from '../../test-utils.js';
 import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
+
+const { SmsCallError, ResultProxyCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('storage', () => {
   describe('defaultStorageLogin()', () => {
+    test("throw a ResultProxyCallError when the Result Proxy can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          resultProxyURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(iexec.storage.defaultStorageLogin(), {
+        constructor: ResultProxyCallError,
+        message: `Result Proxy error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+      });
+    });
+
+    test('throw a ResultProxyCallError when the Result Proxy encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          resultProxyURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(iexec.storage.defaultStorageLogin(), {
+        constructor: ResultProxyCallError,
+        message: `Result Proxy error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+      });
+    });
+
     test('gets a token from the result proxy', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const token = await iexec.storage.defaultStorageLogin();
@@ -20,6 +52,30 @@ describe('storage', () => {
   });
 
   describe('pushStorageToken()', () => {
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(iexec.storage.pushStorageToken('oops'), {
+        constructor: SmsCallError,
+        message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+      });
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)({
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(iexec.storage.pushStorageToken('oops'), {
+        constructor: SmsCallError,
+        message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+      });
+    });
+
     test('pushes the token on the SMS', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const pushRes = await iexec.storage.pushStorageToken('oops');
@@ -85,6 +141,36 @@ describe('storage', () => {
   });
 
   describe('checkStorageTokenExists()', () => {
+    test("throw a SmsCallError when the SMS can't be reached", async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        options: {
+          smsURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.storage.checkStorageTokenExists(getRandomAddress()),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a SmsCallError when the SMS encounters an error', async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        options: {
+          smsURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.storage.checkStorageTokenExists(getRandomAddress()),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
     test('anyone can check a token exists', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({

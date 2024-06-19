@@ -4,11 +4,14 @@ import { describe, test, expect } from '@jest/globals';
 import {
   deployAndGetApporder,
   deployAndGetWorkerpoolorder,
+  expectAsyncCustomError,
   getMatchableRequestorder,
   getTestConfig,
 } from '../lib-test-utils.js';
 import {
   NULL_BYTES32,
+  SERVICE_HTTP_500_URL,
+  SERVICE_UNREACHABLE_URL,
   TEST_CHAINS,
   adminCreateCategory,
   initializeTask,
@@ -17,11 +20,58 @@ import {
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
-const { ObjectNotFoundError } = errors;
+const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('task', () => {
+  describe('fetchResults()', () => {
+    const BELLECOUR_COMPLETED_TASK_ID =
+      '0x71a9ccb619dd7712b1cd6ee88c018ef4da05820d95e3bfd6693f4914cae39181';
+
+    test("throw a IpfsGatewayCallError when the IPFS gateway can't be reached", async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          ipfsGatewayURL: SERVICE_UNREACHABLE_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        {
+          constructor: IpfsGatewayCallError,
+          message: `IPFS gateway error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
+    });
+
+    test('throw a IpfsGatewayCallError when the IPFS gateway encounters an error', async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+        options: {
+          ipfsGatewayURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expectAsyncCustomError(
+        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        {
+          constructor: IpfsGatewayCallError,
+          message: `IPFS gateway error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
+      );
+    });
+
+    test('downloads the result archive from IPFS', async () => {
+      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+      });
+      const res = await iexecReadOnly.task.fetchResults(
+        BELLECOUR_COMPLETED_TASK_ID,
+      );
+      expect(res).toBeInstanceOf(Response);
+    });
+  });
+
   describe.skip('obsTask()', () => {
     test('emits task updates', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();

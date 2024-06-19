@@ -23,6 +23,7 @@ import {
 import { viewDeal, viewTask } from './common.js';
 import { obsTask } from './task.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
+import { MarketCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:execution:deal');
 
@@ -85,6 +86,7 @@ export const fetchRequesterDeals = async (
       api: iexecGatewayURL,
       endpoint: '/deals',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (response.ok && response.deals) {
       return response;
@@ -394,6 +396,7 @@ export const fetchDealsByOrderHash = async (
       api: iexecGatewayURL,
       endpoint: '/deals',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };

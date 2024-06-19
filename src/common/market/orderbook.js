@@ -11,6 +11,7 @@ import {
   throwIfMissing,
   booleanSchema,
 } from '../utils/validator.js';
+import { MarketCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:market:orderbook');
 
@@ -81,6 +82,7 @@ export const fetchAppOrderbook = async (
       api: iexecGatewayURL,
       endpoint: '/apporders',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (ok) {
       return response;
@@ -120,7 +122,7 @@ export const fetchDatasetOrderbook = async (
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
         }).validate(app),
-      isAppStrict: await booleanSchema().validate(isAppStrict),
+        isAppStrict: await booleanSchema().validate(isAppStrict),
       }),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
@@ -157,6 +159,7 @@ export const fetchDatasetOrderbook = async (
       api: iexecGatewayURL,
       endpoint: '/datasetorders',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (ok) {
       return response;
@@ -247,6 +250,7 @@ export const fetchWorkerpoolOrderbook = async (
       api: iexecGatewayURL,
       endpoint: '/workerpoolorders',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (ok) {
       return response;
@@ -333,6 +337,7 @@ export const fetchRequestOrderbook = async (
       api: iexecGatewayURL,
       endpoint: '/requestorders',
       query,
+      ApiCallErrorClass: MarketCallError,
     });
     if (ok) {
       return response;
