@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.9.1] 2024-06-19
+
+### Changed
+
+- fixed exposed version
+
 ## [8.9.0] 2024-06-19
 
 ### Added
