@@ -525,6 +525,25 @@ export const abi = [
         type: 'uint256',
       },
     ],
+    name: 'VoucherDrained',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'voucher',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
     name: 'VoucherRefunded',
     type: 'event',
   },
@@ -618,7 +637,7 @@ export const abi = [
   },
   {
     inputs: [],
-    name: 'ASSET_ELIGIBILITY_MANAGER_ROLE',
+    name: 'DEFAULT_ADMIN_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -631,7 +650,33 @@ export const abi = [
   },
   {
     inputs: [],
-    name: 'DEFAULT_ADMIN_ROLE',
+    name: 'MANAGER_ROLE',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'MINTER_ROLE',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'UPGRADER_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -650,32 +695,6 @@ export const abi = [
         internalType: 'string',
         name: '',
         type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'UPGRADE_MANAGER_ROLE',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'VOUCHER_MANAGER_ROLE',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
       },
     ],
     stateMutability: 'view',
@@ -960,6 +979,19 @@ export const abi = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'voucher',
+        type: 'address',
+      },
+    ],
+    name: 'drainVoucher',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'getIexecPoco',
     outputs: [
@@ -1113,12 +1145,12 @@ export const abi = [
     inputs: [
       {
         internalType: 'address',
-        name: 'assetEligibilityManager',
+        name: 'manager',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'voucherManager',
+        name: 'minter',
         type: 'address',
       },
       {
@@ -1478,6 +1510,24 @@ export const abi = [
     name: 'upgradeToAndCall',
     outputs: [],
     stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];
