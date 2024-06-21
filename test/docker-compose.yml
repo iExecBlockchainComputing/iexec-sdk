@@ -35,7 +35,7 @@ services:
   bellecour-fork-voucher-deployment:
     restart: 'no'
     # https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
+    image: pierreiexec/voucher-deployer:next
     environment:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
