@@ -15,13 +15,8 @@ export const getVoucherInfo = async (
     query getVoucherInfo($id: ID!) {
       voucher(id: $id) {
         voucherType {
-          sponsoredApps: eligibleAssets(where: { type: app }) {
-            id
-          }
-          sponsoredDatasets: eligibleAssets(where: { type: dataset }) {
-            id
-          }
-          sponsoredWorkerpools: eligibleAssets(where: { type: workerpool }) {
+          eligibleAssets {
+            type: __typename
             id
           }
         }
@@ -41,12 +36,20 @@ export const getVoucherInfo = async (
     const mapIds = (items) =>
       items?.map((item) => checksummedAddress(item.id.toLowerCase())) || [];
 
-    const sponsoredApps = mapIds(voucherInfo?.voucherType?.sponsoredApps);
+    const sponsoredApps = mapIds(
+      voucherInfo?.voucherType?.eligibleAssets.filter(
+        ({ type }) => type === 'App',
+      ),
+    );
     const sponsoredDatasets = mapIds(
-      voucherInfo?.voucherType?.sponsoredDatasets,
+      voucherInfo?.voucherType?.eligibleAssets.filter(
+        ({ type }) => type === 'Dataset',
+      ),
     );
     const sponsoredWorkerpools = mapIds(
-      voucherInfo?.voucherType?.sponsoredWorkerpools,
+      voucherInfo?.voucherType?.eligibleAssets.filter(
+        ({ type }) => type === 'Workerpool',
+      ),
     );
     const authorizedAccounts = mapIds(voucherInfo?.authorizedAccounts);
 
