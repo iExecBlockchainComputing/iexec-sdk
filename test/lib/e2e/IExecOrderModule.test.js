@@ -2408,6 +2408,50 @@ describe('estimateMatchOrders()', () => {
     });
 
     describe('useVoucher option', () => {
+      test('should throw error if no voucher available for the requester', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+        const { iexec: iexecResourcesProvider } =
+          getTestConfig(iexecTestChain)();
+
+        const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecResourcesProvider,
+          {
+            volume: 7,
+            datasetprice: 1,
+          },
+        );
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecResourcesProvider,
+          { volume: 5, workerpoolprice: 1 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true },
+          ),
+        ).rejects.toThrow(
+          Error(
+            `No voucher available for the requester ${requesterWallet.address}`,
+          ),
+        );
+      });
+
       test('requires voucherHubAddress to be configured when useVoucher is true', async () => {
         const noVoucherTestChain = TEST_CHAINS['custom-token-chain'];
         const options = {
