@@ -983,7 +983,7 @@ export const matchOrders = async (
       voucherAddress = await voucherHubContract.getVoucher(
         vRequestOrder.requester,
       );
-      if (!voucherAddress) {
+      if (voucherAddress === NULL_ADDRESS) {
         throw new Error(
           `No voucher available for the requester ${vRequestOrder.requester}`,
         );
