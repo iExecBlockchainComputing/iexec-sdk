@@ -69,6 +69,9 @@ export const uint256Schema = () =>
 
 export const booleanSchema = () => boolean();
 
+export const basicUrlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} "${value}" is not a valid URL');
+
 const amountErrorMessage = ({ originalValue }) =>
   `${
     Array.isArray(originalValue) ? originalValue.join(' ') : originalValue
@@ -263,11 +266,7 @@ export const paramsInputFilesArraySchema = () =>
       }
       return value;
     })
-    .of(
-      string()
-        .url('${path} "${value}" is not a valid URL')
-        .required('${path} "${value}" is not a valid URL'),
-    );
+    .of(basicUrlSchema().required('${path} "${value}" is not a valid URL'));
 
 export const paramsEncryptResultSchema = () => boolean();
 
@@ -830,9 +829,6 @@ export const textRecordKeySchema = () => string().required().strict(true);
 export const textRecordValueSchema = () => string().default('').strict(true);
 
 export const workerpoolApiUrlSchema = () => string().url().default('');
-
-export const basicUrlSchema = () =>
-  string().matches(/^http[s]?:\/\//, '${path} is not a valid url');
 
 export const smsUrlOrMapSchema = () =>
   lazy((stringOrMap) => {
