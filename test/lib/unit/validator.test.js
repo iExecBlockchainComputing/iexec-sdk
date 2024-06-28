@@ -484,11 +484,13 @@ describe('[paramsInputFilesArraySchema]', () => {
     await expect(
       paramsInputFilesArraySchema().validate([
         'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        'http://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        'http://docker-service:8080/uploads/pdf/iExec-WPv3.0-English.pdf',
       ]),
     ).resolves.toEqual([
       'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-      'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'http://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      'http://docker-service:8080/uploads/pdf/iExec-WPv3.0-English.pdf',
     ]);
   });
   test('string comma separated list of URL', async () => {
@@ -728,14 +730,14 @@ describe('[objParamsSchema]', () => {
         {
           iexec_input_files: [
             'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-            'https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+            'iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
           ],
         },
         { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_input_files[1] "https://iexec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
+        'iexec_input_files[1] "iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
       ),
     );
   });
@@ -1483,7 +1485,7 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('throw with empty string', async () => {
     await expect(smsUrlOrMapSchema().validate('')).rejects.toThrow(
-      'this is not a valid url',
+      'this "" is not a valid URL',
     );
   });
   test('throw with null', async () => {
@@ -1493,7 +1495,7 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('throw with invalid url', async () => {
     await expect(smsUrlOrMapSchema().validate('foo')).rejects.toThrow(
-      'this is not a valid url',
+      'this "foo" is not a valid URL',
     );
   });
   test('throw with unknown TEE framework key', async () => {
@@ -1504,7 +1506,7 @@ describe('[smsUrlOrMapSchema]', () => {
   test('throw with invalid url on a TEE framework key', async () => {
     await expect(
       smsUrlOrMapSchema().validate({ scone: 'foo' }),
-    ).rejects.toThrow('scone is not a valid url');
+    ).rejects.toThrow('scone "foo" is not a valid URL');
   });
 });
 

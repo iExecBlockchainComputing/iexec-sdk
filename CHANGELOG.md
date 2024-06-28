@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+- more permissive url validation for `iexec_input_files`
+
 ## [8.9.1] 2024-06-19
 
 ### Changed
