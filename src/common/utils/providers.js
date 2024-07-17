@@ -36,6 +36,7 @@ export const getReadOnlyProvider = (host, options = {}) => {
     'etherscan',
     'infura',
     'pocket', // currently commented in ethers
+    'chainstack',
     'quicknode',
   ];
   const nonConfiguredProviders = apiProvidersList.filter(
