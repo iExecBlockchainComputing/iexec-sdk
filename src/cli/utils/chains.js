@@ -40,11 +40,15 @@ const createChainFromConf = (
     const chain = { ...chainConf };
     const provider =
       chainConf.host && chainConf.host.indexOf('http') === 0
-        ? new JsonRpcProvider(chainConf.host, {
-            ensAddress: chainConf.ensRegistry,
-            chainId: parseInt(chainConf.id, 10),
-            name: chainName,
-          })
+        ? new JsonRpcProvider(
+            chainConf.host,
+            {
+              ensAddress: chainConf.ensRegistry,
+              chainId: parseInt(chainConf.id, 10),
+              name: chainName,
+            },
+            { pollingInterval: 1000 }, // override default polling interval (4000) for faster confirmation
+          )
         : getReadOnlyProvider(chainConf.host, { providers: providerOptions });
 
     chain.name = chainName;
@@ -62,10 +66,14 @@ const createChainFromConf = (
       chain.bridgedNetwork = { ...bridgeConf };
       const bridgeProvider =
         bridgeConf.host && bridgeConf.host.indexOf('http') === 0
-          ? new JsonRpcProvider(bridgeConf.host, {
-              ensAddress: bridgeConf.ensRegistry,
-              chainId: parseInt(bridgeConf.id, 10),
-            })
+          ? new JsonRpcProvider(
+              bridgeConf.host,
+              {
+                ensAddress: bridgeConf.ensRegistry,
+                chainId: parseInt(bridgeConf.id, 10),
+              },
+              { pollingInterval: 1000 }, // override default polling interval (4000) for faster confirmation)
+            )
           : getReadOnlyProvider(bridgeConf.host, {
               providers: providerOptions,
             });

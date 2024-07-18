@@ -129,6 +129,7 @@ export default class IExecConfig {
               // eslint-disable-next-line no-underscore-dangle
               ethProvider.provider._getConnection().url,
               networkOverride,
+              { pollingInterval: 1000 }, // override default polling interval (4000) for faster confirmation
             ),
           );
         } else {
