@@ -95,7 +95,6 @@ export const getChainDefaults = ({ id, flavour }) => ({
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
-  network: networkMap[id],
 });
 
 export const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];

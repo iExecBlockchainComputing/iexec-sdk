@@ -387,30 +387,6 @@ describe('[IExecConfig]', () => {
       });
     });
 
-    describe('read-only ethProvider with ens override', () => {
-      test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, ensRegistryAddress })', async () => {
-        const config = new IExecConfig(
-          { ethProvider: unknownTestChain.rpcURL },
-          {
-            hubAddress: unknownTestChain.hubAddress,
-            ensRegistryAddress: unknownTestChain.ensRegistryAddress,
-          },
-        );
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(unknownTestChain.chainId);
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
-        expect(network.name).toBe('unknown');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(unknownTestChain.ensRegistryAddress);
-      });
-    });
-
     describe('signer provider from private key', () => {
       test('getSignerFromPrivateKey()', async () => {
         const wallet = getRandomWallet();
@@ -507,6 +483,35 @@ describe('[IExecConfig]', () => {
         expect(
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+      });
+
+      test('JsonRpcProvider with custom network (including ens)', async () => {
+        const ethersProvider = new JsonRpcProvider(unknownTestChain.rpcURL, {
+          chainId: parseInt(unknownTestChain.chainId, 10),
+          name: 'test',
+          ensAddress: unknownTestChain.ensRegistryAddress,
+        });
+        const config = new IExecConfig(
+          {
+            ethProvider: ethersProvider,
+          },
+          {
+            hubAddress: unknownTestChain.hubAddress,
+            ensRegistryAddress: unknownTestChain.ensRegistryAddress,
+          },
+        );
+        const { provider, signer, chainId } =
+          await config.resolveContractsClient();
+        expect(signer).toBeUndefined();
+        expect(provider).toBeDefined();
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
+        expect(chainId).toBe(unknownTestChain.chainId);
+        const network = await provider.getNetwork();
+        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
+        expect(network.name).toBe('test');
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(unknownTestChain.ensRegistryAddress);
       });
     });
 

@@ -21,7 +21,6 @@ export default class IExecConfig {
     { ethProvider, flavour = 'standard' } = {},
     {
       hubAddress,
-      ensRegistryAddress,
       ensPublicResolverAddress,
       isNative,
       useGas = true,
@@ -138,17 +137,9 @@ export default class IExecConfig {
     const providerAndSignerPromise = (async () => {
       let provider;
       let signer;
-      const network = await networkPromise;
-      const chainDefaults = await chainConfDefaultsPromise;
-      const networkOverride = {
-        ...network,
-        ...chainDefaults.network,
-        ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
-      };
       if (isRpcUrlProvider) {
         provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
-          network: networkOverride,
         });
       } else if (isEthersAbstractSignerWithProvider) {
         provider = ethProvider.provider;
@@ -159,7 +150,7 @@ export default class IExecConfig {
           signer = new BrowserProviderSignerAdapter(ethProvider);
         }
       } else {
-        provider = new BrowserProvider(ethProvider, networkOverride);
+        provider = new BrowserProvider(ethProvider);
         signer = new BrowserProviderSignerAdapter(provider);
       }
       return { provider, signer };
@@ -285,7 +276,6 @@ export default class IExecConfig {
           flavour === 'standard' ? !contracts.isNative : contracts.isNative,
         hubAddress: bridgedNetworkConf.hubAddress,
         bridgeAddress: bridgedBridgeAddress,
-        network: bridgedChainConfDefaults.network,
       };
     })();
 
@@ -300,7 +290,6 @@ export default class IExecConfig {
           chainId: bridgedConf.chainId,
           provider: getReadOnlyProvider(bridgedConf.rpcURL, {
             providers: providerOptions,
-            network: bridgedConf.network,
           }),
           hubAddress: bridgedConf.hubAddress,
           confirms,

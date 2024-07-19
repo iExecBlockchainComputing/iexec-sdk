@@ -55,10 +55,6 @@ export interface IExecConfigOptions {
    */
   hubAddress?: string;
   /**
-   * override the ENS registry contract address to target a custom instance
-   */
-  ensRegistryAddress?: string;
-  /**
    * override the ENS public resolver contract address to target a custom instance
    */
   ensPublicResolverAddress?: string;
