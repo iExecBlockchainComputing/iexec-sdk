@@ -4,8 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT
 
-- removed `ensRegistryAddress` option (use ethers `Network.register()` to configure custom networks supporting ENS)
+### Added
+
+- added support for ethers `AbstractProvider`, `AbstractSigner` and `BrowserProvider` to instantiate modules
+
+### Changed
+
+- reduced default polling interval for faster tx confirms
 - more permissive url validation for `iexec_input_files`
+
+### Removed
+
+- removed `ensRegistryAddress` option (use ethers `Network.register()` to configure custom networks supporting ENS)
 
 ## [8.9.1] 2024-06-19
 
