@@ -1,17 +1,14 @@
 import Debug from 'debug';
-import { JsonRpcProvider, BrowserProvider } from 'ethers';
+import { BrowserProvider, AbstractProvider, AbstractSigner } from 'ethers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { ConfigurationError } from '../common/utils/errors.js';
-import {
-  EnhancedWallet,
-  BrowserProviderSigner,
-} from '../common/utils/signers.js';
 import {
   getChainDefaults,
   isEnterpriseEnabled,
 } from '../common/utils/config.js';
 import { TEE_FRAMEWORKS } from '../common/utils/constant.js';
 import { getReadOnlyProvider } from '../common/utils/providers.js';
+import { BrowserProviderSignerAdapter } from '../common/utils/signers.js';
 import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
@@ -47,15 +44,42 @@ export default class IExecConfig {
     ) {
       throw new ConfigurationError('Missing ethProvider');
     }
-    const isReadOnlyProvider =
-      typeof ethProvider === 'string' || typeof ethProvider === 'number';
-    const isEnhancedWalletProvider = ethProvider instanceof EnhancedWallet;
 
+    /**
+     * JSON RPC provider, API providers, Browser provider (polling option)
+     */
+    const isEthersAbstractProvider = ethProvider instanceof AbstractProvider;
+    /**
+     * Browser provider is abstract signer with getSigner
+     */
+    const isEthersBrowserProvider = ethProvider instanceof BrowserProvider;
+    /**
+     *  Wallet, JSON RPC signer may have a provider
+     */
+    const isEthersAbstractSigner = ethProvider instanceof AbstractSigner;
+    /**
+     *  Wallet, JSON RPC signer with a provider
+     */
+    const isEthersAbstractSignerWithProvider =
+      isEthersAbstractSigner && ethProvider.provider;
+    if (isEthersAbstractSigner && !isEthersAbstractSignerWithProvider) {
+      throw new ConfigurationError('Missing provider for ethProvider signer');
+    }
+
+    /**
+     * RPC url, chain name/id
+     */
+    const isRpcUrlProvider =
+      typeof ethProvider === 'string' || typeof ethProvider === 'number';
+
+    // used to get chain id and and find additional config
     let disposableProvider;
     try {
-      if (isEnhancedWalletProvider) {
+      if (isEthersAbstractProvider) {
+        disposableProvider = ethProvider;
+      } else if (isEthersAbstractSignerWithProvider) {
         disposableProvider = ethProvider.provider;
-      } else if (isReadOnlyProvider) {
+      } else if (isRpcUrlProvider) {
         disposableProvider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
         });
@@ -121,39 +145,22 @@ export default class IExecConfig {
         ...chainDefaults.network,
         ...(ensRegistryAddress && { ensAddress: ensRegistryAddress }),
       };
-      if (isEnhancedWalletProvider) {
-        if (ethProvider.provider instanceof JsonRpcProvider) {
-          // case JsonRpcProvider
-          signer = ethProvider.connect(
-            new JsonRpcProvider(
-              // eslint-disable-next-line no-underscore-dangle
-              ethProvider.provider._getConnection().url,
-              networkOverride,
-              { pollingInterval: 1000 }, // override default polling interval (4000) for faster confirmation
-            ),
-          );
-        } else {
-          // case FallbackProvider can not override
-          if (ensRegistryAddress) {
-            console.warn(
-              'IExec: ensRegistryAddress option is not supported when using a default provider',
-            );
-          }
-          signer = ethProvider;
-        }
-        provider = signer.provider;
-      } else if (isReadOnlyProvider) {
+      if (isRpcUrlProvider) {
         provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
           network: networkOverride,
         });
+      } else if (isEthersAbstractSignerWithProvider) {
+        provider = ethProvider.provider;
+        signer = ethProvider;
+      } else if (isEthersAbstractProvider) {
+        provider = ethProvider;
+        if (isEthersBrowserProvider) {
+          signer = new BrowserProviderSignerAdapter(ethProvider);
+        }
       } else {
-        const browserSigner = new BrowserProviderSigner(
-          ethProvider,
-          networkOverride,
-        );
-        signer = browserSigner;
-        provider = browserSigner.provider;
+        provider = new BrowserProvider(ethProvider, networkOverride);
+        signer = new BrowserProviderSignerAdapter(provider);
       }
       return { provider, signer };
     })();

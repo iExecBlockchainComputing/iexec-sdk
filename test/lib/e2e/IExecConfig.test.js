@@ -9,6 +9,8 @@ import {
   EtherscanProvider,
   CloudflareProvider,
   BrowserProvider,
+  Wallet,
+  HDNodeWallet,
 } from 'ethers';
 import {
   ALCHEMY_API_KEY,
@@ -477,6 +479,61 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(BrowserProvider);
+        expect(chainId).toBe(iexecTestChain.chainId);
+        const network = await provider.getNetwork();
+        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
+        expect(network.name).toBe(iexecTestChain.defaults.name);
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+      });
+    });
+
+    describe('ethers AbstractProvider', () => {
+      test('JsonRpcProvider', async () => {
+        const ethersProvider = new JsonRpcProvider(iexecTestChain.rpcURL);
+        const config = new IExecConfig({
+          ethProvider: ethersProvider,
+        });
+        const { provider, signer, chainId } =
+          await config.resolveContractsClient();
+        expect(signer).toBeUndefined();
+        expect(provider).toBeDefined();
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
+        expect(chainId).toBe(iexecTestChain.chainId);
+        const network = await provider.getNetwork();
+        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
+        expect(network.name).toBe(iexecTestChain.defaults.name);
+        expect(
+          network.getPlugin('org.ethers.plugins.network.Ens').address,
+        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+      });
+    });
+
+    describe('ethers AbstractSigner', () => {
+      test('throw if no provider is connected', async () => {
+        const ethersSigner = Wallet.createRandom();
+        const createConfig = () =>
+          new IExecConfig({ ethProvider: ethersSigner });
+        expect(createConfig).toThrow(
+          Error('Missing provider for ethProvider signer'),
+        );
+        expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+
+      test('Wallet with provider', async () => {
+        const ethersSigner = Wallet.createRandom(
+          new JsonRpcProvider(iexecTestChain.rpcURL),
+        );
+        const config = new IExecConfig({
+          ethProvider: ethersSigner,
+        });
+        const { provider, signer, chainId } =
+          await config.resolveContractsClient();
+        expect(signer).toBeDefined();
+        expect(signer).toBeInstanceOf(HDNodeWallet);
+        expect(provider).toBeDefined();
+        expect(provider).toBeInstanceOf(JsonRpcProvider);
         expect(chainId).toBe(iexecTestChain.chainId);
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));

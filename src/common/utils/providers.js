@@ -24,7 +24,9 @@ export const getReadOnlyProvider = (host, options = {}) => {
   }
   // RPC endpoint
   if (resolvedHost.startsWith('http')) {
-    return new JsonRpcProvider(resolvedHost, resolvedNetwork);
+    return new JsonRpcProvider(resolvedHost, resolvedNetwork, {
+      pollingInterval: 1000, // override default 4s for faster tx confirms (TODO: default value per network + option)
+    });
   }
   // API provider
   const { quorum, ...providersOptionsRest } = providerOptions;
