@@ -6,6 +6,7 @@ import {
   adminCreateCategory,
   execAsync,
   initializeTask,
+  sleep,
 } from '../test-utils';
 import {
   globalSetup,
@@ -48,6 +49,7 @@ describe('iexec deal', () => {
     dealid = await runIExecCliRaw(
       `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
     ).then((res) => res.deals[0].dealid);
+    await sleep(5000); // wait for next block to be added (deal timeout)
   });
 
   afterAll(async () => {
@@ -124,6 +126,7 @@ describe('iexec deal', () => {
       const claimableDealid = await runIExecCliRaw(
         `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
+      await sleep(5000); // wait for next block to be added
       const res = await runIExecCliRaw(
         `${iexecPath} deal claim ${claimableDealid}`,
       );
