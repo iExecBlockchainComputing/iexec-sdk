@@ -85,7 +85,4 @@ Find changes in the [CHANGELOG](./CHANGELOG.md)
 ## Resources
 
 - [iExec main documentation](https://docs.iex.ec/for-developers/)
-- [The iExec Dapp Store](https://dapps.iex.ec)
-- [The iExec Marketplace](https://market.iex.ec)
 - [The iExec Explorer](https://explorer.iex.ec)
-- [The iExec Workerpool registry](https://pools.iex.ec)
