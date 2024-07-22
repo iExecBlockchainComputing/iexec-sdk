@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT
 
+### Changed
+
 - more permissive url validation for `iexec_input_files`
+
+### Removed
+
+- CLI removed `iexec registry` commands
 
 ## [8.9.1] 2024-06-19
 
