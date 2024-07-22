@@ -71,20 +71,25 @@ export default class IExecConfig {
     const isRpcUrlProvider =
       typeof ethProvider === 'string' || typeof ethProvider === 'number';
 
-    // used to get chain id and and find additional config
-    let disposableProvider;
+    let provider;
+    let signer;
     try {
-      if (isEthersAbstractProvider) {
-        disposableProvider = ethProvider;
-      } else if (isEthersAbstractSignerWithProvider) {
-        disposableProvider = ethProvider.provider;
-      } else if (isRpcUrlProvider) {
-        disposableProvider = getReadOnlyProvider(ethProvider, {
+      if (isRpcUrlProvider) {
+        provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
         });
+      } else if (isEthersAbstractSignerWithProvider) {
+        provider = ethProvider.provider;
+        signer = ethProvider;
+      } else if (isEthersAbstractProvider) {
+        provider = ethProvider;
+        if (isEthersBrowserProvider) {
+          signer = new BrowserProviderSignerAdapter(ethProvider);
+        }
       } else {
         try {
-          disposableProvider = new BrowserProvider(ethProvider);
+          provider = new BrowserProvider(ethProvider);
+          signer = new BrowserProviderSignerAdapter(provider);
         } catch (err) {
           debug('BrowserProvider', err);
           throw Error('Unsupported provider');
@@ -93,7 +98,6 @@ export default class IExecConfig {
     } catch (err) {
       throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
     }
-
     let vSmsUrlOrMap;
     try {
       vSmsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
@@ -112,7 +116,7 @@ export default class IExecConfig {
     }
 
     const networkPromise = (async () => {
-      const network = await disposableProvider.getNetwork().catch((err) => {
+      const network = await provider.getNetwork().catch((err) => {
         throw Error(`Failed to detect network: ${err.message}`);
       });
       const { chainId, name } = network;
@@ -134,35 +138,8 @@ export default class IExecConfig {
       debug('chainConfDefaultsPromise', err);
     });
 
-    const providerAndSignerPromise = (async () => {
-      let provider;
-      let signer;
-      if (isRpcUrlProvider) {
-        provider = getReadOnlyProvider(ethProvider, {
-          providers: providerOptions,
-        });
-      } else if (isEthersAbstractSignerWithProvider) {
-        provider = ethProvider.provider;
-        signer = ethProvider;
-      } else if (isEthersAbstractProvider) {
-        provider = ethProvider;
-        if (isEthersBrowserProvider) {
-          signer = new BrowserProviderSignerAdapter(ethProvider);
-        }
-      } else {
-        provider = new BrowserProvider(ethProvider);
-        signer = new BrowserProviderSignerAdapter(provider);
-      }
-      return { provider, signer };
-    })();
-
-    providerAndSignerPromise.catch((err) => {
-      debug('providerAndSignerPromise', err);
-    });
-
     const contractsPromise = (async () => {
       const { chainId } = await networkPromise;
-      const { provider, signer } = await providerAndSignerPromise;
       try {
         return new IExecContractsClient({
           chainId,
@@ -187,7 +164,6 @@ export default class IExecConfig {
 
     const enterpriseSwapContractsPromise = (async () => {
       const { chainId } = await networkPromise;
-      const { provider, signer } = await providerAndSignerPromise;
       const hasEnterpriseConf =
         enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
       if (!hasEnterpriseConf) {
