@@ -88,7 +88,6 @@ export const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
-  ensRegistry: ensMap[id] && ensMap[id].registry,
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
