@@ -41,10 +41,10 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 
 #### Parameters
 
-| Name            | Type     | Description                                                    |
-| :-------------- | :------- | :------------------------------------------------------------- |
-| `message`       | `string` | A descriptive error message detailing the nature of the error. |
-| `originalError` | `Error`  | The original Error object that caused this API call error.     |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error` | The original Error object that caused this API call error. |
 
 #### Returns
 
@@ -62,7 +62,7 @@ Error.constructor
 
 The original Error object that caused this API call error.
 
----
+___
 
 ### originalError
 

@@ -26,49 +26,49 @@ sell order for computing power
 
 • **apprestrict**: `string`
 
----
+___
 
 ### category
 
 • **category**: `string`
 
----
+___
 
 ### datasetrestrict
 
 • **datasetrestrict**: `string`
 
----
+___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
----
+___
 
 ### tag
 
 • **tag**: `string`
 
----
+___
 
 ### trust
 
 • **trust**: `string`
 
----
+___
 
 ### volume
 
 • **volume**: `string`
 
----
+___
 
 ### workerpool
 
 • **workerpool**: `string`
 
----
+___
 
 ### workerpoolprice
 

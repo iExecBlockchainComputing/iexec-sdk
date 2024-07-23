@@ -23,7 +23,7 @@
 
 app image digest
 
----
+___
 
 ### mrenclave
 
@@ -31,7 +31,7 @@ app image digest
 
 optional for TEE apps only, specify the TEE protocol to use
 
----
+___
 
 ### multiaddr
 
@@ -39,7 +39,7 @@ optional for TEE apps only, specify the TEE protocol to use
 
 app image address
 
----
+___
 
 ### name
 
@@ -47,7 +47,7 @@ app image address
 
 a name for the app
 
----
+___
 
 ### owner
 
@@ -55,7 +55,7 @@ a name for the app
 
 the app owner
 
----
+___
 
 ### type
 

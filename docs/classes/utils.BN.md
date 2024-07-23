@@ -7,7 +7,6 @@
 class used for big numbers manipulation
 
 example:
-
 ```js
 const one = new BN(1);
 const two = new BN('2');
@@ -37,11 +36,11 @@ const maxSafeIntegerPlusOne = maxSafeInteger.add(one);
 
 #### Parameters
 
-| Name      | Type                                                                   |
-| :-------- | :--------------------------------------------------------------------- |
-| `number`  | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
-| `base?`   | `number` \| `"hex"`                                                    |
-| `endian?` | `Endianness`                                                           |
+| Name | Type |
+| :------ | :------ |
+| `number` | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
+| `base?` | `number` \| ``"hex"`` |
+| `endian?` | `Endianness` |
 
 #### Returns
 
@@ -55,10 +54,10 @@ BNJS.constructor
 
 #### Parameters
 
-| Name      | Type                                                                   |
-| :-------- | :--------------------------------------------------------------------- |
-| `number`  | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
-| `endian?` | `Endianness`                                                           |
+| Name | Type |
+| :------ | :------ |
+| `number` | `string` \| `number` \| `Buffer` \| `Uint8Array` \| `BN` \| `number`[] |
+| `endian?` | `Endianness` |
 
 #### Returns
 

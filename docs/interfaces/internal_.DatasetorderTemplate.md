@@ -24,37 +24,37 @@ sell order for a dataset
 
 • **apprestrict**: `string`
 
----
+___
 
 ### dataset
 
 • **dataset**: `string`
 
----
+___
 
 ### datasetprice
 
 • **datasetprice**: `string`
 
----
+___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
----
+___
 
 ### tag
 
 • **tag**: [`Tag`](../modules.md#tag)
 
----
+___
 
 ### volume
 
 • **volume**: `string`
 
----
+___
 
 ### workerpoolrestrict
 

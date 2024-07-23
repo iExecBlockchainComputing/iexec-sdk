@@ -49,7 +49,7 @@ data:
 | --- | --- | --- |
 | `CHECK_BRIDGE_POLICY` | sent once | |
 | `BRIDGE_POLICY_CHECKED` | sent once | `minPerTx`,`maxPerTx`,`dailyLimit` |
-| `CHECK_BRIDGE_LIMIT` | sent once | |
+| `CHECK_BRIDGE_LIMIT` | sent once |  |
 | `BRIDGE_LIMIT_CHECKED` | sent once | `totalSpentPerDay` |
 | `SEND_TO_BRIDGE_TX_REQUEST` | sent once | `bridgeAddress` |
 | `SEND_TO_BRIDGE_TX_SUCCESS` | sent once | `txHash` |
@@ -58,12 +58,12 @@ data:
 
 #### Parameters
 
-| Name                 | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| :------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `callbacks`          | `Object`                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `callbacks.complete` | () => `any`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `callbacks.error`    | (`error`: `Error`) => `any`                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `callbacks.next`     | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: `"CHECK_BRIDGE_POLICY"` \| `"BRIDGE_POLICY_CHECKED"` \| `"CHECK_BRIDGE_LIMIT"` \| `"BRIDGE_LIMIT_CHECKED"` \| `"SEND_TO_BRIDGE_TX_REQUEST"` \| `"SEND_TO_BRIDGE_TX_SUCCESS"` \| `"WAIT_RECEIVE_TX"` \| `"RECEIVE_TX_SUCCESS"` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string` }) => `any` |
+| Name | Type |
+| :------ | :------ |
+| `callbacks` | `Object` |
+| `callbacks.complete` | () => `any` |
+| `callbacks.error` | (`error`: `Error`) => `any` |
+| `callbacks.next` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: ``"CHECK_BRIDGE_POLICY"`` \| ``"BRIDGE_POLICY_CHECKED"`` \| ``"CHECK_BRIDGE_LIMIT"`` \| ``"BRIDGE_LIMIT_CHECKED"`` \| ``"SEND_TO_BRIDGE_TX_REQUEST"`` \| ``"SEND_TO_BRIDGE_TX_SUCCESS"`` \| ``"WAIT_RECEIVE_TX"`` \| ``"RECEIVE_TX_SUCCESS"`` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
 
 #### Returns
 
@@ -80,7 +80,7 @@ data:
 | --- | --- | --- |
 | `CHECK_BRIDGE_POLICY` | sent once | |
 | `BRIDGE_POLICY_CHECKED` | sent once | `minPerTx`,`maxPerTx`,`dailyLimit` |
-| `CHECK_BRIDGE_LIMIT` | sent once | |
+| `CHECK_BRIDGE_LIMIT` | sent once |  |
 | `BRIDGE_LIMIT_CHECKED` | sent once | `totalSpentPerDay` |
 | `SEND_TO_BRIDGE_TX_REQUEST` | sent once | `bridgeAddress` |
 | `SEND_TO_BRIDGE_TX_SUCCESS` | sent once | `txHash` |

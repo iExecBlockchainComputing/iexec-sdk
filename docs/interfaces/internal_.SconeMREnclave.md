@@ -22,7 +22,7 @@
 
 app entrypoint path
 
----
+___
 
 ### fingerprint
 
@@ -30,7 +30,7 @@ app entrypoint path
 
 app tee fingerprint
 
----
+___
 
 ### framework
 
@@ -38,7 +38,7 @@ app tee fingerprint
 
 TEE framework name 'SCONE'
 
----
+___
 
 ### heapSize
 
@@ -46,7 +46,7 @@ TEE framework name 'SCONE'
 
 dedicated memory in bytes
 
----
+___
 
 ### version
 

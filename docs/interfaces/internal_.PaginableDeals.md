@@ -20,15 +20,15 @@
 
 total count
 
----
+___
 
 ### deals
 
-• **deals**: { `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number` } ; `appHash`: `string` ; `beneficiary`: `string` ; `botFirst`: `number` ; `botSize`: `number` ; `callback`: `string` ; `category`: `number` ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number` } ; `datasetHash`: `string` ; `dealid`: `string` ; `params`: `string` ; `requestHash`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: `number` ; `startTime`: `number` ; `tag`: `string` ; `trust`: `number` ; `workerStake`: `number` ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number` } ; `workerpoolHash`: `string` }[]
+• **deals**: { `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number`  } ; `appHash`: `string` ; `beneficiary`: `string` ; `botFirst`: `number` ; `botSize`: `number` ; `callback`: `string` ; `category`: `number` ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number`  } ; `datasetHash`: `string` ; `dealid`: `string` ; `params`: `string` ; `requestHash`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: `number` ; `startTime`: `number` ; `tag`: `string` ; `trust`: `number` ; `workerStake`: `number` ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: `number`  } ; `workerpoolHash`: `string`  }[]
 
 deal page (this may be a partial result)
 
----
+___
 
 ### more
 

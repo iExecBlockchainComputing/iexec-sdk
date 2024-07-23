@@ -30,10 +30,10 @@
 
 #### Parameters
 
-| Name       | Type              |
-| :--------- | :---------------- |
+| Name | Type |
+| :------ | :------ |
 | `ethereum` | `Eip1193Provider` |
-| `network?` | `Networkish`      |
+| `network?` | `Networkish` |
 
 #### Returns
 
@@ -51,9 +51,9 @@ AbstractSigner.constructor
 
 #### Parameters
 
-| Name       | Type                 |
-| :--------- | :------------------- |
-| `provider` | `null` \| `Provider` |
+| Name | Type |
+| :------ | :------ |
+| `provider` | ``null`` \| `Provider` |
 
 #### Returns
 
@@ -63,7 +63,7 @@ AbstractSigner.constructor
 
 AbstractSigner.connect
 
----
+___
 
 ### getAddress
 
@@ -77,7 +77,7 @@ AbstractSigner.connect
 
 AbstractSigner.getAddress
 
----
+___
 
 ### signMessage
 
@@ -85,8 +85,8 @@ AbstractSigner.getAddress
 
 #### Parameters
 
-| Name      | Type                     |
-| :-------- | :----------------------- |
+| Name | Type |
+| :------ | :------ |
 | `message` | `string` \| `Uint8Array` |
 
 #### Returns
@@ -97,7 +97,7 @@ AbstractSigner.getAddress
 
 AbstractSigner.signMessage
 
----
+___
 
 ### signTransaction
 
@@ -105,8 +105,8 @@ AbstractSigner.signMessage
 
 #### Parameters
 
-| Name | Type                 |
-| :--- | :------------------- |
+| Name | Type |
+| :------ | :------ |
 | `tx` | `TransactionRequest` |
 
 #### Returns
@@ -117,7 +117,7 @@ AbstractSigner.signMessage
 
 AbstractSigner.signTransaction
 
----
+___
 
 ### signTypedData
 
@@ -125,11 +125,11 @@ AbstractSigner.signTransaction
 
 #### Parameters
 
-| Name     | Type                                    |
-| :------- | :-------------------------------------- |
-| `domain` | `TypedDataDomain`                       |
-| `types`  | `Record`<`string`, `TypedDataField`[]\> |
-| `value`  | `Record`<`string`, `any`\>              |
+| Name | Type |
+| :------ | :------ |
+| `domain` | `TypedDataDomain` |
+| `types` | `Record`<`string`, `TypedDataField`[]\> |
+| `value` | `Record`<`string`, `any`\> |
 
 #### Returns
 

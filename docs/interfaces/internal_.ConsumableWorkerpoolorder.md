@@ -28,61 +28,61 @@ signed sell order for computing power
 
 • **apprestrict**: `string`
 
----
+___
 
 ### category
 
 • **category**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### datasetrestrict
 
 • **datasetrestrict**: `string`
 
----
+___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
----
+___
 
 ### salt
 
 • **salt**: `string`
 
----
+___
 
 ### sign
 
 • **sign**: `string`
 
----
+___
 
 ### tag
 
 • **tag**: [`Tag`](../modules.md#tag)
 
----
+___
 
 ### trust
 
 • **trust**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### volume
 
 • **volume**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### workerpool
 
 • **workerpool**: `string`
 
----
+___
 
 ### workerpoolprice
 

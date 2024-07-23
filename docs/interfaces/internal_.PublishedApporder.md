@@ -24,7 +24,7 @@ published sell order for an app
 
 • **chainId**: `number`
 
----
+___
 
 ### order
 
@@ -32,43 +32,43 @@ published sell order for an app
 
 #### Type declaration
 
-| Name                 | Type     |
-| :------------------- | :------- |
-| `app`                | `string` |
-| `appprice`           | `number` |
-| `datasetrestrict`    | `string` |
-| `requesterrestrict`  | `string` |
-| `salt`               | `string` |
-| `sign`               | `string` |
-| `tag`                | `string` |
-| `volume`             | `number` |
+| Name | Type |
+| :------ | :------ |
+| `app` | `string` |
+| `appprice` | `number` |
+| `datasetrestrict` | `string` |
+| `requesterrestrict` | `string` |
+| `salt` | `string` |
+| `sign` | `string` |
+| `tag` | `string` |
+| `volume` | `number` |
 | `workerpoolrestrict` | `string` |
 
----
+___
 
 ### orderHash
 
 • **orderHash**: `string`
 
----
+___
 
 ### publicationTimestamp
 
 • **publicationTimestamp**: `string`
 
----
+___
 
 ### remaining
 
 • **remaining**: `number`
 
----
+___
 
 ### signer
 
 • **signer**: `string`
 
----
+___
 
 ### status
 

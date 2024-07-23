@@ -21,7 +21,7 @@
 
 sha256sum of the file
 
----
+___
 
 ### multiaddr
 
@@ -29,7 +29,7 @@ sha256sum of the file
 
 dataset file download address
 
----
+___
 
 ### name
 
@@ -37,7 +37,7 @@ dataset file download address
 
 a name for the dataset
 
----
+___
 
 ### owner
 

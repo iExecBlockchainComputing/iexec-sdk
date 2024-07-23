@@ -24,7 +24,7 @@ published buy order for computing tasks
 
 • **chainId**: `number`
 
----
+___
 
 ### order
 
@@ -32,49 +32,49 @@ published buy order for computing tasks
 
 #### Type declaration
 
-| Name                 | Type     |
-| :------------------- | :------- |
-| `app`                | `string` |
-| `appmaxprice`        | `number` |
-| `beneficiary`        | `string` |
-| `callback`           | `string` |
-| `category`           | `number` |
-| `dataset`            | `string` |
-| `datasetmaxprice`    | `number` |
-| `params`             | `string` |
-| `salt`               | `string` |
-| `sign`               | `string` |
-| `tag`                | `string` |
-| `trust`              | `number` |
-| `volume`             | `number` |
-| `workerpool`         | `string` |
+| Name | Type |
+| :------ | :------ |
+| `app` | `string` |
+| `appmaxprice` | `number` |
+| `beneficiary` | `string` |
+| `callback` | `string` |
+| `category` | `number` |
+| `dataset` | `string` |
+| `datasetmaxprice` | `number` |
+| `params` | `string` |
+| `salt` | `string` |
+| `sign` | `string` |
+| `tag` | `string` |
+| `trust` | `number` |
+| `volume` | `number` |
+| `workerpool` | `string` |
 | `workerpoolmaxprice` | `number` |
 
----
+___
 
 ### orderHash
 
 • **orderHash**: `string`
 
----
+___
 
 ### publicationTimestamp
 
 • **publicationTimestamp**: `string`
 
----
+___
 
 ### remaining
 
 • **remaining**: `number`
 
----
+___
 
 ### signer
 
 • **signer**: `string`
 
----
+___
 
 ### status
 

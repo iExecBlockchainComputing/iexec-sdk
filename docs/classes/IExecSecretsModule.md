@@ -36,10 +36,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name           | Type                                                                                     |
-| :------------- | :--------------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -70,64 +70,58 @@ current IExecConfig
 check if a named secret exists for the requester in the Secret Management Service
 
 example:
-
 ```js
-const isSecretSet = await checkRequesterSecretExists(
-  requesterAddress,
-  'my-password'
-);
+const isSecretSet = await checkRequesterSecretExists(requesterAddress, "my-password");
 console.log('secret "my-password" set:', isSecretSet);
 ```
 
 #### Parameters
 
-| Name                    | Type                                         |
-| :---------------------- | :------------------------------------------- |
-| `requesterAddress`      | `string`                                     |
-| `secretName`            | `String`                                     |
-| `options?`              | `Object`                                     |
+| Name | Type |
+| :------ | :------ |
+| `requesterAddress` | `string` |
+| `secretName` | `String` |
+| `options?` | `Object` |
 | `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
 `Promise`<`boolean`\>
 
----
+___
 
 ### pushRequesterSecret
 
-▸ **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`<{ `isPushed`: `boolean` }\>
+▸ **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`<{ `isPushed`: `boolean`  }\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
 push a named secret to the Secret Management Service
 
 _NB_:
-
 - pushed secrets can be used in `tee` tasks by specifying `iexec_secrets` in the requestorder params.
 - once pushed a secret can not be updated
 
 example:
-
 ```js
-const { isPushed } = await pushRequesterSecret('my-password', 'passw0rd');
+const { isPushed } = await pushRequesterSecret("my-password", "passw0rd");
 console.log('pushed secret "my-password":', isPushed);
 ```
 
 #### Parameters
 
-| Name                    | Type                                         |
-| :---------------------- | :------------------------------------------- |
-| `secretName`            | `String`                                     |
-| `secretValue`           | `String`                                     |
-| `options?`              | `Object`                                     |
+| Name | Type |
+| :------ | :------ |
+| `secretName` | `String` |
+| `secretValue` | `String` |
+| `options?` | `Object` |
 | `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`<{ `isPushed`: `boolean` }\>
+`Promise`<{ `isPushed`: `boolean`  }\>
 
----
+___
 
 ### fromConfig
 
@@ -137,8 +131,8 @@ Create an IExecSecretsModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name     | Type                            |
-| :------- | :------------------------------ |
+| Name | Type |
+| :------ | :------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
