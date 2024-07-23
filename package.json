@@ -150,7 +150,7 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "lint": "eslint src",
-    "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc",
+    "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc && npm run format",
     "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "stop-test-stack": "cd test && docker compose down --remove-orphans --volumes",
     "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose pull && docker compose up -d",
