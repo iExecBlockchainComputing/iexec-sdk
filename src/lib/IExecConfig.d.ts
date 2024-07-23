@@ -4,8 +4,7 @@ export type * from './IExecConfig.js';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
-import { AbstractProvider, AbstractSigner } from 'ethers';
-import { BrowserProvider } from 'ethers';
+import { AbstractProvider, AbstractSigner, BrowserProvider } from 'ethers';
 
 export interface Eip1193Provider {
   request(request: {
