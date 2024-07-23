@@ -7,7 +7,7 @@
 ## Type parameters
 
 | Name |
-| :------ |
+| :--- |
 | `OT` |
 
 ## Table of contents
@@ -26,7 +26,7 @@
 
 total count
 
-___
+---
 
 ### more
 
@@ -42,7 +42,7 @@ when a partial result is returned, `more()` can be called to get the next page.
 
 `Promise`<[`PaginableOrders`](internal_.PaginableOrders.md)<`OT`\>\>
 
-___
+---
 
 ### orders
 

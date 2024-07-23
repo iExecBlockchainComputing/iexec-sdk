@@ -32,85 +32,85 @@ signed buy order for computing tasks
 
 • **app**: `string`
 
-___
+---
 
 ### appmaxprice
 
 • **appmaxprice**: `string`
 
-___
+---
 
 ### beneficiary
 
 • **beneficiary**: `string`
 
-___
+---
 
 ### callback
 
 • **callback**: `string`
 
-___
+---
 
 ### category
 
 • **category**: `string`
 
-___
+---
 
 ### dataset
 
 • **dataset**: `string`
 
-___
+---
 
 ### datasetmaxprice
 
 • **datasetmaxprice**: `string`
 
-___
+---
 
 ### params
 
 • **params**: `string`
 
-___
+---
 
 ### salt
 
 • **salt**: `string`
 
-___
+---
 
 ### sign
 
 • **sign**: `string`
 
-___
+---
 
 ### tag
 
 • **tag**: `string`
 
-___
+---
 
 ### trust
 
 • **trust**: `string`
 
-___
+---
 
 ### volume
 
 • **volume**: `string`
 
-___
+---
 
 ### workerpool
 
 • **workerpool**: `string`
 
-___
+---
 
 ### workerpoolmaxprice
 

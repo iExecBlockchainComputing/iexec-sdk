@@ -26,49 +26,49 @@ signed sell order for a dataset
 
 • **apprestrict**: `string`
 
-___
+---
 
 ### dataset
 
 • **dataset**: `string`
 
-___
+---
 
 ### datasetprice
 
 • **datasetprice**: [`BNish`](../modules.md#bnish)
 
-___
+---
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
-___
+---
 
 ### salt
 
 • **salt**: `string`
 
-___
+---
 
 ### sign
 
 • **sign**: `string`
 
-___
+---
 
 ### tag
 
 • **tag**: [`Tag`](../modules.md#tag)
 
-___
+---
 
 ### volume
 
 • **volume**: [`BNish`](../modules.md#bnish)
 
-___
+---
 
 ### workerpoolrestrict
 

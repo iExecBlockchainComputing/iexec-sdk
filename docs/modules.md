@@ -84,11 +84,12 @@ Re-exports [BN](classes/utils.BN.md)
 ethereum address
 
 example:
+
 ```js
 const address = '0xF048eF3d7E3B33A465E0599E641BB29421f7Df92';
 ```
 
-___
+---
 
 ### Addressish
 
@@ -96,13 +97,13 @@ ___
 
 ethereum address or ENS
 
-___
+---
 
 ### AnyRecord
 
 Ƭ **AnyRecord**: `Record`<`string`, `any`\>
 
-___
+---
 
 ### BNish
 
@@ -110,7 +111,7 @@ ___
 
 big number like
 
-___
+---
 
 ### Bytes
 
@@ -119,11 +120,12 @@ ___
 bytes hex string
 
 example:
+
 ```js
 const NULL_BYTES = '0x';
 ```
 
-___
+---
 
 ### Bytes32
 
@@ -132,11 +134,13 @@ ___
 bytes 32 hex string
 
 example:
+
 ```js
-const bytes32 = '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef883c6';
+const bytes32 =
+  '0x800e8dca929fd7b6ced10b5f84487c49f7be79b2eed662827eccba258ef883c6';
 ```
 
-___
+---
 
 ### Dealid
 
@@ -144,7 +148,7 @@ ___
 
 id of a deal
 
-___
+---
 
 ### ENS
 
@@ -153,11 +157,12 @@ ___
 ENS
 
 example:
+
 ```js
 const ensName = 'iexec.eth';
 ```
 
-___
+---
 
 ### HumanSingleTag
 
@@ -166,11 +171,12 @@ ___
 human redable task tag
 
 example:
+
 ```js
 const teeTag = 'tee';
 ```
 
-___
+---
 
 ### Multiaddress
 
@@ -179,12 +185,13 @@ ___
 multiaddress
 
 example:
+
 ```js
-const url = 'https://example.com/foo.bar'
-const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
+const url = 'https://example.com/foo.bar';
+const ipfs = '/ipfs/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ';
 ```
 
-___
+---
 
 ### NRLCAmount
 
@@ -195,6 +202,7 @@ nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC toke
 named units ('nRLC', 'RLC') can be used with the format `${amount} ${unit}`
 
 examples:
+
 ```js
 // number
 const oneNRLC = 1;
@@ -208,7 +216,7 @@ const zeroPointOneRLC = '0.1 RLC';
 const tenNRLC = new BN(10);
 ```
 
-___
+---
 
 ### OrderHash
 
@@ -216,7 +224,7 @@ ___
 
 order hash
 
-___
+---
 
 ### Tag
 
@@ -225,13 +233,14 @@ ___
 task tag used to specify the runtime
 
 example:
+
 ```js
 const gpuTag = ['gpu'];
 const sconeTeeTag = ['tee', 'scone'];
 const gramineTeeTag = ['tee', 'gramine'];
 ```
 
-___
+---
 
 ### TaskIndex
 
@@ -239,7 +248,7 @@ ___
 
 index of a task in a bag of tasks
 
-___
+---
 
 ### Taskid
 
@@ -247,15 +256,15 @@ ___
 
 id of a task
 
-___
+---
 
 ### TeeFramework
 
-Ƭ **TeeFramework**: ``"scone"`` \| ``"gramine"``
+Ƭ **TeeFramework**: `"scone"` \| `"gramine"`
 
 Trusted Execution Environment name
 
-___
+---
 
 ### TxHash
 
@@ -263,7 +272,7 @@ ___
 
 transaction hash
 
-___
+---
 
 ### WeiAmount
 
@@ -274,6 +283,7 @@ wei amount (wei is the smallest sub-division of ether: 1 ether = 1,000,000,000,0
 named units ('wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' or 'eth') can be used with the format `${amount} ${unit}`
 
 examples:
+
 ```js
 // number
 const oneWei = 1;

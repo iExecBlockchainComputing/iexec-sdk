@@ -22,7 +22,7 @@ IExec category
 
 a description of the category
 
-___
+---
 
 ### name
 
@@ -30,10 +30,10 @@ ___
 
 a name for the category
 
-___
+---
 
 ### workClockTimeRef
 
 • **workClockTimeRef**: [`BNish`](../modules.md#bnish)
 
-time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)
+time base (in sec) for the category (tasks of this category must be completed under 10 \* workClockTimeRef)
