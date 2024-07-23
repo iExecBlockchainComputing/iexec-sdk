@@ -14,7 +14,7 @@ export interface Eip1193Provider {
 }
 export interface IExecConfigArgs {
   /**
-   * A web3 Eth provider, network name or chain id or an ethers provider
+   * A web3 Eth provider, a network name, a chain id or an ethers provider
    *
    * read-only provider examples:
    * - `"mainnet"` or `1` or `"1"` for ethereum mainnet provider
