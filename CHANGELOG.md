@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- reduced default polling interval for faster tx confirms
+- reduced default polling interval for faster tx confirmation
 - more permissive url validation for `iexec_input_files`
 
 ### Removed
