@@ -26,13 +26,13 @@ ValidationError is thrown when a method is called with missing or unexpected par
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name            | Type                                                          |
+| :-------------- | :------------------------------------------------------------ |
 | `errorOrErrors` | `string` \| `ValidationError` \| readonly `ValidationError`[] |
-| `value?` | `any` |
-| `field?` | `string` |
-| `type?` | `string` |
-| `disableStack?` | `boolean` |
+| `value?`        | `any`                                                         |
+| `field?`        | `string`                                                      |
+| `type?`         | `string`                                                      |
+| `disableStack?` | `boolean`                                                     |
 
 #### Returns
 

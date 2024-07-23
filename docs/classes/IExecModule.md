@@ -66,10 +66,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------- |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
 
 #### Returns
 
@@ -93,8 +93,8 @@ Create an IExecModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                            |
+| :------- | :------------------------------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

@@ -42,7 +42,7 @@ export const getSignerFromPrivateKey: (
      * providers options
      */
     providers: ProviderOptions;
-  },
+  }
 ) => EnhancedWallet;
 
 /**
@@ -141,5 +141,5 @@ export const sumTags: (tags: Bytes32[]) => Bytes32;
  */
 export const decryptResult: (
   encrypted: Buffer | ArrayBuffer | Uint8Array | string,
-  beneficiaryKey: Buffer | ArrayBuffer | Uint8Array | CryptoKey | string,
+  beneficiaryKey: Buffer | ArrayBuffer | Uint8Array | CryptoKey | string
 ) => Promise<Buffer>;

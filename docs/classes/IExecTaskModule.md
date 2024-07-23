@@ -38,10 +38,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------- |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
 
 #### Returns
 
@@ -74,6 +74,7 @@ current IExecConfig
 claim a task not completed after the final deadline (proceed to refunds).
 
 example:
+
 ```js
 const claimTxHash = await claim(taskid);
 console.log('task claimed:', claimTxHash);
@@ -81,15 +82,15 @@ console.log('task claimed:', claimTxHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type     |
+| :------- | :------- |
 | `taskid` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### fetchResults
 
@@ -100,22 +101,25 @@ ___
 download the specified task result.
 
 example:
+
 ```js
-const response = await fetchResults('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+const response = await fetchResults(
+  '0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81'
+);
 const binary = await response.blob();
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type     |
+| :------- | :------- |
 | `taskid` | `string` |
 
 #### Returns
 
 `Promise`<`Response`\>
 
-___
+---
 
 ### obsTask
 
@@ -126,17 +130,23 @@ return an Observable with a `subscribe` method to monitor the task status change
 _NB_: specify the `dealid` of the task to allow task monitoring when the task is not yet initialized (ACTIVE)
 
 example:
+
 - monitor task updates
+
 ```js
-const taskObservable = await obsTask('0xec8045dfb0235d46c2d7ece1eadfe7741728754aed8b7efb716e9890cf3e9a8d');
+const taskObservable = await obsTask(
+  '0xec8045dfb0235d46c2d7ece1eadfe7741728754aed8b7efb716e9890cf3e9a8d'
+);
 const unsubscribe = taskObservable.subscribe({
- next: ({ message, task }) => console.log(message, task.statusName),
- error: (e) => console.error(e),
- complete: () => console.log('final state reached'),
+  next: ({ message, task }) => console.log(message, task.statusName),
+  error: (e) => console.error(e),
+  complete: () => console.log('final state reached'),
 });
 // call unsubscribe() to unsubscribe from taskObservable
 ```
+
 - wait for task completion
+
 ```js
 const waitFinalState = (taskid, dealid) =>
   new Promise((resolve, reject) => {
@@ -155,17 +165,17 @@ const task = await waitFinalState(
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `taskid` | `string` |
-| `optional?` | `Object` |
+| Name               | Type     |
+| :----------------- | :------- |
+| `taskid`           | `string` |
+| `optional?`        | `Object` |
 | `optional.dealid?` | `string` |
 
 #### Returns
 
 `Promise`<[`TaskObservable`](internal_.TaskObservable.md)\>
 
-___
+---
 
 ### show
 
@@ -174,24 +184,25 @@ ___
 show the details of a task.
 
 example:
+
 ```js
 const task = await show(
- '0xec8045dfb0235d46c2d7ece1eadfe7741728754aed8b7efb716e9890cf3e9a8d',
+  '0xec8045dfb0235d46c2d7ece1eadfe7741728754aed8b7efb716e9890cf3e9a8d'
 );
 console.log('task:', task);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type     |
+| :------- | :------- |
 | `taskid` | `string` |
 
 #### Returns
 
 `Promise`<[`Task`](../interfaces/internal_.Task.md)\>
 
-___
+---
 
 ### fromConfig
 
@@ -201,8 +212,8 @@ Create an IExecTaskModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                            |
+| :------- | :------------------------------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

@@ -25,55 +25,55 @@
 
 • **address**: `string`
 
-___
+---
 
 ### allowanceAmount
 
 • **allowanceAmount**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### authorizedAccounts
 
 • **authorizedAccounts**: `string`[]
 
-___
+---
 
 ### balance
 
 • **balance**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### expirationTimestamp
 
 • **expirationTimestamp**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### owner
 
 • **owner**: `string`
 
-___
+---
 
 ### sponsoredApps
 
 • **sponsoredApps**: `string`[]
 
-___
+---
 
 ### sponsoredDatasets
 
 • **sponsoredDatasets**: `string`[]
 
-___
+---
 
 ### sponsoredWorkerpools
 
 • **sponsoredWorkerpools**: `string`[]
 
-___
+---
 
 ### type
 

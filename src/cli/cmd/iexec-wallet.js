@@ -69,7 +69,7 @@ create
         `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
-        { raw: res },
+        { raw: res }
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
@@ -97,7 +97,7 @@ importPk
         `Your wallet address is ${res.address}\nWallet saved in "${
           res.fileName
         }":\n${pretty(res.wallet)}`,
-        { raw: res },
+        { raw: res }
       );
       spinner.warn('You must backup your wallet file in a safe place!');
     } catch (error) {
@@ -150,7 +150,7 @@ show
             }
           } catch (error) {
             throw Error(
-              `Failed to load wallet address from keystore: ${error.message}`,
+              `Failed to load wallet address from keystore: ${error.message}`
             );
           }
         }
@@ -194,7 +194,7 @@ show
             ...(!address && displayedWallet && { wallet: displayedWallet }),
             ens,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -232,7 +232,7 @@ sendETH
           formatEth(weiAmount),
           chain.name,
           opts.to,
-          chain.id,
+          chain.id
         );
       }
       const message = `${formatEth(weiAmount)} ${
@@ -284,7 +284,7 @@ sendRLC
           formatRLC(nRlcAmount),
           chain.name,
           opts.to,
-          chain.id,
+          chain.id
         );
       }
       const message = `${formatRLC(nRlcAmount)} ${
@@ -334,13 +334,13 @@ sweep
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ether and RLC')(
           chain.name,
           opts.to,
-          chain.id,
+          chain.id
         );
       }
       spinner.start('Sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await walletSweep(
         chain.contracts,
-        opts.to,
+        opts.to
       );
       spinner.succeed(
         `Wallet swept from ${address} to ${opts.to}\n${
@@ -354,7 +354,7 @@ sweep
             sendERC20TxHash,
             errors,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -390,12 +390,12 @@ bridgeToSidechain
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`
         );
       }
       if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`
         );
       }
       if (!opts.force) {
@@ -403,7 +403,7 @@ bridgeToSidechain
           formatRLC(nRlcAmount),
           chain.name,
           `bridge contract ${bridgeAddress} (please double check the address)`,
-          chain.id,
+          chain.id
         );
       }
       const bridgedChainConfigured = !!(
@@ -425,7 +425,7 @@ bridgeToSidechain
             bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
           bridgedContracts:
             bridgedChainConfigured && chain.bridgedNetwork.contracts,
-        },
+        }
       );
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
@@ -441,7 +441,7 @@ bridgeToSidechain
             sendTxHash,
             receiveTxHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -477,12 +477,12 @@ bridgeToMainchain
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
         throw Error(
-          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
+          `Missing bridge contract address in "chain.json" for chain ${chain.name}`
         );
       }
       if (!bridgedChainId) {
         throw Error(
-          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
+          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`
         );
       }
       if (!opts.force) {
@@ -490,7 +490,7 @@ bridgeToMainchain
           formatRLC(nRlcAmount),
           chain.name,
           `bridge contract ${bridgeAddress} (please double check the address)`,
-          chain.id,
+          chain.id
         );
       }
       const bridgedChainConfigured = !!(
@@ -512,7 +512,7 @@ bridgeToMainchain
             bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
           bridgedContracts:
             bridgedChainConfigured && chain.bridgedNetwork.contracts,
-        },
+        }
       );
       spinner.succeed(
         `Sent ${message} (tx: ${sendTxHash})\n${
@@ -528,7 +528,7 @@ bridgeToMainchain
             sendTxHash,
             receiveTxHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -559,7 +559,7 @@ wrapEnterpriseRLC
         chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(
-          `No enterprise smart contracts found on current chain ${chain.id}`,
+          `No enterprise smart contracts found on current chain ${chain.id}`
         );
       }
 
@@ -585,7 +585,7 @@ wrapEnterpriseRLC
       const txHash = await walletWrapEnterpriseRLC(
         standardContracts,
         enterpriseContracts,
-        nRlcAmount,
+        nRlcAmount
       );
       spinner.succeed(`Wrapped ${message}\n`, {
         raw: {
@@ -622,7 +622,7 @@ unwrapEnterpriseRLC
         chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
       if (!hasEnterpriseFlavour) {
         throw Error(
-          `No enterprise smart contracts found on current chain ${chain.id}`,
+          `No enterprise smart contracts found on current chain ${chain.id}`
         );
       }
 
@@ -642,7 +642,7 @@ unwrapEnterpriseRLC
 
       const txHash = await walletUnwrapEnterpriseRLC(
         enterpriseContracts,
-        nRlcAmount,
+        nRlcAmount
       );
       spinner.succeed(`Unwrapped ${message}\n`, {
         raw: {
@@ -685,7 +685,7 @@ sendNRLC
           formatRLC(nRlcAmount),
           chain.name,
           opts.to,
-          chain.id,
+          chain.id
         );
       }
       const message = `${formatRLC(nRlcAmount)} ${

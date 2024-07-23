@@ -37,8 +37,8 @@ const generatePackage = async (fileName) => {
         main: `../${path.join(distDir, 'esm', 'lib', fileName)}`,
       },
       null,
-      2,
-    ).concat('\n'),
+      2
+    ).concat('\n')
   );
   if (!packageFiles.includes(dirName)) {
     packageFiles.push(dirName);
@@ -54,12 +54,12 @@ fsPromises
           (name) =>
             name.split('.').length === 2 &&
             name.endsWith('.js') &&
-            name !== 'index.js',
+            name !== 'index.js'
         )
-        .map(generatePackage),
+        .map(generatePackage)
     ).then((res) => {
       console.log(`${res.length} packages generated`);
-    }),
+    })
   )
   .then(() => {
     console.log('updating package.json');
@@ -67,7 +67,7 @@ fsPromises
     packageJson.files = packageFiles;
     return fsPromises.writeFile(
       'package.json',
-      JSON.stringify(packageJson, null, 2).concat('\n'),
+      JSON.stringify(packageJson, null, 2).concat('\n')
     );
   })
   .then(() => {

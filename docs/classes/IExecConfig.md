@@ -5,6 +5,7 @@
 configuration for IExecModule
 
 example:
+
 ```js
 // create the configuration
 const config = new IExecConfig({ ethProvider: window.ethereum });
@@ -61,14 +62,16 @@ const config = new IExecConfig({ ethProvider: window.ethereum });
 
 ```js
 import { getSignerFromPrivateKey } from 'iexec/utils';
-const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
+const config = new IExecConfig({
+  ethProvider: getSignerFromPrivateKey('mainnet', privateKey),
+});
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `args` | [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| Name       | Type                                                        |
+| :--------- | :---------------------------------------------------------- |
+| `args`     | [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md)       |
 | `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
@@ -87,7 +90,7 @@ resolve the current bridge contract address
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveBridgeBackAddress
 
@@ -99,7 +102,7 @@ resolve the bridge contract address on bridged chain
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveBridgedContractsClient
 
@@ -111,7 +114,7 @@ resolve the current bridged IExecContractsClient
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-___
+---
 
 ### resolveChainId
 
@@ -123,7 +126,7 @@ resolve the current chainId
 
 `Promise`<`number`\>
 
-___
+---
 
 ### resolveContractsClient
 
@@ -135,7 +138,7 @@ resolve the current IExecContractsClient
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-___
+---
 
 ### resolveEnsPublicResolverAddress
 
@@ -147,7 +150,7 @@ resolve the current ENS public resolver contract address
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveEnterpriseContractsClient
 
@@ -159,7 +162,7 @@ resolve the current enterprise IExecContractsClient
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-___
+---
 
 ### resolveIexecGatewayURL
 
@@ -171,7 +174,7 @@ resolve the current IExec market URL
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveIpfsGatewayURL
 
@@ -183,7 +186,7 @@ resolve the current IPFS gateway URL
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolvePocoSubgraphURL
 
@@ -195,7 +198,7 @@ resolve the current PoCo subgraph URL
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveResultProxyURL
 
@@ -207,7 +210,7 @@ resolve the current result proxy URL
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveSmsURL
 
@@ -217,16 +220,16 @@ resolve the current SMS URL
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `options?` | `Object` |
+| Name                    | Type                                         |
+| :---------------------- | :------------------------------------------- |
+| `options?`              | `Object`                                     |
 | `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### resolveStandardContractsClient
 
@@ -238,28 +241,28 @@ resolve the current standard IExecContractsClient
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-___
+---
 
 ### resolveVoucherHubAddress
 
-▸ **resolveVoucherHubAddress**(): `Promise`<``null`` \| `string`\>
+▸ **resolveVoucherHubAddress**(): `Promise`<`null` \| `string`\>
 
 resolve the current VoucherHub contract address
 returns `null` if not available
 
 #### Returns
 
-`Promise`<``null`` \| `string`\>
+`Promise`<`null` \| `string`\>
 
-___
+---
 
 ### resolveVoucherSubgraphURL
 
-▸ **resolveVoucherSubgraphURL**(): `Promise`<``null`` \| `string`\>
+▸ **resolveVoucherSubgraphURL**(): `Promise`<`null` \| `string`\>
 
 resolve the current voucher subgraph URL
 returns `null` if not available
 
 #### Returns
 
-`Promise`<``null`` \| `string`\>
+`Promise`<`null` \| `string`\>

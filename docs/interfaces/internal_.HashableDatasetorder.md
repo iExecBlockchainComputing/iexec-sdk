@@ -35,7 +35,7 @@ sell order for a dataset
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[apprestrict](internal_.SignableDatasetorder.md#apprestrict)
 
-___
+---
 
 ### dataset
 
@@ -45,7 +45,7 @@ ___
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[dataset](internal_.SignableDatasetorder.md#dataset)
 
-___
+---
 
 ### datasetprice
 
@@ -55,7 +55,7 @@ ___
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[datasetprice](internal_.SignableDatasetorder.md#datasetprice)
 
-___
+---
 
 ### requesterrestrict
 
@@ -65,13 +65,13 @@ ___
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[requesterrestrict](internal_.SignableDatasetorder.md#requesterrestrict)
 
-___
+---
 
 ### salt
 
 • **salt**: `string`
 
-___
+---
 
 ### tag
 
@@ -81,7 +81,7 @@ ___
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[tag](internal_.SignableDatasetorder.md#tag)
 
-___
+---
 
 ### volume
 
@@ -91,7 +91,7 @@ ___
 
 [SignableDatasetorder](internal_.SignableDatasetorder.md).[volume](internal_.SignableDatasetorder.md#volume)
 
-___
+---
 
 ### workerpoolrestrict
 

@@ -19,7 +19,7 @@
 
 a description for the workerpool
 
-___
+---
 
 ### owner
 

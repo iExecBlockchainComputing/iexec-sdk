@@ -24,7 +24,7 @@ published sell order for computing power
 
 • **chainId**: `number`
 
-___
+---
 
 ### order
 
@@ -32,45 +32,45 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `apprestrict` | `string` |
-| `category` | `number` |
-| `datasetrestrict` | `string` |
+| Name                | Type     |
+| :------------------ | :------- |
+| `apprestrict`       | `string` |
+| `category`          | `number` |
+| `datasetrestrict`   | `string` |
 | `requesterrestrict` | `string` |
-| `salt` | `string` |
-| `sign` | `string` |
-| `tag` | `string` |
-| `trust` | `number` |
-| `volume` | `number` |
-| `workerpool` | `string` |
-| `workerpoolprice` | `number` |
+| `salt`              | `string` |
+| `sign`              | `string` |
+| `tag`               | `string` |
+| `trust`             | `number` |
+| `volume`            | `number` |
+| `workerpool`        | `string` |
+| `workerpoolprice`   | `number` |
 
-___
+---
 
 ### orderHash
 
 • **orderHash**: `string`
 
-___
+---
 
 ### publicationTimestamp
 
 • **publicationTimestamp**: `string`
 
-___
+---
 
 ### remaining
 
 • **remaining**: `number`
 
-___
+---
 
 ### signer
 
 • **signer**: `string`
 
-___
+---
 
 ### status
 

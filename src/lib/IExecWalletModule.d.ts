@@ -165,7 +165,7 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   sweep(
-    to: Addressish,
+    to: Addressish
   ): Promise<{ sendERC20TxHash: TxHash; sendNativeTxHash: TxHash }>;
   /**
    * **SIGNER REQUIRED**
@@ -183,7 +183,7 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   bridgeToSidechain(
-    nRLCAmount: NRLCAmount,
+    nRLCAmount: NRLCAmount
   ): Promise<{ sendTxHash: TxHash; receiveTxHash?: TxHash }>;
   /**
    * **SIGNER REQUIRED**
@@ -201,7 +201,7 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   bridgeToMainchain(
-    nRLCAmount: NRLCAmount,
+    nRLCAmount: NRLCAmount
   ): Promise<{ sendTxHash: TxHash; receiveTxHash?: TxHash }>;
   /**
    * **SIGNER REQUIRED**

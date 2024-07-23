@@ -24,7 +24,7 @@ IExec workerpool
 
 the workerpool owner
 
-___
+---
 
 ### registry
 
@@ -32,19 +32,19 @@ ___
 
 workerpool registry address
 
-___
+---
 
 ### schedulerRewardRatioPolicy
 
 • **schedulerRewardRatioPolicy**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### workerStakeRatioPolicy
 
 • **workerStakeRatioPolicy**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### workerpoolDescription
 

@@ -67,7 +67,7 @@ export class BridgeError extends Error {
   constructor(originalError, sendTxHash) {
     super(
       `Failed to get bridged chain confirmation for transaction ${sendTxHash}`,
-      { cause: originalError },
+      { cause: originalError }
     );
     this.name = this.constructor.name;
     this.sendTxHash = sendTxHash;

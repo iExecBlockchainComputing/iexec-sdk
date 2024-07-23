@@ -63,7 +63,7 @@ describe('app', () => {
       });
       const address = getRandomAddress();
       await expect(readOnlyIExec.app.showApp(address)).rejects.toThrow(
-        new errors.ObjectNotFoundError('app', address, iexecTestChain.chainId),
+        new errors.ObjectNotFoundError('app', address, iexecTestChain.chainId)
       );
     });
   });
@@ -108,7 +108,7 @@ describe('app', () => {
       });
       const address = getRandomAddress();
       await expect(readOnlyIExec.app.showUserApp(0, address)).rejects.toThrow(
-        Error('app not deployed'),
+        Error('app not deployed')
       );
     });
   });
@@ -120,7 +120,7 @@ describe('app', () => {
       });
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const resBeforeDeploy = await readOnlyIExec.app.countUserApps(
-        wallet.address,
+        wallet.address
       );
       await deployRandomApp(iexec);
       const res = await readOnlyIExec.app.countUserApps(wallet.address);
@@ -143,8 +143,8 @@ describe('app', () => {
       };
       await expect(iexec.app.deployApp(app)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
+          'The current provider is not a signer, impossible to sign messages or transactions'
+        )
       );
     });
 
@@ -175,7 +175,7 @@ describe('app', () => {
       };
       const deployed = await iexec.app.deployApp(app);
       await expect(iexec.app.deployApp(app)).rejects.toThrow(
-        Error(`App already deployed at address ${deployed.address}`),
+        Error(`App already deployed at address ${deployed.address}`)
       );
     });
   });
@@ -196,11 +196,11 @@ describe('app', () => {
       };
       const predictedAddress = await readOnlyIExec.app.predictAppAddress(app);
       await expect(
-        readOnlyIExec.app.checkDeployedApp(predictedAddress),
+        readOnlyIExec.app.checkDeployedApp(predictedAddress)
       ).resolves.toBe(false);
       await iexec.app.deployApp(app);
       await expect(
-        readOnlyIExec.app.checkDeployedApp(predictedAddress),
+        readOnlyIExec.app.checkDeployedApp(predictedAddress)
       ).resolves.toBe(true);
     });
   });
@@ -221,11 +221,11 @@ describe('app', () => {
       };
       const predictedAddress = await readOnlyIExec.app.predictAppAddress(app);
       await expect(
-        readOnlyIExec.app.checkDeployedApp(predictedAddress),
+        readOnlyIExec.app.checkDeployedApp(predictedAddress)
       ).resolves.toBe(false);
       await iexec.app.deployApp(app);
       await expect(
-        readOnlyIExec.app.checkDeployedApp(predictedAddress),
+        readOnlyIExec.app.checkDeployedApp(predictedAddress)
       ).resolves.toBe(true);
     });
   });
@@ -234,11 +234,11 @@ describe('app', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
-        iexec.app.transferApp(getRandomAddress(), getRandomAddress()),
+        iexec.app.transferApp(getRandomAddress(), getRandomAddress())
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
+          'The current provider is not a signer, impossible to sign messages or transactions'
+        )
       );
     });
 
@@ -248,10 +248,10 @@ describe('app', () => {
       const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexecAppOwner);
       await expect(
-        iexecRandom.app.transferApp(getRandomAddress(), receiverAddress),
+        iexecRandom.app.transferApp(getRandomAddress(), receiverAddress)
       ).rejects.toThrow(Error('Invalid app address'));
       await expect(
-        iexecRandom.app.transferApp(address, receiverAddress),
+        iexecRandom.app.transferApp(address, receiverAddress)
       ).rejects.toThrow(Error('Only app owner can transfer app ownership'));
       const res = await iexecAppOwner.app.transferApp(address, receiverAddress);
       expect(res.address).toBe(address);
@@ -282,7 +282,7 @@ describe('app', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -298,7 +298,7 @@ describe('app', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -311,18 +311,18 @@ describe('app', () => {
         teeFramework: TEE_FRAMEWORKS.GRAMINE,
       });
       await expect(
-        readOnlyIExec.app.checkAppSecretExists(address),
+        readOnlyIExec.app.checkAppSecretExists(address)
       ).resolves.toBe(false);
       await iexec.app.pushAppSecret(address, 'foo');
       // infer teeFramework to use
       await expect(
-        readOnlyIExec.app.checkAppSecretExists(address),
+        readOnlyIExec.app.checkAppSecretExists(address)
       ).resolves.toBe(true);
       // check inferred teeFramework with teeFramework option
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
+        })
       ).resolves.toBe(true);
     });
 
@@ -338,13 +338,13 @@ describe('app', () => {
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
+        })
       ).resolves.toBe(false);
       // validate teeFramework
       await expect(
         readOnlyIExec.app.checkAppSecretExists(getRandomAddress(), {
           teeFramework: 'foo',
-        }),
+        })
       ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
@@ -371,7 +371,7 @@ describe('app', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -387,7 +387,7 @@ describe('app', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -400,11 +400,11 @@ describe('app', () => {
       });
       // only owner can push secret
       await expect(
-        iexecRandom.app.pushAppSecret(appAddress, 'foo'),
+        iexecRandom.app.pushAppSecret(appAddress, 'foo')
       ).rejects.toThrow(
         Error(
-          `Wallet ${randomWallet.address} is not allowed to set secret for ${appAddress}`,
-        ),
+          `Wallet ${randomWallet.address} is not allowed to set secret for ${appAddress}`
+        )
       );
     });
 
@@ -415,15 +415,15 @@ describe('app', () => {
       });
       // infer teeFramework to use
       await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
-        true,
+        true
       );
       // check inferred teeFramework with teeFramework option
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
+        })
       ).rejects.toThrow(
-        Error(`Secret already exists for ${appAddress} and can't be updated`),
+        Error(`Secret already exists for ${appAddress} and can't be updated`)
       );
     });
 
@@ -434,13 +434,13 @@ describe('app', () => {
       });
 
       await expect(
-        iexecAppOwner.app.pushAppSecret(appAddress, 'foo'),
+        iexecAppOwner.app.pushAppSecret(appAddress, 'foo')
       ).resolves.toBe(true);
       // can't update existing secret
       await expect(
-        iexecAppOwner.app.pushAppSecret(appAddress, 'foo'),
+        iexecAppOwner.app.pushAppSecret(appAddress, 'foo')
       ).rejects.toThrow(
-        Error(`Secret already exists for ${appAddress} and can't be updated`),
+        Error(`Secret already exists for ${appAddress} and can't be updated`)
       );
     });
 
@@ -449,29 +449,29 @@ describe('app', () => {
       const { address: appAddress } = await deployRandomApp(iexec);
       // infer teeFramework to use
       await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
-        true,
+        true
       );
       await expect(
         iexec.app.checkAppSecretExists(appAddress, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
+        })
       ).resolves.toBe(false);
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
+        })
       ).resolves.toBe(true);
       await expect(
         iexec.app.checkAppSecretExists(appAddress, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
+        })
       ).resolves.toBe(true);
 
       // validate teeFramework
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
           teeFramework: 'foo',
-        }),
+        })
       ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });

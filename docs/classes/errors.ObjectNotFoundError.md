@@ -32,11 +32,11 @@ ObjectNotFoundError is thrown when trying to access an unknown onchain resource.
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `objName` | `string` | Name of the resource. |
-| `objId` | `string` | Id or address of the resource. |
-| `chainId` | `string` | Chain id of the blockchain. |
+| Name      | Type     | Description                    |
+| :-------- | :------- | :----------------------------- |
+| `objName` | `string` | Name of the resource.          |
+| `objId`   | `string` | Id or address of the resource. |
+| `chainId` | `string` | Chain id of the blockchain.    |
 
 #### Returns
 
@@ -54,7 +54,7 @@ Error.constructor
 
 Chain id of the blockchain.
 
-___
+---
 
 ### objId
 
@@ -62,7 +62,7 @@ ___
 
 Id or address of the resource.
 
-___
+---
 
 ### objName
 

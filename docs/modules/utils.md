@@ -10,8 +10,8 @@
 
 ### Variables
 
-- [NULL\_ADDRESS](utils.md#null_address)
-- [NULL\_BYTES32](utils.md#null_bytes32)
+- [NULL_ADDRESS](utils.md#null_address)
+- [NULL_BYTES32](utils.md#null_bytes32)
 
 ### Functions
 
@@ -27,17 +27,17 @@
 
 ## Variables
 
-### NULL\_ADDRESS
+### NULL_ADDRESS
 
-• `Const` **NULL\_ADDRESS**: `string`
+• `Const` **NULL_ADDRESS**: `string`
 
 ethereum null/zero address
 
-___
+---
 
-### NULL\_BYTES32
+### NULL_BYTES32
 
-• `Const` **NULL\_BYTES32**: `string`
+• `Const` **NULL_BYTES32**: `string`
 
 null bytes32
 
@@ -50,21 +50,26 @@ null bytes32
 decode a bytes32 tag in an array of human readable tags
 
 example:
+
 ```js
-console.log(decodeTag('0x0000000000000000000000000000000000000000000000000000000000000001'));
+console.log(
+  decodeTag(
+    '0x0000000000000000000000000000000000000000000000000000000000000001'
+  )
+);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name  | Type     |
+| :---- | :------- |
 | `tag` | `string` |
 
 #### Returns
 
 `string`[]
 
-___
+---
 
 ### decryptResult
 
@@ -73,10 +78,13 @@ ___
 decrypt an encrypted result file
 
 example:
+
 ```js
 // somehow load the beneficiary RSA private key
 const beneficiaryKey = await loadBeneficiaryKey();
-const response = await iexec.task.fetchResults('0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19');
+const response = await iexec.task.fetchResults(
+  '0x5c959fd2e9ea2d5bdb965d7c2e7271c9cb91dd05b7bdcfa8204c34c52f8c8c19'
+);
 const encFileBuffer = await response.arrayBuffer();
 const decryptedFileBuffer = await decryptResult(encFileBuffer, beneficiaryKey);
 const binary = new Blob([decryptedFileBuffer]);
@@ -84,16 +92,16 @@ const binary = new Blob([decryptedFileBuffer]);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `encrypted` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
+| Name             | Type                                                                 |
+| :--------------- | :------------------------------------------------------------------- |
+| `encrypted`      | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array`                |
 | `beneficiaryKey` | `string` \| `Buffer` \| `ArrayBuffer` \| `Uint8Array` \| `CryptoKey` |
 
 #### Returns
 
 `Promise`<`Buffer`\>
 
-___
+---
 
 ### encodeTag
 
@@ -102,21 +110,22 @@ ___
 encode an array of human readable tags in a bytes32 tag readable by iExec's smart contracts
 
 example:
+
 ```js
 console.log(encodeTag(['tee', 'gpu']));
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name   | Type       |
+| :----- | :--------- |
 | `tags` | `string`[] |
 
 #### Returns
 
 `string`
 
-___
+---
 
 ### formatEth
 
@@ -125,21 +134,22 @@ ___
 format a wei amount in Eth
 
 example:
+
 ```js
 console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name  | Type                                   |
+| :---- | :------------------------------------- |
 | `wei` | [`WeiAmount`](../modules.md#weiamount) |
 
 #### Returns
 
 `string`
 
-___
+---
 
 ### formatRLC
 
@@ -147,22 +157,23 @@ ___
 
 format a nRLC amount in RLC
 
- * example:
+- example:
+
 ```js
 console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name   | Type                                     |
+| :----- | :--------------------------------------- |
 | `nRLC` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
 `string`
 
-___
+---
 
 ### getSignerFromPrivateKey
 
@@ -171,27 +182,31 @@ ___
 create a signer connected to the specified blockchain host from a private key
 
 example:
+
 ```js
-const ethProvider = getSignerFromPrivateKey('http://localhost:8545', '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407');
+const ethProvider = getSignerFromPrivateKey(
+  'http://localhost:8545',
+  '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
+);
 const iexec = new IExec({ ethProvider });
 ```
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `host` | `string` | node RPC url |
-| `privateKey` | `string` | wallet private key |
-| `options?` | `Object` | - |
-| `options.gasPrice?` | `string` \| `number` \| `bigint` | gas price override |
-| `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
-| `options.providers` | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options |
+| Name                           | Type                                                  | Description        |
+| :----------------------------- | :---------------------------------------------------- | :----------------- |
+| `host`                         | `string`                                              | node RPC url       |
+| `privateKey`                   | `string`                                              | wallet private key |
+| `options?`                     | `Object`                                              | -                  |
+| `options.gasPrice?`            | `string` \| `number` \| `bigint`                      | gas price override |
+| `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\>     | nonce override     |
+| `options.providers`            | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options  |
 
 #### Returns
 
 [`EnhancedWallet`](../classes/EnhancedWallet.md)
 
-___
+---
 
 ### parseEth
 
@@ -202,6 +217,7 @@ parse a string formatted Eht value in wei big number
 supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'wei'
 
 example:
+
 ```js
 console.log('5 gwei =' + parseEth('5 gwei') + 'wei');
 console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
@@ -209,16 +225,16 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `value` | `string` |
+| Name           | Type     |
+| :------------- | :------- |
+| `value`        | `string` |
 | `defaultUnit?` | `string` |
 
 #### Returns
 
 [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### parseRLC
 
@@ -229,6 +245,7 @@ parse a string formatted RLC value in nRLC big number
 supported units: 'nRLC', 'RLC' default unit 'nRLC'
 
 example:
+
 ```js
 console.log('5 RLC =' + parseEth('5 RLC') + 'nRLC');
 console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
@@ -236,16 +253,16 @@ console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `value` | `string` |
+| Name           | Type     |
+| :------------- | :------- |
+| `value`        | `string` |
 | `defaultUnit?` | `string` |
 
 #### Returns
 
 [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### sumTags
 
@@ -254,18 +271,22 @@ ___
 sum an array of bytes32 tags
 
 example:
+
 ```js
-const appTag = '0x0000000000000000000000000000000000000000000000000000000000000100';
-const datasetTag = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const requestTag = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const appTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000100';
+const datasetTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000001';
+const requestTag =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 const workerpoolMinTag = sumTags([appTag, datasetTag, requestTag]);
 console.log('workerpoolMinTag', workerpoolMinTag);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name   | Type       |
+| :----- | :--------- |
 | `tags` | `string`[] |
 
 #### Returns

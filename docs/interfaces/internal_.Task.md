@@ -32,97 +32,97 @@
 
 • **consensusValue**: `string`
 
-___
+---
 
 ### contributionDeadline
 
 • **contributionDeadline**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### contributors
 
 • **contributors**: `string`[]
 
-___
+---
 
 ### dealid
 
 • **dealid**: `string`
 
-___
+---
 
 ### finalDeadline
 
 • **finalDeadline**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### idx
 
 • **idx**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### resultDigest
 
 • **resultDigest**: `string`
 
-___
+---
 
 ### results
 
-• **results**: `string` \| { `location?`: `string` ; `storage`: `string`  }
+• **results**: `string` \| { `location?`: `string` ; `storage`: `string` }
 
-___
+---
 
 ### resultsCallback
 
 • **resultsCallback**: `string`
 
-___
+---
 
 ### resultsTimestamp
 
 • **resultsTimestamp**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### revealCounter
 
 • **revealCounter**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### revealDeadline
 
 • **revealDeadline**: [`BN`](../classes/utils.BN.md)
 
-___
+---
 
 ### status
 
 • **status**: `number`
 
-___
+---
 
 ### statusName
 
 • **statusName**: `string`
 
-___
+---
 
 ### taskTimedOut
 
 • **taskTimedOut**: `boolean`
 
-___
+---
 
 ### taskid
 
 • **taskid**: `string`
 
-___
+---
 
 ### winnerCounter
 

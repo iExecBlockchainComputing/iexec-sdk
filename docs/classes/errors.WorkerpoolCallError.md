@@ -31,10 +31,10 @@ WorkerpoolCallError encapsulates an error occurring during a call to a workerpoo
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `message` | `string` | A descriptive error message detailing the nature of the error. |
-| `originalError` | `Error` | The original Error object that caused this API call error. |
+| Name            | Type     | Description                                                    |
+| :-------------- | :------- | :------------------------------------------------------------- |
+| `message`       | `string` | A descriptive error message detailing the nature of the error. |
+| `originalError` | `Error`  | The original Error object that caused this API call error.     |
 
 #### Returns
 
@@ -56,7 +56,7 @@ The original Error object that caused this API call error.
 
 [ApiCallError](errors.ApiCallError.md).[cause](errors.ApiCallError.md#cause)
 
-___
+---
 
 ### originalError
 

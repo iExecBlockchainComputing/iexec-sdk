@@ -15,7 +15,7 @@ export default class IExecModule {
    */
   constructor(
     configOrArgs: IExecConfig | IExecConfigArgs,
-    options?: IExecConfigOptions,
+    options?: IExecConfigOptions
   );
   /**
    * current IExecConfig

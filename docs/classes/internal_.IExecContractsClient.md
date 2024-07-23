@@ -42,17 +42,17 @@ Create a client for IExec contracts
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `args` | `Object` | - |
-| `args.chainId` | `string` \| `number` | id of the chain to use (used to resolve IExec contract address) |
-| `args.confirms?` | `number` | number of block to wait for transactions confirmation (default 1) |
-| `args.flavour?` | `string` | flavour to use (default standard) |
-| `args.hubAddress?` | `string` | override the IExec contract address to target a custom instance |
-| `args.isNative?` | `boolean` | true if IExec contract use the chain native token |
-| `args.provider` | `Provider` | ethers Provider |
-| `args.signer?` | `Signer` | ethers Signer, required to sign transactions and messages |
-| `args.useGas?` | `boolean` | if false set the gasPrice to 0 (default true) |
+| Name               | Type                 | Description                                                       |
+| :----------------- | :------------------- | :---------------------------------------------------------------- |
+| `args`             | `Object`             | -                                                                 |
+| `args.chainId`     | `string` \| `number` | id of the chain to use (used to resolve IExec contract address)   |
+| `args.confirms?`   | `number`             | number of block to wait for transactions confirmation (default 1) |
+| `args.flavour?`    | `string`             | flavour to use (default standard)                                 |
+| `args.hubAddress?` | `string`             | override the IExec contract address to target a custom instance   |
+| `args.isNative?`   | `boolean`            | true if IExec contract use the chain native token                 |
+| `args.provider`    | `Provider`           | ethers Provider                                                   |
+| `args.signer?`     | `Signer`             | ethers Signer, required to sign transactions and messages         |
+| `args.useGas?`     | `boolean`            | if false set the gasPrice to 0 (default true)                     |
 
 #### Returns
 
@@ -66,7 +66,7 @@ Create a client for IExec contracts
 
 current chainId
 
-___
+---
 
 ### confirms
 
@@ -74,7 +74,7 @@ ___
 
 number of block to wait for transactions confirmation
 
-___
+---
 
 ### flavour
 
@@ -82,7 +82,7 @@ ___
 
 current IExec flavour
 
-___
+---
 
 ### hubAddress
 
@@ -90,7 +90,7 @@ ___
 
 current IExec contract address
 
-___
+---
 
 ### isNative
 
@@ -98,7 +98,7 @@ ___
 
 true if current instance use native token
 
-___
+---
 
 ### pocoVersion
 
@@ -106,7 +106,7 @@ ___
 
 IExec PoCo ABI version
 
-___
+---
 
 ### provider
 
@@ -114,7 +114,7 @@ ___
 
 current Provider
 
-___
+---
 
 ### signer
 
@@ -122,7 +122,7 @@ ___
 
 current Signer
 
-___
+---
 
 ### txOptions
 
@@ -132,8 +132,8 @@ transaction options
 
 #### Type declaration
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
+| Name        | Type     | Description       |
+| :---------- | :------- | :---------------- |
 | `gasPrice?` | `bigint` | gasPrice override |
 
 ## Methods
@@ -146,15 +146,15 @@ fetch the IExec registry contract address of specified resource
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type     |
+| :------------- | :------- |
 | `resourceName` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### fetchRegistryContract
 
@@ -164,15 +164,15 @@ fetch the IExec registry Contract instance of specified resource
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type     |
+| :------------- | :------- |
 | `resourceName` | `string` |
 
 #### Returns
 
 `Promise`<`Contract`\>
 
-___
+---
 
 ### fetchTokenAddress
 
@@ -182,15 +182,15 @@ fetch the IExec token contract address, not available when isNative is true
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type     |
+| :------------- | :------- |
 | `resourceName` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### fetchTokenContract
 
@@ -200,15 +200,15 @@ fetch the IExec token Contract instance, not available when isNative is true
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type     |
+| :------------- | :------- |
 | `resourceName` | `string` |
 
 #### Returns
 
 `Promise`<`Contract`\>
 
-___
+---
 
 ### getContract
 
@@ -218,16 +218,16 @@ get a known Contract instance at specified address
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `name` | `string` |
+| Name      | Type     |
+| :-------- | :------- |
+| `name`    | `string` |
 | `address` | `string` |
 
 #### Returns
 
 `Contract`
 
-___
+---
 
 ### getIExecContract
 
@@ -239,7 +239,7 @@ get the IExec Contract instance
 
 `Contract`
 
-___
+---
 
 ### setSigner
 
@@ -249,8 +249,8 @@ set the signer
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type     |
+| :------- | :------- |
 | `signer` | `Signer` |
 
 #### Returns

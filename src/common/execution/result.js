@@ -8,7 +8,7 @@ const debug = Debug('iexec:execution:result');
 
 const downloadFromIpfs = async (
   ipfsAddress,
-  { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {},
+  { ipfsGatewayURL = 'https://gateway.ipfs.io' } = {}
 ) => {
   try {
     return await downloadZipApi.get({
@@ -27,7 +27,7 @@ const downloadFromIpfs = async (
 export const fetchTaskResults = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  { ipfsGatewayURL } = {},
+  { ipfsGatewayURL } = {}
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
@@ -42,7 +42,7 @@ export const fetchTaskResults = async (
     }
     if (!location) {
       throw Error(
-        'Missing location key in task results, download not supported',
+        'Missing location key in task results, download not supported'
       );
     }
     return await downloadFromIpfs(location, { ipfsGatewayURL });

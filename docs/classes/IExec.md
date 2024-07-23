@@ -50,10 +50,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------- |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
 
 #### Returns
 
@@ -71,7 +71,7 @@ Create an IExecModule instance using an IExecConfig like
 
 account module
 
-___
+---
 
 ### app
 
@@ -79,7 +79,7 @@ ___
 
 app module
 
-___
+---
 
 ### config
 
@@ -91,7 +91,7 @@ current IExecConfig
 
 [IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
-___
+---
 
 ### dataset
 
@@ -99,7 +99,7 @@ ___
 
 dataset module
 
-___
+---
 
 ### deal
 
@@ -107,7 +107,7 @@ ___
 
 deal module
 
-___
+---
 
 ### ens
 
@@ -115,7 +115,7 @@ ___
 
 ens module
 
-___
+---
 
 ### hub
 
@@ -123,7 +123,7 @@ ___
 
 hub module
 
-___
+---
 
 ### network
 
@@ -131,7 +131,7 @@ ___
 
 network module
 
-___
+---
 
 ### order
 
@@ -139,7 +139,7 @@ ___
 
 order module
 
-___
+---
 
 ### orderbook
 
@@ -147,7 +147,7 @@ ___
 
 orderbook module
 
-___
+---
 
 ### result
 
@@ -155,7 +155,7 @@ ___
 
 result module
 
-___
+---
 
 ### secrets
 
@@ -163,7 +163,7 @@ ___
 
 secrets module
 
-___
+---
 
 ### storage
 
@@ -171,7 +171,7 @@ ___
 
 storage module
 
-___
+---
 
 ### task
 
@@ -179,7 +179,7 @@ ___
 
 task module
 
-___
+---
 
 ### voucher
 
@@ -187,7 +187,7 @@ ___
 
 voucher module
 
-___
+---
 
 ### wallet
 
@@ -195,7 +195,7 @@ ___
 
 wallet module
 
-___
+---
 
 ### workerpool
 
@@ -213,8 +213,8 @@ Create an IExec instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                            |
+| :------- | :------------------------------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

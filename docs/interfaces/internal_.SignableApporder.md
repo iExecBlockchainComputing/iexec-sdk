@@ -30,37 +30,37 @@ sell order for an app
 
 • **app**: `string`
 
-___
+---
 
 ### appprice
 
 • **appprice**: [`BNish`](../modules.md#bnish)
 
-___
+---
 
 ### datasetrestrict
 
 • **datasetrestrict**: `string`
 
-___
+---
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
-___
+---
 
 ### tag
 
 • **tag**: [`Tag`](../modules.md#tag)
 
-___
+---
 
 ### volume
 
 • **volume**: [`BNish`](../modules.md#bnish)
 
-___
+---
 
 ### workerpoolrestrict
 

@@ -38,7 +38,7 @@ const obsBridgeMessages = {
 const findBlockNumberBeforeTimestamp = async (
   provider,
   targetTimestamp,
-  { step = 100, refBlock } = {},
+  { step = 100, refBlock } = {}
 ) => {
   const lastTriedBlock = refBlock || (await wrapCall(provider.getBlock()));
   const triedBlockNumber = Math.max(lastTriedBlock.number - step, 0);
@@ -48,11 +48,11 @@ const findBlockNumberBeforeTimestamp = async (
   if (remainingTime > 0) {
     const stepTime = Math.max(
       lastTriedBlock.timestamp - triedBlockTimestamp,
-      100,
+      100
     );
     const nextStep = Math.min(
       Math.ceil((remainingTime / stepTime) * step) + 5,
-      1000,
+      1000
     );
     return findBlockNumberBeforeTimestamp(provider, targetTimestamp, {
       refBlock: triedBlock,
@@ -66,7 +66,7 @@ export const obsBridgeToSidechain = (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { sidechainBridgeAddress, bridgedContracts } = {},
+  { sidechainBridgeAddress, bridgedContracts } = {}
 ) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
@@ -88,7 +88,7 @@ export const obsBridgeToSidechain = (
         if (contracts.isNative) throw Error('Current chain is a sidechain');
         const balance = await getRlcBalance(
           contracts,
-          await getAddress(contracts),
+          await getAddress(contracts)
         );
         if (balance.lt(new BN(vAmount))) {
           throw Error('Amount to bridge exceeds wallet balance');
@@ -102,7 +102,7 @@ export const obsBridgeToSidechain = (
         const ercBridgeContract = new Contract(
           vBridgeAddress,
           ForeignBridgeErcToNativeAbi,
-          contracts.provider,
+          contracts.provider
         );
         const [minPerTx, maxPerTx, dailyLimit] = await Promise.all([
           wrapCall(ercBridgeContract.minPerTx()),
@@ -119,15 +119,15 @@ export const obsBridgeToSidechain = (
         if (new BN(vAmount).lt(bigIntToBn(minPerTx))) {
           throw Error(
             `Minimum amount allowed to bridge is ${formatRLC(
-              minPerTx.toString(),
-            )} RLC`,
+              minPerTx.toString()
+            )} RLC`
           );
         }
         if (new BN(vAmount).gt(bigIntToBn(maxPerTx))) {
           throw Error(
             `Maximum amount allowed to bridge is ${formatRLC(
-              maxPerTx.toString(),
-            )} RLC`,
+              maxPerTx.toString()
+            )} RLC`
           );
         }
 
@@ -140,7 +140,7 @@ export const obsBridgeToSidechain = (
         const dayStartTimestamp = currentDay.toNumber() * (60 * 60 * 24);
         const startBlockNumber = await findBlockNumberBeforeTimestamp(
           contracts.provider,
-          dayStartTimestamp,
+          dayStartTimestamp
         );
         if (abort) return;
         const erc20Contract = await wrapCall(contracts.fetchTokenContract());
@@ -168,7 +168,7 @@ export const obsBridgeToSidechain = (
             const parsedLog = erc20Interface.parseLog(logs[0]);
             if (parsedLog.args.to === vBridgeAddress) {
               totalSpentPerDay = totalSpentPerDay.add(
-                bigIntToBn(parsedLog.args.value),
+                bigIntToBn(parsedLog.args.value)
               );
             }
           }
@@ -188,8 +188,8 @@ export const obsBridgeToSidechain = (
         if (!withinLimit) {
           throw Error(
             `Amount to bridge would exceed bridge daily limit. ${formatRLC(
-              totalSpentPerDay,
-            )}/${formatRLC(dailyLimit)} RLC already bridged today.`,
+              totalSpentPerDay
+            )}/${formatRLC(dailyLimit)} RLC already bridged today.`
           );
         }
 
@@ -224,7 +224,7 @@ export const obsBridgeToSidechain = (
               const sidechainBridge = new Contract(
                 vSidechainBridgeAddress,
                 HomeBridgeErcToNativeAbi,
-                bridgedContracts.provider,
+                bridgedContracts.provider
               );
               const cleanListeners = () =>
                 sidechainBridge.removeAllListeners('AffirmationCompleted');
@@ -240,13 +240,13 @@ export const obsBridgeToSidechain = (
                       cleanListeners();
                       resolve(event);
                     }
-                  },
+                  }
                 );
                 bridgedContracts.provider.resetEventsBlock(
-                  sidechainBlockNumber,
+                  sidechainBlockNumber
                 );
                 debug(
-                  `watching AffirmationCompleted events from block ${sidechainBlockNumber}`,
+                  `watching AffirmationCompleted events from block ${sidechainBlockNumber}`
                 );
               } catch (e) {
                 cleanListeners();
@@ -283,7 +283,7 @@ export const bridgeToSidechain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { sidechainBridgeAddress, bridgedContracts } = {},
+  { sidechainBridgeAddress, bridgedContracts } = {}
 ) => {
   checkSigner(contracts);
   let sendTxHash;
@@ -319,7 +319,7 @@ export const obsBridgeToMainchain = (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { mainchainBridgeAddress, bridgedContracts } = {},
+  { mainchainBridgeAddress, bridgedContracts } = {}
 ) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
@@ -341,7 +341,7 @@ export const obsBridgeToMainchain = (
         if (!contracts.isNative) throw Error('Current chain is a mainchain');
         const balance = await getRlcBalance(
           contracts,
-          await getAddress(contracts),
+          await getAddress(contracts)
         );
         if (balance.lt(new BN(vAmount))) {
           throw Error('Amount to bridge exceeds wallet balance');
@@ -349,7 +349,7 @@ export const obsBridgeToMainchain = (
         const sidechainBridgeContract = new Contract(
           vBridgeAddress,
           HomeBridgeErcToNativeAbi,
-          contracts.provider,
+          contracts.provider
         );
         const bnWeiValue = bnNRlcToBnWei(new BN(vAmount));
         const weiValue = bnWeiValue.toString();
@@ -374,15 +374,15 @@ export const obsBridgeToMainchain = (
         if (bnWeiValue.lt(bigIntToBn(minPerTx))) {
           throw Error(
             `Minimum amount allowed to bridge is ${formatRLC(
-              truncateBnWeiToBnNRlc(bigIntToBn(minPerTx)),
-            )} RLC`,
+              truncateBnWeiToBnNRlc(bigIntToBn(minPerTx))
+            )} RLC`
           );
         }
         if (bnWeiValue.gt(bigIntToBn(maxPerTx))) {
           throw Error(
             `Maximum amount allowed to bridge is ${formatRLC(
-              truncateBnWeiToBnNRlc(bigIntToBn(maxPerTx)),
-            )} RLC`,
+              truncateBnWeiToBnNRlc(bigIntToBn(maxPerTx))
+            )} RLC`
           );
         }
 
@@ -397,8 +397,8 @@ export const obsBridgeToMainchain = (
             sidechainBridgeContract
               .getCurrentDay()
               .then((currentDay) =>
-                sidechainBridgeContract.totalSpentPerDay(currentDay),
-              ),
+                sidechainBridgeContract.totalSpentPerDay(currentDay)
+              )
           ),
         ]);
         if (abort) return;
@@ -409,10 +409,10 @@ export const obsBridgeToMainchain = (
         if (!withinLimit) {
           throw Error(
             `Amount to bridge would exceed bridge daily limit. ${formatRLC(
-              truncateBnWeiToBnNRlc(bigIntToBn(totalSpentPerDay)),
+              truncateBnWeiToBnNRlc(bigIntToBn(totalSpentPerDay))
             )}/${formatRLC(
-              truncateBnWeiToBnNRlc(bigIntToBn(dailyLimit)),
-            )} RLC already bridged today`,
+              truncateBnWeiToBnNRlc(bigIntToBn(dailyLimit))
+            )} RLC already bridged today`
           );
         }
 
@@ -447,7 +447,7 @@ export const obsBridgeToMainchain = (
               const mainchainBridge = new Contract(
                 vMainchainBridgeAddress,
                 ForeignBridgeErcToNativeAbi,
-                bridgedContracts.provider,
+                bridgedContracts.provider
               );
               const cleanListeners = () =>
                 mainchainBridge.removeAllListeners('RelayedMessage');
@@ -463,13 +463,13 @@ export const obsBridgeToMainchain = (
                       cleanListeners();
                       resolve(event);
                     }
-                  },
+                  }
                 );
                 bridgedContracts.provider.resetEventsBlock(
-                  mainchainBlockNumber,
+                  mainchainBlockNumber
                 );
                 debug(
-                  `watching RelayedMessage events from block ${mainchainBlockNumber}`,
+                  `watching RelayedMessage events from block ${mainchainBlockNumber}`
                 );
               } catch (e) {
                 cleanListeners();
@@ -506,7 +506,7 @@ export const bridgeToMainchain = async (
   contracts = throwIfMissing(),
   bridgeAddress = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  { mainchainBridgeAddress, bridgedContracts } = {},
+  { mainchainBridgeAddress, bridgedContracts } = {}
 ) => {
   checkSigner(contracts);
   let sendTxHash;

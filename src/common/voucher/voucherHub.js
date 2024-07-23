@@ -10,7 +10,7 @@ const debug = Debug('iexec:voucher:voucherHub');
 export const fetchVoucherAddress = async (
   contracts = throwIfMissing(),
   voucherHubAddress = throwIfMissing(),
-  owner,
+  owner
 ) => {
   try {
     const vOwner = await addressSchema({ ethProvider: contracts.provider })
@@ -18,7 +18,7 @@ export const fetchVoucherAddress = async (
       .validate(owner);
     const voucherHubContract = getVoucherHubContract(
       contracts,
-      voucherHubAddress,
+      voucherHubAddress
     );
     const address = await wrapCall(voucherHubContract.getVoucher(vOwner));
     return address !== NULL_ADDRESS ? address : null;

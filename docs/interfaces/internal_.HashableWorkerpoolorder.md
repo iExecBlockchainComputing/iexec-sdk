@@ -37,7 +37,7 @@ sell order for computing power
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[apprestrict](internal_.SignableWorkerpoolorder.md#apprestrict)
 
-___
+---
 
 ### category
 
@@ -47,7 +47,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[category](internal_.SignableWorkerpoolorder.md#category)
 
-___
+---
 
 ### datasetrestrict
 
@@ -57,7 +57,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[datasetrestrict](internal_.SignableWorkerpoolorder.md#datasetrestrict)
 
-___
+---
 
 ### requesterrestrict
 
@@ -67,13 +67,13 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[requesterrestrict](internal_.SignableWorkerpoolorder.md#requesterrestrict)
 
-___
+---
 
 ### salt
 
 • **salt**: `string`
 
-___
+---
 
 ### tag
 
@@ -83,7 +83,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[tag](internal_.SignableWorkerpoolorder.md#tag)
 
-___
+---
 
 ### trust
 
@@ -93,7 +93,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[trust](internal_.SignableWorkerpoolorder.md#trust)
 
-___
+---
 
 ### volume
 
@@ -103,7 +103,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[volume](internal_.SignableWorkerpoolorder.md#volume)
 
-___
+---
 
 ### workerpool
 
@@ -113,7 +113,7 @@ ___
 
 [SignableWorkerpoolorder](internal_.SignableWorkerpoolorder.md).[workerpool](internal_.SignableWorkerpoolorder.md#workerpool)
 
-___
+---
 
 ### workerpoolprice
 

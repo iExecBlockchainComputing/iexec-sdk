@@ -36,7 +36,7 @@ export const checkDeployedObj =
   async (contracts = throwIfMissing(), address = throwIfMissing()) => {
     try {
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       return await wrapCall(registryContract.isRegistered(address));
     } catch (error) {
@@ -47,29 +47,29 @@ export const checkDeployedObj =
 
 export const checkDeployedApp = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   checkDeployedObj(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 export const checkDeployedDataset = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   checkDeployedObj(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 export const checkDeployedWorkerpool = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   checkDeployedObj(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 const toUpperFirst = (str) => ''.concat(str[0].toUpperCase(), str.substr(1));
@@ -85,7 +85,7 @@ const predictObjAddress =
   async (contracts = throwIfMissing(), obj = throwIfMissing()) => {
     try {
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       const args = createArgs[objName].map((e) => obj[e]);
       const predictFunctionName = 'predict'.concat(toUpperFirst(objName));
@@ -102,24 +102,24 @@ const deployObj =
     try {
       checkSigner(contracts);
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       const predictedAddress = await predictObjAddress(objName)(contracts, obj);
       const isDeployed = await checkDeployedObj(objName)(
         contracts,
-        predictedAddress,
+        predictedAddress
       );
       if (isDeployed) {
         throw Error(
           `${toUpperFirst(
-            objName,
-          )} already deployed at address ${predictedAddress}`,
+            objName
+          )} already deployed at address ${predictedAddress}`
         );
       }
       const args = createArgs[objName].map((e) => obj[e]);
       const createFunctionName = 'create'.concat(toUpperFirst(objName));
       const tx = await wrapSend(
-        registryContract[createFunctionName](...args, contracts.txOptions),
+        registryContract[createFunctionName](...args, contracts.txOptions)
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.logs, {
@@ -138,37 +138,37 @@ const deployObj =
 export const predictAppAddress = async (contracts, app) =>
   predictObjAddress(APP)(
     contracts,
-    await appSchema({ ethProvider: contracts.provider }).validate(app),
+    await appSchema({ ethProvider: contracts.provider }).validate(app)
   );
 export const predictDatasetAddress = async (contracts, dataset) =>
   predictObjAddress(DATASET)(
     contracts,
-    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
+    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset)
   );
 export const predictWorkerpoolAddress = async (contracts, workerpool) =>
   predictObjAddress(WORKERPOOL)(
     contracts,
     await workerpoolSchema({ ethProvider: contracts.provider }).validate(
-      workerpool,
-    ),
+      workerpool
+    )
   );
 
 export const deployApp = async (contracts, app) =>
   deployObj(APP)(
     contracts,
-    await appSchema({ ethProvider: contracts.provider }).validate(app),
+    await appSchema({ ethProvider: contracts.provider }).validate(app)
   );
 export const deployDataset = async (contracts, dataset) =>
   deployObj(DATASET)(
     contracts,
-    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
+    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset)
   );
 export const deployWorkerpool = async (contracts, workerpool) =>
   deployObj(WORKERPOOL)(
     contracts,
     await workerpoolSchema({ ethProvider: contracts.provider }).validate(
-      workerpool,
-    ),
+      workerpool
+    )
   );
 
 const getObjOwner =
@@ -185,29 +185,29 @@ const getObjOwner =
 
 export const getAppOwner = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   getObjOwner(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 export const getDatasetOwner = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   getObjOwner(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 export const getWorkerpoolOwner = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) =>
   getObjOwner(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider }).validate(address),
+    await addressSchema({ ethProvider: contracts.provider }).validate(address)
   );
 
 const showObjByAddress =
@@ -225,11 +225,11 @@ const showObjByAddress =
         .filter((fragment) => fragment.stateMutability === 'view')
         .map((fragment) => fragment.name);
       const values = await Promise.all(
-        readableProps.map((e) => wrapCall(contract[e]())),
+        readableProps.map((e) => wrapCall(contract[e]()))
       );
       const objFromProps = values.reduce(
         (acc, curr, i) => ({ ...acc, [readableProps[i]]: curr }),
-        {},
+        {}
       );
       const obj = bnifyNestedBigInt(objFromProps);
       return { obj, objAddress: vAddress };
@@ -247,7 +247,7 @@ const countUserObj =
         ethProvider: contracts.provider,
       }).validate(userAddress);
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       const objCount = await wrapCall(registryContract.balanceOf(vAddress));
       return bigIntToBn(objCount);
@@ -259,33 +259,33 @@ const countUserObj =
 
 export const countUserApps = async (
   contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) =>
   countUserObj(APP)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
 export const countUserDatasets = async (
   contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) =>
   countUserObj(DATASET)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
 export const countUserWorkerpools = async (
   contracts = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) =>
   countUserObj(WORKERPOOL)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
 
 const showUserObjByIndex =
@@ -293,7 +293,7 @@ const showUserObjByIndex =
   async (
     contracts = throwIfMissing(),
     objIndex = throwIfMissing(),
-    userAddress = throwIfMissing(),
+    userAddress = throwIfMissing()
   ) => {
     try {
       const vIndex = await uint256Schema().validate(objIndex);
@@ -303,10 +303,10 @@ const showUserObjByIndex =
       const totalObj = await countUserObj(objName)(contracts, userAddress);
       if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       const tokenId = await wrapCall(
-        registryContract.tokenOfOwnerByIndex(vAddress, vIndex),
+        registryContract.tokenOfOwnerByIndex(vAddress, vIndex)
       );
       const objAddress = tokenIdToAddress(tokenId);
       return showObjByAddress(objName)(contracts, objAddress);
@@ -333,18 +333,18 @@ const cleanApp = (obj) =>
     },
     obj.m_appMREnclave && {
       appMREnclave: hexToBuffer(obj.m_appMREnclave).toString(),
-    },
+    }
   );
 
 export const showApp = async (
   contracts = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  appAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showObjByAddress(APP)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      appAddress,
-    ),
+      appAddress
+    )
   );
   return { objAddress, app: cleanApp(obj) };
 };
@@ -352,33 +352,33 @@ export const showApp = async (
 export const showUserApp = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showUserObjByIndex(APP)(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
   return { objAddress, app: cleanApp(obj) };
 };
 
 export const showDataset = async (
   contracts = throwIfMissing(),
-  datasetAddress = throwIfMissing(),
+  datasetAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showObjByAddress(DATASET)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      datasetAddress,
-    ),
+      datasetAddress
+    )
   );
   const clean = Object.assign(
     cleanObj(obj),
     obj.m_datasetMultiaddr && {
       datasetMultiaddr: multiaddrHexToHuman(obj.m_datasetMultiaddr),
-    },
+    }
   );
   return { objAddress, dataset: clean };
 };
@@ -386,33 +386,33 @@ export const showDataset = async (
 export const showUserDataset = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showUserObjByIndex(DATASET)(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
   const clean = Object.assign(
     cleanObj(obj),
     obj.m_datasetMultiaddr && {
       datasetMultiaddr: multiaddrHexToHuman(obj.m_datasetMultiaddr),
-    },
+    }
   );
   return { objAddress, dataset: clean };
 };
 
 export const showWorkerpool = async (
   contracts = throwIfMissing(),
-  workerpoolAddress = throwIfMissing(),
+  workerpoolAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showObjByAddress(WORKERPOOL)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      workerpoolAddress,
-    ),
+      workerpoolAddress
+    )
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -421,14 +421,14 @@ export const showWorkerpool = async (
 export const showUserWorkerpool = async (
   contracts = throwIfMissing(),
   index = throwIfMissing(),
-  userAddress = throwIfMissing(),
+  userAddress = throwIfMissing()
 ) => {
   const { obj, objAddress } = await showUserObjByIndex(WORKERPOOL)(
     contracts,
     await uint256Schema().validate(index),
     await addressSchema({ ethProvider: contracts.provider }).validate(
-      userAddress,
-    ),
+      userAddress
+    )
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -439,7 +439,7 @@ const transferObj =
   async (
     contracts = throwIfMissing(),
     address = throwIfMissing(),
-    to = throwIfMissing(),
+    to = throwIfMissing()
   ) => {
     try {
       checkSigner(contracts);
@@ -453,15 +453,15 @@ const transferObj =
         throw Error(`Only ${objName} owner can transfer ${objName} ownership`);
       }
       const registryContract = await wrapCall(
-        contracts.fetchRegistryContract(objName),
+        contracts.fetchRegistryContract(objName)
       );
       const tx = await wrapSend(
         registryContract['safeTransferFrom(address,address,uint256)'](
           walletAddress,
           to,
           address,
-          contracts.txOptions,
-        ),
+          contracts.txOptions
+        )
       );
       await wrapWait(tx.wait(contracts.confirms));
       const txHash = tx.hash;
@@ -475,39 +475,39 @@ const transferObj =
 export const transferApp = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-  to = throwIfMissing(),
+  to = throwIfMissing()
 ) =>
   transferObj(APP)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
-    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to)
   );
 
 export const transferDataset = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-  to = throwIfMissing(),
+  to = throwIfMissing()
 ) =>
   transferObj(DATASET)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
-    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to)
   );
 
 export const transferWorkerpool = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-  to = throwIfMissing(),
+  to = throwIfMissing()
 ) =>
   transferObj(WORKERPOOL)(
     contracts,
     await addressSchema({ ethProvider: contracts.provider }).validate(address),
-    await addressSchema({ ethProvider: contracts.provider }).validate(to),
+    await addressSchema({ ethProvider: contracts.provider }).validate(to)
   );
 
 export const resolveTeeFrameworkFromApp = async (
   app,
-  { strict = true } = {},
+  { strict = true } = {}
 ) => {
   if (app.appMREnclave) {
     try {

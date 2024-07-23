@@ -25,7 +25,7 @@ export default class IExecVoucherModule extends IExecModule {
         contracts,
         voucherSubgraphURL,
         voucherHubAddress,
-        owner,
+        owner
       );
     };
 
@@ -41,7 +41,7 @@ export default class IExecVoucherModule extends IExecModule {
       return revokeRequesterAuthorization(
         contracts,
         voucherHubAddress,
-        requester,
+        requester
       );
     };
   }

@@ -46,12 +46,12 @@ return the `unsubscribe: () => void` method.
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `callbacks` | `Object` | callbacks to call on specific events |
-| `callbacks.complete?` | () => `any` | callback to fire when the data emission is done no other callback is fired after firing `complete()` |
-| `callbacks.error?` | (`error`: `Error`) => `any` | callback to fire when a error occurs on the data source no other callback is fired after firing `error(error: Error)` |
-| `callbacks.next?` | (`data`: `Record`<`string`, `any`\> & { `message`: `string`  }) => `any` | callback to fire on incoming data |
+| Name                  | Type                                                                    | Description                                                                                                           |
+| :-------------------- | :---------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| `callbacks`           | `Object`                                                                | callbacks to call on specific events                                                                                  |
+| `callbacks.complete?` | () => `any`                                                             | callback to fire when the data emission is done no other callback is fired after firing `complete()`                  |
+| `callbacks.error?`    | (`error`: `Error`) => `any`                                             | callback to fire when a error occurs on the data source no other callback is fired after firing `error(error: Error)` |
+| `callbacks.next?`     | (`data`: `Record`<`string`, `any`\> & { `message`: `string` }) => `any` | callback to fire on incoming data                                                                                     |
 
 #### Returns
 

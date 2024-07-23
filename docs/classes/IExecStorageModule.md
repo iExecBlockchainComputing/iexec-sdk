@@ -37,10 +37,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------- |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
 
 #### Returns
 
@@ -73,6 +73,7 @@ check if a storage token exists for the beneficiary in the Secret Management Ser
 _NB_: specify the storage provider with the option `provider` (supported values `'ipfs'`|`'dropbox'` default `'ipfs'`)
 
 example:
+
 ```js
 const isIpfsStorageInitialized = await checkStorageTokenExists(userAddress);
 console.log('IPFS storage initialized:', isIpfsStorageInitialized);
@@ -80,18 +81,18 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `beneficiaryAddress` | `string` |
-| `options?` | `Object` |
-| `options.provider?` | `string` |
+| Name                    | Type                                         |
+| :---------------------- | :------------------------------------------- |
+| `beneficiaryAddress`    | `string`                                     |
+| `options?`              | `Object`                                     |
+| `options.provider?`     | `string`                                     |
 | `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
 `Promise`<`boolean`\>
 
-___
+---
 
 ### defaultStorageLogin
 
@@ -102,6 +103,7 @@ ___
 get an authorization token from the default IPFS based remote storage
 
 example:
+
 ```js
 const token = await defaultStorageLogin();
 const { isPushed } = await pushStorageToken(token);
@@ -112,48 +114,55 @@ console.log('default storage initialized:', isPushed);
 
 `Promise`<`string`\>
 
-___
+---
 
 ### pushStorageToken
 
-▸ **pushStorageToken**(`token`, `options?`): `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
+▸ **pushStorageToken**(`token`, `options?`): `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean` }\>
 
 **SIGNER REQUIRED, ONLY BENEFICIARY**
 
 push a personal storage token to the Secret Management Service to allow result archive upload
 
 _NB_:
+
 - specify the storage provider with the option `provider` (supported values `'ipfs'`|`'dropbox'` default `'ipfs'`)
 - this method will throw an error if a token already exists for the target storage provider in the Secret Management Service unless the option `forceUpdate: true` is used.
 
 example:
+
 - init default storage
+
 ```js
 const token = await defaultStorageLogin();
 const { isPushed } = await pushStorageToken(token);
 console.log('default storage initialized:', isPushed);
 ```
+
 - init dropbox storage
+
 ```js
-const { isPushed } = await pushStorageToken(dropboxApiToken, {provider: 'dropbox'});
+const { isPushed } = await pushStorageToken(dropboxApiToken, {
+  provider: 'dropbox',
+});
 console.log('dropbox storage initialized:', isPushed);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `token` | `string` |
-| `options?` | `Object` |
-| `options.forceUpdate?` | `boolean` |
-| `options.provider?` | `string` |
+| Name                    | Type                                         |
+| :---------------------- | :------------------------------------------- |
+| `token`                 | `string`                                     |
+| `options?`              | `Object`                                     |
+| `options.forceUpdate?`  | `boolean`                                    |
+| `options.provider?`     | `string`                                     |
 | `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
+`Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean` }\>
 
-___
+---
 
 ### fromConfig
 
@@ -163,8 +172,8 @@ Create an IExecStorageModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                            |
+| :------- | :------------------------------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

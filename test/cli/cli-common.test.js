@@ -26,7 +26,7 @@ describe('cli common', () => {
     const out = await execAsync(`${iexecPath}`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
-      -1,
+      -1
     );
   });
   test('invalid command', async () => {
@@ -34,21 +34,21 @@ describe('cli common', () => {
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
     expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
-      -1,
+      -1
     );
   });
   test('unknown option', async () => {
     const out = await execAsync(`${iexecPath} --test`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf('Usage: iexec [command] [options]')).not.toBe(
-      -1,
+      -1
     );
   });
   test('missing subcommand', async () => {
     const out = await execAsync(`${iexecPath} app`).catch((e) => e);
     expect(out instanceof Error).toBe(true);
     expect(
-      out.message.indexOf('Usage: iexec app <command> [options]'),
+      out.message.indexOf('Usage: iexec app <command> [options]')
     ).not.toBe(-1);
   });
   test('invalid subcommand', async () => {
@@ -56,7 +56,7 @@ describe('cli common', () => {
     expect(out instanceof Error).toBe(true);
     expect(out.message.indexOf("error: unknown command 'test'")).not.toBe(-1);
     expect(
-      out.message.indexOf('Usage: iexec app <command> [options]'),
+      out.message.indexOf('Usage: iexec app <command> [options]')
     ).not.toBe(-1);
   });
   test('subcommand unknown option', async () => {

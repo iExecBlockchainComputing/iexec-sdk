@@ -31,10 +31,10 @@ Web3ProviderSignMessageError encapsulates an error thrown by the web3 provider d
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `message` | `string` | A descriptive error message detailing the nature of the error. |
-| `originalError` | `Error` | The original Error object that caused this web3 provider error. |
+| Name            | Type     | Description                                                     |
+| :-------------- | :------- | :-------------------------------------------------------------- |
+| `message`       | `string` | A descriptive error message detailing the nature of the error.  |
+| `originalError` | `Error`  | The original Error object that caused this web3 provider error. |
 
 #### Returns
 
@@ -56,7 +56,7 @@ The original Error object that caused this web3 provider error.
 
 [Web3ProviderError](errors.Web3ProviderError.md).[cause](errors.Web3ProviderError.md#cause)
 
-___
+---
 
 ### originalError
 

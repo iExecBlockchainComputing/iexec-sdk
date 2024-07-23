@@ -20,7 +20,7 @@
 
 app tee fingerprint
 
-___
+---
 
 ### framework
 
@@ -28,7 +28,7 @@ ___
 
 TEE framework name 'GRAMINE'
 
-___
+---
 
 ### version
 

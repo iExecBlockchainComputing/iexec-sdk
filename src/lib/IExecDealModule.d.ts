@@ -267,7 +267,7 @@ export default class IExecDealModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
-    },
+    }
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified apporder.
@@ -292,7 +292,7 @@ export default class IExecDealModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
-    },
+    }
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified datasetorder.
@@ -317,7 +317,7 @@ export default class IExecDealModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
-    },
+    }
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified workerpoolorder.
@@ -342,7 +342,7 @@ export default class IExecDealModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
-    },
+    }
   ): Promise<PaginableDeals>;
   /**
    * fetch the latest deals sealed with a specified requestorder.
@@ -367,7 +367,7 @@ export default class IExecDealModule extends IExecModule {
        * size of the page to fetch
        */
       pageSize?: number;
-    },
+    }
   ): Promise<PaginableDeals>;
   /**
    * Create an IExecDealModule instance using an IExecConfig instance

@@ -37,10 +37,10 @@ Web3ProviderError encapsulates an error thrown by the web3 provider.
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `message` | `string` | A descriptive error message detailing the nature of the error. |
-| `originalError` | `Error` | The original Error object that caused this web3 provider error. |
+| Name            | Type     | Description                                                     |
+| :-------------- | :------- | :-------------------------------------------------------------- |
+| `message`       | `string` | A descriptive error message detailing the nature of the error.  |
+| `originalError` | `Error`  | The original Error object that caused this web3 provider error. |
 
 #### Returns
 
@@ -58,7 +58,7 @@ Error.constructor
 
 The original Error object that caused this web3 provider error.
 
-___
+---
 
 ### originalError
 
