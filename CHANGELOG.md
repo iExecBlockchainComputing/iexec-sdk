@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 - removed `ensRegistryAddress` option (use ethers `Network.register()` to configure custom networks supporting ENS)
+- CLI removed `iexec registry` commands
 
 ## [8.9.1] 2024-06-19
 
