@@ -25,7 +25,7 @@ export default class IExecStorageModule extends IExecModule {
     options?: {
       provider?: string;
       teeFramework?: TeeFramework;
-    },
+    }
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
@@ -68,7 +68,7 @@ export default class IExecStorageModule extends IExecModule {
       provider?: string;
       teeFramework?: TeeFramework;
       forceUpdate?: boolean;
-    },
+    }
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;
   /**
    * Create an IExecStorageModule instance using an IExecConfig instance

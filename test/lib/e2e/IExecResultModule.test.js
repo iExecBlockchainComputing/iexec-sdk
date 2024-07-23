@@ -15,24 +15,24 @@ describe('result', () => {
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
       await expect(
-        iexec.result.pushResultEncryptionKey('oops'),
+        iexec.result.pushResultEncryptionKey('oops')
       ).rejects.toThrow(
         Error(
-          `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`,
-        ),
+          `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`
+        )
       );
       await expect(
         iexec.result.pushResultEncryptionKey('oops', {
           teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
+        })
       ).rejects.toThrow(
         Error(
-          `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`,
-        ),
+          `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`
+        )
       );
       const pushForTeeFrameworkRes = await iexec.result.pushResultEncryptionKey(
         'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
+        { teeFramework: TEE_FRAMEWORKS.GRAMINE }
       );
       expect(pushForTeeFrameworkRes.isPushed).toBe(true);
       expect(pushForTeeFrameworkRes.isUpdated).toBe(false);
@@ -65,7 +65,7 @@ describe('result', () => {
       await iexec.result.pushResultEncryptionKey('oops');
       const withSecretRes =
         await iexecReadOnly.result.checkResultEncryptionKeyExists(
-          wallet.address,
+          wallet.address
         );
       expect(withSecretRes).toBe(true);
       const withSecretForTeeFrameworkRes =
@@ -73,7 +73,7 @@ describe('result', () => {
           wallet.address,
           {
             teeFramework: TEE_FRAMEWORKS.SCONE,
-          },
+          }
         );
       expect(withSecretForTeeFrameworkRes).toBe(true);
       const withoutSecretForTeeFrameworkRes =
@@ -81,7 +81,7 @@ describe('result', () => {
           wallet.address,
           {
             teeFramework: TEE_FRAMEWORKS.GRAMINE,
-          },
+          }
         );
       expect(withoutSecretForTeeFrameworkRes).toBe(false);
     });

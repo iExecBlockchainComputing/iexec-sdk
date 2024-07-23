@@ -33,7 +33,7 @@
 
 override the bridge contract address to target a custom instance
 
-___
+---
 
 ### bridgedNetworkConf
 
@@ -43,14 +43,14 @@ override the bridged network configuration
 
 #### Type declaration
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `bridgeAddress?` | `string` | bridge contract address on bridged network |
-| `chainId?` | `string` \| `number` | bridged network chainId |
-| `hubAddress?` | `string` | IExec contract address on bridged network |
-| `rpcURL?` | `string` | bridged network node url |
+| Name             | Type                 | Description                                |
+| :--------------- | :------------------- | :----------------------------------------- |
+| `bridgeAddress?` | `string`             | bridge contract address on bridged network |
+| `chainId?`       | `string` \| `number` | bridged network chainId                    |
+| `hubAddress?`    | `string`             | IExec contract address on bridged network  |
+| `rpcURL?`        | `string`             | bridged network node url                   |
 
-___
+---
 
 ### confirms
 
@@ -58,7 +58,7 @@ ___
 
 number of block to wait for transactions confirmation (default 1)
 
-___
+---
 
 ### defaultTeeFramework
 
@@ -66,7 +66,7 @@ ___
 
 override the TEE framework to use when as default
 
-___
+---
 
 ### ensPublicResolverAddress
 
@@ -74,7 +74,7 @@ ___
 
 override the ENS public resolver contract address to target a custom instance
 
-___
+---
 
 ### ensRegistryAddress
 
@@ -82,7 +82,7 @@ ___
 
 override the ENS registry contract address to target a custom instance
 
-___
+---
 
 ### enterpriseSwapConf
 
@@ -92,11 +92,11 @@ override the enterprise configuration
 
 #### Type declaration
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
+| Name          | Type     | Description                       |
+| :------------ | :------- | :-------------------------------- |
 | `hubAddress?` | `string` | IExec enterprise contract address |
 
-___
+---
 
 ### hubAddress
 
@@ -104,7 +104,7 @@ ___
 
 override the IExec contract address to target a custom instance
 
-___
+---
 
 ### iexecGatewayURL
 
@@ -112,7 +112,7 @@ ___
 
 override the IExec market URL to target a custom instance
 
-___
+---
 
 ### ipfsGatewayURL
 
@@ -120,7 +120,7 @@ ___
 
 override the IPFS gateway URL to target a custom instance
 
-___
+---
 
 ### isNative
 
@@ -128,7 +128,7 @@ ___
 
 true if IExec contract use the chain native token (default false)
 
-___
+---
 
 ### pocoSubgraphURL
 
@@ -136,7 +136,7 @@ ___
 
 override the PoCo subgraph URL to target a custom instance
 
-___
+---
 
 ### providerOptions
 
@@ -144,7 +144,7 @@ ___
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 
-___
+---
 
 ### resultProxyURL
 
@@ -152,7 +152,7 @@ ___
 
 override the result proxy URL to target a custom instance
 
-___
+---
 
 ### smsURL
 
@@ -160,7 +160,7 @@ ___
 
 override the SMS URL to target a custom instance
 
-___
+---
 
 ### useGas
 
@@ -168,7 +168,7 @@ ___
 
 if false set the gasPrice to 0 (default true)
 
-___
+---
 
 ### voucherHubAddress
 
@@ -176,7 +176,7 @@ ___
 
 override the VoucherHub contract address to target a custom instance
 
-___
+---
 
 ### voucherSubgraphURL
 

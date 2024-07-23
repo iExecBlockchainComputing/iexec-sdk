@@ -17,7 +17,7 @@ const debug = Debug('iexec:protocol:category');
 
 export const createCategory = async (
   contracts = throwIfMissing(),
-  obj = throwIfMissing(),
+  obj = throwIfMissing()
 ) => {
   try {
     checkSigner(contracts);
@@ -27,7 +27,7 @@ export const createCategory = async (
     const userAddress = await getAddress(contracts);
     if (!(categoryOwner === userAddress)) {
       throw Error(
-        `only category owner ${categoryOwner} can create new categories`,
+        `only category owner ${categoryOwner} can create new categories`
       );
     }
     const args = [
@@ -36,7 +36,7 @@ export const createCategory = async (
       vCategory.workClockTimeRef,
     ];
     const tx = await wrapSend(
-      iexecContract.createCategory(...args, contracts.txOptions),
+      iexecContract.createCategory(...args, contracts.txOptions)
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const { catid: catidBigInt } = getEventFromLogs(
@@ -44,7 +44,7 @@ export const createCategory = async (
       txReceipt.logs,
       {
         strict: true,
-      },
+      }
     ).args;
     const catid = bigIntToBn(catidBigInt);
     const txHash = tx.hash;
@@ -57,7 +57,7 @@ export const createCategory = async (
 
 export const showCategory = async (
   contracts = throwIfMissing(),
-  index = throwIfMissing(),
+  index = throwIfMissing()
 ) => {
   try {
     const vIndex = await uint256Schema().validate(index);

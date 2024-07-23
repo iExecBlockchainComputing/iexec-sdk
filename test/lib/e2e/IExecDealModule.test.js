@@ -41,7 +41,7 @@ describe('deal', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -57,7 +57,7 @@ describe('deal', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -73,7 +73,7 @@ describe('deal', () => {
         workerpoolorder,
       });
       const res = await iexec.deal.fetchRequesterDeals(
-        await iexec.wallet.getAddress(),
+        await iexec.wallet.getAddress()
       );
       expect(typeof res.count).toBe('number');
       const { dealid } = await iexec.order.matchOrders(
@@ -83,7 +83,7 @@ describe('deal', () => {
           workerpoolorder,
           requestorder,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       await sleep(5000);
       const resAfterMatch =
@@ -93,7 +93,7 @@ describe('deal', () => {
         requesterAddress,
         {
           appAddress: apporder.app,
-        },
+        }
       );
       expect(resAppFiltered.count).toBe(1);
       expect(resAppFiltered.deals[0].dealid).toBe(dealid);
@@ -102,23 +102,23 @@ describe('deal', () => {
         requesterAddress,
         {
           datasetAddress: datasetorder.dataset,
-        },
+        }
       );
       expect(resDatasetFiltered.count).toBe(1);
       expect(resDatasetFiltered.deals[0].dealid).toBe(dealid);
       expect(resDatasetFiltered.deals[0].dataset.pointer).toBe(
-        datasetorder.dataset,
+        datasetorder.dataset
       );
       const resWorkerpoolFiltered = await iexec.deal.fetchRequesterDeals(
         requesterAddress,
         {
           workerpoolAddress: workerpoolorder.workerpool,
-        },
+        }
       );
       expect(resWorkerpoolFiltered.deals[0].dealid).toBe(dealid);
       expect(resWorkerpoolFiltered.count).toBe(1);
       expect(resWorkerpoolFiltered.deals[0].workerpool.pointer).toBe(
-        workerpoolorder.workerpool,
+        workerpoolorder.workerpool
       );
     });
   });
@@ -136,7 +136,7 @@ describe('deal', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -152,7 +152,7 @@ describe('deal', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -177,7 +177,7 @@ describe('deal', () => {
             workerpoolorder,
             requestorder,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
         await sleep(5000);
         const resAfterMatch = await iexec.deal.fetchDealsByApporder(orderHash);
@@ -208,7 +208,7 @@ describe('deal', () => {
             workerpoolorder,
             requestorder,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
         await sleep(5000);
         const resAfterMatch =
@@ -216,7 +216,7 @@ describe('deal', () => {
         expect(resAfterMatch.count).toBe(1);
         expect(resAfterMatch.deals[0].dealid).toBe(dealid);
         expect(resAfterMatch.deals[0].dataset.pointer).toBe(
-          datasetorder.dataset,
+          datasetorder.dataset
         );
       });
     });
@@ -243,7 +243,7 @@ describe('deal', () => {
             workerpoolorder,
             requestorder,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
         await sleep(5000);
         const resAfterMatch =
@@ -251,7 +251,7 @@ describe('deal', () => {
         expect(resAfterMatch.count).toBe(1);
         expect(resAfterMatch.deals[0].dealid).toBe(dealid);
         expect(resAfterMatch.deals[0].workerpool.pointer).toBe(
-          workerpoolorder.workerpool,
+          workerpoolorder.workerpool
         );
       });
     });
@@ -277,7 +277,7 @@ describe('deal', () => {
             workerpoolorder,
             requestorder,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
         await sleep(5000);
         const resAfterMatch =
@@ -314,7 +314,7 @@ describe('deal', () => {
           workerpoolorder,
           requestorder,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
 
       const dealObservable = await iexec.deal.obsDeal(dealid);
@@ -341,7 +341,7 @@ describe('deal', () => {
       expect(unsubAfterInitRes.messages[0].failedTasksCount).toBe(0);
       expect(unsubAfterInitRes.messages[0].deal.dealid).toBe(dealid);
       expect(Object.entries(unsubAfterInitRes.messages[0].tasks).length).toBe(
-        5,
+        5
       );
       expect(unsubAfterInitRes.messages[0].tasks[0].status).toBe(0);
       expect(unsubAfterInitRes.messages[0].tasks[1].status).toBe(0);
@@ -357,7 +357,7 @@ describe('deal', () => {
       expect(unsubAfterInitRes.messages[2].failedTasksCount).toBe(0);
       expect(unsubAfterInitRes.messages[2].deal.dealid).toBe(dealid);
       expect(Object.entries(unsubAfterInitRes.messages[2].tasks).length).toBe(
-        5,
+        5
       );
       expect(unsubAfterInitRes.messages[2].tasks[0].status).toBe(1);
       expect(unsubAfterInitRes.messages[2].tasks[1].status).toBe(0);
@@ -373,7 +373,7 @@ describe('deal', () => {
       expect(unsubBeforeInitRes.messages[0].failedTasksCount).toBe(0);
       expect(unsubBeforeInitRes.messages[0].deal.dealid).toBe(dealid);
       expect(Object.entries(unsubBeforeInitRes.messages[0].tasks).length).toBe(
-        5,
+        5
       );
       expect(unsubBeforeInitRes.messages[0].tasks[0].status).toBe(0);
       expect(unsubBeforeInitRes.messages[0].tasks[1].status).toBe(0);
@@ -406,7 +406,7 @@ describe('deal', () => {
           workerpoolorder,
           requestorder,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
 
       const dealObservable = await iexec.deal.obsDeal(dealid);
@@ -429,7 +429,7 @@ describe('deal', () => {
       ]);
 
       expect(wrongDealidRes.error).toStrictEqual(
-        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId),
+        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId)
       );
       expect(wrongDealidRes.messages.length).toBe(0);
       expect(wrongDealidRes.completed).toBe(false);

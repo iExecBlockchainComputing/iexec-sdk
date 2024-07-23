@@ -49,8 +49,8 @@ init
       if (chainRes.fileName) {
         spinner.info(
           `Here is your chain config "${chainRes.fileName}":${pretty(
-            chainRes.saved,
-          )}`,
+            chainRes.saved
+          )}`
         );
       }
 
@@ -62,7 +62,7 @@ init
         spinner.info(
           `Your wallet address is ${walletRes.address} Wallet file saved in "${
             walletRes.fileName
-          }" you must backup this file safely :\n${pretty(walletRes.wallet)}`,
+          }" you must backup this file safely :\n${pretty(walletRes.wallet)}`
         );
         spinner.warn('You must backup your wallet file in a safe place!');
       }

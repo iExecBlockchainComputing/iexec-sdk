@@ -28,28 +28,28 @@ export default class IExecENSModule extends IExecModule {
       registerFifsEns(
         await this.config.resolveContractsClient(),
         label,
-        domain,
+        domain
       );
     this.obsConfigureResolution = async (name, address) =>
       obsConfigureResolution(
         await this.config.resolveContractsClient(),
         await this.config.resolveEnsPublicResolverAddress(),
         name,
-        address,
+        address
       );
     this.configureResolution = async (name, address) =>
       configureResolution(
         await this.config.resolveContractsClient(),
         await this.config.resolveEnsPublicResolverAddress(),
         name,
-        address,
+        address
       );
     this.setTextRecord = async (name, key, value) =>
       setTextRecord(
         await this.config.resolveContractsClient(),
         name,
         key,
-        value,
+        value
       );
     this.readTextRecord = async (name, key) =>
       readTextRecord(await this.config.resolveContractsClient(), name, key);

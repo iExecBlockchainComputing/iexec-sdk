@@ -25,7 +25,7 @@ export class Observable {
        * no other callback is fired after firing `error(error: Error)`
        */
       error?: (error: Error) => any;
-    },
+    }
   ): /**
    * `unsubscribe: () => void` method, calling this method cancels the subscription
    *

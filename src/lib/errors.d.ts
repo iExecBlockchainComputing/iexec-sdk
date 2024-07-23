@@ -19,7 +19,7 @@ export class Web3ProviderError extends Error {
     /**
      * The original Error object that caused this web3 provider error.
      */
-    originalError: Error,
+    originalError: Error
   );
   /**
    * @deprecated use Error cause instead.
@@ -58,7 +58,7 @@ export class ObjectNotFoundError extends Error {
     /**
      * Chain id of the blockchain.
      */
-    chainId: string,
+    chainId: string
   );
   /**
    * Name of the resource.
@@ -85,7 +85,7 @@ export class BridgeError extends Error {
     /**
      * Hash of the transaction sending the value to the bridge contract.
      */
-    sendTxHash: string,
+    sendTxHash: string
   );
   /**
    * Hash of the transaction sending the value to the bridge contract.
@@ -113,7 +113,7 @@ export class ApiCallError extends Error {
     /**
      * The original Error object that caused this API call error.
      */
-    originalError: Error,
+    originalError: Error
   );
   /**
    * @deprecated use Error cause instead.

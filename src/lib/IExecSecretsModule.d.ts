@@ -23,7 +23,7 @@ export default class IExecSecretsModule extends IExecModule {
     secretName: String,
     options?: {
       teeFramework?: TeeFramework;
-    },
+    }
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -45,7 +45,7 @@ export default class IExecSecretsModule extends IExecModule {
     secretValue: String,
     options?: {
       teeFramework?: TeeFramework;
-    },
+    }
   ): Promise<{ isPushed: boolean }>;
   /**
    * Create an IExecSecretsModule instance using an IExecConfig instance

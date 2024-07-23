@@ -24,7 +24,7 @@ published sell order for a dataset
 
 • **chainId**: `number`
 
-___
+---
 
 ### order
 
@@ -32,43 +32,43 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `apprestrict` | `string` |
-| `dataset` | `string` |
-| `datasetprice` | `number` |
-| `requesterrestrict` | `string` |
-| `salt` | `string` |
-| `sign` | `string` |
-| `tag` | `string` |
-| `volume` | `number` |
+| Name                 | Type     |
+| :------------------- | :------- |
+| `apprestrict`        | `string` |
+| `dataset`            | `string` |
+| `datasetprice`       | `number` |
+| `requesterrestrict`  | `string` |
+| `salt`               | `string` |
+| `sign`               | `string` |
+| `tag`                | `string` |
+| `volume`             | `number` |
 | `workerpoolrestrict` | `string` |
 
-___
+---
 
 ### orderHash
 
 • **orderHash**: `string`
 
-___
+---
 
 ### publicationTimestamp
 
 • **publicationTimestamp**: `string`
 
-___
+---
 
 ### remaining
 
 • **remaining**: `number`
 
-___
+---
 
 ### signer
 
 • **signer**: `string`
 
-___
+---
 
 ### status
 

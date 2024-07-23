@@ -66,7 +66,7 @@ export const formatEth = (wei) => {
 
 export const isEthUnit = (str) =>
   ['wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether', 'eth'].includes(
-    str,
+    str
   );
 
 export const parseEth = (value, defaultUnit = 'ether') => {
@@ -221,7 +221,7 @@ export const TAG_MAP = {
 };
 Object.assign(
   TAG_MAP,
-  Object.fromEntries(Object.entries(TAG_MAP).map(([k, v]) => [v, k])),
+  Object.fromEntries(Object.entries(TAG_MAP).map(([k, v]) => [v, k]))
 );
 
 export const encodeTag = (tags) => {
@@ -234,7 +234,7 @@ export const encodeTag = (tags) => {
   });
   const binString = binaryTags.reduce(
     (acc, curr) => (curr ? `1${acc}` : `0${acc}`),
-    '',
+    ''
   );
   const hex = new BN(binString, 2).toString('hex');
   return NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
@@ -284,7 +284,7 @@ export const findMissingBitsInTag = (tag, requiredTag) => {
     throw new ValidationError('requiredTag must be bytes32 hex string');
   const tagBinString = new BN(tag.substring(2), 'hex').toString(2);
   const requiredTagBinString = new BN(requiredTag.substring(2), 'hex').toString(
-    2,
+    2
   );
   const missingBits = [];
   for (let i = 0; i < requiredTagBinString.length; i += 1) {
@@ -324,7 +324,7 @@ export const sleep = (ms) =>
 export const checkSigner = (contracts) => {
   if (!(contracts && contracts.signer)) {
     throw new ConfigurationError(
-      'The current provider is not a signer, impossible to sign messages or transactions',
+      'The current provider is not a signer, impossible to sign messages or transactions'
     );
   }
 };

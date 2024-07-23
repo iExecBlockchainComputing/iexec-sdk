@@ -80,17 +80,17 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     })
     .catch((error) => {
       throw Error(
-        `Failed to load ${ENC_KEY_FILE_NAME} file from zip input file: ${error}`,
+        `Failed to load ${ENC_KEY_FILE_NAME} file from zip input file: ${error}`
       );
     });
 
   const base64encodedEncryptedAesKey = Buffer.from(
-    encryptedResultsKeyArrayBuffer,
+    encryptedResultsKeyArrayBuffer
   ).toString();
 
   const encryptedAesKeyBuffer = Buffer.from(
     base64encodedEncryptedAesKey,
-    'base64',
+    'base64'
   );
 
   debug('Decrypting results key');
@@ -115,7 +115,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     })
     .catch((error) => {
       throw Error(
-        `Failed to load ${ENC_RESULTS_FILE_NAME} file from zip input file: ${error}`,
+        `Failed to load ${ENC_RESULTS_FILE_NAME} file from zip input file: ${error}`
       );
     });
 
@@ -123,15 +123,15 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   debug('Decrypting results');
   try {
     const base64EncodedEncryptedZip = Buffer.from(
-      encResultsArrayBuffer,
+      encResultsArrayBuffer
     ).toString();
     let encryptedOutZipBuffer = Buffer.from(
       base64EncodedEncryptedZip,
-      'base64',
+      'base64'
     );
     const aesEcbDecipher = forgeAes.cipher.createDecipher(
       'AES-ECB',
-      forgeAes.util.createBuffer(aesKeyBuffer),
+      forgeAes.util.createBuffer(aesKeyBuffer)
     );
     aesEcbDecipher.start();
 
@@ -149,7 +149,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     aesEcbDecipher.finish();
     const finalizationBuffer = Buffer.from(
       aesEcbDecipher.output.getBytes(),
-      'binary',
+      'binary'
     );
     return Buffer.concat([decryptionBuffer, finalizationBuffer]);
   } catch (error) {

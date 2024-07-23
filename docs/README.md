@@ -53,7 +53,7 @@ const { PRIVATE_KEY } = process.env;
 
 const ethProvider = utils.getSignerFromPrivateKey(
   'http://localhost:8545', // blockchain node URL
-  PRIVATE_KEY,
+  PRIVATE_KEY
 );
 const iexec = new IExec({
   ethProvider,

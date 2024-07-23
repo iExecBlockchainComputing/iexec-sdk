@@ -86,7 +86,7 @@ export const setChain =
           ...providerOptions,
         },
       },
-      CHAIN_JSON,
+      CHAIN_JSON
     );
 
 export const setAppUniqueName = async () => {
@@ -118,7 +118,7 @@ const editOrder = (orderName) => async (override) => {
   iexecJson.order[orderName] = {
     ...iexecJson.order[orderName],
     ...Object.fromEntries(
-      Object.entries(override).filter((e) => e[1] !== undefined),
+      Object.entries(override).filter((e) => e[1] !== undefined)
     ),
   };
   await saveJSONToFile(iexecJson, 'iexec.json');

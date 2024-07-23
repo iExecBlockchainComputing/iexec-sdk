@@ -33,8 +33,8 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(unknownTestChain)({ readOnly: true });
       await expect(iexec.voucher.getVoucherAddress(owner)).rejects.toThrow(
         Error(
-          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`
+        )
       );
     });
 
@@ -67,8 +67,8 @@ describe('voucher', () => {
       });
       await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrow(
         Error(
-          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`
+        )
       );
     });
 
@@ -80,8 +80,8 @@ describe('voucher', () => {
       });
       await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrow(
         Error(
-          `voucherSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
+          `voucherSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`
+        )
       );
     });
 
@@ -90,14 +90,14 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
 
       await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrowError(
-        `No Voucher found for address ${owner}`,
+        `No Voucher found for address ${owner}`
       );
     });
 
     test('throw error if owner address is not provided', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.voucher.showUserVoucher()).rejects.toThrowError(
-        'Missing parameter',
+        'Missing parameter'
       );
     });
 
@@ -105,7 +105,7 @@ describe('voucher', () => {
       const owner = 'invalid_address';
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.voucher.showUserVoucher(owner)).rejects.toThrowError(
-        `${owner} is not a valid ethereum address`,
+        `${owner} is not a valid ethereum address`
       );
     });
 
@@ -142,24 +142,24 @@ describe('voucher', () => {
       await addVoucherEligibleAsset(iexecTestChain)(appAddress1, voucherType);
       await addVoucherEligibleAsset(iexecTestChain)(
         datasetAddress,
-        voucherType,
+        voucherType
       );
       await addVoucherEligibleAsset(iexecTestChain)(
         datasetAddress1,
-        voucherType,
+        voucherType
       );
       await addVoucherEligibleAsset(iexecTestChain)(
         workerpoolAddress,
-        voucherType,
+        voucherType
       );
       await addVoucherEligibleAsset(iexecTestChain)(
         workerpoolAddress1,
-        voucherType,
+        voucherType
       );
 
       // call the function and check the results
       const userVoucher = await iexec.voucher.showUserVoucher(
-        voucherOwnerWallet.address,
+        voucherOwnerWallet.address
       );
 
       expect(userVoucher.type).toBeInstanceOf(BN);
@@ -169,16 +169,16 @@ describe('voucher', () => {
       expect(userVoucher.owner).toBe(voucherOwnerWallet.address);
       expect(userVoucher.address).toBe(voucherAddress);
       expect([...userVoucher.sponsoredApps].sort()).toEqual(
-        [appAddress, appAddress1].sort(),
+        [appAddress, appAddress1].sort()
       );
       expect([...userVoucher.sponsoredDatasets].sort()).toEqual(
-        [datasetAddress, datasetAddress1].sort(),
+        [datasetAddress, datasetAddress1].sort()
       );
       expect([...userVoucher.sponsoredWorkerpools].sort()).toEqual(
-        [workerpoolAddress, workerpoolAddress1].sort(),
+        [workerpoolAddress, workerpoolAddress1].sort()
       );
       expect([...userVoucher.authorizedAccounts].sort()).toEqual(
-        [accountAddress, accountAddress1].sort(),
+        [accountAddress, accountAddress1].sort()
       );
     });
   });
@@ -187,11 +187,11 @@ describe('voucher', () => {
     test('requires voucherHubAddress to be configured', async () => {
       const { iexec } = getTestConfig(unknownTestChain)();
       await expect(
-        iexec.voucher.authorizeRequester(getRandomAddress()),
+        iexec.voucher.authorizeRequester(getRandomAddress())
       ).rejects.toThrow(
         Error(
-          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`
+        )
       );
     });
 
@@ -200,8 +200,8 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
+          'The current provider is not a signer, impossible to sign messages or transactions'
+        )
       );
     });
 
@@ -209,7 +209,7 @@ describe('voucher', () => {
       const requester = getRandomAddress();
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
-        Error(`No Voucher found for address ${wallet.address}`),
+        Error(`No Voucher found for address ${wallet.address}`)
       );
     });
 
@@ -235,7 +235,7 @@ describe('voucher', () => {
       });
       await iexec.voucher.authorizeRequester(requester);
       await expect(iexec.voucher.authorizeRequester(requester)).rejects.toThrow(
-        Error(`${requester} is already authorized`),
+        Error(`${requester} is already authorized`)
       );
     });
   });
@@ -244,11 +244,11 @@ describe('voucher', () => {
     test('requires voucherHubAddress to be configured', async () => {
       const { iexec } = getTestConfig(unknownTestChain)();
       await expect(
-        iexec.voucher.revokeRequesterAuthorization(getRandomAddress()),
+        iexec.voucher.revokeRequesterAuthorization(getRandomAddress())
       ).rejects.toThrow(
         Error(
-          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
+          `voucherHubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`
+        )
       );
     });
 
@@ -256,11 +256,11 @@ describe('voucher', () => {
       const requester = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
-        iexec.voucher.revokeRequesterAuthorization(requester),
+        iexec.voucher.revokeRequesterAuthorization(requester)
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions',
-        ),
+          'The current provider is not a signer, impossible to sign messages or transactions'
+        )
       );
     });
 
@@ -268,9 +268,9 @@ describe('voucher', () => {
       const requester = getRandomAddress();
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       await expect(
-        iexec.voucher.revokeRequesterAuthorization(requester),
+        iexec.voucher.revokeRequesterAuthorization(requester)
       ).rejects.toThrow(
-        Error(`No Voucher found for address ${wallet.address}`),
+        Error(`No Voucher found for address ${wallet.address}`)
       );
     });
 
@@ -283,7 +283,7 @@ describe('voucher', () => {
         value: 1000,
       });
       await expect(
-        iexec.voucher.revokeRequesterAuthorization(requester),
+        iexec.voucher.revokeRequesterAuthorization(requester)
       ).rejects.toThrow(Error(`${requester} is not authorized`));
     });
 

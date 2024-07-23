@@ -76,9 +76,9 @@ init.description(desc.initObj(objName)).action(async (opts) => {
     });
     spinner.succeed(
       `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-        saved,
+        saved
       )}`,
-      { raw: { workerpool: saved } },
+      { raw: { workerpool: saved } }
     );
   } catch (error) {
     handleError(error, cli, opts);
@@ -106,14 +106,14 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`
         );
       }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployWorkerpool(
         chain.contracts,
-        iexecConf[objName],
+        iexecConf[objName]
       );
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address, txHash },
@@ -143,7 +143,7 @@ setApiUrl
       const address =
         workerpoolAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -160,7 +160,7 @@ setApiUrl
         `API URL "${url}" is set for ${objName} at address ${address}`,
         {
           raw: { address, url, txHash },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -187,7 +187,7 @@ show
       const addressOrIndex =
         cliAddressOrIndex ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
@@ -218,7 +218,7 @@ show
         showInfo = await showUserWorkerpool(
           chain.contracts,
           addressOrIndex,
-          userAddress,
+          userAddress
         );
         [ens, apiUrl] = await Promise.all([
           lookupAddress(chain.contracts, showInfo.objAddress).catch((e) => {
@@ -241,7 +241,7 @@ show
         })}`,
         {
           raw: { address: objAddress, workerpool: cleanObj, ens, apiUrl },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -273,11 +273,11 @@ count
       spinner.start(info.counting(objName));
       const objCountBN = await countUserWorkerpools(
         chain.contracts,
-        userAddress,
+        userAddress
       );
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
-        { raw: { count: objCountBN.toString() } },
+        { raw: { count: objCountBN.toString() } }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -310,7 +310,7 @@ publish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -318,7 +318,7 @@ publish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
         );
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
@@ -338,7 +338,7 @@ publish
       };
       const orderToSign = await createWorkerpoolorder(
         chain.contracts,
-        overrides,
+        overrides
       );
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
@@ -346,12 +346,12 @@ publish
       await connectKeystore(chain, keystore);
       const signedOrder = await signWorkerpoolorder(
         chain.contracts,
-        orderToSign,
+        orderToSign
       );
       const orderHash = await publishWorkerpoolorder(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        signedOrder,
+        signedOrder
       );
       spinner.succeed(
         `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
@@ -359,7 +359,7 @@ publish
           raw: {
             orderHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -385,7 +385,7 @@ unpublish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -393,7 +393,7 @@ unpublish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
         );
       }
       const all = !!opts.all;
@@ -405,12 +405,12 @@ unpublish
         ? await unpublishAllWorkerpoolorders(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address,
+            address
           )
         : await unpublishLastWorkerpoolorder(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address,
+            address
           );
       spinner.succeed(
         `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
@@ -420,7 +420,7 @@ unpublish
           raw: {
             unpublished,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -454,7 +454,7 @@ transfer
       const { txHash, address, to } = await transferWorkerpool(
         chain.contracts,
         objAddress,
-        opts.to,
+        opts.to
       );
       spinner.succeed(
         `Successfully transferred ${objName} ${address} ownership to ${to}`,
@@ -464,7 +464,7 @@ transfer
             to,
             txHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);

@@ -153,7 +153,7 @@ init
         (await teeFrameworkSchema().validate(opts.teeFramework)) ||
         (opts.tee &&
           getDefaultTeeFrameworkFromChain(
-            await loadChain(opts.chain, { spinner }),
+            await loadChain(opts.chain, { spinner })
           ));
       let teeTemplate = {};
       if (teeFramework === TEE_FRAMEWORKS.SCONE) {
@@ -167,9 +167,9 @@ init
       });
       spinner.succeed(
         `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-          saved,
+          saved
         )}`,
-        { raw: { app: saved } },
+        { raw: { app: saved } }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -197,14 +197,14 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`
         );
       }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployApp(
         chain.contracts,
-        iexecConf[objName],
+        iexecConf[objName]
       );
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address, txHash },
@@ -235,7 +235,7 @@ show
       const addressOrIndex =
         cliAddressOrIndex ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
@@ -269,7 +269,7 @@ show
             } else {
               throw e;
             }
-          },
+          }
         );
       }
       const { app, objAddress } = res;
@@ -280,7 +280,7 @@ show
         })}`,
         {
           raw: { address: objAddress, ens, app },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -311,7 +311,7 @@ count
       const objCountBN = await countUserApps(chain.contracts, userAddress);
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
-        { raw: { count: objCountBN.toString() } },
+        { raw: { count: objCountBN.toString() } }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -332,11 +332,11 @@ checkSecret
       const resourceAddress =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!resourceAddress) {
         throw Error(
-          'Missing appAddress argument and no app found in "deployed.json"',
+          'Missing appAddress argument and no app found in "deployed.json"'
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
@@ -349,7 +349,7 @@ checkSecret
       const secretIsSet = await checkAppSecretExists(
         chain.contracts,
         sms,
-        resourceAddress,
+        resourceAddress
       );
       if (secretIsSet) {
         spinner.succeed(`Secret found for app ${resourceAddress}`, {
@@ -385,11 +385,11 @@ pushSecret
       const resourceAddress =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!resourceAddress) {
         throw Error(
-          'Missing appAddress argument and no app found in "deployed.json"',
+          'Missing appAddress argument and no app found in "deployed.json"'
         );
       }
       spinner.info(`App ${resourceAddress}`);
@@ -410,7 +410,7 @@ pushSecret
         contracts,
         sms,
         resourceAddress,
-        secretValue,
+        secretValue
       );
       if (isPushed) {
         spinner.succeed('Secret successfully pushed', {
@@ -449,7 +449,7 @@ publish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -457,7 +457,7 @@ publish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
         );
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
@@ -485,7 +485,7 @@ publish
       const orderHash = await publishApporder(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        signedOrder,
+        signedOrder
       );
       spinner.succeed(
         `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
@@ -493,7 +493,7 @@ publish
           raw: {
             orderHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -519,7 +519,7 @@ unpublish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
+          (deployedObj) => deployedObj && deployedObj[chain.id]
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -527,7 +527,7 @@ unpublish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
         );
       }
       const all = !!opts.all;
@@ -539,12 +539,12 @@ unpublish
         ? await unpublishAllApporders(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address,
+            address
           )
         : await unpublishLastApporder(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address,
+            address
           );
       spinner.succeed(
         `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
@@ -554,7 +554,7 @@ unpublish
           raw: {
             unpublished,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -598,17 +598,17 @@ run
       const app =
         appAddress ||
         (await loadDeployedObj(APP).then(
-          (deployedApp) => deployedApp && deployedApp[chain.id],
+          (deployedApp) => deployedApp && deployedApp[chain.id]
         ));
       if (!app) {
         throw Error(
-          `Missing appAddress and no app found in "deployed.json" for chain ${chain.id}`,
+          `Missing appAddress and no app found in "deployed.json" for chain ${chain.id}`
         );
       }
       debug('useDeployedApp', useDeployedApp, 'app', app);
       if (useDeployedApp) {
         spinner.info(
-          'No app specified, using last app deployed from "deployed.json"',
+          'No app specified, using last app deployed from "deployed.json"'
         );
       }
 
@@ -618,12 +618,12 @@ run
         useDataset &&
         (useDeployedDataset
           ? await loadDeployedObj(DATASET).then(
-              (deployedDataset) => deployedDataset && deployedDataset[chain.id],
+              (deployedDataset) => deployedDataset && deployedDataset[chain.id]
             )
           : opts.dataset);
       if (useDataset && !dataset) {
         throw Error(
-          `No dataset found in "deployed.json" for chain ${chain.id}`,
+          `No dataset found in "deployed.json" for chain ${chain.id}`
         );
       }
       debug(
@@ -632,7 +632,7 @@ run
         'useDeployedDataset',
         useDeployedDataset,
         'dataset',
-        dataset,
+        dataset
       );
       if (useDeployedDataset) {
         spinner.info('Using last dataset deployed from "deployed.json"');
@@ -646,12 +646,12 @@ run
         (useDeployedWorkerpool
           ? await loadDeployedObj(WORKERPOOL).then(
               (deployedWorkerpool) =>
-                deployedWorkerpool && deployedWorkerpool[chain.id],
+                deployedWorkerpool && deployedWorkerpool[chain.id]
             )
           : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
         throw Error(
-          `No workerpool found in "deployed.json" for chain ${chain.id}`,
+          `No workerpool found in "deployed.json" for chain ${chain.id}`
         );
       }
       debug(
@@ -660,7 +660,7 @@ run
         'useDeployedWorkerpool',
         useDeployedWorkerpool,
         'workerpool',
-        workerpool,
+        workerpool
       );
       if (useDeployedWorkerpool) {
         spinner.info('Using last workerpool deployed from "deployed.json"');
@@ -684,16 +684,16 @@ run
               if (separatorIndex === -1) {
                 throw new ValidationError(
                   `'${currMapping}' is not a valid secret mapping syntax (must be <appSecretKey>=<requesterSecretName>)`,
-                  currMapping,
+                  currMapping
                 );
               }
               return {
                 ...mappings,
                 [currMapping.slice(0, separatorIndex)]: currMapping.slice(
-                  separatorIndex + 1,
+                  separatorIndex + 1
                 ),
               };
-            }, {}),
+            }, {})
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
@@ -782,7 +782,7 @@ run
             ...(runOnWorkerpool && { workerpool }),
             ...{ minTag: encodeTag(minTags) },
             maxTag: tag,
-          },
+          }
         );
         const order = orders[0] && orders[0].order;
         if (!order) throw Error(`No order available for app ${app}`);
@@ -791,7 +791,7 @@ run
 
       const getDatasetorder = async () => {
         spinner.info(
-          useDataset ? `Using dataset ${dataset}` : 'Not using dataset',
+          useDataset ? `Using dataset ${dataset}` : 'Not using dataset'
         );
         if (!useDataset) return NULL_DATASETORDER;
         if (
@@ -825,7 +825,7 @@ run
             requester,
             ...(runOnWorkerpool && { workerpool }),
             maxTag: tag,
-          },
+          }
         );
         const order = orders[0] && orders[0].order;
         if (!order) throw Error(`No order available for dataset ${dataset}`);
@@ -842,9 +842,7 @@ run
 
       const getWorkerpoolorder = async () => {
         spinner.info(
-          workerpool
-            ? `Using workerpool ${workerpool}`
-            : 'Using any workerpool',
+          workerpool ? `Using workerpool ${workerpool}` : 'Using any workerpool'
         );
         const minTag = sumTags([apporder.tag, datasetorder.tag, tag]);
         debug('minTag', minTag);
@@ -853,7 +851,7 @@ run
             throw Error(`No workerpool deployed at address ${workerpool}`);
           const workerpoolOwner = await getWorkerpoolOwner(
             chain.contracts,
-            workerpool,
+            workerpool
           );
           const isWorkerpoolOwner =
             workerpoolOwner.toLowerCase() === requester.toLowerCase();
@@ -874,7 +872,7 @@ run
         spinner.info('Fetching workerpoolorder from iExec Marketplace');
         const fetchWorkerpoolOrder = async (
           catid = 0,
-          { strict = false } = {},
+          { strict = false } = {}
         ) => {
           debug('try category', catid, 'strict', strict);
           const { orders } = await fetchWorkerpoolOrderbook(
@@ -888,7 +886,7 @@ run
               requester,
               minTag,
               minTrust: trust,
-            },
+            }
           );
 
           const getFirstOpen = async (i = 0) => {
@@ -897,7 +895,7 @@ run
               const workerpoolVolume = await getRemainingVolume(
                 chain.contracts,
                 WORKERPOOL_ORDER,
-                order,
+                order
               );
               if (workerpoolVolume.gte(new BN(0))) {
                 return order;
@@ -913,7 +911,7 @@ run
           }
           if (strict) {
             throw Error(
-              `No workerpoolorder matching your conditions available in category ${category}`,
+              `No workerpoolorder matching your conditions available in category ${category}`
             );
           }
           const nextCatid = catid + 1;
@@ -922,7 +920,7 @@ run
           } catch (error) {
             debug(error);
             throw Error(
-              'No workerpoolorder matching your conditions currently available',
+              'No workerpoolorder matching your conditions currently available'
             );
           }
           return fetchWorkerpoolOrder(nextCatid);
@@ -964,7 +962,7 @@ run
           beneficiary: beneficiary || requester,
           callback,
           params,
-        },
+        }
       );
       if (!opts.skipPreflightCheck) {
         const resolvedTag = sumTags([
@@ -985,14 +983,14 @@ run
             contracts: chain.contracts,
           },
           apporder,
-          { tagOverride: resolvedTag },
+          { tagOverride: resolvedTag }
         ).catch((e) => {
           throw Error(
             `App requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
         await checkDatasetRequirements(
@@ -1003,14 +1001,14 @@ run
             }),
           },
           datasetorder,
-          { tagOverride: resolvedTag },
+          { tagOverride: resolvedTag }
         ).catch((e) => {
           throw Error(
             `Dataset requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
         await checkRequestRequirements(
@@ -1020,20 +1018,20 @@ run
               teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
             }),
           },
-          requestorderToSign,
+          requestorderToSign
         ).catch((e) => {
           throw Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
       }
       const requestorder = await signRequestorder(
         chain.contracts,
-        requestorderToSign,
+        requestorderToSign
       );
 
       debug('requestorder', requestorder);
@@ -1047,8 +1045,8 @@ run
       if (totalCost.gt(stake)) {
         throw Error(
           `Not enough RLC on your account (${formatRLC(
-            totalCost,
-          )} RLC required). Run "iexec account deposit" to topup your account.`,
+            totalCost
+          )} RLC required). Run "iexec account deposit" to topup your account.`
         );
       }
 
@@ -1057,19 +1055,19 @@ run
       if (!opts.force) {
         await prompt.custom(
           `Do you want to spend ${formatRLC(
-            totalCost,
+            totalCost
           )} RLC to execute the following request: ${pretty({
             app: `${requestorder.app} (${formatRLC(
-              requestorder.appmaxprice,
+              requestorder.appmaxprice
             )} RLC)`,
             dataset:
               requestorder.dataset !== NULL_ADDRESS
                 ? `${requestorder.dataset} (${formatRLC(
-                    requestorder.datasetmaxprice,
+                    requestorder.datasetmaxprice
                   )} RLC)`
                 : undefined,
             workerpool: `${requestorder.workerpool} (${formatRLC(
-              requestorder.workerpoolmaxprice,
+              requestorder.workerpoolmaxprice
             )} RLC)`,
             params:
               (requestorder.params && JSON.parse(requestorder.params)) ||
@@ -1085,7 +1083,7 @@ run
               requestorder.beneficiary !== requestorder.requester
                 ? requestorder.beneficiary
                 : undefined,
-          })}`,
+          })}`
         );
       }
 
@@ -1096,7 +1094,7 @@ run
         apporder,
         datasetorder,
         workerpoolorder,
-        requestorder,
+        requestorder
       );
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
@@ -1115,7 +1113,7 @@ run
               next: (data) => {
                 dealState = data;
                 spinner.start(
-                  `Watching execution...\n${renderTasksStatus(data.tasks)}`,
+                  `Watching execution...\n${renderTasksStatus(data.tasks)}`
                 );
               },
               error: reject,
@@ -1126,12 +1124,12 @@ run
         const dealFinalState = await waitDealFinalState();
 
         const tasksArray = Object.values(dealFinalState.tasks).map(
-          stringifyNestedBn,
+          stringifyNestedBn
         );
         result.tasks = tasksArray;
         const failedTasks = tasksArray.reduce(
           (acc, curr) => (curr.status !== 3 ? [...acc, curr] : acc),
-          [],
+          []
         );
         if (failedTasks.length === 0) {
           spinner.succeed(
@@ -1140,7 +1138,7 @@ run
             })}`,
             {
               raw: result,
-            },
+            }
           );
         } else {
           result.failedTasks = failedTasks;
@@ -1150,7 +1148,7 @@ run
             })}`,
             {
               raw: result,
-            },
+            }
           );
         }
       }
@@ -1214,11 +1212,11 @@ requestRun
       const appprice = await nRlcAmountSchema().validate(opts.appPrice || 0);
       debug('appprice', appprice);
       const datasetprice = await nRlcAmountSchema().validate(
-        (dataset !== NULL_ADDRESS && opts.datasetPrice) || 0,
+        (dataset !== NULL_ADDRESS && opts.datasetPrice) || 0
       );
       debug('datasetprice', datasetprice);
       const workerpoolprice = await nRlcAmountSchema().validate(
-        opts.workerpoolPrice || 0,
+        opts.workerpoolPrice || 0
       );
       debug('workerpoolprice', workerpoolprice);
 
@@ -1242,16 +1240,16 @@ requestRun
               if (separatorIndex === -1) {
                 throw new ValidationError(
                   `'${currMapping}' is not a valid secret mapping syntax (must be <appSecretKey>=<requesterSecretName>)`,
-                  currMapping,
+                  currMapping
                 );
               }
               return {
                 ...mappings,
                 [currMapping.slice(0, separatorIndex)]: currMapping.slice(
-                  separatorIndex + 1,
+                  separatorIndex + 1
                 ),
               };
-            }, {}),
+            }, {})
           ));
       const inputParamsStorageProvider =
         await paramsStorageProviderSchema().validate(opts.storageProvider);
@@ -1320,7 +1318,7 @@ requestRun
           beneficiary: beneficiary || requester,
           callback,
           params,
-        },
+        }
       );
       if (!opts.skipPreflightCheck) {
         await checkRequestRequirements(
@@ -1328,20 +1326,20 @@ requestRun
             contracts: chain.contracts,
             smsURL: getSmsUrlFromChain(chain),
           },
-          requestorderToSign,
+          requestorderToSign
         ).catch((e) => {
           throw Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
       }
       const requestorder = await signRequestorder(
         chain.contracts,
-        requestorderToSign,
+        requestorderToSign
       );
       debug('requestorder', requestorder);
 
@@ -1354,8 +1352,8 @@ requestRun
       if (totalCost.gt(stake)) {
         throw Error(
           `Not enough RLC on your account (${formatRLC(
-            totalCost,
-          )} RLC required). Run "iexec account deposit" to topup your account.`,
+            totalCost
+          )} RLC required). Run "iexec account deposit" to topup your account.`
         );
       }
 
@@ -1364,21 +1362,21 @@ requestRun
       if (!opts.force) {
         await prompt.custom(
           `Do you want to place the following execution request for ${formatRLC(
-            totalCost,
+            totalCost
           )} RLC \n - The amount will be taken from your account only if your request is filled.\n - Your request will be disabled if your stake drops under ${formatRLC(
-            totalCost,
+            totalCost
           )} RLC. ${pretty({
             app: `${requestorder.app} (${formatRLC(
-              requestorder.appmaxprice,
+              requestorder.appmaxprice
             )} RLC)`,
             dataset:
               requestorder.dataset !== NULL_ADDRESS
                 ? `${requestorder.dataset} (${formatRLC(
-                    requestorder.datasetmaxprice,
+                    requestorder.datasetmaxprice
                   )} RLC)`
                 : undefined,
             workerpool: `${requestorder.workerpool} (${formatRLC(
-              requestorder.workerpoolmaxprice,
+              requestorder.workerpoolmaxprice
             )} RLC)`,
             volume: requestorder.volume,
             params:
@@ -1395,7 +1393,7 @@ requestRun
               requestorder.beneficiary !== requestorder.requester
                 ? requestorder.beneficiary
                 : undefined,
-          })}`,
+          })}`
         );
       }
 
@@ -1403,7 +1401,7 @@ requestRun
       const orderHash = await publishRequestorder(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        requestorder,
+        requestorder
       );
       spinner.succeed(
         `Successfully published requestorder with orderHash ${orderHash}\nRun "iexec orderbook requester ${requester}" to show published requestorders`,
@@ -1411,7 +1409,7 @@ requestRun
           raw: {
             orderHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -1445,7 +1443,7 @@ transfer
       const { txHash, address, to } = await transferApp(
         chain.contracts,
         objAddress,
-        opts.to,
+        opts.to
       );
       spinner.succeed(
         `Successfully transferred ${objName} ${address} ownership to ${to}`,
@@ -1455,7 +1453,7 @@ transfer
             to,
             txHash,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);

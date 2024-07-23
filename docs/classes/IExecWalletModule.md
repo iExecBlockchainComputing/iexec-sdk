@@ -46,10 +46,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------- |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
 
 #### Returns
 
@@ -75,71 +75,80 @@ current IExecConfig
 
 ### bridgeToMainchain
 
-▸ **bridgeToMainchain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+▸ **bridgeToMainchain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string` }\>
 
 **SIGNER REQUIRED**
 
 send some nRLC to the mainchain
 
 _NB_:
+
 - RLC is send to the sidechain bridge smart contract on sidechain then credited on mainchain by the mainchain bridge smart contract
 - the reception of the value on the mainchain (`receiveTxHash`) will not be monitored if the bridged network configuration is missing
 
 example:
+
 ```js
 const { sendTxHash, receiveTxHash } = await bridgeToSidechain('1000000000');
-console.log(`sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainchain (tx: ${receiveTxHash})`);
+console.log(
+  `sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainchain (tx: ${receiveTxHash})`
+);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
-`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string` }\>
 
-___
+---
 
 ### bridgeToSidechain
 
-▸ **bridgeToSidechain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+▸ **bridgeToSidechain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string` }\>
 
 **SIGNER REQUIRED**
 
 send some nRLC to the sidechain
 
 _NB_:
+
 - RLC is send to the mainchain bridge smart contract on mainchain then credited on sidechain by the sidechain bridge smart contract
 - the reception of the value on the sidechain (`receiveTxHash`) will not be monitored if the bridged network configuration is missing
 
 example:
+
 ```js
 const { sendTxHash, receiveTxHash } = await bridgeToSidechain('1000000000');
-console.log(`sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidechain (tx: ${receiveTxHash})`);
+console.log(
+  `sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidechain (tx: ${receiveTxHash})`
+);
 ```
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
-`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string` }\>
 
-___
+---
 
 ### checkBalances
 
-▸ **checkBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+▸ **checkBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md) }\>
 
 check the wallet balances (native and iExec token) of specified address
 
 example:
+
 ```js
 const { wei, nRLC } = await checkBalances(address);
 console.log('iExec nano RLC:', nRLC.toString());
@@ -148,23 +157,24 @@ console.log('ethereum wei:', wei.toString());
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name      | Type     |
+| :-------- | :------- |
 | `address` | `string` |
 
 #### Returns
 
-`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md) }\>
 
-___
+---
 
 ### checkBridgedBalances
 
-▸ **checkBridgedBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+▸ **checkBridgedBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md) }\>
 
 check the wallet balances (native and iExec token) of specified address on bridged chain
 
 example:
+
 ```js
 const { wei, nRLC } = await checkBalances(address);
 console.log('iExec nano RLC:', nRLC.toString());
@@ -173,15 +183,15 @@ console.log('ethereum wei:', wei.toString());
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name      | Type     |
+| :-------- | :------- |
 | `address` | `string` |
 
 #### Returns
 
-`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md) }\>
 
-___
+---
 
 ### getAddress
 
@@ -192,6 +202,7 @@ ___
 get the connected wallet address
 
 example:
+
 ```js
 const userAddress = await getAddress();
 console.log('user address:', userAddress);
@@ -201,7 +212,7 @@ console.log('user address:', userAddress);
 
 `Promise`<`string`\>
 
-___
+---
 
 ### obsBridgeToMainchain
 
@@ -212,10 +223,11 @@ ___
 return an Observable with a subscribe method to start and monitor the bridge to mainchain process
 
 example:
+
 ```js
 const bridgeObservable = await obsBridgeToMainchain('1000000000');
 const cancel = bridgeObservable.subscribe({
-  next: ({message, ...rest}) => console.log(message, ...rest),
+  next: ({ message, ...rest }) => console.log(message, ...rest),
   error: (err) => console.error(err),
   complete: () => console.log('completed'),
 });
@@ -223,15 +235,15 @@ const cancel = bridgeObservable.subscribe({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
 `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
-___
+---
 
 ### obsBridgeToSidechain
 
@@ -242,10 +254,11 @@ ___
 return an Observable with a subscribe method to start and monitor the bridge to sidechain process
 
 example:
+
 ```js
 const bridgeObservable = await obsBridgeToSidechain('1000000000');
 const cancel = bridgeObservable.subscribe({
-  next: ({message, ...rest}) => console.log(message, ...rest),
+  next: ({ message, ...rest }) => console.log(message, ...rest),
   error: (err) => console.error(err),
   complete: () => console.log('completed'),
 });
@@ -253,15 +266,15 @@ const cancel = bridgeObservable.subscribe({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
 `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
 
-___
+---
 
 ### sendETH
 
@@ -272,6 +285,7 @@ ___
 send some wei to the specified address
 
 example:
+
 ```js
 const txHash = await sendETH(amount, receiverAddress);
 console.log('transaction hash:', txHash);
@@ -279,16 +293,16 @@ console.log('transaction hash:', txHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name        | Type                                   |
+| :---------- | :------------------------------------- |
 | `WeiAmount` | [`WeiAmount`](../modules.md#weiamount) |
-| `to` | `string` |
+| `to`        | `string`                               |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### sendRLC
 
@@ -299,6 +313,7 @@ ___
 send some nRLC to the specified address
 
 example:
+
 ```js
 const txHash = await sendRLC(amount, receiverAddress);
 console.log('transaction hash:', txHash);
@@ -306,26 +321,27 @@ console.log('transaction hash:', txHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
-| `to` | `string` |
+| `to`         | `string`                                 |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### sweep
 
-▸ **sweep**(`to`): `Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
+▸ **sweep**(`to`): `Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string` }\>
 
 **SIGNER REQUIRED**
 
 send all the iExec token and the native token owned by the wallet to the specified address
 
 example:
+
 ```js
 const { sendERC20TxHash, sendNativeTxHash } = await sweep(receiverAddress);
 console.log('sweep RLC transaction hash:', sendERC20TxHash);
@@ -334,15 +350,15 @@ console.log('sweep ether transaction hash:', sendNativeTxHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name | Type     |
+| :--- | :------- |
 | `to` | `string` |
 
 #### Returns
 
-`Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
+`Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string` }\>
 
-___
+---
 
 ### unwrapEnterpriseRLC
 
@@ -353,6 +369,7 @@ ___
 unwrap some neRLC (enterprise nRLC) into nRLC
 
 example:
+
 ```js
 const txHash = await unwrapEnterpriseRLC(amount);
 console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
@@ -360,15 +377,15 @@ console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### wrapEnterpriseRLC
 
@@ -379,6 +396,7 @@ ___
 wrap some nRLC into neRLC (enterprise nRLC)
 
 example:
+
 ```js
 const txHash = await wrapEnterpriseRLC(amount);
 console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
@@ -386,15 +404,15 @@ console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name         | Type                                     |
+| :----------- | :--------------------------------------- |
 | `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
 `Promise`<`string`\>
 
-___
+---
 
 ### fromConfig
 
@@ -404,8 +422,8 @@ Create an IExecWalletModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                            |
+| :------- | :------------------------------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

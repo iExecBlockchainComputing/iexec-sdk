@@ -192,7 +192,7 @@ export default class IExecOrderbookModule extends IExecModule {
        * filters out orders allowing “any” workerpool (default: `false`)
        */
       isWorkerpoolStrict?: boolean;
-    },
+    }
   ): Promise<PaginableOrders<PublishedApporder>>;
   /**
    * find the cheapest orders for the specified dataset.
@@ -253,7 +253,7 @@ export default class IExecOrderbookModule extends IExecModule {
        * filters out orders allowing “any” workerpool (default: `false`)
        */
       isWorkerpoolStrict?: boolean;
-    },
+    }
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
    * find the cheapest orders for the specified computing resource.

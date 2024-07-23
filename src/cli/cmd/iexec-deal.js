@@ -46,7 +46,7 @@ showDeal
               next: (data) => {
                 dealState = data;
                 spinner.start(
-                  `Watching execution...\n${renderTasksStatus(data.tasks)}`,
+                  `Watching execution...\n${renderTasksStatus(data.tasks)}`
                 );
               },
               error: reject,
@@ -72,7 +72,7 @@ showDeal
         spinner.info(
           `Deal status ${dealStatus}\n${renderTasksStatus(result.tasks, {
             detailed: true,
-          })}`,
+          })}`
         );
       } else {
         spinner.start(info.showing(objName));
@@ -113,7 +113,7 @@ claimDeal
         `Deal successfully claimed (${
           Object.keys(claimed).length
         } tasks claimed)`,
-        { raw: { claimed, transactions } },
+        { raw: { claimed, transactions } }
       );
     } catch (error) {
       handleError(error, cli, opts);

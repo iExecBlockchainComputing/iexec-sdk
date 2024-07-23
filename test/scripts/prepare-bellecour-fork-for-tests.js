@@ -97,7 +97,7 @@ const getIExecHubOwnership = async (targetOwner) => {
         type: 'function',
       },
     ],
-    provider,
+    provider
   );
   const iexecOwner = await iexecContract.owner();
   await impersonate(iexecOwner);
@@ -109,7 +109,7 @@ const getIExecHubOwnership = async (targetOwner) => {
 
   const newOwner = await iexecContract.owner();
   console.log(
-    `IExecHub proxy at ${IEXEC_HUB_ADDRESS} is now owned by ${newOwner}`,
+    `IExecHub proxy at ${IEXEC_HUB_ADDRESS} is now owned by ${newOwner}`
   );
 };
 
@@ -173,7 +173,7 @@ const getVoucherManagementRoles = async (targetManager) => {
         type: 'function',
       },
     ],
-    provider,
+    provider
   );
 
   const defaultAdmin = await voucherHubContract.defaultAdmin();
@@ -203,15 +203,15 @@ const getVoucherManagementRoles = async (targetManager) => {
   console.log(
     `${targetManager} has role MINTER_ROLE: ${await voucherHubContract.hasRole(
       MINTER_ROLE,
-      targetManager,
-    )}`,
+      targetManager
+    )}`
   );
 
   console.log(
     `${targetManager} has role MANAGER_ROLE: ${await voucherHubContract.hasRole(
       MANAGER_ROLE,
-      targetManager,
-    )}`,
+      targetManager
+    )}`
   );
 };
 
@@ -273,7 +273,7 @@ const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
   const resourceContract = new Contract(
     resourceAddress,
     RESOURCE_ABI,
-    provider,
+    provider
   );
 
   const resourceOwner = await resourceContract.owner();
@@ -281,7 +281,7 @@ const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
   const resourceRegistryContract = new Contract(
     resourceRegistryAddress,
     RESOURCE_REGISTRY_ABI,
-    provider,
+    provider
   );
 
   await impersonate(resourceOwner);

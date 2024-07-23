@@ -38,7 +38,7 @@ export const getTestConfig =
     const wallet = privateKey ? new Wallet(privateKey) : Wallet.createRandom();
     const ethProvider = utils.getSignerFromPrivateKey(
       chain.rpcURL,
-      wallet.privateKey,
+      wallet.privateKey
     );
     return {
       iexec: new IExec({ ethProvider }, configOptions),

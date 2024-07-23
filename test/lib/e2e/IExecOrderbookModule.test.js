@@ -38,7 +38,7 @@ describe('orderbook', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -54,7 +54,7 @@ describe('orderbook', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -67,7 +67,7 @@ describe('orderbook', () => {
         const apporder = await deployAndGetApporder(iexec);
         const orderHash = await iexecReadOnly.order.hashApporder(apporder);
         await expect(
-          iexecReadOnly.orderbook.fetchApporder(orderHash),
+          iexecReadOnly.orderbook.fetchApporder(orderHash)
         ).rejects.toThrow(Error('API error: apporder not found'));
         await iexec.order.publishApporder(apporder);
         const found = await iexecReadOnly.orderbook.fetchApporder(orderHash);
@@ -87,7 +87,7 @@ describe('orderbook', () => {
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const orderHash = await iexec.order.hashDatasetorder(datasetorder);
         await expect(
-          iexecReadOnly.orderbook.fetchDatasetorder(orderHash),
+          iexecReadOnly.orderbook.fetchDatasetorder(orderHash)
         ).rejects.toThrow(Error('API error: datasetorder not found'));
         await iexec.order.publishDatasetorder(datasetorder, {
           preflightCheck: false,
@@ -111,7 +111,7 @@ describe('orderbook', () => {
         const orderHash =
           await iexec.order.hashWorkerpoolorder(workerpoolorder);
         await expect(
-          iexecReadOnly.orderbook.fetchWorkerpoolorder(orderHash),
+          iexecReadOnly.orderbook.fetchWorkerpoolorder(orderHash)
         ).rejects.toThrow(Error('API error: workerpoolorder not found'));
         await iexec.order.publishWorkerpoolorder(workerpoolorder);
         const found =
@@ -145,11 +145,11 @@ describe('orderbook', () => {
             volume: 1,
           })
           .then((o) =>
-            iexec.order.signRequestorder(o, { preflightCheck: false }),
+            iexec.order.signRequestorder(o, { preflightCheck: false })
           );
         const orderHash = await iexec.order.hashRequestorder(requestorder);
         await expect(
-          iexecReadOnly.orderbook.fetchRequestorder(orderHash),
+          iexecReadOnly.orderbook.fetchRequestorder(orderHash)
         ).rejects.toThrow(Error('API error: requestorder not found'));
         await iexec.order.publishRequestorder(requestorder, {
           preflightCheck: false,
@@ -177,7 +177,7 @@ describe('orderbook', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -193,7 +193,7 @@ describe('orderbook', () => {
         {
           constructor: MarketCallError,
           message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
     describe('fetchAppOrderbook()', () => {
@@ -235,11 +235,11 @@ describe('orderbook', () => {
             .then((o) => iexec.order.publishApporder(o));
         }
         await deployAndGetApporder(iexec).then((o) =>
-          iexec.order.publishApporder(o),
+          iexec.order.publishApporder(o)
         );
 
         const res1 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
+          apporder.app
         );
         expect(res1.count).toBe(22);
         expect(res1.orders.length).toBe(20);
@@ -252,21 +252,21 @@ describe('orderbook', () => {
           apporder.app,
           {
             dataset: 'any',
-          },
+          }
         );
         expect(res3.count).toBe(24);
         const res4 = await iexecReadOnly.orderbook.fetchAppOrderbook(
           apporder.app,
           {
             workerpool: 'any',
-          },
+          }
         );
         expect(res4.count).toBe(25);
         const res5 = await iexecReadOnly.orderbook.fetchAppOrderbook(
           apporder.app,
           {
             requester: 'any',
-          },
+          }
         );
         expect(res5.count).toBe(26);
         const res6 = await iexecReadOnly.orderbook.fetchAppOrderbook(
@@ -275,7 +275,7 @@ describe('orderbook', () => {
             dataset: 'any',
             requester: 'any',
             workerpool: 'any',
-          },
+          }
         );
         expect(res6.count).toBe(31);
         const res7 = await iexecReadOnly.orderbook.fetchAppOrderbook('any', {
@@ -337,7 +337,7 @@ describe('orderbook', () => {
             dataset: 'any',
             requester: 'any',
             workerpool: 'any',
-          },
+          }
         );
         expect(allAppOrders.count).toBe(5);
         expect(allAppOrders.orders.length).toBe(5);
@@ -348,22 +348,22 @@ describe('orderbook', () => {
         expect(unrestrictedAppOrders.count).toBe(2);
         expect(unrestrictedAppOrders.orders.length).toBe(2);
         expect(unrestrictedAppOrders.orders[0].order.datasetrestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
         expect(
-          unrestrictedAppOrders.orders[0].order.workerpoolrestrict,
+          unrestrictedAppOrders.orders[0].order.workerpoolrestrict
         ).toEqual(NULL_ADDRESS);
         expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
         expect(unrestrictedAppOrders.orders[1].order.datasetrestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
         expect(
-          unrestrictedAppOrders.orders[0].order.workerpoolrestrict,
+          unrestrictedAppOrders.orders[0].order.workerpoolrestrict
         ).toEqual(NULL_ADDRESS);
         expect(unrestrictedAppOrders.orders[0].order.requesterrestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
 
         // all orders without dataset restriction(1,2) and with dataset restriction(3)
@@ -383,7 +383,7 @@ describe('orderbook', () => {
         expect(datasetStrictAppOrder.count).toBe(1);
         expect(datasetStrictAppOrder.orders.length).toBe(1);
         expect(datasetStrictAppOrder.orders[0].order.datasetrestrict).toEqual(
-          datasetAddress,
+          datasetAddress
         );
 
         // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
@@ -403,7 +403,7 @@ describe('orderbook', () => {
         expect(workerpoolStrictAppOrder.count).toBe(1);
         expect(workerpoolStrictAppOrder.orders.length).toBe(1);
         expect(
-          workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict,
+          workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict
         ).toEqual(workerpoolAddress);
 
         // all orders without requester restriction(1,2) and with requester restriction(5)
@@ -423,7 +423,7 @@ describe('orderbook', () => {
         expect(requesterStrictAppOrders.count).toBe(1);
         expect(requesterStrictAppOrders.orders.length).toBe(1);
         expect(
-          requesterStrictAppOrders.orders[0].order.requesterrestrict,
+          requesterStrictAppOrders.orders[0].order.requesterrestrict
         ).toEqual(requesterAddress);
 
         // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
@@ -449,7 +449,7 @@ describe('orderbook', () => {
             isRequesterStrict: true,
             workerpool: workerpoolAddress,
             isWorkerpoolStrict: true,
-          },
+          }
         );
         expect(strictAppOrders.count).toBe(0);
         expect(strictAppOrders.orders.length).toBe(0);
@@ -472,45 +472,45 @@ describe('orderbook', () => {
           await iexec.order
             .signDatasetorder(datasetorder, { preflightCheck: false })
             .then((o) =>
-              iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+              iexec.order.publishDatasetorder(o, { preflightCheck: false })
             );
         }
         for (let i = 0; i < 2; i += 1) {
           await iexec.order
             .signDatasetorder(
               { ...datasetorder, apprestrict: getRandomAddress() },
-              { preflightCheck: false },
+              { preflightCheck: false }
             )
             .then((o) =>
-              iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+              iexec.order.publishDatasetorder(o, { preflightCheck: false })
             );
         }
         for (let i = 0; i < 3; i += 1) {
           await iexec.order
             .signDatasetorder(
               { ...datasetorder, workerpoolrestrict: getRandomAddress() },
-              { preflightCheck: false },
+              { preflightCheck: false }
             )
             .then((o) =>
-              iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+              iexec.order.publishDatasetorder(o, { preflightCheck: false })
             );
         }
         for (let i = 0; i < 4; i += 1) {
           await iexec.order
             .signDatasetorder(
               { ...datasetorder, requesterrestrict: getRandomAddress() },
-              { preflightCheck: false },
+              { preflightCheck: false }
             )
             .then((o) =>
-              iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+              iexec.order.publishDatasetorder(o, { preflightCheck: false })
             );
         }
         await deployAndGetDatasetorder(iexec).then((o) =>
-          iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+          iexec.order.publishDatasetorder(o, { preflightCheck: false })
         );
 
         const res1 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
+          datasetorder.dataset
         );
         expect(res1.count).toBe(23);
         expect(res1.orders.length).toBe(20);
@@ -521,22 +521,22 @@ describe('orderbook', () => {
         expect(res2.more).toBeUndefined();
         const res3 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
           datasetorder.dataset,
-          { app: 'any' },
+          { app: 'any' }
         );
         expect(res3.count).toBe(25);
         const res4 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
           datasetorder.dataset,
-          { workerpool: 'any' },
+          { workerpool: 'any' }
         );
         expect(res4.count).toBe(26);
         const res5 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
           datasetorder.dataset,
-          { requester: 'any' },
+          { requester: 'any' }
         );
         expect(res5.count).toBe(27);
         const res6 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
           datasetorder.dataset,
-          { app: 'any', workerpool: 'any', requester: 'any' },
+          { app: 'any', workerpool: 'any', requester: 'any' }
         );
         expect(res6.count).toBe(32);
         const res7 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
@@ -545,7 +545,7 @@ describe('orderbook', () => {
             app: 'any',
             requester: 'any',
             workerpool: 'any',
-          },
+          }
         );
         expect(res7.count >= 33).toBe(true);
       });
@@ -562,12 +562,12 @@ describe('orderbook', () => {
         await iexec.order
           .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
         await iexec.order
           .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
 
         // 3: app restricted order
@@ -576,7 +576,7 @@ describe('orderbook', () => {
         await iexec.order
           .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
         // reset to empty
         emptyDatasetOrder.apprestrict = NULL_ADDRESS;
@@ -587,7 +587,7 @@ describe('orderbook', () => {
         await iexec.order
           .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
         // reset to empty
         emptyDatasetOrder.workerpoolrestrict = NULL_ADDRESS;
@@ -598,7 +598,7 @@ describe('orderbook', () => {
         await iexec.order
           .signDatasetorder(emptyDatasetOrder, { preflightCheck: false })
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
         // reset to empty
         emptyDatasetOrder.requesterrestrict = NULL_ADDRESS;
@@ -619,22 +619,22 @@ describe('orderbook', () => {
         expect(unrestrictedDatasetOrders.count).toBe(2);
         expect(unrestrictedDatasetOrders.orders.length).toBe(2);
         expect(unrestrictedDatasetOrders.orders[0].order.apprestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
         expect(
-          unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
+          unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedDatasetOrders.orders[0].order.requesterrestrict,
+          unrestrictedDatasetOrders.orders[0].order.requesterrestrict
         ).toEqual(NULL_ADDRESS);
         expect(unrestrictedDatasetOrders.orders[1].order.apprestrict).toEqual(
-          NULL_ADDRESS,
+          NULL_ADDRESS
         );
         expect(
-          unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict,
+          unrestrictedDatasetOrders.orders[0].order.workerpoolrestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedDatasetOrders.orders[0].order.requesterrestrict,
+          unrestrictedDatasetOrders.orders[0].order.requesterrestrict
         ).toEqual(NULL_ADDRESS);
 
         // all orders without app restriction(1,2) and with app restriction(3)
@@ -654,7 +654,7 @@ describe('orderbook', () => {
         expect(appStrictAppOrder.count).toBe(1);
         expect(appStrictAppOrder.orders.length).toBe(1);
         expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(
-          appAddress,
+          appAddress
         );
 
         // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
@@ -674,7 +674,7 @@ describe('orderbook', () => {
         expect(workerpoolStrictAppOrder.count).toBe(1);
         expect(workerpoolStrictAppOrder.orders.length).toBe(1);
         expect(
-          workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict,
+          workerpoolStrictAppOrder.orders[0].order.workerpoolrestrict
         ).toEqual(workerpoolAddress);
 
         // all orders without requester restriction(1,2) and with requester restriction(5)
@@ -694,7 +694,7 @@ describe('orderbook', () => {
         expect(requesterStrictAppOrders.count).toBe(1);
         expect(requesterStrictAppOrders.orders.length).toBe(1);
         expect(
-          requesterStrictAppOrders.orders[0].order.requesterrestrict,
+          requesterStrictAppOrders.orders[0].order.requesterrestrict
         ).toEqual(requesterAddress);
 
         // all orders with app, requester, workerpool restriction and not strict (1,2,3,4,5)
@@ -875,22 +875,22 @@ describe('orderbook', () => {
         expect(unrestrictedWorkerpoolOrders.count).toBe(2);
         expect(unrestrictedWorkerpoolOrders.orders.length).toBe(2);
         expect(
-          unrestrictedWorkerpoolOrders.orders[0].order.apprestrict,
+          unrestrictedWorkerpoolOrders.orders[0].order.apprestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
+          unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+          unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedWorkerpoolOrders.orders[1].order.apprestrict,
+          unrestrictedWorkerpoolOrders.orders[1].order.apprestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict,
+          unrestrictedWorkerpoolOrders.orders[0].order.datasetrestrict
         ).toEqual(NULL_ADDRESS);
         expect(
-          unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict,
+          unrestrictedWorkerpoolOrders.orders[0].order.requesterrestrict
         ).toEqual(NULL_ADDRESS);
 
         // all orders without app restriction(1,2) and with app restriction(3)
@@ -912,7 +912,7 @@ describe('orderbook', () => {
         expect(appStrictAppOrder.count).toBe(1);
         expect(appStrictAppOrder.orders.length).toBe(1);
         expect(appStrictAppOrder.orders[0].order.apprestrict).toEqual(
-          appAddress,
+          appAddress
         );
 
         // all orders without dataset restriction(1,2) and with dataset restriction(4)
@@ -934,7 +934,7 @@ describe('orderbook', () => {
         expect(datasetStrictAppOrder.count).toBe(1);
         expect(datasetStrictAppOrder.orders.length).toBe(1);
         expect(datasetStrictAppOrder.orders[0].order.datasetrestrict).toEqual(
-          datasetAddress,
+          datasetAddress
         );
 
         // all orders without requester restriction(1,2) and with requester restriction(5)
@@ -956,7 +956,7 @@ describe('orderbook', () => {
         expect(requesterStrictAppOrders.count).toBe(1);
         expect(requesterStrictAppOrders.orders.length).toBe(1);
         expect(
-          requesterStrictAppOrders.orders[0].order.requesterrestrict,
+          requesterStrictAppOrders.orders[0].order.requesterrestrict
         ).toEqual(requesterAddress);
 
         // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
@@ -1009,24 +1009,24 @@ describe('orderbook', () => {
           await iexec.order
             .signRequestorder(
               { ...requestorder, workerpool: NULL_ADDRESS },
-              { preflightCheck: false },
+              { preflightCheck: false }
             )
             .then((o) =>
               iexec.order.publishRequestorder(o, {
                 preflightCheck: false,
-              }),
+              })
             );
         }
         for (let i = 0; i < 2; i += 1) {
           await iexec.order
             .signRequestorder(
               { ...requestorder, workerpool: getRandomAddress() },
-              { preflightCheck: false },
+              { preflightCheck: false }
             )
             .then((o) =>
               iexec.order.publishRequestorder(o, {
                 preflightCheck: false,
-              }),
+              })
             );
         }
         const res1 = await iexecReadOnly.orderbook.fetchRequestOrderbook({
@@ -1076,7 +1076,7 @@ describe('orderbook', () => {
         await iexec.order
           .signDatasetorder(datasetorder)
           .then((o) =>
-            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+            iexec.order.publishDatasetorder(o, { preflightCheck: false })
           );
 
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -1084,7 +1084,7 @@ describe('orderbook', () => {
         await iexec.order
           .signWorkerpoolorder(workerpoolorder)
           .then((o) =>
-            iexec.order.publishWorkerpoolorder(o, { preflightCheck: false }),
+            iexec.order.publishWorkerpoolorder(o, { preflightCheck: false })
           );
 
         // first: request order for app without restrictions
@@ -1102,10 +1102,10 @@ describe('orderbook', () => {
             volume: 1,
           })
           .then((o) =>
-            iexec.order.signRequestorder(o, { preflightCheck: false }),
+            iexec.order.signRequestorder(o, { preflightCheck: false })
           )
           .then((o) =>
-            iexec.order.publishRequestorder(o, { preflightCheck: false }),
+            iexec.order.publishRequestorder(o, { preflightCheck: false })
           );
 
         // second: request order for app with workerpool and dataset restrictions
@@ -1123,10 +1123,10 @@ describe('orderbook', () => {
             volume: 1,
           })
           .then((o) =>
-            iexec.order.signRequestorder(o, { preflightCheck: false }),
+            iexec.order.signRequestorder(o, { preflightCheck: false })
           )
           .then((o) =>
-            iexec.order.publishRequestorder(o, { preflightCheck: false }),
+            iexec.order.publishRequestorder(o, { preflightCheck: false })
           );
 
         // request orders restricted by app - always strict (1,2)
@@ -1170,7 +1170,7 @@ describe('orderbook', () => {
         expect(workerpoolSrictRequestOrders.count).toBe(1);
         expect(workerpoolSrictRequestOrders.orders.length).toBe(1);
         expect(workerpoolSrictRequestOrders.orders[0].order.workerpool).toEqual(
-          workerpoolAddress,
+          workerpoolAddress
         );
       });
     });

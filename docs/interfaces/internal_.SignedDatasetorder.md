@@ -26,49 +26,49 @@ signed sell order for a dataset
 
 • **apprestrict**: `string`
 
-___
+---
 
 ### dataset
 
 • **dataset**: `string`
 
-___
+---
 
 ### datasetprice
 
 • **datasetprice**: `string`
 
-___
+---
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
-___
+---
 
 ### salt
 
 • **salt**: `string`
 
-___
+---
 
 ### sign
 
 • **sign**: `string`
 
-___
+---
 
 ### tag
 
 • **tag**: `string`
 
-___
+---
 
 ### volume
 
 • **volume**: `string`
 
-___
+---
 
 ### workerpoolrestrict
 

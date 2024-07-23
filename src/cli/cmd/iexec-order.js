@@ -127,7 +127,7 @@ init
           const overwrite = {};
           if (resourceName === REQUEST) {
             const keystore = Keystore(
-              Object.assign(walletOptions, { isSigner: false }),
+              Object.assign(walletOptions, { isSigner: false })
             );
             const [address] = await keystore.accounts();
             overwrite.requester = address;
@@ -143,8 +143,8 @@ init
           Object.assign(success, { [orderName]: saved });
           spinner.info(
             `Saved default ${orderName} in "${fileName}", you can edit it:${pretty(
-              saved,
-            )}`,
+              saved
+            )}`
           );
         } catch (error) {
           failed.push(`${orderName}: ${error.message}`);
@@ -161,7 +161,7 @@ init
           'Successfully initialized, you can edit in "iexec.json"',
           {
             raw: success,
-          },
+          }
         );
       } else {
         spinner.fail(`Failed to init: ${pretty(failed)}`, {
@@ -220,14 +220,14 @@ sign
               {
                 contracts: chain.contracts,
               },
-              orderObj,
+              orderObj
             ).catch((e) => {
               throw Error(
                 `App requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
                   option.skipPreflightCheck()[0]
-                } to skip preflight requirement check)`,
+                } to skip preflight requirement check)`
               );
             });
           }
@@ -235,10 +235,10 @@ sign
           const { saved, fileName } = await saveSignedOrder(
             APP_ORDER,
             chain.id,
-            signedOrder,
+            signedOrder
           );
           spinner.info(
-            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder))
           );
           Object.assign(success, { apporder: signedOrder });
         } catch (error) {
@@ -255,7 +255,7 @@ sign
           }
           const orderObj = await createDatasetorder(
             chain.contracts,
-            loadedOrder,
+            loadedOrder
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw Error(`No dataset deployed at address ${orderObj.dataset}`);
@@ -267,14 +267,14 @@ sign
                   teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
                 }),
               },
-              orderObj,
+              orderObj
             ).catch((e) => {
               throw Error(
                 `Dataset requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
                   option.skipPreflightCheck()[0]
-                } to skip preflight requirement check)`,
+                } to skip preflight requirement check)`
               );
             });
           }
@@ -282,10 +282,10 @@ sign
           const { saved, fileName } = await saveSignedOrder(
             DATASET_ORDER,
             chain.id,
-            signedOrder,
+            signedOrder
           );
           spinner.info(
-            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder))
           );
 
           Object.assign(success, { datasetorder: signedOrder });
@@ -304,28 +304,28 @@ sign
           }
           const orderObj = await createWorkerpoolorder(
             chain.contracts,
-            loadedOrder,
+            loadedOrder
           );
           if (
             !(await checkDeployedWorkerpool(
               chain.contracts,
-              orderObj.workerpool,
+              orderObj.workerpool
             ))
           )
             throw Error(
-              `No workerpool deployed at address ${orderObj.workerpool}`,
+              `No workerpool deployed at address ${orderObj.workerpool}`
             );
           const signedOrder = await signWorkerpoolorder(
             chain.contracts,
-            orderObj,
+            orderObj
           );
           const { saved, fileName } = await saveSignedOrder(
             WORKERPOOL_ORDER,
             chain.id,
-            signedOrder,
+            signedOrder
           );
           spinner.info(
-            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder))
           );
           Object.assign(success, { workerpoolorder: signedOrder });
         } catch (error) {
@@ -345,7 +345,7 @@ sign
               contracts: chain.contracts,
               resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
             },
-            loadedOrder,
+            loadedOrder
           );
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw Error(`No app deployed at address ${orderObj.app}`);
@@ -357,14 +357,14 @@ sign
                   teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
                 }),
               },
-              orderObj,
+              orderObj
             ).catch((e) => {
               throw Error(
                 `Request requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
                   option.skipPreflightCheck()[0]
-                } to skip preflight requirement check)`,
+                } to skip preflight requirement check)`
               );
             });
           }
@@ -372,10 +372,10 @@ sign
           const { saved, fileName } = await saveSignedOrder(
             REQUEST_ORDER,
             chain.id,
-            signedOrder,
+            signedOrder
           );
           spinner.info(
-            info.orderSigned(saved, fileName).concat(pretty(signedOrder)),
+            info.orderSigned(saved, fileName).concat(pretty(signedOrder))
           );
           Object.assign(success, { requestorder: signedOrder });
         } catch (error) {
@@ -435,17 +435,17 @@ fill
       const getOrderByHash = async (orderName, orderHash) => {
         if (isBytes32(orderHash, { strict: false })) {
           spinner.info(
-            `Fetching ${orderName} ${orderHash} from iexec marketplace`,
+            `Fetching ${orderName} ${orderHash} from iexec marketplace`
           );
           const orderRes = await fetchPublishedOrderByHash(
             getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
-            orderHash,
+            orderHash
           );
           if (!orderRes) {
             throw Error(
-              `${orderName} ${orderHash} is not published on iexec marketplace`,
+              `${orderName} ${orderHash} is not published on iexec marketplace`
             );
           }
           return orderRes.order;
@@ -495,7 +495,7 @@ fill
             workerpoolmaxprice: workerpoolOrder.workerpoolprice || undefined,
             category: workerpoolOrder.category,
             params: inputParams || undefined,
-          },
+          }
         );
         if (!opts.force) {
           await prompt.signGeneratedOrder(REQUEST_ORDER, pretty(unsignedOrder));
@@ -531,14 +531,14 @@ fill
             contracts: chain.contracts,
           },
           appOrder,
-          { tagOverride: resolvedTag },
+          { tagOverride: resolvedTag }
         ).catch((e) => {
           throw Error(
             `App requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
         if (useDataset) {
@@ -550,14 +550,14 @@ fill
               }),
             },
             datasetOrder,
-            { tagOverride: resolvedTag },
+            { tagOverride: resolvedTag }
           ).catch((e) => {
             throw Error(
               `Dataset requirements check failed: ${
                 e.message
               } (If you consider this is not an issue, use ${
                 option.skipPreflightCheck()[0]
-              } to skip preflight requirement check)`,
+              } to skip preflight requirement check)`
             );
           });
         }
@@ -568,14 +568,14 @@ fill
               teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
             }),
           },
-          requestOrder,
+          requestOrder
         ).catch((e) => {
           throw Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
               option.skipPreflightCheck()[0]
-            } to skip preflight requirement check)`,
+            } to skip preflight requirement check)`
           );
         });
       }
@@ -588,11 +588,11 @@ fill
         appOrder,
         useDataset ? datasetOrder : undefined,
         workerpoolOrder,
-        requestOrder,
+        requestOrder
       );
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
-        { raw: { dealid, volume: volume.toString(), txHash } },
+        { raw: { dealid, volume: volume.toString(), txHash } }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -617,7 +617,7 @@ publish
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
-          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)'
         );
       }
       const walletOptions = computeWalletLoadOptions(opts);
@@ -637,7 +637,7 @@ publish
             signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToPublish) {
             throw new Error(
-              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`
             );
           }
           if (!opts.force)
@@ -652,21 +652,21 @@ publish
                   {
                     contracts: chain.contracts,
                   },
-                  orderToPublish,
+                  orderToPublish
                 ).catch((e) => {
                   throw Error(
                     `App requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
                       option.skipPreflightCheck()[0]
-                    } to skip preflight requirement check)`,
+                    } to skip preflight requirement check)`
                   );
                 });
               }
               orderHash = await publishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderToPublish,
+                orderToPublish
               );
               break;
             case DATASET_ORDER:
@@ -676,32 +676,32 @@ publish
                     contracts: chain.contracts,
                     smsURL: getSmsUrlFromChain(chain, {
                       teeFramework: await resolveTeeFrameworkFromTag(
-                        orderToPublish.tag,
+                        orderToPublish.tag
                       ),
                     }),
                   },
-                  orderToPublish,
+                  orderToPublish
                 ).catch((e) => {
                   throw Error(
                     `Dataset requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
                       option.skipPreflightCheck()[0]
-                    } to skip preflight requirement check)`,
+                    } to skip preflight requirement check)`
                   );
                 });
               }
               orderHash = await publishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderToPublish,
+                orderToPublish
               );
               break;
             case WORKERPOOL_ORDER:
               orderHash = await publishWorkerpoolorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderToPublish,
+                orderToPublish
               );
               break;
             case REQUEST_ORDER:
@@ -711,31 +711,31 @@ publish
                     contracts: chain.contracts,
                     smsURL: getSmsUrlFromChain(chain, {
                       teeFramework: await resolveTeeFrameworkFromTag(
-                        orderToPublish.tag,
+                        orderToPublish.tag
                       ),
                     }),
                   },
-                  orderToPublish,
+                  orderToPublish
                 ).catch((e) => {
                   throw Error(
                     `Request requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
                       option.skipPreflightCheck()[0]
-                    } to skip preflight requirement check)`,
+                    } to skip preflight requirement check)`
                   );
                 });
               }
               orderHash = await publishRequestorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderToPublish,
+                orderToPublish
               );
               break;
             default:
           }
           spinner.info(
-            `${orderName} successfully published with orderHash ${orderHash}`,
+            `${orderName} successfully published with orderHash ${orderHash}`
           );
           Object.assign(success, { [orderName]: { orderHash } });
         } catch (error) {
@@ -779,7 +779,7 @@ unpublish
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
-          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)'
         );
       }
       const walletOptions = computeWalletLoadOptions(opts);
@@ -800,24 +800,24 @@ unpublish
             orderHashToUnpublish = orderHash;
           } else {
             spinner.info(
-              `No orderHash specified for unpublish ${orderName}, using orders.json`,
+              `No orderHash specified for unpublish ${orderName}, using orders.json`
             );
             const orderToUnpublish =
               signedOrders[chain.id] && signedOrders[chain.id][orderName];
             if (!orderToUnpublish) {
               throw new Error(
-                `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
+                `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`
               );
             }
             orderHashToUnpublish = await computeOrderHash(
               chain.contracts,
               orderName,
-              orderToUnpublish,
+              orderToUnpublish
             );
             if (!opts.force) {
               await prompt.unpublishFromJsonFile(
                 orderName,
-                pretty(orderToUnpublish),
+                pretty(orderToUnpublish)
               );
             }
           }
@@ -829,34 +829,34 @@ unpublish
               unpublished = await unpublishApporder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderHashToUnpublish,
+                orderHashToUnpublish
               );
               break;
             case DATASET_ORDER:
               unpublished = await unpublishDatasetorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderHashToUnpublish,
+                orderHashToUnpublish
               );
               break;
             case WORKERPOOL_ORDER:
               unpublished = await unpublishWorkerpoolorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderHashToUnpublish,
+                orderHashToUnpublish
               );
               break;
             case REQUEST_ORDER:
               unpublished = await unpublishRequestorder(
                 chain.contracts,
                 getPropertyFormChain(chain, 'iexecGateway'),
-                orderHashToUnpublish,
+                orderHashToUnpublish
               );
               break;
             default:
           }
           spinner.info(
-            `${orderName} with orderHash ${unpublished} successfully unpublished`,
+            `${orderName} with orderHash ${unpublished} successfully unpublished`
           );
           Object.assign(success, { [orderName]: { orderHash: unpublished } });
         } catch (error) {
@@ -903,7 +903,7 @@ cancel
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
-          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)'
         );
       }
       const walletOptions = computeWalletLoadOptions(opts);
@@ -922,7 +922,7 @@ cancel
           const orderToCancel = signedOrders[chain.id][orderName];
           if (!orderToCancel) {
             throw new Error(
-              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
+              `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`
             );
           }
           if (!opts.force)
@@ -994,7 +994,7 @@ show
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
         throw new Error(
-          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
+          'No option specified, you should choose one (--app | --dataset | --workerpool | --request)'
         );
       }
       const chain = await loadChain(opts.chain, { spinner });
@@ -1006,19 +1006,19 @@ show
           let orderHash;
           if (cmdInput === true) {
             spinner.info(
-              `No order hash specified, showing ${orderName} from "orders.json"`,
+              `No order hash specified, showing ${orderName} from "orders.json"`
             );
             const signedOrders = (await loadSignedOrders())[chain.id];
             const signedOrder = signedOrders && signedOrders[orderName];
             if (!signedOrder) {
               throw Error(
-                `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
+                `Missing ${orderName} in "orders.json" for chain ${chain.id}`
               );
             }
             orderHash = await computeOrderHash(
               chain.contracts,
               orderName,
-              signedOrder,
+              signedOrder
             );
           } else {
             orderHash = cmdInput;
@@ -1029,7 +1029,7 @@ show
             getPropertyFormChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
-            orderHash,
+            orderHash
           );
           let deals;
           if (opts.deals) {
@@ -1037,18 +1037,18 @@ show
               getPropertyFormChain(chain, 'iexecGateway'),
               orderName,
               chain.id,
-              orderHash,
+              orderHash
             );
           }
           const orderString = orderToShow
             ? `${orderName} with orderHash ${orderHash} details:${pretty(
-                orderToShow,
+                orderToShow
               )}`
             : `${orderName} with orderHash ${orderHash} is not published`;
           const dealsString =
             deals && deals.count
               ? `\nDeals count: ${deals.count}\nLast deals: ${pretty(
-                  deals.deals,
+                  deals.deals
                 )}`
               : '\nDeals count: 0';
           const raw = {

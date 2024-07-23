@@ -58,7 +58,7 @@ pushSecret
         contracts,
         sms,
         secretName,
-        secretValue,
+        secretValue
       );
       if (isPushed) {
         spinner.succeed(`Secret "${secretName}" successfully pushed`, {
@@ -85,7 +85,7 @@ checkSecret
     try {
       const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, { isSigner: false }),
+        Object.assign(walletOptions, { isSigner: false })
       );
       const chain = await loadChain(opts.chain, {
         spinner,
@@ -96,7 +96,7 @@ checkSecret
       } else {
         [address] = await keystore.accounts();
         spinner.info(
-          `Checking secret "${secretName}" exists for wallet ${address}`,
+          `Checking secret "${secretName}" exists for wallet ${address}`
         );
       }
       const { contracts } = chain;
@@ -107,7 +107,7 @@ checkSecret
         contracts,
         sms,
         address,
-        secretName,
+        secretName
       );
       if (secretExists) {
         spinner.succeed(`Secret "${secretName}" found for address ${address}`, {
@@ -118,7 +118,7 @@ checkSecret
           `No secret "${secretName}" found for address ${address}`,
           {
             raw: { isSet: false, name: secretName },
-          },
+          }
         );
       }
     } catch (error) {

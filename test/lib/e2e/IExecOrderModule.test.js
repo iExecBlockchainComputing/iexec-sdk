@@ -321,15 +321,15 @@ describe('order', () => {
         app: address,
       });
       await expect(iexec.order.signApporder(order)).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
+        Error('Tag mismatch the TEE framework specified by app')
       );
       await expect(
-        iexec.order.signApporder({ ...order, tag: ['tee', 'scone'] }),
+        iexec.order.signApporder({ ...order, tag: ['tee', 'scone'] })
       ).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
+        Error('Tag mismatch the TEE framework specified by app')
       );
       await expect(
-        iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
+        iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] })
       ).resolves.toBeDefined();
     });
 
@@ -339,25 +339,23 @@ describe('order', () => {
         app: getRandomAddress(),
       });
       await expect(
-        iexec.order.signApporder({ ...order, tag: ['tee'] }),
+        iexec.order.signApporder({ ...order, tag: ['tee'] })
       ).rejects.toThrow(
-        Error(
-          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-        ),
+        Error("'tee' tag must be used with a tee framework ('scone'|'gramine')")
       );
       await expect(
-        iexec.order.signApporder({ ...order, tag: ['scone'] }),
+        iexec.order.signApporder({ ...order, tag: ['scone'] })
       ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
       await expect(
-        iexec.order.signApporder({ ...order, tag: ['gramine'] }),
+        iexec.order.signApporder({ ...order, tag: ['gramine'] })
       ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
       await expect(
         iexec.order.signApporder({
           ...order,
           tag: ['tee', 'scone', 'gramine'],
-        }),
+        })
       ).rejects.toThrow(
-        Error("tee framework tags are exclusive ('scone'|'gramine')"),
+        Error("tee framework tags are exclusive ('scone'|'gramine')")
       );
     });
   });
@@ -389,25 +387,25 @@ describe('signDatasetorder()', () => {
       dataset: address,
     });
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] })
     ).rejects.toThrow(
       Error(
-        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
-      ),
+        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`
+      )
     );
     await iexec.dataset.pushDatasetSecret(
       address,
-      iexec.dataset.generateEncryptionKey(),
+      iexec.dataset.generateEncryptionKey()
     );
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] })
     ).resolves.toBeDefined();
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'gramine'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'gramine'] })
     ).rejects.toThrow(
       Error(
-        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
-      ),
+        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`
+      )
     );
   });
 
@@ -417,23 +415,23 @@ describe('signDatasetorder()', () => {
       dataset: getRandomAddress(),
     });
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['tee'] })
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')")
     );
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['scone'] })
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
     await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['gramine'] }),
+      iexec.order.signDatasetorder({ ...order, tag: ['gramine'] })
     ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
     await expect(
       iexec.order.signDatasetorder({
         ...order,
         tag: ['tee', 'scone', 'gramine'],
-      }),
+      })
     ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      Error("tee framework tags are exclusive ('scone'|'gramine')")
     );
   });
 });
@@ -484,23 +482,23 @@ describe('signRequestorder()', () => {
       category: 5,
     });
     await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['tee'] }),
+      iexec.order.signRequestorder({ ...order, tag: ['tee'] })
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')")
     );
     await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
+      iexec.order.signRequestorder({ ...order, tag: ['scone'] })
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
     await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['gramine'] }),
+      iexec.order.signRequestorder({ ...order, tag: ['gramine'] })
     ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
     await expect(
       iexec.order.signRequestorder({
         ...order,
         tag: ['tee', 'scone', 'gramine'],
-      }),
+      })
     ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      Error("tee framework tags are exclusive ('scone'|'gramine')")
     );
   });
 
@@ -517,8 +515,8 @@ describe('signRequestorder()', () => {
 
     await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
       Error(
-        'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
-      ),
+        'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.'
+      )
     );
 
     await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
@@ -544,8 +542,8 @@ describe('signRequestorder()', () => {
       .then(iexec.storage.pushStorageToken);
     await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
       Error(
-        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
-      ),
+        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.'
+      )
     );
     await iexec.result.pushResultEncryptionKey('oops');
     const res = await iexec.order.signRequestorder(order);
@@ -576,7 +574,7 @@ describe('signRequestorder()', () => {
           category: 5,
           dataset,
         })
-        .then(iexecDatasetConsumer.order.signRequestorder),
+        .then(iexecDatasetConsumer.order.signRequestorder)
     ).resolves.toBeDefined();
 
     // tee fail without secret
@@ -588,17 +586,17 @@ describe('signRequestorder()', () => {
           dataset,
           tag: ['tee', 'scone'],
         })
-        .then(iexecDatasetConsumer.order.signRequestorder),
+        .then(iexecDatasetConsumer.order.signRequestorder)
     ).rejects.toThrow(
       Error(
-        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
-      ),
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`
+      )
     );
 
     // tee pass with secret
     await iexecDatasetProvider.dataset.pushDatasetSecret(
       dataset,
-      iexecDatasetProvider.dataset.generateEncryptionKey(),
+      iexecDatasetProvider.dataset.generateEncryptionKey()
     );
     await expect(
       iexecDatasetConsumer.order
@@ -608,7 +606,7 @@ describe('signRequestorder()', () => {
           dataset,
           tag: ['tee', 'scone'],
         })
-        .then(iexecDatasetConsumer.order.signRequestorder),
+        .then(iexecDatasetConsumer.order.signRequestorder)
     ).resolves.toBeDefined();
   });
 
@@ -626,7 +624,7 @@ describe('signRequestorder()', () => {
           category: 5,
           tag: ['tee', 'scone'],
         })
-        .then(iexec.order.signRequestorder),
+        .then(iexec.order.signRequestorder)
     ).resolves.toBeDefined();
 
     // unset secret fail
@@ -644,11 +642,11 @@ describe('signRequestorder()', () => {
             },
           },
         })
-        .then(iexec.order.signRequestorder),
+        .then(iexec.order.signRequestorder)
     ).rejects.toThrow(
       Error(
-        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisioning will fail.`,
-      ),
+        `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisioning will fail.`
+      )
     );
     // set secrets pass
     await iexec.secrets.pushRequesterSecret('bar', 'secret');
@@ -665,7 +663,7 @@ describe('signRequestorder()', () => {
             },
           },
         })
-        .then(iexec.order.signRequestorder),
+        .then(iexec.order.signRequestorder)
     ).resolves.toBeDefined();
   });
 });
@@ -686,7 +684,7 @@ describe('hashApporder()', () => {
     };
     const res = await iexec.order.hashApporder(order);
     expect(res).toBe(
-      '0x210576e452027bc2430a32f6fae97bec8bd1f7bb7a96f59202d6947ec7d6de8f',
+      '0x210576e452027bc2430a32f6fae97bec8bd1f7bb7a96f59202d6947ec7d6de8f'
     );
   });
 });
@@ -707,7 +705,7 @@ describe('hashDatasetorder()', () => {
     };
     const res = await iexec.order.hashDatasetorder(order);
     expect(res).toBe(
-      '0x5831e4e2911c431236a3df6d82698fcb849da8c781d7c4e9eb75ed551e4d35d4',
+      '0x5831e4e2911c431236a3df6d82698fcb849da8c781d7c4e9eb75ed551e4d35d4'
     );
   });
 });
@@ -730,7 +728,7 @@ describe('hashWorkerpoolorder()', () => {
     };
     const res = await iexec.order.hashWorkerpoolorder(order);
     expect(res).toBe(
-      '0x7b23e26344284e809d7809395467d611ba148ef83b2ff3854e03430311f3f8fa',
+      '0x7b23e26344284e809d7809395467d611ba148ef83b2ff3854e03430311f3f8fa'
     );
   });
 });
@@ -760,7 +758,7 @@ describe('hashRequestorder()', () => {
     const res = await iexec.order.hashRequestorder(order);
     expect(res).toBeTxHash();
     expect(res).toBe(
-      '0x8096dd3852b29d6e86b03505ded47fbc96b0bacc9be097f11de3a747ee0e4283',
+      '0x8096dd3852b29d6e86b03505ded47fbc96b0bacc9be097f11de3a747ee0e4283'
     );
   });
 });
@@ -773,7 +771,7 @@ describe('cancelApporder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelApporder(order)).rejects.toThrow(
-      Error('apporder already canceled'),
+      Error('apporder already canceled')
     );
   });
 });
@@ -786,7 +784,7 @@ describe('cancelDatasetorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelDatasetorder(order)).rejects.toThrow(
-      Error('datasetorder already canceled'),
+      Error('datasetorder already canceled')
     );
   });
 });
@@ -799,7 +797,7 @@ describe('cancelWorkerpoolorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelWorkerpoolorder(order)).rejects.toThrow(
-      Error('workerpoolorder already canceled'),
+      Error('workerpoolorder already canceled')
     );
   });
 });
@@ -821,7 +819,7 @@ describe('cancelRequestorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelRequestorder(order)).rejects.toThrow(
-      Error('requestorder already canceled'),
+      Error('requestorder already canceled')
     );
   });
 });
@@ -841,7 +839,7 @@ describe('publish...order()', () => {
       {
         constructor: MarketCallError,
         message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-      },
+      }
     );
   });
 
@@ -859,7 +857,7 @@ describe('publish...order()', () => {
       {
         constructor: MarketCallError,
         message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-      },
+      }
     );
   });
 
@@ -887,18 +885,18 @@ describe('publish...order()', () => {
       });
       const datasetAddress = datasetorder.dataset;
       await expect(
-        iexec.order.publishDatasetorder(datasetorder),
+        iexec.order.publishDatasetorder(datasetorder)
       ).rejects.toThrow(
         Error(
-          `Dataset encryption key is not set for dataset ${datasetAddress} in the SMS. Dataset decryption will fail.`,
-        ),
+          `Dataset encryption key is not set for dataset ${datasetAddress} in the SMS. Dataset decryption will fail.`
+        )
       );
 
       const orderHashSkipPreflight = await iexec.order.publishDatasetorder(
         await iexec.order.signDatasetorder(datasetorder, {
           preflightCheck: false,
         }),
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       expect(orderHashSkipPreflight).toBeTxHash();
 
@@ -907,7 +905,7 @@ describe('publish...order()', () => {
       const orderHashPreflight = await iexec.order.publishDatasetorder(
         await iexec.order.signDatasetorder(datasetorder, {
           preflightCheck: false,
-        }),
+        })
       );
       expect(orderHashPreflight).toBeTxHash();
     });
@@ -942,7 +940,7 @@ describe('publish...order()', () => {
           volume: 1,
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         preflightCheck: false,
@@ -966,14 +964,14 @@ describe('publish...order()', () => {
           params: { iexec_result_encryption: true },
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       await expect(
-        iexec.order.publishRequestorder(requestorder),
+        iexec.order.publishRequestorder(requestorder)
       ).rejects.toThrow(
         Error(
-          'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
-        ),
+          'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.'
+        )
       );
       await iexec.result.pushResultEncryptionKey(
         `-----BEGIN PUBLIC KEY-----
@@ -989,7 +987,7 @@ describe('publish...order()', () => {
   ROsm42L6N5HwSodD4x7Hil6nw2FdgK5/RkTRa47gtTTcSKFUAFB/YivDDBhyCqSx
   oSEDTczO+ZMeoYGNQwiFpetTB7E4zNfxofllEvMax3/VOFurRbwDlMavD0LPeRM6
   MUkxe2lT4YFowUo6JCUFlPcCAwEAAQ==
-  -----END PUBLIC KEY-----`,
+  -----END PUBLIC KEY-----`
       );
       const orderHash = await iexec.order.publishRequestorder(requestorder);
       expect(orderHash).toBeTxHash();
@@ -1012,14 +1010,14 @@ describe('publish...order()', () => {
           tag: ['tee', 'scone'],
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       await expect(
-        iexec.order.publishRequestorder(requestorder),
+        iexec.order.publishRequestorder(requestorder)
       ).rejects.toThrow(
         Error(
-          'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
-        ),
+          'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.'
+        )
       );
       await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
       const orderHash = await iexec.order.publishRequestorder(requestorder);
@@ -1062,8 +1060,8 @@ describe('unpublish...order()', () => {
       expect(unpublishRes).toBe(orderHash);
       await expect(iexec.order.unpublishApporder(orderHash)).rejects.toThrow(
         Error(
-          `API error: apporder with orderHash ${orderHash} is not published`,
-        ),
+          `API error: apporder with orderHash ${orderHash} is not published`
+        )
       );
     });
   });
@@ -1078,11 +1076,11 @@ describe('unpublish...order()', () => {
       const unpublishRes = await iexec.order.unpublishDatasetorder(orderHash);
       expect(unpublishRes).toBe(orderHash);
       await expect(
-        iexec.order.unpublishDatasetorder(orderHash),
+        iexec.order.unpublishDatasetorder(orderHash)
       ).rejects.toThrow(
         Error(
-          `API error: datasetorder with orderHash ${orderHash} is not published`,
-        ),
+          `API error: datasetorder with orderHash ${orderHash} is not published`
+        )
       );
     });
   });
@@ -1097,11 +1095,11 @@ describe('unpublish...order()', () => {
         await iexec.order.unpublishWorkerpoolorder(orderHash);
       expect(unpublishRes).toBe(orderHash);
       await expect(
-        iexec.order.unpublishWorkerpoolorder(orderHash),
+        iexec.order.unpublishWorkerpoolorder(orderHash)
       ).rejects.toThrow(
         Error(
-          `API error: workerpoolorder with orderHash ${orderHash} is not published`,
-        ),
+          `API error: workerpoolorder with orderHash ${orderHash} is not published`
+        )
       );
     });
   });
@@ -1125,7 +1123,7 @@ describe('unpublish...order()', () => {
           volume: 1,
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         preflightCheck: false,
@@ -1133,11 +1131,11 @@ describe('unpublish...order()', () => {
       const unpublishRes = await iexec.order.unpublishRequestorder(orderHash);
       expect(unpublishRes).toBe(orderHash);
       await expect(
-        iexec.order.unpublishRequestorder(orderHash),
+        iexec.order.unpublishRequestorder(orderHash)
       ).rejects.toThrow(
         Error(
-          `API error: requestorder with orderHash ${orderHash} is not published`,
-        ),
+          `API error: requestorder with orderHash ${orderHash} is not published`
+        )
       );
     });
   });
@@ -1150,19 +1148,19 @@ describe('unpublish...order()', () => {
       const lastApporder = await iexec.order.signApporder(apporder);
       const lastOrderHash = await iexec.order.publishApporder(lastApporder);
       const unpublishLastRes = await iexec.order.unpublishLastApporder(
-        apporder.app,
+        apporder.app
       );
       expect(unpublishLastRes).toBe(lastOrderHash);
       const unpublishLast2Res = await iexec.order.unpublishLastApporder(
-        apporder.app,
+        apporder.app
       );
       expect(unpublishLast2Res).toBe(orderHash);
       await expect(
-        iexec.order.unpublishLastApporder(apporder.app),
+        iexec.order.unpublishLastApporder(apporder.app)
       ).rejects.toThrow(
         Error(
-          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
-        ),
+          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`
+        )
       );
     });
   });
@@ -1178,26 +1176,26 @@ describe('unpublish...order()', () => {
         datasetorder,
         {
           preflightCheck: false,
-        },
+        }
       );
       const lastOrderHash = await iexec.order.publishDatasetorder(
         lastDatasetorder,
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const unpublishLastRes = await iexec.order.unpublishLastDatasetorder(
-        datasetorder.dataset,
+        datasetorder.dataset
       );
       expect(unpublishLastRes).toBe(lastOrderHash);
       const unpublishLast2Res = await iexec.order.unpublishLastDatasetorder(
-        datasetorder.dataset,
+        datasetorder.dataset
       );
       expect(unpublishLast2Res).toBe(orderHash);
       await expect(
-        iexec.order.unpublishLastDatasetorder(datasetorder.dataset),
+        iexec.order.unpublishLastDatasetorder(datasetorder.dataset)
       ).rejects.toThrow(
         Error(
-          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
-        ),
+          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`
+        )
       );
     });
   });
@@ -1213,19 +1211,19 @@ describe('unpublish...order()', () => {
       const lastOrderHash =
         await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
       const unpublishLastRes = await iexec.order.unpublishLastWorkerpoolorder(
-        workerpoolorder.workerpool,
+        workerpoolorder.workerpool
       );
       expect(unpublishLastRes).toBe(lastOrderHash);
       const unpublishLast2Res = await iexec.order.unpublishLastWorkerpoolorder(
-        workerpoolorder.workerpool,
+        workerpoolorder.workerpool
       );
       expect(unpublishLast2Res).toBe(orderHash);
       await expect(
-        iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool),
+        iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool)
       ).rejects.toThrow(
         Error(
-          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
-        ),
+          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`
+        )
       );
     });
   });
@@ -1249,7 +1247,7 @@ describe('unpublish...order()', () => {
           volume: 1,
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         preflightCheck: false,
@@ -1258,26 +1256,26 @@ describe('unpublish...order()', () => {
         requestorder,
         {
           preflightCheck: false,
-        },
+        }
       );
       const lastOrderHash = await iexec.order.publishRequestorder(
         lastRequestorder,
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const unpublishLastRes = await iexec.order.unpublishLastRequestorder(
-        requestorder.requester,
+        requestorder.requester
       );
       expect(unpublishLastRes).toBe(lastOrderHash);
       const unpublishLast2Res = await iexec.order.unpublishLastRequestorder(
-        requestorder.requester,
+        requestorder.requester
       );
       expect(unpublishLast2Res).toBe(orderHash);
       await expect(
-        iexec.order.unpublishLastRequestorder(requestorder.requester),
+        iexec.order.unpublishLastRequestorder(requestorder.requester)
       ).rejects.toThrow(
         Error(
-          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
-        ),
+          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`
+        )
       );
     });
   });
@@ -1290,18 +1288,18 @@ describe('unpublish...order()', () => {
       const lastApporder = await iexec.order.signApporder(apporder);
       const lastOrderHash = await iexec.order.publishApporder(lastApporder);
       const unpublishAllRes = await iexec.order.unpublishAllApporders(
-        apporder.app,
+        apporder.app
       );
       expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
+        expect.arrayContaining([orderHash, lastOrderHash])
       );
       expect(unpublishAllRes.length).toBe(2);
       await expect(
-        iexec.order.unpublishAllApporders(apporder.app),
+        iexec.order.unpublishAllApporders(apporder.app)
       ).rejects.toThrow(
         Error(
-          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
-        ),
+          `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`
+        )
       );
     });
   });
@@ -1317,25 +1315,25 @@ describe('unpublish...order()', () => {
         datasetorder,
         {
           preflightCheck: false,
-        },
+        }
       );
       const lastOrderHash = await iexec.order.publishDatasetorder(
         lastDatasetorder,
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const unpublishAllRes = await iexec.order.unpublishAllDatasetorders(
-        datasetorder.dataset,
+        datasetorder.dataset
       );
       expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
+        expect.arrayContaining([orderHash, lastOrderHash])
       );
       expect(unpublishAllRes.length).toBe(2);
       await expect(
-        iexec.order.unpublishAllDatasetorders(datasetorder.dataset),
+        iexec.order.unpublishAllDatasetorders(datasetorder.dataset)
       ).rejects.toThrow(
         Error(
-          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
-        ),
+          `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`
+        )
       );
     });
   });
@@ -1351,18 +1349,18 @@ describe('unpublish...order()', () => {
       const lastOrderHash =
         await iexec.order.publishWorkerpoolorder(lastWorkerpoolorder);
       const unpublishAllRes = await iexec.order.unpublishAllWorkerpoolorders(
-        workerpoolorder.workerpool,
+        workerpoolorder.workerpool
       );
       expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
+        expect.arrayContaining([orderHash, lastOrderHash])
       );
       expect(unpublishAllRes.length).toBe(2);
       await expect(
-        iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool),
+        iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool)
       ).rejects.toThrow(
         Error(
-          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
-        ),
+          `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`
+        )
       );
     });
   });
@@ -1386,7 +1384,7 @@ describe('unpublish...order()', () => {
           volume: 1,
         })
         .then((o) =>
-          iexec.order.signRequestorder(o, { preflightCheck: false }),
+          iexec.order.signRequestorder(o, { preflightCheck: false })
         );
       const orderHash = await iexec.order.publishRequestorder(requestorder, {
         preflightCheck: false,
@@ -1395,25 +1393,25 @@ describe('unpublish...order()', () => {
         requestorder,
         {
           preflightCheck: false,
-        },
+        }
       );
       const lastOrderHash = await iexec.order.publishRequestorder(
         lastRequestorder,
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const unpublishAllRes = await iexec.order.unpublishAllRequestorders(
-        requestorder.requester,
+        requestorder.requester
       );
       expect(unpublishAllRes).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
+        expect.arrayContaining([orderHash, lastOrderHash])
       );
       expect(unpublishAllRes.length).toBe(2);
       await expect(
-        iexec.order.unpublishAllRequestorders(requestorder.requester),
+        iexec.order.unpublishAllRequestorders(requestorder.requester)
       ).rejects.toThrow(
         Error(
-          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
-        ),
+          `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`
+        )
       );
     });
   });
@@ -1445,11 +1443,11 @@ describe('estimateMatchOrders()', () => {
       {
         volume: 7,
         datasetprice: 1,
-      },
+      }
     );
     const workerpoolorder = await deployAndGetWorkerpoolorder(
       iexecResourcesProvider,
-      { volume: 5, workerpoolprice: 1 },
+      { volume: 5, workerpoolprice: 1 }
     );
     const requestorder = await getMatchableRequestorder(iexecRequester, {
       apporder,
@@ -1490,7 +1488,7 @@ describe('estimateMatchOrders()', () => {
       });
       workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
         iexecProvider,
-        { volume: 5, workerpoolprice: 1 },
+        { volume: 5, workerpoolprice: 1 }
       );
 
       const matchableVolume = new BN(5); // min volume among orders
@@ -1503,15 +1501,15 @@ describe('estimateMatchOrders()', () => {
 
       await addVoucherEligibleAsset(iexecTestChain)(
         apporderTemplate.app,
-        voucherTypeId,
+        voucherTypeId
       );
       await addVoucherEligibleAsset(iexecTestChain)(
         datasetorderTemplate.dataset,
-        voucherTypeId,
+        voucherTypeId
       );
       await addVoucherEligibleAsset(iexecTestChain)(
         workerpoolorderTemplate.workerpool,
-        voucherTypeId,
+        voucherTypeId
       );
     });
 
@@ -1540,11 +1538,11 @@ describe('estimateMatchOrders()', () => {
         {
           volume: 7,
           datasetprice: 1,
-        },
+        }
       );
       const workerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
-        { volume: 5, workerpoolprice: 1 },
+        { volume: 5, workerpoolprice: 1 }
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
         apporder,
@@ -1560,12 +1558,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder,
             requestorder,
           },
-          { useVoucher: true },
-        ),
+          { useVoucher: true }
+        )
       ).rejects.toThrow(
         new ConfigurationError(
-          `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`,
-        ),
+          `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`
+        )
       );
       // estimate match orders without useVoucher should pass
       const res = await iexecRequester.order.estimateMatchOrders(
@@ -1575,7 +1573,7 @@ describe('estimateMatchOrders()', () => {
           workerpoolorder,
           requestorder,
         },
-        { useVoucher: false },
+        { useVoucher: false }
       );
       expect(res.sponsored).toBeInstanceOf(BN);
       expect(res.sponsored).toEqual(new BN(0));
@@ -1593,7 +1591,7 @@ describe('estimateMatchOrders()', () => {
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
-        },
+        }
       );
 
       await createVoucher(iexecTestChain)({
@@ -1625,7 +1623,7 @@ describe('estimateMatchOrders()', () => {
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
-        },
+        }
       );
 
       await createVoucher(iexecTestChain)({
@@ -1641,7 +1639,7 @@ describe('estimateMatchOrders()', () => {
           workerpoolorder: workerpoolorderTemplate,
           requestorder: requestorderTemplate,
         },
-        { useVoucher: true },
+        { useVoucher: true }
       );
       expect(res.sponsored).toBeInstanceOf(BN);
       expect(res.sponsored).toEqual(expectedTotal);
@@ -1659,7 +1657,7 @@ describe('estimateMatchOrders()', () => {
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
-        },
+        }
       );
 
       await createVoucher(iexecTestChain)({
@@ -1668,7 +1666,7 @@ describe('estimateMatchOrders()', () => {
         value: 10,
       });
       const voucherInfo = await iexecRequester.voucher.showUserVoucher(
-        requesterWallet.address,
+        requesterWallet.address
       );
 
       const res = await iexecRequester.order.estimateMatchOrders(
@@ -1678,7 +1676,7 @@ describe('estimateMatchOrders()', () => {
           workerpoolorder: workerpoolorderTemplate,
           requestorder: requestorderTemplate,
         },
-        { useVoucher: true },
+        { useVoucher: true }
       );
       expect(res.sponsored).toBeInstanceOf(BN);
       expect(res.sponsored).toEqual(new BN(voucherInfo.balance));
@@ -1696,7 +1694,7 @@ describe('estimateMatchOrders()', () => {
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
-        },
+        }
       );
       const voucherType = await createVoucherType(iexecTestChain)({
         description: 'test voucher type',
@@ -1733,11 +1731,11 @@ describe('estimateMatchOrders()', () => {
 
       await setNRlcBalance(iexecTestChain)(
         requesterWallet.address,
-        10n * ONE_RLC,
+        10n * ONE_RLC
       );
       await setNRlcBalance(iexecTestChain)(
         poolManagerWallet.address,
-        10n * ONE_RLC,
+        10n * ONE_RLC
       );
 
       const apporderTemplate = await deployAndGetApporder(iexecAppProvider);
@@ -1751,7 +1749,7 @@ describe('estimateMatchOrders()', () => {
           apporder: apporderTemplate,
           datasetorder: datasetorderTemplate,
           workerpoolorder: workerpoolorderTemplate,
-        },
+        }
       );
 
       // resource not deployed
@@ -1765,8 +1763,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error(`No app deployed at address ${fakeAddress}`));
       const datasetorderNotDeployed = {
         ...datasetorderTemplate,
@@ -1780,8 +1778,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error(`No dataset deployed at address ${fakeAddress}`));
       const workerpoolorderNotDeployed = {
         ...workerpoolorderTemplate,
@@ -1795,10 +1793,10 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderNotDeployed,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
-        Error(`No workerpool deployed at address ${fakeAddress}`),
+        Error(`No workerpool deployed at address ${fakeAddress}`)
       );
       // invalid sign
       const apporderInvalidSign = {
@@ -1813,8 +1811,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('apporder invalid sign'));
       const datasetorderInvalidSign = {
         ...datasetorderTemplate,
@@ -1828,8 +1826,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('datasetorder invalid sign'));
       const workerpoolorderInvalidSign = {
         ...workerpoolorderTemplate,
@@ -1843,8 +1841,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderInvalidSign,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('workerpoolorder invalid sign'));
       const requestorderInvalidSign = {
         ...requestorderTemplate,
@@ -1858,8 +1856,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderInvalidSign,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('requestorder invalid sign'));
 
       // address mismatch
@@ -1873,12 +1871,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`,
-        ),
+          `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`
+        )
       );
       const datasetorderAddressMismatch =
         await deployAndGetDatasetorder(iexecDatasetProvider);
@@ -1890,12 +1888,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
-        ),
+          `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`
+        )
       );
       const workerpoolorderAddressMismatch =
         await deployAndGetWorkerpoolorder(iexecPoolManager);
@@ -1907,12 +1905,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderAddressMismatch,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `workerpool address mismatch between requestorder (${requestorderTemplate.workerpool}) and workerpoolorder (${workerpoolorderAddressMismatch.workerpool})`,
-        ),
+          `workerpool address mismatch between requestorder (${requestorderTemplate.workerpool}) and workerpoolorder (${workerpoolorderAddressMismatch.workerpool})`
+        )
       );
       // category check
       const workerpoolorderCategoryMismatch =
@@ -1928,12 +1926,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderCategoryMismatch,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `category mismatch between requestorder (${requestorderTemplate.category}) and workerpoolorder (${workerpoolorderCategoryMismatch.category})`,
-        ),
+          `category mismatch between requestorder (${requestorderTemplate.category}) and workerpoolorder (${workerpoolorderCategoryMismatch.category})`
+        )
       );
       // trust check
       const workerpoolorderTrustZero =
@@ -1947,7 +1945,7 @@ describe('estimateMatchOrders()', () => {
             ...requestorderTemplate,
             trust: 2,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       await expect(
         iexecBroker.order.matchOrders(
@@ -1957,12 +1955,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTrustZero,
             requestorder: requestorderTrustTooHigh,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `workerpoolorder trust is too low (expected ${requestorderTrustTooHigh.trust}, got ${workerpoolorderTrustZero.trust})`,
-        ),
+          `workerpoolorder trust is too low (expected ${requestorderTrustTooHigh.trust}, got ${workerpoolorderTrustZero.trust})`
+        )
       );
 
       // workerpool tag check
@@ -1971,7 +1969,7 @@ describe('estimateMatchOrders()', () => {
           ...requestorderTemplate,
           tag: ['tee', 'scone', 'gpu'],
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const workerpoolorderTagGpu =
         await iexecPoolManager.order.signWorkerpoolorder({
@@ -1991,8 +1989,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTagGpu,
             requestorder: requestorderTagTeeGpu,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('Missing tags [tee,scone] in workerpoolorder'));
       const apporderTagGpu = await iexecAppProvider.order.signApporder({
         ...apporderTemplate,
@@ -2006,8 +2004,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTagTee,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
       const datasetorderTagTeeGpu =
         await iexecDatasetProvider.order.signDatasetorder(
@@ -2015,7 +2013,7 @@ describe('estimateMatchOrders()', () => {
             ...datasetorderTemplate,
             tag: ['gpu', 'tee', 'scone'],
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       await expect(
         iexecBroker.order.matchOrders(
@@ -2025,8 +2023,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTagTee,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
       // app tag check
       const datasetorderTagTee =
@@ -2035,7 +2033,7 @@ describe('estimateMatchOrders()', () => {
             ...datasetorderTemplate,
             tag: ['tee', 'scone'],
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       await expect(
         iexecBroker.order.matchOrders(
@@ -2045,8 +2043,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTagTee,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('Missing tag [tee] in apporder'));
       // price check
       const apporderTooExpensive = await iexecAppProvider.order.signApporder({
@@ -2061,12 +2059,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `appmaxprice too low (expected ${apporderTooExpensive.appprice}, got ${requestorderTemplate.appmaxprice})`,
-        ),
+          `appmaxprice too low (expected ${apporderTooExpensive.appprice}, got ${requestorderTemplate.appmaxprice})`
+        )
       );
 
       const datasetorderTooExpensive =
@@ -2075,7 +2073,7 @@ describe('estimateMatchOrders()', () => {
             ...datasetorderTemplate,
             datasetprice: 1,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       await expect(
         iexecBroker.order.matchOrders(
@@ -2085,12 +2083,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `datasetmaxprice too low (expected ${datasetorderTooExpensive.datasetprice}, got ${requestorderTemplate.datasetmaxprice})`,
-        ),
+          `datasetmaxprice too low (expected ${datasetorderTooExpensive.datasetprice}, got ${requestorderTemplate.datasetmaxprice})`
+        )
       );
 
       const workerpoolorderTooExpensive =
@@ -2106,12 +2104,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTooExpensive,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          `workerpoolmaxprice too low (expected ${workerpoolorderTooExpensive.workerpoolprice}, got ${requestorderTemplate.workerpoolmaxprice})`,
-        ),
+          `workerpoolmaxprice too low (expected ${workerpoolorderTooExpensive.workerpoolprice}, got ${requestorderTemplate.workerpoolmaxprice})`
+        )
       );
       // volumes checks
       const apporderCanceled = await iexecAppProvider.order
@@ -2128,8 +2126,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('apporder is fully consumed'));
 
       const datasetorderCanceled = await iexecDatasetProvider.order
@@ -2146,8 +2144,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('datasetorder is fully consumed'));
 
       const workerpoolorderCanceled = await iexecPoolManager.order
@@ -2164,8 +2162,8 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderCanceled,
             requestorder: requestorderTemplate,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('workerpoolorder is fully consumed'));
       const requestorderCanceled = await iexecRequester.order
         .signRequestorder(requestorderTemplate, { preflightCheck: false })
@@ -2181,13 +2179,13 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorderTemplate,
             requestorder: requestorderCanceled,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(Error('requestorder is fully consumed'));
 
       // requester account stake check
       const balance = await iexecRequester.account.checkBalance(
-        await iexecRequester.wallet.getAddress(),
+        await iexecRequester.wallet.getAddress()
       );
       await iexecRequester.account.withdraw(balance.stake).catch(() => {});
       await iexecRequester.account.deposit(5);
@@ -2197,7 +2195,7 @@ describe('estimateMatchOrders()', () => {
           ...apporderTemplate,
           appprice: 3,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const datasetorder2nRlc =
         await iexecDatasetProvider.order.signDatasetorder(
@@ -2205,7 +2203,7 @@ describe('estimateMatchOrders()', () => {
             ...datasetorderTemplate,
             datasetprice: 2,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       const workerpoolorder1nRlc =
         await iexecPoolManager.order.signWorkerpoolorder({
@@ -2219,7 +2217,7 @@ describe('estimateMatchOrders()', () => {
           datasetmaxprice: 100,
           workerpoolmaxprice: 100,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       await expect(
         iexecBroker.order.matchOrders(
@@ -2229,12 +2227,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorder1nRlc,
             requestorder: requestorder300nRlc,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          "Cost per task (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account",
-        ),
+          "Cost per task (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account"
+        )
       );
 
       const apporder0nRlc = await iexecAppProvider.order.signApporder(
@@ -2243,7 +2241,7 @@ describe('estimateMatchOrders()', () => {
           appprice: 0,
           volume: 1000,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       const datasetorder0nRlc =
         await iexecDatasetProvider.order.signDatasetorder(
@@ -2252,7 +2250,7 @@ describe('estimateMatchOrders()', () => {
             datasetprice: 0,
             volume: 1000,
           },
-          { preflightCheck: false },
+          { preflightCheck: false }
         );
       const workerpoolorder2nRlc =
         await iexecPoolManager.order.signWorkerpoolorder({
@@ -2266,7 +2264,7 @@ describe('estimateMatchOrders()', () => {
           workerpoolmaxprice: 2,
           volume: 3,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       await expect(
         iexecBroker.order.matchOrders(
@@ -2276,12 +2274,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorder2nRlc,
             requestorder: requestorder6nRlc,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          "Total cost for 3 tasks (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume",
-        ),
+          "Total cost for 3 tasks (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume"
+        )
       );
       // workerpool owner stake check
       const workerpoolorder7nRlc =
@@ -2291,7 +2289,7 @@ describe('estimateMatchOrders()', () => {
         });
       await iexecRequester.account.deposit(10);
       const poolManagerBalance = await iexecPoolManager.account.checkBalance(
-        await iexecPoolManager.wallet.getAddress(),
+        await iexecPoolManager.wallet.getAddress()
       );
       await iexecPoolManager.account
         .withdraw(poolManagerBalance.stake)
@@ -2306,12 +2304,12 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder: workerpoolorder7nRlc,
             requestorder: requestorder300nRlc,
           },
-          { preflightCheck: false },
-        ),
+          { preflightCheck: false }
+        )
       ).rejects.toThrow(
         Error(
-          "workerpool required stake (2) is greater than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account",
-        ),
+          "workerpool required stake (2) is greater than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account"
+        )
       );
       // standard case
       const res = await iexecBroker.order.matchOrders(
@@ -2321,7 +2319,7 @@ describe('estimateMatchOrders()', () => {
           workerpoolorder: workerpoolorderTemplate,
           requestorder: requestorderTemplate,
         },
-        { preflightCheck: false },
+        { preflightCheck: false }
       );
       expect(res.txHash).toBeTxHash();
       expect(res.volume).toBeInstanceOf(BN);
@@ -2335,10 +2333,10 @@ describe('estimateMatchOrders()', () => {
 
       const apporder = await deployAndGetApporder(iexecResourcesProvider);
       const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
+        iexecResourcesProvider
       );
       const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
+        iexecResourcesProvider
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
         apporder,
@@ -2352,13 +2350,13 @@ describe('estimateMatchOrders()', () => {
       });
       const teeDatasetorder = await deployAndGetDatasetorder(
         iexecResourcesProvider,
-        { tag: ['tee', 'scone'] },
+        { tag: ['tee', 'scone'] }
       );
       const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
         {
           tag: ['tee', 'scone'],
-        },
+        }
       );
       const res = await iexecRequester.order.matchOrders({
         apporder,
@@ -2384,12 +2382,12 @@ describe('estimateMatchOrders()', () => {
           }).then((o) =>
             iexecRequester.order.signRequestorder(
               { ...o, tag: ['tee', 'scone'] },
-              { preflightCheck: false },
-            ),
+              { preflightCheck: false }
+            )
           ),
-        }),
+        })
       ).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
+        Error('Tag mismatch the TEE framework specified by app')
       );
 
       // trigger dataset check
@@ -2403,7 +2401,7 @@ describe('estimateMatchOrders()', () => {
             datasetorder: teeDatasetorder,
             workerpoolorder: teeWorkerpoolorder,
           }),
-        }),
+        })
       ).rejects.toThrow('Dataset encryption key is not set for dataset ');
     });
 
@@ -2423,11 +2421,11 @@ describe('estimateMatchOrders()', () => {
           {
             volume: 7,
             datasetprice: 1,
-          },
+          }
         );
         const workerpoolorder = await deployAndGetWorkerpoolorder(
           iexecResourcesProvider,
-          { volume: 5, workerpoolprice: 1 },
+          { volume: 5, workerpoolprice: 1 }
         );
         const requestorder = await getMatchableRequestorder(iexecRequester, {
           apporder,
@@ -2443,12 +2441,12 @@ describe('estimateMatchOrders()', () => {
               workerpoolorder,
               requestorder,
             },
-            { useVoucher: true },
-          ),
+            { useVoucher: true }
+          )
         ).rejects.toThrow(
           Error(
-            `No voucher available for the requester ${requesterWallet.address}`,
-          ),
+            `No voucher available for the requester ${requesterWallet.address}`
+          )
         );
       });
 
@@ -2479,11 +2477,11 @@ describe('estimateMatchOrders()', () => {
           {
             volume: 7,
             datasetprice: 1,
-          },
+          }
         );
         const workerpoolorder = await deployAndGetWorkerpoolorder(
           iexecResourcesProvider,
-          { volume: 5, workerpoolprice: 1 },
+          { volume: 5, workerpoolprice: 1 }
         );
         const requestorder = await getMatchableRequestorder(iexecRequester, {
           apporder,
@@ -2501,12 +2499,12 @@ describe('estimateMatchOrders()', () => {
               workerpoolorder,
               requestorder,
             },
-            { useVoucher: true },
-          ),
+            { useVoucher: true }
+          )
         ).rejects.toThrow(
           new ConfigurationError(
-            `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`,
-          ),
+            `voucherHubAddress option not set and no default value for your chain ${noVoucherTestChain.chainId}`
+          )
         );
         // match orders without useVoucher should pass
         const res = await iexecRequester.order.matchOrders(
@@ -2516,7 +2514,7 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder,
             requestorder,
           },
-          { useVoucher: false },
+          { useVoucher: false }
         );
         expect(res.txHash).toBeTxHash();
         expect(res.volume).toBeInstanceOf(BN);
@@ -2539,11 +2537,11 @@ describe('estimateMatchOrders()', () => {
           {
             volume: 7,
             datasetprice: 1,
-          },
+          }
         );
         const workerpoolorder = await deployAndGetWorkerpoolorder(
           iexecResourcesProvider,
-          { volume: 5, workerpoolprice: 1 },
+          { volume: 5, workerpoolprice: 1 }
         );
         const requestorder = await getMatchableRequestorder(iexecRequester, {
           apporder,
@@ -2556,11 +2554,11 @@ describe('estimateMatchOrders()', () => {
         });
         await addVoucherEligibleAsset(iexecTestChain)(
           datasetorder.dataset,
-          voucherTypeId,
+          voucherTypeId
         );
         await addVoucherEligibleAsset(iexecTestChain)(
           workerpoolorder.workerpool,
-          voucherTypeId,
+          voucherTypeId
         );
         const voucherAddress = await createVoucher(iexecTestChain)({
           owner: await requesterWallet.getAddress(),
@@ -2569,12 +2567,12 @@ describe('estimateMatchOrders()', () => {
         });
         const allowance = await iexecRequester.account.checkAllowance(
           requestorder.requester,
-          voucherAddress,
+          voucherAddress
         );
         const { total, sponsored } =
           await iexecRequester.order.estimateMatchOrders(
             { apporder, datasetorder, workerpoolorder, requestorder },
-            { preflightCheck: true, useVoucher: true },
+            { preflightCheck: true, useVoucher: true }
           );
 
         const requiredAmount = total.sub(sponsored);
@@ -2588,12 +2586,12 @@ describe('estimateMatchOrders()', () => {
               workerpoolorder,
               requestorder,
             },
-            { useVoucher: true },
-          ),
+            { useVoucher: true }
+          )
         ).rejects.toThrow(
           Error(
-            `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
-          ),
+            `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`
+          )
         );
       });
 
@@ -2612,11 +2610,11 @@ describe('estimateMatchOrders()', () => {
           {
             volume: 7,
             datasetprice: 1,
-          },
+          }
         );
         const workerpoolorder = await deployAndGetWorkerpoolorder(
           iexecResourcesProvider,
-          { volume: 5, workerpoolprice: 1 },
+          { volume: 5, workerpoolprice: 1 }
         );
         const requestorder = await getMatchableRequestorder(iexecRequester, {
           apporder,
@@ -2629,11 +2627,11 @@ describe('estimateMatchOrders()', () => {
         });
         await addVoucherEligibleAsset(iexecTestChain)(
           datasetorder.dataset,
-          voucherTypeId,
+          voucherTypeId
         );
         await addVoucherEligibleAsset(iexecTestChain)(
           workerpoolorder.workerpool,
-          voucherTypeId,
+          voucherTypeId
         );
 
         const voucherAddress = await createVoucher(iexecTestChain)({
@@ -2651,7 +2649,7 @@ describe('estimateMatchOrders()', () => {
             workerpoolorder,
             requestorder,
           },
-          { useVoucher: true },
+          { useVoucher: true }
         );
         expect(res.txHash).toBeTxHash();
         expect(res.volume).toBeInstanceOf(BN);

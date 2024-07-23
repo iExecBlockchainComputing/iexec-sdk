@@ -66,7 +66,7 @@ describe('iexec app', () => {
 
     test('--tee-framework gramine', async () => {
       const raw = await execAsync(
-        `${iexecPath} app init --tee-framework gramine --raw`,
+        `${iexecPath} app init --tee-framework gramine --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -77,7 +77,7 @@ describe('iexec app', () => {
 
     test('--tee-framework scone', async () => {
       const raw = await execAsync(
-        `${iexecPath} app init --tee-framework scone --raw`,
+        `${iexecPath} app init --tee-framework scone --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -107,7 +107,7 @@ describe('iexec app', () => {
       await execAsync(`${iexecPath} app init --tee --raw`);
       await setAppUniqueName();
       const { address } = await execAsync(`${iexecPath} app deploy --raw`).then(
-        JSON.parse,
+        JSON.parse
       );
       const raw = await execAsync(`${iexecPath} app show --raw`);
       const res = JSON.parse(raw);
@@ -128,7 +128,7 @@ describe('iexec app', () => {
 
     test('iexec app show [appAddress]', async () => {
       const raw = await execAsync(
-        `${iexecPath} app show ${userFirstDeployedAppAddress} --raw`,
+        `${iexecPath} app show ${userFirstDeployedAppAddress} --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -149,7 +149,7 @@ describe('iexec app', () => {
 
     test('iexec app count --user [address]', async () => {
       const raw = await execAsync(
-        `${iexecPath} app count --user ${getRandomAddress()} --raw`,
+        `${iexecPath} app count --user ${getRandomAddress()} --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -163,11 +163,11 @@ describe('iexec app', () => {
       await execAsync(`${iexecPath} app init`);
       await setAppUniqueName();
       const { address } = await execAsync(`${iexecPath} app deploy --raw`).then(
-        JSON.parse,
+        JSON.parse
       );
       const receiverAddress = getRandomAddress();
       const res = await execAsync(
-        `${iexecPath} app transfer ${address} --to ${receiverAddress} --force --raw`,
+        `${iexecPath} app transfer ${address} --to ${receiverAddress} --force --raw`
       ).then(JSON.parse);
       expect(res.ok).toBe(true);
       expect(res.address).toBe(address);
@@ -197,19 +197,19 @@ describe('iexec app', () => {
       await execAsync(`${iexecPath} dataset init`);
       await execAsync(`${iexecPath} workerpool init`);
       userApp = await execAsync(`${iexecPath} app deploy --raw`).then(
-        (res) => JSON.parse(res).address,
+        (res) => JSON.parse(res).address
       );
       userDataset = await execAsync(`${iexecPath} dataset deploy --raw`).then(
-        (res) => JSON.parse(res).address,
+        (res) => JSON.parse(res).address
       );
       userWokerpool = await execAsync(
-        `${iexecPath} workerpool deploy --raw`,
+        `${iexecPath} workerpool deploy --raw`
       ).then((res) => JSON.parse(res).address);
     });
 
     test('iexec app run --workerpool deployed', async () => {
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool deployed --skip-preflight-check --force --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -220,7 +220,7 @@ describe('iexec app', () => {
       expect(res.deals[0].txHash).toBeDefined();
 
       const rawDeal = await execAsync(
-        `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+        `${iexecPath} deal show ${res.deals[0].dealid} --raw`
       );
       const resDeal = JSON.parse(rawDeal);
       expect(resDeal.ok).toBe(true);
@@ -233,7 +233,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.workerpool.price).toBe('0');
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.params).toBe(
-        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`
       );
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
@@ -248,7 +248,7 @@ describe('iexec app', () => {
 
     test('iexec app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000', async () => {
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool deployed --dataset 0x0000000000000000000000000000000000000000 --skip-preflight-check --force --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -259,7 +259,7 @@ describe('iexec app', () => {
       expect(res.deals[0].txHash).toBeDefined();
 
       const rawDeal = await execAsync(
-        `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+        `${iexecPath} deal show ${res.deals[0].dealid} --raw`
       );
       const resDeal = JSON.parse(rawDeal);
       expect(resDeal.ok).toBe(true);
@@ -272,7 +272,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.workerpool.price).toBe('0');
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.params).toBe(
-        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`
       );
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
@@ -288,7 +288,7 @@ describe('iexec app', () => {
     test('iexec app run --workerpool deployed --dataset deployed --params <params> --tag <tag> --category <catid> --beneficiary <address> --callback <address>', async () => {
       const beneficiary = getRandomAddress();
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,scone,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${beneficiary} --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool deployed --dataset deployed --params '{"iexec_args":"test params"}' --tag tee,scone,gpu --category 1 --beneficiary 0x0000000000000000000000000000000000000000 --callback ${beneficiary} --skip-preflight-check --force --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -299,7 +299,7 @@ describe('iexec app', () => {
       expect(res.deals[0].txHash).toBeDefined();
 
       const rawDeal = await execAsync(
-        `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+        `${iexecPath} deal show ${res.deals[0].dealid} --raw`
       );
       const resDeal = JSON.parse(rawDeal);
       expect(resDeal.ok).toBe(true);
@@ -318,7 +318,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.botFirst).toBe('0');
       expect(resDeal.deal.botSize).toBe('1');
       expect(resDeal.deal.tag).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000103',
+        '0x0000000000000000000000000000000000000000000000000000000000000103'
       );
       expect(resDeal.deal.trust).toBe('1');
       expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
@@ -327,7 +327,7 @@ describe('iexec app', () => {
 
     test('iexec app run --workerpool deployed --dataset deployed --args <args> --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone', async () => {
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool deployed --args 'command --help' --encrypt-result --input-files https://example.com/foo.txt,https://example.com/bar.zip --storage-provider dropbox --tag tee,scone --skip-preflight-check --force --raw`
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -338,7 +338,7 @@ describe('iexec app', () => {
       expect(res.deals[0].txHash).toBeDefined();
 
       const rawDeal = await execAsync(
-        `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+        `${iexecPath} deal show ${res.deals[0].dealid} --raw`
       );
       const resDeal = JSON.parse(rawDeal);
       expect(resDeal.ok).toBe(true);
@@ -351,7 +351,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.workerpool.price).toBe('0');
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.params).toBe(
-        '{"iexec_args":"command --help","iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_result_storage_provider":"dropbox","iexec_result_encryption":true}',
+        '{"iexec_args":"command --help","iexec_input_files":["https://example.com/foo.txt","https://example.com/bar.zip"],"iexec_result_storage_provider":"dropbox","iexec_result_encryption":true}'
       );
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
@@ -359,7 +359,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.botFirst).toBe('0');
       expect(resDeal.deal.botSize).toBe('1');
       expect(resDeal.deal.tag).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000003',
+        '0x0000000000000000000000000000000000000000000000000000000000000003'
       );
       expect(resDeal.deal.trust).toBe('1');
       expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
@@ -368,7 +368,7 @@ describe('iexec app', () => {
 
     test('iexec app run --workerpool deployed --watch (timeout)', async () => {
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --category ${noDurationCatid} --watch --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool deployed --category ${noDurationCatid} --watch --skip-preflight-check --force --raw`
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
@@ -400,10 +400,10 @@ describe('iexec app', () => {
     test('check-secret', async () => {
       await setAppUniqueName();
       const { address: appAddress } = await runIExecCliRaw(
-        `${iexecPath} app deploy`,
+        `${iexecPath} app deploy`
       );
       const resNotPushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress}`,
+        `${iexecPath} app check-secret ${appAddress}`
       );
       expect(resNotPushed.ok).toBe(true);
       expect(resNotPushed.isSecretSet).toBe(false);
@@ -411,31 +411,31 @@ describe('iexec app', () => {
       // only owner can push
       const unauthorizedWallet = getRandomWallet();
       await runIExecCliRaw(
-        `${iexecPath} wallet import ${unauthorizedWallet.privateKey} --password test`,
+        `${iexecPath} wallet import ${unauthorizedWallet.privateKey} --password test`
       );
       const pushUnauthorized = await runIExecCliRaw(
-        `${iexecPath} app push-secret  ${appAddress} --secret-value foo --wallet-address ${unauthorizedWallet.address} --password test`,
+        `${iexecPath} app push-secret  ${appAddress} --secret-value foo --wallet-address ${unauthorizedWallet.address} --password test`
       );
       expect(pushUnauthorized.ok).toBe(false);
       await runIExecCliRaw(
-        `${iexecPath} app push-secret ${appAddress} --secret-value foo`,
+        `${iexecPath} app push-secret ${appAddress} --secret-value foo`
       );
       const resPushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress}`,
+        `${iexecPath} app check-secret ${appAddress}`
       );
       expect(resPushed.ok).toBe(true);
       expect(resPushed.isSecretSet).toBe(true);
 
       const resGramineNotPushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
+        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`
       );
       expect(resGramineNotPushed.ok).toBe(true);
       expect(resGramineNotPushed.isSecretSet).toBe(false);
       await runIExecCliRaw(
-        `${iexecPath} app push-secret ${appAddress} --secret-value foo --tee-framework gramine`,
+        `${iexecPath} app push-secret ${appAddress} --secret-value foo --tee-framework gramine`
       );
       const resGraminePushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
+        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`
       );
       expect(resGraminePushed.ok).toBe(true);
       expect(resGraminePushed.isSecretSet).toBe(true);
@@ -450,7 +450,7 @@ describe('iexec app', () => {
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
-        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`)
       );
       expect(orderShowRes.apporder.order).toEqual({
         app: address,
@@ -468,16 +468,16 @@ describe('iexec app', () => {
     test('from app address with options', async () => {
       await expect(
         execAsync(
-          `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --tag tee,scone --force`,
-        ),
+          `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --tag tee,scone --force`
+        )
       ).rejects.toThrow('Tag mismatch the TEE framework specified by app');
       const res = await runIExecCliRaw(
-        `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --force`,
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --price 0.1 RLC --volume 100 --force`
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
-        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`),
+        await execAsync(`${iexecPath} order show --app ${res.orderHash} --raw`)
       );
       expect(orderShowRes.apporder.order).toEqual({
         app: userFirstDeployedAppAddress,
@@ -499,7 +499,7 @@ describe('iexec app', () => {
       await runIExecCliRaw(`${iexecPath} app deploy`);
       await runIExecCliRaw(`${iexecPath} app publish --force`);
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} app publish --force`,
+        `${iexecPath} app publish --force`
       );
       const res = await runIExecCliRaw(`${iexecPath} app unpublish --force`);
       expect(res.ok).toBe(true);
@@ -511,20 +511,20 @@ describe('iexec app', () => {
 
     test('from app address --all', async () => {
       const { orderHash } = await runIExecCliRaw(
-        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`,
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`
       );
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`,
+        `${iexecPath} app publish ${userFirstDeployedAppAddress} --force`
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} app unpublish ${userFirstDeployedAppAddress} --all --force`,
+        `${iexecPath} app unpublish ${userFirstDeployedAppAddress} --all --force`
       );
       expect(res.ok).toBe(true);
       expect(res.unpublished).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash]),
+        expect.arrayContaining([orderHash, lastOrderHash])
       );
       const resErr = await runIExecCliRaw(
-        `${iexecPath} app unpublish --all --force --raw`,
+        `${iexecPath} app unpublish --all --force --raw`
       );
       expect(resErr.ok).toBe(false);
     });

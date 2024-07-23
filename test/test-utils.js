@@ -63,14 +63,14 @@ export const TEST_CHAINS = {
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
     ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
     pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
     ),
     // TODO use another wallet
     faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
     ),
     provider: new JsonRpcProvider(
-      DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+      DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545'
     ),
     defaults: {
       isNative: false,
@@ -90,28 +90,28 @@ export const TEST_CHAINS = {
       ? 'http://result-proxy:13200'
       : 'http://localhost:13200',
     pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
     ),
     faucetWallet: new Wallet(
-      '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
+      '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89'
     ),
     voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
     voucherManagerWallet: new Wallet(
-      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
     ),
     voucherSubgraphURL: DRONE
       ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
       : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
     debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
     debugWorkerpoolOwnerWallet: new Wallet(
-      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3',
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
     ),
     prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
     prodWorkerpoolOwnerWallet: new Wallet(
-      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc',
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
     ),
     provider: new JsonRpcProvider(
-      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
@@ -199,7 +199,7 @@ const faucetSendWeiToReachTargetBalance =
     const delta = BigInt(`${targetWeiBalance}`) - currentBalance;
     if (delta < 0n) {
       console.warn(
-        `Faucet send Eth: aborted - current balance exceed target balance`,
+        `Faucet send Eth: aborted - current balance exceed target balance`
       );
       return;
     }
@@ -216,7 +216,7 @@ const faucetSendWeiToReachTargetBalance =
         await faucetSendWeiToReachTargetBalance(chain)(
           address,
           targetWeiBalance,
-          tryCount + 1,
+          tryCount + 1
         );
       } else {
         throw Error(`Failed to send Eth from faucet (tried ${tryCount} times)`);
@@ -250,16 +250,16 @@ const faucetSendNRlcToReachTargetBalance =
       {
         ethProvider: getSignerFromPrivateKey(
           chain.rpcURL,
-          chain.faucetWallet.privateKey,
+          chain.faucetWallet.privateKey
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress }
     );
     const { nRLC } = await iexec.wallet.checkBalances(address);
     const delta = BigInt(`${nRlcTargetBalance}`) - BigInt(`${nRLC}`);
     if (delta < 0n) {
       console.warn(
-        `Faucet send RLC: aborted - current balance exceed target balance`,
+        `Faucet send RLC: aborted - current balance exceed target balance`
       );
       return;
     }
@@ -273,7 +273,7 @@ const faucetSendNRlcToReachTargetBalance =
         await faucetSendNRlcToReachTargetBalance(chain)(
           address,
           nRlcTargetBalance,
-          tryCount + 1,
+          tryCount + 1
         );
       } else {
         throw Error(`Failed to send RLC from faucet (tried ${tryCount} times)`);
@@ -318,7 +318,7 @@ export const initializeTask = (chain) => async (dealid, idx) => {
         type: 'function',
       },
     ],
-    Wallet.createRandom(chain.provider), // random to avoid nonce collisions
+    Wallet.createRandom(chain.provider) // random to avoid nonce collisions
   );
   const initTx = await iexecContract.initialize(dealid, idx);
   await initTx.wait();
@@ -331,17 +331,17 @@ export const adminCreateCategory =
       {
         ethProvider: getSignerFromPrivateKey(
           chain.rpcURL,
-          chain.pocoAdminWallet.privateKey,
+          chain.pocoAdminWallet.privateKey
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress }
     );
     let res;
     try {
       res = await iexec.hub.createCategory(category);
     } catch (e) {
       console.warn(
-        `Admin create category: error (try count ${tryCount}) - ${e}`,
+        `Admin create category: error (try count ${tryCount}) - ${e}`
       );
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
       if (tryCount < 3) {
@@ -349,7 +349,7 @@ export const adminCreateCategory =
         res = await adminCreateCategory(chain)(category, tryCount + 1);
       } else {
         throw Error(
-          `Failed to create category with admin wallet (tried ${tryCount} times)`,
+          `Failed to create category with admin wallet (tried ${tryCount} times)`
         );
       }
     }
@@ -407,7 +407,7 @@ export const createVoucherType =
     const voucherHubContract = new Contract(
       chain.voucherHubAddress,
       VOUCHER_HUB_ABI,
-      chain.provider,
+      chain.provider
     );
     const signer = chain.voucherManagerWallet.connect(chain.provider);
 
@@ -424,14 +424,14 @@ export const createVoucherType =
       } catch (error) {
         console.warn(
           `Error creating voucher type (try count ${tryCount}):`,
-          error,
+          error
         );
         if (tryCount < 3) {
           await sleep(3000 * tryCount);
           id = await retryableCreateVoucherType(tryCount + 1);
         } else {
           throw new Error(
-            `Failed to create voucher after ${tryCount} attempts`,
+            `Failed to create voucher after ${tryCount} attempts`
           );
         }
       }
@@ -445,7 +445,7 @@ const createAndPublishWorkerpoolOrder = async (
   chain,
   workerpool,
   workerpoolOwnerWallet,
-  voucherOwnerAddress,
+  voucherOwnerAddress
 ) => {
   const { iexec } = getTestConfig(chain)({
     privateKey: workerpoolOwnerWallet.privateKey,
@@ -455,7 +455,7 @@ const createAndPublishWorkerpoolOrder = async (
 
   await setNRlcBalance(chain)(
     await iexec.wallet.getAddress(),
-    volume * workerpoolprice,
+    volume * workerpoolprice
   );
 
   const retryableDeposit = async (tryCount = 1) => {
@@ -547,10 +547,10 @@ export const createVoucher =
       {
         ethProvider: getSignerFromPrivateKey(
           chain.rpcURL,
-          voucherSponsorWallet.privateKey,
+          voucherSponsorWallet.privateKey
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress }
     );
     await setNRlcBalance(chain)(voucherSponsorWallet.address, value);
     const contractClient =
@@ -565,7 +565,7 @@ export const createVoucher =
     const voucherHubContract = new Contract(
       chain.voucherHubAddress,
       VOUCHER_HUB_ABI,
-      chain.provider,
+      chain.provider
     );
 
     const signer = chain.voucherManagerWallet.connect(chain.provider);
@@ -583,7 +583,7 @@ export const createVoucher =
           await retryableCreateVoucher(tryCount + 1);
         } else {
           throw new Error(
-            `Failed to create voucher after ${tryCount} attempts`,
+            `Failed to create voucher after ${tryCount} attempts`
           );
         }
       }
@@ -595,13 +595,13 @@ export const createVoucher =
         chain,
         chain.debugWorkerpool,
         chain.debugWorkerpoolOwnerWallet,
-        owner,
+        owner
       );
       await createAndPublishWorkerpoolOrder(
         chain,
         chain.prodWorkerpool,
         chain.prodWorkerpoolOwnerWallet,
-        owner,
+        owner
       );
     } catch (error) {
       console.error('Error publishing workerpoolorder:', error);
@@ -650,14 +650,14 @@ export const addVoucherEligibleAsset =
       } catch (error) {
         console.warn(
           `Error adding eligible asset to voucher (try count ${tryCount}):`,
-          error,
+          error
         );
         if (tryCount < 3) {
           await sleep(3000 * tryCount);
           await retryableAddEligibleAsset(tryCount + 1);
         } else {
           throw new Error(
-            `Failed to add eligible asset to voucher after ${tryCount} attempts`,
+            `Failed to add eligible asset to voucher after ${tryCount} attempts`
           );
         }
       }

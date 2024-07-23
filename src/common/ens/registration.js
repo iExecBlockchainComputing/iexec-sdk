@@ -31,7 +31,7 @@ const FIFS_DOMAINS = {
 
 export const getDefaultDomain = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) => {
   try {
     const vAddress = await addressSchema({
@@ -61,7 +61,7 @@ export const getDefaultDomain = async (
 export const registerFifsEns = async (
   contracts = throwIfMissing(),
   label = throwIfMissing(),
-  domain = FIFS_DOMAINS.default,
+  domain = FIFS_DOMAINS.default
 ) => {
   try {
     checkSigner(contracts);
@@ -75,20 +75,20 @@ export const registerFifsEns = async (
     if (ownedBy === NULL_ADDRESS) {
       const domainOwner = await getOwner(contracts, vDomain);
       const domainOwnerCode = await wrapCall(
-        contracts.provider.getCode(domainOwner),
+        contracts.provider.getCode(domainOwner)
       );
       if (domainOwnerCode === '0x') {
         throw Error(
-          `The base domain ${vDomain} owner ${domainOwner} is not a contract`,
+          `The base domain ${vDomain} owner ${domainOwner} is not a contract`
         );
       }
       const fifsRegistrarContract = new Contract(
         domainOwner,
         FIFSRegistrarAbi,
-        contracts.signer,
+        contracts.signer
       );
       const registerTx = await wrapSend(
-        fifsRegistrarContract.register(labelHash, address, contracts.txOptions),
+        fifsRegistrarContract.register(labelHash, address, contracts.txOptions)
       );
       await wrapWait(registerTx.wait(contracts.confirms));
       registerTxHash = registerTx.hash;
@@ -124,7 +124,7 @@ export const obsConfigureResolution = (
   contracts = throwIfMissing(),
   publicResolverAddress = throwIfMissing(),
   name = throwIfMissing(),
-  address,
+  address
 ) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
@@ -149,11 +149,11 @@ export const obsConfigureResolution = (
         let addressIsContract = false;
         if (vAddress !== walletAddress) {
           const addressCode = await wrapCall(
-            contracts.provider.getCode(vAddress),
+            contracts.provider.getCode(vAddress)
           );
           if (addressCode === '0x') {
             throw Error(
-              `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`,
+              `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`
             );
           } else {
             addressIsContract = true;
@@ -163,7 +163,7 @@ export const obsConfigureResolution = (
         const nameOwner = await getOwner(contracts, vName);
         if (nameOwner.toLowerCase() !== walletAddress.toLowerCase()) {
           throw Error(
-            `The current address ${walletAddress} is not owner of ${vName}`,
+            `The current address ${walletAddress} is not owner of ${vName}`
           );
         }
 
@@ -171,7 +171,7 @@ export const obsConfigureResolution = (
           const registryEntryContract = new Contract(
             vAddress,
             RegistryEntryAbi,
-            contracts.signer,
+            contracts.signer
           );
           const entryOwner = await wrapCall(registryEntryContract.owner());
           if (
@@ -181,7 +181,7 @@ export const obsConfigureResolution = (
             )
           ) {
             throw Error(
-              `${walletAddress} is not the owner of ${vAddress}, impossible to setup ENS resolution`,
+              `${walletAddress} is not the owner of ${vAddress}, impossible to setup ENS resolution`
             );
           }
         }
@@ -194,18 +194,18 @@ export const obsConfigureResolution = (
         });
 
         const resolverCode = await wrapCall(
-          contracts.provider.getCode(publicResolverAddress),
+          contracts.provider.getCode(publicResolverAddress)
         );
         if (resolverCode === '0x') {
           throw Error(
-            `The resolver ${publicResolverAddress} is not a contract`,
+            `The resolver ${publicResolverAddress} is not a contract`
           );
         }
 
         // 1 - setup resolution
         // set resolver
         const currentResolver = await wrapCall(
-          contracts.provider.getResolver(vName),
+          contracts.provider.getResolver(vName)
         );
         const isResolverSet =
           currentResolver &&
@@ -217,7 +217,7 @@ export const obsConfigureResolution = (
           const registryContract = new Contract(
             ensAddress,
             ENSRegistryAbi,
-            contracts.signer,
+            contracts.signer
           );
           safeObserver.next({
             message: obsConfigureResolutionMessages.SET_RESOLVER_TX_REQUEST,
@@ -229,8 +229,8 @@ export const obsConfigureResolution = (
             registryContract.setResolver(
               nameHash,
               publicResolverAddress,
-              contracts.txOptions,
-            ),
+              contracts.txOptions
+            )
           );
           safeObserver.next({
             message: obsConfigureResolutionMessages.SET_RESOLVER_TX_SENT,
@@ -249,10 +249,10 @@ export const obsConfigureResolution = (
         const resolverContract = new Contract(
           publicResolverAddress,
           PublicResolverAbi,
-          contracts.signer,
+          contracts.signer
         );
         const addr = await wrapCall(
-          resolverContract.getFunction('addr(bytes32)')(nameHash),
+          resolverContract.getFunction('addr(bytes32)')(nameHash)
         );
         const isAddrSet = addr && addr.toLowerCase() === vAddress.toLowerCase();
         if (!isAddrSet) {
@@ -266,8 +266,8 @@ export const obsConfigureResolution = (
             resolverContract.getFunction('setAddr(bytes32,address)')(
               nameHash,
               vAddress,
-              contracts.txOptions,
-            ),
+              contracts.txOptions
+            )
           );
           safeObserver.next({
             message: obsConfigureResolutionMessages.SET_ADDR_TX_SENT,
@@ -290,7 +290,7 @@ export const obsConfigureResolution = (
             const registryEntryContract = new Contract(
               vAddress,
               RegistryEntryAbi,
-              contracts.signer,
+              contracts.signer
             );
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_REQUEST,
@@ -302,8 +302,8 @@ export const obsConfigureResolution = (
               registryEntryContract.setName(
                 ensAddress,
                 vName,
-                contracts.txOptions,
-              ),
+                contracts.txOptions
+              )
             );
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_SENT,
@@ -315,12 +315,12 @@ export const obsConfigureResolution = (
             // set name for EOA
             const reverseRegistrarAddress = await getOwner(
               contracts,
-              REVERSE_DOMAIN,
+              REVERSE_DOMAIN
             );
             const reverseRegistrarContract = new Contract(
               reverseRegistrarAddress,
               ReverseRegistrarAbi,
-              contracts.signer,
+              contracts.signer
             );
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_REQUEST,
@@ -329,7 +329,7 @@ export const obsConfigureResolution = (
             });
             if (abort) return;
             const setNameTx = await wrapSend(
-              reverseRegistrarContract.setName(vName, contracts.txOptions),
+              reverseRegistrarContract.setName(vName, contracts.txOptions)
             );
             safeObserver.next({
               message: obsConfigureResolutionMessages.SET_NAME_TX_SENT,
@@ -362,14 +362,14 @@ export const configureResolution = async (
   contracts = throwIfMissing(),
   publicResolverAddress = throwIfMissing(),
   name = throwIfMissing(),
-  address,
+  address
 ) => {
   try {
     checkSigner(contracts);
     const vAddress =
       address !== undefined
         ? await addressSchema({ ethProvider: contracts.provider }).validate(
-            address,
+            address
           )
         : await getAddress(contracts);
     const vName = await ensDomainSchema().validate(name);
@@ -377,7 +377,7 @@ export const configureResolution = async (
       contracts,
       publicResolverAddress,
       name,
-      address,
+      address
     );
     return new Promise((resolve, reject) => {
       const result = {

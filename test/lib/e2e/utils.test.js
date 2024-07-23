@@ -60,13 +60,13 @@ describe('utils', () => {
 
     test("parseEth('4.2 foo')", () => {
       expect(() => utils.parseEth('4.2 foo')).toThrow(
-        Error('Invalid ether unit'),
+        Error('Invalid ether unit')
       );
     });
 
     test("parseEth('4.2 wei')", () => {
       expect(() => utils.parseEth('4.2 wei')).toThrow(
-        Error('Invalid ether amount'),
+        Error('Invalid ether amount')
       );
     });
   });
@@ -110,13 +110,13 @@ describe('utils', () => {
 
     test("parseRLC('4.2 nRLC')", () => {
       expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
-        Error('Invalid token amount'),
+        Error('Invalid token amount')
       );
     });
 
     test("parseRLC('4.2 foo')", () => {
       expect(() => utils.parseRLC('4.2 foo')).toThrow(
-        Error('Invalid token unit'),
+        Error('Invalid token unit')
       );
     });
   });
@@ -158,37 +158,37 @@ describe('utils', () => {
   describe('encodeTag()', () => {
     test("encodeTag(['tee'])", () => {
       expect(utils.encodeTag(['tee'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000001',
+        '0x0000000000000000000000000000000000000000000000000000000000000001'
       );
     });
 
     test("encodeTag(['scone'])", () => {
       expect(utils.encodeTag(['scone'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000002',
+        '0x0000000000000000000000000000000000000000000000000000000000000002'
       );
     });
 
     test("encodeTag(['gramine'])", () => {
       expect(utils.encodeTag(['gramine'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000004',
+        '0x0000000000000000000000000000000000000000000000000000000000000004'
       );
     });
 
     test("encodeTag(['gpu'])", () => {
       expect(utils.encodeTag(['gpu'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000100',
+        '0x0000000000000000000000000000000000000000000000000000000000000100'
       );
     });
 
     test("encodeTag(['gpu','tee'])", () => {
       expect(utils.encodeTag(['gpu', 'tee'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000101'
       );
     });
 
     test("encodeTag(['gpu','tee','gpu','tee'])", () => {
       expect(utils.encodeTag(['gpu', 'tee', 'gpu', 'tee'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000101'
       );
     });
 
@@ -201,16 +201,16 @@ describe('utils', () => {
     test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000003')", () => {
       expect(
         utils.decodeTag(
-          '0x0000000000000000000000000000000000000000000000000000000000000003',
-        ),
+          '0x0000000000000000000000000000000000000000000000000000000000000003'
+        )
       ).toStrictEqual(['tee', 'scone']);
     });
 
     test('decodeTag unknown bit tag', () => {
       expect(() =>
         utils.decodeTag(
-          '0x000000000000000000000000000000000000000000000000000000000000000a',
-        ),
+          '0x000000000000000000000000000000000000000000000000000000000000000a'
+        )
       ).toThrow(Error('Unknown bit 3 in tag'));
     });
   });
@@ -222,9 +222,9 @@ describe('utils', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000100',
           '0x0000000000000000000000000000000000000000000000000000000000000001',
           '0x0000000000000000000000000000000000000000000000000000000000000001',
-        ]),
+        ])
       ).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000101',
+        '0x0000000000000000000000000000000000000000000000000000000000000101'
       );
     });
 
@@ -234,9 +234,9 @@ describe('utils', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000101',
           '0x0000000000000000000000000000000000000000000000000000000000000001',
           '0x0000000000000000000000000000000000000000000000000000000000000002',
-        ]),
+        ])
       ).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000103',
+        '0x0000000000000000000000000000000000000000000000000000000000000103'
       );
     });
 
@@ -245,7 +245,7 @@ describe('utils', () => {
         utils.sumTags([
           '0x000000000000000000000000000000000000000000000000000000000000000z',
           '0x0000000000000000000000000000000000000000000000000000000000000001',
-        ]),
+        ])
       ).toThrow('tag must be bytes32 hex string');
     });
   });
@@ -253,13 +253,10 @@ describe('utils', () => {
   describe('decryptResult()', () => {
     test('decrypts the result with a binary key', async () => {
       const encZip = await readFile(
-        join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
+        join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip')
       );
       const beneficiaryKey = await readFile(
-        join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key'),
+        join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key')
       );
       const res = await utils.decryptResult(encZip, beneficiaryKey);
       const resContent = [];
@@ -275,14 +272,11 @@ describe('utils', () => {
 
     test('decrypts the result with a string key', async () => {
       const encZip = await readFile(
-        join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
+        join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip')
       );
       const beneficiaryKey = (
         await readFile(
-          join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key'),
+          join(process.cwd(), 'test/inputs/beneficiaryKeys/expected_key')
         )
       ).toString();
       const res = await utils.decryptResult(encZip, beneficiaryKey);
@@ -299,19 +293,16 @@ describe('utils', () => {
 
     test('fails to decrypt the result with the wrong key', async () => {
       const encZip = await readFile(
-        join(
-          process.cwd(),
-          'test/inputs/encryptedResults/encryptedResults.zip',
-        ),
+        join(process.cwd(), 'test/inputs/encryptedResults/encryptedResults.zip')
       );
       const beneficiaryKey = await readFile(
-        join(process.cwd(), 'test/inputs/beneficiaryKeys/unexpected_key'),
+        join(process.cwd(), 'test/inputs/beneficiaryKeys/unexpected_key')
       );
       const err = await utils
         .decryptResult(encZip, beneficiaryKey)
         .catch((e) => e);
       expect(err).toEqual(
-        new Error('Failed to decrypt results key with beneficiary key'),
+        new Error('Failed to decrypt results key with beneficiary key')
       );
     });
   });
@@ -330,14 +321,14 @@ describe('utils', () => {
             wallet.privateKey,
             {
               gasPrice,
-            },
+            }
           ),
         },
-        getTestConfigOptions(tokenTestChain)(),
+        getTestConfigOptions(tokenTestChain)()
       );
       await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
       const { registerTxHash: txHash } = await iexec.ens.claimName(
-        `name-${getId()}`,
+        `name-${getId()}`
       );
       const tx = await tokenTestChain.provider.getTransaction(txHash);
       expect(tx).toBeDefined();
@@ -350,7 +341,7 @@ describe('utils', () => {
       const createNonceProvider = (address) => {
         const initNoncePromise = iexecTestChain.provider.getTransactionCount(
           address,
-          'latest',
+          'latest'
         );
         let i = 0;
         const getNonce = () =>
@@ -371,40 +362,40 @@ describe('utils', () => {
         wallet.privateKey,
         {
           getTransactionCount: nonceProvider.getNonce,
-        },
+        }
       );
 
       const iexec = new IExec(
         {
           ethProvider: signer,
         },
-        getTestConfigOptions(iexecTestChain)(),
+        getTestConfigOptions(iexecTestChain)()
       );
 
       const { registerTxHash: tx0 } = await iexec.ens.claimName(
-        `name-${getId()}`,
+        `name-${getId()}`
       );
       expect(tx0).toBeTxHash();
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        'nonce too low',
+        'nonce too low'
       );
 
       nonceProvider.increaseNonce();
 
       const { registerTxHash: tx1 } = await iexec.ens.claimName(
-        `name-${getId()}`,
+        `name-${getId()}`
       );
       expect(tx1).toBeTxHash();
 
       await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        'nonce too low',
+        'nonce too low'
       );
 
       nonceProvider.increaseNonce();
 
       const { registerTxHash: tx2 } = await iexec.ens.claimName(
-        `name-${getId()}`,
+        `name-${getId()}`
       );
       expect(tx2).toBeTxHash();
     });
@@ -452,9 +443,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: alchemyFailQuorumFail,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).rejects.toThrow();
       await expect(
         new IExec({
@@ -463,9 +454,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: alchemyFailQuorumPass,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
       await expect(
         new IExec({
@@ -474,9 +465,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: etherscanFailQuorumFail,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).rejects.toThrow();
       await expect(
         new IExec({
@@ -485,9 +476,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: etherscanFailQuorumPass,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
       await expect(
         new IExec({
@@ -496,9 +487,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: infuraFailQuorumFail,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).rejects.toThrow();
       await expect(
         new IExec({
@@ -507,9 +498,9 @@ describe('utils', () => {
             getRandomWallet().privateKey,
             {
               providers: infuraFailQuorumPass,
-            },
+            }
           ),
-        }).wallet.checkBalances(NULL_ADDRESS),
+        }).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
     });
 
@@ -534,11 +525,11 @@ describe('utils', () => {
               getRandomWallet().privateKey,
               {
                 providers: alchemyFailQuorumFail,
-              },
+              }
             ),
           },
-          getTestConfigOptions(tokenTestChain)(),
-        ).wallet.checkBalances(NULL_ADDRESS),
+          getTestConfigOptions(tokenTestChain)()
+        ).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
       await expect(
         new IExec(
@@ -548,11 +539,11 @@ describe('utils', () => {
               getRandomWallet().privateKey,
               {
                 providers: etherscanFailQuorumFail,
-              },
+              }
             ),
           },
-          getTestConfigOptions(tokenTestChain)(),
-        ).wallet.checkBalances(NULL_ADDRESS),
+          getTestConfigOptions(tokenTestChain)()
+        ).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
       await expect(
         new IExec(
@@ -562,11 +553,11 @@ describe('utils', () => {
               getRandomWallet().privateKey,
               {
                 providers: infuraFailQuorumFail,
-              },
+              }
             ),
           },
-          getTestConfigOptions(tokenTestChain)(),
-        ).wallet.checkBalances(NULL_ADDRESS),
+          getTestConfigOptions(tokenTestChain)()
+        ).wallet.checkBalances(NULL_ADDRESS)
       ).resolves.toBeDefined();
     });
   });

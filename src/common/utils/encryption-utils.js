@@ -12,18 +12,18 @@ export const generateAes256Key = () =>
 
 export const encryptAes256Cbc = async (
   fileBytes = throwIfMissing(),
-  base64Key = throwIfMissing(),
+  base64Key = throwIfMissing()
 ) => {
   const keyBuffer = Buffer.from(
     await base64Encoded256bitsKeySchema().validate(base64Key),
-    'base64',
+    'base64'
   );
   let fileBuffer = await fileBufferSchema().validate(fileBytes);
 
   const iv = randomBytes(16);
   const aesCbcCipher = forgeAes.cipher.createCipher(
     'AES-CBC',
-    forgeAes.util.createBuffer(keyBuffer),
+    forgeAes.util.createBuffer(keyBuffer)
   );
   aesCbcCipher.start({ iv: forgeAes.util.createBuffer(iv) });
 
@@ -41,7 +41,7 @@ export const encryptAes256Cbc = async (
   aesCbcCipher.finish();
   const finalizationBuffer = Buffer.from(
     aesCbcCipher.output.getBytes(),
-    'binary',
+    'binary'
   );
   return Buffer.concat([iv, encryptionBuffer, finalizationBuffer]);
 };

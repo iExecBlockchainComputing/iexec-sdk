@@ -62,7 +62,7 @@ export default class IExecOrderModule extends IExecModule {
     this.createWorkerpoolorder = async (overwrite) =>
       createWorkerpoolorder(
         await this.config.resolveContractsClient(),
-        overwrite,
+        overwrite
       );
     this.createRequestorder = async (overwrite) =>
       createRequestorder(
@@ -70,24 +70,24 @@ export default class IExecOrderModule extends IExecModule {
           contracts: await this.config.resolveContractsClient(),
           resultProxyURL: await this.config.resolveResultProxyURL(),
         },
-        overwrite,
+        overwrite
       );
     this.hashApporder = async (apporder) =>
       hashApporder(await this.config.resolveContractsClient(), apporder);
     this.hashDatasetorder = async (datasetorder) =>
       hashDatasetorder(
         await this.config.resolveContractsClient(),
-        datasetorder,
+        datasetorder
       );
     this.hashWorkerpoolorder = async (workerpoolorder) =>
       hashWorkerpoolorder(
         await this.config.resolveContractsClient(),
-        workerpoolorder,
+        workerpoolorder
       );
     this.hashRequestorder = async (requestorder) =>
       hashRequestorder(
         await this.config.resolveContractsClient(),
-        requestorder,
+        requestorder
       );
     this.signApporder = async (apporder, { preflightCheck = true } = {}) =>
       signApporder(
@@ -97,13 +97,13 @@ export default class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
               },
-              apporder,
+              apporder
             ).then(() => apporder)
-          : apporder,
+          : apporder
       );
     this.signDatasetorder = async (
       datasetorder,
-      { preflightCheck = true } = {},
+      { preflightCheck = true } = {}
     ) =>
       signDatasetorder(
         await this.config.resolveContractsClient(),
@@ -113,22 +113,22 @@ export default class IExecOrderModule extends IExecModule {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
                   teeFramework: await resolveTeeFrameworkFromTag(
-                    (await datasetorderSchema().validate(datasetorder)).tag,
+                    (await datasetorderSchema().validate(datasetorder)).tag
                   ),
                 }),
               },
-              datasetorder,
+              datasetorder
             ).then(() => datasetorder)
-          : datasetorder,
+          : datasetorder
       );
     this.signWorkerpoolorder = async (workerpoolorder) =>
       signWorkerpoolorder(
         await this.config.resolveContractsClient(),
-        workerpoolorder,
+        workerpoolorder
       );
     this.signRequestorder = async (
       requestorder,
-      { preflightCheck = true } = {},
+      { preflightCheck = true } = {}
     ) =>
       signRequestorder(
         await this.config.resolveContractsClient(),
@@ -138,37 +138,37 @@ export default class IExecOrderModule extends IExecModule {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
                   teeFramework: await resolveTeeFrameworkFromTag(
-                    (await requestorderSchema().validate(requestorder)).tag,
+                    (await requestorderSchema().validate(requestorder)).tag
                   ),
                 }),
               },
-              requestorder,
+              requestorder
             ).then(() => requestorder)
-          : requestorder,
+          : requestorder
       );
     this.cancelApporder = async (signedApporder) =>
       cancelApporder(
         await this.config.resolveContractsClient(),
-        signedApporder,
+        signedApporder
       );
     this.cancelDatasetorder = async (signedDatasetorder) =>
       cancelDatasetorder(
         await this.config.resolveContractsClient(),
-        signedDatasetorder,
+        signedDatasetorder
       );
     this.cancelWorkerpoolorder = async (signedWorkerpoolorder) =>
       cancelWorkerpoolorder(
         await this.config.resolveContractsClient(),
-        signedWorkerpoolorder,
+        signedWorkerpoolorder
       );
     this.cancelRequestorder = async (signedRequestorder) =>
       cancelRequestorder(
         await this.config.resolveContractsClient(),
-        signedRequestorder,
+        signedRequestorder
       );
     this.publishApporder = async (
       signedApporder,
-      { preflightCheck = true } = {},
+      { preflightCheck = true } = {}
     ) =>
       publishApporder(
         await this.config.resolveContractsClient(),
@@ -178,13 +178,13 @@ export default class IExecOrderModule extends IExecModule {
               {
                 contracts: await this.config.resolveContractsClient(),
               },
-              signedApporder,
+              signedApporder
             ).then(() => signedApporder)
-          : signedApporder,
+          : signedApporder
       );
     this.publishDatasetorder = async (
       signedDatasetorder,
-      { preflightCheck = true } = {},
+      { preflightCheck = true } = {}
     ) =>
       publishDatasetorder(
         await this.config.resolveContractsClient(),
@@ -196,23 +196,23 @@ export default class IExecOrderModule extends IExecModule {
                 smsURL: await this.config.resolveSmsURL({
                   teeFramework: await resolveTeeFrameworkFromTag(
                     (await datasetorderSchema().validate(signedDatasetorder))
-                      .tag,
+                      .tag
                   ),
                 }),
               },
-              signedDatasetorder,
+              signedDatasetorder
             ).then(() => signedDatasetorder)
-          : signedDatasetorder,
+          : signedDatasetorder
       );
     this.publishWorkerpoolorder = async (signedWorkerpoolorder) =>
       publishWorkerpoolorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        signedWorkerpoolorder,
+        signedWorkerpoolorder
       );
     this.publishRequestorder = async (
       signedRequestorder,
-      { preflightCheck = true } = {},
+      { preflightCheck = true } = {}
     ) =>
       publishRequestorder(
         await this.config.resolveContractsClient(),
@@ -224,83 +224,83 @@ export default class IExecOrderModule extends IExecModule {
                 smsURL: await this.config.resolveSmsURL({
                   teeFramework: await resolveTeeFrameworkFromTag(
                     (await requestorderSchema().validate(signedRequestorder))
-                      .tag,
+                      .tag
                   ),
                 }),
               },
-              signedRequestorder,
+              signedRequestorder
             ).then(() => signedRequestorder)
-          : signedRequestorder,
+          : signedRequestorder
       );
     this.unpublishApporder = async (apporderHash) =>
       unpublishApporder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        apporderHash,
+        apporderHash
       );
     this.unpublishDatasetorder = async (datasetorderHash) =>
       unpublishDatasetorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        datasetorderHash,
+        datasetorderHash
       );
     this.unpublishWorkerpoolorder = async (workerpoolorderHash) =>
       unpublishWorkerpoolorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        workerpoolorderHash,
+        workerpoolorderHash
       );
     this.unpublishRequestorder = async (requestorderHash) =>
       unpublishRequestorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        requestorderHash,
+        requestorderHash
       );
     this.unpublishLastApporder = async (appAddress) =>
       unpublishLastApporder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        appAddress,
+        appAddress
       );
     this.unpublishLastDatasetorder = async (datasetAddress) =>
       unpublishLastDatasetorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        datasetAddress,
+        datasetAddress
       );
     this.unpublishLastWorkerpoolorder = async (workerpoolAddress) =>
       unpublishLastWorkerpoolorder(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        workerpoolAddress,
+        workerpoolAddress
       );
     this.unpublishLastRequestorder = async () =>
       unpublishLastRequestorder(
         await this.config.resolveContractsClient(),
-        await this.config.resolveIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL()
       );
     this.unpublishAllApporders = async (appAddress) =>
       unpublishAllApporders(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        appAddress,
+        appAddress
       );
     this.unpublishAllDatasetorders = async (datasetAddress) =>
       unpublishAllDatasetorders(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        datasetAddress,
+        datasetAddress
       );
     this.unpublishAllWorkerpoolorders = async (workerpoolAddress) =>
       unpublishAllWorkerpoolorders(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        workerpoolAddress,
+        workerpoolAddress
       );
     this.unpublishAllRequestorders = async () =>
       unpublishAllRequestorders(
         await this.config.resolveContractsClient(),
-        await this.config.resolveIexecGatewayURL(),
+        await this.config.resolveIexecGatewayURL()
       );
     this.matchOrders = async (
       {
@@ -309,7 +309,7 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
       },
-      { preflightCheck = true, useVoucher = false } = {},
+      { preflightCheck = true, useVoucher = false } = {}
     ) => {
       const contracts = await this.config.resolveContractsClient();
       let voucherHubAddress;
@@ -338,7 +338,7 @@ export default class IExecOrderModule extends IExecModule {
               contracts,
             },
             apporder,
-            { tagOverride: resolvedTag },
+            { tagOverride: resolvedTag }
           ).then(() => apporder),
           await checkDatasetRequirements(
             {
@@ -348,7 +348,7 @@ export default class IExecOrderModule extends IExecModule {
               }),
             },
             datasetorder,
-            { tagOverride: resolvedTag },
+            { tagOverride: resolvedTag }
           ).then(() => datasetorder),
           workerpoolorder,
           await checkRequestRequirements(
@@ -358,9 +358,9 @@ export default class IExecOrderModule extends IExecModule {
                 teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
             },
-            requestorder,
+            requestorder
           ).then(() => requestorder),
-          useVoucher,
+          useVoucher
         );
       }
       return matchOrders(
@@ -370,13 +370,13 @@ export default class IExecOrderModule extends IExecModule {
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher,
+        useVoucher
       );
     };
 
     this.estimateMatchOrders = async (
       { apporder, datasetorder, workerpoolorder, requestorder },
-      { useVoucher = false } = {},
+      { useVoucher = false } = {}
     ) => {
       const contracts = await this.config.resolveContractsClient();
       const voucherHubAddress = await this.config.resolveVoucherHubAddress();
@@ -387,7 +387,7 @@ export default class IExecOrderModule extends IExecModule {
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher,
+        useVoucher
       );
     };
   }
