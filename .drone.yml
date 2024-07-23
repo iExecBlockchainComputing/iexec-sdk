@@ -340,6 +340,20 @@ steps:
       - npm ci
       - npm run build
 
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - install
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - install
+
   - name: build
     image: node:18
     pull: always
@@ -429,6 +443,20 @@ steps:
       - npm -v
       - npm ci
 
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - install
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - install
+
   - name: build
     image: node:18
     commands:
@@ -471,7 +499,21 @@ steps:
       - npm -v
       - npm ci
 
-  - name: set version nightly
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - install
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - install
+
+  - name: set-version-nightly
     image: node:18
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
@@ -498,6 +540,11 @@ steps:
       token:
         from_secret: npm_token
       tag: ${DRONE_BRANCH}
+    depends_on:
+      - format
+      - lint
+      - build
+      - set-version-nightly
 
   - name: docker publish
     image: plugins/docker
@@ -542,6 +589,20 @@ steps:
       - npm -v
       - npm ci
 
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - install
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - install
+
   - name: build
     image: node:18
     commands:
@@ -556,6 +617,10 @@ steps:
       token:
         from_secret: npm_token
       tag: latest
+    depends_on:
+      - format
+      - lint
+      - build
 
   - name: docker publish
     image: plugins/docker
