@@ -9,6 +9,7 @@ import {
   getId,
   initializeTask,
   setNRlcBalance,
+  sleep,
 } from '../../test-utils';
 import '../../jest-setup';
 import { errors } from '../../../src/lib';
@@ -242,6 +243,8 @@ describe('[workflow]', () => {
     expect(matchOrdersRes.dealid).toBeDefined();
     expect(matchOrdersRes.txHash).toBeDefined();
     expect(matchOrdersRes.volume.eq(new BN(10))).toBe(true);
+
+    await sleep(5000); // wait for next block to be added
 
     const showDealRes = await iexec.deal.show(matchOrdersRes.dealid);
     expect(showDealRes).toBeDefined();

@@ -128,7 +128,10 @@ export const getRandomAddress = () => getRandomWallet().address;
 export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
   constructor(rpcUrl, privateKey) {
-    this.signer = new Wallet(privateKey, new JsonRpcProvider(rpcUrl));
+    this.signer = new Wallet(
+      privateKey,
+      new JsonRpcProvider(rpcUrl, undefined, { pollingInterval: 100 }), // fast polling for tests
+    );
   }
 
   async request(args) {

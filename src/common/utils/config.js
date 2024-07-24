@@ -1,3 +1,4 @@
+import { Network, EnsPlugin } from 'ethers';
 import { TEE_FRAMEWORKS } from './constant.js';
 
 const hostMap = {
@@ -87,14 +88,19 @@ export const getChainDefaults = ({ id, flavour }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
-  ensRegistry: ensMap[id] && ensMap[id].registry,
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
-  network: networkMap[id],
 });
 
 export const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
+
+// register ethers unknown networks
+const bellecourNetwork = new Network(networkMap[134].name, 134).attachPlugin(
+  new EnsPlugin(ensMap[134].registry, 134),
+);
+Network.register(bellecourNetwork.chainId, () => bellecourNetwork);
+Network.register(bellecourNetwork.name, () => bellecourNetwork);

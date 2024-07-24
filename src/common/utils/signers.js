@@ -52,9 +52,15 @@ export class EnhancedWallet extends Wallet {
   }
 }
 
-export class BrowserProviderSigner extends AbstractSigner {
-  constructor(...args) {
-    super(new BrowserProvider(...args));
+/**
+ * BrowserProvider wrapped in an AbstractSigner
+ */
+export class BrowserProviderSignerAdapter extends AbstractSigner {
+  constructor(browserProvider) {
+    if (!(browserProvider instanceof BrowserProvider)) {
+      throw Error('Invalid BrowserProvider');
+    }
+    super(browserProvider);
   }
 
   getAddress() {
