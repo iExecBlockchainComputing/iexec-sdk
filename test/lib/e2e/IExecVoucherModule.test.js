@@ -22,11 +22,6 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];
 
 describe('voucher', () => {
-  let voucherType;
-  beforeAll(async () => {
-    voucherType = await createVoucherType(iexecTestChain)({});
-  });
-
   describe('getVoucherAddress()', () => {
     test('requires voucherHubAddress to be configured', async () => {
       const owner = getRandomAddress();
@@ -47,6 +42,7 @@ describe('voucher', () => {
 
     test('returns voucher address when user has one', async () => {
       const owner = getRandomAddress();
+      const voucherType = await createVoucherType(iexecTestChain)({});
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner,
         voucherType,
@@ -115,19 +111,7 @@ describe('voucher', () => {
       const { iexec } = getTestConfig(iexecTestChain)({
         privateKey: voucherOwnerWallet.privateKey,
       });
-      const voucherValue = 1000;
-      const voucherAddress = await createVoucher(iexecTestChain)({
-        owner: voucherOwnerWallet.address,
-        voucherType,
-        value: voucherValue,
-      });
-
-      // authorize an account for the voucher
-      const accountAddress = getRandomAddress();
-      await iexec.voucher.authorizeRequester(accountAddress);
-      const accountAddress1 = getRandomAddress();
-      await iexec.voucher.authorizeRequester(accountAddress1);
-
+      const voucherType = await createVoucherType(iexecTestChain)({});
       // add sponsored assets
       const { address: appAddress } = await deployRandomApp(iexec);
       const { address: appAddress1 } = await deployRandomApp(iexec);
@@ -157,6 +141,20 @@ describe('voucher', () => {
         voucherType,
       );
 
+      // create voucher
+      const voucherValue = 1000;
+      const voucherAddress = await createVoucher(iexecTestChain)({
+        owner: voucherOwnerWallet.address,
+        voucherType,
+        value: voucherValue,
+      });
+
+      // authorize an account for the voucher
+      const accountAddress = getRandomAddress();
+      await iexec.voucher.authorizeRequester(accountAddress);
+      const accountAddress1 = getRandomAddress();
+      await iexec.voucher.authorizeRequester(accountAddress1);
+
       // call the function and check the results
       const userVoucher = await iexec.voucher.showUserVoucher(
         voucherOwnerWallet.address,
@@ -184,6 +182,11 @@ describe('voucher', () => {
   });
 
   describe('authorizeRequester()', () => {
+    let voucherType;
+    beforeAll(async () => {
+      voucherType = await createVoucherType(iexecTestChain)({});
+    });
+
     test('requires voucherHubAddress to be configured', async () => {
       const { iexec } = getTestConfig(unknownTestChain)();
       await expect(
@@ -241,6 +244,11 @@ describe('voucher', () => {
   });
 
   describe('revokeRequesterAuthorization()', () => {
+    let voucherType;
+    beforeAll(async () => {
+      voucherType = await createVoucherType(iexecTestChain)({});
+    });
+
     test('requires voucherHubAddress to be configured', async () => {
       const { iexec } = getTestConfig(unknownTestChain)();
       await expect(
