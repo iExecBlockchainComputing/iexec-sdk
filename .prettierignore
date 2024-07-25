@@ -38,3 +38,7 @@ errors/**
 
 # env
 .env
+
+# generated files
+docs/
+src/common/generated
