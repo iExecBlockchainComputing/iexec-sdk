@@ -71,6 +71,8 @@ export const TEST_CHAINS = {
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       isNative: false,
@@ -112,6 +114,8 @@ export const TEST_CHAINS = {
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
@@ -146,7 +150,10 @@ export const getRandomAddress = () => getRandomWallet().address;
 export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
   constructor(rpcUrl, privateKey) {
-    this.signer = new Wallet(privateKey, new JsonRpcProvider(rpcUrl));
+    this.signer = new Wallet(
+      privateKey,
+      new JsonRpcProvider(rpcUrl, undefined, { pollingInterval: 100 }), // fast polling for tests
+    );
   }
 
   async request(args) {

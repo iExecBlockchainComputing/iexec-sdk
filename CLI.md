@@ -314,7 +314,6 @@ Commands:
 - [iexec result](#iexec-result)
 - [iexec ens](#iexec-ens)
 - [iexec category](#iexec-category)
-- [iexec registry](#iexec-registry)
 - [info](#iexec-info)
 
 ### iexec init
@@ -2452,37 +2451,6 @@ Options:
 | --raw | use raw output |
 | --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
-
-### iexec registry
-
-interact with iExec registry
-
-Usage:
-
-```sh
-iexec registry <command> [options]
-```
-
-Commands:
-
-- [validate](#iexec-registry-validate)
-
-#### iexec registry validate
-
-validate an app/dataset/workerpool description before submitting it to the iExec registry
-
-Usage:
-
-```sh
-iexec registry validate <object> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
 
 ### iexec info
 

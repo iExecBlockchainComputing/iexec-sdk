@@ -7,6 +7,7 @@ import {
   execAsync,
   initializeTask,
   adminCreateCategory,
+  sleep,
 } from '../test-utils.js';
 import {
   globalSetup,
@@ -125,6 +126,7 @@ describe('iexec task', () => {
       const dealid = await runIExecCliRaw(
         `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
+      await sleep(5000); // wait for next block to be added
       const taskid = await runIExecCliRaw(
         `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);

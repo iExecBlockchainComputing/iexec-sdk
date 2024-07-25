@@ -26,7 +26,7 @@ const chainConfSchema = () =>
     id: chainIdSchema(),
     host: string(),
     hub: string(), // todo address
-    ensRegistry: string(), // todo address
+    ensRegistry: string(), // TODO: DEPRECATED not used anymore
     ensPublicResolver: string(), // todo address
     voucherHub: string(), // todo address
     sms: smsUrlOrMapSchema(),

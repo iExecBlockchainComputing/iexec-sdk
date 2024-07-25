@@ -1,43 +1,44 @@
-[iexec](../README.md) / [Exports](../modules.md) / BrowserProviderSigner
+[iexec](../README.md) / [Exports](../modules.md) / BrowserProviderSignerAdapter
 
-# Class: BrowserProviderSigner
+# Class: BrowserProviderSignerAdapter
+
+BrowserProvider wrapped in an AbstractSigner
 
 ## Hierarchy
 
 - `AbstractSigner`
 
-  ↳ **`BrowserProviderSigner`**
+  ↳ **`BrowserProviderSignerAdapter`**
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](BrowserProviderSigner.md#constructor)
+- [constructor](BrowserProviderSignerAdapter.md#constructor)
 
 ### Methods
 
-- [connect](BrowserProviderSigner.md#connect)
-- [getAddress](BrowserProviderSigner.md#getaddress)
-- [signMessage](BrowserProviderSigner.md#signmessage)
-- [signTransaction](BrowserProviderSigner.md#signtransaction)
-- [signTypedData](BrowserProviderSigner.md#signtypeddata)
+- [connect](BrowserProviderSignerAdapter.md#connect)
+- [getAddress](BrowserProviderSignerAdapter.md#getaddress)
+- [signMessage](BrowserProviderSignerAdapter.md#signmessage)
+- [signTransaction](BrowserProviderSignerAdapter.md#signtransaction)
+- [signTypedData](BrowserProviderSignerAdapter.md#signtypeddata)
 
 ## Constructors
 
 ### constructor
 
-• **new BrowserProviderSigner**(`ethereum`, `network?`): [`BrowserProviderSigner`](BrowserProviderSigner.md)
+• **new BrowserProviderSignerAdapter**(`browserProvider`): [`BrowserProviderSignerAdapter`](BrowserProviderSignerAdapter.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `ethereum` | `Eip1193Provider` |
-| `network?` | `Networkish` |
+| `browserProvider` | `BrowserProvider` |
 
 #### Returns
 
-[`BrowserProviderSigner`](BrowserProviderSigner.md)
+[`BrowserProviderSignerAdapter`](BrowserProviderSignerAdapter.md)
 
 #### Overrides
 

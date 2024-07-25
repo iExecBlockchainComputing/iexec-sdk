@@ -336,9 +336,7 @@ describe('utils', () => {
         getTestConfigOptions(tokenTestChain)(),
       );
       await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
-      const { registerTxHash: txHash } = await iexec.ens.claimName(
-        `name-${getId()}`,
-      );
+      const txHash = await iexec.wallet.sendETH(0, wallet.address);
       const tx = await tokenTestChain.provider.getTransaction(txHash);
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe(gasPrice);
