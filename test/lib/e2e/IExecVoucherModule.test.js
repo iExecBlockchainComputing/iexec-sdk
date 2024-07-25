@@ -15,6 +15,7 @@ import {
   createVoucherType,
   getRandomAddress,
   getRandomWallet,
+  sleep,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 
@@ -154,6 +155,8 @@ describe('voucher', () => {
       await iexec.voucher.authorizeRequester(accountAddress);
       const accountAddress1 = getRandomAddress();
       await iexec.voucher.authorizeRequester(accountAddress1);
+
+      await sleep(10000); // wait for subgraph indexation
 
       // call the function and check the results
       const userVoucher = await iexec.voucher.showUserVoucher(
