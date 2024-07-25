@@ -40,5 +40,6 @@ errors/**
 .env
 
 # generated files
+CLI.md
 docs/
 src/common/generated
